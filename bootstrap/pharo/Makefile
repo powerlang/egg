@@ -1,16 +1,20 @@
 
 # Metacello group to load.
 GROUP ?= base
+MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
+#GIT_PATH := $(dir $(dir $(MKFILE_PATH)))
+GIT_PATH := $(realpath $(dir $(MKFILE_PATH))/../..)
+
 
 all: pharo-ui bootstrap.image
 
 pharo pharo-ui Pharo.image:
 	curl https://get.pharo.org/64/90+vm | bash
 
-bootstrap.image: pharo Pharo.image src
+bootstrap.image: pharo Pharo.image
 	./pharo Pharo.image save bootstrap
-	./pharo $@ eval --save "(IceRepositoryCreator new location: '.' asFileReference; createRepository) register"
-	./pharo $@ metacello install tonel://./src BaselineOfPowerlang --groups=$(GROUP)
+	./pharo $@ eval --save "(IceRepositoryCreator new url: 'file://$(GIT_PATH)'; createRepository) register"
+	./pharo $@ metacello install tonel://. BaselineOfPowerlang --groups=$(GROUP)
 	./pharo $@ eval --save "SystemWindow closeTopWindow. GTPlayground openContents: 'first-steps.st' asFileReference contents withSqueakLineEndings"
 	@echo ""
 	@echo "To open Pharo bootstrap image run:"
