@@ -34,8 +34,8 @@ BootstrapModule >> writeJSONModule: aModule [
 	self fixOverrides.
 	Kernel addModuleLoader: ModuleLoader new.
 	self
-		import: #Builder from: #Core.Modules;
-		import: #Writer from: #Core.Modules.JSON.
+		import: #Builder from: #ImageSegmentBuilder;
+		import: #Writer from: #ImageSegmentBuilder.JSON.
 	builder := Builder new.
 	builder module: aModule; build.
 	writer := Writer new.
