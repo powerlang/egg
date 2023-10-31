@@ -21,6 +21,7 @@ bootstrap.image: pharo Pharo.image
 	@echo ""
 	@echo "    ./pharo-ui bootstrap.image"
 	@echo ""
+	git remote -v | grep -w pharo-bootstrap || git remote add pharo-bootstrap bootstrap/pharo/pharo-local/iceberg/local/egg/
 
 test: bootstrap.image pharo
 	./pharo $< test --junit-xml-output Powerlang-Tests
