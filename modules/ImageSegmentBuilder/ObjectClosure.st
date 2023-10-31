@@ -10,9 +10,7 @@ Class {
 		'queue',
 		'added',
 		'objects',
-		'mapping',
-		'boundary',
-		'scope'
+		'mapping'
 	],
 	#category : #'ObjectClosure'
 }
@@ -27,25 +25,11 @@ ObjectClosure >> traverse: anObject [
 			self addSlotsOf: obj ]
 ]
 
-{ #category : #accessing }
-ObjectClosure >> scope: classes [
-	scope addAll: classes
-]
-
-{ #category : #accessing }
-ObjectClosure >> addBoundary: aClass [
-	aClass name = 'ModuleLoader' ifTrue: [self _halt].
-	boundary add: aClass
-]
-
-
 { #category : #closure }
 ObjectClosure >> addSlotsOf: anObject [
-	| behavior |
-	behavior := anObject behavior.
-	(scope includes: behavior classBinding)
-		ifTrue: [self follow: behavior]
-		ifFalse: [self addBoundary: behavior classBinding].
+	| b |
+	b := anObject behavior.
+	self follow: b.
 	1 to: anObject _pointersSize do: [ :i | | slot |
 		slot := anObject _basicAt: i.
 		self follow: slot ]
@@ -53,23 +37,19 @@ ObjectClosure >> addSlotsOf: anObject [
 
 { #category : #closure }
 ObjectClosure >> follow: anObject [
-	| surrogate | 
+	| surrogate |
 	surrogate := self surrogateFor: anObject.
 "	(surrogate isNil or: [surrogate _isSmallInteger]) ifTrue: [^self]."
+
 	(added includes: surrogate) ifTrue: [^self].
 	added add: surrogate.
 	objects add: surrogate.
-	(boundary includes: surrogate) ifTrue: [^self].
-	(anObject isSpecies andNot: [scope includes: anObject])
-		ifTrue: [
-			self addBoundary: anObject.
-			^self].
-	surrogate _isSmallInteger ifFalse: [queue add: surrogate].
+	surrogate _isSmallInteger ifFalse: [queue add: surrogate]
 ]
 
 { #category : #accessing }
-ObjectClosure >> boundary [
-	^boundary
+ObjectClosure >> imports [
+	^Dictionary new
 ]
 
 { #category : #initialization }
@@ -78,8 +58,6 @@ ObjectClosure >> initialize [
 	queue := OrderedCollection new: 2000.
 	added := IdentitySet new: 2000.
 	objects := OrderedCollection new: 2000.
-	boundary := IdentitySet new: 100.
-	scope := Set new
 ]
 
 { #category : #services }

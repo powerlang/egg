@@ -12,27 +12,8 @@ Class {
 
 { #category : #closure }
 Builder >> build [
-	| metaclasses |
-    classes := module classes.
-	classes do: [:c | self mapClass: c].
 	module prepareForSnapshot: self.
-	metaclasses := classes collect: [:c | c class].
-	closure scope: classes , metaclasses; traverse: module.
-]
-
-{ #category : #accessing }
-Builder >> objects [
-	^closure objects
-]
-
-{ #category : #accessing }
-Builder >> mapping [
-	^closure mapping
-]
-
-{ #category : #accessing }
-Builder >> imports [
-	^closure boundary
+	closure traverse: module.
 ]
 
 { #category : #accessing }
@@ -41,36 +22,54 @@ Builder >> closure [
 ]
 
 { #category : #private }
-Builder >> mapClass: aClass [
+Builder >> configureClass: aClass [
 	self
-		mapSubclassesOf: aClass;
-		mapMethodsOf: aClass;
-		mapMethodsOf: aClass class
+		configureSuperclass: aClass;
+		configureSubclasses: aClass;
+		configureMethods: aClass;
+		configureMethods: aClass class
 ]
 
 { #category : #private }
-Builder >> mapMethodsOf: aClass [
+Builder >> configureMethods: aClass [
     | original saved |
     original := aClass methodDictionary.
 	saved := (classes includes: aClass instanceClass)
 		ifTrue: [original collect: [:method | module originalMethodFor: method]]
 		ifFalse: [Dictionary new].
     saved := saved select: [:method | method notNil].
-	saved do: [:method | closure map: method to: method copy].
+	saved do: [:method | self configureMethodExecutableCode: method].
     closure map: original to: saved
 ]
 
 { #category : #private }
-Builder >> mapSubclassesOf: aClass [
+Builder >> configureMethodExecutableCode: method [
+	closure map: method executableCode to: nil.
+	method hasBlocks ifFalse: [^self].
+	method do: [:slot |
+		slot class == CompiledBlock
+			ifTrue: [closure map: slot blockExecutableCode to: nil]]
+]
+
+{ #category : #private }
+Builder >> configureSubclasses: aClass [
     | original saved |
     original := aClass subclasses.
     saved := original select: [:s | module classes includes: s].
     closure map: original to: saved
 ]
 
+{ #category : #private }
+Builder >> configureSuperclass: aClass [
+    | superclass |
+    superclass := aClass superclass.
+	superclass ifNil: [^self].
+    (module classes includes: superclass) ifFalse: [self import: superclass]
+]
+
 { #category : #initializing }
 Builder >> initialize [
-	closure := ObjectClosure new
+	closure := ObjectClosure new.
 ]
 
 { #category : #accessing }
@@ -81,4 +80,15 @@ Builder >> map: anObject to: anotherObject [
 { #category : #accessing }
 Builder >> module: aModule [
 	module := aModule.
+	classes := Set new.
+	classes 
+		addAll: SmallInteger withAllSuperclasses;
+		addAll: Array withAllSuperclasses;
+		addAll: {ByteArray. CompiledMethod. Interval. OrderedCollection. Character. 
+				CharacterArray. String. Symbol.
+				HashedCollection. Dictionary. Set. HashTable. InlinedHashTable.
+				Species. Class. Metaclass. Behavior. Association.
+				True. False. Boolean. Closure. CompiledBlock.
+				Namespace. Module. KernelModule}.
+    module classes do: [:c | self configureClass: c]
 ]
