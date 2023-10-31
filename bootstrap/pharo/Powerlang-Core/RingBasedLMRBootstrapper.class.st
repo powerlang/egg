@@ -610,7 +610,7 @@ RingBasedLMRBootstrapper >> result [
 
 { #category : #paths }
 RingBasedLMRBootstrapper >> rootDirectory [
-	^ './specs/bee-dmr' asFileReference
+	^ '../../modules' asFileReference
 ]
 
 { #category : #initialization }
