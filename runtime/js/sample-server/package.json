@@ -1,0 +1,20 @@
+{
+  "name": "egg-js-sample-server",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "A sample app serving egg-js through webside",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "turtle",
+    "logo",
+    "smalltalk"
+  ],
+  "author": "Javier Pimás",
+  "license": "MIT",
+  "dependencies": {
+    "powerlangjs-webside": "^1.0.0"
+  }
+}
