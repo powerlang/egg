@@ -5,16 +5,11 @@ IMAGE_SEGMENTS_DIR=$(ROOT_DIR)/image-segments
 
 all: interpreter kernel
 
-powerlang/powerlangjs.image: powerlang
+../bootstrap/powerlangjs.image: powerlang
 	make -C powerlang bootstrap.image
 	cd powerlang && ./pharo bootstrap.image save powerlangjs
-	cd powerlang && ./pharo powerlangjs.image eval --save "Metacello new repository: 'github://powerlang/powerlang-js:main'; baseline: 'PowerlangJS'; load: 'base'"
+	cd powerlang && ./pharo powerlangjs.image eval --save "Metacello new repository: 'github://powerlang/egg:main'; baseline: 'PowerlangJS'; load: 'base'"
 
-powerlang/specs/current: powerlang
-	make -C powerlang specs/current
-
-powerlang:
-	git clone git@github.com:powerlang/powerlang.git
 
 kernel: $(IMAGE_SEGMENTS_DIR)/Kernel.json
 
