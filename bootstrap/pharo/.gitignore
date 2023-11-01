@@ -1,0 +1,9 @@
+*.changes
+*.image
+*.sources
+pharo
+pharo-ui
+pharo-vm
+pharo-local
+PharoDebug.log
+

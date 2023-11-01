@@ -12,27 +12,8 @@ Class {
 
 { #category : #closure }
 Builder >> build [
-	| metaclasses |
-    classes := module classes.
-	classes do: [:c | self mapClass: c].
 	module prepareForSnapshot: self.
-	metaclasses := classes collect: [:c | c class].
-	closure scope: classes , metaclasses; traverse: module.
-]
-
-{ #category : #accessing }
-Builder >> objects [
-	^closure objects
-]
-
-{ #category : #accessing }
-Builder >> mapping [
-	^closure mapping
-]
-
-{ #category : #accessing }
-Builder >> imports [
-	^closure boundary
+	closure traverse: module.
 ]
 
 { #category : #accessing }
@@ -41,15 +22,16 @@ Builder >> closure [
 ]
 
 { #category : #private }
-Builder >> mapClass: aClass [
+Builder >> configureClass: aClass [
 	self
-		mapSubclassesOf: aClass;
-		mapMethodsOf: aClass;
-		mapMethodsOf: aClass class
+		configureSuperclass: aClass;
+		configureSubclasses: aClass;
+		configureMethods: aClass;
+		configureMethods: aClass class
 ]
 
 { #category : #private }
-Builder >> mapMethodsOf: aClass [
+Builder >> configureMethods: aClass [
     | original saved |
     original := aClass methodDictionary.
 	saved := (classes includes: aClass instanceClass)
@@ -61,16 +43,24 @@ Builder >> mapMethodsOf: aClass [
 ]
 
 { #category : #private }
-Builder >> mapSubclassesOf: aClass [
+Builder >> configureSubclasses: aClass [
     | original saved |
     original := aClass subclasses.
     saved := original select: [:s | module classes includes: s].
     closure map: original to: saved
 ]
 
+{ #category : #private }
+Builder >> configureSuperclass: aClass [
+    | superclass |
+    superclass := aClass superclass.
+	superclass ifNil: [^self].
+    (module classes includes: superclass) ifFalse: [self import: superclass]
+]
+
 { #category : #initializing }
 Builder >> initialize [
-	closure := ObjectClosure new
+	closure := ObjectClosure new.
 ]
 
 { #category : #accessing }
@@ -81,4 +71,6 @@ Builder >> map: anObject to: anotherObject [
 { #category : #accessing }
 Builder >> module: aModule [
 	module := aModule.
+	classes := module classes.
+    module classes do: [:c | self configureClass: c]
 ]
