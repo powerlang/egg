@@ -1,0 +1,52 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    name: Build and Test bootstrap - ${{matrix.go-version}} ${{matrix.os}}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v3
+
+    - name: Fetch at least 2 commits so that Iceberg doesn't break
+      run: git fetch --unshallow
+
+    - name: Compile
+      run: make -C bootstrap/pharo
+
+    - name: Run tests
+      run: make -C bootstrap/pharo/ test-ci
+
+    - name: Attach the report
+      if: always() && matrix.os == 'ubuntu-latest' # run this step even if previous step failed (only on ubuntu)
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: bootstrap/pharo/test-reports/Powerlang-Tests-Test.xml
+
+    - name: Test Report
+      uses: dorny/test-reporter@v1
+      if: always() && matrix.os == 'ubuntu-latest'
+      with:
+        name: SUnit Test Report            # Name of the check run which will be created
+        path: bootstrap/pharo/test-reports/*.xml    # Path to test results
+        reporter: java-junit        # Format of test results
+        fail-on-error: true
+
