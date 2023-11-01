@@ -11,7 +11,7 @@ BaselineOfPowerlangJS >> baseline: spec [
 	spec for: #common do: [ 
 		spec baseline: 'OCompiler' with: [ 
 			spec loads: 'default'.
-			spec repository: 'github://powerlang/ocompiler:main' ].
+			spec repository: 'github://powerlang/egg:main' ].
 
 		spec
 			package: 'PowerlangJS-Core'
