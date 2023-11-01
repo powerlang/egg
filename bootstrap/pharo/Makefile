@@ -2,9 +2,14 @@
 # Metacello group to load.
 GROUP ?= base
 MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
-#GIT_PATH := $(dir $(dir $(MKFILE_PATH)))
 GIT_PATH := $(realpath $(dir $(MKFILE_PATH))/../..)
 
+# distingish windows as iceberg url requires adding a / before C:/
+ifdef OS
+ICEBERG_URL=file:///$(GIT_PATH)
+else
+ICEBERG_URL=file://$(GIT_PATH)
+endif
 
 all: pharo-ui bootstrap.image
 
@@ -13,7 +18,7 @@ pharo pharo-ui Pharo.image:
 
 bootstrap.image: pharo Pharo.image
 	./pharo Pharo.image save bootstrap
-	./pharo $@ eval --save "(IceRepositoryCreator new url: 'file://$(GIT_PATH)'; createRepository) register"
+	./pharo $@ eval --save "(IceRepositoryCreator new url: '$(ICEBERG_URL)'; createRepository) register"
 	./pharo $@ metacello install tonel://. BaselineOfPowerlang --groups=$(GROUP)
 	./pharo $@ eval --save "SystemWindow closeTopWindow. GTPlayground openContents: 'first-steps.st' asFileReference contents withSqueakLineEndings"
 	@echo ""
