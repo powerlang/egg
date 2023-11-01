@@ -1,8 +1,8 @@
 import Bootstrapper from '../bootstrapper.js';
-import WebsideServer from '../PowerlangJS-Webside/WebsideServer.js';
+import WebsideServer from '../webside/WebsideServer.js';
 
 var bootstrapper = new Bootstrapper();
-bootstrapper.loadKernelFile("image-segments/Kernel.json");
+bootstrapper.loadKernelFile("../image-segments/Kernel.json");
 const runtime = bootstrapper.runtime;
 
 const webside = new WebsideServer("localhost", 9005, runtime);
