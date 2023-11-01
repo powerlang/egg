@@ -23,6 +23,9 @@ test-ci: bootstrap.image pharo
 	./pharo $< test --junit-xml-output Powerlang-Tests
 	mkdir -p test-reports
 	mv Powerlang-Tests-Test.xml test-reports
+	
+release-js:
+	make -C runtime/js release
 
 clean:
 	make -C bootstrap/pharo clean
