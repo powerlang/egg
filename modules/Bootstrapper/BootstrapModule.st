@@ -13,12 +13,8 @@ Class {
 }
 
 { #category : #bootstrapping }
-BootstrapModule >> imports [
-	^{#Core.Modules -> #Builder. #Core.Modules.JSON -> #Writer  }
-]
-
-{ #category : #bootstrapping }
-BootstrapModule >> start [
+BootstrapModule >> justLoaded [
+	super justLoaded.
 	Kernel addModuleLoader: ModuleLoader new.
 ]
 
@@ -29,6 +25,11 @@ BootstrapModule >> fixOverrides [
 
 { #category : #bootstrapping }
 BootstrapModule >> writeJSONKernel [
+	^self writeJSONModule: Kernel
+]
+
+{ #category : #bootstrapping }
+BootstrapModule >> writeJSONModule: aModule [
 	| builder writer |
 	self fixOverrides.
 	Kernel addModuleLoader: ModuleLoader new.
@@ -36,8 +37,7 @@ BootstrapModule >> writeJSONKernel [
 		import: #Builder from: #ImageSegmentBuilder;
 		import: #Writer from: #ImageSegmentBuilder.JSON.
 	builder := Builder new.
-	builder module: Kernel; build.
+	builder module: aModule; build.
 	writer := Writer new.
-	^writer closure: builder closure; exports: Kernel exports; write; image
+	^writer closure: builder closure; exports: aModule exports; write; image
 ]
-

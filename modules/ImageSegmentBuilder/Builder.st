@@ -38,17 +38,8 @@ Builder >> configureMethods: aClass [
 		ifTrue: [original collect: [:method | module originalMethodFor: method]]
 		ifFalse: [Dictionary new].
     saved := saved select: [:method | method notNil].
-	saved do: [:method | self configureMethodExecutableCode: method].
+	saved do: [:method | closure map: method to: method copy].
     closure map: original to: saved
-]
-
-{ #category : #private }
-Builder >> configureMethodExecutableCode: method [
-	closure map: method executableCode to: nil.
-	method hasBlocks ifFalse: [^self].
-	method do: [:slot |
-		slot class == CompiledBlock
-			ifTrue: [closure map: slot blockExecutableCode to: nil]]
 ]
 
 { #category : #private }
@@ -80,15 +71,6 @@ Builder >> map: anObject to: anotherObject [
 { #category : #accessing }
 Builder >> module: aModule [
 	module := aModule.
-	classes := Set new.
-	classes 
-		addAll: SmallInteger withAllSuperclasses;
-		addAll: Array withAllSuperclasses;
-		addAll: {ByteArray. CompiledMethod. Interval. OrderedCollection. Character. 
-				CharacterArray. String. Symbol.
-				HashedCollection. Dictionary. Set. HashTable. InlinedHashTable.
-				Species. Class. Metaclass. Behavior. Association.
-				True. False. Boolean. Closure. CompiledBlock.
-				Namespace. Module. KernelModule}.
+	classes := module classes.
     module classes do: [:c | self configureClass: c]
 ]
