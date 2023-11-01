@@ -79,7 +79,7 @@ JSTranspiler class >> powerlangInterpreterClasses [
 { #category : #'as yet unclassified' }
 JSTranspiler class >> rootDirectory [
 	| root |
-	root := Smalltalk os environment at: 'POWERLANG_JS_ROOT' ifAbsent: '..'.
+	root := Smalltalk os environment at: 'POWERLANG_JS_ROOT' ifAbsent: '../../runtime/js'.
 	^ root asFileReference
 ]
 

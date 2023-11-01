@@ -135,8 +135,3 @@ Object >> isSmallInteger [
 Object >> isSpecies [
 	^false
 ]
-
-{ #category : #'*Powerlang-Compatibility-Pharo' }
-Object >> primitivePrintString [
-	^self printString
-]
