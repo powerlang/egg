@@ -7,6 +7,7 @@ Please use github issue tracker to raise new issues.
 Take care of the following before committing:
 
  - Use short non-empty messages.
+ - Start the message with a <tag>: (i.e. bootstrap: fix whatever, or js: great feature added)
  - Always commit to a branch (pushing to main is not allowed anyway).
  - Split commits in the branch to ease others reviewing and searching history.
  - Do not put unrelated things in a same branch.
