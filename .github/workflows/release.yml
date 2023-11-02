@@ -47,6 +47,6 @@ jobs:
 
     - uses: ncipollo/release-action@v1
       with:
-        artifacts: "build/egg-${{env.RELEASE_TAG}}.tar.gz,build/egg-${{env.RELEASE_TAG}}.zip"
+        artifacts: "runtime/js/build/egg-${{env.RELEASE_TAG}}.tar.gz,runtime/js/build/egg-${{env.RELEASE_TAG}}.zip"
 #        bodyFile: "body.md" 
 
