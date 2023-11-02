@@ -39,7 +39,7 @@ test-ci: bootstrap.image pharo
 	mv Powerlang-Tests-Test.xml test-reports
 
 clean:
-	rm -f bootstrap.image bootstrap.changes
+	rm -f bootstrap.image bootstrap.changes powerlangjs.image powerlangjs.changes
 
 mrproper: clean
 	rm -rf Pharo* pharo* icon-packs
