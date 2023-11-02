@@ -31,7 +31,7 @@ jobs:
       run: git fetch --unshallow
 
     - name: Fetch at main so that Iceberg doesn't break
-      run: git fetch --unshallow origin main
+      run: git fetch origin main
 
     - name: Compile
       run: make js
