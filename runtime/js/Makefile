@@ -11,7 +11,7 @@ all: interpreter kernel
 $(POWERLANG_DIR)/powerlangjs.image:
 	make -C $(POWERLANG_DIR) bootstrap.image
 	cd $(POWERLANG_DIR) && ./pharo bootstrap.image save powerlangjs
-	cd $(POWERLANG_DIR) && ./pharo powerlangjs.image metacello install tonel://. BaselineOfPowerlangJS
+	cd $(POWERLANG_DIR) && ./pharo powerlangjs.image metacello install tonel://. BaselineOfPowerlang --groups=powerlangjs
 
 kernel: $(IMAGE_SEGMENTS_DIR)/Kernel.json
 
