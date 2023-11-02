@@ -30,6 +30,9 @@ jobs:
     - name: Fetch at least 2 commits so that Iceberg doesn't break
       run: git fetch --unshallow
 
+    - name: Fetch at main so that Iceberg doesn't break
+      run: git fetch --unshallow origin main
+
     - name: Compile
       run: make js
 
