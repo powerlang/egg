@@ -467,6 +467,11 @@ PowertalkLMR >> methodExecutableCode: anLMRObject put: anObject [
 ]
 
 { #category : #initialization }
+PowertalkLMR >> methodExecutableCodeIndex: anInteger [
+	compiledCodeExecutableCodeIndex := anInteger
+]
+
+{ #category : #initialization }
 PowertalkLMR >> methodFlagsIndex: anInteger [
 	methodFlagsIndex := anInteger
 ]
@@ -486,11 +491,6 @@ PowertalkLMR >> methodFor: aSymbol in: behavior [
 { #category : #initialization }
 PowertalkLMR >> methodInstSize: anInteger [
 	methodInstSize := anInteger
-]
-
-{ #category : #initialization }
-PowertalkLMR >> methodOptimizedCodeIndex: anInteger [
-	compiledCodeExecutableCodeIndex := anInteger
 ]
 
 { #category : #initialization }

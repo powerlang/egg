@@ -81,6 +81,7 @@ AbstractJSFunctionEmitter >> transpileBinarySelector: selector [
 		ifTrue: [ ^ #_slash ].
 	selector = #, ifTrue: [ ^#_comma ].
 	selector = #!= ifTrue: [ ^#_notEqual ].
+	selector = #!== ifTrue: [ ^#_notEqualEqual ].
 	selector = #= ifTrue: [ ^#_equal ].
 	selector = #== ifTrue: [ ^#_equalEqual ].
 	selector = #+ ifTrue: [ ^#_plus ].

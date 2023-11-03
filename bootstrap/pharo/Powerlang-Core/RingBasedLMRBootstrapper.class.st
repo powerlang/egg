@@ -379,7 +379,7 @@ RingBasedLMRBootstrapper >> image: aPowertalkRingImage [
 	index := (source => #CompiledMethod) allInstVarNames indexOf:
 		         'optimizedCode'.
 	dest
-		methodOptimizedCodeIndex: index;
+		methodExecutableCodeIndex: index;
 		methodInstSize: (source => #CompiledMethod) allInstVarNames size
 ]
 
