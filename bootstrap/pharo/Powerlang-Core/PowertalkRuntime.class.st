@@ -61,10 +61,12 @@ PowertalkRuntime >> false [
 { #category : #accessing }
 PowertalkRuntime >> flushDispatchCache: aSymbol [
 
+	| cached |
 	symbolCache
 		at: aSymbol
 		ifPresent: [ :messages | messages do: #flushCache ].
-	^ methodCache keys select: [ :key |  key key == aSymbol ] thenDo: [ :key | self removeKey: key]
+	cached := methodCache keys select: [ :key |  key key == aSymbol ].
+	cached do: [ :key | methodCache removeKey: key]
 ]
 
 { #category : #accessing }
