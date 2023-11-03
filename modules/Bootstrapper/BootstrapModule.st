@@ -39,5 +39,11 @@ BootstrapModule >> writeJSONModule: aModule [
 	builder := Builder new.
 	builder module: aModule; build.
 	writer := Writer new.
-	^writer closure: builder closure; exports: aModule exports; write; image
+	^writer
+		objects: builder objects;
+		mapping: builder mapping;
+		imports: builder imports;
+		exports: aModule exports;
+		write;
+		image
 ]

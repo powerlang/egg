@@ -9,6 +9,7 @@ Class {
 	#instVars : [
 		'stream',
 		'objects',
+		'mapping',
 		'imports',
 		'exports',
 		'indexes'
@@ -16,16 +17,19 @@ Class {
 	#category : #'Writer'
 }
 
-{ #category : #closure }
-Writer >> closure: anObjectClosure [
-	| index |
-	index := 0.
-	objects := anObjectClosure objects.
-	objects do: [:o | indexes at: o put: index. index := index + 1].
-	imports := anObjectClosure imports.
-	imports do: [:o | indexes at: o put: index. index := index + 1].
-	anObjectClosure mapping
-		keysAndValuesDo: [:obj :surrogate | indexes at: obj put: (indexes at: surrogate)]
+{ #category : #accessing }
+Writer >> objects: aCollection [
+	objects := aCollection
+]
+
+{ #category : #accessing }
+Writer >> mapping: aDictionary [
+	mapping := aDictionary
+]
+
+{ #category : #accessing }
+Writer >> imports: aCollection [
+	imports := aCollection
 ]
 
 { #category : #accessing }
@@ -44,6 +48,17 @@ Writer >> initialize [
 	stream := '' writeStream.
 ]
 
+{ #category : #closure }
+Writer >> generateIndexes [
+	| index |
+	index := 0.
+	objects do: [:o | indexes at: o put: index. index := index + 1].
+	imports do: [:o | indexes at: o put: index. index := index + 1].
+	mapping keysAndValuesDo: [:obj :surrogate | | i |
+		i := indexes at: surrogate ifAbsent: [].
+		i notNil ifTrue: [indexes at: obj put: i]]
+]
+
 { #category : #services }
 Writer >> indexOf: anObject [
 	^indexes at: anObject ifAbsent: [indexes at: nil]
@@ -56,8 +71,11 @@ Writer >> stream: aWriteStream [
 
 { #category : #services }
 Writer >> write [
+	self generateIndexes.
 	stream nextPutAll: '{ '; crtab; nextPutAll: '"objects" : ['; crtab: 2.
-	self writeObjects; writeImports.
+	self writeObjects; writeImportedObjects.
+	stream crtab; nextPutAll: '],'; crtab; nextPutAll: '"imports" : ['; crtab: 2.
+	self writeImports.
 	stream crtab; nextPutAll: '],'; crtab; nextPutAll: '"exports" : ['; crtab: 2.
 	self  writeExports.
 	stream crtab; nextPutAll: ']'; cr; nextPutAll: '}'
@@ -78,13 +96,31 @@ Writer >> writeExports [
 
 { #category : #writing }
 Writer >> writeImports [
-	imports keys
-		do: [ :name |
+	imports
+		do: [ :class |
+			stream 
+				nextPutAll: '["';
+				nextPutAll: class name;
+				nextPutAll: '", "';
+				nextPutAll: class module name; 
+				nextPutAll: '"]' ]
+		separatedBy: [stream nextPutAll: ', '; crtab: 2]
+]
+
+{ #category : #writing }
+Writer >> writeImportedObjects [
+	| index |
+	stream nextPutAll: ', '; crtab: 2.
+	index := 0.
+	imports
+		do: [ :class |
 			stream 
 				nextPutAll: '[4, ';
-				nextPutAll: name;
+				nextPutAll: index asString;
 				nextPutAll: ']' ]
-		separatedBy: [stream nextPutAll: ', '; crtab: 2]
+		separatedBy: [
+			index := index + 1.
+			stream nextPutAll: ', '; crtab: 2]
 ]
 
 { #category : #writing }
@@ -137,7 +173,7 @@ Writer >> writeObjectSlots: obj [
 
 { #category : #accessing }
 Writer >> writeObjects [
-	objects
+	objects , imports
 		do: [ :obj | 
 			stream nextPut: $[.
 			self writeObject: obj.
