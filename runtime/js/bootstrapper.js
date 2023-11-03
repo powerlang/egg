@@ -23,6 +23,7 @@ let Bootstrapper = class {
 	initializeKernel(module)
 	{
 		this.kernel = module;
+		this.runtime.bootstrapper_(this);
 		//Object.assign(this.runtime, this.kernel.meta);
 		Object.assign(this.runtime, this.kernelMeta());
 		Object.assign(this.runtime, this.kernelObjects());
@@ -36,6 +37,10 @@ let Bootstrapper = class {
 	{
 		const symbol = this.kernel.exports["SymbolTable"];
 		this.runtime.symbolTable_(symbol);
+	}
+
+	loadModule_(name) {
+		return this.loadModuleFromFile('../image-segments/' + name + '.json');
 	}
 
 	loadModuleFromFile(path)
@@ -59,6 +64,8 @@ let Bootstrapper = class {
 			_metaclassClass:    this.kernel.exports["Metaclass"],
 			_methodClass:       this.kernel.exports["CompiledMethod"],
 			_smallIntegerClass: this.kernel.exports["SmallInteger"],
+			_largePositiveIntegerClass: this.kernel.exports["LargePositiveInteger"],
+			_largeNegativeIntegerClass: this.kernel.exports["LargeNegativeInteger"],
 			_blockClass:        this.kernel.exports["CompiledBlock"],
 			_byteArrayClass:    this.kernel.exports["ByteArray"],
 			_stringClass:       this.kernel.exports["String"],
