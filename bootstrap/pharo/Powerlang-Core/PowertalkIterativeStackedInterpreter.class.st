@@ -131,7 +131,7 @@ PowertalkIterativeStackedInterpreter >> underprimitiveRestart [
 { #category : #initialization }
 PowertalkIterativeStackedInterpreter >> visitOpDispatchMessage: anSOpDispatchMessage [
 
-	| message behavior method size environment work1 |
+	| message behavior method size environment |
 	message := anSOpDispatchMessage message.
 	message cachedUndermessage ifNotNil: [ :block | 
 		^ self evaluateUndermessage: message with: block ].
@@ -146,9 +146,7 @@ PowertalkIterativeStackedInterpreter >> visitOpDispatchMessage: anSOpDispatchMes
 		^ self evaluateUndermessage: message with: method ].
 	size := runtime methodEnvironmentSize: method.
 	environment := runtime newEnvironmentSized: size.
-	work1 := self prepareForExecuting: method.
-	self assert: work1 notNil.
-	work := work1.
+	work := self prepareForExecuting: method.
 	context
 		buildMethodFrameFor: regR
 		code: method
