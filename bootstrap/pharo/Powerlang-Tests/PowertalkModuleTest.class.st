@@ -193,7 +193,7 @@ A >> a [
 		        sendLocal: #writeJSONModule:
 		        to: bootstrapModule
 		        with: { module }.
-	output := bootstrapper rootDirectory / 'A/A.json'.
+	output := JSTranspiler rootDirectory / 'image-segments/A.json'.
 	output ensureCreateFile; writeStreamDo: [ :stream | | ws |
 		stream truncate.
 		ws := ZnNewLineWriterStream on: stream.
