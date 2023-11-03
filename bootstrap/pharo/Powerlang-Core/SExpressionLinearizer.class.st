@@ -499,7 +499,7 @@ SExpressionLinearizer >> visitBlock: anSBlock [
 	anSBlock isInlined ifFalse: [ 
 		code := runtime newExecutableCodeFor: operations asArray.
 		runtime
-			blockOptimizedCode: anSBlock compiledCode
+			blockExecutableCode: anSBlock compiledCode
 			put: code ].
 	operations := prevOperations.
 	inBlock := prevInBlock

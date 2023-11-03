@@ -13,7 +13,7 @@ PowertalkNativeJSEvaluator >> initializeExecutableCodeOf: method [
 		        evaluator: self;
 		        nativize: sexpressions.
 	executable := runtime newExecutableCodeFor: js.
-	runtime methodOptimizedCode: method put: executable.
+	runtime methodExecutableCode: method put: executable.
 	^ executable
 ]
 

@@ -80,7 +80,7 @@ StackedEvaluationContext >> buildLaunchFrame [
 	launcher := system newCompiledMethod.
 	code := system newArraySized: 0.
 	executable := system newExecutableCodeFor: code.
-	system methodOptimizedCode: launcher put: executable.
+	system methodExecutableCode: launcher put: executable.
 	self
 		buildMethodFrameFor: system nil
 		code: launcher

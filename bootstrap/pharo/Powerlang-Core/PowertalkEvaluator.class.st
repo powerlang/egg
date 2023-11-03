@@ -122,7 +122,7 @@ PowertalkEvaluator >> initializeLinearExecutableCodeOf: method [
 	self linearizer visitMethod: sexpressions.
 	executable := runtime newExecutableCodeFor:
 		              self linearizer operations asArray.
-	^runtime methodOptimizedCode: method put: executable
+	^runtime methodExecutableCode: method put: executable
 ]
 
 { #category : #initializing }
@@ -185,7 +185,7 @@ PowertalkEvaluator >> initializeRecursiveExecutableCodeOf: method [
 	| sexpressions executable |
 	sexpressions := runtime sexpressionsOf: method.
 	executable := runtime newExecutableCodeFor: sexpressions.
-	^runtime methodOptimizedCode: method put: executable
+	^runtime methodExecutableCode: method put: executable
 ]
 
 { #category : #initializing }
@@ -276,7 +276,7 @@ PowertalkEvaluator >> nil [
 PowertalkEvaluator >> prepareExecutableCode: method [
 
 	| code |
-	code := runtime methodOptimizedCode: method.
+	code := runtime methodExecutableCode: method.
 	(runtime isExecutableCode: code) ifTrue: [ ^ code ].
 	^ self initializeExecutableCodeOf: method
 ]

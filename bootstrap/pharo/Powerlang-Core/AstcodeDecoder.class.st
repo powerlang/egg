@@ -90,7 +90,7 @@ AstcodeDecoder >> decodeBlock [
 			block := self literalAt: index.
 			builder ifNotNil: [ 
 				code := builder newExecutableCodeFor: expression.
-				builder blockOptimizedCode: block put: code ].
+				builder blockExecutableCode: block put: code ].
 			expression
 				compiledCode: block;
 				index: index;

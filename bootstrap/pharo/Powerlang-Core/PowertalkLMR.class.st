@@ -18,7 +18,6 @@ Class {
 		'metaclassClass',
 		'speciesInstanceBehaviorIndex',
 		'speciesFormatIndex',
-		'methodOptimizedCodeIndex',
 		'methodAstcodesIndex',
 		'methodInstSize',
 		'methodClassBindingIndex',
@@ -41,7 +40,8 @@ Class {
 		'classNamespacesIndex',
 		'largePositiveIntegerClass',
 		'largeNegativeIntegerClass',
-		'methodSelectorIndex'
+		'methodSelectorIndex',
+		'compiledCodeExecutableCodeIndex'
 	],
 	#pools : [
 		'SCompiledBlockFlags',
@@ -145,8 +145,19 @@ PowertalkLMR >> blockEnvironmentCount: anLMRObject [
 ]
 
 { #category : #initialization }
+PowertalkLMR >> blockExecutableCode: anLMRObject [
+
+	^ self methodExecutableCode: anLMRObject
+]
+
+{ #category : #initialization }
+PowertalkLMR >> blockExecutableCode: anLMRObject put: anObject [
+	^ self methodExecutableCode: anLMRObject put: anObject
+]
+
+{ #category : #initialization }
 PowertalkLMR >> blockExecutionTree: anLMRObject [
-	^ anLMRObject slotAt: methodOptimizedCodeIndex
+	^ anLMRObject slotAt: compiledCodeExecutableCodeIndex
 ]
 
 { #category : #initialization }
@@ -157,17 +168,6 @@ PowertalkLMR >> blockMethod: anLMRObject [
 { #category : #initialization }
 PowertalkLMR >> blockMethodIndex: anInteger [
 	blockMethodIndex := anInteger
-]
-
-{ #category : #initialization }
-PowertalkLMR >> blockOptimizedCode: anLMRObject [
-
-	^ self methodOptimizedCode: anLMRObject
-]
-
-{ #category : #initialization }
-PowertalkLMR >> blockOptimizedCode: anLMRObject put: anObject [
-	^ self methodOptimizedCode: anLMRObject put: anObject
 ]
 
 { #category : #initialization }
@@ -454,6 +454,19 @@ PowertalkLMR >> methodEnvironmentSize: anLMRObject [
 ]
 
 { #category : #initialization }
+PowertalkLMR >> methodExecutableCode: anLMRObject [
+
+^anLMRObject slotAt: compiledCodeExecutableCodeIndex.
+	
+]
+
+{ #category : #initialization }
+PowertalkLMR >> methodExecutableCode: anLMRObject put: anObject [
+
+	^ anLMRObject slotAt: compiledCodeExecutableCodeIndex put: anObject 
+]
+
+{ #category : #initialization }
 PowertalkLMR >> methodFlagsIndex: anInteger [
 	methodFlagsIndex := anInteger
 ]
@@ -476,21 +489,8 @@ PowertalkLMR >> methodInstSize: anInteger [
 ]
 
 { #category : #initialization }
-PowertalkLMR >> methodOptimizedCode: anLMRObject [
-
-^anLMRObject slotAt: methodOptimizedCodeIndex.
-	
-]
-
-{ #category : #initialization }
-PowertalkLMR >> methodOptimizedCode: anLMRObject put: anObject [
-
-	^ anLMRObject slotAt: methodOptimizedCodeIndex put: anObject 
-]
-
-{ #category : #initialization }
 PowertalkLMR >> methodOptimizedCodeIndex: anInteger [
-	methodOptimizedCodeIndex := anInteger
+	compiledCodeExecutableCodeIndex := anInteger
 ]
 
 { #category : #initialization }

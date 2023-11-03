@@ -78,11 +78,11 @@ pc := context incRegPC.
 PowertalkIterativeStackedInterpreter >> prepareBlockExecutableCode: block [
 
 	| code method |
-	code := runtime blockOptimizedCode: block.
+	code := runtime blockExecutableCode: block.
 	(runtime isExecutableCode: code) ifTrue: [ ^ code ].
 	method := runtime blockMethod: block.
 	self initializeExecutableCodeOf: method.
-	code := runtime blockOptimizedCode: block.
+	code := runtime blockExecutableCode: block.
 	self ASSERT: (runtime isExecutableCode: code).
 	^ code
 ]
@@ -177,7 +177,7 @@ PowertalkIterativeStackedInterpreter >> visitOpNonLocalReturn: anSOpReturn [
 
 	| code |
 	context unwind.
-	code := runtime methodOptimizedCode: context regM.
+	code := runtime methodExecutableCode: context regM.
 	work := runtime executableCodeWork: code
 ]
 
@@ -196,6 +196,6 @@ PowertalkIterativeStackedInterpreter >> visitOpReturn: anSOpReturn [
 
 	| code |
 	context popFrame.
-	code := runtime methodOptimizedCode: context regM.
+	code := runtime methodExecutableCode: context regM.
 		work := runtime executableCodeWork: code.
 ]

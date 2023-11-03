@@ -49,6 +49,16 @@ PowertalkRingRuntime >> blockCapturesSelf: block [
 ]
 
 { #category : #services }
+PowertalkRingRuntime >> blockExecutableCode: block [
+	^block optimizedCode
+]
+
+{ #category : #services }
+PowertalkRingRuntime >> blockExecutableCode: block put: anObject [
+	block optimizedCode: anObject
+]
+
+{ #category : #services }
 PowertalkRingRuntime >> blockExecutionTree: block [
 	^ block executionTree
 ]
@@ -56,16 +66,6 @@ PowertalkRingRuntime >> blockExecutionTree: block [
 { #category : #services }
 PowertalkRingRuntime >> blockMethod: anObjectMap [
 	^ anObjectMap method
-]
-
-{ #category : #services }
-PowertalkRingRuntime >> blockOptimizedCode: block [
-	^block optimizedCode
-]
-
-{ #category : #services }
-PowertalkRingRuntime >> blockOptimizedCode: block put: anObject [
-	block optimizedCode: anObject
 ]
 
 { #category : #services }
@@ -225,23 +225,23 @@ PowertalkRingRuntime >> methodEnvironmentSize: anSCompiledMethod [
 	^anSCompiledMethod environmentCount
 ]
 
-{ #category : #accessing }
-PowertalkRingRuntime >> methodFor: aSymbol in: anRGBehavior [
-	overrides at: anRGBehavior->aSymbol ifPresent: [:m | ^m].
-	^anRGBehavior methodNamed: aSymbol
-]
-
 { #category : #services }
-PowertalkRingRuntime >> methodOptimizedCode: anSCompiledMethod [
+PowertalkRingRuntime >> methodExecutableCode: anSCompiledMethod [
 	^ anSCompiledMethod optimizedCode
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> methodOptimizedCode: method put: anObject [
+PowertalkRingRuntime >> methodExecutableCode: method put: anObject [
 
 	method optimizedCode: anObject.
 		^anObject 
 		
+]
+
+{ #category : #accessing }
+PowertalkRingRuntime >> methodFor: aSymbol in: anRGBehavior [
+	overrides at: anRGBehavior->aSymbol ifPresent: [:m | ^m].
+	^anRGBehavior methodNamed: aSymbol
 ]
 
 { #category : #services }
