@@ -44,33 +44,34 @@ PowertalkIterativeLinkedInterpreter >> sendLocal: aSymbol to: receiver with: anA
 
 { #category : #accessing }
 PowertalkIterativeLinkedInterpreter >> visitOpDispatchMessage: anSOpDispatchMessage [
+
 	| message argcount arguments behavior method size environment |
 	message := anSOpDispatchMessage message.
 	argcount := message argumentCount.
 	arguments := context popOperands: argcount.
-	(argcount > 0 andNot: [ message isCascadeMessage ])
-		ifTrue: [ context popOperand ].
-	message cachedUndermessage
-		ifNotNil: [ :block | ^ regR := block value: regR value: arguments ].
+	(argcount > 0 andNot: [ message isCascadeMessage ]) ifTrue: [ 
+		context popOperand ].
+	message cachedUndermessage ifNotNil: [ :block | 
+		^ regR := block value: regR value: arguments ].
 	behavior := message receiver isSuper
-		ifTrue: [ runtime superBehaviorOf: context classBinding ]
-		ifFalse: [ runtime behaviorOf: regR ].
+		            ifTrue: [ runtime superBehaviorOf: context classBinding ]
+		            ifFalse: [ runtime behaviorOf: regR ].
 	method := self
-		lookup: message selector
-		startingAt: behavior
-		sendSite: message.
-	method isBlock
-		ifTrue: [ ^ regR := method value: regR value: arguments ].
+		          lookup: message selector
+		          startingAt: behavior
+		          sendSite: message.
+	method isBlock ifTrue: [ 
+		^ regR := method value: regR value: arguments ].
 	size := runtime methodEnvironmentSize: method.
 	environment := runtime newEnvironmentSized: size.
 	context := self evaluationContextClass new
-		self: regR;
-		arguments: arguments;
-		environment: environment;
-		system: runtime; method: method;
-		parent: context
-		.
-	self prepareFor: method
+		           self: regR;
+		           arguments: arguments;
+		           environment: environment;
+		           system: runtime;
+		           method: method;
+		           parent: context.
+	self prepareForExecuting: method
 ]
 
 { #category : #accessing }

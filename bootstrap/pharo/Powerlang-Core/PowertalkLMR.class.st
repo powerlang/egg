@@ -270,6 +270,12 @@ PowertalkLMR >> doLookup: aSymbol startingAt: aBehavior [
 ]
 
 { #category : #initialization }
+PowertalkLMR >> executableCodeWork: anLMRExecutableCode [
+	self ASSERT: anLMRExecutableCode !== nilObj.
+	^anLMRExecutableCode code
+]
+
+{ #category : #initialization }
 PowertalkLMR >> fixOverrides [
 	| selector md |
 	overrides
@@ -325,6 +331,11 @@ PowertalkLMR >> isBlock: compiledCode [
 ]
 
 { #category : #initialization }
+PowertalkLMR >> isExecutableCode: code [
+	^code class == LMRExecutableCode
+]
+
+{ #category : #initialization }
 PowertalkLMR >> isMetaclass: anLMRObject [
 	^ (self speciesFor: anLMRObject) == metaclassClass
 ]
@@ -363,6 +374,12 @@ PowertalkLMR >> loadAssociationValue: association [
 { #category : #initialization }
 PowertalkLMR >> loadModule: symbol [
 	^ bootstrapper loadModule: symbol asLocalString
+]
+
+{ #category : #initialization }
+PowertalkLMR >> localMethodAstcodes: method [
+
+	^ (self methodAstcodes: method) bytes
 ]
 
 { #category : #initialization }
@@ -460,23 +477,15 @@ PowertalkLMR >> methodInstSize: anInteger [
 
 { #category : #initialization }
 PowertalkLMR >> methodOptimizedCode: anLMRObject [
-	| slot |
-	slot := anLMRObject slotAt: methodOptimizedCodeIndex.
-	^ slot == nilObj ifTrue: [ slot ] ifFalse: [ slot code ]
+
+^anLMRObject slotAt: methodOptimizedCodeIndex.
+	
 ]
 
 { #category : #initialization }
 PowertalkLMR >> methodOptimizedCode: anLMRObject put: anObject [
-	| behavior header code |
-	behavior := self speciesInstanceBehavior: arrayClass.
-	header := LMRObjectHeader new
-		behavior: behavior;
-		bytes: false arrayed: true named: false;
-		size: 0;
-		hash: 0.
 
-	code := LMRExecutableCode new header: header; code: anObject.
-	^ anLMRObject slotAt: methodOptimizedCodeIndex put: code
+	^ anLMRObject slotAt: methodOptimizedCodeIndex put: anObject 
 ]
 
 { #category : #initialization }
@@ -611,6 +620,20 @@ PowertalkLMR >> newCompiledMethod [
 { #category : #initialization }
 PowertalkLMR >> newEnvironmentSized: anInteger [
 	^ self newArraySized: anInteger
+]
+
+{ #category : #initialization }
+PowertalkLMR >> newExecutableCodeFor: anObject [
+		| behavior header |
+	behavior := self speciesInstanceBehavior: arrayClass.
+	header := LMRObjectHeader new
+		behavior: behavior;
+		bytes: false arrayed: true named: false;
+		size: 0;
+		hash: 0.
+
+	 ^LMRExecutableCode new header: header; code: anObject.
+
 ]
 
 { #category : #initialization }
@@ -770,20 +793,6 @@ PowertalkLMR >> removeOverride: assoc [
 	symbolCache
 		at: selector
 		ifPresent: [ :messages | messages do: #flushCache ]
-]
-
-{ #category : #initialization }
-PowertalkLMR >> sexpressionsOf: method [
-	| expressions astcodes decoder |
-	expressions := self methodOptimizedCode: method.
-	expressions == nilObj ifFalse: [ ^expressions ].
-	astcodes := self methodAstcodes: method.
-	decoder := AstcodeDecoder new
-		stream: astcodes bytes readStream;
-		method: method; builder: self.
-	expressions := decoder decodeMethod.
-	self methodOptimizedCode: method put: expressions.
-	^expressions
 ]
 
 { #category : #initialization }

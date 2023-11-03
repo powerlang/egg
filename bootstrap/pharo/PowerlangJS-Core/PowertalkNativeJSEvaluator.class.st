@@ -5,6 +5,19 @@ Class {
 }
 
 { #category : #private }
+PowertalkNativeJSEvaluator >> initializeExecutableCodeOf: method [
+
+	| sexpressions js executable |
+	sexpressions := runtime sexpressionsOf: method.
+	js := JSSExpressionTranspiler new
+		        evaluator: self;
+		        nativize: sexpressions.
+	executable := runtime newExecutableCodeFor: js.
+	runtime methodOptimizedCode: method put: executable.
+	^ executable
+]
+
+{ #category : #private }
 PowertalkNativeJSEvaluator >> lookup: anSMessage startingAt: aBehavior [
 	| method symbol |
 	method := anSMessage methodFor: aBehavior.
@@ -22,20 +35,6 @@ PowertalkNativeJSEvaluator >> lookup: anSMessage startingAt: aBehavior [
 				registerCacheWith: runtime;
 				cache: method when: aBehavior.
 	^ method
-]
-
-{ #category : #private }
-PowertalkNativeJSEvaluator >> prepareForExecution: method [
-	| code expressions |
-	code := runtime methodOptimizedCode: method.
-	code == runtime nil
-		ifFalse: [ ^ code ].
-	expressions := runtime sexpressionsOf: method.
-	code := JSSExpressionTranspiler new
-		evaluator: self;
-		nativize: expressions. 
-	runtime methodOptimizedCode: method put: code.
-	^ code
 ]
 
 { #category : #private }
@@ -57,7 +56,7 @@ PowertalkNativeJSEvaluator >> send: anSMessage super: aBoolean to: receiver with
 		arguments: arguments;
 		parent: prev;
 		method: method.
-	code := self prepareForExecution: method.
+	code := self prepareExecutableCode: method.
 	result :=  code executeFor: self in: context.
 	context := prev.
 	^result

@@ -18,12 +18,14 @@ PowertalkIterativeStackedInterpreter >> evaluate [
 
 { #category : #private }
 PowertalkIterativeStackedInterpreter >> evaluateClosure: closure withArgs: arguments [
-	| block receiver |
+
+	| block code receiver |
 	block := runtime closureBlock: closure.
-	work := runtime blockOptimizedCode: block.
+	code := self prepareBlockExecutableCode: block.
+	work := runtime executableCodeWork: code.
 	receiver := (runtime blockCapturesSelf: block)
-		ifTrue: [ closure at: 1 ]
-		ifFalse: [ nilObj ].
+		            ifTrue: [ closure at: 1 ]
+		            ifFalse: [ nilObj ].
 	context
 		popFrame;
 		buildClosureFrameFor: receiver code: block environment: closure.
@@ -46,10 +48,21 @@ PowertalkIterativeStackedInterpreter >> initialize [
 	linearizer := SExpressionLinearizer new
 ]
 
+{ #category : #private }
+PowertalkIterativeStackedInterpreter >> initializeExecutableCodeOf: method [
+
+	^ self initializeLinearExecutableCodeOf: method
+]
+
 { #category : #initialization }
 PowertalkIterativeStackedInterpreter >> initializePrimitives [
 	super initializePrimitives.
 	linearizer primitives: primitives
+]
+
+{ #category : #private }
+PowertalkIterativeStackedInterpreter >> linearizer [
+	^linearizer
 ]
 
 { #category : #initialization }
@@ -62,20 +75,16 @@ pc := context incRegPC.
 ]
 
 { #category : #private }
-PowertalkIterativeStackedInterpreter >> prepareFor: method [
-	self prepareForExecution: method
+PowertalkIterativeStackedInterpreter >> prepareBlockExecutableCode: block [
 
-]
-
-{ #category : #private }
-PowertalkIterativeStackedInterpreter >> prepareForExecution: method [
-	| operations linearized |
-	operations := runtime sexpressionsOf: method.
-	operations isCollection
-		ifTrue: [ ^ self ].
-	linearizer visitMethod: operations.
-	linearized := linearizer operations asArray.
-	runtime methodOptimizedCode: method put: linearized
+	| code method |
+	code := runtime blockOptimizedCode: block.
+	(runtime isExecutableCode: code) ifTrue: [ ^ code ].
+	method := runtime blockMethod: block.
+	self initializeExecutableCodeOf: method.
+	code := runtime blockOptimizedCode: block.
+	self ASSERT: (runtime isExecutableCode: code).
+	^ code
 ]
 
 { #category : #initializing }
@@ -121,23 +130,25 @@ PowertalkIterativeStackedInterpreter >> underprimitiveRestart [
 
 { #category : #initialization }
 PowertalkIterativeStackedInterpreter >> visitOpDispatchMessage: anSOpDispatchMessage [
-	| message behavior method size environment |
+
+	| message behavior method size environment work1 |
 	message := anSOpDispatchMessage message.
-	message cachedUndermessage
-		ifNotNil: [ :block | ^ self evaluateUndermessage: message with: block ].
+	message cachedUndermessage ifNotNil: [ :block | 
+		^ self evaluateUndermessage: message with: block ].
 	behavior := message receiver isSuper
-		ifTrue: [ runtime superBehaviorOf: context classBinding ]
-		ifFalse: [ runtime behaviorOf: regR ].
+		            ifTrue: [ runtime superBehaviorOf: context classBinding ]
+		            ifFalse: [ runtime behaviorOf: regR ].
 	method := self
-		lookup: message selector
-		startingAt: behavior
-		sendSite: message.
-	method isBlock
-		ifTrue: [ ^ self evaluateUndermessage: message with: method ].
+		          lookup: message selector
+		          startingAt: behavior
+		          sendSite: message.
+	method isBlock ifTrue: [ 
+		^ self evaluateUndermessage: message with: method ].
 	size := runtime methodEnvironmentSize: method.
 	environment := runtime newEnvironmentSized: size.
-	self prepareFor: method.
-	work := runtime methodOptimizedCode: method.
+	work1 := self prepareForExecuting: method.
+	self assert: work1 notNil.
+	work := work1.
 	context
 		buildMethodFrameFor: regR
 		code: method
@@ -163,8 +174,11 @@ PowertalkIterativeStackedInterpreter >> visitOpJumpTrue: anSOpJumpTrue [
 
 { #category : #initialization }
 PowertalkIterativeStackedInterpreter >> visitOpNonLocalReturn: anSOpReturn [
+
+	| code |
 	context unwind.
-		work := runtime methodOptimizedCode: context regM
+	code := runtime methodOptimizedCode: context regM.
+	work := runtime executableCodeWork: code
 ]
 
 { #category : #initialization }
@@ -179,6 +193,9 @@ PowertalkIterativeStackedInterpreter >> visitOpPrimitive: anSOpPrimtive [
 
 { #category : #initialization }
 PowertalkIterativeStackedInterpreter >> visitOpReturn: anSOpReturn [
+
+	| code |
 	context popFrame.
-	work := runtime methodOptimizedCode: context regM
+	code := runtime methodOptimizedCode: context regM.
+		work := runtime executableCodeWork: code.
 ]

@@ -108,6 +108,11 @@ PowertalkRingRuntime >> doLookup: aSymbol startingAt: aBehavior [
 			self doLookup: aSymbol startingAt: c ]
 ]
 
+{ #category : #accessing }
+PowertalkRingRuntime >> executableCodeWork: code [
+	^code
+]
+
 { #category : #services }
 PowertalkRingRuntime >> homeEnvironmentOf: aClosureMap [
 	^ aClosureMap slotAt: 2
@@ -160,6 +165,12 @@ PowertalkRingRuntime >> isClosure: anObjectMap [
 	^anObjectMap class = ClosureMap
 ]
 
+{ #category : #services }
+PowertalkRingRuntime >> isExecutableCode: code [
+
+	^ code !== nil and: [code !== nilObj]
+]
+
 { #category : #accessing }
 PowertalkRingRuntime >> literalFor: anObject [
 	^ image transferLiteral: anObject
@@ -168,6 +179,12 @@ PowertalkRingRuntime >> literalFor: anObject [
 { #category : #accessing }
 PowertalkRingRuntime >> loadAssociationValue: association [
 	^association value
+]
+
+{ #category : #services }
+PowertalkRingRuntime >> localMethodAstcodes: anSCompiledMethod [
+
+	^ self methodAstcodes: anSCompiledMethod
 ]
 
 { #category : #services }
@@ -193,6 +210,12 @@ PowertalkRingRuntime >> methodArgumentCount: method [
 ]
 
 { #category : #services }
+PowertalkRingRuntime >> methodAstcodes: anSCompiledMethod [
+
+	^ anSCompiledMethod astcodes
+]
+
+{ #category : #services }
 PowertalkRingRuntime >> methodClassBinding: method [
 	^ method classBinding
 ]
@@ -215,7 +238,10 @@ PowertalkRingRuntime >> methodOptimizedCode: anSCompiledMethod [
 
 { #category : #services }
 PowertalkRingRuntime >> methodOptimizedCode: method put: anObject [
-	method optimizedCode: anObject
+
+	method optimizedCode: anObject.
+		^anObject 
+		
 ]
 
 { #category : #services }
@@ -260,6 +286,11 @@ PowertalkRingRuntime >> newCompiledMethod [
 { #category : #accessing }
 PowertalkRingRuntime >> newEnvironmentSized: anInteger [
 	^ image newArraySized: anInteger
+]
+
+{ #category : #accessing }
+PowertalkRingRuntime >> newExecutableCodeFor: anObject [
+	^anObject
 ]
 
 { #category : #accessing }
@@ -334,11 +365,6 @@ PowertalkRingRuntime >> removeOverride: assoc [
 	symbolCache
 		at: symbol
 		ifPresent: [ :messages | messages do: #flushCache ]
-]
-
-{ #category : #accessing }
-PowertalkRingRuntime >> sexpressionsOf: anSCompiledMethod [
-	^ anSCompiledMethod prepareForExecution; optimizedCode
 ]
 
 { #category : #accessing }

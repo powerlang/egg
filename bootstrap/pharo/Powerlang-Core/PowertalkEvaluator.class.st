@@ -108,6 +108,23 @@ PowertalkEvaluator >> initialize [
 	messageCount := 0
 ]
 
+{ #category : #accessing }
+PowertalkEvaluator >> initializeExecutableCodeOf: method [
+
+	^self subclassResponsibility
+]
+
+{ #category : #accessing }
+PowertalkEvaluator >> initializeLinearExecutableCodeOf: method [
+
+	| sexpressions executable |
+	sexpressions := runtime sexpressionsOf: method.
+	self linearizer visitMethod: sexpressions.
+	executable := runtime newExecutableCodeFor:
+		              self linearizer operations asArray.
+	^runtime methodOptimizedCode: method put: executable
+]
+
 { #category : #initializing }
 PowertalkEvaluator >> initializePrimitives [
 
@@ -160,6 +177,15 @@ PowertalkEvaluator >> initializePrimitives [
 		at: #BootstrapFixOverrides put: self primitiveBootstrapFixOverrides;
 		at: #PrimeFor put: self primitivePrimeFor;
 		at: #FlushFromCaches put: self primitiveFlushFromCaches 
+]
+
+{ #category : #accessing }
+PowertalkEvaluator >> initializeRecursiveExecutableCodeOf: method [
+
+	| sexpressions executable |
+	sexpressions := runtime sexpressionsOf: method.
+	executable := runtime newExecutableCodeFor: sexpressions.
+	^runtime methodOptimizedCode: method put: executable
 ]
 
 { #category : #initializing }
@@ -217,6 +243,11 @@ PowertalkEvaluator >> isIdentical: anObject to: anotherObject [
 ]
 
 { #category : #accessing }
+PowertalkEvaluator >> linearizer [
+	^self subclassResponsibility
+]
+
+{ #category : #accessing }
 PowertalkEvaluator >> lookup: aSymbol startingAt: aBehavior sendSite: anSMessage [
 	| method symbol |
 	method := anSMessage methodFor: aBehavior.
@@ -239,6 +270,23 @@ PowertalkEvaluator >> lookup: aSymbol startingAt: aBehavior sendSite: anSMessage
 PowertalkEvaluator >> nil [
 	^nilObj
 	
+]
+
+{ #category : #accessing }
+PowertalkEvaluator >> prepareExecutableCode: method [
+
+	| code |
+	code := runtime methodOptimizedCode: method.
+	(runtime isExecutableCode: code) ifTrue: [ ^ code ].
+	^ self initializeExecutableCodeOf: method
+]
+
+{ #category : #visiting }
+PowertalkEvaluator >> prepareForExecuting: method [
+
+	| code |
+	code := self prepareExecutableCode: method.
+	^ runtime executableCodeWork: code
 ]
 
 { #category : #primitives }

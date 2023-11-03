@@ -54,11 +54,23 @@ PowertalkRecursiveInterpreter >> hasFinished [
 ]
 
 { #category : #visiting }
+PowertalkRecursiveInterpreter >> initializeExecutableCodeOf: method [
+
+	^self initializeRecursiveExecutableCodeOf: method
+]
+
+{ #category : #visiting }
 PowertalkRecursiveInterpreter >> initializePrimitives [ 
 	super initializePrimitives.
 	primitives 
 		at: #ClosureWhileTrue put: self primitiveClosureWhileTrue;
 		at: #ClosureWhileFalse put: self primitiveClosureWhileFalse
+]
+
+{ #category : #initializing }
+PowertalkRecursiveInterpreter >> linearizer [
+
+	self shouldNotImplement
 ]
 
 { #category : #visiting }

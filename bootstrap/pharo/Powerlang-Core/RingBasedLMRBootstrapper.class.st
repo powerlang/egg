@@ -581,7 +581,7 @@ RingBasedLMRBootstrapper >> override: classname with: rgMethod [
 RingBasedLMRBootstrapper >> prepareClosuresForExecution [
 	| mapped |
 	closureMethods
-		do: [ :method | mapped := mapping at: method. dest interpreter prepareForExecution: mapped ]
+		do: [ :method | mapped := mapping at: method. dest interpreter prepareExecutableCode: mapped ]
 ]
 
 { #category : #initialization }
