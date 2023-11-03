@@ -90,7 +90,7 @@ let Bootstrapper = class {
 			_minSMI: BigInt("-4611686018427387904"),
 			_speciesInstanceBehaviorIndex: 2,
 			_speciesFormatIndex: 3,
-			_methodOptimizedCodeIndex: 2,
+			_compiledCodeExecutableCodeIndex: 2,
 			_methodAstcodesIndex: 3,
 			_methodInstSize: 6,
 			_methodClassBindingIndex: 4,
