@@ -56,8 +56,20 @@ Builder >> mapMethodsOf: aClass [
 		ifTrue: [original collect: [:method | module originalMethodFor: method]]
 		ifFalse: [Dictionary new].
     saved := saved select: [:method | method notNil].
-	saved do: [:method | closure map: method to: method copy].
+	saved do: [:method | self mapMethod: method].
     closure map: original to: saved
+]
+
+{ #category : #private }
+Builder >> mapMethod: method [
+	| copy |
+	copy := method copy.
+	closure map: method to: copy.
+	method hasBlocks ifFalse: [^self].
+	method withIndexDo: [:b :i | | bcopy |
+		b isBlock ifTrue: [
+			bcopy := copy at: i.
+			closure map: b to: bcopy]]
 ]
 
 { #category : #private }
