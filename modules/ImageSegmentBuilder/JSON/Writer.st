@@ -110,6 +110,7 @@ Writer >> writeImports [
 { #category : #writing }
 Writer >> writeImportedObjects [
 	| index |
+	imports size = 0 ifTrue: [^self].
 	stream nextPutAll: ', '; crtab: 2.
 	index := 0.
 	imports
