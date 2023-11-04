@@ -19,7 +19,7 @@ Class {
 { #category : #bootstrapping }
 KernelModule >> prepareForSnapshot: anImageSegmentBuilder [
 	anImageSegmentBuilder
-		map: loadedModules to: OrderedCollection new;
+		map: loadedModules to: Dictionary new;
 		map: moduleLoaders to: OrderedCollection new
 ]
 
