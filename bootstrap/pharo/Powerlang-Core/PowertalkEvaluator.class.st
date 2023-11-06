@@ -173,10 +173,10 @@ PowertalkEvaluator >> initializePrimitives [
 		at: #BootstrapDictKeys put: self primitiveBootstrapDictKeys;
 		at: #BootstrapDictAt put: self primitiveBootstrapDictAt;
 		at: #BootstrapDictAtPut put: self primitiveBootstrapDictAtPut;
-		at: #BootstrapLoadModule put: self primitiveBootstrapLoadModule;
-		at: #BootstrapFixOverrides put: self primitiveBootstrapFixOverrides;
+		at: #HostLoadModule put: self primitiveHostLoadModule;
+		at: #HostFixOverrides put: self primitiveHostFixOverrides;
 		at: #PrimeFor put: self primitivePrimeFor;
-		at: #FlushFromCaches put: self primitiveFlushFromCaches 
+		at: #FlushFromCaches put: self primitiveFlushFromCaches
 ]
 
 { #category : #accessing }
@@ -346,16 +346,6 @@ PowertalkEvaluator >> primitiveBootstrapDictNew [
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveBootstrapFixOverrides [
-	^ [ runtime fixOverrides ]
-]
-
-{ #category : #primitives }
-PowertalkEvaluator >> primitiveBootstrapLoadModule [
-	^ [ runtime loadModule: context firstArgument]
-]
-
-{ #category : #primitives }
 PowertalkEvaluator >> primitiveClass [
 	^ [ runtime speciesFor: context self ]
 ]
@@ -408,6 +398,16 @@ PowertalkEvaluator >> primitiveFor: aSymbol [
 { #category : #primitives }
 PowertalkEvaluator >> primitiveHash [
 	^ [ runtime newInteger: (runtime hashFor: context self) ]
+]
+
+{ #category : #primitives }
+PowertalkEvaluator >> primitiveHostFixOverrides [
+	^ [ runtime fixOverrides ]
+]
+
+{ #category : #primitives }
+PowertalkEvaluator >> primitiveHostLoadModule [
+	^ [ runtime loadModule: context firstArgument]
 ]
 
 { #category : #primitives }
