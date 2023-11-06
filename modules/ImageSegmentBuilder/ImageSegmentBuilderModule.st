@@ -1,0 +1,35 @@
+"
+	Copyright (c) 2022, Javier Pimás.
+	See (MIT) license in root directory.
+"
+
+Class {
+	#name : #ImageSegmentBuilderModule,
+	#superclass : #Module,
+	#category : #ImageSegmentBuilder
+}
+
+{ #category : #bootstrapping }
+ImageSegmentBuilderModule >> writeJSONKernel [
+	^self writeJSONModule: Kernel
+]
+
+{ #category : #bootstrapping }
+ImageSegmentBuilderModule >> writeJSONModule: aModule [
+	| builder writer |
+	Kernel host fixOverrides.
+	self
+		import: #Writer from: #ImageSegmentBuilder.JSON.
+	builder := Builder new.
+	builder module: aModule; build.
+	writer := Writer new.
+	^writer
+		objects: builder objects;
+		mapping: builder mapping;
+		imports: builder imports;
+		exports: aModule exports;
+		write;
+		image
+]
+
+

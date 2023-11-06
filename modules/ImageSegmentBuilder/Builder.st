@@ -7,7 +7,7 @@ Class {
 		'wordSize',
 		'classes'
 	],
-	#category : #'Builder'
+	#category : #ImageSegmentBuilder
 }
 
 { #category : #closure }

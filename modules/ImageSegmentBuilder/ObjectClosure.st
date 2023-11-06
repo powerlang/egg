@@ -14,7 +14,7 @@ Class {
 		'boundary',
 		'scope'
 	],
-	#category : #'ObjectClosure'
+	#category : #ImageSegmentBuilder
 }
 
 { #category : #closure }

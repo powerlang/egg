@@ -11,16 +11,22 @@ Class {
 		'memory',
 		'entrypoint',
 		'loadedModules',
-		'moduleLoaders'
+		'moduleLoaders',
+		'host'
 	],
 	#category : #Kernel
 }
 
 { #category : #bootstrapping }
 KernelModule >> prepareForSnapshot: anImageSegmentBuilder [
+	| dict loaders |
+	dict := Dictionary new.
+	dict at: 'Kernel' put: self.
+	loaders := OrderedCollection new.
+	loaders add: moduleLoaders first.
 	anImageSegmentBuilder
-		map: loadedModules to: Dictionary new;
-		map: moduleLoaders to: OrderedCollection new
+		map: loadedModules to: dict;
+		map: moduleLoaders to: loaders
 ]
 
 { #category : #bootstrapping }
@@ -72,6 +78,11 @@ KernelModule >> entry: argc argv: argv [
 
 ]
 
+{ #category : #accessing }
+KernelModule >> host [
+	^host
+]
+
 { #category : #initialization }
 KernelModule >> initialize [
 	"
@@ -81,6 +92,7 @@ KernelModule >> initialize [
 		avoided during bootstrap (else we would end with duplicated symbols)
 	"
 	self basicInitialize.
+	host := HostSystem new.
 	moduleLoaders := OrderedCollection new.
 	loadedModules := Dictionary new.
 	loadedModules at: #Kernel put: self.
@@ -117,6 +129,11 @@ KernelModule >> removeKey: aSymbol from: aMethodDictionary ifAbsent: aBlock [
 	| cm |
 	cm := aMethodDictionary at: aSymbol ifAbsent: [^aBlock value].
 	^aMethodDictionary basicRemoveKey: aSymbol asSelector ifAbsent: aBlock
+]
+
+{ #category : #loading }
+KernelModule >> useHostModuleLoader [
+	self addModuleLoader: host.
 ]
 
 KernelModule >> foo [

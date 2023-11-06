@@ -243,7 +243,7 @@ SmalltalkSystem >> initialize [
 	properties := WeakIdentityDictionary new.
 	eventHandlers := WeakIdentityDictionary new.
 	registeredEvents := WeakIdentityDictionary new.
-	externals := OrderedCollection new.	
+	externals := OrderedCollection new
 ]
 
 { #category : #initialization }
