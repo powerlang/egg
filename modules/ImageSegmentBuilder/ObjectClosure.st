@@ -12,7 +12,8 @@ Class {
 		'objects',
 		'mapping',
 		'boundary',
-		'scope'
+		'scope',
+		'builder'
 	],
 	#category : #ImageSegmentBuilder
 }
@@ -33,43 +34,58 @@ ObjectClosure >> scope: classes [
 ]
 
 { #category : #accessing }
-ObjectClosure >> addBoundary: aClass [
-	aClass name = 'ModuleLoader' ifTrue: [self _halt].
-	boundary add: aClass
+ObjectClosure >> addBoundary: anObject [
+	self addBoundary: anObject as: anObject asSymbolicReference
+]
+
+{ #category : #accessing }
+ObjectClosure >> addBoundary: anObject as: aSymbolicReference [
+	boundary at: anObject put: aSymbolicReference
+]
+
+{ #category : #accessing }
+ObjectClosure >> addKernelBoundaries [
+	| symref |
+	symref := SymbolicReference new token: #nilToken.
+	self addBoundary: HashTable nilToken as: symref.
 ]
 
 
 { #category : #closure }
 ObjectClosure >> addSlotsOf: anObject [
-	| behavior |
-	behavior := anObject behavior.
-	(scope includes: behavior classBinding)
-		ifTrue: [self follow: behavior]
-		ifFalse: [self addBoundary: behavior classBinding].
+	self analyze: anObject behavior.
 	1 to: anObject _pointersSize do: [ :i | | slot |
 		slot := anObject _basicAt: i.
-		self follow: slot ]
+		self analyze: slot ]
 ]
 
 { #category : #closure }
-ObjectClosure >> follow: anObject [
+ObjectClosure >> analyze: anObject [
 	| surrogate | 
 	surrogate := self surrogateFor: anObject.
-"	(surrogate isNil or: [surrogate _isSmallInteger]) ifTrue: [^self]."
+	surrogate _isSmallInteger ifTrue: [^self].
+	(boundary includesKey: surrogate) ifTrue: [^self].
 	(added includes: surrogate) ifTrue: [^self].
+	(surrogate shouldBeStoredIn: self) ifFalse: [^self addBoundary: surrogate].
+
 	added add: surrogate.
 	objects add: surrogate.
-	(boundary includes: surrogate) ifTrue: [^self].
-	(anObject isSpecies andNot: [scope includes: anObject])
-		ifTrue: [
-			self addBoundary: anObject.
-			^self].
-	surrogate _isSmallInteger ifFalse: [queue add: surrogate].
+	queue add: surrogate.
 ]
 
 { #category : #accessing }
 ObjectClosure >> boundary [
 	^boundary
+]
+
+{ #category : #accessing }
+ObjectClosure >> builder [
+	^builder
+]
+
+{ #category : #accessing }
+ObjectClosure >> builder: aBuilder [
+	builder := aBuilder
 ]
 
 { #category : #initialization }
@@ -78,7 +94,7 @@ ObjectClosure >> initialize [
 	queue := OrderedCollection new: 2000.
 	added := IdentitySet new: 2000.
 	objects := OrderedCollection new: 2000.
-	boundary := IdentitySet new: 100.
+	boundary := IdentityDictionary new: 100.
 	scope := Set new
 ]
 
@@ -92,6 +108,11 @@ ObjectClosure >> mapping [
 	^mapping
 ]
 
+{ #category : #accessing }
+ObjectClosure >> module [
+	^builder module
+]
+
 { #category : #services }
 ObjectClosure >> objects [
 	^objects
@@ -100,6 +121,11 @@ ObjectClosure >> objects [
 { #category : #accessing }
 ObjectClosure >> roots: aCollection [
 	roots := aCollection
+]
+
+{ #category : #accessing }
+ObjectClosure >> scope [
+	^scope
 ]
 
 { #category : #accessing }

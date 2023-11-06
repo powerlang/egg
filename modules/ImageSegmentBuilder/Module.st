@@ -9,3 +9,12 @@ Extension { #name : #Module }
 Module >> prepareForSnapshot: anImageSegmentWriter [
 ]
 
+{ #category : #'*snapshotting' }
+Module >> asSymbolicReference [
+	^SymbolicReference new token: self name; linker: #asModule.
+]
+
+{ #category : #'*snapshotting' }
+Module >> shouldBeStoredIn: anObjectClosure [
+	^anObjectClosure module == self
+]

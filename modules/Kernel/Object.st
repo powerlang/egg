@@ -188,6 +188,12 @@ Object >> deepCopy [
 ]
 
 { #category : #debugging }
+Object >> DENY: aBoolean [
+	aBoolean value ifTrue: [AssertionFailure signal].
+	^aBoolean
+]
+
+{ #category : #debugging }
 Object >> disableCode: aBlock [
 	"do not evaluate the code inside the block"
 ]
@@ -270,8 +276,8 @@ Object >> hasActionForEvent: aSymbol [
 ]
 
 { #category : #testing }
-Object >> hasClassBehavior [
-	^self behavior == self class instanceBehavior
+Object >> hasInstanceBehavior [
+	^self behavior isInstanceBehavior
 ]
 
 { #category : #private }
