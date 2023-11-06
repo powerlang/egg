@@ -118,7 +118,7 @@ Behavior >> hash [
 ]
 
 { #category : #testing }
-Behavior >> hasInstanceBehavior [
+Behavior >> isInstanceBehavior [
 	^class instanceBehavior !== self
 ]
 
@@ -138,7 +138,7 @@ Behavior >> includes: behavior [
 
 { #category : #accessing }
 Behavior >> instanceBehavior [
-	^self hasInstanceBehavior ifTrue: [methods]
+	^self isInstanceBehavior ifTrue: [methods]
 ]
 
 { #category : #accessing }

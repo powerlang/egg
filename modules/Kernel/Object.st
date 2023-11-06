@@ -270,8 +270,8 @@ Object >> hasActionForEvent: aSymbol [
 ]
 
 { #category : #testing }
-Object >> hasClassBehavior [
-	^self behavior == self class instanceBehavior
+Object >> hasInstanceBehavior [
+	^self behavior isInstanceBehavior
 ]
 
 { #category : #private }

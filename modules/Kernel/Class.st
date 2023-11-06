@@ -252,7 +252,7 @@ Class >> namespaces [
 
 { #category : #testing }
 Class >> needsReinstallation [
-	self hasClassBehavior ifFalse: [^true].
+	self hasInstanceBehavior ifTrue: [^true].
 	superclass isNil ifTrue: [^false].
 	self instSize - self instVarNames size = superclass instSize
 		ifFalse: [^true].
