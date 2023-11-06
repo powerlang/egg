@@ -478,20 +478,6 @@ RingBasedLMRBootstrapper >> instantiateMetaobjects [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> loadBootstrapModule [
-	| spec classes moduleSpec bootstrapper |
-	spec := PowertalkRingModule lmrBootstrapperSpec.
-	classes := spec allClasses.
-	classes := classes
-		collect: [ :classSpec | self createNewClassFrom: classSpec in: nil].
-	moduleSpec := spec at: #BootstrapModule.
-	bootstrapper := self createNewModule: moduleSpec.
-	self addClasses: classes to: bootstrapper.
-	dest sendLocal: #justLoaded to: bootstrapper.
-	^bootstrapper
-]
-
-{ #category : #initialization }
 RingBasedLMRBootstrapper >> loadModule: symbol [
 
 	| spec classes moduleSpec module extensions |
