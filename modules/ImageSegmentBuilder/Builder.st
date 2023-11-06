@@ -17,6 +17,7 @@ Builder >> build [
 	classes do: [:c | self mapClass: c].
 	module prepareForSnapshot: self.
 	metaclasses := classes collect: [:c | c class].
+	module = Kernel ifFalse: [closure addKernelBoundaries].
 	closure scope: classes , metaclasses; traverse: module.
 ]
 
@@ -82,12 +83,17 @@ Builder >> mapSubclassesOf: aClass [
 
 { #category : #initializing }
 Builder >> initialize [
-	closure := ObjectClosure new
+	closure := ObjectClosure new builder: self
 ]
 
 { #category : #accessing }
 Builder >> map: anObject to: anotherObject [
 	closure map: anObject to: anotherObject
+]
+
+{ #category : #accessing }
+Builder >> module [
+	^module
 ]
 
 { #category : #accessing }

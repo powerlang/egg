@@ -28,8 +28,8 @@ Writer >> mapping: aDictionary [
 ]
 
 { #category : #accessing }
-Writer >> imports: aCollection [
-	imports := aCollection
+Writer >> imports: anIdentityDictionary [
+	imports := anIdentityDictionary
 ]
 
 { #category : #accessing }
@@ -53,15 +53,19 @@ Writer >> generateIndexes [
 	| index |
 	index := 0.
 	objects do: [:o | indexes at: o put: index. index := index + 1].
-	imports do: [:o | indexes at: o put: index. index := index + 1].
-	mapping keysAndValuesDo: [:obj :surrogate | | i |
-		i := indexes at: surrogate.
-		indexes at: obj put: i]
+	imports keysDo: [:o | indexes at: o put: index. index := index + 1].
+	mapping keysAndValuesDo: [:obj :surrogate |
+		indexes at: surrogate ifPresent: [:i | indexes at: obj put: i]]
 ]
 
 { #category : #services }
 Writer >> indexOf: anObject [
 	^indexes at: anObject ifAbsent: [indexes at: nil]
+]
+
+{ #category : #private }
+Writer >> quoted: aSymbol [
+	^'"', aSymbol asString, '"'
 ]
 
 { #category : #accessing }
@@ -94,16 +98,35 @@ Writer >> writeExports [
 		separatedBy: [stream nextPutAll: ', '; crtab: 2]
 ]
 
+{ #category : #'*snapshotting' }
+Writer >> writeImportLinker: linker [
+	linker ifNil: [^self].
+	stream nextPutAll: ', '; nextPutAll: (self quoted: linker)
+]
+
+{ #category : #'*snapshotting' }
+Writer >> writeImportToken: token [
+	token isString ifTrue: [^stream nextPutAll: (self quoted: token)].
+	stream nextPutAll: '['.
+	token
+		do: [:str | stream nextPutAll: (self quoted: str)]
+		separatedBy: [stream nextPutAll: ', '].
+	stream nextPutAll: ']'
+]
+
+{ #category : #writing }
+Writer >> writeImport: aSymbolicReference [
+	stream nextPutAll: '['.
+	self
+		writeImportToken: aSymbolicReference token;
+		writeImportLinker: aSymbolicReference linker.
+	stream nextPutAll: ']'
+]
+
 { #category : #writing }
 Writer >> writeImports [
 	imports
-		do: [ :class |
-			stream 
-				nextPutAll: '["';
-				nextPutAll: class name;
-				nextPutAll: '", "';
-				nextPutAll: class module name; 
-				nextPutAll: '"]' ]
+		do: [ :symref | self writeImport: symref ]
 		separatedBy: [stream nextPutAll: ', '; crtab: 2]
 ]
 
