@@ -188,6 +188,12 @@ Object >> deepCopy [
 ]
 
 { #category : #debugging }
+Object >> DENY: aBoolean [
+	aBoolean value ifTrue: [AssertionFailure signal].
+	^aBoolean
+]
+
+{ #category : #debugging }
 Object >> disableCode: aBlock [
 	"do not evaluate the code inside the block"
 ]
