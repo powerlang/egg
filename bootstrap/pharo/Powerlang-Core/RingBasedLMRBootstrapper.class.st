@@ -614,6 +614,14 @@ RingBasedLMRBootstrapper >> rootDirectory [
 ]
 
 { #category : #initialization }
+RingBasedLMRBootstrapper >> sendLoadModule: aSymbol [
+
+	| symbol |
+	symbol := dest addSymbol: aSymbol.
+	^ dest sendLocal: #load: to: dest kernel with: { symbol }
+]
+
+{ #category : #initialization }
 RingBasedLMRBootstrapper >> source: aPowertalkRingImage [
 	source := aPowertalkRingImage
 ]
@@ -637,4 +645,13 @@ RingBasedLMRBootstrapper >> transferLiteral: anObject [
 	anObject isCharacter
 		ifTrue: [ ^ dest newCharacter: anObject ].
 	self ASSERT: false
+]
+
+{ #category : #initialization }
+RingBasedLMRBootstrapper >> useHostModuleLoader [
+dest
+		          sendLocal: #useHostModuleLoader
+		          to: dest kernel
+		         .
+
 ]

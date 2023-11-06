@@ -21,7 +21,8 @@ JSTranspiler class >> generateKernelSegment [
 	runtime := bootstrapper result.
 	output := self imageSegmentDirectory / 'Kernel.json'.
 	output ensureCreateFile.
-	module := bootstrapper loadBootstrapModule.
+	bootstrapper useHostModuleLoader.
+	module := bootstrapper sendLoadModule: #ImageSegmentBuilder.
 	json := runtime sendLocal: #writeJSONKernel to: module.
 	output writeStreamDo: [ :stream | 
 		stream truncate.
