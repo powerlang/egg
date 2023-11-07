@@ -27,7 +27,7 @@ PowertalkLMRBootstrapTest >> test010GenenerateKernelSegment [
 	| output module  |
 	output := bootstrapper outputDirectory / 'bootstrap' / 'Kernel.is'.
 	output exists ifTrue: [ output deleteFile ].
-
+	bootstrapper useHostModuleLoader.
 	module := bootstrapper sendLoadModule: #ImageSegmentBuilder
 	"json := runtime sendLocal: #writeJSONKernel to: module.
 	self assert: json whatever"

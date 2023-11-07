@@ -106,7 +106,7 @@ ModuleB >> initialize [
 ]
 { #category : #spec }
 ModuleB >> imports [
-	^{#A -> #A}
+	^{#A -> #A. #Kernel -> #Module}
 ] ' ].
 	p := bootstrapper rootDirectory / 'B/package.st'.
 	p

@@ -293,7 +293,7 @@ PowertalkRingModule >> initializeClass: definition superclass: superclass superb
 	subclasses := definition subclasses
 		collect: [ :def | classes at: def ].
 	subclasses := kernel newArray: subclasses.
-	name := kernel newString: definition name.
+	name := kernel newSymbol: definition name.
 	flag := self formatOfClass: definition.
 	format := kernel newInteger: flag.
 	ivars := kernel newStringArray: definition instVarNames.

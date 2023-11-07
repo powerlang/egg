@@ -480,11 +480,12 @@ RingBasedLMRBootstrapper >> instantiateMetaobjects [
 { #category : #initialization }
 RingBasedLMRBootstrapper >> loadModule: symbol [
 
-	| spec classes moduleSpec module extensions |
+	| spec classes moduleName moduleSpec module extensions |
 	spec := self readModuleSpec: symbol.
 	classes := spec allClasses.
-	moduleSpec := spec at: symbol , #Module.
-	moduleSpec ifNil: [ moduleSpec := spec at: #Module , symbol ].
+	moduleName := ('.' split: symbol) last asSymbol.
+	moduleSpec := spec at: moduleName , #Module.
+	moduleSpec ifNil: [ moduleSpec := spec at: #Module , moduleName ].
 	moduleSpec
 		ifNil: [ moduleSpec := source specs at: #Module ]
 		ifNotNil: [ 
