@@ -15,6 +15,16 @@ Class {
 	#category : #Kernel
 }
 
+{ #category : #knownObjects }
+SymbolicReference class >> nilToken [
+	^self new token: #nilToken.
+]
+
+{ #category : #knownObjects }
+SymbolicReference class >> symbolTable [
+	^self new token: #symbolTable.
+]
+
 { #category : #comparing }
 SymbolicReference >> = aSymbolicReference [
 	aSymbolicReference class == self class ifFalse: [^false].
@@ -95,6 +105,11 @@ SymbolicReference >> printOn: aStream [
 { #category : #services }
 SymbolicReference >> referredValue [
 	^linker ifNil: [self perform: token] ifNotNil: [self perform: linker]
+]
+
+{ #category : #linking }
+SymbolicReference >> symbolTable [
+	^Symbol symbolTable
 ]
 
 { #category : #accessing }

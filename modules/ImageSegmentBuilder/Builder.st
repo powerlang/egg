@@ -10,6 +10,11 @@ Class {
 	#category : #ImageSegmentBuilder
 }
 
+{ #category : #degugging }
+Builder >> activateDebugMode [
+	closure activateDebugMode
+]
+
 { #category : #closure }
 Builder >> build [
 	| metaclasses |
@@ -17,7 +22,6 @@ Builder >> build [
 	classes do: [:c | self mapClass: c].
 	module prepareForSnapshot: self.
 	metaclasses := classes collect: [:c | c class].
-	module = Kernel ifFalse: [closure addKernelBoundaries].
 	closure scope: classes , metaclasses; traverse: module.
 ]
 

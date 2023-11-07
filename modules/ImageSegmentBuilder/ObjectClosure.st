@@ -13,7 +13,9 @@ Class {
 		'mapping',
 		'boundary',
 		'scope',
-		'builder'
+		'builder',
+		'reversePaths',
+		'debug'
 	],
 	#category : #ImageSegmentBuilder
 }
@@ -33,6 +35,12 @@ ObjectClosure >> scope: classes [
 	scope addAll: classes
 ]
 
+{ #category : #degugging }
+ObjectClosure >> activateDebugMode [
+	debug := true.
+	reversePaths := IdentityDictionary new: 100.
+]
+
 { #category : #accessing }
 ObjectClosure >> addBoundary: anObject [
 	self addBoundary: anObject as: anObject asSymbolicReference
@@ -43,30 +51,23 @@ ObjectClosure >> addBoundary: anObject as: aSymbolicReference [
 	boundary at: anObject put: aSymbolicReference
 ]
 
-{ #category : #accessing }
-ObjectClosure >> addKernelBoundaries [
-	| symref |
-	symref := SymbolicReference new token: #nilToken.
-	self addBoundary: HashTable nilToken as: symref.
-]
-
-
 { #category : #closure }
 ObjectClosure >> addSlotsOf: anObject [
-	self analyze: anObject behavior.
+	self analyze: anObject behavior from: anObject.
 	1 to: anObject _pointersSize do: [ :i | | slot |
 		slot := anObject _basicAt: i.
-		self analyze: slot ]
+		self analyze: slot from: anObject]
 ]
 
 { #category : #closure }
-ObjectClosure >> analyze: anObject [
-	| surrogate | 
+ObjectClosure >> analyze: anObject from: source [
+	| surrogate |
 	surrogate := self surrogateFor: anObject.
 	surrogate _isSmallInteger ifTrue: [^self].
 	(boundary includesKey: surrogate) ifTrue: [^self].
 	(added includes: surrogate) ifTrue: [^self].
 	(surrogate shouldBeStoredIn: self) ifFalse: [^self addBoundary: surrogate].
+	self isDebugging ifTrue: [reversePaths at: anObject put: source].
 
 	added add: surrogate.
 	objects add: surrogate.
@@ -88,6 +89,11 @@ ObjectClosure >> builder: aBuilder [
 	builder := aBuilder
 ]
 
+{ #category : #degugging }
+ObjectClosure >> isDebugging [
+	^debug
+]
+
 { #category : #initialization }
 ObjectClosure >> initialize [
 	mapping := IdentityDictionary new.
@@ -95,7 +101,8 @@ ObjectClosure >> initialize [
 	added := IdentitySet new: 2000.
 	objects := OrderedCollection new: 2000.
 	boundary := IdentityDictionary new: 100.
-	scope := Set new
+	scope := Set new.
+	debug := false.
 ]
 
 { #category : #services }
@@ -116,6 +123,17 @@ ObjectClosure >> module [
 { #category : #services }
 ObjectClosure >> objects [
 	^objects
+]
+
+{ #category : #debugging }
+ObjectClosure >> reversePathOf: anObject [
+	| path current |
+	path := OrderedCollection new.
+	current:= anObject.
+	[
+		path add: current.
+		current := reversePaths at: current ifAbsent: [^path].
+	] repeat
 ]
 
 { #category : #accessing }

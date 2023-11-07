@@ -9,6 +9,15 @@ Class {
 	#category : #ImageSegmentBuilder
 }
 
+{ #category : #spec }
+ImageSegmentBuilderModule >> imports [
+	^{
+		#Kernel -> #Behavior. #Kernel -> #Boolean. #Kernel -> #False.
+		#Kernel -> #IdentityDictionary. #Kernel -> #IdentitySet.
+		#Kernel -> #KernelModule. #Kernel -> #Module. #Kernel -> #Symbol.
+		#Kernel -> #True. #Kernel -> #UndefinedObject}
+] 
+
 { #category : #bootstrapping }
 ImageSegmentBuilderModule >> writeJSONKernel [
 	^self writeJSONModule: Kernel

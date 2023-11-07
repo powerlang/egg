@@ -44,15 +44,24 @@ Module >> bind: anObject as: aSymbol [
 ]
 
 { #category : #private }
-Module >> bindAllIn: aModule [
-	aModule exports keysAndValuesDo: [:symbol :value |
+Module >> bindAll: aDictionary [
+	aDictionary keysAndValuesDo: [:symbol :value |
 		namespace at: symbol put: value.
 		self justDefined: symbol].
 ]
 
 { #category : #services }
 Module >> bindKernelExports [
-	self bindAllIn: Kernel
+	| bound |
+	bound := Dictionary new.
+	{
+		Object. Class. Metaclass. CompiledMethod.
+		Array. OrderedCollection. Set. Dictionary.
+		SmallInteger. String. Character.
+	} do: [:class |
+			bound at: class symbol put: class].
+	bound at: #Kernel put: Kernel.
+	self bindAll: bound
 ]
 
 { #category : #accessing }
