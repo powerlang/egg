@@ -5,6 +5,7 @@
 
 Package { #name : #ImageSegments,
 	#classes : [
+		'JSONModule',
 		'Writer'
 	]
 }

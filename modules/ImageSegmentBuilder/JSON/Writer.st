@@ -55,7 +55,7 @@ Writer >> generateIndexes [
 	objects do: [:o | indexes at: o put: index. index := index + 1].
 	imports keysDo: [:o | indexes at: o put: index. index := index + 1].
 	mapping keysAndValuesDo: [:obj :surrogate |
-		indexes at: surrogate ifPresent: [:i | indexes at: obj put: i]]
+		indexes at: surrogate ifPresent: [:i | indexes at: obj put: i]].
 ]
 
 { #category : #services }
