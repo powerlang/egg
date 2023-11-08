@@ -16,6 +16,12 @@ Class {
 }
 
 { #category : #knownObjects }
+SymbolicReference class >> character: aCharacter [
+	^self new token: aCharacter codePoint asString; linker: #asCharacter.
+
+]
+
+{ #category : #knownObjects }
 SymbolicReference class >> nilToken [
 	^self new token: #nilToken.
 ]
@@ -50,7 +56,7 @@ SymbolicReference >> asMetaclass [
 
 { #category : #linking }
 SymbolicReference >> asCharacter [
-	^token first
+	^(Integer fromString: token) asCharacter
 ]
 
 { #category : #linking }
