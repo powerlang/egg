@@ -8,6 +8,30 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
+JSTranspiler class >> generateCompilerSegment [
+
+	| image bootstrapper runtime output builder json ws compiler |
+	image := PowertalkRingImage fromSpec
+		         wordSize: 8;
+		         genesis;
+		         bootstrap;
+		         fillClasses;
+		         fillSymbols.
+	bootstrapper := image generateLMR.
+	runtime := bootstrapper result.
+	output := self imageSegmentDirectory / 'Compiler.json'.
+	output ensureCreateFile.
+	bootstrapper useHostModuleLoader.
+	builder := bootstrapper sendLoadModule: #ImageSegmentBuilder.
+	compiler := bootstrapper sendLoadModule: #Compiler.
+	json := runtime sendLocal: #writeJSONModule: to: builder with: {compiler}.
+	output writeStreamDo: [ :stream | 
+		stream truncate.
+		ws := ZnNewLineWriterStream on: stream.
+		ws nextPutAll: json asLocalString ]
+]
+
+{ #category : #'as yet unclassified' }
 JSTranspiler class >> generateKernelSegment [
 
 	| image bootstrapper runtime output module json ws |
