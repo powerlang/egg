@@ -25,6 +25,7 @@ KernelModule >> prepareForSnapshot: aBuilder [
 	loaders := OrderedCollection new.
 	loaders add: moduleLoaders first.
 	aBuilder
+		addNilToken;
 		map: loadedModules to: dict;
 		map: moduleLoaders to: loaders
 ]

@@ -14,6 +14,7 @@ Class {
 		'boundary',
 		'scope',
 		'builder',
+		'nilToken',
 		'reversePaths',
 		'debug'
 	],
@@ -99,6 +100,7 @@ ObjectClosure >> initialize [
 	added := IdentitySet new: 2000.
 	objects := OrderedCollection new: 2000.
 	boundary := IdentityDictionary new: 100.
+	nilToken := Object new.
 	scope := Set new.
 	debug := false.
 ]
@@ -116,6 +118,11 @@ ObjectClosure >> mapping [
 { #category : #accessing }
 ObjectClosure >> module [
 	^builder module
+]
+
+{ #category : #accessing }
+ObjectClosure >> nilToken [
+	^nilToken
 ]
 
 { #category : #services }
@@ -146,6 +153,7 @@ ObjectClosure >> scope [
 
 { #category : #accessing }
 ObjectClosure >> surrogateFor: anObject [
+	anObject == HashTable nilToken ifTrue: [^nilToken].
 	^mapping at: anObject ifAbsent: [anObject]
 ]
 

@@ -12,10 +12,16 @@ Class {
 		'mapping',
 		'imports',
 		'exports',
-		'indexes'
+		'indexes',
+		'closure'
 	],
 	#category : #'Writer'
 }
+
+{ #category : #accessing }
+Writer >> closure: anObjectClosure [
+	closure := anObjectClosure
+]
 
 { #category : #accessing }
 Writer >> objects: aCollection [
@@ -60,7 +66,11 @@ Writer >> generateIndexes [
 
 { #category : #services }
 Writer >> indexOf: anObject [
-	^indexes at: anObject ifAbsent: [self error: 'slot of an object not found in closure']
+	| path |
+	HashTable nilToken == anObject ifTrue: [^indexes at: closure nilToken].
+	indexes at: anObject ifPresent: [:index | ^index].
+	path := closure isDebugging ifTrue: [closure reversePathOf: anObject].
+	self error: 'slot of an object not found in closure'
 ]
 
 { #category : #private }

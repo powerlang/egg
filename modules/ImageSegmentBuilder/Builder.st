@@ -14,6 +14,15 @@ Class {
 Builder >> activateDebugMode [
 	closure activateDebugMode
 ]
+{ #category : #closure }
+Builder >> addNilToken [
+	closure analyze: closure nilToken from: HashTable nilToken
+]
+
+{ #category : #closure }
+Builder >> importNilToken [
+	closure addBoundary: closure nilToken as: SymbolicReference nilToken
+]
 
 { #category : #closure }
 Builder >> addBoundary: anObject as: aSymbolicReference [

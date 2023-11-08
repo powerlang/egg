@@ -21,6 +21,13 @@ Class {
 	#category : #Kernel
 }
 
+{ #category : #'snapshotting' }
+Module >> prepareForSnapshot: aBuilder [
+	aBuilder
+		importNilToken;
+		addBoundary: Symbol symbolTable as: SymbolicReference symbolTable
+]
+
 { #category : #services }
 Module >> addClass: aClass [
 	classes add: aClass.
