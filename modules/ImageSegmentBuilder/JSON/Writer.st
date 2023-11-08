@@ -60,7 +60,7 @@ Writer >> generateIndexes [
 
 { #category : #services }
 Writer >> indexOf: anObject [
-	^indexes at: anObject ifAbsent: [indexes at: nil]
+	^indexes at: anObject ifAbsent: [self error: 'slot of an object not found in closure']
 ]
 
 { #category : #private }

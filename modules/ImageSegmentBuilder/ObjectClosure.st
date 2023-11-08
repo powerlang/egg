@@ -63,12 +63,10 @@ ObjectClosure >> addSlotsOf: anObject [
 ObjectClosure >> analyze: anObject from: source [
 	| surrogate |
 	surrogate := self surrogateFor: anObject.
-	surrogate _isSmallInteger ifTrue: [^self].
 	(boundary includesKey: surrogate) ifTrue: [^self].
 	(added includes: surrogate) ifTrue: [^self].
 	(surrogate shouldBeStoredIn: self) ifFalse: [^self addBoundary: surrogate].
 	self isDebugging ifTrue: [reversePaths at: anObject put: source].
-
 	added add: surrogate.
 	objects add: surrogate.
 	queue add: surrogate.
