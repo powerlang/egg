@@ -17,14 +17,14 @@ Class {
 	#category : #Kernel
 }
 
-{ #category : #bootstrapping }
-KernelModule >> prepareForSnapshot: anImageSegmentBuilder [
+{ #category : #snapshotting }
+KernelModule >> prepareForSnapshot: aBuilder [
 	| dict loaders |
 	dict := Dictionary new.
 	dict at: 'Kernel' put: self.
 	loaders := OrderedCollection new.
 	loaders add: moduleLoaders first.
-	anImageSegmentBuilder
+	aBuilder
 		map: loadedModules to: dict;
 		map: moduleLoaders to: loaders
 ]

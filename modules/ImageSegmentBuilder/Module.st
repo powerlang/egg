@@ -6,7 +6,10 @@
 Extension { #name : #Module }
 
 { #category : #'*snapshotting' }
-Module >> prepareForSnapshot: anImageSegmentWriter [
+Module >> prepareForSnapshot: aBuilder [
+	aBuilder
+		addBoundary: HashTable nilToken as:  SymbolicReference nilToken;
+		addBoundary: Symbol symbolTable as: SymbolicReference symbolTable
 ]
 
 { #category : #'*snapshotting' }

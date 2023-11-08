@@ -16,6 +16,11 @@ Builder >> activateDebugMode [
 ]
 
 { #category : #closure }
+Builder >> addBoundary: anObject as: aSymbolicReference [
+	closure addBoundary: anObject as: aSymbolicReference
+]
+
+{ #category : #closure }
 Builder >> build [
 	| metaclasses |
     classes := module classes.
