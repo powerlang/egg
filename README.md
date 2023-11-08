@@ -7,7 +7,7 @@ This includes native JIT-based VMs for popular OSes and JS-based runtimes.
 
 ## Contents of this repo
 
-This repository includes the Smalltalk sources of Egg ( in `modules` directory) as
+This repository includes the Smalltalk sources of Egg (in `modules` directory) as
 well as the different runtime implementations (`runtimes` directory) and the
 mechanisms to generate images from scratch (`bootstrap` directory).
 
