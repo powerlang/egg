@@ -28,23 +28,26 @@ PowertalkLinkedLinearInterpreter >> initialize [
 
 ]
 
+{ #category : #private }
+PowertalkLinkedLinearInterpreter >> initializeExecutableCodeOf: method [
+
+	^ self initializeLinearExecutableCodeOf: method
+]
+
 { #category : #visiting }
 PowertalkLinkedLinearInterpreter >> initializePrimitives [
 	super initializePrimitives.
 	linearizer primitives: primitives
 ]
 
+{ #category : #private }
+PowertalkLinkedLinearInterpreter >> linearizer [
+	^linearizer
+]
+
 { #category : #visiting }
 PowertalkLinkedLinearInterpreter >> prepareDispatch: dispatch [
 	context work:  {dispatch}
-]
-
-{ #category : #private }
-PowertalkLinkedLinearInterpreter >> prepareFor: method [
-	| operations |
-	operations := self
-		prepareForExecution: method. context
-		work: operations
 ]
 
 { #category : #visiting }
@@ -55,16 +58,11 @@ PowertalkLinkedLinearInterpreter >> prepareForBlock: sblock [
 	^ nilObj
 ]
 
-{ #category : #private }
-PowertalkLinkedLinearInterpreter >> prepareForExecution: anSCompiledMethod [
-	| operations array |
-	operations := runtime sexpressionsOf: anSCompiledMethod.
-	operations isCollection
-		ifTrue: [ ^ operations ].
-	linearizer visitMethod: operations.
-	array := linearizer operations asArray.
-	runtime methodOptimizedCode: operations put: array.
-	^array
+{ #category : #visiting }
+PowertalkLinkedLinearInterpreter >> prepareForExecuting: method [
+| work |
+work := self prepareForExecuting: method.
+	context work: work
 ]
 
 { #category : #initializing }

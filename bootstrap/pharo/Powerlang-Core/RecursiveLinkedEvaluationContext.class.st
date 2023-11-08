@@ -9,11 +9,12 @@ Class {
 
 { #category : #'as yet unclassified' }
 RecursiveLinkedEvaluationContext >> evaluateFor: interpreter [
+
 	| sexpressions result |
 	nonLocalReturn := [ :value | 
-	interpreter context: self homeContext parent.
-	^ value ].
-	sexpressions := system sexpressionsOf: method.
+	                  interpreter context: self homeContext parent.
+	                  ^ value ].
+	sexpressions := interpreter prepareForExecuting: method.
 	result := interpreter visitMethod: sexpressions.
 	interpreter context: self parent.
 	^ result

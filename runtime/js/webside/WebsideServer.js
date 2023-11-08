@@ -20,9 +20,7 @@ class WebsideServer extends Object {
 		this.debuggers = {};
 		this.workspaces = {};
 
-		// until we fix serialization of closures saved in kernel (their code is broken)
 		let api = new WebsideAPI(this);
-		api.classNamed("Symbol").symbolTable().policy().useStringHash();
 		api.pinSampleObjects();
 	}
 

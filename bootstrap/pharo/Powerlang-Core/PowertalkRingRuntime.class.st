@@ -49,6 +49,16 @@ PowertalkRingRuntime >> blockCapturesSelf: block [
 ]
 
 { #category : #services }
+PowertalkRingRuntime >> blockExecutableCode: block [
+	^block optimizedCode
+]
+
+{ #category : #services }
+PowertalkRingRuntime >> blockExecutableCode: block put: anObject [
+	block optimizedCode: anObject
+]
+
+{ #category : #services }
 PowertalkRingRuntime >> blockExecutionTree: block [
 	^ block executionTree
 ]
@@ -56,16 +66,6 @@ PowertalkRingRuntime >> blockExecutionTree: block [
 { #category : #services }
 PowertalkRingRuntime >> blockMethod: anObjectMap [
 	^ anObjectMap method
-]
-
-{ #category : #services }
-PowertalkRingRuntime >> blockOptimizedCode: block [
-	^block optimizedCode
-]
-
-{ #category : #services }
-PowertalkRingRuntime >> blockOptimizedCode: block put: anObject [
-	block optimizedCode: anObject
 ]
 
 { #category : #services }
@@ -106,6 +106,11 @@ PowertalkRingRuntime >> doLookup: aSymbol startingAt: aBehavior [
 	^ aBehavior isMeta
 		ifTrue: [ c := aBehavior environment at: #Class.
 			self doLookup: aSymbol startingAt: c ]
+]
+
+{ #category : #accessing }
+PowertalkRingRuntime >> executableCodeWork: code [
+	^code
 ]
 
 { #category : #services }
@@ -160,6 +165,12 @@ PowertalkRingRuntime >> isClosure: anObjectMap [
 	^anObjectMap class = ClosureMap
 ]
 
+{ #category : #services }
+PowertalkRingRuntime >> isExecutableCode: code [
+
+	^ code !== nil and: [code !== nilObj]
+]
+
 { #category : #accessing }
 PowertalkRingRuntime >> literalFor: anObject [
 	^ image transferLiteral: anObject
@@ -168,6 +179,12 @@ PowertalkRingRuntime >> literalFor: anObject [
 { #category : #accessing }
 PowertalkRingRuntime >> loadAssociationValue: association [
 	^association value
+]
+
+{ #category : #services }
+PowertalkRingRuntime >> localMethodAstcodes: anSCompiledMethod [
+
+	^ self methodAstcodes: anSCompiledMethod
 ]
 
 { #category : #services }
@@ -193,6 +210,12 @@ PowertalkRingRuntime >> methodArgumentCount: method [
 ]
 
 { #category : #services }
+PowertalkRingRuntime >> methodAstcodes: anSCompiledMethod [
+
+	^ anSCompiledMethod astcodes
+]
+
+{ #category : #services }
 PowertalkRingRuntime >> methodClassBinding: method [
 	^ method classBinding
 ]
@@ -202,20 +225,23 @@ PowertalkRingRuntime >> methodEnvironmentSize: anSCompiledMethod [
 	^anSCompiledMethod environmentCount
 ]
 
-{ #category : #accessing }
-PowertalkRingRuntime >> methodFor: aSymbol in: anRGBehavior [
-	overrides at: anRGBehavior->aSymbol ifPresent: [:m | ^m].
-	^anRGBehavior methodNamed: aSymbol
-]
-
 { #category : #services }
-PowertalkRingRuntime >> methodOptimizedCode: anSCompiledMethod [
+PowertalkRingRuntime >> methodExecutableCode: anSCompiledMethod [
 	^ anSCompiledMethod optimizedCode
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> methodOptimizedCode: method put: anObject [
-	method optimizedCode: anObject
+PowertalkRingRuntime >> methodExecutableCode: method put: anObject [
+
+	method optimizedCode: anObject.
+		^anObject 
+		
+]
+
+{ #category : #accessing }
+PowertalkRingRuntime >> methodFor: aSymbol in: anRGBehavior [
+	overrides at: anRGBehavior->aSymbol ifPresent: [:m | ^m].
+	^anRGBehavior methodNamed: aSymbol
 ]
 
 { #category : #services }
@@ -260,6 +286,11 @@ PowertalkRingRuntime >> newCompiledMethod [
 { #category : #accessing }
 PowertalkRingRuntime >> newEnvironmentSized: anInteger [
 	^ image newArraySized: anInteger
+]
+
+{ #category : #accessing }
+PowertalkRingRuntime >> newExecutableCodeFor: anObject [
+	^anObject
 ]
 
 { #category : #accessing }
@@ -334,11 +365,6 @@ PowertalkRingRuntime >> removeOverride: assoc [
 	symbolCache
 		at: symbol
 		ifPresent: [ :messages | messages do: #flushCache ]
-]
-
-{ #category : #accessing }
-PowertalkRingRuntime >> sexpressionsOf: anSCompiledMethod [
-	^ anSCompiledMethod prepareForExecution; optimizedCode
 ]
 
 { #category : #accessing }

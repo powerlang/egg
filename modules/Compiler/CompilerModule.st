@@ -16,3 +16,11 @@ Class {
 CompilerModule >> justLoaded [
 	AstcodeEncoder initializeBindingIds; initializeTreecodeIds; initializeClosureElementIds
 ]
+
+{ #category : #spec }
+CompilerModule >> imports [
+	^{
+		#Kernel -> #Error. #Kernel -> #ByteArray. #Kernel -> #Module. #Kernel -> #Species.
+		#Kernel -> #OrderedDictionary
+	}
+] 

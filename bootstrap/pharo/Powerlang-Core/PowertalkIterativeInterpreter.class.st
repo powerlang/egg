@@ -30,19 +30,9 @@ PowertalkIterativeInterpreter >> prepareDispatch: dispatch [
 	self subclassResponsibility
 ]
 
-{ #category : #private }
-PowertalkIterativeInterpreter >> prepareFor: anSCompiledMethod [
-	self subclassResponsibility
-]
-
 { #category : #accessing }
 PowertalkIterativeInterpreter >> prepareForBlock: sblock [
 	^self subclassResponsibility	
-]
-
-{ #category : #private }
-PowertalkIterativeInterpreter >> prepareForExecution: method [
-	self subclassResponsibility
 ]
 
 { #category : #accessing }

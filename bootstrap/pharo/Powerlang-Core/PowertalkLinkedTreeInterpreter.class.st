@@ -25,6 +25,18 @@ PowertalkLinkedTreeInterpreter >> evaluationContextClass [
 ]
 
 { #category : #accessing }
+PowertalkLinkedTreeInterpreter >> initializeExecutableCodeOf: method [
+
+	^self initializeRecursiveExecutableCodeOf: method
+]
+
+{ #category : #accessing }
+PowertalkLinkedTreeInterpreter >> linearizer [
+
+	self shouldNotImplement
+]
+
+{ #category : #accessing }
 PowertalkLinkedTreeInterpreter >> loadRfromStack: anInteger [
 	| load |
 	load := SOpLoadRfromStack new index: anInteger.
@@ -41,13 +53,6 @@ PowertalkLinkedTreeInterpreter >> prepareDispatch: dispatch [
 	context pushOperation: dispatch
 ]
 
-{ #category : #private }
-PowertalkLinkedTreeInterpreter >> prepareFor: method [
-	| sexpressions |
-	sexpressions := self prepareForExecution: method.
-	self push: sexpressions
-]
-
 { #category : #accessing }
 PowertalkLinkedTreeInterpreter >> prepareForBlock: sblock [
 	| statements |
@@ -58,10 +63,12 @@ PowertalkLinkedTreeInterpreter >> prepareForBlock: sblock [
 	^ nilObj
 ]
 
-{ #category : #private }
-PowertalkLinkedTreeInterpreter >> prepareForExecution: anSCompiledMethod [
-	^runtime sexpressionsOf: anSCompiledMethod.
+{ #category : #accessing }
+PowertalkLinkedTreeInterpreter >> prepareForExecuting: method [
 
+	| work |
+	work := super prepareForExecuting: method.
+	self push: work
 ]
 
 { #category : #accessing }
@@ -97,12 +104,14 @@ PowertalkLinkedTreeInterpreter >> pushR [
 
 { #category : #initializing }
 PowertalkLinkedTreeInterpreter >> underprimitiveRestart [
+
 	^ [ :receiver :arguments | 
-	| sexpressions |
-	sexpressions := runtime sexpressionsOf: context method.
-	context
-		restart;
-		pushOperation: sexpressions ]
+	  
+	  context
+		  restart.
+		self prepareForExecuting: context method.
+	  
+		   ]
 ]
 
 { #category : #accessing }
@@ -173,9 +182,8 @@ PowertalkLinkedTreeInterpreter >> visitMethod: anSMethod [
 
 { #category : #accessing }
 PowertalkLinkedTreeInterpreter >> visitOpRestart: anSOpRestart [
-	| sexpressions |
-	sexpressions := runtime sexpressionsOf: context method.
-	self push: sexpressions
+
+ self prepareForExecuting: context method
 ]
 
 { #category : #accessing }

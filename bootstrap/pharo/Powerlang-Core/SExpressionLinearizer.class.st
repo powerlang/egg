@@ -484,7 +484,8 @@ SExpressionLinearizer >> visitAssignment: anSAssignment [
 
 { #category : #initialization }
 SExpressionLinearizer >> visitBlock: anSBlock [
-	| prevInBlock prevOperations statements |
+
+	| prevInBlock prevOperations statements code |
 	operations add: anSBlock.
 	prevInBlock := inBlock.
 	prevOperations := operations.
@@ -494,12 +495,12 @@ SExpressionLinearizer >> visitBlock: anSBlock [
 	statements do: [ :node | node acceptVisitor: self ].
 	statements isEmpty
 		ifTrue: [ self loadRwithNil ]
-		ifFalse: [ statements last isReturn
-				ifFalse: [ self return ] ].
+		ifFalse: [ statements last isReturn ifFalse: [ self return ] ].
 	anSBlock isInlined ifFalse: [ 
-	runtime
-		blockOptimizedCode: anSBlock compiledCode
-		put: operations asArray].
+		code := runtime newExecutableCodeFor: operations asArray.
+		runtime
+			blockExecutableCode: anSBlock compiledCode
+			put: code ].
 	operations := prevOperations.
 	inBlock := prevInBlock
 ]

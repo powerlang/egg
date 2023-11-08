@@ -641,6 +641,11 @@ Character >> isLetter [
 	value < 91 ifTrue: [^true].
 	value < 97 ifTrue: [^false].
 	value < 123 ifTrue: [^true].
+	value < 128 ifTrue: [^false].
+	value < 256 ifTrue: [ | byte bit |
+		byte := #[0x0 0x0 0x0 0x0 0x0 0x4 0x20 0x4 0xFF 0xFF 0x7F 0xFF 0xFF 0xFF 0x7F 0xFF] at: ((value - 128) bitShift: -3) + 1.
+		bit := (value bitAnd: 7) + 1.
+		^(byte bitAt: bit) == 1].
 	^ActiveLocale isLetter: self
 ]
 

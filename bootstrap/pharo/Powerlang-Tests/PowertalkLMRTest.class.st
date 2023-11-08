@@ -40,6 +40,7 @@ PowertalkLMRTest >> assertNoLeftoverFrames [
 
 { #category : #tests }
 PowertalkLMRTest >> compile: aString in: classname during: aBlock [
+
 	| class behavior md selector method |
 	class := self globalNamed: classname.
 	behavior := runtime speciesInstanceBehavior: class.
@@ -48,12 +49,11 @@ PowertalkLMRTest >> compile: aString in: classname during: aBlock [
 	self assert: method notNil.
 	method := self convertMethod: method.
 	selector := method slotAt: 5.
-	runtime
-		sendLocal: #at:put:
-		to: md
-		with:
-			{selector.
-			method}
+	runtime sendLocal: #at:put: to: md with: { 
+			selector.
+			method }.
+	aBlock value.
+	runtime sendLocal: #removeKey: to: md with: { selector }
 ]
 
 { #category : #tests }

@@ -55,6 +55,21 @@ LMRObjectHeader >> isSmall [
 ]
 
 { #category : #accessing }
+LMRObjectHeader >> printOn: aStream [
+
+	aStream
+		nextPutAll: '[ hash: ';
+		print: hash;
+		nextPutAll: ' | size: ';
+		print: size;
+		nextPutAll: ' | flags: ';
+		nextPutAll: flags hex;
+		nextPutAll: ' | ';
+		print: behavior;
+		nextPut: $]
+]
+
+{ #category : #accessing }
 LMRObjectHeader >> size [
 	^size 
 ]

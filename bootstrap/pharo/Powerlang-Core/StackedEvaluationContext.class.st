@@ -76,10 +76,11 @@ StackedEvaluationContext >> buildFrameFor: receiver code: code environment: envi
 
 { #category : #initialization }
 StackedEvaluationContext >> buildLaunchFrame [
-	| launcher code |
+	| launcher code executable |
 	launcher := system newCompiledMethod.
 	code := system newArraySized: 0.
-	system methodOptimizedCode: launcher put: code.
+	executable := system newExecutableCodeFor: code.
+	system methodExecutableCode: launcher put: executable.
 	self
 		buildMethodFrameFor: system nil
 		code: launcher

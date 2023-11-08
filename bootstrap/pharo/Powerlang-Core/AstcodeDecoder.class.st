@@ -79,14 +79,18 @@ AstcodeDecoder >> decodeAssignment [
 
 { #category : #public }
 AstcodeDecoder >> decodeBlock [
-	| expression inlined block index |
+
+	| expression inlined block index code |
 	expression := SBlock new.
 	inlined := self nextBoolean.
 	inlined
 		ifTrue: [ expression inlinedArgs: self nextArray ]
-		ifFalse: [ index := self nextInteger.
+		ifFalse: [ 
+			index := self nextInteger.
 			block := self literalAt: index.
-			builder ifNotNil: [ builder blockOptimizedCode: block put: expression ].
+			builder ifNotNil: [ 
+				code := builder newExecutableCodeFor: expression.
+				builder blockExecutableCode: block put: code ].
 			expression
 				compiledCode: block;
 				index: index;

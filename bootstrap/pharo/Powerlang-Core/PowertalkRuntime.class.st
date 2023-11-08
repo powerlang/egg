@@ -47,6 +47,12 @@ PowertalkRuntime >> evaluatePrimitiveHash: receiver [
 	^ self newInteger: hash
 ]
 
+{ #category : #accessing }
+PowertalkRuntime >> executableCodeWork: anLMRExecutableCode [
+
+	^ self subclassResponsibility
+]
+
 { #category : #initialization }
 PowertalkRuntime >> false [
 	^ falseObj
@@ -55,10 +61,12 @@ PowertalkRuntime >> false [
 { #category : #accessing }
 PowertalkRuntime >> flushDispatchCache: aSymbol [
 
+	| cached |
 	symbolCache
 		at: aSymbol
 		ifPresent: [ :messages | messages do: #flushCache ].
-	^ methodCache keys select: [ :key |  key key == aSymbol ] thenDo: [ :key | self removeKey: key]
+	cached := methodCache keys select: [ :key |  key key == aSymbol ].
+	cached do: [ :key | methodCache removeKey: key]
 ]
 
 { #category : #accessing }
@@ -113,6 +121,12 @@ PowertalkRuntime >> literalFor: anObject [
 ]
 
 { #category : #accessing }
+PowertalkRuntime >> localMethodAstcodes: method [
+
+	^ self subclassResponsibility
+]
+
+{ #category : #accessing }
 PowertalkRuntime >> localSymbolFrom: anObject [
 	^ anObject bytes allButLast asString asSymbol
 ]
@@ -120,6 +134,12 @@ PowertalkRuntime >> localSymbolFrom: anObject [
 { #category : #accessing }
 PowertalkRuntime >> lookup: aSymbol startingAt: aBehavior [
 	^methodCache at: aSymbol -> aBehavior ifAbsentPut: [ self doLookup: aSymbol startingAt: aBehavior ]
+]
+
+{ #category : #accessing }
+PowertalkRuntime >> methodAstcodes: method [
+
+	^ self subclassResponsibility
 ]
 
 { #category : #accessing }
@@ -150,6 +170,12 @@ PowertalkRuntime >> newClosureFor: compiledBlock [
 { #category : #accessing }
 PowertalkRuntime >> newEnvironmentSized: anInteger [
 	^self subclassResponsibility
+
+]
+
+{ #category : #accessing }
+PowertalkRuntime >> newExecutableCodeFor: anObject [
+	^ self subclassResponsibility
 
 ]
 
@@ -193,8 +219,15 @@ PowertalkRuntime >> sendLocal: aSymbol to: receiver with: anArray [
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> sexpressionsOf: aMethod [
-	^self subclassResponsibility
+PowertalkRuntime >> sexpressionsOf: method [
+
+	| astcodes decoder |
+	astcodes := self localMethodAstcodes: method.
+	decoder := AstcodeDecoder new
+		           stream: astcodes readStream;
+		           method: method;
+		           builder: self.
+	^ decoder decodeMethod
 ]
 
 { #category : #accessing }

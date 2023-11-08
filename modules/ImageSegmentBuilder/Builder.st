@@ -7,13 +7,42 @@ Class {
 		'wordSize',
 		'classes'
 	],
-	#category : #'Builder'
+	#category : #ImageSegmentBuilder
 }
+
+{ #category : #degugging }
+Builder >> activateDebugMode [
+	closure activateDebugMode
+]
+
+{ #category : #closure }
+Builder >> addBoundary: anObject as: aSymbolicReference [
+	closure addBoundary: anObject as: aSymbolicReference
+]
 
 { #category : #closure }
 Builder >> build [
+	| metaclasses |
+    classes := module classes.
+	classes do: [:c | self mapClass: c].
 	module prepareForSnapshot: self.
-	closure traverse: module.
+	metaclasses := classes collect: [:c | c class].
+	closure scope: classes , metaclasses; traverse: module.
+]
+
+{ #category : #accessing }
+Builder >> objects [
+	^closure objects
+]
+
+{ #category : #accessing }
+Builder >> mapping [
+	^closure mapping
+]
+
+{ #category : #accessing }
+Builder >> imports [
+	^closure boundary
 ]
 
 { #category : #accessing }
@@ -22,45 +51,48 @@ Builder >> closure [
 ]
 
 { #category : #private }
-Builder >> configureClass: aClass [
+Builder >> mapClass: aClass [
 	self
-		configureSuperclass: aClass;
-		configureSubclasses: aClass;
-		configureMethods: aClass;
-		configureMethods: aClass class
+		mapSubclassesOf: aClass;
+		mapMethodsOf: aClass;
+		mapMethodsOf: aClass class
 ]
 
 { #category : #private }
-Builder >> configureMethods: aClass [
+Builder >> mapMethodsOf: aClass [
     | original saved |
     original := aClass methodDictionary.
 	saved := (classes includes: aClass instanceClass)
 		ifTrue: [original collect: [:method | module originalMethodFor: method]]
 		ifFalse: [Dictionary new].
     saved := saved select: [:method | method notNil].
-	saved do: [:method | closure map: method to: method copy].
+	saved do: [:method | self mapMethod: method].
     closure map: original to: saved
 ]
 
 { #category : #private }
-Builder >> configureSubclasses: aClass [
+Builder >> mapMethod: method [
+	| copy |
+	copy := method copy.
+	closure map: method to: copy.
+	method hasBlocks ifFalse: [^self].
+	method withIndexDo: [:b :i | | bcopy |
+		b isBlock ifTrue: [
+			bcopy := copy at: i.
+			closure map: b to: bcopy]]
+]
+
+{ #category : #private }
+Builder >> mapSubclassesOf: aClass [
     | original saved |
     original := aClass subclasses.
     saved := original select: [:s | module classes includes: s].
     closure map: original to: saved
 ]
 
-{ #category : #private }
-Builder >> configureSuperclass: aClass [
-    | superclass |
-    superclass := aClass superclass.
-	superclass ifNil: [^self].
-    (module classes includes: superclass) ifFalse: [self import: superclass]
-]
-
 { #category : #initializing }
 Builder >> initialize [
-	closure := ObjectClosure new.
+	closure := ObjectClosure new builder: self
 ]
 
 { #category : #accessing }
@@ -69,8 +101,11 @@ Builder >> map: anObject to: anotherObject [
 ]
 
 { #category : #accessing }
+Builder >> module [
+	^module
+]
+
+{ #category : #accessing }
 Builder >> module: aModule [
 	module := aModule.
-	classes := module classes.
-    module classes do: [:c | self configureClass: c]
 ]

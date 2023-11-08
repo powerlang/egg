@@ -25,7 +25,6 @@ Class {
 	],
 	#classVars : [
 		'KernelSpec',
-		'LMRBootstrapperSpec',
 		'VMPrimitivesSpec'
 	],
 	#category : #'Powerlang-Core-Execution-Ring'
@@ -39,18 +38,6 @@ PowertalkRingModule class >> fromSpec [
 { #category : #accessing }
 PowertalkRingModule class >> kernelSpec [
 	^ KernelSpec ifNil: [ KernelSpec := self readSpec: #Kernel at: '.' ]
-]
-
-{ #category : #accessing }
-PowertalkRingModule class >> lmrBootstrapper [
-	^ self new
-		specs: self lmrBootstrapperSpec
-]
-
-{ #category : #accessing }
-PowertalkRingModule class >> lmrBootstrapperSpec [
-	^ LMRBootstrapperSpec
-		ifNil: [ LMRBootstrapperSpec := self readSpec: #Bootstrapper at: '.' ]
 ]
 
 { #category : #'instance creation' }
@@ -82,8 +69,7 @@ PowertalkRingModule class >> resetSpecs [
 	"
 
 	KernelSpec := nil.
-	VMPrimitivesSpec := nil.
-	LMRBootstrapperSpec := nil
+	VMPrimitivesSpec := nil
 ]
 
 { #category : #accessing }
@@ -307,7 +293,7 @@ PowertalkRingModule >> initializeClass: definition superclass: superclass superb
 	subclasses := definition subclasses
 		collect: [ :def | classes at: def ].
 	subclasses := kernel newArray: subclasses.
-	name := kernel newString: definition name.
+	name := kernel newSymbol: definition name.
 	flag := self formatOfClass: definition.
 	format := kernel newInteger: flag.
 	ivars := kernel newStringArray: definition instVarNames.

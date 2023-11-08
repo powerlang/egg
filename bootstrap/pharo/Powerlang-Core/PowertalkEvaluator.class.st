@@ -108,6 +108,23 @@ PowertalkEvaluator >> initialize [
 	messageCount := 0
 ]
 
+{ #category : #accessing }
+PowertalkEvaluator >> initializeExecutableCodeOf: method [
+
+	^self subclassResponsibility
+]
+
+{ #category : #accessing }
+PowertalkEvaluator >> initializeLinearExecutableCodeOf: method [
+
+	| sexpressions executable |
+	sexpressions := runtime sexpressionsOf: method.
+	self linearizer visitMethod: sexpressions.
+	executable := runtime newExecutableCodeFor:
+		              self linearizer operations asArray.
+	^runtime methodExecutableCode: method put: executable
+]
+
 { #category : #initializing }
 PowertalkEvaluator >> initializePrimitives [
 
@@ -156,10 +173,19 @@ PowertalkEvaluator >> initializePrimitives [
 		at: #BootstrapDictKeys put: self primitiveBootstrapDictKeys;
 		at: #BootstrapDictAt put: self primitiveBootstrapDictAt;
 		at: #BootstrapDictAtPut put: self primitiveBootstrapDictAtPut;
-		at: #BootstrapLoadModule put: self primitiveBootstrapLoadModule;
-		at: #BootstrapFixOverrides put: self primitiveBootstrapFixOverrides;
+		at: #HostLoadModule put: self primitiveHostLoadModule;
+		at: #HostFixOverrides put: self primitiveHostFixOverrides;
 		at: #PrimeFor put: self primitivePrimeFor;
-		at: #FlushFromCaches put: self primitiveFlushFromCaches 
+		at: #FlushFromCaches put: self primitiveFlushFromCaches
+]
+
+{ #category : #accessing }
+PowertalkEvaluator >> initializeRecursiveExecutableCodeOf: method [
+
+	| sexpressions executable |
+	sexpressions := runtime sexpressionsOf: method.
+	executable := runtime newExecutableCodeFor: sexpressions.
+	^runtime methodExecutableCode: method put: executable
 ]
 
 { #category : #initializing }
@@ -217,6 +243,11 @@ PowertalkEvaluator >> isIdentical: anObject to: anotherObject [
 ]
 
 { #category : #accessing }
+PowertalkEvaluator >> linearizer [
+	^self subclassResponsibility
+]
+
+{ #category : #accessing }
 PowertalkEvaluator >> lookup: aSymbol startingAt: aBehavior sendSite: anSMessage [
 	| method symbol |
 	method := anSMessage methodFor: aBehavior.
@@ -239,6 +270,23 @@ PowertalkEvaluator >> lookup: aSymbol startingAt: aBehavior sendSite: anSMessage
 PowertalkEvaluator >> nil [
 	^nilObj
 	
+]
+
+{ #category : #accessing }
+PowertalkEvaluator >> prepareExecutableCode: method [
+
+	| code |
+	code := runtime methodExecutableCode: method.
+	(runtime isExecutableCode: code) ifTrue: [ ^ code ].
+	^ self initializeExecutableCodeOf: method
+]
+
+{ #category : #visiting }
+PowertalkEvaluator >> prepareForExecuting: method [
+
+	| code |
+	code := self prepareExecutableCode: method.
+	^ runtime executableCodeWork: code
 ]
 
 { #category : #primitives }
@@ -298,16 +346,6 @@ PowertalkEvaluator >> primitiveBootstrapDictNew [
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveBootstrapFixOverrides [
-	^ [ runtime fixOverrides ]
-]
-
-{ #category : #primitives }
-PowertalkEvaluator >> primitiveBootstrapLoadModule [
-	^ [ runtime loadModule: context firstArgument]
-]
-
-{ #category : #primitives }
 PowertalkEvaluator >> primitiveClass [
 	^ [ runtime speciesFor: context self ]
 ]
@@ -360,6 +398,16 @@ PowertalkEvaluator >> primitiveFor: aSymbol [
 { #category : #primitives }
 PowertalkEvaluator >> primitiveHash [
 	^ [ runtime newInteger: (runtime hashFor: context self) ]
+]
+
+{ #category : #primitives }
+PowertalkEvaluator >> primitiveHostFixOverrides [
+	^ [ runtime fixOverrides ]
+]
+
+{ #category : #primitives }
+PowertalkEvaluator >> primitiveHostLoadModule [
+	^ [ runtime loadModule: context firstArgument]
 ]
 
 { #category : #primitives }

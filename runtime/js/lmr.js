@@ -199,6 +199,7 @@ Object.prototype._arrow = function(value) {
 Object.prototype._equal = function(value) { return this ==  value; }
 Object.prototype._notEqual = function(value) { return this !=  value; }
 Object.prototype._equalEqual = function(value) { return this ===  value; }
+Object.prototype._notEqualEqual = function(value) { return this !==  value; }
 
 // add some Smalltalk-ish methods to JS numbers
 Number.prototype._lessEqualThan = function(value) { return this <=  value; }

@@ -379,7 +379,7 @@ RingBasedLMRBootstrapper >> image: aPowertalkRingImage [
 	index := (source => #CompiledMethod) allInstVarNames indexOf:
 		         'optimizedCode'.
 	dest
-		methodOptimizedCodeIndex: index;
+		methodExecutableCodeIndex: index;
 		methodInstSize: (source => #CompiledMethod) allInstVarNames size
 ]
 
@@ -478,27 +478,14 @@ RingBasedLMRBootstrapper >> instantiateMetaobjects [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> loadBootstrapModule [
-	| spec classes moduleSpec bootstrapper |
-	spec := PowertalkRingModule lmrBootstrapperSpec.
-	classes := spec allClasses.
-	classes := classes
-		collect: [ :classSpec | self createNewClassFrom: classSpec in: nil].
-	moduleSpec := spec at: #BootstrapModule.
-	bootstrapper := self createNewModule: moduleSpec.
-	self addClasses: classes to: bootstrapper.
-	dest sendLocal: #justLoaded to: bootstrapper.
-	^bootstrapper
-]
-
-{ #category : #initialization }
 RingBasedLMRBootstrapper >> loadModule: symbol [
 
-	| spec classes moduleSpec module extensions |
+	| spec classes moduleName moduleSpec module extensions |
 	spec := self readModuleSpec: symbol.
 	classes := spec allClasses.
-	moduleSpec := spec at: symbol , #Module.
-	moduleSpec ifNil: [ moduleSpec := spec at: #Module , symbol ].
+	moduleName := ('.' split: symbol) last asSymbol.
+	moduleSpec := spec at: moduleName , #Module.
+	moduleSpec ifNil: [ moduleSpec := spec at: #Module , moduleName ].
 	moduleSpec
 		ifNil: [ moduleSpec := source specs at: #Module ]
 		ifNotNil: [ 
@@ -581,7 +568,7 @@ RingBasedLMRBootstrapper >> override: classname with: rgMethod [
 RingBasedLMRBootstrapper >> prepareClosuresForExecution [
 	| mapped |
 	closureMethods
-		do: [ :method | mapped := mapping at: method. dest interpreter prepareForExecution: mapped ]
+		do: [ :method | mapped := mapping at: method. dest interpreter prepareExecutableCode: mapped ]
 ]
 
 { #category : #initialization }
@@ -614,6 +601,14 @@ RingBasedLMRBootstrapper >> rootDirectory [
 ]
 
 { #category : #initialization }
+RingBasedLMRBootstrapper >> sendLoadModule: aSymbol [
+
+	| symbol |
+	symbol := dest addSymbol: aSymbol.
+	^ dest sendLocal: #load: to: dest kernel with: { symbol }
+]
+
+{ #category : #initialization }
 RingBasedLMRBootstrapper >> source: aPowertalkRingImage [
 	source := aPowertalkRingImage
 ]
@@ -637,4 +632,13 @@ RingBasedLMRBootstrapper >> transferLiteral: anObject [
 	anObject isCharacter
 		ifTrue: [ ^ dest newCharacter: anObject ].
 	self ASSERT: false
+]
+
+{ #category : #initialization }
+RingBasedLMRBootstrapper >> useHostModuleLoader [
+dest
+		          sendLocal: #useHostModuleLoader
+		          to: dest kernel
+		         .
+
 ]
