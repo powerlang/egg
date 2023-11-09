@@ -1,36 +1,40 @@
 # powerlang.js - A Smalltalk VM that runs on top of JavaScript
 
-In a nutshell, with this repo you get a bunch of js files that allow how to load an image file in a JSON format and execute Smalltalk code by evaluating Bee ~~bytecodes~~ treecodes.
+In a nutshell, here you get a bunch of js files that allow how to load an image file in a JSON format and execute Smalltalk code by evaluating Egg code.
 
 # Getting Started
 
-Until we have a CI set in place, you have to clone this repo and build the whole thing.
-  
+*IMPORTANT NOTE* this doc is a little bit outdated and there are quite a few things that may not work.
+
+Unless you want to build the whole thing, you could just download a release from the appropriate section in github.
+
 ## Building
 
-  
+Running `make js` from root egg dir should build everything needed
 
-    # fetch the code, generate interpreter and image, fetch js dependencies
-    git clone git@github.com:powerlang/powerlang-js.git
-    cd powerlang-js
-    make all
-    npm install
 
-**NOTE:** The makefile is not complete yet, so make step fails. After make ends (with error), you need to do the following manually in Pharo:
+### Build system
 
-1 - open the generated bootstrap image with:
-     cd powerlang
-     ./pharo-ui bootstrap.image
+The idea is that you have egg code in root dir, and here in `image-segments` subdir you'll get the binaries for
+the parts of the image, like `kernel.json` and `compiler.json`.
 
-2 - load the Powerlang-JS package using Iceberg (the repo should already be configured and show up as '.').
+A bootstrap process generates those files from bare egg code, using pharo (see `egg/bootstrap/pharo`). The process
+of bootstrapping does the following (it's all done automatically through `make`):
 
-3 - execute `JSTranspiler transpilePowerlangInterpreter` to generate the js files of the interpreter
-4 - debug the test `PowerlangJSTest>>#test010WriteKernelAsJSON`, and when it halts, manually evaluate in the debugger: `'../kernel.json' asFileReference writeStreamDo: [ :s | s nextPutAll: result asLocalString ]`.
+1 - generates an bootstrap pharo image with the needed pharo code
+2 - loads the Powerlang-* packages using Iceberg
+3 - executes `JSTranspiler transpilePowerlangInterpreter` to generate the js files of the interpreter. Those files get
+    writen `egg/runtimes/js/interpreter`.
+4 - executes `JSTranspiler generateKernelModule` et al
 
 ## Evaluating Smalltalk code using nodejs
-    $ node cli.js --eval "1 tinyBenchmarks"
+    $ node sample-server/index.js
 
-## Opening a Smalltalk REPL
+## In the future it will be possible the following
+
+    npm install egg-js
+
+    ## Opening a Smalltalk REPL
     $ node repl.js
     Welcome to powerlang.js!
     [1] > 3 + 4
@@ -39,7 +43,7 @@ Until we have a CI set in place, you have to clone this repo and build the whole
     See you soon!
     $
 
-## Using Smalltalk as a library from nodejs
+    ## Using Smalltalk as a library from nodejs
 
     # bench.js
     import powerlang from 'powerlang.js';
@@ -54,7 +58,7 @@ Until we have a CI set in place, you have to clone this repo and build the whole
     $ node bench.js
     bytecodeIntensiveBenchmark returned 1028 and took 3233.994176030159 milliseconds
 
-## Using Smalltalk as a library in a web page
+    ## Using Smalltalk as a library in a web page
 
     # bench.html
     <!DOCTYPE html>
