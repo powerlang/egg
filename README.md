@@ -1,4 +1,4 @@
-# to-be-named Smalltalk (a.k.a. egg)
+# Egg Smalltalk
 
 This is an implementation of a Smalltalk-80 derived environment. 
 Designed to support multiple VMs that allow running on multiple platforms.
