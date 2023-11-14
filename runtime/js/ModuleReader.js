@@ -63,7 +63,9 @@ const ModuleReader = class {
 			case ObjectTypes.SmallIntegerObject:
 				return this.newSmallInteger(object);
             case ObjectTypes.Import:
-                return this.environment[object.name];
+				const imported = this.environment[object.name];
+				if (!imported) debugger;
+                return imported;
 			default: 
 				throw "unknown object type";
 		}
