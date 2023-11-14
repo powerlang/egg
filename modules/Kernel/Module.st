@@ -146,10 +146,11 @@ Module >> import: name from: moduleName as: newName [
 
 { #category : #services }
 Module >> importDescriptor: descriptor [
-	| exportName moduleName |
-	exportName := descriptor value.
+	| moduleName token exportNames |
 	moduleName := descriptor key.
-	^self import: exportName from: moduleName
+	token := descriptor value.
+	exportNames := token isArray ifTrue: [token] ifFalse: [{token}].
+	exportNames do: [:name | self import: name from: moduleName]
 ]
 
 { #category : #services }

@@ -207,7 +207,7 @@ Writer >> writeObjectSlots: obj [
 
 { #category : #accessing }
 Writer >> writeObjects [
-	objects , imports
+	objects
 		do: [ :obj | 
 			stream nextPut: $[.
 			self writeObject: obj.

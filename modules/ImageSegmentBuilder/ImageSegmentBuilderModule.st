@@ -15,7 +15,7 @@ ImageSegmentBuilderModule >> imports [
 		#Kernel -> #Behavior. #Kernel -> #Boolean. #Kernel -> #False.
 		#Kernel -> #HashTable. #Kernel -> #IdentityDictionary. #Kernel -> #IdentitySet.
 		#Kernel -> #KernelModule. #Kernel -> #Module. #Kernel -> #Symbol.
-		#Kernel -> #True. #Kernel -> #UndefinedObject}
+		#Kernel -> #SymbolicReference. #Kernel -> #True. #Kernel -> #UndefinedObject}
 ] 
 
 { #category : #bootstrapping }
