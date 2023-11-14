@@ -40,7 +40,7 @@ let Bootstrapper = class {
 	}
 
 	loadModule_(name) {
-		return this.loadModuleFromFile('../image-segments/' + name + '.json');
+		return this.loadModuleFromFile('image-segments/' + name + '.json');
 	}
 
 	loadModuleFromFile(path)
