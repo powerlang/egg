@@ -312,7 +312,7 @@ PowertalkEvaluator >> primitiveBehavior [
 	| receiver |
 	^ [ receiver := context self.
 	receiver isImmediate
-		ifTrue: [ self smallintBehavior ]
+		ifTrue: [ runtime smallIntegerBehavior ]
 		ifFalse: [ receiver behavior ] ]
 ]
 
