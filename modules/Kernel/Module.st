@@ -100,6 +100,7 @@ Module >> defaultName [
 Module >> exports [
 	| result |
 	result := Dictionary new.
+	result at: '__module__' put: self.
 	exports do: [:name | | value |
 		value := namespace at: name.
 		result at: name put: value].
