@@ -5,7 +5,12 @@ MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 GIT_PATH := $(realpath $(dir $(MKFILE_PATH))/../..)
 
 # distingish windows as iceberg url requires adding a / before C:/
-ifdef OS
+ifdef OS # only defined in windows
+  MIN_MAKE_VERSION := 3.81
+  GREATER_VERSION := $(lastword $(shell printf "$(MAKE_VERSION)\n$(MIN_MAKE_VERSION)\n" | sort -V) )
+  ifeq ($(GREATER_VERSION),$(MIN_MAKE_VERSION))
+  $(error This version of make is too old and known to be buggy in Windows, update to some newer one (i.e. choco install make))
+  endif
 ICEBERG_URL=file:///$(GIT_PATH)
 else
 ICEBERG_URL=file://$(GIT_PATH)
