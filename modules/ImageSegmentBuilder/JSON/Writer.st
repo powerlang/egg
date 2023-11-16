@@ -87,7 +87,7 @@ Writer >> stream: aWriteStream [
 Writer >> write [
 	self generateIndexes.
 	stream nextPutAll: '{ '; crtab; nextPutAll: '"objects" : ['; crtab: 2.
-	self writeObjects; writeImportedObjects.
+	self writeObjects.
 	stream crtab; nextPutAll: '],'; crtab; nextPutAll: '"imports" : ['; crtab: 2.
 	self writeImports.
 	stream crtab; nextPutAll: '],'; crtab; nextPutAll: '"exports" : ['; crtab: 2.
@@ -138,23 +138,6 @@ Writer >> writeImports [
 	imports
 		do: [ :symref | self writeImport: symref ]
 		separatedBy: [stream nextPutAll: ', '; crtab: 2]
-]
-
-{ #category : #writing }
-Writer >> writeImportedObjects [
-	| index |
-	imports size = 0 ifTrue: [^self].
-	stream nextPutAll: ', '; crtab: 2.
-	index := 0.
-	imports
-		do: [ :class |
-			stream 
-				nextPutAll: '[4, ';
-				nextPutAll: index asString;
-				nextPutAll: ']' ]
-		separatedBy: [
-			index := index + 1.
-			stream nextPutAll: ', '; crtab: 2]
 ]
 
 { #category : #writing }
