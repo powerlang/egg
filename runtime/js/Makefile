@@ -8,6 +8,8 @@ POWERLANG_DIR=$(GIT_PATH)/bootstrap/pharo
 
 all: interpreter kernel
 
+clean:
+
 $(POWERLANG_DIR)/powerlangjs.image:
 	make -C $(POWERLANG_DIR) bootstrap.image
 	cd $(POWERLANG_DIR) && ./pharo bootstrap.image save powerlangjs
