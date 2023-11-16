@@ -75,6 +75,16 @@ ProtoObject >> _beUnseen [
 	self _flagsMask: HasBeenSeenMask
 ]
 
+{ #category : #lookup }
+ProtoObject >> _cachedLookup: aSymbol [
+	^self _cachedLookup: aSymbol in: self behavior
+]
+
+{ #category : #lookup }
+ProtoObject >> _cachedLookup: aSymbol in: behavior [
+	^GlobalDispatchCache current lookupAndCache: aSymbol in: behavior
+]
+
 { #category : #'*header access' }
 ProtoObject >> _copyBasicHeaderFrom: other [
 	self
@@ -253,6 +263,13 @@ ProtoObject >> _pointersSize [
 	^self _isBytes ifTrue: [0] ifFalse: [self _size]
 ]
 
+{ #category : #'raw access' }
+ProtoObject >> _uLongAtValidOffset: offset put: anInteger [
+	anInteger size > 4 ifTrue: [self error: 'does not fit in 32 bits'].
+	self _primitiveULongAtOffset: offset put: anInteger.
+	^anInteger
+]
+
 { #category : #unwinding }
 ProtoObject >> _returnTo: aBeeFrame [
 	[#forceEnvironment].
@@ -329,6 +346,24 @@ ProtoObject >> initializeExtended: aBoolean contentSize: size [
 		ifFalse: [self _smallSize: size; _beSmall]
 ]
 
+{ #category : #lookup }
+ProtoObject >> lookupAndInvoke: aSymbol [
+	| cm |
+	cm := self _cachedLookup: aSymbol.
+	cm == nil ifTrue: [^self doesNotUnderstandSelector: aSymbol].
+	cm prepareForExecution.
+	self _transferControlDiscardingLastArgTo: cm validNativeCodeAddress _asNative
+]
+
+{ #category : #system }
+ProtoObject >> perform: aSymbol withArguments: anArray [
+	| size |
+	size := anArray basicSize.
+	aSymbol arity = size ifFalse: [^self error: 'incorrect arity'].
+	anArray _expandInStackSized: size.
+	^self lookupAndInvoke: aSymbol
+]
+
 { #category : #'*system' }
 ProtoObject >> primitiveSize [
 	| size |
@@ -352,5 +387,22 @@ ProtoObject >> primitiveAt: i put: anObject [
 	^self _isBytes
 		ifTrue: [self basicByteAt: i put: anObject]
 		ifFalse: [self basicObjectAt: i put: anObject]
+]
+
+{ #category : #private }
+ProtoObject >> shouldBeInRememberedSet [
+	| m |
+	m := Memory current.
+	(m isYoung: self) ifTrue: [^false].
+	(m isYoung: self behavior) ifTrue: [^true].
+	1 to: self _pointersSize do: [:index | | ivar |
+		ivar := self _basicAt: index.
+		ivar _isSmallInteger ifFalse: [(m isYoung: ivar) ifTrue: [^true]]].
+	^false
+]
+
+{ #category : #underprimitives }
+ProtoObject >> smallOop [
+	^self _asPointer
 ]
 
