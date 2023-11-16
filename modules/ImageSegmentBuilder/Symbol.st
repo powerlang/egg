@@ -7,7 +7,7 @@ Extension { #name : #Symbol }
 
 { #category : #'*snapshotting' }
 Symbol >> asSymbolicReference [
-	^SymbolicReference new token: self; linker: #asSymbol.
+	^SymbolicReference forSymbol: self
 ]
 
 { #category : #'*snapshotting' }

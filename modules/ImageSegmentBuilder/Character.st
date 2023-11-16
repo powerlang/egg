@@ -7,7 +7,7 @@ Extension { #name : #Character }
 
 { #category : #'*snapshotting' }
 Character >> asSymbolicReference [
-	^SymbolicReference character: self.
+	^SymbolicReference forCharacter: self
 ]
 
 { #category : #'*snapshotting' }
