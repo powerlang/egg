@@ -60,6 +60,19 @@ PowertalkIterativeStackedInterpreter >> initializePrimitives [
 	linearizer primitives: primitives
 ]
 
+{ #category : #initialization }
+PowertalkIterativeStackedInterpreter >> invoke: method with: receiver [
+	| size environment |
+	size := runtime methodEnvironmentSize: method.
+	environment := runtime newEnvironmentSized: size.
+	work := self prepareForExecuting: method.
+	context
+		buildMethodFrameFor: receiver
+		code: method
+		environment: environment.
+	^regR
+]
+
 { #category : #private }
 PowertalkIterativeStackedInterpreter >> linearizer [
 	^linearizer
@@ -131,7 +144,7 @@ PowertalkIterativeStackedInterpreter >> underprimitiveRestart [
 { #category : #initialization }
 PowertalkIterativeStackedInterpreter >> visitOpDispatchMessage: anSOpDispatchMessage [
 
-	| message behavior method size environment |
+	| message behavior method |
 	message := anSOpDispatchMessage message.
 	message cachedUndermessage ifNotNil: [ :block | 
 		^ self evaluateUndermessage: message with: block ].
@@ -144,13 +157,7 @@ PowertalkIterativeStackedInterpreter >> visitOpDispatchMessage: anSOpDispatchMes
 		          sendSite: message.
 	method isBlock ifTrue: [ 
 		^ self evaluateUndermessage: message with: method ].
-	size := runtime methodEnvironmentSize: method.
-	environment := runtime newEnvironmentSized: size.
-	work := self prepareForExecuting: method.
-	context
-		buildMethodFrameFor: regR
-		code: method
-		environment: environment
+	^self invoke: method with: regR
 ]
 
 { #category : #initialization }

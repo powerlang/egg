@@ -87,6 +87,15 @@ PowertalkEvaluator >> evaluateClosure: receiver withArgs: arguments [
 	^self subclassResponsibility
 ]
 
+{ #category : #primitives }
+PowertalkEvaluator >> evaluatePerform: aSymbol in: receiver withArgs: arguments [
+	| behavior method |
+	behavior := runtime behaviorOf: receiver.
+	method := runtime lookup: aSymbol startingAt: behavior.
+	arguments slots do: [ :arg | context pushOperand: arg ].
+	^self invoke: method with: receiver
+]
+
 { #category : #accessing }
 PowertalkEvaluator >> evaluatePrimitiveHash: receiver [
 	| hash |
@@ -163,6 +172,7 @@ PowertalkEvaluator >> initializePrimitives [
 		at: #ClosureValue put: self primitiveClosureValue;
 		at: #ClosureValueWithArgs put: self primitiveClosureValueWithArgs;
 		at: #ClosureArgumentCount put: self primitiveClosureArgumentCount;
+		at: #PerformWithArguments put: self primitivePerformWithArguments;
 		at: #StringReplaceFromToWithStartingAt
 		put: self primitiveStringReplaceFromToWithStartingAt;
 		at: #FloatNew put: self primitiveFloatNew;
@@ -232,6 +242,11 @@ PowertalkEvaluator >> initializeUndermessages [
 		at: #_smiBitAnd: put: self underprimitiveSMIBitAnd;
 		at: #_smiBitOr: put: self underprimitiveSMIBitOr;
 		at: #_halt put: self underprimitiveHalt
+]
+
+{ #category : #primitives }
+PowertalkEvaluator >> invoke: method with: receiver [
+	^self subclassResponsibility
 ]
 
 { #category : #accessing }
@@ -432,6 +447,13 @@ PowertalkEvaluator >> primitiveNewSized [
 	| size |
 	^ [ size := context firstArgument value.
 	runtime newOf: context self sized: size ]
+]
+
+{ #category : #primitives }
+PowertalkEvaluator >> primitivePerformWithArguments [
+	^ [ self
+		evaluatePerform: context firstArgument in: context self
+		withArgs: context secondArgument ]
 ]
 
 { #category : #primitives }
