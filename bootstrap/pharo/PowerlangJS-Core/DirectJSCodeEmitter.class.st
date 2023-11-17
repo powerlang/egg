@@ -355,6 +355,8 @@ DirectJSCodeEmitter >> visitSpecialMessage: message [
 	selector == #/ ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message].
 	selector == #| ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message].
 	selector == #& ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message].
+	selector == #>> ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message].
+	selector == #<< ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message].
 	selector == #bitOr: ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message selector: '|'].
 	selector == #bitAnd: ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message selector: '&'].
 	selector == #bitsAt:
@@ -372,7 +374,8 @@ DirectJSCodeEmitter >> visitSpecialMessage: message [
 	selector == #whileTrue:
 		ifTrue: [ self visitWhileTrue_: message ].
 	selector == #whileFalse:
-		ifTrue: [ self visitWhileFalse_: message ]
+		ifTrue: [ self visitWhileFalse_: message ].
+	self assert: false
 ]
 
 { #category : #visiting }
