@@ -5,6 +5,8 @@ import PowertalkLMR from "./interpreter/PowertalkLMR.js";
 
 import ModuleReader from "./ModuleReader.js"
 
+import path from 'path';
+import fs from 'fs';
 
 
 let Bootstrapper = class {
@@ -40,18 +42,66 @@ let Bootstrapper = class {
 	}
 
 	loadModule_(name) {
-		return this.loadModuleFromFile('image-segments/' + name + '.json');
+
+		const reader = this.loadModuleFromFile(name + '.json');
+		return reader.exports["__module__"];
 	}
 
-	loadModuleFromFile(path)
+	bindModuleImports(reader)
 	{
+		reader.imports = reader.data.imports.map(descriptor => this.bindModuleImport(descriptor));
+	}
+
+	bindModuleImport(descriptor)
+	{
+		const token = this.transferImportLiteral(descriptor[0]);
+		const linker = descriptor[1] ? this.transferImportLiteral(descriptor[1]) : this.kernel.exports["nil"];
+		
+		const ref = this.runtime.sendLocal_to_with_("token:linker:", this.kernel.exports["SymbolicReference"], [token, linker]);
+		return this.runtime.sendLocal_to_("link", ref);
+	}
+
+	transferImportLiteral(anObject)
+	{
+		if (Number.isInteger(anObject))
+			return this.runtime.newInteger_(anObject);
+
+		if (typeof anObject === 'string')
+			return this.runtime.addSymbol_(anObject);
+
+		if (Array.isArray(anObject))
+		{
+			let transferred = anObject.map(o => this.transferImportLiteral(o));
+			return this.runtime.newArray_(transferred);
+		}
+
+		debugger
+	}
+
+	loadModuleFromFile(filename)
+	{
+		const filepath = this.findInPath(filename);
 		const reader = new ModuleReader();
-		return this.loadModuleNamed(reader.loadFile(path), path);
+		reader.loadFile(filepath);
+		this.bindModuleImports(reader);
+		return reader.loadObjects();
 	}
 
-	loadModuleNamed(module, name)
+	findInPath(imageSegmentFile)
 	{
-		return this.modules[name] = module;
+		const dirs = ['./', '../'];
+		const searched = 'image-segments/' + imageSegmentFile;
+		for (const dir of dirs) {
+			const filePath = path.join(dir, searched);
+
+			try {
+				const stats = fs.statSync(filePath);
+
+				if (stats.isFile()) {
+					return filePath;
+				}
+			} catch (err) { continue; }
+		}
 	}
 
 	kernelObjects()
