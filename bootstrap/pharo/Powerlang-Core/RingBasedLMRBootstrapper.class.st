@@ -276,7 +276,8 @@ RingBasedLMRBootstrapper >> createNewModule: spec [
 	dest
 		sendLocal: #bindKernelExports to: module;
 		sendLocal: #importRequiredModules to: module.
-	spec name != #Module ifTrue: [ dest sendLocal: #module: to: class with: { module }].
+	spec name != #Module ifTrue: [ dest sendLocal: #module: to: class with: { module }; sendLocal: #addClass: to: module with: { class }].
+
 	^ module
 ]
 
