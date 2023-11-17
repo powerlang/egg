@@ -74,7 +74,7 @@ PowertalkRuntime >> flushDispatchCache: aSymbol in: class [
 	| behavior |
 	behavior := self speciesInstanceBehavior: class.
 	symbolCache at: aSymbol ifPresent: [ :messages | messages do: #flushCache ].
-	^ methodCache removeKey: aSymbol -> behavior ifAbsent: nil
+	^ methodCache removeKey: aSymbol -> behavior ifAbsent: []
 ]
 
 { #category : #initialization }
