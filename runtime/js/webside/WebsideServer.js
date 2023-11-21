@@ -139,6 +139,11 @@ class WebsideServer extends Object {
 		this.server.delete("/debuggers/:id", (request, response) => {
 			this.api(request, response).deleteDebugger();
 		});
+
+		//Compilation ..."
+		this.server.post("/changes", (request, response) => {
+			this.api(request, response).addChange();
+		});
 	}
 
 	newId() {

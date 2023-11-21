@@ -12,6 +12,17 @@ class WebsideAPI extends Object {
 		this.response = response;
 	}
 
+	scompiler() {
+
+		const compiler = this.runtime.addSymbol_("Compiler");
+		const kernel = this.runtime.bootstrapper().kernel.exports["Kernel"];
+		const module = this.runtime.sendLocal_to_with_("load:", kernel, [compiler]);
+		const namespace = this.runtime.sendLocal_to_("namespace", module);
+		const classname = this.runtime.addSymbol_("SCompiler");
+		const scompiler = this.runtime.sendLocal_to_with_("at:", namespace, [classname]);
+		return scompiler
+	}
+
 	notFound() {
 		this.response.sendStatus(404);
 	}
@@ -36,6 +47,36 @@ class WebsideAPI extends Object {
 	dialect() {
 		this.respondWithData("PowerlangJS");
 	}
+
+	addChange() {
+
+		let change = this.request.body;
+		const target = this.runtime.bootstrapper().kernel.exports[change.className];
+		const code = this.runtime.newString_(change.sourceCode);
+		const method = this.runtime.sendLocal_to_with_("compile:in:", this.scompiler(), [code, target]);
+		this.runtime.sendLocal_to_("install", method);
+		//const label = this.runtime.sendLocal_to_("printString", method);
+		const label = method.toString();
+		//const source = this.runtime.sendLocal_to_("sourceObject", method);
+		const source = code.asLocalString();
+
+		let result = {
+			"type": "AddMethod",
+			"label": label,
+			"package": "Kernel",
+			"timestamp": new Date().toISOString(),
+			"author": change.author,
+			"sourceCode": source,
+			"currentSourceCode": source,
+			"changesSomething": false,
+			"canBeApplied": true,
+			"className": change.className,
+			"selector": change.selector,
+			"category": "unclassified"
+		}
+		return result
+	}
+
 
 	//Code endpoints..."
 	classes() {
@@ -73,6 +114,7 @@ class WebsideAPI extends Object {
 		);
 		this.respondWithJson(variables);
 	}
+
 
 	instanceVariables() {
 		let species = this.requestedClass();
