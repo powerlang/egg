@@ -140,7 +140,7 @@ class WebsideServer extends Object {
 			this.api(request, response).deleteDebugger();
 		});
 
-		//Compilation ..."
+		//Changes ..."
 		this.server.post("/changes", (request, response) => {
 			this.api(request, response).addChange();
 		});

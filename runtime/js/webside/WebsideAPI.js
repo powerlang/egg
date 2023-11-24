@@ -13,14 +13,13 @@ class WebsideAPI extends Object {
 	}
 
 	scompiler() {
-
 		const compiler = this.runtime.addSymbol_("Compiler");
 		const kernel = this.runtime.bootstrapper().kernel.exports["Kernel"];
 		const module = this.runtime.sendLocal_to_with_("load:", kernel, [compiler]);
 		const namespace = this.runtime.sendLocal_to_("namespace", module);
 		const classname = this.runtime.addSymbol_("SCompiler");
 		const scompiler = this.runtime.sendLocal_to_with_("at:", namespace, [classname]);
-		return scompiler
+		return scompiler;
 	}
 
 	notFound() {
@@ -48,35 +47,47 @@ class WebsideAPI extends Object {
 		this.respondWithData("PowerlangJS");
 	}
 
+	//Changes endpoints
 	addChange() {
-
 		let change = this.request.body;
-		const target = this.runtime.bootstrapper().kernel.exports[change.className];
-		const code = this.runtime.newString_(change.sourceCode);
-		const method = this.runtime.sendLocal_to_with_("compile:in:", this.scompiler(), [code, target]);
-		this.runtime.sendLocal_to_("install", method);
-		//const label = this.runtime.sendLocal_to_("printString", method);
-		const label = method.toString();
-		//const source = this.runtime.sendLocal_to_("sourceObject", method);
-		const source = code.asLocalString();
-
-		let result = {
-			"type": "AddMethod",
-			"label": label,
-			"package": "Kernel",
-			"timestamp": new Date().toISOString(),
-			"author": change.author,
-			"sourceCode": source,
-			"currentSourceCode": source,
-			"changesSomething": false,
-			"canBeApplied": true,
-			"className": change.className,
-			"selector": change.selector,
-			"category": "unclassified"
+		var result;
+		switch (change.type) {
+			case "AddMethod":
+				result = this.applyAddMethod(change);
+				break;
+			case "RemoveMethod":
+				result = this.applyRemoveMethod(change);
+				break;
+			default:
+				this.badRequest("Change type " + change.type + " not supported");
 		}
-		return result
+		return this.respondWithJson(result);
 	}
 
+	applyAddMethod(change) {
+		const method = this.compile(change.sourceCode, change.className);
+		const selector = this.runtime.sendLocal_to_("selector", method);
+		//const label = this.runtime.sendLocal_to_("printString", method);
+		change.label = method.toString();
+		//change.sourceCode = this.runtime.sendLocal_to_("sourceObject", method).asLocalString();
+		change.currentSourceCode = change.sourceCode;
+		change.selector = selector.asLocalString();
+		change.timestamp = new Date().toISOString();
+		change.category = "unclassified";
+		return change;
+	}
+
+	applyRemoveMethod(change) {
+		return change;
+	}
+
+	compile(source, classname) {
+		const species = this.classNamed(classname).wrappee();
+		const code = this.runtime.newString_(source);
+		const method = this.runtime.sendLocal_to_with_("compile:in:", this.scompiler(), [code, species]);
+		this.runtime.sendLocal_to_("install", method);
+		return method;
+	}
 
 	//Code endpoints..."
 	classes() {
@@ -114,7 +125,6 @@ class WebsideAPI extends Object {
 		);
 		this.respondWithJson(variables);
 	}
-
 
 	instanceVariables() {
 		let species = this.requestedClass();
@@ -295,24 +305,12 @@ class WebsideAPI extends Object {
 		if (pin == undefined) pin = false;
 		let id = this.server.newId();
 		let object;
+		let source = "doIt ^(" + expression + ")";
 		try {
-			// let i = this.runtime.newInteger_(1);
-			// object = this.runtime.sendLocal_to_("asOrderedCollection", i);
-
-			// let x = this.runtime.newInteger_(1);
-			// let y = this.runtime.newInteger_(2);
-			// let point = this.runtime.sendLocal_to_with_("@", x, [y]);
-			// object = this.runtime.sendLocal_to_with_("left:", point, [
-			// 	this.runtime.nil(),
-			// ]);
-
-			let array = this.runtime.newArray_([
-				this.runtime.nil(),
-				this.runtime.true(),
-				this.runtime.newInteger_(123),
-			]);
-			object = this.runtime.sendLocal_to_("printString", array);
-
+			this.compile(source, "Object");
+			object = this.runtime.sendLocal_to_("doIt", this.runtime.nil());
+			console.log(object.toString())
+			//this.runtime.sendLocal_to_with_("removeSelector:", species, [selector]);
 			object = this.wrap(object);
 			if (!sync || pin) {
 				this.server.pinnedObjects[id] = object;
@@ -403,8 +401,8 @@ class WebsideAPI extends Object {
 			let type = b.isTemporary()
 				? "temporary"
 				: b.isArgument()
-				? "argument"
-				: "variable";
+					? "argument"
+					: "variable";
 			let print;
 			try {
 				print = b.object.printString();
