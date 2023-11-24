@@ -11,7 +11,8 @@ Class {
 JSONModule >> imports [
 	^{
 		#Kernel -> #Module.
-		#Kernel -> #IdentityDictionary
+		#Kernel -> #HashTable.
+		#Kernel -> #IdentityDictionary.
 	}
 ]
 

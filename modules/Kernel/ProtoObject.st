@@ -90,16 +90,6 @@ ProtoObject >> _basicAt: anInteger [
 	^self errorVMSpecific
 ]
 
-{ #category : #lookup }
-ProtoObject >> _cachedLookup: aSymbol [
-	^self _cachedLookup: aSymbol in: self behavior
-]
-
-{ #category : #lookup }
-ProtoObject >> _cachedLookup: aSymbol in: behavior [
-	^GlobalDispatchCache current lookupAndCache: aSymbol in: behavior
-]
-
 { #category : #'header access' }
 ProtoObject >> _copyBasicHeaderFrom: other [
 	self errorVMSpecific
@@ -128,13 +118,6 @@ ProtoObject >> _pointersSize [
 { #category : #'header access' }
 ProtoObject >> _size [
 	^self errorVMSpecific
-]
-
-{ #category : #'raw access' }
-ProtoObject >> _uLongAtValidOffset: offset put: anInteger [
-	anInteger size > 4 ifTrue: [self error: 'does not fit in 32 bits'].
-	self _primitiveULongAtOffset: offset put: anInteger.
-	^anInteger
 ]
 
 { #category : #comparing }
@@ -416,15 +399,6 @@ ProtoObject >> literalString [
 	^nil
 ]
 
-{ #category : #lookup }
-ProtoObject >> lookupAndInvoke: aSymbol [
-	| cm |
-	cm := self _cachedLookup: aSymbol.
-	cm == nil ifTrue: [^self doesNotUnderstandSelector: aSymbol].
-	cm prepareForExecution.
-	self _transferControlDiscardingLastArgTo: cm validNativeCodeAddress _asNative
-]
-
 { #category : #system }
 ProtoObject >> notNil [
 	^true
@@ -443,8 +417,7 @@ ProtoObject >> objectAtValid: index put: anObject [
 
 { #category : #system }
 ProtoObject >> perform: aSymbol [
-	aSymbol arity = 0 ifFalse: [^self error: 'incorrect arity'].
-	^self lookupAndInvoke: aSymbol
+	^self perform: aSymbol withArguments: #()
 ]
 
 { #category : #system }
@@ -454,11 +427,7 @@ ProtoObject >> perform: aSymbol with: anObject [
 
 { #category : #system }
 ProtoObject >> perform: aSymbol withArguments: anArray [
-	| size |
-	size := anArray basicSize.
-	aSymbol arity = size ifFalse: [^self error: 'incorrect arity'].
-	anArray _expandInStackSized: size.
-	^self lookupAndInvoke: aSymbol
+	^self errorVMSpecific
 ]
 
 { #category : #accessing }
@@ -502,18 +471,6 @@ ProtoObject >> requiresFinalization [
 	^self finalizationRegistry includes: self
 ]
 
-{ #category : #private }
-ProtoObject >> shouldBeInRememberedSet [
-	| m |
-	m := Memory current.
-	(m isYoung: self) ifTrue: [^false].
-	(m isYoung: self behavior) ifTrue: [^true].
-	1 to: self _pointersSize do: [:index | | ivar |
-		ivar := self _basicAt: index.
-		ivar _isSmallInteger ifFalse: [(m isYoung: ivar) ifTrue: [^true]]].
-	^false
-]
-
 { #category : #interrupts }
 ProtoObject >> signalStep [
 	ActiveProcess handleStepSignal
@@ -522,11 +479,6 @@ ProtoObject >> signalStep [
 { #category : #interrupts }
 ProtoObject >> signalStep: aSymbol [
 	ActiveProcess handleStepSignal
-]
-
-{ #category : #underprimitives }
-ProtoObject >> smallOop [
-	^self _asPointer
 ]
 
 { #category : #system }

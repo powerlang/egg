@@ -13,9 +13,9 @@ Class {
 ImageSegmentBuilderModule >> imports [
 	^{
 		#Kernel -> #Behavior. #Kernel -> #Boolean. #Kernel -> #False.
-		#Kernel -> #IdentityDictionary. #Kernel -> #IdentitySet.
+		#Kernel -> #HashTable. #Kernel -> #IdentityDictionary. #Kernel -> #IdentitySet.
 		#Kernel -> #KernelModule. #Kernel -> #Module. #Kernel -> #Symbol.
-		#Kernel -> #True. #Kernel -> #UndefinedObject}
+		#Kernel -> #SymbolicReference. #Kernel -> #True. #Kernel -> #UndefinedObject}
 ] 
 
 { #category : #bootstrapping }
@@ -33,6 +33,7 @@ ImageSegmentBuilderModule >> writeJSONModule: aModule [
 	builder module: aModule; build.
 	writer := Writer new.
 	^writer
+		closure: builder closure;
 		objects: builder objects;
 		mapping: builder mapping;
 		imports: builder imports;

@@ -45,6 +45,11 @@ ProtoObject >> == anObject [
 	<primitive: Equal>
 ]
 
+{ #category : #system }
+ProtoObject >> perform: aSymbol withArguments: anArray [
+	<primitive: PerformWithArguments>
+]
+
 { #category : '*Primitives' }
 ProtoObject >> primitiveSize [
 	<primitive: Size>

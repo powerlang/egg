@@ -21,10 +21,11 @@ Class {
 KernelModule >> prepareForSnapshot: aBuilder [
 	| dict loaders |
 	dict := Dictionary new.
-	dict at: 'Kernel' put: self.
+	dict at: #Kernel put: self.
 	loaders := OrderedCollection new.
 	loaders add: moduleLoaders first.
 	aBuilder
+		addNilToken;
 		map: loadedModules to: dict;
 		map: moduleLoaders to: loaders
 ]

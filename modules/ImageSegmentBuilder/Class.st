@@ -7,7 +7,7 @@ Extension { #name : #Class }
 
 { #category : #'*snapshotting' }
 Class >> asSymbolicReference [
-	^SymbolicReference new token: {self module name. self name}; linker: #asClass.
+	^SymbolicReference forClass: self
 ]
 
 { #category : #'*snapshotting' }

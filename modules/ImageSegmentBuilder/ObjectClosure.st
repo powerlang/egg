@@ -14,6 +14,7 @@ Class {
 		'boundary',
 		'scope',
 		'builder',
+		'nilToken',
 		'reversePaths',
 		'debug'
 	],
@@ -63,12 +64,10 @@ ObjectClosure >> addSlotsOf: anObject [
 ObjectClosure >> analyze: anObject from: source [
 	| surrogate |
 	surrogate := self surrogateFor: anObject.
-	surrogate _isSmallInteger ifTrue: [^self].
 	(boundary includesKey: surrogate) ifTrue: [^self].
 	(added includes: surrogate) ifTrue: [^self].
 	(surrogate shouldBeStoredIn: self) ifFalse: [^self addBoundary: surrogate].
 	self isDebugging ifTrue: [reversePaths at: anObject put: source].
-
 	added add: surrogate.
 	objects add: surrogate.
 	queue add: surrogate.
@@ -101,6 +100,7 @@ ObjectClosure >> initialize [
 	added := IdentitySet new: 2000.
 	objects := OrderedCollection new: 2000.
 	boundary := IdentityDictionary new: 100.
+	nilToken := Object new.
 	scope := Set new.
 	debug := false.
 ]
@@ -118,6 +118,11 @@ ObjectClosure >> mapping [
 { #category : #accessing }
 ObjectClosure >> module [
 	^builder module
+]
+
+{ #category : #accessing }
+ObjectClosure >> nilToken [
+	^nilToken
 ]
 
 { #category : #services }
@@ -148,6 +153,7 @@ ObjectClosure >> scope [
 
 { #category : #accessing }
 ObjectClosure >> surrogateFor: anObject [
+	anObject == HashTable nilToken ifTrue: [^nilToken].
 	^mapping at: anObject ifAbsent: [anObject]
 ]
 

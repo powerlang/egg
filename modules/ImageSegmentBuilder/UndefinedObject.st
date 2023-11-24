@@ -7,7 +7,7 @@ Extension { #name : #UndefinedObject }
 
 { #category : #'*snapshotting' }
 UndefinedObject >> asSymbolicReference [
-	^SymbolicReference new token: #nil.
+	^SymbolicReference new token: #nil
 ]
 
 { #category : #'*snapshotting' }

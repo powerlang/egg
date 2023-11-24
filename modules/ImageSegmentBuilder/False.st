@@ -7,6 +7,6 @@ Extension { #name : #False }
 
 { #category : #'*snapshotting' }
 False >> asSymbolicReference [
-	^SymbolicReference new token: #false.
+	^SymbolicReference new token: #false
 ]
 

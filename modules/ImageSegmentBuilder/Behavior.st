@@ -8,7 +8,7 @@ Extension { #name : #Behavior }
 { #category : #'*snapshotting' }
 Behavior >> asSymbolicReference [
 	self DENY: self isInstanceBehavior.
-	^SymbolicReference new token: {class module name. class name}; linker: #asBehavior.
+	^SymbolicReference forBehavior: self
 ]
 
 { #category : #'*snapshotting' }

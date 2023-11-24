@@ -207,6 +207,11 @@ Number.prototype._lessThan = function(value) { return this <  value; }
 Number.prototype._greaterEqualThan = function(value) { return this >=  value; }
 Number.prototype._greaterThan = function(value) { return this >  value; }
 
+Number.prototype.byteAt_ = function(index) {
+	const shift = (index - 1) << 3;
+	return (this >> shift) & 0xFF;
+}
+
 Number.prototype._plus = function(value) { return this + value; }
 Number.prototype._minus = function(value) { return this - value; }
 Number.prototype._times = function(value) { return this * value; }

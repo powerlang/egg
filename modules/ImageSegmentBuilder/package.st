@@ -6,7 +6,7 @@
 Package { #name : #ImageSegmentBuilder,
 	#classes : [
 		'Builder',
-		'Module',
+		'ImageSegmentBuilderModule'
 		'ObjectClosure'
 	]
 }

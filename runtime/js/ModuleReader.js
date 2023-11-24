@@ -9,8 +9,7 @@ import { readFileSync } from 'fs';
 export const ObjectTypes = Object.freeze({
 	SlotObject: 1,
 	ByteObject: 2,
-	SmallIntegerObject: 3,
-	Import: 4
+	SmallIntegerObject: 3
 })
 
 /**
@@ -37,16 +36,17 @@ const ModuleReader = class {
 
    	loadFile(path) {
 		let rawdata = readFileSync(path);
-		let module = JSON.parse(rawdata);
-		this.loadObjects(module);
+		this.data = JSON.parse(rawdata);
 		return this;
 	}
 
-	loadObjects(module) {
-		this.objects = module.objects.map(obj => this.recreate(obj));
-		this.objects.forEach(obj => this.linkSlots(obj));
-		this.exports = Object.fromEntries(module.exports.map( exp => [exp[0], this.objects[exp[1]]]));
-		return this.objects;
+	loadObjects() {
+		this.objects = this.data.objects.map(obj => this.recreate(obj));
+		const length = this.objects.length;
+		this.objects.push(...this.imports);
+		this.objects.slice(0,length).forEach(obj => this.linkSlots(obj));
+		this.exports = Object.fromEntries(this.data.exports.map( exp => [exp[0], this.objects[exp[1]]]));
+		return this;
 	}
 
 	objectNamed(name)
@@ -62,8 +62,6 @@ const ModuleReader = class {
 				return this.newByteObject(object);
 			case ObjectTypes.SmallIntegerObject:
 				return this.newSmallInteger(object);
-            case ObjectTypes.Import:
-                return this.environment[object.name];
 			default: 
 				throw "unknown object type";
 		}
@@ -134,6 +132,11 @@ const ModuleReader = class {
 	objectHash(object)
 	{
 		return this.objectHeader(object)[1];
+	}
+
+	importIndex(descriptor)
+	{
+		return descriptor[1];
 	}
 
 }

@@ -122,7 +122,7 @@ ModuleB >> imports [
 }' ].
 	module := bootstrapper sendLoadModule: #B.
 	classes := runtime sendLocal: #classes to: module.
-	class := runtime sendLocal: #first to: classes.
+	class := runtime sendLocal: #second to: classes.
 	b := runtime sendLocal: #new to: class.
 	str := runtime sendLocal: #a to: b.
 	self assert: str asLocalString equals: 'ab'

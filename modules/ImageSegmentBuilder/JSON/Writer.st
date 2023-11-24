@@ -12,10 +12,16 @@ Class {
 		'mapping',
 		'imports',
 		'exports',
-		'indexes'
+		'indexes',
+		'closure'
 	],
 	#category : #'Writer'
 }
+
+{ #category : #accessing }
+Writer >> closure: anObjectClosure [
+	closure := anObjectClosure
+]
 
 { #category : #accessing }
 Writer >> objects: aCollection [
@@ -60,7 +66,11 @@ Writer >> generateIndexes [
 
 { #category : #services }
 Writer >> indexOf: anObject [
-	^indexes at: anObject ifAbsent: [indexes at: nil]
+	| path |
+	HashTable nilToken == anObject ifTrue: [^indexes at: closure nilToken].
+	indexes at: anObject ifPresent: [:index | ^index].
+	path := closure isDebugging ifTrue: [closure reversePathOf: anObject].
+	self error: 'slot of an object not found in closure'
 ]
 
 { #category : #private }
@@ -77,7 +87,7 @@ Writer >> stream: aWriteStream [
 Writer >> write [
 	self generateIndexes.
 	stream nextPutAll: '{ '; crtab; nextPutAll: '"objects" : ['; crtab: 2.
-	self writeObjects; writeImportedObjects.
+	self writeObjects.
 	stream crtab; nextPutAll: '],'; crtab; nextPutAll: '"imports" : ['; crtab: 2.
 	self writeImports.
 	stream crtab; nextPutAll: '],'; crtab; nextPutAll: '"exports" : ['; crtab: 2.
@@ -131,23 +141,6 @@ Writer >> writeImports [
 ]
 
 { #category : #writing }
-Writer >> writeImportedObjects [
-	| index |
-	imports size = 0 ifTrue: [^self].
-	stream nextPutAll: ', '; crtab: 2.
-	index := 0.
-	imports
-		do: [ :class |
-			stream 
-				nextPutAll: '[4, ';
-				nextPutAll: index asString;
-				nextPutAll: ']' ]
-		separatedBy: [
-			index := index + 1.
-			stream nextPutAll: ', '; crtab: 2]
-]
-
-{ #category : #writing }
 Writer >> writeObject: obj [
 	obj _isSmallInteger 
 		ifTrue: [^stream nextPutAll: '3, ', obj printString].
@@ -197,7 +190,7 @@ Writer >> writeObjectSlots: obj [
 
 { #category : #accessing }
 Writer >> writeObjects [
-	objects , imports
+	objects
 		do: [ :obj | 
 			stream nextPut: $[.
 			self writeObject: obj.

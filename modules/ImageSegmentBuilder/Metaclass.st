@@ -7,7 +7,7 @@ Extension { #name : #Metaclass }
 
 { #category : #'*snapshotting' }
 Metaclass >> asSymbolicReference [
-	^SymbolicReference new token: {class module name. class name}; linker: #asMetaclass.
+	^SymbolicReference forMetaclass: self
 ]
 
 { #category : #'*snapshotting' }

@@ -421,6 +421,9 @@ Character >> asInteger [
 
 { #category : #operations }
 Character >> asLowercase [
+	value < 65 ifTrue: [^self].
+	value < 91 ifTrue: [^Character value: value + 32].
+	value < 128 ifTrue: [^self].
 	^ActiveLocale lowercaseOf: self
 ]
 
@@ -445,6 +448,9 @@ Character >> asUnicode [
 
 { #category : #operations }
 Character >> asUppercase [
+	value < 97 ifTrue: [^self].
+	value < 123 ifTrue: [^Character value: value - 32].
+	value < 128 ifTrue: [^self].
 	^ActiveLocale uppercaseOf: self
 ]
 

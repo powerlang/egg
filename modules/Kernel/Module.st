@@ -21,6 +21,13 @@ Class {
 	#category : #Kernel
 }
 
+{ #category : #'snapshotting' }
+Module >> prepareForSnapshot: aBuilder [
+	aBuilder
+		importNilToken;
+		addBoundary: Symbol symbolTable as: SymbolicReference symbolTable
+]
+
 { #category : #services }
 Module >> addClass: aClass [
 	classes add: aClass.
@@ -93,6 +100,7 @@ Module >> defaultName [
 Module >> exports [
 	| result |
 	result := Dictionary new.
+	result at: '__module__' put: self.
 	exports do: [:name | | value |
 		value := namespace at: name.
 		result at: name put: value].
@@ -139,10 +147,11 @@ Module >> import: name from: moduleName as: newName [
 
 { #category : #services }
 Module >> importDescriptor: descriptor [
-	| exportName moduleName |
-	exportName := descriptor value.
+	| moduleName token exportNames |
 	moduleName := descriptor key.
-	^self import: exportName from: moduleName
+	token := descriptor value.
+	exportNames := token isArray ifTrue: [token] ifFalse: [{token}].
+	exportNames do: [:name | self import: name from: moduleName]
 ]
 
 { #category : #services }
