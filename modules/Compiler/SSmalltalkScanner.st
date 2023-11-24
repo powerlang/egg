@@ -183,7 +183,7 @@ SSmalltalkScanner >> nextLiteralString [
 SSmalltalkScanner >> nextNumber [
 	| parser assoc |
 	stream skip: -1.
-	parser := NumberParser2 new on: stream.
+	parser := NumberParser new on: stream.
 	assoc := parser next.
 	parser error ifNotNil: [:e | ^self error: e key at: e value].
 	^self
