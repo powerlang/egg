@@ -1,8 +1,26 @@
 # Egg Smalltalk
 
-This is an implementation of a Smalltalk-80 derived environment. 
-Designed to support multiple VMs that allow running on multiple platforms.
-This includes native JIT-based VMs for popular OSes and JS-based runtimes. 
+Egg is a MIT-licensed implementation of a Smalltalk-80 derived environment.
+Egg is not strictly a ST80 though. Some egg characteristics
+and intentions are:
+ - It is _module-based_, where each module has its own namespace (no Smalltalk globals anymore).
+ - Modules can be loaded quickly through _image segments_ (without requiring a compiler).
+ - It is _minimal_, with the capability to grow dynamically: its kernel has much fewer
+   things than ST80 (i.e. no GUI and no compiler), but because of image-segments those
+   modules can be loaded instantly.
+ - Most identifiers are _dynamically bound_. This means that like #doesNotUnderstand:
+   message, you can also get a #doesNotKnow: message. The implementation uses a cache and
+   is fast (you don't have to worry about performance there :).
+ - Module dependencies are stated explicitly, new modules are built through _importing_
+   components of other modules.
+ - Designed to support _multiple VMs_ that allow running on _multiple platforms_.
+ - This includes native JIT-based VMs for popular OSes and JS-based runtimes.
+ - For all VMs and OSes, the same Smalltalk code base is used (there might only be small
+   differences if the platform used doesn't support a particular feature).
+ - Egg is developed in tandem with [Webside](https://github.com/guillermoamaral/Webside),
+   which is the GUI used to develop and debug the Smalltalk code on any platform.
+   This allows to keep Egg minimal, even in platforms such as _EggNOS_ (a successor of
+   SqueakNOS!)
 
 
 ## Contents of this repo
@@ -11,19 +29,22 @@ This repository includes the Smalltalk sources of Egg (in `modules` directory) a
 well as the different runtime implementations (`runtimes` directory) and the
 mechanisms to generate images from scratch (`bootstrap` directory).
 
-## Downloading and Building
+## Using
 
 If you just want to use egg, download the corresponding build artifact from releases.
 Currently, our only working platform is JS, native ones will come soon™.
-If you want to build things from scratch clone this repo and follow the next steps.
 
+
+## Building
+
+If you want to build things from scratch clone this repo and follow the next steps.
 
 ```
 git clone git@github.com:powerlang/egg.git
 ```
 
-Then just do `make <platform>`, where platform can be `js`, `native` or `native-lmr` (only
-`js` works right now).
+Then just do `make <platform>`, where platform can be `js`, `native` or `native-lmr` (remember,
+only `js` works right now).
 
 ### JavaScript platform
 
@@ -37,4 +58,12 @@ You'll find the results in `runtime/js`, continue from there.
 ### Native and Native-LMR platforms
 
 To be implemented
+
+## Project status
+
+There are (at least) two mostly orthogonal sides in this project: runtimes and Smalltalk.
+In Smalltalk axis, we already have: kernel, compiler, modules and image-segment builder, among others.
+In runtime axis, we started with JS platform as it is the easiest to get working (JS
+already includes a GC and JIT).
+We are also developing other VMs: a traditional C++-based VM with interpreter and JIT and an LMR (Live Metacircular Runtime, a.k.a. Smalltalk-in-Smalltalk VM)
 
