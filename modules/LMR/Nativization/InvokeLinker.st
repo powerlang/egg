@@ -5,7 +5,7 @@ Class {
 		'invoker',
 		'sends'
 	],
-	#category : #'Powerlang-Core-Nativization'
+	#category : #Nativization
 }
 
 { #category : #nativizing }

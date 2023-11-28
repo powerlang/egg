@@ -1,7 +1,7 @@
 Class {
 	#name : #HaltingSend,
 	#superclass : #MessageLinker,
-	#category : #'Powerlang-Core-Nativization'
+	#category : #Nativization
 }
 
 { #category : #nativizing }

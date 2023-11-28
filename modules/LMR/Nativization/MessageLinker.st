@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'filter'
 	],
-	#category : #'Powerlang-Core-Nativization'
+	#category : #Nativization
 }
 
 { #category : #testing }
