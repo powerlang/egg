@@ -10,3 +10,7 @@ CompiledMethod >> flushFromCaches [
 	<primitive: FlushFromCaches>
 ]
 
+{ #category : '*Primitives' }
+CompiledMethod >> prepareForExecution [
+	<primitive: PrepareForExecution>
+]
