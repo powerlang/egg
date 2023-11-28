@@ -10,153 +10,13 @@ Class {
 		'stackCount',
 		'fallbacks',
 		'activeScript',
-		'ir'
+		'assembler'
 	],
 	#pools : [
 		'ClosureElementTypes'
 	],
 	#category : #Nativization
 }
-
-{ #category : #'instance creation' }
-SExpressionNativizer class >> assemblyFor: aCompiledMethod [
-	^ NativizationEnvironment forTesting
-		newExpressionNativizer nativize: aCompiledMethod
-]
-
-{ #category : #'instance creation' }
-SExpressionNativizer class >> assemblyForBlock [
-	^self assemblyForSource: 'foo [1] value'
-]
-
-{ #category : #'instance creation' }
-SExpressionNativizer class >> assemblyForIfTrue [
-	^self assemblyForSource: 'foo x ifTrue: [1]' in: Point
-]
-
-{ #category : #'instance creation' }
-SExpressionNativizer class >> assemblyForMessage [
-	^self assemblyForSource: 'foo self bar'
-]
-
-{ #category : #'instance creation' }
-SExpressionNativizer class >> assemblyForMessageCascade [
-	^self assemblyForSource: 'foo self bar; baz'
-]
-
-{ #category : #'instance creation' }
-SExpressionNativizer class >> assemblyForMethod: aCompiledMethod [
-
-^	self
-		assemblyForSource: aCompiledMethod sourceCode
-		in: aCompiledMethod classBinding value.
-
-]
-
-{ #category : #'instance creation' }
-SExpressionNativizer class >> assemblyForPoint_1_plus_y [
-	^self assemblyForSource: 'foo 1 + y' in: Point
-]
-
-{ #category : #'instance creation' }
-SExpressionNativizer class >> assemblyForPoint_ret_x_eq_1 [
-	^ self assemblyForSource: 'foo ^x = 1' in: Point
-]
-
-{ #category : #'instance creation' }
-SExpressionNativizer class >> assemblyForPoint_x [
-	^ self assemblyForMethod: Point >> #x
-]
-
-{ #category : #'instance creation' }
-SExpressionNativizer class >> assemblyForPoint_x_eq_1 [
-	^self assemblyForSource: 'foo x = 1' in: Point
-]
-
-{ #category : #'instance creation' }
-SExpressionNativizer class >> assemblyForPoint_x_eq_eq_1 [
-	^self assemblyForSource: 'foo x == 1' in: Point
-]
-
-{ #category : #'instance creation' }
-SExpressionNativizer class >> assemblyForPoint_x_plus_1 [
-	^self assemblyForSource: 'foo x + 1' in: Point
-]
-
-{ #category : #'instance creation' }
-SExpressionNativizer class >> assemblyForPoint_x_plus_y [
-	^self assemblyForSource: 'foo x + y' in: Point
-]
-
-{ #category : #'instance creation' }
-SExpressionNativizer class >> assemblyForSource: aString [
-	^self assemblyForSource: aString in: UndefinedObject
-]
-
-{ #category : #'instance creation' }
-SExpressionNativizer class >> assemblyForSource: aString in: aSpecies [
-	| method |
-	method := SCompiler compile: aString in: aSpecies.
-	^self assemblyFor: method
-]
-
-{ #category : #'instance creation' }
-SExpressionNativizer class >> assemblyForSourceOrig: aString [
-	^self assemblyForSourceOrig: aString in: UndefinedObject
-]
-
-{ #category : #'instance creation' }
-SExpressionNativizer class >> assemblyForSourceOrig: aString in: aSpecies [
-	| method |
-	method := SCompiler compile: aString in: aSpecies.
-	^self assemblyOrigFor: method
-]
-
-{ #category : #'instance creation' }
-SExpressionNativizer class >> assemblyForWhileTrue [
-	^self assemblyForSource: 'foo [x := x + 1. true] whileTrue' in: Point
-]
-
-{ #category : #'instance creation' }
-SExpressionNativizer class >> assemblyOrigFor: aCompiledMethod [
-	^ NativizationEnvironment forTesting nativize:
-		  aCompiledMethod
-]
-
-{ #category : #'instance creation' }
-SExpressionNativizer class >> methodBasicAdd [
-	| source |
-	source := 'basicAdd: anObject
-	end = contents size ifTrue: [self makeRoomBehind].
-	end := end + 1.
-	contents at: end put: anObject.
-	^anObject'.
-	^self methodForSource: source in: OrderedCollection
-]
-
-{ #category : #'instance creation' }
-SExpressionNativizer class >> methodForSource: aString [
-	^self methodForSource: aString in: UndefinedObject
-]
-
-{ #category : #'instance creation' }
-SExpressionNativizer class >> methodForSource: aString in: aSpecies [
-	| method |
-	method := SCompiler compile: aString in: aSpecies.
-	^self nativize: method
-]
-
-{ #category : #'instance creation' }
-SExpressionNativizer class >> methodWithBlock [
-	^self methodForSource: 'foo [1] value'
-]
-
-{ #category : #'instance creation' }
-SExpressionNativizer class >> nativize: aCompiledMethod [
-
-	^ NativizationEnvironment forTesting newExpressionNativizer
-		nativize: aCompiledMethod
-]
 
 { #category : #services }
 SExpressionNativizer >> addFallback: aBlock [
@@ -178,7 +38,7 @@ SExpressionNativizer >> argumentCount [
 
 { #category : #services }
 SExpressionNativizer >> argumentInEnvironmentAt: index [
-	ir loadRwithEindex: index + SClosure instSize
+	assembler loadRwithEindex: index + SClosure instSize
 ]
 
 { #category : #services }
@@ -187,9 +47,9 @@ SExpressionNativizer >> argumentInStackAt: index [
 	args := self argumentCount.
 	method hasFrame ifTrue: [ 
 		end := 3 + args.
-	ir loadRwithFPindex: end - index ] ifFalse: [ 
+	assembler loadRwithFPindex: end - index ] ifFalse: [ 
 		end := 2 + args.
-		ir  loadRwithSPindex: end - index
+		assembler  loadRwithSPindex: end - index
 	 ]
 ]
 
@@ -202,7 +62,7 @@ SExpressionNativizer >> argumentInlinedAt: index [
 SExpressionNativizer >> associationValueAt: anInteger [
 	| literal |
 	literal := self methodLiteralAt: anInteger.
-	ir
+	assembler
 		loadRwithLiteral: literal;
 		loadRwithRindex: 2
 ]
@@ -211,7 +71,7 @@ SExpressionNativizer >> associationValueAt: anInteger [
 SExpressionNativizer >> associationValueAt: anInteger put: dummy [
 	| literal |
 	literal := self methodLiteralAt: anInteger.
-	ir
+	assembler
 		loadAwithLiteral: literal;
 		storeRinAindex: 2;
 		pushA.
@@ -236,33 +96,33 @@ SExpressionNativizer >> captureVariable: stream index: anInteger [
 	| type pos |
 	type := stream next.
 	type = nil ifTrue: [^self].
-	type = Self ifTrue: [^ir storeSinRindex: anInteger].
-	type = Environment ifTrue: [^ir storeEinRindex: anInteger].
+	type = Self ifTrue: [^assembler storeSinRindex: anInteger].
+	type = Environment ifTrue: [^assembler storeEinRindex: anInteger].
 	pos := stream next.
 	type = LocalArgument ifTrue: [
-		ir
+		assembler
 			loadTwithFPindex: pos + 2;
 			storeTinRindex: anInteger].
 	type = EnvironmentValue
-		ifTrue: [ir loadTwithEindex: pos; storeTinRindex: anInteger]
+		ifTrue: [assembler loadTwithEindex: pos; storeTinRindex: anInteger]
 ]
 
 { #category : #services }
 SExpressionNativizer >> constPoolValueAt: anInteger [
 	| literal |
 	literal := self methodLiteralAt: anInteger.
-	ir loadRwithLiteral: literal
+	assembler loadRwithLiteral: literal
 ]
 
 { #category : #services }
 SExpressionNativizer >> dropTos [
-	ir dropTos: 1.
+	assembler dropTos: 1.
 	^stackCount := stackCount - 1
 ]
 
 { #category : #services }
 SExpressionNativizer >> emitBlockPrologue: anSBlock [
-	ir saveCallerFrame.
+	assembler saveCallerFrame.
 	self
 		loadBlockSelf: anSBlock compiledCode;
 		loadBlockNativeCode;
@@ -273,9 +133,9 @@ SExpressionNativizer >> emitBlockPrologue: anSBlock [
 
 { #category : #services }
 SExpressionNativizer >> emitCallbackEpilogue [
-	ir restoreCallerFrame.
+	assembler restoreCallerFrame.
 	environment abi
-		restoreContext: method descriptor with: ir
+		restoreContext: method descriptor with: assembler
 ]
 
 { #category : #services }
@@ -283,10 +143,10 @@ SExpressionNativizer >> emitCallbackPrologue [
 	| retaddr |
 	environment abi emitEntrypoint: method descriptor with: ir.
 	retaddr := 0.
-	ir
+	assembler
 		pushImm: retaddr;
 		xorFPwithFP;
-		loadLongMwithIPoffset: 0 - ir currentAddress + ImageSegmentWriter behaviorOffset;
+		loadLongMwithIPoffset: 0 - assembler currentAddress + ImageSegmentWriter behaviorOffset;
 		loadMwithMindex: SCallbackMethod behaviorNativeCodeSlot;
 		loadGwithLiteral: environment globals;
 		loadNilWithLiteral: nil;
@@ -300,12 +160,12 @@ SExpressionNativizer >> emitCallbackPrologue [
 { #category : #services }
 SExpressionNativizer >> emitEpilogue [
 	method hasBlocks
-		ifTrue: [ ir restoreCallerEnvironment ].
+		ifTrue: [ assembler restoreCallerEnvironment ].
 	method isCallback
 		ifTrue: [ ^ self emitCallbackEpilogue ].
 	method isFrameless
-		ifFalse: [ ir restoreCallerFrame ].
-	ir
+		ifFalse: [ assembler restoreCallerFrame ].
+	assembler
 		restoreCallerSelf;
 		restoreCallerM;
 		return
@@ -314,9 +174,9 @@ SExpressionNativizer >> emitEpilogue [
 { #category : #services }
 SExpressionNativizer >> emitFFICall [
 	self loadObject: method.
-	ir pushR; pushS.
+	assembler pushR; pushS.
 	self emitSend: #_ffiCall:.
-	ir
+	assembler
 		restoreCallerFrame;
 		restoreCallerSelf;
 		restoreCallerM;
@@ -330,7 +190,7 @@ SExpressionNativizer >> emitFallbacks [
 
 { #category : #services }
 SExpressionNativizer >> emitFramedMethodPrologue [
-	ir
+	assembler
 		saveCallerFrame;
 		pushR;
 		initializeS.
@@ -346,7 +206,7 @@ SExpressionNativizer >> emitFramedMethodPrologue [
 { #category : #services }
 SExpressionNativizer >> emitFramelessMethodPrologue [
 	method capturesSelf
-		ifTrue: [ ir initializeS ]
+		ifTrue: [ assembler initializeS ]
 ]
 
 { #category : #services }
@@ -370,8 +230,8 @@ SExpressionNativizer >> emitSend: selector [
  	| linker |
 	linker := environment messageLinker.
 	method isDebuggable
-		ifTrue: [ linker emitSendDebuggable: selector using: ir ]
-		ifFalse: [ linker emitSend: selector using: ir ]
+		ifTrue: [ linker emitSendDebuggable: selector using: assembler ]
+		ifFalse: [ linker emitSend: selector using: assembler ]
 ]
 
 { #category : #services }
@@ -380,13 +240,13 @@ SExpressionNativizer >> emitSend: selector super: aBoolean [
 	linker := environment messageLinker.
 	
 	method isDebuggable
-		ifTrue: [ aBoolean ifTrue: [linker emitSendSuperDebuggable: selector from: method classBinding using: ir] ifFalse: [linker emitSendDebuggable: selector using: ir ]]
-		ifFalse: [ aBoolean ifTrue: [linker emitSendSuper: selector from: method classBinding using: ir ] ifFalse: [linker emitSend: selector using: ir ]]
+		ifTrue: [ aBoolean ifTrue: [linker emitSendSuperDebuggable: selector from: method classBinding using: ir] ifFalse: [linker emitSendDebuggable: selector using: assembler ]]
+		ifFalse: [ aBoolean ifTrue: [linker emitSendSuper: selector from: method classBinding using: assembler ] ifFalse: [linker emitSend: selector using: assembler ]]
 ]
 
 { #category : #services }
 SExpressionNativizer >> emitWriteBarrier [
-	ir
+	assembler
 		loadAwithGlobal: #WriteBarrier;
 		callIndirectA;
 		discardArguments: 1
@@ -395,12 +255,12 @@ SExpressionNativizer >> emitWriteBarrier [
 { #category : #accessing }
 SExpressionNativizer >> environment: aNativizationEnvironment [
 	environment := aNativizationEnvironment.
-	ir := environment platform newAssembler
+	assembler := environment platform newAssembler
 ]
 
 { #category : #services }
 SExpressionNativizer >> falseLiteral [
-	ir loadRwithFalse
+	assembler loadRwithFalse
 ]
 
 { #category : #initialization }
@@ -412,16 +272,16 @@ SExpressionNativizer >> initialize [
 SExpressionNativizer >> initializeMethodEnvironment [
 	method hasBlocks
 		ifFalse: [ ^ self ].
-	ir pushE.
+	assembler pushE.
 	method hasEnvironment
-		ifTrue: [ ir
+		ifTrue: [ assembler
 				pushSmallInteger: method environmentCount;
 				loadRwithM.
 			self emitSend: #newEnvironment:.
-			ir
+			assembler
 				loadEwithR;
 				pushE ]
-		ifFalse: [ ir pushNil ]
+		ifFalse: [ assembler pushNil ]
 ]
 
 { #category : #services }
@@ -434,19 +294,19 @@ SExpressionNativizer >> initializeTemporaries: count [
 	count = 0
 		ifTrue: [ ^ self ].
 	count <= 6
-		ifTrue: [ count timesRepeat: [ ir pushNil ] ]
-		ifFalse: [ ir
-				loop: [ ir pushNil ] times: count ]
+		ifTrue: [ count timesRepeat: [ assembler pushNil ] ]
+		ifFalse: [ assembler
+				loop: [ assembler pushNil ] times: count ]
 ]
 
 { #category : #services }
 SExpressionNativizer >> instanceVarAt: index [
-	ir loadRwithSindex: index
+	assembler loadRwithSindex: index
 ]
 
 { #category : #services }
 SExpressionNativizer >> instanceVarAt: index put: value [
-	ir storeRinSindex: index; pushS.
+	assembler storeRinSindex: index; pushS.
 	self emitWriteBarrier
 ]
 
@@ -467,9 +327,9 @@ SExpressionNativizer >> loadAwithArgument: index in: envIndex [
 SExpressionNativizer >> loadAwithArgumentInEnvironment: envIndex at: index [
 	| offset |
 	envIndex = 0
-		ifTrue: [ ir loadAwithEindex: index + SClosure instSize ]
+		ifTrue: [ assembler loadAwithEindex: index + SClosure instSize ]
 		ifFalse: [ offset := activeScript offsetOfEnvironment: envIndex.
-			ir
+			assembler
 				loadAwithEindex: envIndex + SClosure instSize;
 				loadAwithAindex: index + offset ]
 ]
@@ -478,7 +338,7 @@ SExpressionNativizer >> loadAwithArgumentInEnvironment: envIndex at: index [
 SExpressionNativizer >> loadAwithArgumentInStackAt: index [
 		| end |
 	end := 3 + self argumentCount.
-			ir loadAwithFPindex: end - index
+			assembler loadAwithFPindex: end - index
 
 ]
 
@@ -490,7 +350,7 @@ SExpressionNativizer >> loadAwithArgumentInlinedAt: index [
 
 { #category : #services }
 SExpressionNativizer >> loadAwithStack: anInteger [
-	ir loadAwithFPindex: 1 - anInteger
+	assembler loadAwithFPindex: 1 - anInteger
 ]
 
 { #category : #services }
@@ -506,9 +366,9 @@ SExpressionNativizer >> loadAwithTemporary: index in: envIndex [
 SExpressionNativizer >> loadAwithTemporaryInEnvironment: envIndex at: index [
 	| offset |
 	envIndex = 0
-		ifTrue: [offset := activeScript offsetOfCurrentEnvironment. ir loadAwithEindex: index + offset ]
+		ifTrue: [offset := activeScript offsetOfCurrentEnvironment. assembler loadAwithEindex: index + offset ]
 		ifFalse: [ offset := activeScript offsetOfEnvironment: envIndex.
-			ir
+			assembler
 				loadAwithEindex: envIndex + SClosure instSize;
 				loadAwithAindex: index + offset ]
 ]
@@ -519,7 +379,7 @@ SExpressionNativizer >> loadAwithTemporaryInStackAt: index [
 	start := self pushesEnvironments
 					 ifTrue: [ -3 ]
 					 ifFalse: [ -1 ].
-		^ ir loadAwithFPindex: start - index
+		^ assembler loadAwithFPindex: start - index
 
 ]
 
@@ -528,7 +388,7 @@ SExpressionNativizer >> loadBlockNativeCode [
 	| block nativeCode |
 	block := SClosure indexOfSlot: 'block'.
 	nativeCode := SCompiledBlock indexOfSlot: 'nativeCode'.
-	ir
+	assembler
 		loadMwithRindex: block;
 		loadMwithMindex: nativeCode
 ]
@@ -540,31 +400,31 @@ SExpressionNativizer >> loadBlockSelf: aCompiledBlock [
 		ifTrue: [ offset := aCompiledBlock capturesHome
 				ifTrue: [ 1 ]
 				ifFalse: [ 0 ].
-			ir loadSwithRindex: SClosure instSize + 1 + offset ]
-		ifFalse: [ ir loadSwithNil ].
-	ir pushS
+			assembler loadSwithRindex: SClosure instSize + 1 + offset ]
+		ifFalse: [ assembler loadSwithNil ].
+	assembler pushS
 ]
 
 { #category : #services }
 SExpressionNativizer >> loadLiteralAt: anInteger [
 	| literal |
 	literal := self methodLiteralAt: anInteger.
-	ir loadRwithLiteral: literal
+	assembler loadRwithLiteral: literal
 ]
 
 { #category : #services }
 SExpressionNativizer >> loadObject: anObject [
-	ir 	 loadRwithLiteral:  anObject
+	assembler 	 loadRwithLiteral:  anObject
 ]
 
 { #category : #services }
 SExpressionNativizer >> loadRwithStack: anInteger [
-	ir loadRwithFPindex: 1 - anInteger
+	assembler loadRwithFPindex: 1 - anInteger
 ]
 
 { #category : #services }
 SExpressionNativizer >> loadTwithStack: anInteger [
-	ir loadTwithFPindex: 1 - anInteger
+	assembler loadTwithFPindex: 1 - anInteger
 ]
 
 { #category : #accessing }
@@ -615,33 +475,33 @@ SExpressionNativizer >> nativizeBlock: anSBlock [
 	(statements isEmpty orNot: [statements last isReturn])
 		ifTrue: [self emitEpilogue].
 	self emitFallbacks.
-	anSBlock compiledCode nativeCode: ir applyFixups nativeCode
+	anSBlock compiledCode nativeCode: assembler applyFixups nativeCode
 ]
 
 { #category : #services }
 SExpressionNativizer >> nilLiteral [
-	ir loadRwithNil
+	assembler loadRwithNil
 ]
 
 { #category : #services }
 SExpressionNativizer >> popR [
-	ir popR.
+	assembler popR.
 	stackCount := stackCount - 1
 ]
 
 { #category : #services }
 SExpressionNativizer >> pushEnvironments [
-	ir pushE; loadEwithR; pushE
+	assembler pushE; loadEwithR; pushE
 ]
 
 { #category : #services }
 SExpressionNativizer >> pushNativeCode [
-	ir pushM
+	assembler pushM
 ]
 
 { #category : #services }
 SExpressionNativizer >> pushR [
-	ir pushR.
+	assembler pushR.
 	^stackCount := stackCount + 1
 ]
 
@@ -652,7 +512,7 @@ SExpressionNativizer >> pushesEnvironments [
 
 { #category : #services }
 SExpressionNativizer >> receiver [
-	ir loadRwithS
+	assembler loadRwithS
 ]
 
 { #category : #services }
@@ -663,26 +523,26 @@ SExpressionNativizer >> resetFor: aCompiledMethod [
 	remainingBlocks := OrderedCollection new.
 	fixed := aCompiledMethod hasBlocks ifTrue: [4] ifFalse: [2].
 	stackCount := aCompiledMethod tempCount + fixed.
-	ir reset
+	assembler reset
 ]
 
 { #category : #services }
 SExpressionNativizer >> resetForBlock: anSBlock [ 
 	fallbacks := OrderedCollection new.
 	stackCount := anSBlock tempCount + 4.
-	ir reset
+	assembler reset
 ]
 
 { #category : #services }
 SExpressionNativizer >> saveContextSwitchPoint [
 	method isDebuggable
 		ifFalse: [ ^ self ].
-	ir
+	assembler
 		pushA;
 		pushT;
 		pushR.
 	environment messageLinker emitSend: #signalStep using: ir.
-	ir
+	assembler
 		popR;
 		popT;
 		popA
@@ -690,7 +550,7 @@ SExpressionNativizer >> saveContextSwitchPoint [
 
 { #category : #services }
 SExpressionNativizer >> saveMethodCode [
-	mainCode := ir
+	mainCode := assembler
 					applyFixups;
 					nativeCode
 ]
@@ -702,7 +562,7 @@ SExpressionNativizer >> sendMustBeBoolean [
 
 { #category : #services }
 SExpressionNativizer >> storeRInStack: index [
-	ir storeRinFPindex: 1 - index
+	assembler storeRinFPindex: 1 - index
 ]
 
 { #category : #services }
@@ -721,10 +581,10 @@ SExpressionNativizer >> temporaryAt: index in: envIndex put: dummy [
 SExpressionNativizer >> temporaryInEnvironment: envIndex at: index [
 	| offset |
 	envIndex = 0
-		ifTrue: [offset := activeScript offsetOfCurrentEnvironment. ir loadRwithEindex: index + offset ]
+		ifTrue: [offset := activeScript offsetOfCurrentEnvironment. assembler loadRwithEindex: index + offset ]
 		ifFalse: [ 
 			offset := activeScript offsetOfEnvironment: envIndex.
-			ir
+			assembler
 				loadRwithEindex: envIndex + SClosure instSize ;
 				loadRwithRindex: index + offset]
 ]
@@ -734,11 +594,11 @@ SExpressionNativizer >> temporaryInEnvironment: envIndex atPut: index [
 	| offset |
 	envIndex = 0
 		ifTrue: [ offset := activeScript offsetOfCurrentEnvironment.
-			ir
+			assembler
 				storeRinEindex: index + offset;
 				pushE ]
 		ifFalse: [ offset := activeScript offsetOfEnvironment: envIndex.
-			ir
+			assembler
 				loadTwithEindex: envIndex + SClosure instSize ;
 				storeRinTindex: index + offset;
 				pushT ].
@@ -751,7 +611,7 @@ SExpressionNativizer >> temporaryInStackAt: index [
 	start := self pushesEnvironments
 					 ifTrue: [ -3 ]
 					 ifFalse: [ -1 ].
-		^ ir loadRwithFPindex: start - index .
+		^ assembler loadRwithFPindex: start - index .
 
 ]
 
@@ -761,13 +621,13 @@ SExpressionNativizer >> temporaryInStackAtPut: index [
 	start := self pushesEnvironments
 						 ifTrue: [ -3 ]
 						 ifFalse: [ -1 ].
-			ir storeRinFPindex: start - index
+			assembler storeRinFPindex: start - index
 
 ]
 
 { #category : #services }
 SExpressionNativizer >> trueLiteral [
-	ir loadRwithTrue
+	assembler loadRwithTrue
 ]
 
 { #category : #services }
@@ -830,7 +690,7 @@ SExpressionNativizer >> visitLiteral: anSLiteral [
 	| value |
 	value := anSLiteral value.
 	value isSmallInteger
-		ifTrue: [ ir loadRwithSmallInteger: value ]
+		ifTrue: [ assembler loadRwithSmallInteger: value ]
 		ifFalse: [ self loadLiteralAt: anSLiteral index ]
 ]
 
@@ -864,7 +724,7 @@ SExpressionNativizer >> visitMethod: anSMethod [
 	statements := anSMethod statements.
 	statements do: [ :s | s acceptVisitor: self ].
 	(statements notEmpty andNot: [ statements last isReturn ])
-		ifTrue: [ ir loadRwithS ].
+		ifTrue: [ assembler loadRwithS ].
 	returned := statements notEmpty and: [ 	
 	statements last isReturn].
 	returned ifFalse: [ self emitEpilogue ].
@@ -886,7 +746,7 @@ SExpressionNativizer >> visitOptimizedMessage: anSMessage [
 { #category : #services }
 SExpressionNativizer >> visitReturn: anSReturn [
   anSReturn expression acceptVisitor: self.
-  anSReturn local ifTrue: [ self emitEpilogue ] ifFalse: [ ir
+  anSReturn local ifTrue: [ self emitEpilogue ] ifFalse: [ assembler
 		   pushR;
 		   loadRwithE.
 		self emitSend: #_return: ] 
