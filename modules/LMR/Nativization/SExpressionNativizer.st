@@ -15,7 +15,7 @@ Class {
 	#pools : [
 		'ClosureElementTypes'
 	],
-	#category : #'Powerlang-Core-Nativization'
+	#category : #Nativization
 }
 
 { #category : #'instance creation' }

@@ -9,7 +9,7 @@ Class {
 		'InlineMessageLinkerFlags',
 		'Registers'
 	],
-	#category : #'Powerlang-Core-Nativization'
+	#category : #Nativization
 }
 
 { #category : #private }

@@ -14,7 +14,7 @@ ii) provide fixed mapping from 'IR' registers (such as A, R, M and so on)
 Class {
 	#name : #ABI,
 	#superclass : #Object,
-	#category : #'Powerlang-Core-Assembly'
+	#category : #'Nativization-Assembly'
 }
 
 { #category : #unclassified }
