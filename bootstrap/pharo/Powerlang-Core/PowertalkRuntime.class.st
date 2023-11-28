@@ -64,7 +64,7 @@ PowertalkRuntime >> flushDispatchCache: aSymbol [
 	| cached |
 	symbolCache
 		at: aSymbol
-		ifPresent: [ :messages | messages do: #flushCache ].
+		ifPresent: [ :messages | messages do: [:m | m flushCache ]].
 	cached := methodCache keys select: [ :key |  key key == aSymbol ].
 	cached do: [ :key | methodCache removeKey: key]
 ]
@@ -73,7 +73,7 @@ PowertalkRuntime >> flushDispatchCache: aSymbol [
 PowertalkRuntime >> flushDispatchCache: aSymbol in: class [
 	| behavior |
 	behavior := self speciesInstanceBehavior: class.
-	symbolCache at: aSymbol ifPresent: [ :messages | messages do: #flushCache ].
+	symbolCache at: aSymbol ifPresent: [ :messages | messages do: [:m | m flushCache ]].
 	^ methodCache removeKey: aSymbol -> behavior ifAbsent: []
 ]
 

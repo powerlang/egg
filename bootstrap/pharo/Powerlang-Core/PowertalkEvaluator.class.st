@@ -186,7 +186,8 @@ PowertalkEvaluator >> initializePrimitives [
 		at: #HostLoadModule put: self primitiveHostLoadModule;
 		at: #HostFixOverrides put: self primitiveHostFixOverrides;
 		at: #PrimeFor put: self primitivePrimeFor;
-		at: #FlushFromCaches put: self primitiveFlushFromCaches
+		at: #FlushFromCaches put: self primitiveFlushFromCaches;
+		at: #PrepareForExecution put: self primitivePrepareForExecution
 ]
 
 { #category : #accessing }
@@ -454,6 +455,12 @@ PowertalkEvaluator >> primitivePerformWithArguments [
 	^ [ self
 		evaluatePerform: context firstArgument in: context self
 		withArgs: context secondArgument ]
+]
+
+{ #category : #primitives }
+PowertalkEvaluator >> primitivePrepareForExecution [
+
+	^ [ self prepareForExecuting: context self ]
 ]
 
 { #category : #primitives }
