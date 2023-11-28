@@ -6,7 +6,8 @@ Class {
 	#name : #AMD64TemplateAssembler,
 	#superclass : #Assembler,
 	#instVars : [
-		'wordSize'
+		'wordSize',
+		'buffer'
 	],
 	#category : #'Powerlang-Core-Assembler-Intel'
 }
@@ -67,20 +68,32 @@ AMD64TemplateAssembler >> andRwithImmediate: imm [
 		assembleBytes: #[16r4C 16r21 16rD8]
 ]
 
+
+{ #category : #basic }
+AMD64CodeGenerator >> assembleBytes: value count: count [
+
+
+]
+
+
 { #category : #arithmetic }
 AMD64TemplateAssembler >> assembleByte: anInteger [
-	codegen assembleByte: anInteger
+	buffer nextBytePut: anInteger
 ]
 
 { #category : #arithmetic }
 AMD64TemplateAssembler >> assembleBytes: aByteArray [
-	codegen assembleBytes: aByteArray
+	buffer nextBytesPut: aByteArray
 ]
 
 { #category : #arithmetic }
 AMD64TemplateAssembler >> assembleBytes: value count: count [
-	codegen assembleBytes: value count: count
+	self ASSERT: value isInteger.
+	self ASSERT:(count == 4 or:[ count == 8 ]).
 
+	count == 4 
+		ifTrue: [ buffer nextLongPut: value] 
+		ifFalse: [ buffer nextLargePut: value]
 ]
 
 { #category : #private }
