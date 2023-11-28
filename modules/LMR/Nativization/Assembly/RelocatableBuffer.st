@@ -13,14 +13,6 @@ Class {
 	#category : #'Powerlang-Core-Assembly'
 }
 
-{ #category : #'instance creation' }
-RelocatableBuffer class >> new [
-	"return an initialized instance"
-
-	^ self basicNew initialize.
-
-]
-
 { #category : #fixups }
 RelocatableBuffer >> addAbsoluteFixup: label [
 	| fixup |
@@ -66,8 +58,7 @@ RelocatableBuffer >> initialize [
 	super initialize.
 	fixups := OrderedCollection new.
 	address := 0.
-	stream := ReadWriteStream on: #[]
-
+	stream := ByteArray writeStream
 ]
 
 { #category : #writing }
