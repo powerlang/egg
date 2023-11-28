@@ -6,7 +6,6 @@ Class {
 	#name : #Assembler,
 	#superclass : #Object,
 	#instVars : [
-		'codegen',
 		'labels',
 		'literals'
 	],
@@ -43,23 +42,22 @@ Assembler >> @ label [
 
 { #category : #'operations - arithmetic' }
 Assembler >> add: source1 to: source2andDest [
-	codegen add: source1 to: source2andDest
+	self subclassResponsibility
 ]
 
 { #category : #arithmetic }
 Assembler >> addAtoR [
-	codegen add: codegen regA to: codegen regR
+	self subclassResponsibility
 ]
 
 { #category : #arithmetic }
 Assembler >> addDoubleX1toX0 [
-	codegen addDouble: codegen regX1 to: codegen regX0
-
+	self subclassResponsibility
 ]
 
 { #category : #'operations - arithmetic' }
 Assembler >> addImm: imm to: dest [
-	codegen addImm: imm to: dest
+	self subclassResponsibility
 ]
 
 { #category : #labels }
@@ -85,110 +83,97 @@ Assembler >> addLiteral: anObject [
 
 { #category : #arithmetic }
 Assembler >> addRwithImmediate: imm [
-	codegen addImm: imm to: codegen regR 
+	self subclassResponsibility
 ]
 
 { #category : #logic }
 Assembler >> addSPwithImmediate: imm [
-	codegen addImm: imm to: codegen regSP
+	self subclassResponsibility
 ]
 
 { #category : #arithmetic }
 Assembler >> addTtoR [
-	codegen add: codegen regT to: codegen regR
+	self subclassResponsibility
 ]
 
 { #category : #logic }
 Assembler >> addTwithImmediate: imm [
-	codegen addImm: imm to: codegen regT
+	self subclassResponsibility
 ]
 
 { #category : #'operations - arithmetic' }
 Assembler >> alignTo: anInteger [
-	codegen alignTo: anInteger
+	self subclassResponsibility
 ]
 
 { #category : #'operations - logical' }
 Assembler >> and: source1andDest with: source2 [
-	codegen and: source1andDest with: source2
+	self subclassResponsibility
 ]
 
 { #category : #'operations - logical' }
 Assembler >> and: source1andDest withImm: imm [
-	codegen and: source1andDest withImm: imm
+	self subclassResponsibility
 ]
 
 { #category : #logic }
 Assembler >> andRwithA [
-	codegen and: codegen regR with: codegen regA
+	self subclassResponsibility
 ]
 
 { #category : #arithmetic }
 Assembler >> andRwithImmediate: imm [
-	codegen and: codegen regR withImm: imm
-]
-
-{ #category : #relocation }
-Assembler >> applyFixups [
-	codegen memory applyFixupsWith: self
+	self subclassResponsibility
 ]
 
 { #category : #'operations - arithmetic' }
 Assembler >> breakpoint [
-	codegen breakpoint
+	self subclassResponsibility
 ]
 
 { #category : #private }
 Assembler >> buildFrame [
-	self
-		push: codegen regFP;
-		move: codegen regSP to: codegen regFP
+	self subclassResponsibility
 ]
 
 { #category : #private }
 Assembler >> bytes [
-	^codegen bytes
+	self subclassResponsibility
 ]
 
 { #category : #'operations - arithmetic' }
 Assembler >> callIndirectA [
-	| memref |
-	memref := codegen memRef: codegen regA indexImm: 1.
-	codegen callIndirect: memref
+	self subclassResponsibility
 ]
 
 { #category : #'operations - arithmetic' }
 Assembler >> callIndirectM [
-	| memref |
-	memref := codegen memRef: codegen regM indexImm: 1.
-	codegen callIndirect: memref
+	self subclassResponsibility
 ]
 
 { #category : #'operations - arithmetic' }
 Assembler >> callR [
-	codegen call: codegen regR
+	self subclassResponsibility
 ]
 
 { #category : #'to-cleanup' }
 Assembler >> clearFPUFlags [
-	codegen clearFPUFlags
+	self subclassResponsibility
 ]
 
 { #category : #'operations - arithmetic' }
 Assembler >> clearIntegerBit: srcAndDstReg [
-	self clearSafeIntegerBit: srcAndDstReg
-
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> clearRhigh32 [
-	codegen clearHigh32: codegen regR
-
+	self subclassResponsibility
 ]
 
 { #category : #'operations - arithmetic' }
 Assembler >> clearRintegerBit [
-	self dec: codegen regR
+	self subclassResponsibility
 ]
 
 { #category : #'operations - arithmetic' }
@@ -198,13 +183,12 @@ Assembler >> clearSafeIntegerBit: srcAndDstReg [
 
 { #category : #'operations - arithmetic' }
 Assembler >> clearSafeRintegerBit [
-	self clearSafeIntegerBit: codegen regR
-
+	self subclassResponsibility
 ]
 
 { #category : #'operations - arithmetic' }
 Assembler >> compare: reg1 with: reg2 [
-	codegen compare: reg1 with: reg2
+	self subclassResponsibility
 ]
 
 { #category : #comparing }
@@ -216,10 +200,7 @@ Assembler >> compare: register withBoolean: aBoolean [
 
 { #category : #'operations - arithmetic' }
 Assembler >> compare: register withLiteral: anObject [
-	| index memref |
-	index := self addLiteral: anObject.
-	memref := codegen memRef: codegen regM indexImm: index.
-	codegen compare: register withMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #comparing }
@@ -231,27 +212,27 @@ Assembler >> compareAwithBoolean: aBoolean [
 
 { #category : #'operations - arithmetic' }
 Assembler >> compareAwithFalse [
-	codegen compare: codegen regA with: codegen regFalse
+	self subclassResponsibility
 ]
 
 { #category : #'operations - arithmetic' }
 Assembler >> compareAwithTrue [
-	codegen compare: codegen regA with: codegen regTrue
+	self subclassResponsibility
 ]
 
 { #category : #'to-cleanup' }
 Assembler >> compareEqualDoubleX0withAindirect [
-	codegen compareEqualDoubleX0withAindirect
+	self subclassResponsibility
 ]
 
 { #category : #'to-cleanup' }
 Assembler >> compareLessThanDoubleX0withAindirect [
-	codegen compareLessThanDoubleX0withAindirect
+	self subclassResponsibility
 ]
 
 { #category : #'operations - arithmetic' }
 Assembler >> compareRwithA [
-	codegen compare: codegen regR with: codegen regA
+	self subclassResponsibility
 ]
 
 { #category : #comparing }
@@ -263,17 +244,17 @@ Assembler >> compareRwithBoolean: aBoolean [
 
 { #category : #'operations - arithmetic' }
 Assembler >> compareRwithFalse [
-	codegen compare: codegen regR with: codegen regFalse
+	self subclassResponsibility
 ]
 
 { #category : #'operations - arithmetic' }
 Assembler >> compareRwithImmediate: imm [
-	codegen compare: codegen regR withImm: imm
+	self subclassResponsibility
 ]
 
 { #category : #'operations - arithmetic' }
 Assembler >> compareRwithNil [
-	codegen compare: codegen regR with: codegen regNil
+	self subclassResponsibility
 ]
 
 { #category : #comparing }
@@ -285,61 +266,59 @@ Assembler >> compareRwithSmallInteger: anInteger [
 
 { #category : #'operations - arithmetic' }
 Assembler >> compareRwithTrue [
-	codegen compare: codegen regR with: codegen regTrue
+	self subclassResponsibility
 ]
 
 { #category : #'operations - arithmetic' }
 Assembler >> compareSwithTindex: index [
-	| memref |
-	memref := codegen memRef: codegen regT indexImm: index.
-	codegen compare: codegen regS withMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #'operations - arithmetic' }
 Assembler >> compareTwithA [
-	codegen compare: codegen regT with: codegen regA
+	self subclassResponsibility
 ]
 
 { #category : #'operations - arithmetic' }
 Assembler >> compareTwithImmediate: imm [
-	codegen compare: codegen regT withImm: imm
+	self subclassResponsibility
 ]
 
 { #category : #'operations - arithmetic' }
 Assembler >> compareWithFalse: register [
-	codegen compare: register with: codegen regFalse
+	self subclassResponsibility
 ]
 
 { #category : #'operations - arithmetic' }
 Assembler >> compareWithNil: register [
-	codegen compare: register with: codegen regNil
+	self subclassResponsibility
 ]
 
 { #category : #'operations - arithmetic' }
 Assembler >> compareWithTrue: register [
-	codegen compare: register with: codegen regTrue
+	self subclassResponsibility
 ]
 
 { #category : #arithmetic }
 Assembler >> convertAtoNativeInteger [
-	self convertToNativeInteger: codegen regA
+	self subclassResponsibility
 	
 ]
 
 { #category : #arithmetic }
 Assembler >> convertRtoNativeInteger [
-	self convertToNativeInteger: codegen regR
+	self subclassResponsibility
 	
 ]
 
 { #category : #arithmetic }
 Assembler >> convertRtoSmallInteger [
-	self convertToSmallInteger: codegen regR
+	self subclassResponsibility
 ]
 
 { #category : #arithmetic }
 Assembler >> convertToNativeInteger: srcAndDstReg [
-	codegen shiftRightArithmetic: srcAndDstReg byImm: 1
+	self subclassResponsibility
 ]
 
 { #category : #arithmetic }
@@ -349,121 +328,112 @@ Assembler >> convertToSmallInteger: srcAndDstReg [
 
 { #category : #arithmetic }
 Assembler >> convertTtoNativeInteger [
-	self convertToNativeInteger: codegen regT
-	
+	self subclassResponsibility	
 ]
 
 { #category : #services }
 Assembler >> currentAddress [
-	^ codegen currentAddress
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> dec: srcAndDstReg [
-	codegen dec: srcAndDstReg
-
+	self subclassResponsibility
 ]
 
 { #category : #private }
 Assembler >> decRindirect [
-	| memref |
-	memref := codegen memRef: codegen regR indexImm: 1.
-	codegen decMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #private }
 Assembler >> discardArguments: anInteger [
-	anInteger = 0 ifTrue: [^self].
-	codegen addImm: anInteger * codegen wordSize to: codegen regSP
+	self subclassResponsibility
 ]
 
 { #category : #'floting point' }
 Assembler >> divideDoubleX0byX1 [
-	codegen divDouble: codegen regX0 by: codegen regX1
+	self subclassResponsibility
 ]
 
 { #category : #'to-cleanup' }
 Assembler >> dropTopOfFPU [
-	codegen dropTopOfFPU
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> dropTos: count [
-	codegen addImm: (count * codegen addressSize) to: codegen regSP
-
+	self subclassResponsibility
 ]
 
 { #category : #arithmetic }
 Assembler >> exchangeRindirectWithT [
-	| memref |
-	memref := codegen memRef: codegen regR indexImm: 1.
-	codegen exchange: codegen regT withMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #storing }
 Assembler >> extendRtoAandDividebyT [
-	codegen divide: codegen regR extendingTo: codegen regA by: codegen regT
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> inc: srcAndDstReg [
-	codegen inc: srcAndDstReg
-
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> initializeS [
-	codegen move: codegen regR to: codegen regS
+	self subclassResponsibility
 ]
 
 { #category : #jumps }
 Assembler >> jumpIfEqualTo: label [
-	codegen jumpIfEqualTo: label
+	self subclassResponsibility
 ]
 
 { #category : #jumps }
 Assembler >> jumpIfGreaterOrEqualSignedTo: label [
-	codegen jumpIfGreaterOrEqualSignedTo: label
+	self subclassResponsibility
 ]
 
 { #category : #jumps }
 Assembler >> jumpIfGreaterSignedTo: label [
-	codegen jumpIfGreaterSignedTo: label
+	self subclassResponsibility
 ]
 
 { #category : #jumps }
 Assembler >> jumpIfLessOrEqualSignedTo: label [
-	codegen jumpIfLessOrEqualSignedTo: label
+	self subclassResponsibility
 ]
 
 { #category : #jumps }
 Assembler >> jumpIfLessSignedTo: label [
-	codegen jumpIfLessSignedTo: label
+	self subclassResponsibility
 ]
 
 { #category : #jumps }
 Assembler >> jumpIfNotEqualTo: label [
-	codegen jumpIfNotEqualTo: label
+	self subclassResponsibility
 ]
 
 { #category : #jumps }
 Assembler >> jumpIfNotZeroTo: label [
-	codegen jumpIfNotZeroTo: label
+	self subclassResponsibility
 ]
 
 { #category : #jumps }
 Assembler >> jumpIfOverflowTo: label [
-	codegen jumpIfOverflowTo: label
+	self subclassResponsibility
 ]
 
 { #category : #jumps }
 Assembler >> jumpIfSignTo: label [
-	codegen jumpIfSignTo: label
+	self subclassResponsibility
 ]
 
 { #category : #jumps }
 Assembler >> jumpIfZeroTo: label [
-	codegen jumpIfZeroTo: label
+	self subclassResponsibility
 ]
 
 { #category : #accessing }
@@ -477,14 +447,12 @@ Assembler >> jumpOver: aBlock [
 
 { #category : #accessing }
 Assembler >> jumpTo: label [
-	codegen jumpTo: label
+	self subclassResponsibility
 ]
 
 { #category : #accessing }
 Assembler >> jumpToMindex: index [
-	| memref |
-	memref := codegen memRef: codegen regM indexImm: index.
-	codegen jumpToMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #integers }
@@ -498,13 +466,12 @@ Assembler >> labeledIntegerBitTestOf: aRegister [
 
 { #category : #integers }
 Assembler >> labeledIntegerBitTestOfR [
-	^self labeledIntegerBitTestOf: codegen regR
-
+	self subclassResponsibility
 ]
 
 { #category : #integers }
 Assembler >> labeledIntegerBitTestOfT [
-	^self labeledIntegerBitTestOf: codegen regT byte
+	self subclassResponsibility
 ]
 
 { #category : #integers }
@@ -518,17 +485,17 @@ Assembler >> labeledIntegerNativizationOf: aRegister [
 
 { #category : #integers }
 Assembler >> labeledIntegerNativizationOfA [
-	^self labeledIntegerNativizationOf: codegen regA
+	self subclassResponsibility
 ]
 
 { #category : #integers }
 Assembler >> labeledIntegerNativizationOfR [
-	^self labeledIntegerNativizationOf: codegen regR
+	self subclassResponsibility
 ]
 
 { #category : #integers }
 Assembler >> labeledIntegerNativizationOfT [
-	^self labeledIntegerNativizationOf: codegen regT
+	self subclassResponsibility
 ]
 
 { #category : #integers }
@@ -542,76 +509,52 @@ Assembler >> labeledNonIntegerBitTestOf: aRegister [
 
 { #category : #integers }
 Assembler >> labeledNonIntegerBitTestOfR [
-	^self labeledNonIntegerBitTestOf: codegen regR
-
+	self subclassResponsibility
 ]
 
 { #category : #'to-cleanup' }
 Assembler >> leadingRzeroCount [
-	codegen leadingRzeroCount
+	self subclassResponsibility
 ]
 
 { #category : #'memory - load / store' }
 Assembler >> load: dstReg fromMem: srcMemRef [
-	^codegen load: dstReg fromMem: srcMemRef
-
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> load:dstReg withImmediate: imm [
-	codegen moveImm: imm to: dstReg
-
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> load: register withLiteral: anObject [
-	| index memref |
-	index := self addLiteral: anObject.
-	memref := codegen memRef: codegen regM indexImm: index.
-	codegen
-		load: register
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadAwithAindex: index [
-	| memref |
-	memref := codegen memRef: codegen regA indexImm: index.
-	codegen
-		load: codegen regA
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadAwithEindex: index [
-	| memref |
-	memref := codegen memRef: codegen regE indexImm: index.
-	codegen
-		load: codegen regA
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadAwithFPindex: index [
-	| memref |
-	memref := codegen memRef: codegen regFP indexImm: index.
-	codegen
-		load: codegen regA
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadAwithFalse [
-	codegen move: codegen regFalse to: codegen regA
+	self subclassResponsibility
 ]
 
 { #category : #private }
 Assembler >> loadAwithGindex: index [
-	| memref |
-	memref := codegen memRef: codegen regG indexImm: index.
-	codegen
-		load: codegen regA
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
@@ -623,12 +566,12 @@ Assembler >> loadAwithGlobal: aSymbol [
 
 { #category : #integers }
 Assembler >> loadAwithImmediate: imm [
-	self load: codegen regA withImmediate: imm
+	self subclassResponsibility
 ]
 
 { #category : #arithmetic }
 Assembler >> loadAwithKnown: anObject [
-	codegen breakpoint
+	self subclassResponsibility
 ]
 
 { #category : #loading }
@@ -640,47 +583,32 @@ Assembler >> loadAwithLiteral: anObject [
 
 { #category : #loading }
 Assembler >> loadAwithMindex: index [
-	| memref |
-	memref := codegen memRef: codegen regM indexImm: index.
-	codegen
-		load: codegen regA
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadAwithNil [
-	codegen move: codegen regNil to: codegen regA
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadAwithR [
-	codegen move: codegen regR to: codegen regA
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadAwithRoffsetAtA [
-	| memref |
-	memref := codegen memRef
-				base: codegen regR;
-				index: codegen regA;
-				scale: 1.
-	codegen
-		load: codegen regA
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadAwithS [
-	codegen move: codegen regS to: codegen regA
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadAwithSindex: index [
-	| memref |
-	memref := codegen memRef: codegen regS indexImm: index.
-	codegen
-		load: codegen regA
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #integers }
@@ -692,46 +620,37 @@ Assembler >> loadAwithSmallInteger: anInteger [
 
 { #category : #loading }
 Assembler >> loadAwithTrue [
-	codegen move: codegen regTrue to: codegen regA
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> loadEwithAddressOfRatA [
-	| memref |
-	memref := codegen
-		memRef: codegen regR
-		index: codegen regA
-		offsetImm: codegen wordSize negated.
-	codegen lea: codegen regE withMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadEwithFPindex: index [
-	| memref |
-	memref := codegen memRef: codegen regFP indexImm: index.
-	codegen
-		load: codegen regE
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadEwithNil [
-	codegen move: codegen regNil to: codegen regE
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadEwithR [
-	codegen move: codegen regR to: codegen regE
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadFPwithR [
-	codegen move: codegen regR to: codegen regFP
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadFPwithSP [
-	codegen move: codegen regSP to: codegen regFP
+	self subclassResponsibility
 ]
 
 { #category : #loading }
@@ -743,11 +662,7 @@ Assembler >> loadFalseWithLiteral: anObject [
 
 { #category : #loading }
 Assembler >> loadFalseWithMindex: index [
-	| memref |
-	memref := codegen memRef: codegen regM indexImm: index.
-	codegen
-		load: codegen regFalse
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
@@ -759,76 +674,52 @@ Assembler >> loadGwithLiteral: anObject [
 
 { #category : #loading }
 Assembler >> loadGwithMindex: index [
-	| memref |
-	memref := codegen memRef: codegen regM indexImm: index.
-	codegen
-		load: codegen regG
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> loadLargeX0withRindirect [
-	| memref |
-	memref := codegen memRef64: codegen regR indexImm: 1.
-	codegen loadDouble: codegen regX0 fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> loadLargeX1withAindirect [
-	| memref |
-	memref := codegen memRef64: codegen regA indexImm: 1.
-	codegen loadDouble: codegen regX1 fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #'to-cleanup' }
 Assembler >> loadLongMwithIPoffset: anInteger [
-	codegen loadLongMwithIPoffset: anInteger
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> loadLongRwithRatOffsetA [
-	| memref |
-	memref := codegen
-		memRef32: codegen regR
-		offset: codegen regA.
-	codegen load: codegen regR fromMem: memref
-
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> loadLongSwithRindex: index [
-	| memref |
-	memref := codegen memRef32: codegen regR indexImm: index.
-	codegen load: codegen regS fromMem: memref
-
+	self subclassResponsibility
 ]
 
 { #category : #'to-cleanup' }
 Assembler >> loadMXCSRfromA [
-	codegen loadMXCSRfromA
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> loadMwithA [
-	codegen move: codegen regA to: codegen regM
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadMwithFPindex: index [
-	| memref |
-	memref := codegen memRef: codegen regFP indexImm: index.
-	codegen
-		load: codegen regM
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #private }
 Assembler >> loadMwithGindex: index [
-	| memref |
-	memref := codegen memRef: codegen regG indexImm: index.
-	codegen
-		load: codegen regM
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
@@ -840,29 +731,17 @@ Assembler >> loadMwithGlobal: aSymbol [
 
 { #category : #loading }
 Assembler >> loadMwithMindex: index [
-	| memref |
-	memref := codegen memRef: codegen regM indexImm: index.
-	codegen
-		load: codegen regM
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadMwithRindex: index [
-	| memref |
-	memref := codegen memRef: codegen regR indexImm: index.
-	codegen
-		load: codegen regM
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadMwithTindex: index [
-	| memref |
-	memref := codegen memRef: codegen regT indexImm: index.
-	codegen
-		load: codegen regM
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
@@ -874,68 +753,52 @@ Assembler >> loadNilWithLiteral: anObject [
 
 { #category : #loading }
 Assembler >> loadNilWithMindex: index [
-	| memref |
-	memref := codegen memRef: codegen regM indexImm: index.
-	codegen
-		load: codegen regNil
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> loadRconvertingDoublePointedByR [
-	| memref |
-	memref := codegen memRef64: codegen regR indexImm: 1.
-	codegen load: codegen regR convertingDoubleToIntegerFromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadRwithA [
-	codegen move: codegen regA to: codegen regR
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> loadRwithArgPointer [
-	| memref |
-	memref := codegen memRef: codegen regFP indexImm: 3.
-	codegen lea: codegen regR withMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadRwithE [
-	codegen move: codegen regE to: codegen regR
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadRwithEindex: index [
-	| memref |
-	memref := codegen memRef: codegen regE indexImm: index.
-	codegen
-		load: codegen regR
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadRwithFP [
-	codegen move: codegen regFP to: codegen regR
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadRwithFPindex: index [
-	| memref |
-	memref := codegen memRef: codegen regFP indexImm: index.
-	codegen
-		load: codegen regR
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadRwithFalse [
-	codegen move: codegen regFalse to: codegen regR
+	self subclassResponsibility
 ]
 
 { #category : #integers }
 Assembler >> loadRwithImmediate: imm [
-	self load: codegen regR withImmediate: imm
+	self subclassResponsibility
 ]
 
 { #category : #loading }
@@ -947,75 +810,47 @@ Assembler >> loadRwithLiteral: anObject [
 
 { #category : #loading }
 Assembler >> loadRwithM [
-	codegen move: codegen regM to: codegen regR
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadRwithMindex: index [
-	| memref |
-	memref := codegen memRef: codegen regM indexImm: index.
-	codegen
-		load: codegen regR
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadRwithNil [
-	codegen move: codegen regNil to: codegen regR
+	self subclassResponsibility
 ]
 
 { #category : #integers }
 Assembler >> loadRwithRatA [
-	| memref |
-	memref := codegen memRef: codegen regR index: codegen regA.
-	self
-		load: codegen regR
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadRwithRatOffsetA [
-	| memref |
-	memref := codegen memRef
-				base: codegen regR;
-				index: codegen regA;
-				scale: 1.
-	codegen
-		load: codegen regR
-		fromMem:
-			memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadRwithRindex: index [
-	| memref |
-	memref := codegen memRef: codegen regR indexImm: index.
-	codegen
-		load: codegen regR
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadRwithS [
-	codegen move: codegen regS to: codegen regR
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadRwithSPindex: index [
-	| memref |
-	memref := codegen memRef: codegen regSP indexImm: index.
-	codegen
-		load: codegen regR
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadRwithSindex: index [
-	| memref |
-	memref := codegen memRef: codegen regS indexImm: index.
-	codegen
-		load: codegen regR
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #integers }
@@ -1027,55 +862,42 @@ Assembler >> loadRwithSmallInteger: anInteger [
 
 { #category : #loading }
 Assembler >> loadRwithT [
-	codegen move: codegen regT to: codegen regR
+	self subclassResponsibility
 ]
 
 { #category : #'floting point' }
 Assembler >> loadRwithTIBatR [
-	codegen load: codegen regR withTIBat: codegen regR
+	self subclassResponsibility
 ]
 
 { #category : #'floting point' }
 Assembler >> loadRwithThreadVariableAtR [
-	codegen load: codegen regR withThreadVariableAt: codegen regR
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadRwithTrue [
-	codegen move: codegen regTrue to: codegen regR
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadSPwithFP [
-	codegen move: codegen regFP to: codegen regSP
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> loadSwithAddressOfSatA [
-	| memref |
-	memref := codegen
-		memRef: codegen regS
-		index: codegen regA
-		offsetImm: codegen wordSize negated.
-	codegen lea: codegen regS withMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadSwithFPindex: index [
-	| memref |
-	memref := codegen memRef: codegen regFP indexImm: index.
-	codegen
-		load: codegen regS
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #private }
 Assembler >> loadSwithGindex: index [
-	| memref |
-	memref := codegen memRef: codegen regG indexImm: index.
-	codegen
-		load: codegen regS
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
@@ -1087,16 +909,12 @@ Assembler >> loadSwithGlobal: aSymbol [
 
 { #category : #loading }
 Assembler >> loadSwithNil [
-	codegen move: codegen regNil to: codegen regS
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadSwithRindex: index [
-	| memref |
-	memref := codegen memRef: codegen regR indexImm: index.
-	codegen
-		load: codegen regS
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
@@ -1108,48 +926,32 @@ Assembler >> loadTrueWithLiteral: anObject [
 
 { #category : #loading }
 Assembler >> loadTrueWithMindex: index [
-	| memref |
-	memref := codegen memRef: codegen regM indexImm: index.
-	codegen
-		load: codegen regTrue
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadTwithA [
-	codegen move: codegen regA to: codegen regT
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadTwithAindex: index [
-	| memref |
-	memref := codegen memRef: codegen regA indexImm: index.
-	codegen
-		load: codegen regT
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadTwithEindex: index [
-	| memref |
-	memref := codegen memRef: codegen regE indexImm: index.
-	codegen
-		load: codegen regT
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadTwithFPindex: index [
-	| memref |
-	memref := codegen memRef: codegen regFP indexImm: index.
-	codegen
-		load: codegen regT
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #integers }
 Assembler >> loadTwithImmediate: imm [
-	self load: codegen regT withImmediate: imm
+	self subclassResponsibility
 ]
 
 { #category : #loading }
@@ -1161,215 +963,137 @@ Assembler >> loadTwithLiteral: anObject [
 
 { #category : #loading }
 Assembler >> loadTwithMindex: index [
-	| memref |
-	memref := codegen memRef: codegen regM indexImm: index.
-	codegen
-		load: codegen regT
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadTwithR [
-	codegen move: codegen regR to: codegen regT
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadTwithTindex: index [
-	| memref |
-	memref := codegen memRef: codegen regT indexImm: index.
-	codegen load: codegen regT fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadWithFalse: register [ 
-	codegen move: codegen regFalse to: register
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadWithNil: register [ 
-	codegen move: codegen regNil to: register
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> loadWithTrue: register [ 
-	codegen move: codegen regTrue to: register
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> loadX0withRasDouble [
-	codegen convert: codegen regR toDouble: codegen regX0
+	self subclassResponsibility
 ]
 
 { #category : #'to-cleanup' }
 Assembler >> loadZeroExtendByte: dstReg from: srcBaseReg atIndexAt: srcIndexReg [
-	codegen loadZeroExtendByte: dstReg from: srcBaseReg atIndexAt: srcIndexReg
-
+	self subclassResponsibility
 ]
 
 { #category : #'to-cleanup' }
 Assembler >> loadZeroExtendByte: dstReg from: srcBaseReg atIndexImm: indexImm [
-
-	codegen
-		loadZeroExtendByte: dstReg
-		from: srcBaseReg
-		atIndexImm: indexImm
+	self subclassResponsibility
 ]
 
 { #category : #jumps }
 Assembler >> loadZeroExtendByte: reg1 from: reg2 atOffset: offset [
-	codegen loadZeroExtendByte: reg1 from: reg2 atOffset: offset
+	self subclassResponsibility
 ]
 
 { #category : #integers }
 Assembler >> loadZeroExtendByteRwithRatA [
-	self loadZeroExtendByte: codegen regR from: codegen regR atIndexAt: codegen regA
+	self subclassResponsibility
 ]
 
 { #category : #integers }
 Assembler >> loadZeroExtendByteRwithRindex: index [
-	#dontOptimize.
-	self loadZeroExtendByte: codegen regR from: codegen regR atIndexImm: index
+	self subclassResponsibility
 ]
 
 { #category : #integers }
 Assembler >> loadZeroExtendByteRwithSPatA [
-	self loadZeroExtendByte: codegen regR from: codegen regSP atIndexAt: codegen regA
+	self subclassResponsibility
 ]
 
 { #category : #integers }
 Assembler >> loadZeroExtendByteTwithAindex: index [
-	#dontOptimize.
-	self loadZeroExtendByte: codegen regT from: codegen regA atIndexImm: index
+	self subclassResponsibility
 ]
 
 { #category : #integers }
 Assembler >> loadZeroExtendLongRwithRatA [
-	| memref |
-	memref := codegen memRef32: codegen regR index: codegen regA.
-	codegen
-		load: codegen regR
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #integers }
 Assembler >> loadZeroExtendLongRwithRindex: index [
-	| memref |
-	#dontOptimize.
-	memref := codegen memRef32: codegen regR indexImm: index.
-	codegen
-		load: codegen regR e
-		fromMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #'to-cleanup' }
 Assembler >> loadZeroExtendShortRwithRoffset: offset [
-	codegen
-		loadZeroExtendShortRwithRoffset: offset
+	self subclassResponsibility
 ]
 
 { #category : #'to-cleanup' }
 Assembler >> lock [
-	codegen lock
+	self subclassResponsibility
 ]
 
 { #category : #jumps }
 Assembler >> loop: aBlock times: anInteger [
-	| loop |
-	loop := self newLabel.
-	self loadTwithImmediate: anInteger; @ loop.
-	aBlock value.
-	self dec: codegen regT; shortJumpIfNotZeroTo: loop
+	self subclassResponsibility
 ]
 
 { #category : #jumps }
 Assembler >> loopTtimes: aBlock [
-	| loop end |
-	loop := self newLabel.
-	end := self newLabel.
-	self
-		compareTwithImmediate: 0;
-		@ loop;
-		shortJumpIfEqualTo: end.
-	aBlock value.
-	self
-		dec: codegen regT;
-		shortJumpTo: loop;
-		@ end
-]
-
-{ #category : #memory }
-Assembler >> memRef [
-	"Return clean instance of pointer-sized memory reference"
-
-	^ codegen memRef
-
-]
-
-{ #category : #memory }
-Assembler >> memRef32: baseReg indexImm: indexImm [
-	^ codegen memRef32: baseReg indexImm: indexImm
-]
-
-{ #category : #memory }
-Assembler >> memRef8 [
-	"Return clean instance of byte-sized memory reference"
-
-	^ codegen memRef8
-]
-
-{ #category : #memory }
-Assembler >> memRef8: baseReg index: indexReg [
-	^ codegen memRef8: baseReg index: indexReg
-]
-
-{ #category : #memory }
-Assembler >> memRef: baseReg index: indexReg [
-	^ codegen memRef: baseReg index: indexReg
-]
-
-{ #category : #memory }
-Assembler >> memRef: baseReg indexImm: indexImm [
-	^ codegen memRef: baseReg indexImm: indexImm
+	self subclassResponsibility
 ]
 
 { #category : #services }
 Assembler >> move: srcReg to: dstReg [
-	^ codegen move: srcReg to: dstReg
-
+	self subclassResponsibility
 ]
 
 { #category : #services }
 Assembler >> moveImm: imm to: dstReg [
-	codegen moveImm: imm to: dstReg
-
+	self subclassResponsibility
 ]
 
 { #category : #'to-cleanup' }
 Assembler >> moveTslots [
-	codegen moveTslots
+	self subclassResponsibility
 ]
 
 { #category : #'floting point' }
 Assembler >> moveX0toR [
-	codegen moveDouble: codegen regX0 into: codegen regR
+	self subclassResponsibility
 ]
 
 { #category : #'floting point' }
 Assembler >> multiplyDoubleX0byX1 [
-	codegen mulDouble: codegen regX0 by: codegen regX1
+	self subclassResponsibility
 ]
 
 { #category : #storing }
 Assembler >> multiplyRbyAwideningToA [
-	codegen
-		multiply: codegen regR
-		by: codegen regA
-		wideningTo: codegen regA
+	self subclassResponsibility
 ]
 
 { #category : #arithmetic }
 Assembler >> nativeCode [
-	^(NativeCode withAll: literals) code: codegen memory bytes
+	self subclassResponsibility
 ]
 
 { #category : #labels }
@@ -1384,157 +1108,147 @@ Assembler >> newLabel [
 
 { #category : #'operations - logical' }
 Assembler >> or: src1AndDst with: src2 [
-	^ codegen or: src1AndDst with: src2
+	self subclassResponsibility
 ]
 
 { #category : #'operations - logical' }
 Assembler >> or: source1andDest withImm: imm [
-	codegen or: source1andDest withImm: imm
+	self subclassResponsibility
 ]
 
 { #category : #logic }
 Assembler >> orRwithA [
-	codegen or: codegen regR with: codegen regA
-
+	self subclassResponsibility
 ]
 
 { #category : #private }
 Assembler >> pop: dstReg [
-	codegen pop: dstReg
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> popA [
-	codegen pop: codegen regA
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> popE [
-	codegen pop: codegen regE
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> popFP [
-	codegen pop: codegen regFP
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> popFalse [
-	codegen pop: codegen regFalse
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> popG [
-	codegen pop: codegen regG
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> popM [
-	codegen pop: codegen regM
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> popNil [
-	codegen pop: codegen regNil
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> popR [
-	codegen pop: codegen regR
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> popS [
-	codegen pop: codegen regS
+	self subclassResponsibility
 ]
 
 { #category : #'operations - arithmetic' }
 Assembler >> popSPindirect [
-	| memref |
-	memref := codegen memRef: codegen regSP indexImm: 1.
-	codegen popIntoMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> popT [
-	codegen pop: codegen regT
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> popTrue [
-	codegen pop: codegen regTrue
+	self subclassResponsibility
 ]
 
 { #category : #private }
 Assembler >> push: srcReg [
-	codegen push: srcReg
-
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> pushA [
-	codegen push: codegen regA
+	self subclassResponsibility
 ]
 
 { #category : #'floting point' }
 Assembler >> pushAatToffset: offset [
-	| memref |
-	memref := codegen memRef: codegen regA index: codegen regT.
-	memref displacement: offset.
-	codegen pushMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> pushE [
-	codegen push: codegen regE
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> pushFP [
-	codegen push: codegen regFP
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> pushFalse [
-	codegen push: codegen regFalse
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> pushG [
-	codegen push: codegen regG
+	self subclassResponsibility
 ]
 
 { #category : #private }
 Assembler >> pushImm: imm [
-	codegen pushImm: imm
-
+	self subclassResponsibility
 ]
 
 { #category : #private }
 Assembler >> pushIndirectR [
-	| memref |
-	memref := codegen memRef: codegen regR indexImm: 1.
-	codegen pushMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> pushM [
-	codegen push: codegen regM
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> pushNil [
-	codegen push: codegen regNil
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> pushR [
-	codegen push: codegen regR
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> pushS [
-	codegen push: codegen regS
+	self subclassResponsibility
 ]
 
 { #category : #arithmetic }
@@ -1546,150 +1260,133 @@ Assembler >> pushSmallInteger: integer [
 
 { #category : #'push/pop' }
 Assembler >> pushT [
-	codegen push: codegen regT
+	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
 Assembler >> pushTrue [
-	codegen push: codegen regTrue
+	self subclassResponsibility
 ]
 
 { #category : #'to-cleanup' }
 Assembler >> readFPUStatusOnA [
-	codegen readFPUStatusOnA
+	self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
 Assembler >> regA [
-	^codegen regA
-
+	self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
 Assembler >> regA8 [
-	^ codegen regA byte
-
+	self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
 Assembler >> regE [
-	^ codegen regE
+	self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
 Assembler >> regFP [
-	^ codegen regFP
-
+	self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
 Assembler >> regFalse [
-	^ codegen regFalse
-
+	self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
 Assembler >> regG [
-	^ codegen regG
-
+	self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
 Assembler >> regIP [
-	^ codegen regIP
-
+	self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
 Assembler >> regM [
-	^ codegen regM
-
+	self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
 Assembler >> regNil [
-	^ codegen regNil
-
+	self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
 Assembler >> regR [
-	^ codegen regR
-
+	self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
 Assembler >> regR8 [
-	^ codegen regR byte
-
+	self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
 Assembler >> regS [
-	^ codegen regS
+	self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
 Assembler >> regSP [
-	^ codegen regSP
-
+	self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
 Assembler >> regT [
-	^ codegen regT
+	self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
 Assembler >> regT8 [
-	^ codegen reg byte
+	self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
 Assembler >> regTrue [
-	^ codegen regTrue
-
+	self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
 Assembler >> regV [
-	^ codegen regV
-
+	self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
 Assembler >> regX0 [
-	"IEEE 754 double register"
-	^ codegen regX0
-
+	self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
 Assembler >> regX1 [
-	"IEEE 754 double register"
-	^ codegen regX1
+	self subclassResponsibility
 ]
 
 { #category : #jumps }
 Assembler >> renameByteRegisterIfNeeded: register preserving: preserved during: aBlock [
-	codegen renameByteRegisterIfNeeded: register preserving: preserved during: aBlock
+	self subclassResponsibility
 ]
 
 { #category : #'floting point' }
 Assembler >> renameByteRegisterIfNeeded: register preserving: preserved1 preserving: preserved2 during: aBlock [
-	codegen renameByteRegisterIfNeeded: register preserving: preserved1 preserving: preserved2 during: aBlock
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> reserveStackSlots: amount [
-	codegen subImm: amount * codegen addressSize from: codegen regSP
+	self subclassResponsibility
 ]
 
 { #category : #initialization }
 Assembler >> reset [
 	labels := Dictionary new: 100.
 	literals := OrderedCollection new.
-	codegen reset
 ]
 
 { #category : #labels }
@@ -1704,9 +1401,7 @@ Assembler >> restoreCallerEnvironment [
 
 { #category : #epilogue }
 Assembler >> restoreCallerFrame [
-	codegen
-		move: codegen regFP to: codegen regSP;
-		pop: codegen regFP
+	self subclassResponsibility
 ]
 
 { #category : #epilogue }
@@ -1721,12 +1416,12 @@ Assembler >> restoreCallerSelf [
 
 { #category : #jumps }
 Assembler >> return [
-	codegen return
+	self subclassResponsibility
 ]
 
 { #category : #'floting point' }
 Assembler >> roundDoubleX0intoX1 [
-	codegen roundDouble: codegen regX0 into: codegen regX1
+	self subclassResponsibility
 ]
 
 { #category : #loading }
@@ -1736,7 +1431,7 @@ Assembler >> saveCallerFrame [
 
 { #category : #'to-cleanup' }
 Assembler >> scaleFloatOnRWithA [
-	codegen scaleFloatOnRWithA
+	self subclassResponsibility
 ]
 
 { #category : #arithmetic }
@@ -1746,8 +1441,7 @@ Assembler >> setIntegerBit: srcAndDstReg [
 
 { #category : #arithmetic }
 Assembler >> setRintegerBit [
-	self setIntegerBit: codegen regR
-
+	self subclassResponsibility
 ]
 
 { #category : #arithmetic }
@@ -1757,8 +1451,7 @@ Assembler >> setSafeIntegerBit: srcAndDstReg [
 
 { #category : #arithmetic }
 Assembler >> setSafeRintegerBit [
-	self setSafeIntegerBit: codegen regR
-
+	self subclassResponsibility
 ]
 
 { #category : #'operations - logical' }
@@ -1768,19 +1461,17 @@ Assembler >> shiftLeft: srcAndDst by: countReg [
 
 { #category : #'operations - logical' }
 Assembler >> shiftLeft: srcAndDst byImm: count [
-	codegen shiftLeft: srcAndDst byImm: count
+	self subclassResponsibility
 ]
 
 { #category : #arithmetic }
 Assembler >> shiftLeftRwithT [
-	codegen shiftLeft: codegen regR by: codegen regT
-
+	self subclassResponsibility
 ]
 
 { #category : #arithmetic }
 Assembler >> shiftLogicalRright: count [
-	codegen shiftRight: codegen regR byImm: count
-
+	self subclassResponsibility
 ]
 
 { #category : #'operations - logical' }
@@ -1795,57 +1486,52 @@ Assembler >> shiftRight: srcAndDst byImm: count [
 
 { #category : #'operations - logical' }
 Assembler >> shiftRightArithmetic: srcAndDst by: countReg [
-	codegen shiftRightArithmetic: srcAndDst by: countReg
+	self subclassResponsibility
 ]
 
 { #category : #'operations - logical' }
 Assembler >> shiftRightArithmetic: srcAndDst byImm: count [
-	codegen shiftRightArithmetic: srcAndDst byImm: count
-
+	self subclassResponsibility
 ]
 
 { #category : #arithmetic }
 Assembler >> shiftRightRwithT [
-	codegen shiftRightArithmetic: codegen regR by: codegen regT
-
+	self subclassResponsibility
 ]
 
 { #category : #arithmetic }
 Assembler >> shiftRleft: count [
-	 codegen shiftLeft: codegen regR byImm: count
-
+	self subclassResponsibility
 ]
 
 { #category : #arithmetic }
 Assembler >> shiftRright: count [
-	codegen shiftRightArithmetic: codegen regR byImm: count
-
+	self subclassResponsibility
 ]
 
 { #category : #arithmetic }
 Assembler >> shiftTright: count [
-	codegen shiftRightArithmetic: codegen regT byImm: count
-
+	self subclassResponsibility
 ]
 
 { #category : #jumps }
 Assembler >> shortJumpIfCarryTo: label [
-	codegen shortJumpIfCarryTo: label
+	self subclassResponsibility
 ]
 
 { #category : #jumps }
 Assembler >> shortJumpIfEqualTo: label [
-	codegen shortJumpIfEqualTo: label
+	self subclassResponsibility
 ]
 
 { #category : #jumps }
 Assembler >> shortJumpIfNotCarryTo: label [
-	codegen shortJumpIfNotCarryTo: label
+	self subclassResponsibility
 ]
 
 { #category : #jumps }
 Assembler >> shortJumpIfNotEqualTo: label [
-	codegen shortJumpIfNotEqualTo: label
+	self subclassResponsibility
 ]
 
 { #category : #jumps }
@@ -1855,7 +1541,7 @@ Assembler >> shortJumpIfNotZeroTo: label [
 
 { #category : #jumps }
 Assembler >> shortJumpIfSignTo: label [
-	codegen shortJumpIfSignTo: label
+	self subclassResponsibility
 ]
 
 { #category : #jumps }
@@ -1865,7 +1551,7 @@ Assembler >> shortJumpIfZeroTo: label [
 
 { #category : #jumps }
 Assembler >> shortJumpTo: label [
-	codegen shortJumpTo: label
+	self subclassResponsibility
 ]
 
 { #category : #comparing }
@@ -1875,304 +1561,211 @@ Assembler >> smallInteger: anInteger [
 
 { #category : #'floting point' }
 Assembler >> sqrtDoubleX0 [
-	codegen sqrtDouble: codegen regX0 into: codegen regX0
-]
-
-{ #category : #'memory - load / store' }
-Assembler >> store: srcReg intoMem: dstMemRef [
-	^ codegen store: srcReg intoMem: dstMemRef
+	self subclassResponsibility
 ]
 
 { #category : #'floting point' }
 Assembler >> storeAinThreadVariableAtIndexR [
-	codegen store: codegen regA intoThreadVariableAt: codegen regR
+	self subclassResponsibility
 ]
 
 { #category : #storing }
 Assembler >> storeAinTindex: index [
-	| memref |
-	memref := codegen memRef: codegen regT indexImm: index.
-	codegen
-		store: codegen regA
-		intoMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #storing }
 Assembler >> storeByteAinRindex: index [
-	| memref |
-	memref := codegen memRef8: codegen regR indexImm: index.
-	codegen store: codegen regA byte intoMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #storing }
 Assembler >> storeByteTinRatA [
-	| memref |
-	memref := codegen memRef8: codegen regR index: codegen regA.
-	codegen store: codegen regT byte intoMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #'floting point' }
 Assembler >> storeDoubleResultInRindirect [
-	| memref |
-	memref := codegen memRef: codegen regR indexImm: 1.
-	codegen storeDoubleResultIntoMem:  memref
+	self subclassResponsibility
 ]
 
 { #category : #storing }
 Assembler >> storeEinRindex: index [
-	| memref |
-	memref := codegen memRef: codegen regR indexImm: index.
-	codegen
-		store: codegen regE
-		intoMem: memref
-]
-
-{ #category : #'memory - load / store' }
-Assembler >> storeImm: imm intoMem: dstMemRef [
-	"Store constant into memory location `dstMemRef`. 
-
-	 The size of data loaded is specified in `dstMemRef`"
-
-	self
-		moveImm: imm to: self regV;
-		store: self regV intoMem: dstMemRef
+	self subclassResponsibility
 ]
 
 { #category : #storing }
 Assembler >> storeLargeX0inA [
-	| memref |
-	memref := codegen memRef64: codegen regA indexImm: 1.
-	codegen storeDouble: codegen regX0 intoMem: memref
-		
-
+	self subclassResponsibility		
 ]
 
 { #category : #storing }
 Assembler >> storeLargeX0inT [
-	| memref |
-	memref := codegen memRef64: codegen regT indexImm: 1.
-	codegen storeDouble: codegen regX0 intoMem: memref
-		
-
+	self subclassResponsibility
 ]
 
 { #category : #storing }
 Assembler >> storeLongTinRatA [
-	| memref |
-	memref := codegen memRef32: codegen regR index: codegen regA.
-	codegen
-		store: codegen regT
-		intoMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #storing }
 Assembler >> storeLongTinRatOffsetA [
-	| memref |
-	memref := codegen memRef32: codegen regR offset: codegen regA.
-	codegen store: codegen regT long intoMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #'to-cleanup' }
 Assembler >> storeMXCSRintoA [
-	codegen storeMXCSRintoA
-
+	self subclassResponsibility
 ]
 
 { #category : #storing }
 Assembler >> storeRinAindex: index [
-	| memref |
-	memref := codegen memRef: codegen regA indexImm: index.
-	codegen
-		store: codegen regR
-		intoMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #storing }
 Assembler >> storeRinEindex: index [
-	| memref |
-	memref := codegen memRef: codegen regE indexImm: index.
-	codegen
-		store: codegen regR
-		intoMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #storing }
 Assembler >> storeRinFPindex: index [
-	| memref |
-	memref := codegen memRef: codegen regFP indexImm: index.
-	codegen
-		store: codegen regR
-		intoMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #storing }
 Assembler >> storeRinSindex: index [
-	| memref |
-	memref := codegen memRef: codegen regS indexImm: index.
-	codegen
-		store: codegen regR
-		intoMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #storing }
 Assembler >> storeRinTindex: index [
-	| memref |
-	memref := codegen memRef: codegen regT indexImm: index.
-	codegen
-		store: codegen regR
-		intoMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #storing }
 Assembler >> storeShortAinRoffset: offset [
-	|  memref |
-	memref := codegen memRef16: codegen regR offsetImm: offset.
-	codegen store: codegen regA short intoMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #storing }
 Assembler >> storeShortTinRatOffsetA [
-	| memref |
-	memref := codegen memRef16: codegen regR offset: codegen regA.
-	codegen store: codegen regT short intoMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #storing }
 Assembler >> storeSinRindex: index [
-	| memref |
-	memref := codegen memRef: codegen regR indexImm: index.
-	codegen
-		store: codegen regS
-		intoMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #'floting point' }
 Assembler >> storeTIBatRwithA [
-	codegen store: codegen regA intoTIBat: codegen regR
+	self subclassResponsibility
 ]
 
 { #category : #storing }
 Assembler >> storeTinRatA [
-	| memref |
-	memref := codegen memRef: codegen regR index: codegen regA.
-	codegen
-		store: codegen regT
-		intoMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #storing }
 Assembler >> storeTinRatOffsetA [
-	| memref |
-	memref := codegen memRef: codegen regR offset: codegen regA.
-	codegen store: codegen regT intoMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #storing }
 Assembler >> storeTinRindex: index [
-	| memref |
-	memref := codegen memRef: codegen regR indexImm: index.
-	codegen
-		store: codegen regT
-		intoMem: memref
+	self subclassResponsibility
 ]
 
 { #category : #'operations - arithmetic' }
 Assembler >> sub: src2 from: src1AndDst [
-	codegen sub: src2  from: src1AndDst
-
+	self subclassResponsibility
 ]
 
 { #category : #arithmetic }
 Assembler >> subAfromR [
-	codegen sub: codegen regA from: codegen regR
-
+	self subclassResponsibility
 ]
 
 { #category : #arithmetic }
 Assembler >> subAfromT [
-	codegen sub: codegen regA from: codegen regT    
-
+	self subclassResponsibility
 ]
 
 { #category : #'floting point' }
 Assembler >> subDoubleX1fromX0 [
-	codegen subDouble: codegen regX1 from: codegen regX0
+	self subclassResponsibility
 ]
 
 { #category : #arithmetic }
 Assembler >> subFromRconstant: imm [
-	codegen subImm: imm from: codegen regR
-
+	self subclassResponsibility
 ]
 
 { #category : #'operations - arithmetic' }
 Assembler >> subImm: imm from: srcAndDst [
-	codegen subImm: imm from: srcAndDst
-
+	self subclassResponsibility
 ]
 
 { #category : #'to-cleanup' }
 Assembler >> subTslotsToSP [
-	codegen subTslotsToSP
+	self subclassResponsibility
 ]
 
 { #category : #initialization }
 Assembler >> platform: aNativizationPlatform [
-	codegen := aNativizationPlatform newCodeGenerator.
 	self reset
 ]
 
 { #category : #loading }
 Assembler >> testIntegerBit: aRegister [
-	codegen testIntegerBit: aRegister
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> testIntegerBitOf: aRegister [
-	codegen test: aRegister byte withImm: 1
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> testRintegerBit [
-	codegen test: codegen regR byte withImm: 1
+	self subclassResponsibility
 ]
 
 { #category : #loading }
 Assembler >> testRwithR [
-	codegen test: codegen regR with: codegen regR
+	self subclassResponsibility
 ]
 
 { #category : #services }
 Assembler >> wordSize [
-	^codegen wordSize
+	self subclassResponsibility
 ]
 
 { #category : #'to-cleanup' }
 Assembler >> writeTslots [
-	codegen writeTslots
+	self subclassResponsibility
 ]
 
 { #category : #'operations - logical' }
 Assembler >> xor: src1AndDst with: src2 [
 	^ self subclassResponsibility
-
 ]
 
 { #category : #logic }
 Assembler >> xorAwithR [
-	codegen xor: codegen regA with: codegen regR
-
+	self subclassResponsibility
 ]
 
 { #category : #logic }
 Assembler >> xorFPwithFP [
-	codegen xor: codegen regFP with: codegen regFP
-
+	self subclassResponsibility
 ]
 
 { #category : #logic }
 Assembler >> xorRwithA [
-	codegen xor: codegen regR with: codegen regA
-
+	self subclassResponsibility
 ]
 
