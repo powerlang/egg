@@ -281,7 +281,7 @@ NativizationEnvironment >> nativizerDuring: aBlock [
 
 { #category : #services }
 NativizationEnvironment >> newExpressionNativizer [
-	^SExpressionNativizer new environment: self
+	^TemplateJIT new environment: self
 ]
 
 { #category : #accessing }
