@@ -10,7 +10,7 @@ Class {
 	#classVars : [
 		'Default'
 	],
-	#category : #'Powerlang-Core-Nativization'
+	#category : #Nativization
 }
 
 { #category : #accessing }

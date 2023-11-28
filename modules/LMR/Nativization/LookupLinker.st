@@ -5,7 +5,7 @@ Class {
 		'lookup',
 		'lookupSuper'
 	],
-	#category : #'Powerlang-Core-Nativization'
+	#category : #Nativization
 }
 
 { #category : #nativizing }

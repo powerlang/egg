@@ -8,7 +8,7 @@ Class {
 		'done',
 		'failed'
 	],
-	#category : #'Powerlang-Core-Nativization'
+	#category : #Nativization
 }
 
 { #category : #private }

@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'candidates'
 	],
-	#category : #'Powerlang-Core-Nativization'
+	#category : #Nativization
 }
 
 { #category : #services }

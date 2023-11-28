@@ -8,7 +8,7 @@ Class {
 		'_Reserved',
 		'_SmallSize'
 	],
-	#category : #'Powerlang-Core-Nativization'
+	#category : #Nativization
 }
 
 { #category : #'class initialization' }

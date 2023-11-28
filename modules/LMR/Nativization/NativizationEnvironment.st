@@ -13,7 +13,7 @@ Class {
 		'cachedNativizer',
 		'busy'
 	],
-	#category : #'Powerlang-Core-Nativization'
+	#category : #Nativization
 }
 
 { #category : #accessing }

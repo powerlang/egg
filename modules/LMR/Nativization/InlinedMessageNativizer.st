@@ -8,7 +8,7 @@ Class {
 		'start',
 		'end'
 	],
-	#category : #'Powerlang-Core-Nativization'
+	#category : #Nativization
 }
 
 { #category : #accessing }
