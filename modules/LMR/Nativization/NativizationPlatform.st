@@ -7,27 +7,8 @@ Class {
 		'abi',
 		'codeGeneratorClass'
 	],
-	#classVars : [
-		'Default'
-	],
 	#category : #Nativization
 }
-
-{ #category : #accessing }
-NativizationPlatform class >> default [
-	"Return the default platform to use for tests. Defaults to host.
-
-	 NEVER, EVER use this for anything but testing!"
-
-	^ Default ifNil: [ self host ]
-]
-
-{ #category : #accessing }
-NativizationPlatform class >> default: aNativizationPlatform [
-	"Set the default platform to use in tests."
-
-	Default := aNativizationPlatform.
-]
 
 { #category : #accessing }
 NativizationPlatform class >> host [
