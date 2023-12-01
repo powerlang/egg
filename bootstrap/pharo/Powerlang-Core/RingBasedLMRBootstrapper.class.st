@@ -157,6 +157,18 @@ RingBasedLMRBootstrapper >> createExtensionMethodsOf: spec in: module [
 ]
 
 { #category : #initialization }
+RingBasedLMRBootstrapper >> createNamespaceWith: aCollection [
+
+	| namespace |
+	namespace := dest sendLocal: #new to: self => #Namespace.
+	aCollection do: [ :variable | 
+		dest sendLocal: #at:put: to: namespace with: { 
+				(dest addSymbol: variable name).
+				nilObj } ].
+	^ namespace
+]
+
+{ #category : #initialization }
 RingBasedLMRBootstrapper >> createNewBlock: sblock [
 	| format transferred method literal tliteral |
 	format := dest newInteger: sblock format.
@@ -176,29 +188,6 @@ RingBasedLMRBootstrapper >> createNewBlock: sblock [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> createNewClassFrom: spec [
-	| superclass metaclass class instanceBehavior classBehavior ivars |
-	superclass := self => spec superclass name.
-	metaclass := dest
-		sendLocal: #newSubclassOf:
-		to: self => #Class
-		with: {superclass}.
-	class := dest sendLocal: #instanceClass to: metaclass.
-	dest sendLocal: #name: to: class with: {(dest newString: spec name)}.
-	ivars := self transferLiteral: spec instVarNames.
-	dest sendLocal: #instVarNames: to: class with:  { ivars }.
-	instanceBehavior := dest sendLocal: #instanceBehavior to: class.
-	classBehavior := dest sendLocal: #instanceBehavior to: metaclass.
-	behaviors
-		at: spec put: instanceBehavior;
-		at: spec metaclass put: classBehavior.
-	spec methods do: [ :m | self createNewMethod: m in: class ].
-	spec metaclass methods
-		do: [ :m | self createNewMethod: m in: metaclass ].
-	^ class
-]
-
-{ #category : #initialization }
 RingBasedLMRBootstrapper >> createNewClassFrom: spec in: module [
 
 	| supername superclass namespace metaclass class instanceBehavior classBehavior ivars |
@@ -210,9 +199,9 @@ RingBasedLMRBootstrapper >> createNewClassFrom: spec in: module [
 			              to: namespace
 			              with: { (dest addSymbol: supername) } ].
 	class := dest
-		             sendLocal: #newSubclassOf:
-		             to: self => #Class
-		             with: { superclass }.
+		         sendLocal: #newSubclassOf:
+		         to: self => #Class
+		         with: { superclass }.
 	metaclass := dest sendLocal: #class to: class.
 	dest
 		sendLocal: #name:
@@ -220,6 +209,7 @@ RingBasedLMRBootstrapper >> createNewClassFrom: spec in: module [
 		with: { (dest newString: spec name) }.
 	ivars := self transferLiteral: spec instVarNames.
 	dest sendLocal: #instVarNames: to: class with: { ivars }.
+	dest sendLocal: #classVariables: to: class with: { self createNamespaceWith: spec classVariables}. 
 	instanceBehavior := dest sendLocal: #instanceBehavior to: class.
 	classBehavior := dest sendLocal: #instanceBehavior to: metaclass.
 	behaviors
@@ -228,10 +218,10 @@ RingBasedLMRBootstrapper >> createNewClassFrom: spec in: module [
 	spec methods do: [ :m | self createNewMethod: m in: class ].
 	spec metaclass methods do: [ :m | 
 		self createNewMethod: m in: metaclass ].
-	module ifNotNil: [
-	dest
-		sendLocal: #addClass: to: module with: { class };
-		sendLocal: #module: to: class with: { module }].
+	module ifNotNil: [ 
+		dest
+			sendLocal: #addClass: to: module with: { class };
+			sendLocal: #module: to: class with: { module } ].
 	^ class
 ]
 
