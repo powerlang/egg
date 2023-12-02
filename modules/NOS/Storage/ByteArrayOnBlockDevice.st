@@ -9,7 +9,7 @@ Class {
 	#instVars : [
 		'contents'
 	],
-	#category : #'SqueakNOS-Storage'
+	#category : 'SqueakNOS-Storage'
 }
 
 { #category : #'instance creation' }
@@ -31,6 +31,11 @@ ByteArrayOnBlockDevice >> at: anInteger put: byte [
 { #category : #accessing }
 ByteArrayOnBlockDevice >> byteAt: index [
 	^contents byteAt: index
+]
+
+{ #category : #accessing }
+ByteArrayOnBlockDevice >> byteAt: index put: value [
+	^contents byteAt: index put: value
 ]
 
 { #category : #accessing }

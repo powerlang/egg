@@ -10,7 +10,7 @@ Class {
 	#instVars : [
 		'device'
 	],
-	#category : #'SqueakNOS-FileSupport'
+	#category : 'SqueakNOS-FileSupport'
 }
 
 { #category : #'as yet unclassified' }

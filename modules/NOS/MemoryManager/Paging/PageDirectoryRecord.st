@@ -2,7 +2,7 @@ Class {
 	#name : #PageDirectoryRecord,
 	#superclass : #Alien,
 	#type : #bytes,
-	#category : #'SqueakNOS-MemoryManager-Paging'
+	#category : 'SqueakNOS-MemoryManager-Paging'
 }
 
 { #category : #'initialize-release' }

@@ -1,7 +1,7 @@
 Class {
 	#name : #PagingTest,
 	#superclass : #TestCase,
-	#category : #'SqueakNOS-Memory-Manager'
+	#category : 'SqueakNOS-Memory-Manager'
 }
 
 { #category : #'as yet unclassified' }

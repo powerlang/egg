@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'frameList'
 	],
-	#category : #'SqueakNOS-Devices-USB'
+	#category : 'SqueakNOS-Devices-USB'
 }
 
 { #category : #'as yet unclassified' }
@@ -309,7 +309,7 @@ USBUHCIController >> frameList [
 
 { #category : #'accessing - frame list' }
 USBUHCIController >> frameListAddressAt: index [
-	^ ExternalAddress fromInteger: ((self frameListValueAt: index) bitClear: 2r1111)
+	^ ExternalAddress new fromInteger: ((self frameListValueAt: index) bitClear: 2r1111)
 ]
 
 { #category : #'accessing - frame list' }

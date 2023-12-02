@@ -1,7 +1,7 @@
 Class {
 	#name : #MultiBootInfo,
 	#superclass : #ExternalStructure,
-	#category : #'SqueakNOS-External-Structures'
+	#category : 'SqueakNOS-External-Structures'
 }
 
 { #category : #accessing }

@@ -72,11 +72,22 @@ still_going:
 Class {
 	#name : #ATAController,
 	#superclass : #PCIDevice,
+	#instVars : [
+		'control',
+		'busMaster',
+		'buffer',
+		'done',
+		'busy',
+		'transferReady',
+		'transferReadyBool',
+		'interruptController',
+		'bytes'
+	],
 	#classVars : [
 		'primary',
 		'secondary'
 	],
-	#category : #'SqueakNOS-Devices-Storage'
+	#category : 'SqueakNOS-Devices-Storage'
 }
 
 { #category : #'as yet unclassified' }
@@ -85,6 +96,11 @@ ATAController class >> findPCIBusEntry [
 	"IDE controller have a PCI classID = 1 (Mass storage device) and subclass 1 (IDE Mass storage device)."
 	
 	^PCIBusEntry allValid detect: [ :entry | entry classCode = 1 and: [entry classSubCode = 1]] ifNone: [^nil].
+]
+
+{ #category : #'instance creation' }
+ATAController class >> onPort: portNumber [
+	^ (super onPort: portNumber) initializeControlBlock; initializeBusMaster
 ]
 
 { #category : #'as yet unclassified' }
@@ -100,32 +116,62 @@ ATAController class >> secondary [
 ]
 
 { #category : #services }
-ATAController >> at: firstSectorNumber count: aNumberOfSectors of: aDeviceNumber [ 
-	| answer remaining alreadyRead nextBlockNumber |
+ATAController >> at2: startSector count: sectorCount of: deviceNumber [
+	| remaining alreadyRead nextBlockNumber |
 	"The max we can read is 256 sectors (thats an ATA limit). If we want to read more, we do it by grabing chunks of 256 sectors until we finish."
 	"Transcript show: 'Reading from: ', firstBlockNumber asString, ' to: ', lastBlockNumber asString, Character cr asString."
 	"self halt."
-	remaining := aNumberOfSectors .
+	remaining := sectorCount.
 	alreadyRead := 0.
-	
-	answer := ByteArray new: remaining * self sectorSize.
-	nextBlockNumber := firstSectorNumber - 1.
+	nextBlockNumber := startSector - 1.
+	[ remaining > 0 ]
+		whileTrue: [ | chunkSize |
+			chunkSize := remaining min: 256.
+			self
+				issueReadFrom: nextBlockNumber
+				count: chunkSize
+				device: deviceNumber
+				timeout: self readMillisecondsTimeout.
+			nextBlockNumber := nextBlockNumber + chunkSize.
+			alreadyRead := alreadyRead + 256.
+			remaining := remaining - 256 ].
+]
 
-	[ remaining > 0 ] whileTrue: [ | chunkSize | 
-		"Transcript show: 'Reading sector ', (nextBlockNumber - 1) asString, Character cr asString."
-		chunkSize := remaining min: 256.
-		answer 
-			replaceFrom: (self byteOffsetOfBlock: alreadyRead + 1)
-			to: (self byteOffsetOfBlock: alreadyRead + chunkSize + 1) - 1
-			with: (self issueReadFrom: nextBlockNumber count: chunkSize device: aDeviceNumber timeout: self readMillisecondsTimeout)
-			startingAt: 1.
-		nextBlockNumber := nextBlockNumber + chunkSize.
-		alreadyRead := alreadyRead + 256.
-		remaining := remaining - 256. 
-		].
-	"Transcript show: '... done
-	'."
-	^ answer.
+{ #category : #services }
+ATAController >> at: startSector count: sectorCount of: deviceNumber [
+
+		| answer |
+	answer := ByteArray new: sectorCount * self sectorSize.
+		self at: startSector count: sectorCount of: deviceNumber into: answer.
+		^answer
+
+]
+
+{ #category : #services }
+ATAController >> at: startSector count: sectorCount of: deviceNumber into: answer [
+	| remaining alreadyRead nextBlockNumber start size |
+	"The max we can read is 256 sectors (thats an ATA limit). If we want to read more, we do it by grabing chunks of 256 sectors until we finish."
+	"Transcript show: 'Reading from: ', firstBlockNumber asString, ' to: ', lastBlockNumber asString, Character cr asString."
+	"self halt."
+	answer unsignedLongAt: 1 put: 16r55AA66BB.
+	remaining := sectorCount.
+	alreadyRead := 0.
+	nextBlockNumber := startSector - 1.
+	[ remaining > 0 ]
+		whileTrue: [ | chunkSize |
+			chunkSize := remaining min: 256.
+			start := self byteOffsetOfBlock: alreadyRead + 1.
+			size := chunkSize * self blockSize.
+			self
+						issueReadFrom: nextBlockNumber
+						count: chunkSize
+						device: deviceNumber
+						timeout: self readMillisecondsTimeout.
+			buffer fillInto: answer at: start size: size.
+			nextBlockNumber := nextBlockNumber + chunkSize.
+			alreadyRead := alreadyRead + 256.
+			remaining := remaining - 256 ].
+	^ answer
 ]
 
 { #category : #services }
@@ -144,6 +190,11 @@ ATAController >> at: firstSectorNumber of: aDeviceNumber putAll: aByteArray [
 
 	
 
+]
+
+{ #category : #registers }
+ATAController >> atAlternateStatusReg [
+	^ control uByteAtOffset: 0
 ]
 
 { #category : #registers }
@@ -247,6 +298,11 @@ ATAController >> atDataPortRegRead: anAmount [
 { #category : #registers }
 ATAController >> atDataPortRegWrite: aString [
 	^ self shortStringAt: 0 put: aString
+]
+
+{ #category : #registers }
+ATAController >> atDeviceControRegPut: anInteger [
+	^ control uByteAtOffset: 0 + 1put: anInteger
 ]
 
 { #category : #registers }
@@ -429,6 +485,21 @@ ATAController >> cmdIdentifyDevice [
 ]
 
 { #category : #commands }
+ATAController >> cmdReadSectors [
+	^ self atCommandRegPut: 16r21
+]
+
+{ #category : #commands }
+ATAController >> cmdReadSectorsDMA [
+	^ self atCommandRegPut: 16rC9
+]
+
+{ #category : #commands }
+ATAController >> cmdReadSectorsDMAWithRetry [
+	^ self atCommandRegPut: 16rC8
+]
+
+{ #category : #commands }
 ATAController >> cmdReadSectorsWithRetry [
 	^ self atCommandRegPut: 16r20
 ]
@@ -438,9 +509,55 @@ ATAController >> cmdWriteSectorsWithRetry [
 	^ self atCommandRegPut: 16r30
 ]
 
+{ #category : #services }
+ATAController >> consumeUselessInterrupt [
+	self atStatusReg.
+	transferReadyBool := false
+	"transferReady wait."
+]
+
+{ #category : #registers }
+ATAController >> control [
+	^control
+]
+
 { #category : #'status/testing' }
 ATAController >> dataReady: aStatus [
 	^ aStatus anyMask: 8.
+]
+
+{ #category : #registers }
+ATAController >> disableInterrupts [
+	^ self atDeviceControRegPut: 2r00000010
+]
+
+{ #category : #services }
+ATAController >> doReadSectors: sectorCount [
+	| result |
+	result := self
+		cmdReadSectors;
+		readAllAvailable: sectorCount.
+	self reenableIRQsAndCheckForErrors.
+	^result
+	
+		
+]
+
+{ #category : #services }
+ATAController >> doReadSectorsDMA: sectorCount [
+	| size offset |
+	size := sectorCount * self sectorSize.
+	self cmdReadSectorsDMAWithRetry.
+	offset := busMaster offset.
+	busMaster
+		setupTransferOf: size with: buffer;
+		issueRead.
+	self waitUntilTransferIsReady.
+	busMaster
+		stopTransfer;
+		resetDescriptorTable.
+	self reenableIRQsAndCheckForErrors.
+	^buffer
 ]
 
 { #category : #'status/testing' }
@@ -449,8 +566,8 @@ ATAController >> driveReady: aStatus [
 ]
 
 { #category : #registers }
-ATAController >> error [
-	^ self byteAt: 1
+ATAController >> enableInterrupts [
+	^ self atDeviceControRegPut: 0
 ]
 
 { #category : #'status/testing' }
@@ -504,16 +621,68 @@ ATAController >> groupsOfMax: n atATimeIn: aByteArray do: aBlock [
 
 ]
 
-{ #category : #services }
-ATAController >> issueReadFrom: firstSector count: sectorsCount device: deviceNumber timeout: timeout [
-	^self waitUntilNotBusyOr: timeout;
-		 sectorCount: sectorsCount;
-		 selectSector: firstSector ofDrive: deviceNumber;
-		 waitUntilReadyOr: timeout;
-		 cmdReadSectorsWithRetry;
-		 readAllAvailable: sectorsCount.
-	
+{ #category : #registers }
+ATAController >> handleIRQ [
+	"Transcript show: 'disk irq!'."
 
+	transferReady signal.
+	transferReadyBool := true.
+]
+
+{ #category : #initialization }
+ATAController >> initialize [
+	"buffer size is large enough to handle largest ata read, which is
+	 256 sectors (128kb) and also aligned to 64kb for dma requirements"
+
+	bytes := ByteArray new: 128 * 1024.
+	buffer := ExternalAddress allocate: 64 * 3 * 1024.
+	buffer fromInteger: (buffer asInteger alignedTo: 64 * 1024).
+	transferReady := Semaphore new.
+	transferReadyBool := false.
+	busy := Semaphore forMutualExclusion
+]
+
+{ #category : #initialization }
+ATAController >> initializeBusMaster [
+	| entry port |
+	entry := self class findPCIBusEntry.
+	entry enableBusMastering.
+	port := entry baseIOAddress: 4.
+	busMaster := PCIBusMaster onPort: port function: entry
+
+
+]
+
+{ #category : #initialization }
+ATAController >> initializeControlBlock [
+	| port isPrimary |
+	isPrimary := resource asInteger = 16r1F0.
+	port := isPrimary
+		ifTrue: [ 16r3F6 ]
+		ifFalse: [ 16r376 ].
+	control := ExternalIOPort address: port.
+	self
+		selectDrive: 0;
+		resetController;
+		enableInterrupts;
+		selectDrive: 1;
+		enableInterrupts;
+		selectDrive: 0
+]
+
+{ #category : #services }
+ATAController >> installOn: aComputer [
+	aComputer interruptController addHandler: self forIRQ: 14.
+]
+
+{ #category : #services }
+ATAController >> issueReadFrom: firstSector count: sectorCount device: deviceNumber timeout: timeout [
+	^ self
+		waitUntilNotBusyOr: timeout;
+		selectSector: firstSector ofDrive: deviceNumber;
+		regSectorCount: sectorCount;
+		waitUntilReadyOr: timeout;
+		doReadSectorsDMA: sectorCount
 ]
 
 { #category : #services }
@@ -522,13 +691,18 @@ ATAController >> issueWrite: aByteArray at: firstSector device: deviceNumber tim
 	'."
 	self waitUntilNotBusyOr: aTimeout;
 		selectSector: firstSector ofDrive: deviceNumber;
-		sectorCount: aByteArray size // 512;
+		regSectorCount: aByteArray size // 512;
 		waitUntilReadyOr: aTimeout;
 		cmdWriteSectorsWithRetry;
 		writeAllAvailable: aByteArray.
 
 	
 
+]
+
+{ #category : #initialization }
+ATAController >> lock [
+	busy wait
 ]
 
 { #category : #'device creation' }
@@ -541,8 +715,8 @@ ATAController >> moreDataIsAvailable [
 	"We should remove this method, it does the same than waitUntilDataTransferIsReady"
 	| status time |
 	time := 0.
-	[status := self atStatusReg. (self busy: status) & (self errorsDidntOccur: status) and: [ time < 10 ]] whileTrue:
-		[time := time + 1. (Delay forMilliseconds: 1) wait ]..
+	[status := self atAlternateStatusReg. (self busy: status) & (self errorsDidntOccur: status) and: [ time < 10 ]] whileTrue:
+		[time := time + 1. 50000 timesRepeat: [1+1]. "(Delay forMilliseconds: 1) wait" ]..
 	(self errorOccurred: status) ifTrue: [self error: 'An error occurred while reading'].
 	time >= 10 ifTrue: [Transcript show: 'Read timeout. Status: ', status, Character cr ].
 	"tells wheter data port contains more data available. This happens if:"
@@ -553,28 +727,28 @@ ATAController >> moreDataIsAvailable [
 ATAController >> readAllAvailable [
 	| answer |
 	answer := ''.
-	[ self moreDataIsAvailable ] whileTrue: [answer := answer, self readSector].
-	(answer = '') ifTrue: [
-		 Transcript show: 'Status: ', self atStatusReg asString, Character cr asString.
-		 self error: 'No grabe nada' ].
-	^answer.
-
+	[ self waitUntilDeviceIsReadyForTransfer ] whileTrue: [ answer := answer , self readSector ].
+	answer = ''
+		ifTrue: [ Transcript show: 'Status: ' , self atAlternateStatusReg asString , String cr.
+			self error: 'Could not read anything.' ].
+	^ answer
 ]
 
 { #category : #private }
 ATAController >> readAllAvailable: sectorCount [
-	| answer nextPosition |
-	answer := ByteArray new: sectorCount * self sectorSize.
+	| each answer nextPosition |
+	each := self sectorSize.
+	answer := ByteArray new: sectorCount * each.
 	nextPosition := 1.
-	[ self moreDataIsAvailable ] whileTrue: [
-		answer replaceFrom: nextPosition to: nextPosition + self sectorSize - 1 with: self readSector startingAt:1.
-		nextPosition := nextPosition + self sectorSize.
-	].
-	(answer = '') ifTrue: [
-		 Transcript show: 'Status: ', self atStatusReg asString, Character cr asString.
-		 self error: 'No grabe nada' ].
-	^answer.
-
+	sectorCount timesRepeat: [ 
+			self waitUntilDeviceIsReadyForTransfer.
+			answer
+				replaceFrom: nextPosition
+				to: nextPosition + self sectorSize - 1
+				with: self readSector
+				startingAt: 1.
+			nextPosition := nextPosition + each ].
+	^ answer
 ]
 
 { #category : #private }
@@ -588,24 +762,51 @@ ATAController >> readSector [
 	^ self atDataPortRegRead: 512
 ]
 
+{ #category : #services }
+ATAController >> reenableIRQsAndCheckForErrors [
+	| status |
+	status := self atStatusReg.
+	(self errorOccurred: status) ifTrue:  [ self error: 'An error ocurred while transfering data' ]
+]
+
+{ #category : #registers }
+ATAController >> regError [
+	^ self byteAt: 1
+]
+
+{ #category : #registers }
+ATAController >> regErrorClear [
+	^ self byteAt: 1 put: 0
+]
+
+{ #category : #registers }
+ATAController >> regSectorCount [
+	^ self byteAt: 2
+]
+
+{ #category : #registers }
+ATAController >> regSectorCount: aSmallInteger [
+	"We handle special case when we want to read 256 sectors, which is done by puting a 0 in
+	 sector count register"
+	aSmallInteger = 256 ifTrue: [^ self byteAt: 2 put: 0].
+	^ self byteAt: 2 put: aSmallInteger
+]
+
+{ #category : #initialization }
+ATAController >> release [
+	busy signal
+]
+
+{ #category : #registers }
+ATAController >> resetController [
+	^ self atDeviceControRegPut: 2r100
+]
+
 { #category : #accessing }
 ATAController >> resetDevice: aDriveNumber [
 	^self
 		selectDrive: aDriveNumber;
 		cmdDeviceReset
-]
-
-{ #category : #registers }
-ATAController >> sectorCount [
-	^ self byteAt: 2
-]
-
-{ #category : #registers }
-ATAController >> sectorCount: aSmallInteger [
-	"We handle special case when we want to read 256 sectors, which is done by puting a 0 in
-	 sector count register"
-	aSmallInteger = 256 ifTrue: [^ self byteAt: 2 put: 0].
-	^ self byteAt: 2 put: aSmallInteger
 ]
 
 { #category : #registers }
@@ -638,17 +839,22 @@ ATAController >> selectHead: aHeadNumber ofDevice: aDeviceNumber [
 
 { #category : #accessing }
 ATAController >> selectSector: lbaAddress ofDrive: aDriveNumber [
-
 	"LBA Addressing: 28 bits. 
 	<4 bits: head> < 8 bits: cyl high> <8 bits: cyl low> <8 bits: sector>
 	We add 4 to drive number so that the bit of LBA addressing mode is asserted inside selectHead.
 	"
 
+	| sector cylLow cylHigh head |
+	sector := lbaAddress bitAnd: 16rFF.
+	cylLow := (lbaAddress bitShift: -8) bitAnd: 16rFF.
+	cylHigh := (lbaAddress bitShift: -16) bitAnd: 16rFF.
+	head := (lbaAddress bitShift: -24) bitAnd: 16rF.
 	self
-		atSectorNumberRegPut: (lbaAddress bitAnd: 16rFF);
-		atCylinderLowRegPut: ((lbaAddress bitShift: -8) bitAnd: 16rFF);
-		atCylinderHighRegPut: ((lbaAddress bitShift: -16) bitAnd: 16rFF);
-		selectHead: ((lbaAddress bitShift: -24) bitAnd: 16rF) ofDevice: aDriveNumber + 4.
+		selectHead: head ofDevice: aDriveNumber + 4;
+		regErrorClear;
+		atSectorNumberRegPut: sector;
+		atCylinderLowRegPut: cylLow;
+		atCylinderHighRegPut: cylHigh
 ]
 
 { #category : #'status/testing' }
@@ -666,16 +872,23 @@ ATAController >> slave [
 	^ATADevice controlledBy: self device: 1.
 ]
 
+{ #category : #private }
+ATAController >> wait400ns [
+	self
+		atAlternateStatusReg;
+		atAlternateStatusReg;
+		atAlternateStatusReg;
+		atAlternateStatusReg
+]
+
 { #category : #'status/testing' }
-ATAController >> waitUntilDataTransferIsReady [
+ATAController >> waitUntilDeviceIsReadyForTransfer [
 	| status |
-	[
-		status := self atStatusReg.
-		(self busy: status) &
-		(self errorsDidntOccur: status)
-	] whileTrue.
-	(self errorOccurred: status) ifTrue: [self error: 'An error occurred while reading'].
-	 ^self dataReady: status.
+	[ status := self atAlternateStatusReg.
+	(self busy: status) & (self errorsDidntOccur: status) ] whileTrue.
+	(self errorOccurred: status)
+		ifTrue: [ self error: 'An error occurred while preparing transfer' ].
+	^ self dataReady: status
 ]
 
 { #category : #services }
@@ -692,15 +905,29 @@ ATAController >> waitUntilReadyOr: maxMilliseconds [
 	| time status |
 	time := Time millisecondClockValue.
 	
-	[ status := self atStatusReg. (self driveReady: status) not and: [ Time millisecondClockValue - time < maxMilliseconds ] ] whileTrue.
+	[ status := self atAlternateStatusReg. (self driveReady: status) not and: [ Time millisecondClockValue - time < maxMilliseconds ] ] whileTrue.
 	
 	"Time millisecondClockValue - time >= maxMilliseconds ifTrue: [Transcript show: 'Ready timeout. Status: ', status, Character cr ]."
+]
+
+{ #category : #services }
+ATAController >> waitUntilTransferIsReady [
+	| status |
+	[ status := self atAlternateStatusReg.
+	(self busy: status)
+		ifFalse: [ 
+			(self errorOccurred: status)
+				ifTrue: [ 'An error occurred during transfer' ] ].
+	transferReadyBool ] whileFalse.
+	transferReadyBool := false.
+	"transferReady wait."
+	"self waitUntilNotBusyOr: 1000."
 ]
 
 { #category : #private }
 ATAController >> writeAllAvailable: aByteArray [
 	self groupsOf: 512 atATimeIn: aByteArray do: [ :sectorContents |
-		self waitUntilDataTransferIsReady.
+		self waitUntilDeviceIsReadyForTransfer.
 		self atDataPortRegWrite: sectorContents.
 	].
 
@@ -715,7 +942,7 @@ ATAController >> writeDataOld: source fromByte: sourceOffset atByteOffset: destO
 	sector := self offsetToSector: destOffset.
 	sectorCount := (self offsetToSector: count) + 1.
 	data := self
-		sectorCount: sectorCount;
+		regSectorCount: sectorCount;
 		selectSector: sector ofDrive: aDriveNumber;
 		cmdReadSectorsWithRetry;
 		readAllAvailable.
@@ -727,7 +954,7 @@ ATAController >> writeDataOld: source fromByte: sourceOffset atByteOffset: destO
 		startingAt: sourceOffset.
 		
 	self
-		sectorCount: sectorCount;
+		regSectorCount: sectorCount;
 		selectSector: sector ofDrive: aDriveNumber;
 		cmdWriteSectorsWithRetry;
 		atDataPortRegWrite: data.

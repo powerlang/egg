@@ -8,7 +8,7 @@ Class {
 		'stream',
 		'blockSize'
 	],
-	#category : #'SqueakNOS-Storage'
+	#category : 'SqueakNOS-Storage'
 }
 
 { #category : #'instance creation' }

@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'size'
 	],
-	#category : #'SqueakNOS-External-Structures'
+	#category : 'SqueakNOS-External-Structures'
 }
 
 { #category : #'instance creation' }
@@ -18,7 +18,7 @@ MultiBootMemoryMap >> do: aBlock [
 	memoryAddress := self address.
 		[memoryAddress - self address > self size] 
 	whileFalse:
-		[entry := MultiBootMemoryMapEntry fromHandle: (ExternalAddress fromInteger: memoryAddress).
+		[entry := MultiBootMemoryMapEntry fromHandle: (ExternalAddress new fromInteger: memoryAddress).
 		aBlock value: entry.
 		memoryAddress := memoryAddress + entry size]
 ]

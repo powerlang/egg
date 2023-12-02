@@ -5,7 +5,7 @@ Class {
 		'pointer',
 		'size'
 	],
-	#category : #'SqueakNOS-External-Structures'
+	#category : 'SqueakNOS-External-Structures'
 }
 
 { #category : #'as yet unclassified' }

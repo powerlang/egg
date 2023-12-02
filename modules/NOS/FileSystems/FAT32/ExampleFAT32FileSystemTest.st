@@ -1,7 +1,7 @@
 Class {
 	#name : #ExampleFAT32FileSystemTest,
 	#superclass : #TestCase,
-	#category : #'SqueakNOS-Filesystems-FAT32'
+	#category : 'SqueakNOS-Filesystems-FAT32'
 }
 
 { #category : #helpers }

@@ -12,7 +12,7 @@ Class {
 		'offset',
 		'size'
 	],
-	#category : #'SqueakNOS-Storage'
+	#category : 'SqueakNOS-Storage'
 }
 
 { #category : #'as yet unclassified' }
@@ -43,13 +43,13 @@ ByteArraySegment >> at: anInteger put: byte [
 { #category : #converting }
 ByteArraySegment >> byteAt: index [
 	self validateIndex: index.
-	^contents at: offset + index
+	^ contents byteAt: offset + index
 ]
 
 { #category : #converting }
 ByteArraySegment >> byteAt: index put: byte [
 	self validateIndex: index.
-	^contents at: offset + index put: byte
+	^ contents byteAt: offset + index put: byte
 ]
 
 { #category : #converting }

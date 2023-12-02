@@ -1,7 +1,7 @@
 Class {
 	#name : #SDDevice,
 	#superclass : #PCIDevice,
-	#category : #'SqueakNOS-Devices-USB'
+	#category : 'SqueakNOS-Devices-USB'
 }
 
 { #category : #accessing }

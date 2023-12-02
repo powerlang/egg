@@ -14,7 +14,7 @@ Class {
 	#instVars : [
 		'resource'
 	],
-	#category : #'SqueakNOS-Kernel'
+	#category : 'SqueakNOS-Devices-Base'
 }
 
 { #category : #'instance creation' }
@@ -131,4 +131,24 @@ HardwareDevice >> shortStringAt: index put: aString [
 { #category : #'I/O' }
 HardwareDevice >> shortStringAt: index size: anInteger [
 	^ resource unsignedShortStringAt: index + 1 size: anInteger
+]
+
+{ #category : #'I/O' }
+HardwareDevice >> unsignedByteAt: index [
+	^ resource unsignedByteAt: index + 1
+]
+
+{ #category : #'I/O' }
+HardwareDevice >> unsignedByteAt: index put: value [
+	^ resource unsignedByteAt: index + 1 put: value
+]
+
+{ #category : #'I/O' }
+HardwareDevice >> unsignedShoftAt: index put: value [
+	^ resource unsignedShortAt: index + 1 put: value
+]
+
+{ #category : #'I/O' }
+HardwareDevice >> unsignedShortAt: index [
+	^ resource unsignedShortAt: index + 1
 ]

@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'contents'
 	],
-	#category : #'SqueakNOS-Filesystems-FAT32'
+	#category : 'SqueakNOS-Filesystems-FAT32'
 }
 
 { #category : #'instance creation' }
@@ -152,7 +152,7 @@ FAT32ClusterRecord >> name [
 { #category : #accessing }
 FAT32ClusterRecord >> name: aString [
 	aString size = 11 ifFalse: [self error: 'The string is not in a suitable format'].
-	contents replaceFrom: 1 to: 11 with: aString startingAt: 1
+	contents replaceFrom: 1 to: 11 with: aString asByteArray startingAt: 1
 	
 
 ]

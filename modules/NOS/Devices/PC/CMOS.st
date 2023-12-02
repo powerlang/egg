@@ -21,7 +21,7 @@ Class {
 		'computer',
 		'alarmBlock'
 	],
-	#category : #'SqueakNOS-Devices-Base'
+	#category : 'SqueakNOS-Devices-Base'
 }
 
 { #category : #'as yet unclassified' }

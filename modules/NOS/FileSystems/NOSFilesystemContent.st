@@ -12,7 +12,7 @@ Class {
 		'filesystem',
 		'directory'
 	],
-	#category : #'SqueakNOS-Filesystems'
+	#category : 'SqueakNOS-Filesystems'
 }
 
 { #category : #'instance creation' }

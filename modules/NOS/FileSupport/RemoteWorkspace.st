@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'remote'
 	],
-	#category : #'SqueakNOS-FileSupport'
+	#category : 'SqueakNOS-FileSupport'
 }
 
 { #category : #'as yet unclassified' }

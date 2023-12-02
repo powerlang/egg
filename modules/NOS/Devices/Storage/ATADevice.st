@@ -13,7 +13,7 @@ Class {
 	#classInstVars : [
 		'loadedDevices'
 	],
-	#category : #'SqueakNOS-Devices-Storage'
+	#category : 'SqueakNOS-Devices-Storage'
 }
 
 { #category : #'as yet unclassified' }
@@ -38,7 +38,7 @@ ATADevice >> at: firstBlockNumber count: numberOfBlocks [
 	"Retrieve numberOfBlocks sector number aBlockNumber from device.
 	 NumberOfBlocks should be no more than 256"
 
-	^ controller at: firstBlockNumber count: numberOfBlocks device: deviceNumber
+	^ controller at: firstBlockNumber count: numberOfBlocks of: deviceNumber
 ]
 
 { #category : #services }

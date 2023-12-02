@@ -5,7 +5,7 @@ Class {
 		'fileSize',
 		'offset'
 	],
-	#category : #'SqueakNOS-Storage'
+	#category : 'SqueakNOS-Storage'
 }
 
 { #category : #'as yet unclassified' }

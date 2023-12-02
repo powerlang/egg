@@ -7,7 +7,7 @@ Class {
 	#instVars : [
 		'bytes'
 	],
-	#category : #'SqueakNOS-Filesystems-FAT32'
+	#category : 'SqueakNOS-Filesystems-FAT32'
 }
 
 { #category : #'as yet unclassified' }

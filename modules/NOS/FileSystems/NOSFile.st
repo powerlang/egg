@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'size'
 	],
-	#category : #'SqueakNOS-Filesystems'
+	#category : 'SqueakNOS-Filesystems'
 }
 
 { #category : #'file creation' }
@@ -104,6 +104,12 @@ NOSFile >> basicOpenForWrite: writeMode [
 ]
 
 { #category : #'open/close' }
+NOSFile >> contents [
+	^self readStream contents
+
+]
+
+{ #category : #'open/close' }
 NOSFile >> delete [
 	"We retries with GC because in some platforms open files cannot be open"
 	self class
@@ -168,9 +174,7 @@ NOSFile >> openForWrite: writeMode [
 	| fileHandle |
 	fileHandle := self basicOpenForWrite: writeMode.
 	fileHandle ifNil: [ FileException signal: 'cannot open file: ', name ].
-	^ (BinaryFileStream handle: fileHandle file: self forWrite: writeMode)
-		register;
-		yourself
+	^ self readWriteStream 
 ]
 
 { #category : #primitives }
@@ -184,17 +188,7 @@ NOSFile >> primDelete: aFileName [
 
 { #category : #primitives }
 NOSFile >> primOpen: fileName writable: writableFlag [
-	"Open a file of the given name, and return the file ID obtained.
-	If writableFlag is true, then
-		if there is none with this name, then create one
-		else prepare to overwrite the existing from the beginning
-	otherwise
-		if the file exists, open it read-only
-		else return nil"
-
-	<primitive: 'primitiveFileOpen' module: 'FilePlugin'>
-	^ nil
-
+	^self
 ]
 
 { #category : #printing }

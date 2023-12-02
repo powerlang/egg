@@ -6,7 +6,7 @@ Class {
 		'chunks',
 		'writeList'
 	],
-	#category : #'SqueakNOS-Storage'
+	#category : 'SqueakNOS-Storage'
 }
 
 { #category : #'as yet unclassified' }

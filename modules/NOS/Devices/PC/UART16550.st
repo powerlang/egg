@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'fifoStatus'
 	],
-	#category : #'SqueakNOS-Devices-Base'
+	#category : 'SqueakNOS-Devices-Base'
 }
 
 { #category : #'system startup' }

@@ -1,7 +1,7 @@
 Class {
 	#name : #StreamOnStreamTest,
 	#superclass : #TestCase,
-	#category : #'SqueakNOS-Storage-Tests'
+	#category : 'SqueakNOS-Storage-Tests'
 }
 
 { #category : #tests }

@@ -19,7 +19,7 @@ Class {
 		'offsetToPartition',
 		'flushProcess'
 	],
-	#category : #'SqueakNOS-Filesystems-FAT32'
+	#category : 'SqueakNOS-Filesystems-FAT32'
 }
 
 { #category : #constants }
@@ -247,7 +247,9 @@ FAT32FileSystem >> createFileNamed: aString on: aDirectory [
 							     ifFalse: [aString].
 	number := self clusterNumberWithFreeRecordsFor: aDirectory.
 	cluster := self clusterAt: number.
-	record := cluster addRecordNamed: (self as83Format: name) firstCluster: 0.
+	contents := 	fat firstFreeClusterSince: 2.
+	fat addCluster: contents to: 0.
+	record := cluster addRecordNamed: (self as83Format: name) firstCluster: contents.
 	^NOSFile named: record name identifier: record firstCluster filesystem: self directory: aDirectory size: record size
 ]
 
@@ -533,5 +535,5 @@ FAT32FileSystem >> writeOn: aFile startingAt: aFileOffset contents: bytes starti
 	
 	^self writeClusters: (clusters copyFrom: firstIndex to: lastIndex)
 		   startingAt: (helper positionInBlockOf: aFileOffset + 1)
-	  	   with: bytes startingAt: bytesStart count: count.	
+	  	   with: bytes asByteArray startingAt: bytesStart count: count.	
 ]

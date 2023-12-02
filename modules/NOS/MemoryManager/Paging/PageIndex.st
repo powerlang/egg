@@ -6,7 +6,7 @@ Class {
 		'entriesCount',
 		'entrySize'
 	],
-	#category : #'SqueakNOS-MemoryManager-Paging'
+	#category : 'SqueakNOS-MemoryManager-Paging'
 }
 
 { #category : #'instance creation' }

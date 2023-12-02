@@ -5,7 +5,7 @@ Class {
 		'chains',
 		'contents'
 	],
-	#category : #'SqueakNOS-Filesystems-FAT32'
+	#category : 'SqueakNOS-Filesystems-FAT32'
 }
 
 { #category : #'instance creation' }

@@ -5,7 +5,7 @@ Class {
 		'size',
 		'blocks'
 	],
-	#category : #'SqueakNOS-Devices-Memory'
+	#category : 'SqueakNOS-Devices-Memory'
 }
 
 { #category : #'instance creation' }

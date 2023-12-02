@@ -5,7 +5,7 @@ Class {
 		'previousScanCode',
 		'actualScanCode'
 	],
-	#category : #'SqueakNOS-Devices-Base'
+	#category : 'SqueakNOS-Devices-Base'
 }
 
 { #category : #'as yet unclassified' }

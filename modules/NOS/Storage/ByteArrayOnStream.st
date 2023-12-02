@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'stream'
 	],
-	#category : #'SqueakNOS-Storage'
+	#category : 'SqueakNOS-Storage'
 }
 
 { #category : #'instance creation' }

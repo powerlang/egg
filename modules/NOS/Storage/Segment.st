@@ -1,7 +1,7 @@
 Class {
 	#name : #Segment,
 	#superclass : #Interval,
-	#category : #'SqueakNOS-Storage'
+	#category : 'SqueakNOS-Storage'
 }
 
 { #category : #'as yet unclassified' }

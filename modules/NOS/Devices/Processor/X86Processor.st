@@ -1,7 +1,7 @@
 Class {
 	#name : #X86Processor,
 	#superclass : #MicroProcessor,
-	#category : #'SqueakNOS-Devices-Processor'
+	#category : 'SqueakNOS-Devices-Processor'
 }
 
 { #category : #registers }
@@ -45,4 +45,10 @@ X86Processor >> enablePagingWithDirectory: memoryAddress [
 { #category : #paging }
 X86Processor >> pageDirectory: memoryAddress [
 	self cr3: memoryAddress
+]
+
+{ #category : #registers }
+X86Processor >> rdtsc [
+	<primitive: 'primitiveReadRdtsc' module:'SqueakNOSPlugin'> "primitiveExternalCall" 
+	^self primitiveFailed
 ]

@@ -8,7 +8,7 @@ OpenFirmwareCalloutClient callout: args.
 Class {
 	#name : #OpenFirmwareCalloutClient,
 	#superclass : #Object,
-	#category : #'SqueakNOS-OFW-OLPC'
+	#category : 'SqueakNOS-OFW-OLPC'
 }
 
 { #category : #'as yet unclassified' }

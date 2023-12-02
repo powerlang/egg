@@ -8,7 +8,7 @@ Class {
 		'offset',
 		'resize'
 	],
-	#category : #'SqueakNOS-Filesystems'
+	#category : 'SqueakNOS-Filesystems'
 }
 
 { #category : #'instance creation' }

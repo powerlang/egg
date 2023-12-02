@@ -1,7 +1,11 @@
+"
+I represent the base class for PCI device drivers. I almost don't provide
+any extra API, except for instantiation, so my use is just organizational.
+"
 Class {
 	#name : #PCIDevice,
 	#superclass : #HardwareDevice,
-	#category : #'SqueakNOS-Devices-Base'
+	#category : 'SqueakNOS-Devices-Base'
 }
 
 { #category : #'instance creation' }

@@ -5,7 +5,7 @@ Class {
 		'interval',
 		'description'
 	],
-	#category : #'SqueakNOS-Devices-Memory'
+	#category : 'SqueakNOS-Devices-Memory'
 }
 
 { #category : #'instance creation' }

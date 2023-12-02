@@ -22,7 +22,7 @@ Class {
 		'lineStatus',
 		'modemStatus'
 	],
-	#category : #'SqueakNOS-Devices-Base'
+	#category : 'SqueakNOS-Devices-Base'
 }
 
 { #category : #'system startup' }

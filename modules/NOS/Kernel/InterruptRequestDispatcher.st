@@ -7,7 +7,7 @@ Class {
 		'interruptNumber',
 		'clients'
 	],
-	#category : #'SqueakNOS-Kernel'
+	#category : 'SqueakNOS-Kernel'
 }
 
 { #category : #'instace creation' }
@@ -55,16 +55,13 @@ InterruptRequestDispatcher >> initialize [
 { #category : #initialization }
 InterruptRequestDispatcher >> installOn: aComputer [
 	self registerSemaphore.
-	process := [
-		[
-			semaphore wait.
-			self handleOn: aComputer.
-			aComputer interruptController signalEndOfInterrupt: interruptNumber
-		] repeat.
-	] forkAt: Processor highIOPriority.
-	process name: 'Iterrupt Dispatcher for IRQ#:', interruptNumber printString.
+	process := [ [ semaphore wait.
+	self handleOn: aComputer.
+	interruptNumber = 46 ifTrue: [ Transcript show: 'irq ended' ].
+	aComputer interruptController signalEndOfInterrupt: interruptNumber ] repeat ]
+		forkAt: Processor highIOPriority.
+	process name: 'Iterrupt Dispatcher for IRQ#:' , interruptNumber printString.
 	aComputer interruptController enableIRQ: interruptNumber
-
 ]
 
 { #category : #accessing }

@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'device'
 	],
-	#category : #'SqueakNOS-Filesystems-FAT32'
+	#category : 'SqueakNOS-Filesystems-FAT32'
 }
 
 { #category : #helpers }

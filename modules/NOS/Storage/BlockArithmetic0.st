@@ -1,7 +1,7 @@
 Class {
 	#name : #BlockArithmetic0,
 	#superclass : #BlockArithmetic,
-	#category : #'SqueakNOS-Storage'
+	#category : 'SqueakNOS-Storage'
 }
 
 { #category : #accessing }

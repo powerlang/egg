@@ -7,7 +7,7 @@ Class {
 	#instVars : [
 		'address'
 	],
-	#category : #'SqueakNOS-Kernel'
+	#category : #'SqueakNOS-Devices-Base'
 }
 
 { #category : #'as yet unclassified' }
@@ -95,6 +95,16 @@ ExternalIOPort >> primOutPort: portNumber word: word [
 ExternalIOPort >> primOutPort: portNumber wordString: aString [ 
 	<primitive: 'primitiveOutPortWordString' module:'SqueakNOSPlugin'> "primitiveExternalCall" 
 	^ self primitiveFailed
+]
+
+{ #category : #'I/O' }
+ExternalIOPort >> uByteAtOffset: offset [
+	^ self primInPortByte: address + 1 + offset
+]
+
+{ #category : #'I/O' }
+ExternalIOPort >> uByteAtOffset: offset put: byte [
+	^ self primOutPort: address + 1 + offset byte: byte
 ]
 
 { #category : #'I/O' }

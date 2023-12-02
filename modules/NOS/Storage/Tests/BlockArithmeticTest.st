@@ -1,7 +1,7 @@
 Class {
 	#name : #BlockArithmeticTest,
 	#superclass : #TestCase,
-	#category : #'SqueakNOS-Storage'
+	#category : 'SqueakNOS-Storage'
 }
 
 { #category : #'as yet unclassified' }

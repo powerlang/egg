@@ -5,7 +5,7 @@ Class {
 		'manager',
 		'handlingBlock'
 	],
-	#category : #'SqueakNOS-Memory-Manager'
+	#category : 'SqueakNOS-Memory-Manager'
 }
 
 { #category : #services }

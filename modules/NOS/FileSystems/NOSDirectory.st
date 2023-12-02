@@ -1,7 +1,7 @@
 Class {
 	#name : #NOSDirectory,
 	#superclass : #NOSFilesystemContent,
-	#category : #'SqueakNOS-Filesystems'
+	#category : 'SqueakNOS-Filesystems'
 }
 
 { #category : #quering }

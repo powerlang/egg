@@ -1,7 +1,7 @@
 Class {
 	#name : #ElfSectionHeaderTable,
 	#superclass : #ExternalStructure,
-	#category : #'SqueakNOS-External-Structures'
+	#category : 'SqueakNOS-External-Structures'
 }
 
 { #category : #accessing }

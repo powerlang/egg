@@ -9,7 +9,7 @@ Class {
 	#instVars : [
 		'phandle'
 	],
-	#category : #'SqueakNOS-OFW-OLPC'
+	#category : 'SqueakNOS-OFW-OLPC'
 }
 
 { #category : #'as yet unclassified' }

@@ -6,7 +6,7 @@ Class {
 		'offset',
 		'stream'
 	],
-	#category : #'SqueakNOS-Storage'
+	#category : 'SqueakNOS-Storage'
 }
 
 { #category : #accessing }

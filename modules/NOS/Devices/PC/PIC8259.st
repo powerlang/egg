@@ -7,7 +7,7 @@ Class {
 		'dispatchers',
 		'savedMask'
 	],
-	#category : #'SqueakNOS-Devices-Base'
+	#category : 'SqueakNOS-Devices-Base'
 }
 
 { #category : #'instance creation' }
@@ -113,8 +113,8 @@ PIC8259 >> enableIRQ: aNumber [
 PIC8259 >> initialize [
 	dispatchers := Array new: 8.
 	savedMask := 0.
-
 	self disableAll.
+
 ]
 
 { #category : #accessing }

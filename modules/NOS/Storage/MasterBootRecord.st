@@ -19,7 +19,7 @@ Class {
 	#instVars : [
 		'bytes'
 	],
-	#category : #'SqueakNOS-Storage'
+	#category : 'SqueakNOS-Storage'
 }
 
 { #category : #'instance creation' }

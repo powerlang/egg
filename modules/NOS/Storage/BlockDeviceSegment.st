@@ -6,7 +6,7 @@ Class {
 		'offset',
 		'size'
 	],
-	#category : #'SqueakNOS-Storage'
+	#category : 'SqueakNOS-Storage'
 }
 
 { #category : #initialization }
@@ -18,6 +18,11 @@ BlockDeviceSegment class >> on: aBlockStorage from: start to: stop [
 { #category : #accessing }
 BlockDeviceSegment >> at: index [
 	^device at: index + offset
+]
+
+{ #category : #accessing }
+BlockDeviceSegment >> at: firstBlockNumber writeArray: aByteArray [
+	^device at: firstBlockNumber + offset writeArray: aByteArray
 ]
 
 { #category : #initialization }

@@ -1,7 +1,7 @@
 Class {
 	#name : #NopsysResolver,
 	#superclass : #PlatformResolver,
-	#category : #'SqueakNOS-FileSupport'
+	#category : 'SqueakNOS-FileSupport'
 }
 
 { #category : #accessing }

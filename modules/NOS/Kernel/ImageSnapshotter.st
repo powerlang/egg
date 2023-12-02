@@ -5,7 +5,7 @@ Class {
 		'computer',
 		'savedPages'
 	],
-	#category : #'SqueakNOS-Kernel'
+	#category : 'SqueakNOS-Kernel'
 }
 
 { #category : #accessing }

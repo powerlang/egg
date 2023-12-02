@@ -8,7 +8,7 @@ Class {
 		'interrupted',
 		'pageFaultCallback'
 	],
-	#category : #'SqueakNOS-Memory-Manager'
+	#category : 'SqueakNOS-Memory-Manager'
 }
 
 { #category : #private }

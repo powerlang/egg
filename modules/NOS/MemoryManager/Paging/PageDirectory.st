@@ -1,7 +1,7 @@
 Class {
 	#name : #PageDirectory,
 	#superclass : #PageIndex,
-	#category : #'SqueakNOS-MemoryManager-Paging'
+	#category : 'SqueakNOS-MemoryManager-Paging'
 }
 
 { #category : #'instance creation' }

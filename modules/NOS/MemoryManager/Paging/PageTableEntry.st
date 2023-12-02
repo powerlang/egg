@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'handle'
 	],
-	#category : #'SqueakNOS-MemoryManager-Paging'
+	#category : 'SqueakNOS-MemoryManager-Paging'
 }
 
 { #category : #accessing }

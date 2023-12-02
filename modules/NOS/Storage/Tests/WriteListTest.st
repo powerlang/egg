@@ -1,7 +1,7 @@
 Class {
 	#name : #WriteListTest,
 	#superclass : #TestCase,
-	#category : #'SqueakNOS-Storage-Tests'
+	#category : 'SqueakNOS-Storage-Tests'
 }
 
 { #category : #'as yet unclassified' }

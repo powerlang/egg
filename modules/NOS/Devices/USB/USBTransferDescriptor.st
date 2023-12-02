@@ -1,7 +1,7 @@
 Class {
 	#name : #USBTransferDescriptor,
 	#superclass : #ExternalStructure,
-	#category : #'SqueakNOS-Devices-USB'
+	#category : 'SqueakNOS-Devices-USB'
 }
 
 { #category : #'as yet unclassified' }

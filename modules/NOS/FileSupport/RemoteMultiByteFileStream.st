@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'channel'
 	],
-	#category : #'SqueakNOS-FileSupport'
+	#category : 'SqueakNOS-FileSupport'
 }
 
 { #category : #'remote file compatibility' }

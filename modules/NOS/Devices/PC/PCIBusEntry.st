@@ -1,5 +1,12 @@
 "
-I represent an entry (a specific device) in the PCI bus. Some examples:
+I represent a device 'function' (DF) 'configuration space' (CS) in the PCI bus. (*guessing*) Simple devices have only one function.
+In PCI, each DF is assigned an ID, which is used to access its associated CS, through IO ports 0xCF8 and 0xCFC. 
+
+The CS provides 64 bytes of fixed fields that give info about the device: device ID, vendor ID, Status, etc. One very important info the CS give are the 6 Base Address Registers (BARs). The BIOS or OS assigns mmaped addresses or IO ports to the DF, and saves those addresses in the BAR fields of the CS. To obtain those addresses, the driver just reads the BAR fields. Those fields are encoded: if it is an io port, the first bit is 1, and bits 3 to 32 are the base io address (4 byte aligned). Else, if first bit is 0,  it is an mmaped address, and bits 5 to 32 tell the base address (16-byte aligned).
+
+The ID of a DF is split in 8 bit bus number, 5 bit device number and 3 bit function number.
+
+Some examples:
 
 ""To scan the bus""		PCIBusEntry allValid
 ""To get memory ranges""	PCIBusEntry allValid collect: [:e | e allMemoryRanges]
@@ -44,7 +51,7 @@ Class {
 	#classVars : [
 		'VendorsAndDevices'
 	],
-	#category : #'SqueakNOS-Devices-Base'
+	#category : 'SqueakNOS-Devices-Base'
 }
 
 { #category : #'instance creation' }
@@ -300,6 +307,15 @@ PCIBusEntry >> baseAddressRegisterSize: index [
 	original even
 		ifTrue: [^ self baseMemoryAddressRegisterSize: index original: original]
 		ifFalse: [^ self baseIOAddressRegisterSize: index original: original]
+
+]
+
+{ #category : #'accessing - addresses map' }
+PCIBusEntry >> baseIOAddress: index [
+	| addr |
+	addr := self baseAddressRegister: index.
+	addr even ifTrue: [^self halt "is memory"].
+	^addr bitAnd: 3 bitInvert
 
 ]
 
@@ -611,6 +627,23 @@ PCIBusEntry >> enableVGAPaletteSnooping [
 	^ self enableCommandBit: 5
 ]
 
+{ #category : #printing }
+PCIBusEntry >> formatedConfigurationRegisters [
+	^ '0h - VENDOR ID: ' , self vendorId hex , ' DEV ID: ' , self deviceId hex , String cr
+		, '4h - COMMAND: ' , self command hex , ' STATUS: ' , self status hex , String cr
+		, '8h - REV ID: ' , self revisionId hex , ' CLS CODE: ' , self classCode hex
+		, String cr , 'Ch - CACHE LINE S: ' , self cacheLineSize hex , ' LAT TIMER: '
+		, self latencyTimer hex , ' HDR TYPE: ' , self headerType hex , ' BIST: '
+		, self builtInSelfTest hex , String cr , '10h - BAR0: '
+		, (self baseAddressRegister: 0) hex , String cr , '14h - BAR1: '
+		, (self baseAddressRegister: 1) hex , String cr , '18h - BAR2: '
+		, (self baseAddressRegister: 2) hex , String cr , '1Ch - BAR3: '
+		, (self baseAddressRegister: 3) hex , String cr , '20h - BAR4: '
+		, (self baseAddressRegister: 4) hex , String cr , '24h - BAR5: '
+		, (self baseAddressRegister: 5) hex , String cr , 'INTR LINE: '
+		, self interruptLine printString
+]
+
 { #category : #private }
 PCIBusEntry >> function: aNumber [
 	function := aNumber
@@ -828,7 +861,9 @@ PCIBusEntry >> printOn: strm [
 		nextPut: $.;
 		nextPutAll: function printString;
 		space;
-		nextPutAll: self stringForVendorAndDevice.
+		nextPutAll: self stringForVendorAndDevice;
+		cr;
+		nextPutAll: self formatedConfigurationRegisters
 ]
 
 { #category : #'accessing - general config' }

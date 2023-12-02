@@ -9,7 +9,7 @@ Class {
 	#instVars : [
 		'cache'
 	],
-	#category : #'SqueakNOS-Devices-Storage'
+	#category : 'SqueakNOS-Devices-Storage'
 }
 
 { #category : #'real access' }
@@ -46,6 +46,15 @@ BlockDevice >> byteAt: anInteger [
 	blockNumber := self blockNumberFromByteIndex: anInteger.
 	blockOffset := anInteger - 1 \\ 512.
 	^self byteAtBlock: blockNumber offset: blockOffset.
+
+]
+
+{ #category : #'real access' }
+BlockDevice >> byteAt: anInteger put: value [
+	| byte |
+	(value < 0 or: [ value > 255 ]) ifTrue: [ self halt ].
+	byte := ByteArray with: value.
+	^self replaceFromByte: anInteger bytesCount: 1 with: byte startingAtByte: 1
 
 ]
 
@@ -232,6 +241,24 @@ BlockDevice >> unsignedLongAt: anInteger [
 ]
 
 { #category : #'real access' }
+BlockDevice >> unsignedLongAt: anInteger put: value [
+	| long |
+	(value < 0 or: [ value >= 16r100000000 ]) ifTrue: [ self halt ].
+	long := ByteArray with: (value digitAt: 1) with: (value digitAt: 2) with: (value digitAt: 3) with: (value digitAt: 4).
+	^self replaceFromByte: anInteger bytesCount: 4 with: long startingAtByte: 1
+
+]
+
+{ #category : #'real access' }
 BlockDevice >> unsignedShortAt: anInteger [
 	^ (self bytesAt: anInteger count: 2) unsignedShortAt: 1
+]
+
+{ #category : #'real access' }
+BlockDevice >> unsignedShortAt: anInteger put: value [
+	| short |
+	(value < 0 or: [ value >= 16r10000 ]) ifTrue: [ self halt ].
+	short := ByteArray with: (value digitAt: 1) with: (value digitAt: 2).
+	^self replaceFromByte: anInteger bytesCount: 2 with: short startingAtByte: 1
+
 ]

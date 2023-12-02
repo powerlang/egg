@@ -1,7 +1,7 @@
 Class {
 	#name : #SnapshotInfo,
 	#superclass : #ExternalStructure,
-	#category : #'SqueakNOS-External-Structures'
+	#category : 'SqueakNOS-External-Structures'
 }
 
 { #category : #'methodsFor:' }
