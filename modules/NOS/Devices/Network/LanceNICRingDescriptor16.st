@@ -1,7 +1,7 @@
 Class {
 	#name : #LanceNICRingDescriptor16,
 	#superclass : #ExternalStructure,
-	#category : #'SqueakNOS-Devices-Network'
+	#category : 'SqueakNOS-Devices-Network'
 }
 
 { #category : #'as yet unclassified' }

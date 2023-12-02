@@ -11,7 +11,7 @@ Class {
 	#instVars : [
 		'nextTxIndex'
 	],
-	#category : #'SqueakNOS-Devices-Network'
+	#category : 'SqueakNOS-Devices-Network'
 }
 
 { #category : #'as yet unclassified' }
@@ -256,7 +256,7 @@ Realtek8139PCIDevice >> sendNow: anEthernetPacket [
 { #category : #transmiting }
 Realtek8139PCIDevice >> sendNow: anEthernetPacket on: descriptorIndex [
 	| str |
-	str := anEthernetPacket asString padded: #right to: 60 with: $ .
+	str := anEthernetPacket asString padRightTo: 60.
 	(self transmitStartAddress: descriptorIndex) stringAt: 1 put: str.
 	self transmitStatus: descriptorIndex put: str size.
 ]
@@ -306,7 +306,7 @@ Realtek8139PCIDevice >> transmitConfiguration: aLong [
 
 { #category : #transmiting }
 Realtek8139PCIDevice >> transmitStartAddress: index [
-	^ ExternalAddress fromInteger: (self longAt: index*4+16r20)
+	^ ExternalAddress new fromInteger: (self longAt: index*4+16r20)
 ]
 
 { #category : #transmiting }

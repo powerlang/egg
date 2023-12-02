@@ -23,7 +23,7 @@ http://www.amd.com/us-en/ConnectivitySolutions/DesignWithAMD (Networking Tech Do
 Class {
 	#name : #LancePCIDevice,
 	#superclass : #NetworkingDevice,
-	#category : #'SqueakNOS-Devices-Network'
+	#category : 'SqueakNOS-Devices-Network'
 }
 
 { #category : #'as yet unclassified' }

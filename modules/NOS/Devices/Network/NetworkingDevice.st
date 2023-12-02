@@ -1,7 +1,7 @@
 Class {
 	#name : #NetworkingDevice,
 	#superclass : #PCIDevice,
-	#category : #'SqueakNOS-Devices-Network'
+	#category : 'SqueakNOS-Devices-Network'
 }
 
 { #category : #'as yet unclassified' }

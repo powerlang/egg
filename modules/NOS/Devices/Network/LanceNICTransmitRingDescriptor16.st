@@ -1,7 +1,7 @@
 Class {
 	#name : #LanceNICTransmitRingDescriptor16,
 	#superclass : #LanceNICRingDescriptor16,
-	#category : #'SqueakNOS-Devices-Network'
+	#category : 'SqueakNOS-Devices-Network'
 }
 
 { #category : #accessing }

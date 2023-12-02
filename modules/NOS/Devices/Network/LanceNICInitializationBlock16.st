@@ -6,7 +6,7 @@ page 156
 Class {
 	#name : #LanceNICInitializationBlock16,
 	#superclass : #ExternalStructure,
-	#category : #'SqueakNOS-Devices-Network'
+	#category : 'SqueakNOS-Devices-Network'
 }
 
 { #category : #'as yet unclassified' }
