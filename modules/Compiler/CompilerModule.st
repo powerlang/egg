@@ -14,6 +14,7 @@ Class {
 
 { #category : #initializing }
 CompilerModule >> justLoaded [
+	super justLoaded.
 	AstcodeEncoder initializeBindingIds; initializeTreecodeIds; initializeClosureElementIds
 ]
 

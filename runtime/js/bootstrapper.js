@@ -18,7 +18,7 @@ let Bootstrapper = class {
 
 	loadKernelFile(kernelPath = 'Kernel.json')
 	{
-		const module = this.loadModuleFromFile(kernelPath);
+		const module = this.loadModuleFromFile(kernelPath, false);
 		this.initializeKernel(module);
 	}
 
@@ -78,13 +78,18 @@ let Bootstrapper = class {
 		debugger
 	}
 
-	loadModuleFromFile(filename)
+	loadModuleFromFile(filename, sendJustLoaded = true)
 	{
 		const filepath = this.findInPath(filename);
 		const reader = new ModuleReader();
 		reader.loadFile(filepath);
 		this.bindModuleImports(reader);
-		return reader.loadObjects();
+		reader.loadObjects();
+		if (sendJustLoaded) {
+			const module_ = reader.exports["__module__"];
+			this.runtime.sendLocal_to_("justLoaded", module_);
+		} 
+		return reader;
 	}
 
 	findInPath(imageSegmentFile)

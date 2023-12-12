@@ -100,7 +100,6 @@ class WebsideAPI extends Object {
 			const json = this.classTreeFrom(root, depth);
 			return this.respondWithJson([json]);
 		}
-		const foo = root.allSubclasses();
 		const classes = [root].concat(root.allSubclasses());
 		if (this.queryAt("names") === "true") {
 			const names = classes.map((c) => c.name());

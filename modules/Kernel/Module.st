@@ -185,8 +185,9 @@ Module >> justDefined: aSymbol [
 	lookups do: [:lookup | lookup flush]
 ]
 
-{ #category : #private }
+{ #category : #services }
 Module >> justLoaded [
+	classes reject: [:cls | classes includes: cls superclass ] thenDo: [:cls | cls superclass addSubclass: cls]
 ]
 
 { #category : #accessing }
