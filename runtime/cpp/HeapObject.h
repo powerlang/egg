@@ -42,7 +42,7 @@ struct HeapObject
       typedef enum
       {
           IsBytes      = 0x01,
-          IsVariable   = 0x02,
+          IsArrayed    = 0x02,
           IsNamed      = 0x04,
           IsRemembered = 0x08,
           IsSpecial    = 0x10,
@@ -133,7 +133,8 @@ struct HeapObject
 
       bool isBytes() const; // `true` means this object is byte-indexed, `false` that its slots contain Object pointers.
       bool isPointers() const; // Opposite of isBytes.
-      bool isNamed() const; // `true` means this object contains named lots (like Point)
+      bool isArrayed() const; // `true` means there are indexed slots in this object
+      bool isNamed() const; // `true` means this object contains named lots (like Point). This is orthogonal to being arrayed
       bool isRemembered() const; // `true` means this object has been added to the rememberedSet
       bool isSpecial() const; // Can mean different things, usually that the object contains weak references or that it is a stack object
       bool hasBeenSeen() const; // Used as mark bit for GC
@@ -143,6 +144,10 @@ struct HeapObject
 
 
       /// ~ header bits setters ~
+
+      void beBytes();
+      void beArrayed();
+      void beNamed();
 
       void beRemembered();
       void beNotRemembered();
