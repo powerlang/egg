@@ -14,7 +14,7 @@ public:
         _pragma = nullptr;
     }
 
-    void acceptVisitor(SExpressionVisitor* visitor) override {
+    void acceptVisitor_(SExpressionVisitor* visitor) override {
         visitor->visitMethod(this);
     }
 
@@ -22,11 +22,11 @@ public:
         return true;
     }
 
-    int offsetOfCurrentEnvironment() const override {
+    int offsetOfCurrentEnvironment() const {
         return 0;
     }
 
-    int offsetOfEnvironment(int anInteger) const override {
+    int offsetOfEnvironment(int anInteger) const {
         return 0;
     }
 
@@ -34,14 +34,11 @@ public:
         return _pragma;
     }
 
-    SMethod* pragma(SPragma* anSPragma) {
+    void pragma_(SPragma* anSPragma) {
         _pragma = anSPragma;
-        return this;
     }
 
-    SSymbol* primitive() const {
-        return _pragma ? _pragma->name() : nullptr;
-    }
+    HeapObject* primitive() const;
 
 };
 

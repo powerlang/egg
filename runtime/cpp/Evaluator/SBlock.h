@@ -6,39 +6,35 @@
 
 namespace Egg {
 
+class SArgumentBinding;
 
 class SBlock : public SScript {
     int _index;
-    std::vector<SExpression*> _capturedVariables;
-    std::vector<SArgumentBinding*> _inlinedArgs;
+    std::vector<uint8_t> _capturedVariables;
+    std::vector<uint8_t> _inlinedArgs;
 public:
 
-    SBlock(int index) : _index(index) {
-        _index = 0;
-    }
+    SBlock()
+        { _index = 0; }
 
-    void acceptVisitor(SExpressionVisitor* visitor) override {
+    void acceptVisitor_(SExpressionVisitor* visitor) override {
         visitor->visitBlock(this);
     }
 
-    const std::vector<SExpression*>& capturedVariables() const {
+    const std::vector<uint8_t>& capturedVariables() const {
         return _capturedVariables;
     }
 
-    SBlock* capturedVariables(const std::vector<SExpression*>& aCollection) {
+    SBlock* capturedVariables_(const std::vector<uint8_t>& aCollection) {
         _capturedVariables = aCollection;
         return this;
-    }
-
-    bool capturesHome() const {
-        return compiledCode()->capturesHome();
     }
 
     int index() const {
         return _index;
     }
 
-    void index(int anInteger) {
+    void index_(int anInteger) {
         _index = anInteger;
     }
 
@@ -51,7 +47,7 @@ public:
         return _inlinedArgs;
     }
 
-    void inlinedArgs(auto anArray) {
+    void inlinedArgs_(auto anArray) {
         _inlinedArgs = anArray;
     }
 
@@ -59,16 +55,8 @@ public:
         return true;
     }
 
-    bool isInlined() const {
-        return compiledCode() == nullptr;
-    }
-
     int offsetOfCurrentEnvironment() const {
         return 2;
-    }
-
-    HeapObject* executableCode() const {
-        return compiledCode()->executableCode();
     }
 
 };

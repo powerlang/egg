@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include "PowertalkRuntime.h"
+#include "Runtime.h"
 #include "../HeapObject.h"
 
 namespace Egg {
@@ -14,7 +14,7 @@ class EvaluationContext;
 class SBinding {
 public:
 
-    virtual void assign_within(int value, PowertalkRuntime* aPowertalkRuntime) {
+    virtual void assign_within_(Object *value, EvaluationContext* anEvaluationContext) {
         subclassResponsibility();
     }
 
@@ -62,13 +62,14 @@ public:
         return false;
     }
 
-    virtual std::string name() const {
-        return printString();
+    virtual HeapObject* name() const {
+        subclassResponsibility();
+        return nullptr;
     }
 
-    virtual HeapObject* valueWithin(EvaluationContext* anEvaluationContext) const {
+    virtual Object* valueWithin_(EvaluationContext* anEvaluationContext) const {
         subclassResponsibility();
-        return null;
+        return nullptr;
     }
 
 private:

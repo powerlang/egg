@@ -13,8 +13,8 @@ public:
         return KnownObjects::_false;
     }
 
-    HeapObject* valueWithin(EvaluationContext* anEvaluationContext) const override {
-        return anEvaluationContext->_false();
+    Object* valueWithin_(EvaluationContext* anEvaluationContext) const override {
+        return (Object*)anEvaluationContext->_false();
     }
 };
 } // namespace Egg

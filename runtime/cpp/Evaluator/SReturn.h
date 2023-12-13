@@ -13,7 +13,7 @@ class SReturn : public SExpression {
 public:
     SReturn(bool local, SExpression* anSExpression) : _local(local), _expression(anSExpression) { }
 
-    void acceptVisitor(SExpressionVisitor* visitor) override {
+    void acceptVisitor_(SExpressionVisitor* visitor) override {
         visitor->visitReturn(this);
     }
 

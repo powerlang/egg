@@ -7,19 +7,19 @@ namespace Egg {
 
 class SPragma : public SExpression {
 public:
-    std::string _name;
+    HeapObject * _name;
 
-    SPragma() {
-        _name = nullptr;
+    SPragma(HeapObject *name) {
+        _name = name;
     }
 
-    const std::string& name() const {
+    HeapObject* name() const {
         return _name;
     }
 
-    SPragma* name(const std::string& aString) {
-        _name = aString;
-        return this;
+    void name(HeapObject *name) {
+        _name = name;
+
     }
 
 };
