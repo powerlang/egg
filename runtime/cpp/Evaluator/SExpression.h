@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include "PowertalkRuntime.h"
+#include "Runtime.h"
 
 namespace Egg {
 
@@ -12,7 +12,7 @@ class SExpressionVisitor;
 
 class SExpression {
 public:
-    virtual void acceptVisitor(SExpressionVisitor* visitor) {
+    virtual void acceptVisitor_(SExpressionVisitor* visitor) {
         subclassResponsibility();
     }
 
@@ -53,6 +53,14 @@ public:
     }
 
     virtual bool isReturn() const {
+        return false;
+    }
+
+    virtual bool isSelf() const {
+        return false;
+    }
+
+    virtual bool isSelfOrSuper() const {
         return false;
     }
 

@@ -12,16 +12,14 @@ class SCascadeMessage : public SExpression {
     HeapObject* _selector;
     std::vector<SExpression*> _arguments;
     SCascade* _cascade;
-    std::vector<HeapObject*> *_cache;  // Assuming SObject is the common base class for Type and SCompiledMethod
+    std::vector<HeapObject*> _cache;
 
 public:
     SCascadeMessage(HeapObject *selector, const std::vector<SExpression*>& arguments, SCascade *cascade) :
         _selector(selector), _arguments(arguments), _cascade(cascade)
-    {
-        _cache = nullptr;
-    }
+        { }
 
-    void acceptVisitor(SExpressionVisitor* visitor) override {
+    void acceptVisitor_(SExpressionVisitor* visitor) override {
         visitor->visitCascadeMessage(this);
     }
 
@@ -33,27 +31,26 @@ public:
         return _arguments;
     }
 
-    SCascadeMessage* arguments(const std::vector<SExpression*>& aCollection) {
+    SCascadeMessage* arguments_(const std::vector<SExpression*>& aCollection) {
         _arguments = aCollection;
         return this;
     }
 
-    void cache_when(HeapObject* anSCompiledMethod, HeapObject* type) {
-        if (!_cache)
-            _cache = new std::vector<HeapObject*>();
-        
-        _cache->push_back(type);
-        _cache->push_back(anSCompiledMethod);
-
+    void cache_when_(HeapObject* anSCompiledMethod, HeapObject* type) {        
+        _cache.push_back(type);
+        _cache.push_back(anSCompiledMethod);
     }
 
-    SCascadeMessage* cacheUndermessage(BlockClosure* aBlockClosure) {
-        _cache = aBlockClosure;
+    SCascadeMessage* cacheUndermessage_(HeapObject* aBlockClosure) {
+        _cache.push_back(aBlockClosure);
         return this;
     }
 
-    BlockClosure* cachedUndermessage() const {
-        return (_cache && _cache->isBlock()) ? dynamic_cast<BlockClosure*>(_cache) : nullptr;
+    HeapObject* cachedUndermessage() const {
+        if (_cache.size() == 1)
+            return _cache[0];
+        else
+            return nullptr;
     }
 
     SCascade* cascade() const {
@@ -66,7 +63,7 @@ public:
     }
 
     SCascadeMessage* flushCache() {
-        _cache = nullptr;
+        _cache.clear();
         return this;
     }
 
@@ -74,15 +71,11 @@ public:
         return true;
     }
 
-    SCompiledMethod* methodFor(Type* requiredType) const {
-        if (!_cache) {
-            return nullptr;
-        }
-
-        for (size_t i = 1; i < _cache->size(); i += 2) {
-            Type* type = dynamic_cast<Type*>(_cache->at(i));
-            if (type && *type == *requiredType) {
-                return dynamic_cast<SCompiledMethod*>(_cache->at(i + 1));
+    HeapObject* methodFor(HeapObject *behavior) const {
+        for (size_t i = 0; i < _cache.size(); i += 2) {
+            HeapObject *cached = _cache[i];
+            if (cached == behavior) {
+                return _cache[i + 1];
             }
         }
 
@@ -94,8 +87,8 @@ public:
     }
 
     SCascadeMessage* registerCacheWith(Runtime* runtime) {
-        if (!_cache) {
-            runtime->registerCache_for(this, _selector);
+        if (_cache.empty()) {
+            runtime->registerCache_for_(&_cache, _selector);
         }
         return this;
     }

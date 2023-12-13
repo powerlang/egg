@@ -13,8 +13,8 @@ public:
         return KnownObjects::nil;
     }
 
-    HeapObject* valueWithin(EvaluationContext* anEvaluationContext) const override {
-        return anEvaluationContext->nil();
+    Object* valueWithin_(EvaluationContext* anEvaluationContext) const override {
+        return (Object*)anEvaluationContext->nil();
     }
 };
 

@@ -18,7 +18,7 @@ public:
         _messages = {};
     }
 
-    void acceptVisitor(SExpressionVisitor* visitor) override {
+    void acceptVisitor_(SExpressionVisitor* visitor) override {
         visitor->visitCascade(this);
     }
 

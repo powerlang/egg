@@ -24,8 +24,8 @@ public:
         return this->_environment == -1;
     }
 
-    HeapObject* valueWithin(EvaluationContext* anEvaluationContext) {
-        return anEvaluationContext->argumentAt_in(this->_position, this->_environment);
+    Object* valueWithin_(EvaluationContext* anEvaluationContext) {
+        return anEvaluationContext->argumentAt_in_(this->_position, this->_environment);
     }
 };
 
