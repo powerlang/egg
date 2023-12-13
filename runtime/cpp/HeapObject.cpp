@@ -72,14 +72,19 @@ bool HeapObject::isRemembered() const
 
 /// ~ header flags setters
 
-void HeapObject::beSmall()
+void HeapObject::beBytes()
 {
-	this->smallHeader()->setFlags(SmallHeader::Flags::IsSmall);
+	this->smallHeader()->setFlags(SmallHeader::Flags::IsBytes);
 }
 
-void HeapObject::beLarge()
+void Egg::HeapObject::beArrayed()
 {
-	this->smallHeader()->unsetFlags(SmallHeader::Flags::IsSmall);
+	this->smallHeader()->unsetFlags(SmallHeader::Flags::IsArrayed);
+}
+
+void Egg::HeapObject::beNamed()
+{
+	this->smallHeader()->unsetFlags(SmallHeader::Flags::IsNamed);
 }
 
 void HeapObject::beStrong()
@@ -97,9 +102,8 @@ void HeapObject::beNotRemembered()
 	this->unsetFlags(SmallHeader::Flags::IsRemembered);
 }
 
-void HeapObject::beRemembered()
-{
-	this->setFlags(SmallHeader::Flags::IsRemembered);
+void HeapObject::beRemembered() {
+    this->setFlags(SmallHeader::Flags::IsRemembered);
 }
 
 void HeapObject::beSeen()
@@ -110,6 +114,16 @@ void HeapObject::beSeen()
 void HeapObject::beUnseen()
 {
 	this->unsetFlags(SmallHeader::Flags::HasBeenSeen);
+}
+
+void HeapObject::beSmall()
+{
+	this->smallHeader()->setFlags(SmallHeader::Flags::IsSmall);
+}
+
+void HeapObject::beLarge()
+{
+	this->smallHeader()->unsetFlags(SmallHeader::Flags::IsSmall);
 }
 
 
