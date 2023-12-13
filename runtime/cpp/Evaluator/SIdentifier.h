@@ -13,7 +13,7 @@ public:
 
     SIdentifier(SBinding* aBinding) : _binding(aBinding) { }
 
-    void acceptVisitor(SExpressionVisitor* visitor) override {
+    void acceptVisitor_(SExpressionVisitor* visitor) override {
         visitor->visitIdentifier(this);
     }
 
@@ -38,23 +38,23 @@ public:
         return true;
     }
 
-    bool isInstVar() const {
+    bool isInstVar() const override {
         return _binding->isInstVar();
     }
 
-    bool isLiteral() const {
+    bool isLiteral() const override {
         return _binding->isLiteral();
     }
 
-    bool isSelf() const {
+    bool isSelf() const override {
         return _binding->isSelf();
     }
 
-    bool isSelfOrSuper() const {
+    bool isSelfOrSuper() const override {
         return _binding->isSelf() || _binding->isSuper();
     }
 
-    bool isSuper() const {
+    bool isSuper() const override {
         return _binding->isSuper();
     }
 

@@ -13,7 +13,6 @@ public:
     HeapObject* _compiledCode;
 
     SScript() {
-        _statements = {};
         _compiledCode = nullptr;
     }
 
@@ -21,18 +20,16 @@ public:
         return _compiledCode;
     }
 
-    SScript* compiledCode(HeapObject* anObject) {
+    void compiledCode_(HeapObject* anObject) {
         _compiledCode = anObject;
-        return this;
     }
 
     const std::vector<SExpression*>& statements() const {
         return _statements;
     }
 
-    SScript* statements(const std::vector<SExpression*>& aCollection) {
+    void statements_(const std::vector<SExpression*>& aCollection) {
         _statements = aCollection;
-        return this;
     }
 };
 

@@ -13,7 +13,7 @@ public:
         return true;
     }
 
-    HeapObject* valueWithin(EvaluationContext* anEvaluationContext) const override {
+    Object* valueWithin_(EvaluationContext* anEvaluationContext) const override {
         return anEvaluationContext->receiver();
     }
 };

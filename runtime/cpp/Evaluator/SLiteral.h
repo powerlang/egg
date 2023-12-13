@@ -8,11 +8,11 @@
 namespace Egg {
 
 class SLiteral : public SLiteralVar {
-    HeapObject *_value;
+    Object *_value;
 public:
-    SLiteral(int64_t index, HeapObject *value) : SLiteralVar(index), _value(value) {}
+    SLiteral(int64_t index, Object *value) : SLiteralVar(index), _value(value) {}
 
-    void acceptVisitor(SExpressionVisitor* visitor) {
+    void acceptVisitor_(SExpressionVisitor* visitor) {
         return visitor->visitLiteral(this);
     }
 
@@ -20,11 +20,11 @@ public:
         return true;
     }
 
-    HeapObject* value() const {
+    Object* value() const {
         return _value;
     }
 
-    void value_(HeapObject* anObject) {
+    void value_(Object* anObject) {
         _value = anObject;
     }
 

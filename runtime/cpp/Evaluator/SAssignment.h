@@ -15,7 +15,7 @@ class SAssignment : public SExpression {
 public:
     SAssignment(SExpression *expression) : _expression(expression) { }
 
-    void acceptVisitor(SExpressionVisitor* visitor) override {
+    void acceptVisitor_(SExpressionVisitor* visitor) override {
         visitor->visitAssignment(this);
     }
 
@@ -37,7 +37,7 @@ public:
         return this;
     }
 
-    bool isAssignment() const {
+    bool isAssignment() const override {
         return true;
     }
 
