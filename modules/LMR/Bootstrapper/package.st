@@ -5,7 +5,6 @@
 
 Package { #name : #Bootstrapper,
 	#classes : [
-		'BootstrapModule',
-		'ModuleLoader'
+		'BootstrapModule'
 	]
 }
