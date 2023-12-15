@@ -6,9 +6,7 @@
 Class {
 	#name : #CompilerModule,
 	#superclass : #Module,
-	#instVars : [
-		'environment'
-	],
+	#instVars : [],
 	#category : #'Powerlang-Core-LMR'
 }
 
