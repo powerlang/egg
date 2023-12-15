@@ -3,7 +3,7 @@
 import './lmr.js';
 import PowertalkLMR from "./interpreter/PowertalkLMR.js";
 
-import SegmentReader from "./SegmentReader.js"
+import ImageSegmentReader from "./ImageSegmentReader.js"
 
 import path from 'path';
 import fs from 'fs';
@@ -81,7 +81,7 @@ let Bootstrapper = class {
 	loadModuleFromFile(filename, sendJustLoaded = true)
 	{
 		const filepath = this.findInPath(filename);
-		const reader = new SegmentReader();
+		const reader = new ImageSegmentReader();
 		reader.loadFile(filepath);
 		this.bindModuleImports(reader);
 		reader.loadObjects();
