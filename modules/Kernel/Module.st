@@ -59,16 +59,16 @@ Module >> bindAll: aDictionary [
 
 { #category : #services }
 Module >> bindKernelExports [
-	| bound |
-	bound := Dictionary new.
+	| bindings |
+	bindings := Dictionary new.
 	{
 		Object. Class. Metaclass. CompiledMethod.
 		Array. OrderedCollection. Set. Dictionary.
 		SmallInteger. String. Character.
 	} do: [:class |
-			bound at: class symbol put: class].
-	bound at: #Kernel put: Kernel.
-	self bindAll: bound
+			bindings at: class symbol put: class].
+	bindings at: #Kernel put: Kernel.
+	self bindAll: bindings
 ]
 
 { #category : #accessing }
@@ -185,8 +185,9 @@ Module >> justDefined: aSymbol [
 	lookups do: [:lookup | lookup flush]
 ]
 
-{ #category : #private }
+{ #category : #services }
 Module >> justLoaded [
+	classes reject: [:cls | classes includes: cls superclass ] thenDo: [:cls | cls superclass addSubclass: cls]
 ]
 
 { #category : #accessing }

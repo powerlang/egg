@@ -6,14 +6,13 @@
 Class {
 	#name : #CompilerModule,
 	#superclass : #Module,
-	#instVars : [
-		'environment'
-	],
+	#instVars : [],
 	#category : #'Powerlang-Core-LMR'
 }
 
 { #category : #initializing }
 CompilerModule >> justLoaded [
+	super justLoaded.
 	AstcodeEncoder initializeBindingIds; initializeTreecodeIds; initializeClosureElementIds
 ]
 

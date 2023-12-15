@@ -3,7 +3,7 @@
 import './lmr.js';
 import PowertalkLMR from "./interpreter/PowertalkLMR.js";
 
-import ModuleReader from "./ModuleReader.js"
+import ImageSegmentReader from "./ImageSegmentReader.js"
 
 import path from 'path';
 import fs from 'fs';
@@ -18,7 +18,7 @@ let Bootstrapper = class {
 
 	loadKernelFile(kernelPath = 'Kernel.json')
 	{
-		const module = this.loadModuleFromFile(kernelPath);
+		const module = this.loadModuleFromFile(kernelPath, false);
 		this.initializeKernel(module);
 	}
 
@@ -78,13 +78,18 @@ let Bootstrapper = class {
 		debugger
 	}
 
-	loadModuleFromFile(filename)
+	loadModuleFromFile(filename, sendJustLoaded = true)
 	{
 		const filepath = this.findInPath(filename);
-		const reader = new ModuleReader();
+		const reader = new ImageSegmentReader();
 		reader.loadFile(filepath);
 		this.bindModuleImports(reader);
-		return reader.loadObjects();
+		reader.loadObjects();
+		if (sendJustLoaded) {
+			const module_ = reader.exports["__module__"];
+			this.runtime.sendLocal_to_("justLoaded", module_);
+		} 
+		return reader;
 	}
 
 	findInPath(imageSegmentFile)
