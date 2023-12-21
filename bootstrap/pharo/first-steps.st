@@ -2,6 +2,12 @@
     Browsing kernel code (load kernel smalltalk from files and browse it).
 "
 
+PowertalkRingImage resetSpecs.
+
+JSTranspiler generateKernelSegment.
+JSTranspiler generateCompilerSegment.
+JSTranspiler transpilePowerlangInterpreter.
+
 PowertalkRingImage kernelSpec browse.
 
 "
