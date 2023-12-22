@@ -241,6 +241,11 @@ PowertalkRuntime >> speciesInstanceBehavior: class [
 ]
 
 { #category : #accessing }
+PowertalkRuntime >> storeAssociation: association value: anObject [
+	self sendLocal: #value: to: association  with: {anObject}
+]
+
+{ #category : #accessing }
 PowertalkRuntime >> symbolFrom: anObject [
 	^anObject
 ]
