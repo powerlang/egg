@@ -393,11 +393,6 @@ PowertalkRingRuntime >> staticBindingForIvar: aSymbol in: receiver [
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> storeAssociation: association value: anObject [
-	association value: anObject
-]
-
-{ #category : #accessing }
 PowertalkRingRuntime >> superBehaviorOf: aSpeciesMap [
 	^ aSpeciesMap superclass instanceSpec
 ]
