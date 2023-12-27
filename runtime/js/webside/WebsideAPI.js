@@ -310,7 +310,7 @@ class WebsideAPI extends Object {
 			object = this.runtime.sendLocal_to_("doIt", this.runtime.nil());
 			console.log(object.toString())
 			//this.runtime.sendLocal_to_with_("removeSelector:", species, [selector]);
-			object = this.wrap(object);
+			object = this.wrapWithId(object, id);
 			if (!sync || pin) {
 				this.server.pinnedObjects[id] = object;
 			}
@@ -425,6 +425,10 @@ class WebsideAPI extends Object {
 	}
 
 	//Private...
+	wrapWithId(object, id) {
+		return PowerlangObjectWrapper.on_runtime_id_(object, this.runtime, id);
+	}
+
 	wrap(object) {
 		return PowerlangObjectWrapper.on_runtime_(object, this.runtime);
 	}
