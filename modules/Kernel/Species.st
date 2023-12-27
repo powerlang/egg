@@ -34,17 +34,23 @@ Species class >> maxInstVarCount [
 
 { #category : #testing }
 Species >> _instancesAreArrayed [
-	^format & Variable = Variable
+	| var |
+	var := Flags at: #Variable.
+	^format & var = var
 ]
 
 { #category : #testing }
 Species >> _instancesAreFixed [
-	^format & Variable = 0
+	| var |
+	var := Flags at: #Variable.
+	^format & var = 0
 ]
 
 { #category : #testing }
 Species >> _instancesHavePointers [
-	^format & Pointers != 0
+	| pointer |
+	pointer := Flags at: #Pointers.
+	^format & pointer != 0
 ]
 
 { #category : #accessing }

@@ -191,6 +191,10 @@ let PowerlangSpeciesWrapper = class extends PowerlangObjectWrapper {
 		return this.send("includesSelector:", [symbol]).asLocalObject();
 	}
 
+	isVariable() {
+		return this.send("isVariable").asLocalObject();
+	}
+
 	methodFor_(aSymbol) {
 		let symbol;
 		symbol = cachedSymbols[aSymbol];
