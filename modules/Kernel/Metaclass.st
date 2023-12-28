@@ -116,6 +116,6 @@ Metaclass >> subspeciesDo: aBlock [
 
 { #category : #accessing }
 Metaclass >> symbol [
-	^class symbol
+	^self name asSymbol
 ]
 

@@ -13,7 +13,6 @@ Class {
 SCompiler class >> compile: aString in: aClass [
 	| compiler |
 	compiler := self forClass: aClass.
-	self _halt.
 	^compiler compile: aString
 ]
 

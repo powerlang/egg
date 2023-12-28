@@ -49,7 +49,7 @@ Object.prototype.initialize = function() { return this;}
 Object.prototype.basicNew = function() { return new this; }
 Object.prototype.new = function() { const obj = new this; obj.initialize(); return obj; }
 Object.prototype.class = function() { return this.constructor; }
-
+Object.prototype.asString = function() { return this.toString(); }
 
 // add some Smalltalk-ish methods to JS booleans
 
@@ -101,6 +101,7 @@ Array.prototype.detect_ = function(block) { return this.find(block); }
 
 String.prototype.asSymbol = function() { return this; }
 String.prototype.asString = function() { return this; }
+String.prototype._comma = function(string) { return this.concat(string); }
 
 Array.prototype.add_ = function(object) { return this.push(object); }
 Array.prototype._comma = function(array) { return this.concat(array); }
