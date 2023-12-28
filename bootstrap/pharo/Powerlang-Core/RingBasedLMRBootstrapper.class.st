@@ -150,9 +150,11 @@ RingBasedLMRBootstrapper >> createExtensionMethodsOf: spec in: module [
 	namespace := dest sendLocal: #namespace to: module. 
 	class := dest sendLocal: #at: to: namespace with: { name }.
 	metaclass := dest behaviorClass: class behavior.
-	spec methods do: [ :m | self createNewMethod: m in: class ].
-	spec metaclass methods do: [ :m | 
-		self createNewMethod: m in: metaclass ].
+	spec methods do: [ :m | | cm | cm := self createNewMethod: m in: class.
+		module ifNotNil: [ dest sendLocal: #addExtension: to: module with: { cm } ] ].
+	spec metaclass methods do: [ :m | | cm | 
+		cm := self createNewMethod: m in: metaclass.
+		module ifNotNil: [ dest sendLocal: #addExtension: to: module with: { cm } ] ].
 	^ module
 ]
 
