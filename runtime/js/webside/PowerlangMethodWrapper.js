@@ -16,9 +16,12 @@ let PowerlangMethodWrapper = class extends PowerlangObjectWrapper {
 	}
 
 	selector() {
-		let s = this.send("selector");
+		let s;
+		if (this.respondsTo("selector")) {
+			s = this.send("selector");
+		};
 		if (s) return s.wrappee().asLocalString();
-		return nil;
+		return "[]";
 	}
 
 	sourceCode() {

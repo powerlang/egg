@@ -154,7 +154,7 @@ let PowerlangObjectWrapper = class {
 	}
 
 	respondsTo_(aSymbol) {
-		return this.class().canUnderstand_(aSymbol);
+		return this.class().canUnderstand(aSymbol);
 	}
 
 	runtime_(aPowerlangLMR) {

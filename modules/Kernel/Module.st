@@ -34,6 +34,13 @@ Module >> addClass: aClass [
 	self exportClass: aClass
 ]
 
+{ #category : #services }
+Module >> addExtension: aCompiledMethod [
+	| collection | 
+	collection := extensions at: aCompiledMethod classBinding symbol ifAbsentPut: [OrderedCollection new].
+	collection add: aCompiledMethod.
+]
+
 { #category : #initializing }
 Module >> basicInitialize [
 	name := self defaultName.
@@ -187,7 +194,14 @@ Module >> justDefined: aSymbol [
 
 { #category : #services }
 Module >> justLoaded [
-	classes reject: [:cls | classes includes: cls superclass ] thenDo: [:cls | cls superclass addSubclass: cls]
+	classes reject: [:cls | classes includes: cls superclass ] thenDo: [:cls | cls superclass addSubclass: cls].
+	extensions keysAndValuesDo: [:s :methods | | meta key cls |
+		meta := s endsWith: ' class'.
+		key := meta ifTrue: [(s trimTail: ' class') asSymbol] ifFalse: [s].
+		cls := namespace at: key ifAbsent: [self _halt].
+		meta ifTrue: [ cls := cls class].
+		methods do: [:cm | cls addSelector: cm selector withMethod: cm ]
+	]
 ]
 
 { #category : #accessing }
