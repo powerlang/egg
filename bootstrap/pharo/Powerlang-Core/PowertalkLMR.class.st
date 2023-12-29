@@ -921,12 +921,16 @@ PowertalkLMR >> superBehaviorOf: class [
 
 { #category : #initialization }
 PowertalkLMR >> symbolFromLocal: aSymbol [
+
 	| bytes table symbol |
-	knownSymbols at: aSymbol ifPresent: [ :s | ^s ].
-	bytes := aSymbol asByteArray, #[0].
+	knownSymbols at: aSymbol ifPresent: [ :s | ^ s ].
+	bytes := aSymbol asByteArray , #[ 0 ].
 	table := symbolTable slotAt: 2.
-	2 to: table size do: [:i | symbol := table slotAt: i. symbol == nilObj ifFalse: [symbol bytes = bytes ifTrue: [ ^symbol ] ] ].
-	self error: 'symbol not found'
+	2 to: table size do: [ :i | 
+		symbol := table slotAt: i.
+		symbol == nilObj ifFalse: [ 
+			symbol bytes = bytes ifTrue: [ ^ symbol ] ] ].
+	PowertalkEvaluatorError signal: 'symbol not found' on: interpreter context
 ]
 
 { #category : #initialization }
