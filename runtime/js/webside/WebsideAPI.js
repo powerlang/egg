@@ -398,28 +398,28 @@ class WebsideAPI extends Object {
 		let frame = frames[index];
 		let code = PowerlangMethodWrapper.on_runtime_(frame[0], this.runtime);
 		let receiver = PowerlangObjectWrapper.on_runtime_(frame[1], this.runtime);
-		let bindings = [{ name: "self", type: "variable", object: receiver, print: receiver.printString() }];
-		let object;
-		let binding;
-		let print;
+		let bindings = [{ name: "self", type: "variable", object: receiver.asWebsideJson(), print: receiver.printString().asLocalObject() }];
+		let object,  binding, print, wrapper;
 		for (let i = 1; i <= code.argumentCount().asLocalObject(); i++) {
-			object = context.argumentAt_frameIndex_(i, index);
+			object = context.argumentAt_frameIndex_(i, index+1);
 			try {
-				print = object.asString();
+				print = object.asString().asLocalObject();
 			} catch (error) {
 				print = "Cannot print object";
 			}
-			binding = { name: "argument" + i, type: "argument", object: object, print: print };
+			wrapper = PowerlangObjectWrapper.on_runtime_(object, this.runtime);
+			binding = { name: "argument" + i, type: "argument", object: wrapper.asWebsideJson(), print: print };
 			bindings.push(binding);
 		}
 		for (let i = 1; i <= code.tempCount().asLocalObject(); i++) {
-			object = context.stackTemporaryAt_frameIndex_(i, index);
+			object = context.stackTemporaryAt_frameIndex_(i, index+1);
 			try {
-				print = object.asString();
+				print = object.asString().asLocalObject();
 			} catch (error) {
 				print = "Cannot print object";
 			}
-			binding = { name: "temporary" + i, type: "temporary", object: object, print: print };
+			wrapper = PowerlangObjectWrapper.on_runtime_(object, this.runtime);
+			binding = { name: "temporary" + i, type: "temporary", object: wrapper.asWebsideJson(), print: print };
 			bindings.push(binding);
 		}
 		this.respondWithJson(bindings);
