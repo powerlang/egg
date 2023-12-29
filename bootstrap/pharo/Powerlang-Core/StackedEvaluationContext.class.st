@@ -15,9 +15,18 @@ Class {
 
 { #category : #initialization }
 StackedEvaluationContext >> argumentAt: anInteger [
-	| args |
-	args := self isBlock ifTrue: [ system blockArgumentCount: regM ] ifFalse: [ system methodArgumentCount: regM ].
-	^stack at: regBP + 1 + (args - anInteger + 1)
+
+	^self argumentAt: anInteger frameIndex: 1 
+]
+
+{ #category : #initialization }
+StackedEvaluationContext >> argumentAt: anInteger frameIndex: anotherInteger [
+
+	| bp code count |
+	bp := self bpForFrameAt: anotherInteger.
+	code := stack at: bp - 2.
+	count := system argumentCountOf: code.
+	^ stack at: bp + 1 + (count - anInteger + 1)
 ]
 
 { #category : #initialization }
@@ -30,7 +39,6 @@ StackedEvaluationContext >> argumentAt: index in: environmentIndex [
 { #category : #initialization }
 StackedEvaluationContext >> arguments [
 	| count |
-	self halt.
 	count := system argumentCountOf: regM.
 	^ (count to: 1 by: -1) collect: [ :i | self argumentAt: i ]
 ]
@@ -46,6 +54,17 @@ StackedEvaluationContext >> backtrace [
 			result add: {code. receiver}.
 			bp := stack at: bp ].
 	^ result
+]
+
+{ #category : #services }
+StackedEvaluationContext >> bpForFrameAt: anInteger [
+
+	| bp  |
+	bp := regBP.
+	anInteger - 1 timesRepeat: [ 
+		bp = 0 ifTrue: [ ^ nil ].
+		bp := stack at: bp ].
+	^ bp
 ]
 
 { #category : #initialization }
@@ -333,13 +352,29 @@ StackedEvaluationContext >> self [
 ]
 
 { #category : #initialization }
-StackedEvaluationContext >> stackTemporaryAt: index [
-	^ stack at: regBP - self tempOffset - index
+StackedEvaluationContext >> stackTemporaryAt: anInteger [
+
+	^ self stackTemporaryAt: anInteger frameIndex: 1 
 ]
 
 { #category : #initialization }
-StackedEvaluationContext >> stackTemporaryAt: index put: value [
-	^ stack at: regBP - self tempOffset - index put: value
+StackedEvaluationContext >> stackTemporaryAt: anInteger frameIndex: anotherInteger [
+	| bp |
+	bp := self bpForFrameAt: anotherInteger.
+	^ stack at: bp - self tempOffset - anInteger
+]
+
+{ #category : #initialization }
+StackedEvaluationContext >> stackTemporaryAt: anInteger frameIndex: anotherInteger put: anObject [
+	| bp |
+	bp := self bpForFrameAt: anotherInteger.
+	^ stack at: bp - self tempOffset - anInteger put: anObject
+]
+
+{ #category : #initialization }
+StackedEvaluationContext >> stackTemporaryAt: anInteger put: anObject [
+
+	^ self stackTemporaryAt: anInteger frameIndex: 1 put: anObject 
 ]
 
 { #category : #initialization }
