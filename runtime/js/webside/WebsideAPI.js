@@ -358,9 +358,8 @@ class WebsideAPI extends Object {
 				frame[1],
 				this.runtime
 			);
-			let label =
-				receiver.objectClass().name() + ">>" + method.selector();
-			return { index: index, label, label };
+			let label = receiver.objectClass().name() + ">>" + method.selector();
+			return { index: index, label: label };
 		});
 		this.respondWithJson(json);
 	}
@@ -372,13 +371,10 @@ class WebsideAPI extends Object {
 		let index = this.requestedIndex();
 		let error = this.server.evaluations[id];
 		let frames = error.context.backtrace();
-		if (index > frames.lengh - 1) return this.notFound();
+		if (index > frames.length - 1) return this.notFound();
 		let frame = frames[index];
 		let method = PowerlangMethodWrapper.on_runtime_(frame[0], this.runtime);
-		let receiver = PowerlangObjectWrapper.on_runtime_(
-			frame[1],
-			this.runtime
-		);
+		let receiver = PowerlangObjectWrapper.on_runtime_(frame[1], this.runtime);
 		let label = receiver.objectClass().name() + ">>" + method.selector();
 		let json = {
 			index: index,
@@ -395,21 +391,37 @@ class WebsideAPI extends Object {
 		let _debugger = this.server.debuggers[id];
 		if (!_debugger) return this.notFound();
 		let index = this.requestedIndex();
-		let frame = { bindings: [] };
-		let bindings = frame.bindings.map((b) => {
-			let type = b.isTemporary()
-				? "temporary"
-				: b.isArgument()
-					? "argument"
-					: "variable";
-			let print;
+		let error = this.server.evaluations[id];
+		let context = error.context;
+		let frames = context.backtrace();
+		if (index > frames.length - 1) return this.notFound();
+		let frame = frames[index];
+		let code = PowerlangMethodWrapper.on_runtime_(frame[0], this.runtime);
+		let receiver = PowerlangObjectWrapper.on_runtime_(frame[1], this.runtime);
+		let bindings = [{ name: "self", type: "variable", object: receiver, print: receiver.printString() }];
+		let object;
+		let binding;
+		let print;
+		for (let i = 1; i <= code.argumentCount().asLocalObject(); i++) {
+			object = context.argumentAt_frameIndex_(i, index);
 			try {
-				print = b.object.printString();
+				print = object.asString();
 			} catch (error) {
 				print = "Cannot print object";
 			}
-			return { name: b.name, value: print, type: type };
-		});
+			binding = { name: "argument" + i, type: "argument", object: object, print: print };
+			bindings.push(binding);
+		}
+		for (let i = 1; i <= code.tempCount().asLocalObject(); i++) {
+			object = context.stackTemporaryAt_frameIndex_(i, index);
+			try {
+				print = object.asString();
+			} catch (error) {
+				print = "Cannot print object";
+			}
+			binding = { name: "temporary" + i, type: "temporary", object: object, print: print };
+			bindings.push(binding);
+		}
 		this.respondWithJson(bindings);
 	}
 
