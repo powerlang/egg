@@ -22,12 +22,6 @@ PowertalkRingRuntime class >> new [
 
 ]
 
-{ #category : #services }
-PowertalkRingRuntime >> argumentCountOf: anObjectMap [
-self halt.
-	^ anObjectMap argumentCount
-]
-
 { #category : #accessing }
 PowertalkRingRuntime >> arrayedSizeOf: anObjectMap [
 	^anObjectMap arrayedSize

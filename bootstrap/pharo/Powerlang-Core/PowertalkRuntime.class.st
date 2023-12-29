@@ -16,6 +16,13 @@ Class {
 	#category : #'Powerlang-Core-Execution'
 }
 
+{ #category : #services }
+PowertalkRuntime >> argumentCountOf: code [
+	^(self isBlock: code)
+		        ifTrue: [ self blockArgumentCount: code ]
+		        ifFalse: [ self methodArgumentCount: code ]
+]
+
 { #category : #accessing }
 PowertalkRuntime >> behaviorOf: anObject [
 	^self subclassResponsibility
