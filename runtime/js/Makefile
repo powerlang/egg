@@ -6,7 +6,7 @@ POWERLANG_DIR=$(GIT_PATH)/bootstrap/pharo
 
 .PHONY: all interpreter kernel
 
-all: interpreter kernel
+all: interpreter kernel compiler
 
 clean:
 
@@ -17,14 +17,22 @@ $(POWERLANG_DIR)/powerlangjs.image:
 
 kernel: $(IMAGE_SEGMENTS_DIR)/Kernel.json
 
-interpreter/PowertalkEvaluator.js: $(POWERLANG_DIR)/powerlangjs.image
-	cd $(POWERLANG_DIR) && ./pharo powerlangjs.image eval "JSTranspiler transpilePowerlangInterpreter"
-
-interpreter: interpreter/PowertalkEvaluator.js
-
 $(IMAGE_SEGMENTS_DIR)/Kernel.json: $(POWERLANG_DIR)/powerlangjs.image
 	export IMAGE_SEGMENTS_DIR
 	cd $(POWERLANG_DIR) && ./pharo powerlangjs.image eval "JSTranspiler generateKernelSegment"
+
+interpreter: interpreter/PowertalkEvaluator.js
+
+interpreter/PowertalkEvaluator.js: $(POWERLANG_DIR)/powerlangjs.image
+	cd $(POWERLANG_DIR) && ./pharo powerlangjs.image eval "JSTranspiler transpilePowerlangInterpreter"
+	
+compiler: $(IMAGE_SEGMENTS_DIR)/Compiler.json
+
+$(IMAGE_SEGMENTS_DIR)/Compiler.json: $(POWERLANG_DIR)/powerlangjs.image
+	export IMAGE_SEGMENTS_DIR
+	cd $(POWERLANG_DIR) && ./pharo powerlangjs.image eval "JSTranspiler generateCompilerSegment"
+	
+
 
 
 
