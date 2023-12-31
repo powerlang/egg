@@ -908,6 +908,11 @@ PowertalkLMR >> staticBindingForIvar: aSymbol in: receiver [
 ]
 
 { #category : #initialization }
+PowertalkLMR >> storeAssociation: association value: anObject [
+	association slotAt: 2 put: anObject
+]
+
+{ #category : #initialization }
 PowertalkLMR >> stringClass: anLMRObject [
 	stringClass := anLMRObject
 ]
