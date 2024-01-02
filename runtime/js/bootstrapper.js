@@ -81,6 +81,9 @@ let Bootstrapper = class {
 	loadModuleFromFile(filename, sendJustLoaded = true)
 	{
 		const filepath = this.findInPath(filename);
+		if (filepath === undefined) {
+			throw new Error(`Failed to load ${filename}`);
+		}
 		const reader = new ImageSegmentReader();
 		reader.loadFile(filepath);
 		this.bindModuleImports(reader);
