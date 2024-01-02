@@ -4,9 +4,9 @@ ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 IMAGE_SEGMENTS_DIR=$(ROOT_DIR)/image-segments
 POWERLANG_DIR=$(GIT_PATH)/bootstrap/pharo
 
-.PHONY: all interpreter kernel
+.PHONY: all interpreter kernel compiler
 
-all: interpreter kernel
+all: interpreter kernel compiler
 
 clean:
 
@@ -26,5 +26,9 @@ $(IMAGE_SEGMENTS_DIR)/Kernel.json: $(POWERLANG_DIR)/powerlangjs.image
 	export IMAGE_SEGMENTS_DIR
 	cd $(POWERLANG_DIR) && ./pharo powerlangjs.image eval "JSTranspiler generateKernelSegment"
 
+compiler: $(IMAGE_SEGMENTS_DIR)/Compiler.json
 
+$(IMAGE_SEGMENTS_DIR)/Compiler.json: $(POWERLANG_DIR)/powerlangjs.image
+	export IMAGE_SEGMENTS_DIR
+	cd $(POWERLANG_DIR) && ./pharo powerlangjs.image eval "JSTranspiler generateCompilerSegment"
 
