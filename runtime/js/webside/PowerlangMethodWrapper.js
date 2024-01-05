@@ -3,15 +3,28 @@ import PowerlangObjectWrapper from "./PowerlangObjectWrapper.js";
 let PowerlangMethodWrapper = class extends PowerlangObjectWrapper {
 	asWebsideJson() {
 		let json = super.asWebsideJson();
-		json["selector"] = this.selector();
-		let species = this.classBinding();
-		json["methodClass"] = species ? species.name() : "Unknown class";
-		json["category"] = "self category";
-		json["source"] = this.sourceCode();
-		json["author"] = "self author";
-		json["timestamp"] = "self timeStamp";
-		json["overriding"] = false;
-		json["overriden"] = false;
+		try {
+			json.selector = this.selector();
+		} catch (error) {
+			json.selector = "Error retrieving selector: " + error.message;
+		}
+		let species;
+		try {
+			species = this.classBinding();
+			json.methodClass = species ? species.name() : "Unknown class";
+		} catch (error) {
+			json.methodClass = "Error retrieving class: " + error.message;
+		}
+		try {
+			json.source = this.sourceCode();
+		} catch (error) {
+			json.source = "Error retrieving source: " + error.message;
+		}
+		json.category = "Unknown category";
+		json.author = "Unknown author";
+		json.timestamp = "Unknown timeStamp";
+		json.overriding = false;
+		json.overriden = false;
 		return json;
 	}
 

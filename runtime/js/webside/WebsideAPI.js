@@ -308,7 +308,6 @@ class WebsideAPI extends Object {
 		try {
 			this.compile(source, "Object");
 			object = this.runtime.sendLocal_to_("doIt", this.runtime.nil());
-			console.log(object.toString())
 			//this.runtime.sendLocal_to_with_("removeSelector:", species, [selector]);
 			object = this.wrap(object);
 			if (!sync || pin) {
@@ -398,28 +397,18 @@ class WebsideAPI extends Object {
 		let frame = frames[index];
 		let code = PowerlangMethodWrapper.on_runtime_(frame[0], this.runtime);
 		let receiver = PowerlangObjectWrapper.on_runtime_(frame[1], this.runtime);
-		let bindings = [{ name: "self", type: "variable", object: receiver.asWebsideJson(), print: receiver.printString().asLocalObject() }];
-		let object,  binding, print, wrapper;
+		let bindings = [{ name: "self", type: "variable", value: receiver.printString() }];
+		let object, wrapper, binding;
 		for (let i = 1; i <= code.argumentCount().asLocalObject(); i++) {
-			object = context.argumentAt_frameIndex_(i, index+1);
-			try {
-				print = object.asString().asLocalObject();
-			} catch (error) {
-				print = "Cannot print object";
-			}
+			object = context.argumentAt_frameIndex_(i, index + 1);
 			wrapper = PowerlangObjectWrapper.on_runtime_(object, this.runtime);
-			binding = { name: "argument" + i, type: "argument", object: wrapper.asWebsideJson(), print: print };
+			binding = { name: "argument" + i, type: "argument", value: wrapper.printString() };
 			bindings.push(binding);
 		}
 		for (let i = 1; i <= code.tempCount().asLocalObject(); i++) {
-			object = context.stackTemporaryAt_frameIndex_(i, index+1);
-			try {
-				print = object.asString().asLocalObject();
-			} catch (error) {
-				print = "Cannot print object";
-			}
+			object = context.stackTemporaryAt_frameIndex_(i, index + 1);
 			wrapper = PowerlangObjectWrapper.on_runtime_(object, this.runtime);
-			binding = { name: "temporary" + i, type: "temporary", object: wrapper.asWebsideJson(), print: print };
+			binding = { name: "temporary" + i, type: "temporary", value: wrapper.printString() };
 			bindings.push(binding);
 		}
 		this.respondWithJson(bindings);

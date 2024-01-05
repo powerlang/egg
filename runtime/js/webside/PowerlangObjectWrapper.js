@@ -74,28 +74,29 @@ let PowerlangObjectWrapper = class {
 		return nil;
 	}
 
+	printString() {
+		let print;
+		try {
+			print = this.send("printString").asLocalObject();
+		} catch (error) {
+			print = "Cannot print object";
+		}
+		return print;
+	}
+
 	asWebsideJson() {
-		let species = this.objectClass();
-		let variable = species.isVariable().asLocalObject();
-		let name = species.name();
-		let printed;
-		//This check should be removed once we solve Recurson exception in Collection printing...
-		let trouble = species
-			.withAllSuperclasses()
-			.find((c) => c.notNil() && c.name() == "Collection");
-		printed = trouble
-			? "a " + name
-			: this._runtime
-					.sendLocal_to_("printString", this._wrappee)
-					.asLocalString();
-		return {
-			class: name,
-			indexable: variable,
-			size: variable ? this.size().wrappee().value() : 0,
-			printString: printed,
-			hasNamedSlots: species.instancesHavePointers().asLocalObject(),
-			hasIndexedSlots: this.hasIndexedSlots().asLocalObject(),
-		};
+		let json = { id: this.id, printString: this.printString() };
+		try {
+			let species = this.objectClass();
+			let variable = species.isVariable();
+			json.class = species.name();
+			json.indexable = variable;
+			json.size = variable ? this.size().wrappee().value() : 0;
+			json.hasNamedSlots = species.instancesHavePointers().asLocalObject();
+			json.hasIndexedSlots = this.hasIndexedSlots().asLocalObject();
+		}
+		catch (error) { json.error = error.message }
+		return json;
 	}
 
 	displayString() {
@@ -118,9 +119,8 @@ let PowerlangObjectWrapper = class {
 		);
 		if (!(result instanceof LMRObject)) return result;
 		_class =
-			this._runtime.sendLocal_to_("isSpecies", result) ===
-			this._runtime.true()
-				? PowerlangSpeciesWrapper
+			this._runtime.sendLocal_to_("isSpecies", result) === this._runtime.true() ?
+				PowerlangSpeciesWrapper
 				: PowerlangObjectWrapper;
 		return _class.on_runtime_(result, this._runtime);
 	}
@@ -149,7 +149,6 @@ let PowerlangObjectWrapper = class {
 
 	objectClass() {
 		let _class = this._runtime.sendLocal_to_("class", this._wrappee);
-
 		return PowerlangSpeciesWrapper.on_runtime_(_class, this._runtime);
 	}
 
@@ -167,10 +166,6 @@ let PowerlangObjectWrapper = class {
 			this._wrappee.slotAt_(index),
 			this._runtime
 		);
-	}
-
-	stDisplayString() {
-		return this.printString();
 	}
 
 	wrappee() {
