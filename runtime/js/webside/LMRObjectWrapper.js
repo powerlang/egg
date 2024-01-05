@@ -2,7 +2,7 @@ import LMRByteObject from "../interpreter/LMRByteObject.js";
 import LMRObject from "../interpreter/LMRObject.js";
 import LMRSmallInteger from "../interpreter/LMRSmallInteger.js";
 
-let PowerlangSpeciesWrapper;
+let LMRSpeciesWrapper;
 
 let selectorFor = function (selector, args) {
 	if (args.length == 0) return selector;
@@ -11,7 +11,7 @@ let selectorFor = function (selector, args) {
 	throw "should be implemented";
 };
 
-let PowerlangObjectWrapper = class {
+let LMRObjectWrapper = class {
 	/*				if (typeof prop == "function")
 						return function(...args) {
 							return prop.call(args);
@@ -37,8 +37,8 @@ let PowerlangObjectWrapper = class {
 		});
 	}
 
-	static setPowerlangSpeciesWrapper(obj) {
-		PowerlangSpeciesWrapper = obj;
+	static setLMRSpeciesWrapper(obj) {
+		LMRSpeciesWrapper = obj;
 	}
 
 	initialize() {}
@@ -52,7 +52,7 @@ let PowerlangObjectWrapper = class {
 
 	_equal(anObject) {
 		let object =
-			anObject instanceof PowerlangObjectWrapper
+			anObject instanceof LMRObjectWrapper
 				? anObject.wrappee()
 				: anObject;
 		return this._wrappee == object;
@@ -110,7 +110,7 @@ let PowerlangObjectWrapper = class {
 	send(selector, args = []) {
 		let _arguments, result, _class;
 		_arguments = args.map((a) => {
-			return a instanceof PowerlangObjectWrapper ? a.wrappee() : a;
+			return a instanceof LMRObjectWrapper ? a.wrappee() : a;
 		});
 		result = this._runtime.sendLocal_to_with_(
 			selector,
@@ -120,8 +120,8 @@ let PowerlangObjectWrapper = class {
 		if (!(result instanceof LMRObject)) return result;
 		_class =
 			this._runtime.sendLocal_to_("isSpecies", result) === this._runtime.true() ?
-				PowerlangSpeciesWrapper
-				: PowerlangObjectWrapper;
+				LMRSpeciesWrapper
+				: LMRObjectWrapper;
 		return _class.on_runtime_(result, this._runtime);
 	}
 
@@ -149,7 +149,7 @@ let PowerlangObjectWrapper = class {
 
 	objectClass() {
 		let _class = this._runtime.sendLocal_to_("class", this._wrappee);
-		return PowerlangSpeciesWrapper.on_runtime_(_class, this._runtime);
+		return LMRSpeciesWrapper.on_runtime_(_class, this._runtime);
 	}
 
 	respondsTo_(aSymbol) {
@@ -178,4 +178,4 @@ let PowerlangObjectWrapper = class {
 	}
 };
 
-export default PowerlangObjectWrapper;
+export default LMRObjectWrapper;

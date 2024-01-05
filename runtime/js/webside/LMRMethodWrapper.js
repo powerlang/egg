@@ -1,6 +1,6 @@
-import PowerlangObjectWrapper from "./PowerlangObjectWrapper.js";
+import LMRObjectWrapper from "./LMRObjectWrapper.js";
 
-let PowerlangMethodWrapper = class extends PowerlangObjectWrapper {
+let LMRMethodWrapper = class extends LMRObjectWrapper {
 	asWebsideJson() {
 		let json = super.asWebsideJson();
 		try {
@@ -44,4 +44,4 @@ let PowerlangMethodWrapper = class extends PowerlangObjectWrapper {
 	}
 };
 
-export default PowerlangMethodWrapper;
+export default LMRMethodWrapper;
