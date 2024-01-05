@@ -115,7 +115,7 @@ Collection >> asSortedCollection: aBlock [
 
 { #category : #printing }
 Collection >> basicPrintOn: aStream [
-	Recursion
+	self disableCode: [Recursion
 		checkOn: self
 		while: [
 			self class printOn: aStream.
@@ -126,7 +126,13 @@ Collection >> basicPrintOn: aStream [
 			aStream nextPut: $)]
 		onSignal: [:e | 
 			aStream nextPutAll: e description.
-			^self]
+			^self]].
+	self class printOn: aStream.
+	aStream nextPut: $(.
+	self
+		do: [:element | element printOn: aStream]
+		separatedBy: [aStream space].
+	aStream nextPut: $)
 ]
 
 { #category : #enumerating }
