@@ -99,6 +99,27 @@ StackedEvaluationContext >> buildMethodFrameFor: receiver code: code environment
 ]
 
 { #category : #services }
+StackedEvaluationContext >> clone [
+
+	| copy |
+	copy := stack class new: stack size.
+	copy
+		replaceFrom: 1
+		to: stack size
+		with: stack
+		startingAt: 1.
+	^ self class new
+		  system: system;
+		  regPC: pc;
+		  regBP: regBP;
+		  regSP: regSP;
+		  stack: copy;
+		  receiver: regS;
+		  method: regM;
+		  environment: regE
+]
+
+{ #category : #services }
 StackedEvaluationContext >> dropOperands: anInteger [
 	regSP := regSP + anInteger
 ]
@@ -106,6 +127,12 @@ StackedEvaluationContext >> dropOperands: anInteger [
 { #category : #initialization }
 StackedEvaluationContext >> environment [
 	^regE
+]
+
+{ #category : #initialization }
+StackedEvaluationContext >> environment: array [
+
+	regE := array
 ]
 
 { #category : #initialization }
@@ -290,8 +317,20 @@ StackedEvaluationContext >> receiver [
 ]
 
 { #category : #initialization }
+StackedEvaluationContext >> receiver: object [
+
+	regS := object
+]
+
+{ #category : #initialization }
 StackedEvaluationContext >> regBP [
 	^ regBP
+]
+
+{ #category : #initialization }
+StackedEvaluationContext >> regBP: integer [
+
+	regBP := integer
 ]
 
 { #category : #accessing }
@@ -307,6 +346,12 @@ StackedEvaluationContext >> regPC [
 { #category : #accessing }
 StackedEvaluationContext >> regPC: anInteger [ 
 	pc := anInteger
+]
+
+{ #category : #accessing }
+StackedEvaluationContext >> regSP: integer [
+
+	regSP := integer
 ]
 
 { #category : #services }
@@ -330,6 +375,11 @@ StackedEvaluationContext >> secondArgument [
 { #category : #initialization }
 StackedEvaluationContext >> self [
 	^ regS
+]
+
+{ #category : #services }
+StackedEvaluationContext >> stack: array [
+	stack := array
 ]
 
 { #category : #initialization }
