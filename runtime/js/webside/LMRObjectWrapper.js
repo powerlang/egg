@@ -50,6 +50,12 @@ let LMRObjectWrapper = class {
 		return res;
 	}
 
+	static on_runtime_id_(anLMRObject, aPowerlangLMR, id) {
+		let res = this.on_runtime_(anLMRObject, aPowerlangLMR);
+		res._id = id;
+		return res;
+	}
+
 	_equal(anObject) {
 		let object =
 			anObject instanceof LMRObjectWrapper
@@ -85,7 +91,7 @@ let LMRObjectWrapper = class {
 	}
 
 	asWebsideJson() {
-		let json = { id: this.id, printString: this.printString() };
+		let json = { id: this._id, printString: this.printString() };
 		try {
 			let species = this.objectClass();
 			let variable = species.isVariable();
