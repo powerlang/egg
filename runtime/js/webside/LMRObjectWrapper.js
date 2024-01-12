@@ -2,7 +2,7 @@ import LMRByteObject from "../interpreter/LMRByteObject.js";
 import LMRObject from "../interpreter/LMRObject.js";
 import LMRSmallInteger from "../interpreter/LMRSmallInteger.js";
 
-let PowerlangSpeciesWrapper;
+let LMRSpeciesWrapper;
 
 let selectorFor = function (selector, args) {
 	if (args.length == 0) return selector;
@@ -11,7 +11,7 @@ let selectorFor = function (selector, args) {
 	throw "should be implemented";
 };
 
-let PowerlangObjectWrapper = class {
+let LMRObjectWrapper = class {
 	/*				if (typeof prop == "function")
 						return function(...args) {
 							return prop.call(args);
@@ -21,7 +21,6 @@ let PowerlangObjectWrapper = class {
 	constructor() {
 		this._wrappee = nil;
 		this._runtime = nil;
-		this.id = nil;
 		return new Proxy(this, {
 			get(target, p) {
 				if (p in target) {
@@ -38,17 +37,11 @@ let PowerlangObjectWrapper = class {
 		});
 	}
 
-	static setPowerlangSpeciesWrapper(obj) {
-		PowerlangSpeciesWrapper = obj;
+	static setLMRSpeciesWrapper(obj) {
+		LMRSpeciesWrapper = obj;
 	}
 
 	initialize() {}
-
-	static on_runtime_id_(anLMRObject, aPowerlangLMR, anIID) {
-		let res = this.on_runtime_(anLMRObject, aPowerlangLMR);
-		res.id = anIID;
-		return res;
-	}
 
 	static on_runtime_(anLMRObject, aPowerlangLMR) {
 		let res = this.new();
@@ -59,7 +52,7 @@ let PowerlangObjectWrapper = class {
 
 	_equal(anObject) {
 		let object =
-			anObject instanceof PowerlangObjectWrapper
+			anObject instanceof LMRObjectWrapper
 				? anObject.wrappee()
 				: anObject;
 		return this._wrappee == object;
@@ -81,29 +74,29 @@ let PowerlangObjectWrapper = class {
 		return nil;
 	}
 
+	printString() {
+		let print;
+		try {
+			print = this.send("printString").asLocalObject();
+		} catch (error) {
+			print = "Cannot print object";
+		}
+		return print;
+	}
+
 	asWebsideJson() {
-		let species = this.objectClass();
-		let variable = species.isVariable();
-		let name = species.name();
-		let printed;
-		//This check should be removed once we solve Recurson exception in Collection printing...
-		let trouble = species
-			.withAllSuperclasses()
-			.find((c) => c.notNil() && c.name() == "Collection");
-		printed = trouble
-			? "a " + name
-			: this._runtime
-					.sendLocal_to_("printString", this._wrappee)
-					.asLocalString();
-		return { 
-			id: this.id,
-			class: name,
-			indexable: variable,
-			size: variable ? this.size().wrappee().value() : 0,
-			printString: printed,
-			hasNamedSlots: species.instancesHavePointers().asLocalObject(),
-			hasIndexedSlots: this.hasIndexedSlots().asLocalObject(),
-		};
+		let json = { id: this.id, printString: this.printString() };
+		try {
+			let species = this.objectClass();
+			let variable = species.isVariable();
+			json.class = species.name();
+			json.indexable = variable;
+			json.size = variable ? this.size().wrappee().value() : 0;
+			json.hasNamedSlots = species.instancesHavePointers().asLocalObject();
+			json.hasIndexedSlots = this.hasIndexedSlots().asLocalObject();
+		}
+		catch (error) { json.error = error.message }
+		return json;
 	}
 
 	displayString() {
@@ -117,7 +110,7 @@ let PowerlangObjectWrapper = class {
 	send(selector, args = []) {
 		let _arguments, result, _class;
 		_arguments = args.map((a) => {
-			return a instanceof PowerlangObjectWrapper ? a.wrappee() : a;
+			return a instanceof LMRObjectWrapper ? a.wrappee() : a;
 		});
 		result = this._runtime.sendLocal_to_with_(
 			selector,
@@ -126,10 +119,9 @@ let PowerlangObjectWrapper = class {
 		);
 		if (!(result instanceof LMRObject)) return result;
 		_class =
-			this._runtime.sendLocal_to_("isSpecies", result) ===
-			this._runtime.true()
-				? PowerlangSpeciesWrapper
-				: PowerlangObjectWrapper;
+			this._runtime.sendLocal_to_("isSpecies", result) === this._runtime.true() ?
+				LMRSpeciesWrapper
+				: LMRObjectWrapper;
 		return _class.on_runtime_(result, this._runtime);
 	}
 
@@ -157,12 +149,11 @@ let PowerlangObjectWrapper = class {
 
 	objectClass() {
 		let _class = this._runtime.sendLocal_to_("class", this._wrappee);
-
-		return PowerlangSpeciesWrapper.on_runtime_(_class, this._runtime);
+		return LMRSpeciesWrapper.on_runtime_(_class, this._runtime);
 	}
 
-	respondsTo(aSymbol) {
-		return this.objectClass().canUnderstand(aSymbol);
+	respondsTo_(aSymbol) {
+		return this.class().canUnderstand_(aSymbol);
 	}
 
 	runtime_(aPowerlangLMR) {
@@ -177,10 +168,6 @@ let PowerlangObjectWrapper = class {
 		);
 	}
 
-	stDisplayString() {
-		return this.printString();
-	}
-
 	wrappee() {
 		return this._wrappee;
 	}
@@ -191,4 +178,4 @@ let PowerlangObjectWrapper = class {
 	}
 };
 
-export default PowerlangObjectWrapper;
+export default LMRObjectWrapper;

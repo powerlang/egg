@@ -1,7 +1,5 @@
 import express from "express";
 import cors from "cors";
-import PowerlangObjectWrapper from "./PowerlangObjectWrapper.js";
-import aPowerlangSpeciesWrapper from "./PowerlangSpeciesWrapper.js";
 import WebsideAPI from "./WebsideAPI.js";
 import { v4 as uuidv4 } from "uuid";
 

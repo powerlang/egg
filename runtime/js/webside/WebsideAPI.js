@@ -1,7 +1,8 @@
-import PowerlangObjectWrapper from "./PowerlangObjectWrapper.js";
-import aPowerlangSpeciesWrapper from "./PowerlangSpeciesWrapper.js";
+import LMRObjectWrapper from "./LMRObjectWrapper.js";
+// This is required due to circular references between LMRObjectWrapper and LMRSpeciesWrapper..
+import "./LMRSpeciesWrapper.js";
 import PowertalkEvaluatorError from "../interpreter/PowertalkEvaluatorError.js";
-import PowerlangMethodWrapper from "./PowerlangMethodWrapper.js";
+import LMRMethodWrapper from "./LMRMethodWrapper.js";
 
 class WebsideAPI extends Object {
 	constructor(server, request, response) {
@@ -308,7 +309,6 @@ class WebsideAPI extends Object {
 		try {
 			this.compile(source, "Object");
 			object = this.runtime.sendLocal_to_("doIt", this.runtime.nil());
-			console.log(object.toString())
 			//this.runtime.sendLocal_to_with_("removeSelector:", species, [selector]);
 			object = this.wrapWithId(object, id);
 			if (!sync || pin) {
@@ -350,17 +350,16 @@ class WebsideAPI extends Object {
 		let error = this.server.evaluations[id];
 		let frames = error.context.backtrace();
 		let json = frames.map((frame, index) => {
-			let method = PowerlangMethodWrapper.on_runtime_(
+			let method = LMRMethodWrapper.on_runtime_(
 				frame[0],
 				this.runtime
 			);
-			let receiver = PowerlangObjectWrapper.on_runtime_(
+			let receiver = LMRObjectWrapper.on_runtime_(
 				frame[1],
 				this.runtime
 			);
-			let label =
-				receiver.objectClass().name() + ">>" + method.selector();
-			return { index: index, label, label };
+			let label = receiver.objectClass().name() + ">>" + method.selector();
+			return { index: index, label: label };
 		});
 		this.respondWithJson(json);
 	}
@@ -372,13 +371,10 @@ class WebsideAPI extends Object {
 		let index = this.requestedIndex();
 		let error = this.server.evaluations[id];
 		let frames = error.context.backtrace();
-		if (index > frames.lengh - 1) return this.notFound();
+		if (index > frames.length - 1) return this.notFound();
 		let frame = frames[index];
-		let method = PowerlangMethodWrapper.on_runtime_(frame[0], this.runtime);
-		let receiver = PowerlangObjectWrapper.on_runtime_(
-			frame[1],
-			this.runtime
-		);
+		let method = LMRMethodWrapper.on_runtime_(frame[0], this.runtime);
+		let receiver = LMRObjectWrapper.on_runtime_(frame[1], this.runtime);
 		let label = receiver.objectClass().name() + ">>" + method.selector();
 		let json = {
 			index: index,
@@ -395,21 +391,27 @@ class WebsideAPI extends Object {
 		let _debugger = this.server.debuggers[id];
 		if (!_debugger) return this.notFound();
 		let index = this.requestedIndex();
-		let frame = { bindings: [] };
-		let bindings = frame.bindings.map((b) => {
-			let type = b.isTemporary()
-				? "temporary"
-				: b.isArgument()
-					? "argument"
-					: "variable";
-			let print;
-			try {
-				print = b.object.printString();
-			} catch (error) {
-				print = "Cannot print object";
-			}
-			return { name: b.name, value: print, type: type };
-		});
+		let error = this.server.evaluations[id];
+		let context = error.context;
+		let frames = context.backtrace();
+		if (index > frames.length - 1) return this.notFound();
+		let frame = frames[index];
+		let code = LMRMethodWrapper.on_runtime_(frame[0], this.runtime);
+		let receiver = LMRObjectWrapper.on_runtime_(frame[1], this.runtime);
+		let bindings = [{ name: "self", type: "variable", value: receiver.printString() }];
+		let object, wrapper, binding;
+		for (let i = 1; i <= code.argumentCount().asLocalObject(); i++) {
+			object = context.argumentAt_frameIndex_(i, index + 1);
+			wrapper = LMRObjectWrapper.on_runtime_(object, this.runtime);
+			binding = { name: "argument" + i, type: "argument", value: wrapper.printString() };
+			bindings.push(binding);
+		}
+		for (let i = 1; i <= code.tempCount().asLocalObject(); i++) {
+			object = context.stackTemporaryAt_frameIndex_(i, index + 1);
+			wrapper = LMRObjectWrapper.on_runtime_(object, this.runtime);
+			binding = { name: "temporary" + i, type: "temporary", value: wrapper.printString() };
+			bindings.push(binding);
+		}
 		this.respondWithJson(bindings);
 	}
 
@@ -426,11 +428,11 @@ class WebsideAPI extends Object {
 
 	//Private...
 	wrapWithId(object, id) {
-		return PowerlangObjectWrapper.on_runtime_id_(object, this.runtime, id);
+		return LMRObjectWrapper.on_runtime_id_(object, this.runtime, id);
 	}
 
 	wrap(object) {
-		return PowerlangObjectWrapper.on_runtime_(object, this.runtime);
+		return LMRObjectWrapper.on_runtime_(object, this.runtime);
 	}
 
 	defaultRootClass() {
