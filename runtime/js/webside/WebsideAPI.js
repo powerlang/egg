@@ -514,8 +514,8 @@ class WebsideAPI extends Object {
 		let root = this.defaultRootClass();
 		return root
 			.withAllSubspecies()
-			.filter((c) => c.includesSelector_(symbol))
-			.map((c) => c.methodFor_(symbol));
+			.filter((c) => c.includesSelector(symbol))
+			.map((c) => c.methodFor(symbol));
 	}
 
 	queriedAccessing() {

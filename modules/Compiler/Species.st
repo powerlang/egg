@@ -7,9 +7,9 @@ Extension { #name : #Species }
 
 { #category : '*Compiling' }
 Species >> compile: aString [
-	| result |
-	result := SCompiler compile: aString in: class.
-	result method ifNotNil: [:m | m install ]
+	| method |
+	method := SCompiler compile: aString in: self.
+	method ifNotNil: [method install]
 ]
 
 

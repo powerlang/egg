@@ -181,7 +181,17 @@ let LMRSpeciesWrapper = class extends LMRObjectWrapper {
 		});
 	}
 
-	includesSelector_(aSymbol) {
+	canUnderstand(aSymbol) {
+		let symbol;
+		symbol = cachedSymbols[aSymbol];
+		if (!symbol) {
+			symbol = this._runtime.addSymbol_(aSymbol);
+			cachedSymbols[aSymbol] = symbol;
+		}
+		return this.send("canUnderstand:", [symbol]).asLocalObject();
+	}
+
+	includesSelector(aSymbol) {
 		let symbol;
 		symbol = cachedSymbols[aSymbol];
 		if (!symbol) {
@@ -195,7 +205,7 @@ let LMRSpeciesWrapper = class extends LMRObjectWrapper {
 		return this.send("isVariable").asLocalObject();
 	}
 
-	methodFor_(aSymbol) {
+	methodFor(aSymbol) {
 		let symbol;
 		symbol = cachedSymbols[aSymbol];
 		if (!symbol) {

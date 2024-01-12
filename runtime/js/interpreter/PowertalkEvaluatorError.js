@@ -9,5 +9,4 @@ let PowertalkEvaluatorError = class extends Error {
 	}
 };
 
-export default PowertalkEvaluatorError
-
+export default PowertalkEvaluatorError;
