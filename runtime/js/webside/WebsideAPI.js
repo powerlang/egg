@@ -310,7 +310,7 @@ class WebsideAPI extends Object {
 			this.compile(source, "Object");
 			object = this.runtime.sendLocal_to_("doIt", this.runtime.nil());
 			//this.runtime.sendLocal_to_with_("removeSelector:", species, [selector]);
-			object = this.wrap(object);
+			object = this.wrapWithId(object, id);
 			if (!sync || pin) {
 				this.server.pinnedObjects[id] = object;
 			}
