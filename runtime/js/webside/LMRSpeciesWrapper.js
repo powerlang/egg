@@ -1,13 +1,13 @@
-import PowerlangMethodWrapper from "./PowerlangMethodWrapper.js";
-import PowerlangObjectWrapper from "./PowerlangObjectWrapper.js";
-//import SCompiler from './SCompiler.js';
+import LMRMethodWrapper from "./LMRMethodWrapper.js";
+import LMRObjectWrapper from "./LMRObjectWrapper.js";
+
 const cachedSymbols = {};
 
-let PowerlangSpeciesWrapper = class extends PowerlangObjectWrapper {
+let LMRSpeciesWrapper = class extends LMRObjectWrapper {
 	_shiftRight(aSymbol) {
 		let symbol;
 		symbol = this._runtime.symbolFromLocal_(aSymbol);
-		return PowerlangMethodWrapper.on_runtime_(
+		return LMRMethodWrapper.on_runtime_(
 			this.send("shiftRight", [symbol]).wrappee(),
 			this._runtime
 		);
@@ -24,7 +24,7 @@ let PowerlangSpeciesWrapper = class extends PowerlangObjectWrapper {
 	allSubclasses() {
 		const slots = this.send("allSubclasses").asArray().wrappee().slots();
 		const mapped = slots.map((c) =>
-			PowerlangSpeciesWrapper.on_runtime_(c, this._runtime)
+			LMRSpeciesWrapper.on_runtime_(c, this._runtime)
 		);
 
 		return mapped;
@@ -33,7 +33,7 @@ let PowerlangSpeciesWrapper = class extends PowerlangObjectWrapper {
 	allSubspecies() {
 		const slots = this.send("allSubspecies").asArray().wrappee().slots();
 		const mapped = slots.map((c) =>
-			PowerlangSpeciesWrapper.on_runtime_(c, this._runtime)
+			LMRSpeciesWrapper.on_runtime_(c, this._runtime)
 		);
 
 		return mapped;
@@ -44,7 +44,7 @@ let PowerlangSpeciesWrapper = class extends PowerlangObjectWrapper {
 			.asArray()
 			.wrappee()
 			.slots()
-			.map((c) => PowerlangSpeciesWrapper.on_runtime_(c, this._runtime));
+			.map((c) => LMRSpeciesWrapper.on_runtime_(c, this._runtime));
 	}
 
 	asWebsideJson() {
@@ -213,7 +213,7 @@ let PowerlangSpeciesWrapper = class extends PowerlangObjectWrapper {
 			cachedSymbols[aSymbol] = symbol;
 		}
 		let method = this.send(">>", [symbol]);
-		return PowerlangMethodWrapper.on_runtime_(
+		return LMRMethodWrapper.on_runtime_(
 			method.wrappee(),
 			this._runtime
 		);
@@ -256,7 +256,7 @@ let PowerlangSpeciesWrapper = class extends PowerlangObjectWrapper {
 			.asArray()
 			.wrappee()
 			.slots()
-			.map((m) => PowerlangMethodWrapper.on_runtime_(m, this._runtime));
+			.map((m) => LMRMethodWrapper.on_runtime_(m, this._runtime));
 	}
 
 	name() {
@@ -279,7 +279,7 @@ let PowerlangSpeciesWrapper = class extends PowerlangObjectWrapper {
 			.asArray()
 			.wrappee()
 			.slots()
-			.map((c) => PowerlangSpeciesWrapper.on_runtime_(c, this._runtime));
+			.map((c) => LMRSpeciesWrapper.on_runtime_(c, this._runtime));
 	}
 
 	withAllSubclasses() {
@@ -295,6 +295,6 @@ let PowerlangSpeciesWrapper = class extends PowerlangObjectWrapper {
 	}
 };
 
-PowerlangObjectWrapper.setPowerlangSpeciesWrapper(PowerlangSpeciesWrapper);
+LMRObjectWrapper.setLMRSpeciesWrapper(LMRSpeciesWrapper);
 
-export default PowerlangSpeciesWrapper;
+export default LMRSpeciesWrapper;
