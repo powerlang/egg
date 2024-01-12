@@ -908,6 +908,11 @@ PowertalkLMR >> staticBindingForIvar: aSymbol in: receiver [
 ]
 
 { #category : #initialization }
+PowertalkLMR >> storeAssociation: association value: anObject [
+	association slotAt: 2 put: anObject
+]
+
+{ #category : #initialization }
 PowertalkLMR >> stringClass: anLMRObject [
 	stringClass := anLMRObject
 ]
@@ -921,12 +926,16 @@ PowertalkLMR >> superBehaviorOf: class [
 
 { #category : #initialization }
 PowertalkLMR >> symbolFromLocal: aSymbol [
+
 	| bytes table symbol |
-	knownSymbols at: aSymbol ifPresent: [ :s | ^s ].
-	bytes := aSymbol asByteArray, #[0].
+	knownSymbols at: aSymbol ifPresent: [ :s | ^ s ].
+	bytes := aSymbol asByteArray , #[ 0 ].
 	table := symbolTable slotAt: 2.
-	2 to: table size do: [:i | symbol := table slotAt: i. symbol == nilObj ifFalse: [symbol bytes = bytes ifTrue: [ ^symbol ] ] ].
-	self error: 'symbol not found'
+	2 to: table size do: [ :i | 
+		symbol := table slotAt: i.
+		symbol == nilObj ifFalse: [ 
+			symbol bytes = bytes ifTrue: [ ^ symbol ] ] ].
+	PowertalkEvaluatorError signal: 'symbol not found' on: interpreter context
 ]
 
 { #category : #initialization }

@@ -21,6 +21,7 @@ let PowerlangObjectWrapper = class {
 	constructor() {
 		this._wrappee = nil;
 		this._runtime = nil;
+		this.id = nil;
 		return new Proxy(this, {
 			get(target, p) {
 				if (p in target) {
@@ -42,6 +43,12 @@ let PowerlangObjectWrapper = class {
 	}
 
 	initialize() {}
+
+	static on_runtime_id_(anLMRObject, aPowerlangLMR, anIID) {
+		let res = this.on_runtime_(anLMRObject, aPowerlangLMR);
+		res.id = anIID;
+		return res;
+	}
 
 	static on_runtime_(anLMRObject, aPowerlangLMR) {
 		let res = this.new();
@@ -76,7 +83,7 @@ let PowerlangObjectWrapper = class {
 
 	asWebsideJson() {
 		let species = this.objectClass();
-		let variable = species.isVariable().asLocalObject();
+		let variable = species.isVariable();
 		let name = species.name();
 		let printed;
 		//This check should be removed once we solve Recurson exception in Collection printing...
@@ -88,7 +95,8 @@ let PowerlangObjectWrapper = class {
 			: this._runtime
 					.sendLocal_to_("printString", this._wrappee)
 					.asLocalString();
-		return {
+		return { 
+			id: this.id,
 			class: name,
 			indexable: variable,
 			size: variable ? this.size().wrappee().value() : 0,
@@ -153,8 +161,8 @@ let PowerlangObjectWrapper = class {
 		return PowerlangSpeciesWrapper.on_runtime_(_class, this._runtime);
 	}
 
-	respondsTo_(aSymbol) {
-		return this.class().canUnderstand(aSymbol);
+	respondsTo(aSymbol) {
+		return this.objectClass().canUnderstand(aSymbol);
 	}
 
 	runtime_(aPowerlangLMR) {
