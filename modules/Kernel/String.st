@@ -780,3 +780,7 @@ String >> zapLfs [
 	^self reject: [:c | c isLf]
 ]
 
+{ #category : #services }
+String >> lines [
+	^ Cr split: self
+]
