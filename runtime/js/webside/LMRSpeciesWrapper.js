@@ -69,6 +69,16 @@ let LMRSpeciesWrapper = class extends LMRObjectWrapper {
 			.map((c) => c.asLocalString());
 	}
 
+	cachedSymbolFor(string) {
+		let symbol;
+		symbol = cachedSymbols[string];
+		if (!symbol || typeof symbol !== "object") {
+			symbol = this._runtime.addSymbol_(string);
+			cachedSymbols[string] = symbol;
+		}
+		return symbol;
+	}
+
 	classVarNames() {
 		return this.send("classVarNames")
 			.asArray()
@@ -182,22 +192,12 @@ let LMRSpeciesWrapper = class extends LMRObjectWrapper {
 	}
 
 	canUnderstand(aSymbol) {
-		let symbol;
-		symbol = cachedSymbols[aSymbol];
-		if (!symbol) {
-			symbol = this._runtime.addSymbol_(aSymbol);
-			cachedSymbols[aSymbol] = symbol;
-		}
+		let symbol = this.cachedSymbolFor(aSymbol);
 		return this.send("canUnderstand:", [symbol]).asLocalObject();
 	}
 
 	includesSelector(aSymbol) {
-		let symbol;
-		symbol = cachedSymbols[aSymbol];
-		if (!symbol) {
-			symbol = this._runtime.addSymbol_(aSymbol);
-			cachedSymbols[aSymbol] = symbol;
-		}
+		let symbol = this.cachedSymbolFor(aSymbol);
 		return this.send("includesSelector:", [symbol]).asLocalObject();
 	}
 
@@ -206,12 +206,7 @@ let LMRSpeciesWrapper = class extends LMRObjectWrapper {
 	}
 
 	methodFor(aSymbol) {
-		let symbol;
-		symbol = cachedSymbols[aSymbol];
-		if (!symbol) {
-			symbol = this._runtime.addSymbol_(aSymbol);
-			cachedSymbols[aSymbol] = symbol;
-		}
+		let symbol = this.cachedSymbolFor(aSymbol);
 		let method = this.send(">>", [symbol]);
 		return LMRMethodWrapper.on_runtime_(
 			method.wrappee(),
