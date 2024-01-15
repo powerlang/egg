@@ -1,7 +1,7 @@
-DMR runtime
+LMR runtime
 ===========
 
-The Dynamic Metacircular Runtime flavor of powerlang is an implementation of a runtime
+The Live Metacircular Runtime flavor of Egg is an implementation of a runtime
 that is completely self hosted. There is no other "VM", the generated image contains
 everything needed to execute its code.
 

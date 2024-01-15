@@ -22,14 +22,14 @@ what is described hereby*
 
 A namespace is an object that maps symbols to objects. In the original ST-80, the
 only "namespace" was Smalltalk object, whereas in Egg different contexts use
-different namespaces, which allow for the coexistance of independent libraries
+different namespaces, which allow for the coexistence of independent libraries
 without the names of one interfering with the names of the other.
 
 
 2.  Modules
 ###########
 
-The main kind of namespaces are modules. A module is a conceptual unit that defines
+A module is a conceptual unit that defines
 a namespace, a series of dependencies, imported names, classes with methods and 
 extension methods. As names defined in a module do not interfere with names defined
 in other module, the symbols of each module's namespace are more tightly coupled than
@@ -37,16 +37,17 @@ in say Smalltalk dictionary. For that reason, and to simplify, Egg classes
 do not use class variables: i.e. instead of having a SecondsPerMinute in the Timestamp
 class, you have SecondsPerMinute in the Kernel::Time module.
 
-Egg allows class methods, but does not have metaclasses. Instead, it adds
-class methods as instance methods of the classes. 
+..
+    Egg allows class methods, but does not have metaclasses. Instead, it adds
+    class methods as instance methods of the classes. 
 
-A similar approach can be taken to remove class methods, and metaclasses altogether,
-by replacing them with module methods: instead of defining :code:`Time>>#current`
-we define :code:`Time>>#currentTime` (Time corresponds to the module not the class).
+    A similar approach can be taken to remove class methods, and metaclasses altogether,
+    by replacing them with module methods: instead of defining :code:`Time>>#current`
+    we define :code:`Time>>#currentTime` (Time corresponds to the module not the class).
 
 
 
-1. Module Methods *(heavily WIP)*
+1. Module Methods *(WIP idea/proposal)*
 ------------------------------------
 
 

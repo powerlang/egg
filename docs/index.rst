@@ -2,18 +2,20 @@
 Welcome to Egg's documentation!
 =====================================
 
-Egg is a research vehicle to explore the implementation of programming
-laguages. While focused on Smalltalk, it aims to be a generic language creation
-toolkit, something you can use to either evolve Smalltalk, or either build
-a new language implementation of choice.
-We provide tools for coding, bootstrapping, compiling, jitting and debugging the
-implementation.
+Egg is a an open source, MIT-licensed implementation of a Smalltalk-80 derived
+programming language. Egg is not strictly a ST80 though. Some egg characteristics
+and intentions are:
 
-Bee Smalltalk serves as a reference implementation using the framework.
-We are implementing an evolution of the classic Smalltalk-80. Something
-adapted to the new kinds of systems that are common these days: from
-embedded to servers, with or without a gui, supporting remote development
-from scratch.
+- It is module-based, where each module has its own namespace (no Smalltalk globals anymore).
+- Modules can be loaded quickly through image segments (without requiring compilation).
+- It is minimal, with the capability to grow dynamically: its kernel has much fewer things than ST80 (i.e. no GUI and no compiler), but because of image-segments those modules can be loaded instantly.
+- Most identifiers are dynamically bound. This implies that, akin to the `#doesNotUnderstand:` message, you can also get a `#doesNotKnow:` message. The implementation uses a cache and is fast (you don't have to worry about performance there :).
+- Module dependencies are stated explicitly, new modules are built through importing components of other modules.
+- Designed to support multiple VMs that allow running on multiple platforms.
+- This includes native JIT-based VMs for popular OSes and JS-based runtimes.
+- For all VMs and OSes, the same Smalltalk code base is used (there might only be small differences if the platform used doesn't support a particular feature).
+- Egg is developed in tandem with Webside, which is the GUI used to develop and debug the Smalltalk code on any platform. This allows to keep Egg minimal, even in platforms such as EggNOS (a successor of SqueakNOS!)
+
 
 
 Design
@@ -31,23 +33,24 @@ the live environment development will be supported as usual in Smalltalk-80
 systems.
 Computation is represented using Smalltalk Expressions (or SExpressions), 
 a lower-level representation of abstract syntax trees (ASTs) that is
-encoded into byte arrays (called astcodes).
+encoded into byte arrays (called treecodes).
 
-Namespaces are supported from the beginning, and form the base of packages.
-Packages are built into (binary) image segments that load very quickly.
+Namespaces are supported from the beginning, and form the base of modules.
+Modules are automatically written into an image segment cache. Image segments
+are stored in a binary format that can be loaded extremely quickly.
 A package distribution system computes dependencies and fetches
 prebuilt image segments for quick setup, update and deployment.
 
 The base system can be used to allow creation of
 different dynamic languages.  In particular, 
-we expect Bee Smalltalk to expand on two different axes: on one hand, it can
+we expect Egg Smalltalk to expand on two different axes: on one hand, it can
 grow to become a full, tightly integrated Smalltalk; on the other hand,
 its kernel can be the base system on top of which we support other
 Smalltalks (or other languages). The main candidate for the latter
-approach is to make the opensmalltalk-vm run on top of Bee kernel, instead
+approach is to make the opensmalltalk-vm run on top of Egg kernel, instead
 of translating it to C and compiling. This would make Squeak/Pharo/Cuis
-run on top of Bee, which could either run self-hosted (if using the DMR)
-or on top of another VM (like the OMR). Below we present a look of different
+run on top of Egg, which could either run self-hosted (if using the LMR, see next section)
+or on top of another VM. Below we present a look of different
 possible mixes and matches of language environments and hosting runtimes.
 
 .. image:: figures/runtime-types.png
@@ -57,26 +60,25 @@ possible mixes and matches of language environments and hosting runtimes.
 Implementation
 **************
 
-Egg-based systems should work on Windows, Linux, Mac, Android and nopsys, 
+Egg-based systems should work on Windows, Linux, Mac, Android and nopsys,
 including embedded platforms.
 64 and 32 bit architectures are the starting point, but if possible we may try
 even smaller.
 
-At least two runtimes are being developed in parallel. The pure DMR (dynamic
-metacircular runtime), and the `Eclipse OMR <https://www.eclipse.org/omr/>`_.
-The DMR is an AOT-based approach, that uses Smalltalk to pre-nativize a Smalltalk
+Different runtimes are being developed in parallel. The pure LMR (live
+metacircular runtime), a VM written in JS (to run Egg in the browser) and
+a native VM written in C++.
+The LMR is an AOT-based approach, that uses Smalltalk to pre-nativize a Smalltalk
 JIT compiler, and then uses that compiler to nativize on the fly other
-Smalltalk code. The OMR is a state-of-the-art C++ runtime engine, that includes
-plugabble interpreters, JIT-compilers and garbage collectors, which can be
-used to support languages like Smalltalk.
+Smalltalk code.
 
 Smalltalk source code is stored on git, using a tonel-like format. We store 
 just code and definitions in the repo, no artifacts.
 Build artifacts go through Continuous Integration from the very beginning.
-Each OS platform is put in a separate namespace and built into separate
-image segments, which are autoloaded according at startup according to the
+Each OS platform is implemented as a separate module and built into separate
+image segments, which are autoloaded at startup according to the
 running platform.
-The system can be debugged remotely through a vdb/gdb connection, which
+The system can be debugged remotely through a Webside, which
 allows both local and remote debugging.
 
 Setup
@@ -113,7 +115,7 @@ Indices and tables
    
    egg/index
    bootstrap/index
-   dmr/dmr
+   lmr/lmr
 ..   :caption: Contents:
 
 * :ref:`genindex`

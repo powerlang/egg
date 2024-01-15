@@ -1,9 +1,9 @@
-ABI of the DMR runtime
+ABI of the LMR runtime
 ======================
 
 
 
-The native code of the DMR follows a series of rules that form an invariant
+The native code of the LMR follows a series of rules that form an invariant
 which must be maintained while executing managed code. An optimizing
 compiler might alter those rules during moments considered atomic, but
 in general the rules apply all the time.
@@ -14,7 +14,7 @@ Then comes performance, which should be take into account too.
 Execution context
 *****************
 
-The DMR is designed as a register machine with a stack. There is a set
+The LMR is designed as a register machine with a stack. There is a set
 of abstract registers, which are mapped to concrete ones depending on
 the target processor ISA:
 
