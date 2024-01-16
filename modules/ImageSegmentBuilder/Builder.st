@@ -71,9 +71,7 @@ Builder >> mapClass: aClass [
 Builder >> mapMethodsOf: aClass [
     | original saved |
     original := aClass methodDictionary.
-	saved := (classes includes: aClass instanceClass)
-		ifTrue: [original collect: [:method | module originalMethodFor: method]]
-		ifFalse: [Dictionary new].
+	saved := original collect: [:method | module originalMethodFor: method].
     saved := saved select: [:method | method notNil].
 	saved do: [:method | self mapMethod: method].
     closure map: original to: saved
