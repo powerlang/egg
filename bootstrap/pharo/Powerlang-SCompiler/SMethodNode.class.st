@@ -76,7 +76,7 @@ SMethodNode >> isMethod [
 
 { #category : #parsing }
 SMethodNode >> literals [
-	| literals v l |
+	| literals v l literalsWithClasses |
 	literals := OrderedCollection new.
 	pragma isUsed
 		ifTrue: [ literals add: pragma name ].
@@ -102,7 +102,10 @@ SMethodNode >> literals [
 				ifTrue: [ literals add: l ].
 			(n isBlockNode andNot: [ n isInlined ])
 				ifTrue: [ literals add: n buildBlock ] ].
-	^ literals removeDuplicates
+	"Pharo thinks symbols and strings are the same. We disagree"
+	literalsWithClasses := literals collect: [ :n | n -> n class ].
+	literalsWithClasses removeDuplicates.
+	^ literalsWithClasses collect: [ :n | n key ].
 ]
 
 { #category : #parsing }
