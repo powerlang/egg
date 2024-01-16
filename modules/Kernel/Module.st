@@ -25,7 +25,8 @@ Class {
 Module >> prepareForSnapshot: aBuilder [
 	aBuilder
 		importNilToken;
-		addBoundary: Symbol symbolTable as: SymbolicReference symbolTable
+		addBoundary: Symbol symbolTable as: SymbolicReference symbolTable;
+		map: overriden to: Dictionary new
 ]
 
 { #category : #services }
@@ -39,6 +40,11 @@ Module >> addExtension: aCompiledMethod [
 	| collection | 
 	collection := extensions at: aCompiledMethod classBinding symbol ifAbsentPut: [OrderedCollection new].
 	collection add: aCompiledMethod.
+]
+
+{ #category : #services }
+Module >> addOverride: aCompiledMethod [
+	overriden at: aCompiledMethod signature put: aCompiledMethod
 ]
 
 { #category : #initializing }
@@ -202,9 +208,12 @@ Module >> justLoaded [
 		key := meta ifTrue: [(s trimTail: ' class') asSymbol] ifFalse: [s].
 		target := namespace at: key ifAbsent: [self _halt].
 		meta ifTrue: [target := target class].
-		methods do: [:m | | extension |
+		methods do: [:m | | current extension |
+			current := target compiledMethodAt: m selector.
 			extension := m asExtensionFor: self.
-			target addSelector: m selector withMethod: extension]
+			m selector == #compile: ifTrue: [extension isExtension _halt].
+			target addSelector: m selector withMethod: extension.
+			current notNil ifTrue: [current module addOverride: current]]
 	]
 ]
 
@@ -215,8 +224,8 @@ Module >> namespace [
 
 { #category : #accessing }
 Module >> originalMethodFor: aCompiledMethod [
-	"TODO: implement. it should look in the overriden methods"
-	^aCompiledMethod
+	aCompiledMethod module == self ifTrue: [^aCompiledMethod].
+	^overriden at: aCompiledMethod signature ifAbsent: nil
 ]
 
 { #category : #accessing }

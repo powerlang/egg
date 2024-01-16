@@ -100,6 +100,7 @@ CompiledMethod >> asExtensionFor: aModule [
 	extension := self class withAll: self literals , {#module -> aModule}.
 	extension
 		format: format;
+		beExtension;
 		selector: selector;
 		sourceObject: source;
 		classBinding: class;
@@ -349,6 +350,7 @@ CompiledMethod >> method [
 
 { #category : #inquiries }
 CompiledMethod >> module [
+	| association |
 	self isExtension ifFalse: [^class module].
  	association := self detect: [:l | l isAssociation and: [l key == #module]] ifNone: nil.
 	^association ifNil: [class module] ifNotNil: [association value]
@@ -424,6 +426,11 @@ CompiledMethod >> selectorAt: index [
 { #category : #accessing }
 CompiledMethod >> sendSites [
 	^optimizedCode sendSites
+]
+
+{ #category : #inquiries }
+CompiledMethod >> signature [
+	^class -> selector
 ]
 
 { #category : #'source code support' }
