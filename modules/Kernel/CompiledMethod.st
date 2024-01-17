@@ -318,6 +318,11 @@ CompiledMethod >> isExtension [
 ]
 
 { #category : #testing }
+CompiledMethod >> isCalloutMethod [
+	^false
+]
+
+{ #category : #testing }
 CompiledMethod >> isFFIMethod [
 	^false
 ]
