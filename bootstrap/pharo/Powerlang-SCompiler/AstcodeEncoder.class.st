@@ -133,6 +133,14 @@ AstcodeEncoder >> encodedEnvironment: aLocalEnvironment [
 ]
 
 { #category : #accessing }
+AstcodeEncoder >> findLiteralIndex: anObject ifAbsent: aBlock [
+	^ method
+		detectIndex: [ :v |
+			v = anObject and: v class = anObject class ]
+		ifNone: aBlock
+]
+
+{ #category : #accessing }
 AstcodeEncoder >> initialize [
 	stream := #[] writeStream
 ]
@@ -169,8 +177,8 @@ AstcodeEncoder >> nextIntegerPut: anInteger [
 { #category : #visiting }
 AstcodeEncoder >> nextLiteralPut: anObject [
 	| index |
-	index := method
-		indexOf: anObject
+	index := self
+		findLiteralIndex: anObject
 		ifAbsent: [ self ASSERT: false ].
 	self nextIntegerPut: index
 ]
@@ -188,8 +196,8 @@ AstcodeEncoder >> nextPutAll: aCollection [
 { #category : #visiting }
 AstcodeEncoder >> nextSymbolPut: aSymbol [
 	| index |
-	index := method
-		indexOf: aSymbol asSymbol
+	index := self
+		findLiteralIndex: aSymbol asSymbol
 		ifAbsent: [ self ASSERT: false ].
 	self nextIntegerPut: index
 ]
@@ -261,7 +269,9 @@ AstcodeEncoder >> visitIdentifier: anIdentifierNode [
 { #category : #visiting }
 AstcodeEncoder >> visitLiteral: aLiteralNode [
 	| index |
-	index := method indexOf: aLiteralNode value.
+	index := self
+		findLiteralIndex: aLiteralNode value
+		ifAbsent: [ 0 ].
 	self
 		nextTypePut: LiteralId;
 		nextIntegerPut: index.
