@@ -230,7 +230,7 @@ RingBasedLMRBootstrapper >> createNewClassFrom: spec in: module [
 { #category : #initialization }
 RingBasedLMRBootstrapper >> createNewMethod: m in: species [
 
-	| smethod size transferred astcodes selector format tliteral md code |
+	| smethod size transferred astcodes selector format tliteral md organizer code category |
 	smethod := SCompiler new compile: m sourceCode.
 	smethod classBinding: species.
 	size := dest newInteger: smethod size.
@@ -256,6 +256,11 @@ RingBasedLMRBootstrapper >> createNewMethod: m in: species [
 	dest sendLocal: #at:put: to: md with: { 
 			selector.
 			transferred }.
+	organizer := dest sendLocal: #organization to: species.
+	category := dest addSymbol: m category.
+	dest sendLocal: #classify:under: to: organizer with: {
+			selector.
+			category }.
 	^ transferred
 ]
 
