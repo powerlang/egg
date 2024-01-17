@@ -353,12 +353,6 @@ DirectJSCodeEmitter >> visitSpecialMessage: message [
 	selector == #- ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message].
 	selector == #* ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message].
 	selector == #/ ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message].
-	selector == #| ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message].
-	selector == #& ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message].
-	selector == #>> ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message].
-	selector == #<< ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message].
-	selector == #bitOr: ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message selector: '|'].
-	selector == #bitAnd: ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message selector: '&'].
 	selector == #bitsAt:
 		ifTrue: [ ^ self visitBitsAt: message ].
 	selector == #ifTrue:
