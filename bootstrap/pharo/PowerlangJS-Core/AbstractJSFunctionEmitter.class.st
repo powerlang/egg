@@ -36,7 +36,7 @@ AbstractJSFunctionEmitter class >> translateIdentifier: aString [
 AbstractJSFunctionEmitter >> isSpecialSelector: selector [
 	"	^ #(ifTrue: ifFalse: #ifTrue:ifFalse: whileTrue whileFalse whileTrue: whileFalse:)"
 
-	^ #(#bitsAt: + - * / & | << >> bitAnd: bitOr: ) includes: selector	" #(ifTrue: ifFalse:) includes: selector"
+	^ #(#bitsAt: + - * /) includes: selector	" #(ifTrue: ifFalse:) includes: selector"
 ]
 
 { #category : #accessing }
@@ -96,6 +96,8 @@ AbstractJSFunctionEmitter >> transpileBinarySelector: selector [
 	selector = #-> ifTrue: [ ^#_arrow ].
 	selector = #<< ifTrue: [ ^#_shiftLeft ].
 	selector = #>> ifTrue: [ ^#_shiftRight ].
+	selector = #& ifTrue: [ ^#bitAnd_ ].
+	selector = #| ifTrue: [ ^#bitOr_ ].
 	selector = #\\ ifTrue: [ ^#_modulo ].
 
 
