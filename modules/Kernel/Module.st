@@ -211,7 +211,6 @@ Module >> justLoaded [
 		methods do: [:m | | current extension |
 			current := target compiledMethodAt: m selector.
 			extension := m asExtensionFor: self.
-			m selector == #compile: ifTrue: [extension isExtension _halt].
 			target addSelector: m selector withMethod: extension.
 			current notNil ifTrue: [current module addOverride: current]]
 	]
