@@ -121,3 +121,13 @@ SMessageNode >> selector: node [
 SMessageNode >> symbol [
 	^selector symbol
 ]
+
+{ #category : #accessing }
+SMessageNode >> inlined: aBoolean [
+	inlined := aBoolean
+]
+
+{ #category : #decoding }
+SMessageNode class >> decodeUsing: anAstcodeDecoder [
+	^anAstcodeDecoder decodeMessage
+]

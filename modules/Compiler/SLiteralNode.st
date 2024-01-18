@@ -46,3 +46,8 @@ SLiteralNode >> value [
 SLiteralNode >> value: anObject [
 	value := anObject
 ]
+
+{ #category : #decoding }
+SLiteralNode class >> decodeUsing: anAstcodeDecoder [
+	^anAstcodeDecoder decodeLiteral
+]

@@ -107,6 +107,11 @@ SScriptNode >> statements [
 ]
 
 { #category : #accessing }
+SScriptNode >> statements: aCollection [
+	statements := aCollection
+]
+
+{ #category : #accessing }
 SScriptNode >> temporaries [
 	^temporaries
 ]

@@ -132,3 +132,8 @@ Binding >> printOn: aStream [
 	super printOn: aStream.
 	aStream nextPutAll: ')'
 ]
+
+{ #category : #decoding }
+Binding class >> decodeUsing: anAstcodeDecoder [
+	^self subclassResponsibility
+]
