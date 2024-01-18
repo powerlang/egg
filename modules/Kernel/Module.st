@@ -25,7 +25,8 @@ Class {
 Module >> prepareForSnapshot: aBuilder [
 	aBuilder
 		importNilToken;
-		addBoundary: Symbol symbolTable as: SymbolicReference symbolTable
+		addBoundary: Symbol symbolTable as: SymbolicReference symbolTable;
+		map: overriden to: Dictionary new
 ]
 
 { #category : #services }
@@ -39,6 +40,11 @@ Module >> addExtension: aCompiledMethod [
 	| collection | 
 	collection := extensions at: aCompiledMethod classBinding symbol ifAbsentPut: [OrderedCollection new].
 	collection add: aCompiledMethod.
+]
+
+{ #category : #services }
+Module >> addOverride: aCompiledMethod [
+	overriden at: aCompiledMethod signature put: aCompiledMethod
 ]
 
 { #category : #initializing }
@@ -194,13 +200,19 @@ Module >> justDefined: aSymbol [
 
 { #category : #services }
 Module >> justLoaded [
-	classes reject: [:cls | classes includes: cls superclass ] thenDo: [:cls | cls superclass addSubclass: cls].
-	extensions keysAndValuesDo: [:s :methods | | meta key cls |
+	classes
+		reject: [:c | classes includes: c superclass]
+		thenDo: [:c | c superclass addSubclass: c].
+	extensions keysAndValuesDo: [:s :methods | | meta key target |
 		meta := s endsWith: ' class'.
 		key := meta ifTrue: [(s trimTail: ' class') asSymbol] ifFalse: [s].
-		cls := namespace at: key ifAbsent: [self _halt].
-		meta ifTrue: [ cls := cls class].
-		methods do: [:cm | cls addSelector: cm selector withMethod: cm ]
+		target := namespace at: key ifAbsent: [self _halt].
+		meta ifTrue: [target := target class].
+		methods do: [:m | | current extension |
+			current := target compiledMethodAt: m selector.
+			extension := m asExtensionFor: self.
+			target addSelector: m selector withMethod: extension.
+			current notNil ifTrue: [current module addOverride: current]]
 	]
 ]
 
@@ -211,8 +223,8 @@ Module >> namespace [
 
 { #category : #accessing }
 Module >> originalMethodFor: aCompiledMethod [
-	"TODO: implement. it should look in the overriden methods"
-	^aCompiledMethod
+	aCompiledMethod module == self ifTrue: [^aCompiledMethod].
+	^overriden at: aCompiledMethod signature ifAbsent: nil
 ]
 
 { #category : #accessing }
