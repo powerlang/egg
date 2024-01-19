@@ -191,9 +191,8 @@ EvaluationContext >> staticBindingForIvar: aSymbol [
 
 { #category : #accessing }
 EvaluationContext >> staticBindingForMvar: symbol [
-	| species module |
-	species := system methodClassBinding: self method.
-	module := system speciesModule: species.
+	| module |
+	module := system methodModule: self method.
 	^ self staticBindingFor: symbol inModule: module
 ]
 

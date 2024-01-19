@@ -108,6 +108,12 @@ PowertalkRingRuntime >> executableCodeWork: code [
 ]
 
 { #category : #services }
+PowertalkRingRuntime >> extensionMethodModule: method [
+
+	^ method module
+]
+
+{ #category : #services }
 PowertalkRingRuntime >> homeEnvironmentOf: aClosureMap [
 	^ aClosureMap slotAt: 2
 ]
@@ -236,6 +242,12 @@ PowertalkRingRuntime >> methodExecutableCode: method put: anObject [
 PowertalkRingRuntime >> methodFor: aSymbol in: anRGBehavior [
 	overrides at: anRGBehavior->aSymbol ifPresent: [:m | ^m].
 	^anRGBehavior methodNamed: aSymbol
+]
+
+{ #category : #services }
+PowertalkRingRuntime >> methodIsExtension: method [
+
+	^ method isExtension
 ]
 
 { #category : #services }

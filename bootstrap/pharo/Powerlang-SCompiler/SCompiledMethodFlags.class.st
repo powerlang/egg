@@ -9,6 +9,7 @@ Class {
 		'EnvCount',
 		'HasEnvironment',
 		'HasFrame',
+		'IsExtension',
 		'TempCount'
 	],
 	#category : #'Powerlang-SCompiler-Backend'
@@ -16,6 +17,7 @@ Class {
 
 { #category : #'class initialization' }
 SCompiledMethodFlags class >> initialize [
+
 	ArgCount := 1 thru: 6.
 	BlockCount := 7 thru: 13.
 	TempCount := 14 thru: 21.
@@ -23,5 +25,6 @@ SCompiledMethodFlags class >> initialize [
 	HasEnvironment := 1 bitShift: 23 - 1.
 	HasFrame := 1 bitShift: 24 - 1.
 	Debuggable := 1 bitShift: 25 - 1.
-	EnvCount := 26 thru: 31
+	EnvCount := 26 thru: 31.
+	IsExtension := 1 bitShift: 32 - 1
 ]
