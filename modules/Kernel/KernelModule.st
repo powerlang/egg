@@ -12,7 +12,8 @@ Class {
 		'entrypoint',
 		'loadedModules',
 		'moduleLoaders',
-		'host'
+		'host',
+		'CRITICAL'
 	],
 	#category : #Kernel
 }
@@ -46,6 +47,7 @@ KernelModule >> bootstrap [
 	LargeInteger initializeBase.
 	LargeNegativeInteger initializeConstants.
 	SmallInteger initializeConstants.
+	CRITICAL := true.
 	cachedLookups := Dictionary new.
 	shift := WordSize = 8 ifTrue: [3] ifFalse: [2].
 	namespace 
@@ -70,6 +72,16 @@ KernelModule >> bootstrap [
 { #category : #initialization }
 KernelModule >> addModuleLoader: aModuleLoader [
 	moduleLoaders add: aModuleLoader
+]
+
+{ #category : #services }
+KernelModule >> critical: aBlock [
+	"critical meaning is: run without GC and without interrupts"
+	prev := CRITICAL.
+	CRITICAL := true.
+	result := aBlock value.
+	CRITICAL := prev.
+	aBlock value
 ]
 
 KernelModule >> entry: argc argv: argv [
