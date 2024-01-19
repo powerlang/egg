@@ -190,6 +190,12 @@ SCompiledMethod >> isDebuggable [
 ]
 
 { #category : #constants }
+SCompiledMethod >> isExtension [
+
+	^ format anyMask: IsExtension
+]
+
+{ #category : #constants }
 SCompiledMethod >> isFrameless [
 	^ self hasFrame not
 ]
@@ -197,6 +203,16 @@ SCompiledMethod >> isFrameless [
 { #category : #constants }
 SCompiledMethod >> literals [
 	^Array withAll: self
+]
+
+{ #category : #accessing }
+SCompiledMethod >> module [
+	| association |
+	self isExtension ifFalse: [^class module].
+ 	association := self last.
+	(association isAssociation and: [association key == #module])
+		ifFalse: [self error: 'extension method ', self signature , ' without module'].
+	^association value
 ]
 
 { #category : #accessing }

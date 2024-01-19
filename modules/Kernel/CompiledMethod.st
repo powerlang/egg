@@ -352,8 +352,10 @@ CompiledMethod >> method [
 CompiledMethod >> module [
 	| association |
 	self isExtension ifFalse: [^class module].
- 	association := self detect: [:l | l isAssociation and: [l key == #module]] ifNone: nil.
-	^association ifNil: [class module] ifNotNil: [association value]
+ 	association := self last.
+	(association isAssociation and: [association key == #module])
+		ifFalse: [self error: 'extension method ', self signature , ' without module'].
+	^association value
 ]
 
 { #category : #accessing }
