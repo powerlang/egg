@@ -41,7 +41,8 @@ Class {
 		'largePositiveIntegerClass',
 		'largeNegativeIntegerClass',
 		'methodSelectorIndex',
-		'compiledCodeExecutableCodeIndex'
+		'compiledCodeExecutableCodeIndex',
+		'floatClass'
 	],
 	#pools : [
 		'SCompiledBlockFlags',
@@ -301,6 +302,12 @@ PowertalkLMR >> fixOverrides [
 				with:
 					{selector.
 					method} ]
+]
+
+{ #category : #initialization }
+PowertalkLMR >> floatClass: anLMRObject [
+
+	floatClass := anLMRObject
 ]
 
 { #category : #initialization }
@@ -578,14 +585,17 @@ PowertalkLMR >> newArraySized: anInteger [
 
 { #category : #initialization }
 PowertalkLMR >> newByteArray: aByteArray [
+
 	| behavior header |
 	behavior := self speciesInstanceBehavior: byteArrayClass.
 	header := LMRObjectHeader new
-		behavior: behavior;
-		bytes: false arrayed: true named: false;
-		size: aByteArray size;
-		hash: 0.
-	^ LMRByteObject new header: header; bytes: aByteArray
+		          behavior: behavior;
+		          bytes: true arrayed: true named: false;
+		          size: aByteArray size;
+		          hash: 0.
+	^ LMRByteObject new
+		  header: header;
+		  bytes: aByteArray
 ]
 
 { #category : #initialization }
@@ -655,6 +665,21 @@ PowertalkLMR >> newExecutableCodeFor: anObject [
 
 	 ^LMRExecutableCode new header: header; code: anObject.
 
+]
+
+{ #category : #initialization }
+PowertalkLMR >> newFloat: aFloat [
+
+	| behavior header |
+	behavior := self speciesInstanceBehavior: floatClass.
+	header := LMRObjectHeader new
+		          behavior: behavior;
+		          bytes: true arrayed: true named: false;
+		          size: 8;
+		          hash: 0.
+	^ LMRByteObject new
+		  header: header;
+		  bytes: aFloat pointerDouble
 ]
 
 { #category : #initialization }

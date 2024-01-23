@@ -7,54 +7,60 @@ Class {
 	#category : #'PowerlangJS-Core'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #services }
 JSTranspiler class >> generateCompilerSegment [
 
-	| image bootstrapper runtime output builder json ws compiler |
+	self generateSegmentFromModuleNamed: 'Compiler'
+]
+
+{ #category : #services }
+JSTranspiler class >> generateKernelSegment [
+
+	self generateSegmentFromModuleNamed: 'Kernel'
+]
+
+{ #category : #services }
+JSTranspiler class >> generateLMRBootstrapper [
+
+	| image |
 	image := PowertalkRingImage fromSpec
 		         wordSize: 8;
 		         genesis;
 		         bootstrap;
 		         fillClasses;
 		         fillSymbols.
-	bootstrapper := image generateLMR.
+	^ image generateLMR
+]
+
+{ #category : #services }
+JSTranspiler class >> generateSTONSegment [
+
+	self generateSegmentFromModuleNamed: 'STON'
+]
+
+{ #category : #services }
+JSTranspiler class >> generateSegmentFromModuleNamed: aString [
+
+	
+	| bootstrapper runtime output builder module json ws |
+	bootstrapper := self generateLMRBootstrapper.
 	runtime := bootstrapper result.
-	output := self imageSegmentDirectory / 'Compiler.json'.
+	output := self imageSegmentDirectory / (aString ,'.json').
 	output ensureCreateFile.
 	bootstrapper useHostModuleLoader.
 	builder := bootstrapper sendLoadModule: #ImageSegmentBuilder.
-	compiler := bootstrapper sendLoadModule: #Compiler.
-	json := runtime sendLocal: #writeJSONModule: to: builder with: {compiler}.
+	module := bootstrapper sendLoadModule: aString asSymbol.
+	json := runtime
+		        sendLocal: #writeJSONModule:
+		        to: builder
+		        with: { module }.
 	output writeStreamDo: [ :stream | 
 		stream truncate.
 		ws := ZnNewLineWriterStream on: stream.
 		ws nextPutAll: json asLocalString ]
 ]
 
-{ #category : #'as yet unclassified' }
-JSTranspiler class >> generateKernelSegment [
-
-	| image bootstrapper runtime output module json ws |
-	image := PowertalkRingImage fromSpec
-		         wordSize: 8;
-		         genesis;
-		         bootstrap;
-		         fillClasses;
-		         fillSymbols.
-	bootstrapper := image generateLMR.
-	runtime := bootstrapper result.
-	output := self imageSegmentDirectory / 'Kernel.json'.
-	output ensureCreateFile.
-	bootstrapper useHostModuleLoader.
-	module := bootstrapper sendLoadModule: #ImageSegmentBuilder.
-	json := runtime sendLocal: #writeJSONKernel to: module.
-	output writeStreamDo: [ :stream | 
-		stream truncate.
-		ws := ZnNewLineWriterStream on: stream.
-		ws nextPutAll: json asLocalString ]
-]
-
-{ #category : #'as yet unclassified' }
+{ #category : #private }
 JSTranspiler class >> imageSegmentDirectory [
 
 	| dir |
@@ -64,7 +70,7 @@ JSTranspiler class >> imageSegmentDirectory [
 	^ dir asFileReference
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #private }
 JSTranspiler class >> interpreterDirectory [
 	"
 		self new outputDirectory path pathString
@@ -73,7 +79,7 @@ JSTranspiler class >> interpreterDirectory [
 	^ self rootDirectory / 'interpreter'
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #private }
 JSTranspiler class >> powerlangInterpreterClasses [
 	^ LMRObject withAllSubclasses
 		,
@@ -101,14 +107,14 @@ JSTranspiler class >> powerlangInterpreterClasses [
 			NativeJSEvaluationContext}
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #private }
 JSTranspiler class >> rootDirectory [
 	| root |
 	root := Smalltalk os environment at: 'POWERLANG_JS_ROOT' ifAbsent: '../../runtime/js'.
 	^ root asFileReference
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #services }
 JSTranspiler class >> transpilePowerlangInterpreter [
 	| transpiler |
 	transpiler := self new.
