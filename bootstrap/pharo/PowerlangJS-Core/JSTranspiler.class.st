@@ -16,7 +16,7 @@ JSTranspiler class >> generateCompilerSegment [
 { #category : #services }
 JSTranspiler class >> generateImageSegmentBuilderSegment [
 
-	self generateSegmentFromModuleNamed: 'ImageSegmentBuilder'
+	self generateSegmentFromModuleNamed: 'ImageSegmentBuilder'; generateSegmentFromModuleNamed: 'ImageSegmentBuilder.JSON'
 ]
 
 { #category : #services }
