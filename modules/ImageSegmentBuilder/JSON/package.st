@@ -3,9 +3,10 @@
     See (MIT) license in root directory.
 "
 
-Package { #name : #ImageSegments,
+Package {
+	#name : #ImageSegmentBuilder.JSON,
 	#classes : [
 		'JSONModule',
-		'Writer'
+		'JSONWriter'
 	]
 }

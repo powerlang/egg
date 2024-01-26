@@ -14,6 +14,12 @@ JSTranspiler class >> generateCompilerSegment [
 ]
 
 { #category : #services }
+JSTranspiler class >> generateImageSegmentBuilderSegment [
+
+	self generateSegmentFromModuleNamed: 'ImageSegmentBuilder'; generateSegmentFromModuleNamed: 'ImageSegmentBuilder.JSON'
+]
+
+{ #category : #services }
 JSTranspiler class >> generateKernelSegment [
 
 	self generateSegmentFromModuleNamed: 'Kernel'
@@ -41,23 +47,20 @@ JSTranspiler class >> generateSTONSegment [
 { #category : #services }
 JSTranspiler class >> generateSegmentFromModuleNamed: aString [
 
-	
 	| bootstrapper runtime output builder module json ws |
 	bootstrapper := self generateLMRBootstrapper.
 	runtime := bootstrapper result.
-	output := self imageSegmentDirectory / (aString ,'.json').
+	output := self imageSegmentDirectory / (aString , '.json').
 	output ensureCreateFile.
 	bootstrapper useHostModuleLoader.
 	builder := bootstrapper sendLoadModule: #ImageSegmentBuilder.
+	runtime sendLocal: #prepareForJSBootstrap to: builder.
 	module := bootstrapper sendLoadModule: aString asSymbol.
-	json := runtime
-		        sendLocal: #writeJSONModule:
-		        to: builder
-		        with: { module }.
+	json := runtime sendLocal: #writeImageSegment to: module.
 	output writeStreamDo: [ :stream | 
 		stream truncate.
 		ws := ZnNewLineWriterStream on: stream.
-		ws nextPutAll: json asLocalString ]
+		ws nextPutAll: json asLocalString ]  
 ]
 
 { #category : #private }

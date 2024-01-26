@@ -4,7 +4,7 @@
 "
 
 Class {
-	#name : #Writer,
+	#name : #JSONWriter,
 	#superclass : #Object,
 	#instVars : [
 		'stream',
@@ -15,47 +15,47 @@ Class {
 		'indexes',
 		'closure'
 	],
-	#category : #'Writer'
+	#category : #'JSONWriter'
 }
 
 { #category : #accessing }
-Writer >> closure: anObjectClosure [
+JSONWriter >> closure: anObjectClosure [
 	closure := anObjectClosure
 ]
 
 { #category : #accessing }
-Writer >> objects: aCollection [
+JSONWriter >> objects: aCollection [
 	objects := aCollection
 ]
 
 { #category : #accessing }
-Writer >> mapping: aDictionary [
+JSONWriter >> mapping: aDictionary [
 	mapping := aDictionary
 ]
 
 { #category : #accessing }
-Writer >> imports: anIdentityDictionary [
+JSONWriter >> imports: anIdentityDictionary [
 	imports := anIdentityDictionary
 ]
 
 { #category : #accessing }
-Writer >> exports: aDictionary [
+JSONWriter >> exports: aDictionary [
 	exports := aDictionary
 ]
 
 { #category : #accessing }
-Writer >> image [
+JSONWriter >> image [
 	^stream contents
 ]
 
 { #category : #initializing }
-Writer >> initialize [
+JSONWriter >> initialize [
 	indexes := IdentityDictionary new.
 	stream := '' writeStream.
 ]
 
 { #category : #closure }
-Writer >> generateIndexes [
+JSONWriter >> generateIndexes [
 	| index |
 	index := 0.
 	objects do: [:o | indexes at: o put: index. index := index + 1].
@@ -65,7 +65,7 @@ Writer >> generateIndexes [
 ]
 
 { #category : #services }
-Writer >> indexOf: anObject [
+JSONWriter >> indexOf: anObject [
 	| path |
 	HashTable nilToken == anObject ifTrue: [^indexes at: closure nilToken].
 	indexes at: anObject ifPresent: [:index | ^index].
@@ -74,17 +74,17 @@ Writer >> indexOf: anObject [
 ]
 
 { #category : #private }
-Writer >> quoted: aSymbol [
+JSONWriter >> quoted: aSymbol [
 	^'"', aSymbol asString, '"'
 ]
 
 { #category : #accessing }
-Writer >> stream: aWriteStream [
+JSONWriter >> stream: aWriteStream [
 	stream := aWriteStream
 ]
 
 { #category : #services }
-Writer >> write [
+JSONWriter >> write [
 	self generateIndexes.
 	stream nextPutAll: '{ '; crtab; nextPutAll: '"objects" : ['; crtab: 2.
 	self writeObjects.
@@ -96,7 +96,7 @@ Writer >> write [
 ]
 
 { #category : #writing }
-Writer >> writeExports [
+JSONWriter >> writeExports [
 	exports keys
 		do: [ :name | | object index |
 			object := exports at: name.
@@ -109,13 +109,13 @@ Writer >> writeExports [
 ]
 
 { #category : #'*snapshotting' }
-Writer >> writeImportLinker: linker [
+JSONWriter >> writeImportLinker: linker [
 	linker ifNil: [^self].
 	stream nextPutAll: ', '; nextPutAll: (self quoted: linker)
 ]
 
 { #category : #'*snapshotting' }
-Writer >> writeImportToken: token [
+JSONWriter >> writeImportToken: token [
 	token isString ifTrue: [^stream nextPutAll: (self quoted: token)].
 	stream nextPutAll: '['.
 	token
@@ -125,7 +125,7 @@ Writer >> writeImportToken: token [
 ]
 
 { #category : #writing }
-Writer >> writeImport: aSymbolicReference [
+JSONWriter >> writeImport: aSymbolicReference [
 	stream nextPutAll: '['.
 	self
 		writeImportToken: aSymbolicReference token;
@@ -134,14 +134,14 @@ Writer >> writeImport: aSymbolicReference [
 ]
 
 { #category : #writing }
-Writer >> writeImports [
+JSONWriter >> writeImports [
 	imports
 		do: [ :symref | self writeImport: symref ]
 		separatedBy: [stream nextPutAll: ', '; crtab: 2]
 ]
 
 { #category : #writing }
-Writer >> writeObject: obj [
+JSONWriter >> writeObject: obj [
 	obj _isSmallInteger 
 		ifTrue: [^stream nextPutAll: '3, ', obj printString].
 	
@@ -149,14 +149,14 @@ Writer >> writeObject: obj [
 ]
 
 { #category : #writing }
-Writer >> writeObjectBody: obj [
+JSONWriter >> writeObjectBody: obj [
 	obj _isBytes
 		ifTrue: [ self writeObjectBytes: obj ]
 		ifFalse: [ self writeObjectSlots: obj ]
 ]
 
 { #category : #writing }
-Writer >> writeObjectBytes: obj [
+JSONWriter >> writeObjectBytes: obj [
 	| current aligned |
 	stream nextPutAll: '2, ['.
 	(1 to: obj _size) 
@@ -166,7 +166,7 @@ Writer >> writeObjectBytes: obj [
 ]
 
 { #category : #accessing }
-Writer >> writeObjectHeader: obj [
+JSONWriter >> writeObjectHeader: obj [
 	| behavior |
 	behavior := self indexOf: obj behavior.
 	stream 
@@ -177,7 +177,7 @@ Writer >> writeObjectHeader: obj [
 ]
 
 { #category : #accessing }
-Writer >> writeObjectSlots: obj [
+JSONWriter >> writeObjectSlots: obj [
 	stream nextPutAll: '1, ['.
 	(1 to: obj _pointersSize)
 		do: [ :i | | slot index | 
@@ -189,7 +189,7 @@ Writer >> writeObjectSlots: obj [
 ]
 
 { #category : #accessing }
-Writer >> writeObjects [
+JSONWriter >> writeObjects [
 	objects
 		do: [ :obj | 
 			stream nextPut: $[.
@@ -199,12 +199,12 @@ Writer >> writeObjects [
 ]
 
 { #category : #writing }
-Writer >> writeTo: aStream [
+JSONWriter >> writeTo: aStream [
 	self stream: aStream; write.
 ]
 
 { #category : #writing }
-Writer >> writeToFile: filename [
+JSONWriter >> writeToFile: filename [
 	filename binaryWriteStreamDo: [ :s | self writeTo: byteStream ]
 ]
 

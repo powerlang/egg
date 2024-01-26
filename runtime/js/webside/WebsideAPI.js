@@ -45,7 +45,7 @@ class WebsideAPI extends Object {
 
 	//General endpoints
 	dialect() {
-		this.respondWithData("PowerlangJS");
+		this.respondWithData("EggJS");
 	}
 
 	//Changes endpoints
