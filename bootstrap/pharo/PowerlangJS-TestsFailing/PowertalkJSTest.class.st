@@ -29,6 +29,6 @@ PowertalkJSTest >> test010WriteKernelAsJSON [
 	output exists ifTrue: [ output delete ].
 
 	module := bootstrapper sendLoadModule: #ImageSegmentBuilder.
-	json := runtime sendLocal: #writeJSONKernel to: module
+	json := runtime sendLocal: #writeJSONModule: to: module with: { bootstrapper result kernel }
 	"self assert: output exists"
 ]

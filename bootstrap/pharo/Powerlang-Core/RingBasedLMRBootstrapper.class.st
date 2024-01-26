@@ -411,14 +411,15 @@ RingBasedLMRBootstrapper >> initializeEmulationOverrides [
 
 { #category : #initialization }
 RingBasedLMRBootstrapper >> initializeRuntime [
-	| map symbols array method smi block metaclass kernel byteArray string closure behavior lpi lni |
+
+	| map symbols array method smi block metaclass kernel byteArray string closure behavior lpi lni float |
 	symbols := Dictionary new.
-	#(+ - < > <= >= = == not)
-		do: [ :symbol | 
-			map := source newSymbol: symbol.
-			symbols at: symbol put: (mapping at: map) ].
+	#( + - < > <= >= = == not ) do: [ :symbol | 
+		map := source newSymbol: symbol.
+		symbols at: symbol put: (mapping at: map) ].
 	array := mapping at: (source classNamed: #Array).
 	byteArray := mapping at: (source classNamed: #ByteArray).
+		float := mapping at: (source classNamed: #Float).
 	method := mapping at: (source classNamed: #CompiledMethod).
 	block := mapping at: (source classNamed: #CompiledBlock).
 	closure := mapping at: (source classNamed: #Closure).
@@ -432,6 +433,7 @@ RingBasedLMRBootstrapper >> initializeRuntime [
 	dest
 		arrayClass: array;
 		byteArrayClass: byteArray;
+		floatClass: float;
 		methodClass: method;
 		blockClass: block;
 		closureClass: closure;
@@ -613,22 +615,22 @@ RingBasedLMRBootstrapper >> source: aPowertalkRingImage [
 
 { #category : #initialization }
 RingBasedLMRBootstrapper >> transferLiteral: anObject [
+
 	| transferred |
-	anObject isInteger
-		ifTrue: [ ^ dest newInteger: anObject ].
-	anObject class == ByteArray
-		ifTrue: [ ^ dest newByteArray: anObject ].
-	anObject isSymbol
-		ifTrue: [ ^ dest addSymbol: anObject ].
-	anObject isString
-		ifTrue: [ ^ dest newString: anObject ].
-	anObject class == SCompiledBlock
-		ifTrue: [ ^self createNewBlock: anObject ].
+	anObject isInteger ifTrue: [ ^ dest newInteger: anObject ].
+	anObject == nil ifTrue: [ ^ nilObj ].
+	anObject == false ifTrue: [ ^ falseObj ].
+	anObject == true ifTrue: [ ^ trueObj ].
+	anObject class == ByteArray ifTrue: [ ^ dest newByteArray: anObject ].
+	anObject isSymbol ifTrue: [ ^ dest addSymbol: anObject ].
+	anObject isString ifTrue: [ ^ dest newString: anObject ].
+	anObject isFloat ifTrue: [ ^ dest newFloat: anObject ].
+	anObject class == SCompiledBlock ifTrue: [ 
+		^ self createNewBlock: anObject ].
 	anObject class == Array ifTrue: [ 
 		transferred := anObject collect: [ :o | self transferLiteral: o ].
-		^dest newArray: transferred ].
-	anObject isCharacter
-		ifTrue: [ ^ dest newCharacter: anObject ].
+		^ dest newArray: transferred ].
+	anObject isCharacter ifTrue: [ ^ dest newCharacter: anObject ].
 	self ASSERT: false
 ]
 

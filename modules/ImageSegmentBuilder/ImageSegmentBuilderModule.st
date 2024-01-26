@@ -16,11 +16,6 @@ ImageSegmentBuilderModule >> imports [
 		#Kernel -> #HashTable. #Kernel -> #IdentityDictionary. #Kernel -> #IdentitySet.
 		#Kernel -> #KernelModule. #Kernel -> #Module. #Kernel -> #Symbol.
 		#Kernel -> #SymbolicReference. #Kernel -> #True. #Kernel -> #UndefinedObject}
-] 
-
-{ #category : #bootstrapping }
-ImageSegmentBuilderModule >> writeJSONKernel [
-	^self writeJSONModule: Kernel
 ]
 
 { #category : #bootstrapping }
