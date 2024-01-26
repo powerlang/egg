@@ -3,7 +3,8 @@
     See (MIT) license in root directory.
 "
 
-Package { #name : #ImageSegmentBuilder,
+Package {
+	#name : #ImageSegmentBuilder,
 	#classes : [
 		'Builder',
 		'ImageSegmentBuilderModule'
