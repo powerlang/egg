@@ -22,7 +22,8 @@ Class {
 
 {#category : #'class initialization'}
 STONWriter class >> initialize [
-	self initializeSTONCharacters; initializeSTONSimpleSymbolCharacters]
+	self initializeSTONCharacters; initializeSTONSimpleSymbolCharacters
+]
 
 {#category : #'class initialization'}
 STONWriter class >> initializeSTONCharacters [
@@ -35,7 +36,8 @@ STONWriter class >> initializeSTONCharacters [
 		at: 13 put: '\f';
 		at: 14 put: '\r';
 		at: 40 put: '\''';
-		at: 93 put: '\\']
+		at: 93 put: '\\'
+]
 
 {#category : #'class initialization'}
 STONWriter class >> initializeSTONSimpleSymbolCharacters [
@@ -43,34 +45,41 @@ STONWriter class >> initializeSTONSimpleSymbolCharacters [
 	1 to: 256 do: [:code | | char |
 		char := (code - 1) asCharacter.
 		(self isSimpleSymbolChar: char)
-			ifTrue: [STONSimpleSymbolCharacters at: code put: 0]]]
+			ifTrue: [STONSimpleSymbolCharacters at: code put: 0]]
+]
 
 {#category : #private}
 STONWriter class >> isSimpleSymbolChar: aCharacter [
 	^'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_./'
-		includes: aCharacter]
+		includes: aCharacter
+]
 
 {#category : #'instance creation'}
 STONWriter class >> new [
-	^super new initialize]
+	^super new initialize
+]
 
 {#category : #'instance creation'}
 STONWriter class >> on: aWriteStream [
-	^self new on: aWriteStream]
+	^self new on: aWriteStream
+]
 
 {#category : #open/close}
 STONWriter >> close [
 	stream isNil ifTrue: [^self].
 	stream close.
-	stream := nil]
+	stream := nil
+]
 
 {#category : #private}
 STONWriter >> comma [
-	stream nextPutAll: ', ']
+	stream nextPutAll: ', '
+]
 
 {#category : #private}
 STONWriter >> cr [
-	stream crtab: indent]
+	stream crtab: indent
+]
 
 {#category : #private}
 STONWriter >> encodeCharacter: char [
@@ -83,13 +92,15 @@ STONWriter >> encodeCharacter: char [
 			(encoding == #pass or: [json and: [char = $']])
 				ifTrue: [stream nextPut: char]
 				ifFalse: [stream nextPutAll: encoding]]
-		ifFalse: [self escapeUnicode: code]]
+		ifFalse: [self escapeUnicode: code]
+]
 
 {#category : #private}
 STONWriter >> encodeKey: key value: value [
 	self nextPut: key.
 	stream nextPutAll: ' : '.
-	self nextPut: value]
+	self nextPut: value
+]
 
 {#category : #writing}
 STONWriter >> encodeList: aCollection [
@@ -102,7 +113,8 @@ STONWriter >> encodeList: aCollection [
 					do: [:element | self nextPut: element]
 					separatedBy: [self comma; cr]];
 			cr].
-	stream nextPut: $]]
+	stream nextPut: $]
+]
 
 {#category : #writing}
 STONWriter >> encodeMap: pairs [
@@ -119,7 +131,8 @@ STONWriter >> encodeMap: pairs [
 					single ifFalse: [self cr]].
 				self encodeKey: key value: value]].
 		single ifFalse: [self cr]].
-	stream nextPut: $}]
+	stream nextPut: $}
+]
 
 {#category : #private}
 STONWriter >> encodeString: aString [
@@ -127,18 +140,21 @@ STONWriter >> encodeString: aString [
 	quote := json ifTrue: [$"] ifFalse: [$'].
 	stream nextPut: quote.
 	aString do: [:ch | self encodeCharacter: ch].
-	stream nextPut: quote]
+	stream nextPut: quote
+]
 
 {#category : #'error handling'}
 STONWriter >> error: aString [
-	^STONWriterError signal: aString]
+	^STONWriterError signal: aString
+]
 
 {#category : #private}
 STONWriter >> escape: aCharacter with: anObject [
 	self
 		ASSERT: anObject isString | (anObject == #pass);
 		ASSERT: aCharacter codePoint < 256.
-	self writeableStonCharacters at: aCharacter codePoint + 1 put: anObject]
+	self writeableStonCharacters at: aCharacter codePoint + 1 put: anObject
+]
 
 {#category : #private}
 STONWriter >> escapeUnicode: codePoint [
@@ -152,20 +168,23 @@ STONWriter >> escapeUnicode: codePoint [
 				trail := 16rDC00 + (shifted \\ 16r400).
 				self escapeUnicode4: lead; escapeUnicode4: trail]
 			ifFalse: [self
-				error: 'Character Unicode code point outside encoder range']]]
+				error: 'Character Unicode code point outside encoder range']]
+]
 
 {#category : #private}
 STONWriter >> escapeUnicode4: codePoint [
 	| code |
 	stream nextPutAll: '\u'.
 	code := codePoint printPaddedWith: $0 to: 4 base: 16.
-	stream nextPutAll: code]
+	stream nextPutAll: code
+]
 
 {#category : #private}
 STONWriter >> indentedDo: aBlock [
 	indent := indent + 1.
 	aBlock value.
-	indent := indent - 1]
+	indent := indent - 1
+]
 
 {#category : #initialization}
 STONWriter >> initialize [
@@ -174,7 +193,8 @@ STONWriter >> initialize [
 	stonCharacters := STONCharacters.
 	indent := 0.
 	json := false.
-	objects := IdentityDictionary new]
+	objects := IdentityDictionary new
+]
 
 {#category : #private}
 STONWriter >> isSimpleSymbol: aSymbol [
@@ -182,7 +202,8 @@ STONWriter >> isSimpleSymbol: aSymbol [
 	1 to: aSymbol size do: [:i | | token |
 		token := STONSimpleSymbolCharacters at: (aSymbol codeAt: i) + 1.
 		token = 0 ifFalse: [^false]].
-	^true]
+	^true
+]
 
 {#category : #accessing}
 STONWriter >> jsonMode: boolean [
@@ -195,23 +216,28 @@ STONWriter >> jsonMode: boolean [
 		ifFalse: [
 			self
 				escape: $" with: #pass;
-				escape: $' with: '\''']]
+				escape: $' with: '\''']
+]
 
 {#category : #public}
 STONWriter >> nextPut: anObject [
-	anObject stonOn: self]
+	anObject stonOn: self
+]
 
 {#category : #accessing}
 STONWriter >> on: aWriteStream [
-	stream := aWriteStream]
+	stream := aWriteStream
+]
 
 {#category : #accessing}
 STONWriter >> reset [
-	objects removeAll]
+	objects removeAll
+]
 
 {#category : #private}
 STONWriter >> stonCharacters [
-	^stonCharacters ifNil: [stonCharacters := STONCharacters]]
+	^stonCharacters ifNil: [stonCharacters := STONCharacters]
+]
 
 {#category : #private}
 STONWriter >> with: anObject do: aBlock [
@@ -223,44 +249,53 @@ STONWriter >> with: anObject do: aBlock [
 			aBlock value]
 		ifFalse: [
 			json ifTrue: [^self error: 'shared reference detected'].
-			self writeReference: index]]
+			self writeReference: index]
+]
 
 {#category : #private}
 STONWriter >> writeableStonCharacters [
 	^self stonCharacters == STONCharacters
 		ifTrue: [stonCharacters := stonCharacters copy]
-		ifFalse: [stonCharacters]]
+		ifFalse: [stonCharacters]
+]
 
 {#category : #writing}
 STONWriter >> writeAssociation: anAssociation [
 	json ifTrue: [self error: 'wrong object class for JSON mode'].
-	self encodeKey: anAssociation key value: anAssociation value]
+	self encodeKey: anAssociation key value: anAssociation value
+]
 
 {#category : #writing}
 STONWriter >> writeBoolean: boolean [
-	stream print: boolean]
+	stream print: boolean
+]
 
 {#category : #writing}
 STONWriter >> writeFloat: float [
-	float storeOn: stream]
+	float storeOn: stream
+]
 
 {#category : #writing}
 STONWriter >> writeInteger: anInteger [
-	stream print: anInteger]
+	stream print: anInteger
+]
 
 {#category : #writing}
 STONWriter >> writeList: aCollection [
-	self with: aCollection do: [self encodeList: aCollection]]
+	self with: aCollection do: [self encodeList: aCollection]
+]
 
 {#category : #writing}
 STONWriter >> writeMap: aDictionary [
-	self with: aDictionary do: [self encodeMap: aDictionary]]
+	self with: aDictionary do: [self encodeMap: aDictionary]
+]
 
 {#category : #writing}
 STONWriter >> writeNull [
 	| token |
 	token := json ifTrue: ['null'].
-	stream print: token]
+	stream print: token
+]
 
 {#category : #writing}
 STONWriter >> writeObject: anObject [
@@ -271,7 +306,8 @@ STONWriter >> writeObject: anObject [
 	self writeObject: anObject streamMap: [:writer | 
 		ivars do: [:ivar | 
 			(anObject instVarNamed: ivar)
-				ifNotNil: [:value | writer at: ivar asSymbol put: value]]]]
+				ifNotNil: [:value | writer at: ivar asSymbol put: value]]]
+]
 
 {#category : #writing}
 STONWriter >> writeObject: anObject do: aBlock [
@@ -283,14 +319,16 @@ STONWriter >> writeObject: anObject do: aBlock [
 		class := anObject class.
 		name := class isMetaclass ifTrue: ['Class'] ifFalse: [class name].
 		stream nextPutAll: name; space.
-		aBlock value]]
+		aBlock value]
+]
 
 {#category : #writing}
 STONWriter >> writeObject: object listSingleton: element [
 	self writeObject: object do: [
 		stream nextPut: $[.
 		self nextPut: element.
-		stream nextPut: $]]]
+		stream nextPut: $]]
+]
 
 {#category : #writing}
 STONWriter >> writeObject: anObject streamMap: aBlock [
@@ -300,7 +338,8 @@ STONWriter >> writeObject: anObject streamMap: aBlock [
 		self indentedDo: [
 			self cr.
 			aBlock value: writer]; cr.
-		stream nextPut: $}]]
+		stream nextPut: $}]
+]
 
 {#category : #writing}
 STONWriter >> writeObject: anObject streamShortList: aBlock [
@@ -308,15 +347,18 @@ STONWriter >> writeObject: anObject streamShortList: aBlock [
 		writer := STONStreamWriter on: self.
 		stream nextPut: $[.
 		self indentedDo: [aBlock value: writer].
-		stream nextPut: $]]]
+		stream nextPut: $]]
+]
 
 {#category : #writing}
 STONWriter >> writeReference: anInteger [
-	stream nextPut: $@; print: anInteger]
+	stream nextPut: $@; print: anInteger
+]
 
 {#category : #writing}
 STONWriter >> writeString: aString [
-	self encodeString: aString]
+	self encodeString: aString
+]
 
 {#category : #writing}
 STONWriter >> writeSymbol: aSymbol [
@@ -324,5 +366,6 @@ STONWriter >> writeSymbol: aSymbol [
 	stream nextPut: $#.
 	(self isSimpleSymbol: aSymbol)
 		ifTrue: [stream nextPutAll: aSymbol]
-		ifFalse: [self encodeString: aSymbol]]
+		ifFalse: [self encodeString: aSymbol]
+]
 

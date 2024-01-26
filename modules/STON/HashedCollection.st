@@ -7,5 +7,6 @@ Extension {#name : #HashedCollection}
 
 {#category : '*STON'}
 HashedCollection >> stonPostReferenceResolution [
-	self rehash]
+	self rehash
+]
 

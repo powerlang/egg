@@ -7,13 +7,16 @@ Extension {#name : #'Interval class'}
 
 {#category : '*STON'}
 Interval class >> fromSton: stonReader [
-	^self new fromSton: stonReader; yourself]
+	^self new fromSton: stonReader; yourself
+]
 
 {#category : '*STON'}
 Interval >> fromSton: aSTONReader [
-	aSTONReader parseNamedInstVarsFor: self]
+	aSTONReader parseNamedInstVarsFor: self
+]
 
 {#category : '*STON'}
 Interval >> stonOn: aSTONWriter [
-	aSTONWriter writeObject: self]
+	aSTONWriter writeObject: self
+]
 

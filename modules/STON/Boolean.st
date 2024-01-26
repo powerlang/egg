@@ -7,5 +7,6 @@ Extension {#name : #Boolean}
 
 {#category : '*STON'}
 Boolean >> stonOn: aSTONWriter [
-	aSTONWriter writeBoolean: self]
+	aSTONWriter writeBoolean: self
+]
 

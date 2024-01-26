@@ -7,5 +7,6 @@ Extension {#name : #Number}
 
 {#category : '*STON'}
 Number >> stonOn: aSTONWriter [
-	aSTONWriter writeFloat: self asFloat]
+	aSTONWriter writeFloat: self asFloat
+]
 

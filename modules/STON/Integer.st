@@ -7,5 +7,6 @@ Extension {#name : #Integer}
 
 {#category : '*STON'}
 Integer >> stonOn: aSTONWriter [
-	aSTONWriter writeInteger: self]
+	aSTONWriter writeInteger: self
+]
 

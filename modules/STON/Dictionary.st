@@ -13,11 +13,13 @@ Dictionary class >> fromSton: stonReader [
 		dictionary at: key put: value.
 		(key isStonReference or: [value isStonReference])
 			ifTrue: [stonReader addReferenceKey: key value: value of: dictionary]].
-	^dictionary]
+	^dictionary
+]
 
 {#category : '*STON'}
 Dictionary >> stonOn: aSTONWriter [
 	self class == STON mapClass
 		ifTrue: [aSTONWriter writeMap: self]
-		ifFalse: [aSTONWriter writeObject: self do: [aSTONWriter encodeMap: self]]]
+		ifFalse: [aSTONWriter writeObject: self do: [aSTONWriter encodeMap: self]]
+]
 

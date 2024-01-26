@@ -7,7 +7,8 @@ Extension {#name : #'Timestamp class'}
 
 {#category : '*STON'}
 Timestamp class >> fromSton: stonReader [
-	^self readFromIso8601: stonReader parseListSingleton readStream]
+	^self readFromIso8601: stonReader parseListSingleton readStream
+]
 
 {#category : '*STON'}
 Timestamp class >> year: yyyy
@@ -25,9 +26,11 @@ offset: h [
 		minutes: mm
 		seconds: ss
 		milliseconds: 0
-		offset: h * 60]
+		offset: h * 60
+]
 
 {#category : '*STON'}
 Timestamp >> stonOn: aSTONWriter [
-	aSTONWriter writeObject: self listSingleton: self iso8601]
+	aSTONWriter writeObject: self listSingleton: self iso8601
+]
 

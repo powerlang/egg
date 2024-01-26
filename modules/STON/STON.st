@@ -11,72 +11,89 @@ Class {
 
 {#category : #accessing}
 STON class >> associationClass [
-	^ Association]
+	^ Association
+]
 
 {#category : #accessing}
 STON class >> classNameKey [
-	^ #className]
+	^ #className
+]
 
 {#category : #convencience}
 STON class >> fromStream: readStream [
-	^ (self reader on: readStream) next]
+	^ (self reader on: readStream) next
+]
 
 {#category : #convencience}
 STON class >> fromString: string [
-	^ self fromStream: string readStream]
+	^ self fromStream: string readStream
+]
 
 {#category : #accessing}
 STON class >> jsonWriter [
-	^STONWriter new jsonMode: true]
+	^STONWriter new jsonMode: true
+]
 
 {#category : #accessing}
 STON class >> listClass [
-	^Array]
+	^Array
+]
 
 {#category : #accessing}
 STON class >> mapClass [
-	^Dictionary]
+	^Dictionary
+]
 
 {#category : #convencience}
 STON class >> put: object asJsonOnStream: stream [
-	self jsonWriter on: stream; nextPut: object]
+	self jsonWriter on: stream; nextPut: object
+]
 
 {#category : #convencience}
 STON class >> put: object asJsonOnStreamPretty: stream [
-	self jsonWriter on: stream; nextPut: object]
+	self jsonWriter on: stream; nextPut: object
+]
 
 {#category : #convencience}
 STON class >> put: object onStream: stream [
-	(self writer on: stream) nextPut: object]
+	(self writer on: stream) nextPut: object
+]
 
 {#category : #convencience}
 STON class >> put: object onStreamPretty: stream [
-	self writer on: stream; nextPut: object]
+	self writer on: stream; nextPut: object
+]
 
 {#category : #accessing}
 STON class >> reader [
-	^ STONReader new]
+	^ STONReader new
+]
 
 {#category : #convencience}
 STON class >> toJsonString: object [
-	^String streamContents: [:stream | self put: object asJsonOnStream: stream]]
+	^String streamContents: [:stream | self put: object asJsonOnStream: stream]
+]
 
 {#category : #convencience}
 STON class >> toJsonStringPretty: object [
 	^ String streamContents: [ :stream |
-		self put: object asJsonOnStreamPretty: stream ]]
+		self put: object asJsonOnStreamPretty: stream ]
+]
 
 {#category : #convencience}
 STON class >> toString: object [
 	^ String streamContents: [ :stream |
-		self put: object onStream: stream ]]
+		self put: object onStream: stream ]
+]
 
 {#category : #convencience}
 STON class >> toStringPretty: object [
 	^ String streamContents: [ :stream |
-		self put: object onStreamPretty: stream ]]
+		self put: object onStreamPretty: stream ]
+]
 
 {#category : #accessing}
 STON class >> writer [
-	^ STONWriter new]
+	^ STONWriter new
+]
 

@@ -17,7 +17,8 @@ STONReaderError class >> signal: aString streamPosition: streamPosition [
 	^ self new
 		streamPosition: streamPosition;
 		signal: aString;
-		yourself]
+		yourself
+]
 
 {#category : #accessing}
 STONReaderError >> description [
@@ -27,17 +28,21 @@ STONReaderError >> description [
 			nextPutAll: 'At character ';
 			nextPutAll: position asString;
 			space;
-			nextPutAll: super description]]
+			nextPutAll: super description]
+]
 
 {#category : #services}
 STONReaderError >> signal: aString [
-	self description: aString; signal]
+	self description: aString; signal
+]
 
 {#category : #accessing}
 STONReaderError >> streamPosition [
-	^ position]
+	^ position
+]
 
 {#category : #accessing}
 STONReaderError >> streamPosition: aNumber [
-	position := aNumber]
+	position := aNumber
+]
 

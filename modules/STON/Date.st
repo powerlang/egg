@@ -7,9 +7,11 @@ Extension {#name : #'Date class'}
 
 {#category : '*STON'}
 Date class >> fromSton: stonReader [
-	^self yyyymmdd: stonReader parseListSingleton]
+	^self yyyymmdd: stonReader parseListSingleton
+]
 
 {#category : '*STON'}
 Date >> stonOn: stonWriter [
-	stonWriter writeObject: self listSingleton: self yyyymmdd]
+	stonWriter writeObject: self listSingleton: self yyyymmdd
+]
 

@@ -17,11 +17,13 @@ SequenceableCollection class >> fromSton: stonReader [
 			i := i + 1]].
 	references
 		do: [:ref | stonReader addElement: ref first of: collection at: ref second].
-	^collection]
+	^collection
+]
 
 {#category : '*STON'}
 SequenceableCollection >> stonOn: aSTONWriter [
 	self class == STON listClass
 		ifTrue: [aSTONWriter writeList: self]
-		ifFalse: [super stonOn: aSTONWriter]]
+		ifFalse: [super stonOn: aSTONWriter]
+]
 

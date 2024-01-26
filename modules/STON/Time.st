@@ -7,7 +7,8 @@ Extension {#name : #'Time class'}
 
 {#category : '*STON'}
 Time class >> fromSton: stonReader [
-	^self readFromIso8601: stonReader parseListSingleton readStream]
+	^self readFromIso8601: stonReader parseListSingleton readStream
+]
 
 {#category : '*STON'}
 Time class >> readFromIso8601: aStream [
@@ -35,9 +36,11 @@ Time class >> readFromIso8601: aStream [
 			ifFalse: [Timestamp localOffsetFor: Date today]].
 	ts := Timestamp date: Date today time: time.
 	ts offset: offset.
-	^ts time]
+	^ts time
+]
 
 {#category : '*STON'}
 Time >> stonOn: aSTONWriter [
-	aSTONWriter writeObject: self listSingleton: self hhmmssms]
+	aSTONWriter writeObject: self listSingleton: self hhmmssms
+]
 

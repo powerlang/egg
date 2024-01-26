@@ -7,5 +7,6 @@ Extension {#name : #Symbol}
 
 {#category : '*STON'}
 Symbol >> stonOn: aSTONWriter [
-	aSTONWriter writeSymbol: self]
+	aSTONWriter writeSymbol: self
+]
 

@@ -7,9 +7,11 @@ Extension {#name : #'Character class'}
 
 {#category : '*STON'}
 Character class >> fromSton: stonReader [
-	^ stonReader parseListSingleton first]
+	^ stonReader parseListSingleton first
+]
 
 {#category : '*STON'}
 Character >> stonOn: aSTONWriter [
-	aSTONWriter writeObject: self listSingleton: self asString]
+	aSTONWriter writeObject: self listSingleton: self asString
+]
 

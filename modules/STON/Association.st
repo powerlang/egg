@@ -7,5 +7,6 @@ Extension {#name : #Association}
 
 {#category : '*STON'}
 Association >> stonOn: aSTONWriter [
-	aSTONWriter writeAssociation: self]
+	aSTONWriter writeAssociation: self
+]
 

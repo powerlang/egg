@@ -7,19 +7,22 @@ Extension {#name : #'Object class'}
 
 {#category : '*STON'}
 Object class >> fromSton: stonReader [
-	^self new fromSton: stonReader; yourself]
+	^self new fromSton: stonReader; yourself
+]
 
 {#category : '*STON'}
 Object class >> stonAllInstVarNames [
 	"Override to encode my instances using a custom set of instance variables or to define their order."
 	
-	^ self allInstVarNames ]
+	^ self allInstVarNames 
+]
 
 {#category : '*STON'}
 Object class >> stonName [
 	"Override to encode my instances using a different class name."
 	
-	^ self name]
+	^ self name
+]
 
 {#category : '*STON'}
 Object >> fromSton: aSTONReader [
@@ -27,11 +30,13 @@ Object >> fromSton: aSTONReader [
 		ifTrue: [
 			aSTONReader
 				error: 'custom #fromSton: implementation needed for variable/indexable class']
-		ifFalse: [aSTONReader parseNamedInstVarsFor: self]]
+		ifFalse: [aSTONReader parseNamedInstVarsFor: self]
+]
 
 {#category : '*STON'}
 Object >> isStonReference [
-	^false]
+	^false
+]
 
 {#category : '*STON'}
 Object >> stonOn: aSTONWriter [
@@ -39,9 +44,11 @@ Object >> stonOn: aSTONWriter [
 		ifTrue: [
 			aSTONWriter
 				error: 'custom #stonOn: implementation needed for variable/indexable class']
-		ifFalse: [aSTONWriter writeObject: self]]
+		ifFalse: [aSTONWriter writeObject: self]
+]
 
 {#category : '*STON'}
 Object >> stonPostReferenceResolution [
-	]
+	
+]
 

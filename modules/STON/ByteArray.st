@@ -7,12 +7,14 @@ Extension {#name : #'ByteArray class'}
 
 {#category : '*STON'}
 ByteArray class >> fromSton: stonReader [
-	^self readHexFrom: stonReader parseListSingleton]
+	^self readHexFrom: stonReader parseListSingleton
+]
 
 {#category : '*STON'}
 ByteArray class >> readHexFrom: aString [
 	self ASSERT: aString size even.
-	^(self new: aString size // 2) readHexFrom: aString readStream]
+	^(self new: aString size // 2) readHexFrom: aString readStream
+]
 
 {#category : '*STON'}
 ByteArray >> readHexFrom: aStream [
@@ -26,9 +28,11 @@ ByteArray >> readHexFrom: aStream [
 		lo := map
 			indexOf: aStream next asLowercase
 			ifAbsent: [^self error: 'Hex digit expected'].
-		self at: i put: hi + lo - 1]]
+		self at: i put: hi + lo - 1]
+]
 
 {#category : '*STON'}
 ByteArray >> stonOn: aSTONWriter [
-	aSTONWriter writeObject: self listSingleton: self hexString]
+	aSTONWriter writeObject: self listSingleton: self hexString
+]
 

@@ -11,5 +11,6 @@ Class {
 
 {#category : #accessing}
 STONMapWriter >> comma [
-	writer comma; cr]
+	writer comma; cr
+]
 

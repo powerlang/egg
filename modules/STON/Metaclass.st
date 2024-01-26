@@ -9,13 +9,16 @@ Extension {#name : #'Metaclass class'}
 Metaclass class >> fromSton: stonReader [
 	| class |
 	class := Smalltalk at: stonReader parseListSingleton.
-	^class class]
+	^class class
+]
 
 {#category : '*STON'}
 Metaclass >> stonName [
-	^#Class]
+	^#Class
+]
 
 {#category : '*STON'}
 Metaclass >> stonOn: aSTONWriter [
-	aSTONWriter writeObject: self listSingleton: self instanceClass symbol]
+	aSTONWriter writeObject: self listSingleton: self instanceClass symbol
+]
 

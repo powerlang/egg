@@ -9,11 +9,13 @@ Extension {#name : #Point}
 Point >> fromSton: aSTONReader [
 	aSTONReader parseListDo: [:v :i | 
 		i = 1 ifTrue: [x := v].
-		i = 2 ifTrue: [y := v]]]
+		i = 2 ifTrue: [y := v]]
+]
 
 {#category : '*STON'}
 Point >> stonOn: stonWriter [
 	stonWriter
 		writeObject: self
-		streamShortList: [:writer | writer add: x; add: y]]
+		streamShortList: [:writer | writer add: x; add: y]
+]
 

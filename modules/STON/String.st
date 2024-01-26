@@ -7,5 +7,6 @@ Extension {#name : #String}
 
 {#category : '*STON'}
 String >> stonOn: aSTONWriter [
-	aSTONWriter writeString: self]
+	aSTONWriter writeString: self
+]
 

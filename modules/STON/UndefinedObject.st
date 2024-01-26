@@ -7,5 +7,6 @@ Extension {#name : #UndefinedObject}
 
 {#category : '*STON'}
 UndefinedObject >> stonOn: aSTONWriter [
-	aSTONWriter writeNull]
+	aSTONWriter writeNull
+]
 

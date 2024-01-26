@@ -9,5 +9,6 @@ Extension {#name : #Closure}
 Closure >> cull: a cull: b [
 	^self argumentCount < 2
 		ifTrue: [self cull: a]
-		ifFalse: [self value: a value: b]]
+		ifFalse: [self value: a value: b]
+]
 

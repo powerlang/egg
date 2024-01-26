@@ -7,5 +7,6 @@ Extension {#name : #OrderedDictionary}
 
 {#category : '*STON'}
 OrderedDictionary >> stonOn: aSTONWriter [
-	aSTONWriter writeObject: self do: [aSTONWriter encodeMap: self]]
+	aSTONWriter writeObject: self do: [aSTONWriter encodeMap: self]
+]
 

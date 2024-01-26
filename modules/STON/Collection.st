@@ -13,9 +13,11 @@ Collection class >> fromSton: stonReader [
 		collection add: element.
 		element isStonReference
 			ifTrue: [stonReader addElement: element of: collection]].
-	^collection]
+	^collection
+]
 
 {#category : '*STON'}
 Collection >> stonOn: aSTONWriter [
-	aSTONWriter writeObject: self do: [aSTONWriter encodeList: self]]
+	aSTONWriter writeObject: self do: [aSTONWriter encodeList: self]
+]
 
