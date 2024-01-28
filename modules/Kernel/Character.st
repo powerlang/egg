@@ -576,6 +576,13 @@ Character >> isDigit [
 ]
 
 { #category : #testing }
+Character >> isHexDigit [
+	^self isDigit "0123456789"
+		or: [value >= 65 and: [value <= 70]] "ABCDEF"
+		or: [value >= 97 and: [value <= 102]] "abcdef"
+]
+
+{ #category : #testing }
 Character >> isDollar [
 	^value = 36
 ]
@@ -642,11 +649,17 @@ Character >> isLessThan [
 ]
 
 { #category : #testing }
-Character >> isLetter [
+Character >> isAsciiLetter [
 	value < 65 ifTrue: [^false].
 	value < 91 ifTrue: [^true].
 	value < 97 ifTrue: [^false].
 	value < 123 ifTrue: [^true].
+	^false.
+]
+
+{ #category : #testing }
+Character >> isLetter [
+	self isAsciiLetter ifTrue: [^true].
 	value < 128 ifTrue: [^false].
 	value < 256 ifTrue: [ | byte bit |
 		byte := #[0x0 0x0 0x0 0x0 0x0 0x4 0x20 0x4 0xFF 0xFF 0x7F 0xFF 0xFF 0xFF 0x7F 0xFF] at: ((value - 128) bitShift: -3) + 1.
