@@ -323,6 +323,11 @@ CompiledMethod >> isCalloutMethod [
 ]
 
 { #category : #testing }
+CompiledMethod >> isFrameless [
+	^self hasFrame not
+]
+
+{ #category : #testing }
 CompiledMethod >> isFFIMethod [
 	^false
 ]
