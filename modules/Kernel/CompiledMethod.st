@@ -243,6 +243,11 @@ CompiledMethod >> hasEnvironment [
 ]
 
 { #category : #accessing }
+CompiledMethod >> hasFrame [
+	^format isOnBit: HasFrame
+]
+
+{ #category : #accessing }
 CompiledMethod >> hasFrame: aBoolean [
 	format := aBoolean
 				ifTrue: [ format bitOr: HasFrame ]
@@ -310,6 +315,16 @@ CompiledMethod >> isExpression [
 { #category : #testing }
 CompiledMethod >> isExtension [
 	^format isOnBit: IsExtension
+]
+
+{ #category : #testing }
+CompiledMethod >> isCalloutMethod [
+	^false
+]
+
+{ #category : #testing }
+CompiledMethod >> isFrameless [
+	^self hasFrame not
 ]
 
 { #category : #testing }
