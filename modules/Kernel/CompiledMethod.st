@@ -243,6 +243,11 @@ CompiledMethod >> hasEnvironment [
 ]
 
 { #category : #accessing }
+CompiledMethod >> hasFrame [
+	^format isOnBit: HasFrame
+]
+
+{ #category : #accessing }
 CompiledMethod >> hasFrame: aBoolean [
 	format := aBoolean
 				ifTrue: [ format bitOr: HasFrame ]
