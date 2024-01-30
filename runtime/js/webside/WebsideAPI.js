@@ -14,16 +14,19 @@ class WebsideAPI extends Object {
 		this.response = response;
 	}
 
+	kernel() {
+		return this.runtime.bootstrapper().kernel.exports["Kernel"];
+	}
+
 	scompiler() {
-		const compiler = this.runtime.addSymbol_("Compiler");
-		const kernel = this.runtime.bootstrapper().kernel.exports["Kernel"];
-		const module = this.runtime.sendLocal_to_with_("load:", kernel, [
-			compiler,
+		let name = this.runtime.addSymbol_("Compiler");
+		const module = this.runtime.sendLocal_to_with_("load:", this.kernel(), [
+			name,
 		]);
 		const namespace = this.runtime.sendLocal_to_("namespace", module);
-		const classname = this.runtime.addSymbol_("SCompiler");
+		name = this.runtime.addSymbol_("SCompiler");
 		const scompiler = this.runtime.sendLocal_to_with_("at:", namespace, [
-			classname,
+			name,
 		]);
 		return scompiler;
 	}
@@ -110,6 +113,36 @@ class WebsideAPI extends Object {
 	}
 
 	//Code endpoints..."
+	packages() {
+		const modules = this.loadedModules();
+		if (this.queryAt("names") === "true") {
+			const names = modules.map((m) => {
+				return m.name().asLocalObject();
+			});
+			return this.respondWithJson(names);
+		}
+		this.respondWithJson(modules.map((c) => c.asWebsideJson()));
+	}
+
+	packageClasses() {
+		const package = this.requestedPackage();
+		if (package.isNil()) return this.notFound();
+		const defined = this.wrapCollection(package.classes());
+		const extended =
+			this.queryAt("extended") == "true"
+				? this.wrapCollection(package.extensionClasses())
+				: [];
+		const all = defined.concat(extended);
+		if (this.queryAt("tree") == "true") {
+			const tree = this.classTreeFromClasses(all);
+			return this.respondWithJson(tree);
+		}
+		if (this.queryAt("names") == "true") {
+			return all.map((c) => c.name());
+		}
+		return all.map((c) => c.asWebsideJson());
+	}
+
 	classes() {
 		let root = this.queryAt("root");
 		if (root) root = this.classNamed(root);
@@ -459,11 +492,36 @@ class WebsideAPI extends Object {
 		return LMRObjectWrapper.on_runtime_(object, this.runtime);
 	}
 
+	wrapCollection(collection) {
+		return collection
+			.asArray()
+			.wrappee()
+			.slots()
+			.map((e) => this.wrap(e));
+	}
+
+	loadedModules() {
+		const dictionary = this.wrap(
+			this.runtime.sendLocal_to_("loadedModules", this.kernel())
+		);
+		return this.wrapCollection(dictionary.values());
+	}
+
+	packageNamed(name) {
+		const symbol = this.runtime.addSymbol_(name);
+		return this.wrap(
+			this.runtime.sendLocal_to_with_(
+				"loadedModuleNamed:",
+				this.kernel(),
+				[symbol]
+			)
+		);
+	}
+
 	defaultRootClass() {
 		const nil = this.runtime.nil();
-		let root = this.wrap(this.runtime.nil()).objectClass();
-		while (!(root.superclass().wrappee() === this.runtime.nil()))
-			root = root.superclass();
+		let root = this.wrap(nil).objectClass();
+		while (!(root.superclass().wrappee() === nil)) root = root.superclass();
 		return root;
 	}
 
@@ -489,6 +547,32 @@ class WebsideAPI extends Object {
 			.map((s) => this.classTreeFrom(s, depth - 1));
 		json["subclasses"] = subclasses;
 		return json;
+	}
+
+	classTreeFromClasses(classes) {
+		const roots = {};
+		let name, superclass, root, superclasses;
+		classes.forEach((c) => {
+			name = c.name();
+			roots[name] = { name: name };
+		});
+		classes.forEach((c) => {
+			superclass = c.superclass();
+			if (superclass.notNil()) {
+				name = superclass.name();
+				root = roots[name];
+				if (root) {
+					if (!root.subclasses) root.subclasses = [];
+					root.subclasses.push(root[c.name()]);
+				}
+			}
+		});
+		classes.forEach((c) => {
+			superclasses = this.wrapCollection(c.allSuperclasses());
+			if (superclasses.find((sc) => roots[sc.name()]))
+				delete roots[c.name()];
+			return Object.values(roots);
+		});
 	}
 
 	classNamed(name) {
@@ -585,6 +669,11 @@ class WebsideAPI extends Object {
 	requestedClass() {
 		const name = this.parameterAt("classname") || this.queryAt("classname");
 		return this.classNamed(name);
+	}
+
+	requestedPackage() {
+		const name = this.parameterAt("packagename");
+		return this.packageNamed(name);
 	}
 
 	requestedId() {

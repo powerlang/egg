@@ -136,6 +136,11 @@ Module >> extensions [
 	^extensions
 ]
 
+{ #category : #inquiries }
+Module >> extensionClasses [
+	^extensions keys collect: [:symbol | namespace at: symbol]
+]
+
 { #category : #services }
 Module >> import: moduleName [
 	| module |
