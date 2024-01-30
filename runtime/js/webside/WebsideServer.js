@@ -40,6 +40,10 @@ class WebsideServer extends Object {
 		});
 
 		//Code endpoints..."
+		this.server.get("/packages", (request, response) => {
+			this.api(request, response).packages();
+		});
+
 		this.server.get("/classes", (request, response) => {
 			this.api(request, response).classes();
 		});

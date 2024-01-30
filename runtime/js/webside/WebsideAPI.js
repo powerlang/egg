@@ -13,13 +13,20 @@ class WebsideAPI extends Object {
 		this.response = response;
 	}
 
+	kernel() {
+		return this.runtime.bootstrapper().kernel.exports["Kernel"];
+	}
+
 	scompiler() {
 		const compiler = this.runtime.addSymbol_("Compiler");
-		const kernel = this.runtime.bootstrapper().kernel.exports["Kernel"];
-		const module = this.runtime.sendLocal_to_with_("load:", kernel, [compiler]);
+		const module = this.runtime.sendLocal_to_with_("load:", this.kernel(), [
+			compiler,
+		]);
 		const namespace = this.runtime.sendLocal_to_("namespace", module);
 		const classname = this.runtime.addSymbol_("SCompiler");
-		const scompiler = this.runtime.sendLocal_to_with_("at:", namespace, [classname]);
+		const scompiler = this.runtime.sendLocal_to_with_("at:", namespace, [
+			classname,
+		]);
 		return scompiler;
 	}
 
@@ -60,7 +67,9 @@ class WebsideAPI extends Object {
 				result = this.applyRemoveMethod(change);
 				break;
 			default:
-				this.badRequest("Change type " + change.type + " not supported");
+				this.badRequest(
+					"Change type " + change.type + " not supported"
+				);
 		}
 		return this.respondWithJson(result);
 	}
@@ -85,12 +94,27 @@ class WebsideAPI extends Object {
 	compile(source, classname) {
 		const species = this.classNamed(classname).wrappee();
 		const code = this.runtime.newString_(source);
-		const method = this.runtime.sendLocal_to_with_("compile:in:", this.scompiler(), [code, species]);
+		const method = this.runtime.sendLocal_to_with_(
+			"compile:in:",
+			this.scompiler(),
+			[code, species]
+		);
 		this.runtime.sendLocal_to_("install", method);
 		return method;
 	}
 
 	//Code endpoints..."
+	packages() {
+		const modules = this.loadedModules();
+		if (this.queryAt("names") === "true") {
+			const names = modules.map((m) => {
+				return m.name().asLocalObject();
+			});
+			return this.respondWithJson(names);
+		}
+		this.respondWithJson(modules.map((c) => c.asWebsideJson()));
+	}
+
 	classes() {
 		let root = this.queryAt("root");
 		if (root) root = this.classNamed(root);
@@ -350,15 +374,10 @@ class WebsideAPI extends Object {
 		let error = this.server.evaluations[id];
 		let frames = error.context.backtrace();
 		let json = frames.map((frame, index) => {
-			let method = LMRMethodWrapper.on_runtime_(
-				frame[0],
-				this.runtime
-			);
-			let receiver = LMRObjectWrapper.on_runtime_(
-				frame[1],
-				this.runtime
-			);
-			let label = receiver.objectClass().name() + ">>" + method.selector();
+			let method = LMRMethodWrapper.on_runtime_(frame[0], this.runtime);
+			let receiver = LMRObjectWrapper.on_runtime_(frame[1], this.runtime);
+			let label =
+				receiver.objectClass().name() + ">>" + method.selector();
 			return { index: index, label: label };
 		});
 		this.respondWithJson(json);
@@ -398,18 +417,28 @@ class WebsideAPI extends Object {
 		let frame = frames[index];
 		let code = LMRMethodWrapper.on_runtime_(frame[0], this.runtime);
 		let receiver = LMRObjectWrapper.on_runtime_(frame[1], this.runtime);
-		let bindings = [{ name: "self", type: "variable", value: receiver.printString() }];
+		let bindings = [
+			{ name: "self", type: "variable", value: receiver.printString() },
+		];
 		let object, wrapper, binding;
 		for (let i = 1; i <= code.argumentCount().asLocalObject(); i++) {
 			object = context.argumentAt_frameIndex_(i, index + 1);
 			wrapper = LMRObjectWrapper.on_runtime_(object, this.runtime);
-			binding = { name: "argument" + i, type: "argument", value: wrapper.printString() };
+			binding = {
+				name: "argument" + i,
+				type: "argument",
+				value: wrapper.printString(),
+			};
 			bindings.push(binding);
 		}
 		for (let i = 1; i <= code.tempCount().asLocalObject(); i++) {
 			object = context.stackTemporaryAt_frameIndex_(i, index + 1);
 			wrapper = LMRObjectWrapper.on_runtime_(object, this.runtime);
-			binding = { name: "temporary" + i, type: "temporary", value: wrapper.printString() };
+			binding = {
+				name: "temporary" + i,
+				type: "temporary",
+				value: wrapper.printString(),
+			};
 			bindings.push(binding);
 		}
 		this.respondWithJson(bindings);
@@ -433,6 +462,18 @@ class WebsideAPI extends Object {
 
 	wrap(object) {
 		return LMRObjectWrapper.on_runtime_(object, this.runtime);
+	}
+
+	loadedModules() {
+		const dictionary = this.wrap(
+			this.runtime.sendLocal_to_("loadedModules", this.kernel())
+		);
+		return dictionary
+			.values()
+			.asArray()
+			.wrappee()
+			.slots()
+			.map((o) => this.wrap(o));
 	}
 
 	defaultRootClass() {
