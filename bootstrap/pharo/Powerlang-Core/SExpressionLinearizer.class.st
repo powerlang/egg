@@ -485,10 +485,12 @@ SExpressionLinearizer >> visitAssignment: anSAssignment [
 { #category : #initialization }
 SExpressionLinearizer >> visitBlock: anSBlock [
 
-	| prevInBlock prevOperations statements code |
+	| prevInBlock prevOperations prevStackTop statements code |
 	operations add: anSBlock.
 	prevInBlock := inBlock.
 	prevOperations := operations.
+	prevStackTop := stackTop.
+	stackTop := runtime blockTempCount: anSBlock compiledCode.
 	inBlock := true.
 	operations := OrderedCollection new.
 	statements := anSBlock statements.
@@ -498,9 +500,8 @@ SExpressionLinearizer >> visitBlock: anSBlock [
 		ifFalse: [ statements last isReturn ifFalse: [ self return ] ].
 	anSBlock isInlined ifFalse: [ 
 		code := runtime newExecutableCodeFor: operations asArray.
-		runtime
-			blockExecutableCode: anSBlock compiledCode
-			put: code ].
+		runtime blockExecutableCode: anSBlock compiledCode put: code ].
+	stackTop := prevStackTop.
 	operations := prevOperations.
 	inBlock := prevInBlock
 ]

@@ -14,12 +14,6 @@ JSTranspiler class >> generateCompilerSegment [
 ]
 
 { #category : #services }
-JSTranspiler class >> generateImageSegmentBuilderSegment [
-
-	self generateSegmentFromModuleNamed: 'ImageSegmentBuilder'; generateSegmentFromModuleNamed: 'ImageSegmentBuilder.JSON'
-]
-
-{ #category : #services }
 JSTranspiler class >> generateKernelSegment [
 
 	self generateSegmentFromModuleNamed: 'Kernel'
@@ -39,28 +33,49 @@ JSTranspiler class >> generateLMRBootstrapper [
 ]
 
 { #category : #services }
-JSTranspiler class >> generateSTONSegment [
+JSTranspiler class >> generateModuleSystemSegments [
+	| runtime |
+	runtime := self generateRuntimeForModules.
+	#( 'ImageSegmentBuilder' 'ImageSegmentBuilder.JSON'
+	   'STON' 'Tonel' ) do: [ :n | 
+		self generateSegmentFromModuleNamed: n in: runtime]
+]
 
-	self generateSegmentFromModuleNamed: 'STON'
+{ #category : #services }
+JSTranspiler class >> generateRuntimeForModules [
+
+	| bootstrapper runtime builder |
+	bootstrapper := self generateLMRBootstrapper.
+	runtime := bootstrapper result.
+	bootstrapper useHostModuleLoader.
+	builder := bootstrapper sendLoadModule: #ImageSegmentBuilder.
+	runtime sendLocal: #prepareForJSBootstrap to: builder.
+	^runtime
 ]
 
 { #category : #services }
 JSTranspiler class >> generateSegmentFromModuleNamed: aString [
 
-	| bootstrapper runtime output builder module json ws |
-	bootstrapper := self generateLMRBootstrapper.
-	runtime := bootstrapper result.
-	output := self imageSegmentDirectory / (aString , '.json').
-	output ensureCreateFile.
-	bootstrapper useHostModuleLoader.
-	builder := bootstrapper sendLoadModule: #ImageSegmentBuilder.
-	runtime sendLocal: #prepareForJSBootstrap to: builder.
-	module := bootstrapper sendLoadModule: aString asSymbol.
+
+
+	self generateSegmentFromModuleNamed: aString in: self generateRuntimeForModules
+]
+
+{ #category : #services }
+JSTranspiler class >> generateSegmentFromModuleNamed: aString in: runtime [
+
+	| symbol module json output ws |
+	symbol := runtime addSymbol: aString.
+	module := runtime
+		          sendLocal: #load:
+		          to: runtime kernel
+		          with: { symbol }.
 	json := runtime sendLocal: #writeImageSegment to: module.
-	output writeStreamDo: [ :stream | 
+	output := self imageSegmentDirectory / (aString , '.json').
+	output ensureCreateFile;writeStreamDo: [ :stream | 
 		stream truncate.
 		ws := ZnNewLineWriterStream on: stream.
-		ws nextPutAll: json asLocalString ]  
+		ws nextPutAll: json asLocalString ]
 ]
 
 { #category : #private }
