@@ -480,7 +480,7 @@ RingBasedLMRBootstrapper >> instantiateMetaobjects [
 { #category : #initialization }
 RingBasedLMRBootstrapper >> loadModule: symbol [
 
-	| spec classes moduleName moduleSpec module extensions |
+	| spec classes moduleName moduleSpec module extensions name |
 	spec := self readModuleSpec: symbol.
 	classes := spec allClasses.
 	moduleName := ('.' split: symbol) last asSymbol.
@@ -492,10 +492,15 @@ RingBasedLMRBootstrapper >> loadModule: symbol [
 			self createNewClassFrom: moduleSpec in: nil.
 			classes remove: moduleSpec ].
 	module := self createNewModule: moduleSpec.
+	name := dest sendLocal: #name to: module.
+	(dest sendLocal: #isEmpty to: name) == dest true ifTrue: [ 
+		name := dest newString: symbol asString.
+		dest sendLocal: #name: to: module with: { name } ].
 	classes := self classesSortedBySuperclass: classes.
 	classes := classes collect: [ :classSpec | 
 		           self createNewClassFrom: classSpec in: module ].
-	extensions := spec allExtensionClasses do: [:classSpec | self createExtensionMethodsOf: classSpec in: module].
+	extensions := spec allExtensionClasses do: [ :classSpec | 
+		              self createExtensionMethodsOf: classSpec in: module ].
 	dest sendLocal: #justLoaded to: module.
 	^ module
 ]
