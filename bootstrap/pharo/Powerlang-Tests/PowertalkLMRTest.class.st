@@ -8,6 +8,11 @@ Class {
 }
 
 { #category : #accessing }
+PowertalkLMRTest class >> defaultTimeLimit [
+	^ 100 seconds
+]
+
+{ #category : #accessing }
 PowertalkLMRTest class >> resources [
 	^ Array with: PowertalkLMRTestResource
 ]
@@ -249,6 +254,38 @@ PowertalkLMRTest >> test152compute20dividedBy5 [
 	self 
 		assert: result equals: self ==> 4;
 		assertNoLeftoverFrames
+]
+
+{ #category : #tests }
+PowertalkLMRTest >> test153sendTimesRepeat [
+	| result |
+	self
+		compile:
+			'foo
+			 | a |
+			a := 0.
+			1 timesRepeat: [a := a + 1].
+			^a'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: runtime true.
+			self assert: result equals: self ==> 1 ].
+	self assertNoLeftoverFrames
+]
+
+{ #category : #tests }
+PowertalkLMRTest >> test154sendTimesRepeatInsideBlock [
+	| result |
+	self
+		compile:
+			'foo
+			 | a b c d e |
+			a := 0.
+			[1 timesRepeat: [a := a + 1]] value.
+			^a'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: runtime true.
+			self assert: result equals: self ==> 1 ].
+	self assertNoLeftoverFrames
 ]
 
 { #category : #tests }
