@@ -500,7 +500,9 @@ SExpressionLinearizer >> visitBlock: anSBlock [
 		ifFalse: [ statements last isReturn ifFalse: [ self return ] ].
 	anSBlock isInlined ifFalse: [ 
 		code := runtime newExecutableCodeFor: operations asArray.
-		runtime blockExecutableCode: anSBlock compiledCode put: code ].
+		runtime
+			blockExecutableCode: anSBlock compiledCode
+			put: code ].
 	stackTop := prevStackTop.
 	operations := prevOperations.
 	inBlock := prevInBlock
