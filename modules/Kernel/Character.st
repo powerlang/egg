@@ -519,6 +519,16 @@ Character >> isAnsiCompliant [
 ]
 
 { #category : #testing }
+Character >> isAsciiLetter [
+	value < 65 ifTrue: [^false].
+	value < 91 ifTrue: [^true].
+	value = 95 ifTrue: [^true].
+	value < 97 ifTrue: [^false].
+	value < 123 ifTrue: [^true].
+	^false.
+]
+
+{ #category : #testing }
 Character >> isAsterisk [
 	^value = 42
 ]
@@ -577,9 +587,7 @@ Character >> isDigit [
 
 { #category : #testing }
 Character >> isHexDigit [
-	^self isDigit "0123456789"
-		or: [value >= 65 and: [value <= 70]] "ABCDEF"
-		or: [value >= 97 and: [value <= 102]] "abcdef"
+	^self isDigit or: [self between: $a and: $f] or: [self between: $A and: $F]
 ]
 
 { #category : #testing }
@@ -646,15 +654,6 @@ Character >> isLeftCurlyBracket [
 { #category : #testing }
 Character >> isLessThan [
 	^value = 60
-]
-
-{ #category : #testing }
-Character >> isAsciiLetter [
-	value < 65 ifTrue: [^false].
-	value < 91 ifTrue: [^true].
-	value < 97 ifTrue: [^false].
-	value < 123 ifTrue: [^true].
-	^false.
 ]
 
 { #category : #testing }
