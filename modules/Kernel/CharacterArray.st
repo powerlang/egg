@@ -472,6 +472,16 @@ CharacterArray >> lineAt: index [
 		start := end]
 ]
 
+{ #category : #services }
+CharacterArray >> lines [
+	| read |
+	read := self readStream.
+	^Array streamContents: [:write | 
+		[
+			write nextPut: read nextLine trimBlanks.
+			read atEnd] whileFalse]
+]
+
 { #category : #filenames }
 CharacterArray >> pathName [
 	"
