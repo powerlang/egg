@@ -3,11 +3,12 @@
     See (MIT) license in root directory.
 "
 
-Package { #name : #Compiler',
+Package { #name : #Compiler,
 	#classes : [
 		'ArgumentBinding',
 		'ArgumentEnvironment',
 		'ArrayEnvironment',
+		'AstcodeDecoder',
 		'AstcodeEncoder',
 		'BlockScope',
 		'Binding',

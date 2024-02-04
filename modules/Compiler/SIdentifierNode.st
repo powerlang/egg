@@ -159,3 +159,8 @@ SIdentifierNode >> sourceIntervals [
 		whileTrue: [stretchs add: (index to: index + string size - 1)].
 	^stretchs
 ]
+
+{ #category : #decoding }
+SIdentifierNode class >> decodeUsing: anAstcodeDecoder [
+	^anAstcodeDecoder decodeIdentifier
+]

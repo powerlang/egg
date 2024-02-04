@@ -38,3 +38,8 @@ SCascadeMessageNode >> nodesDo: aBlock includingDeclarations: aBoolean [
 	aBlock value: self.
 	arguments do: [:arg | arg nodesDo: aBlock includingDeclarations: aBoolean]
 ]
+
+{ #category : #decoding }
+SCascadeMessageNode class >> decodeUsing: anAstcodeDecoder [
+	^anAstcodeDecoder decodeCascadeMessage
+]

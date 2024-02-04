@@ -68,3 +68,8 @@ SAssignmentNode >> nodesDo: aBlock includingDeclarations: aBoolean [
 SAssignmentNode >> operators [
 	^operators
 ]
+
+{ #category : #decoding }
+SAssignmentNode class >> decodeUsing: anAstcodeDecoder [
+	^anAstcodeDecoder decodeAssignment
+]

@@ -107,3 +107,8 @@ SBlockNode >> usesHome [
 		ifTrue: [children anySatisfy: [:block | block usesHome]]
 		ifFalse: [scope capturesHome]
 ]
+
+{ #category : #decoding }
+SBlockNode class >> decodeUsing: anAstcodeDecoder [
+	^anAstcodeDecoder decodeBlock
+]

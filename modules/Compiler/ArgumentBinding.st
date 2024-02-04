@@ -53,3 +53,8 @@ ArgumentBinding >> isArgument [
 ArgumentBinding >> isInlined [
 	^environment isInlinedArgument
 ]
+
+{ #category : #decoding }
+ArgumentBinding class >> decodeUsing: anAstcodeDecoder [
+	^anAstcodeDecoder decodeArgument
+]
