@@ -57,6 +57,10 @@ class WebsideAPI extends Object {
 		this.respondWithData(logo.data);
 	}
 
+	colors() {
+		this.respondWithJson({ primary: "#81C784", secondary: "#2E7D32" });
+	}
+
 	//Changes endpoints
 	addChange() {
 		let change = this.request.body;
