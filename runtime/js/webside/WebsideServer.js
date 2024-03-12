@@ -43,6 +43,10 @@ class WebsideServer extends Object {
 			this.api(request, response).logo();
 		});
 
+		this.server.get("/colors", (request, response) => {
+			this.api(request, response).colors();
+		});
+
 		//Code endpoints..."
 		this.server.get("/classes", (request, response) => {
 			this.api(request, response).classes();
