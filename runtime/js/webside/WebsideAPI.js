@@ -113,11 +113,6 @@ class WebsideAPI extends Object {
 			this.scompiler(),
 			[code, species]
 		);
-		const method = this.runtime.sendLocal_to_with_(
-			"compile:in:",
-			this.scompiler(),
-			[code, species]
-		);
 		this.runtime.sendLocal_to_("install", method);
 		return method;
 	}
@@ -422,10 +417,6 @@ class WebsideAPI extends Object {
 			let receiver = LMRObjectWrapper.on_runtime_(frame[1], this.runtime);
 			let label =
 				receiver.objectClass().name() + ">>" + method.selector();
-			let method = LMRMethodWrapper.on_runtime_(frame[0], this.runtime);
-			let receiver = LMRObjectWrapper.on_runtime_(frame[1], this.runtime);
-			let label =
-				receiver.objectClass().name() + ">>" + method.selector();
 			return { index: index, label: label };
 		});
 		this.respondWithJson(json);
@@ -465,9 +456,6 @@ class WebsideAPI extends Object {
 		let frame = frames[index];
 		let code = LMRMethodWrapper.on_runtime_(frame[0], this.runtime);
 		let receiver = LMRObjectWrapper.on_runtime_(frame[1], this.runtime);
-		let bindings = [
-			{ name: "self", type: "variable", value: receiver.printString() },
-		];
 		let bindings = [
 			{ name: "self", type: "variable", value: receiver.printString() },
 		];
