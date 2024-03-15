@@ -52,6 +52,10 @@ class WebsideServer extends Object {
 			this.api(request, response).packages();
 		});
 
+		this.server.get("/packages/:packagename", (request, response) => {
+			this.api(request, response).package();
+		});
+
 		this.server.get(
 			"/packages/:packagename/classes",
 			(request, response) => {

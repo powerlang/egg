@@ -1,6 +1,6 @@
 import LMRObjectWrapper from "./LMRObjectWrapper.js";
 // This is required due to circular references between LMRObjectWrapper and LMRSpeciesWrapper..
-import "./LMRSpeciesWrapper.js";
+import LMRSpeciesWrapper from "./LMRSpeciesWrapper.js";
 import PowertalkEvaluatorError from "../interpreter/PowertalkEvaluatorError.js";
 import LMRMethodWrapper from "./LMRMethodWrapper.js";
 import * as logo from "./logo.js";
@@ -14,15 +14,17 @@ class WebsideAPI extends Object {
 		this.response = response;
 	}
 
-	kernel() {
+	kernelModule() {
 		return this.runtime.bootstrapper().kernel.exports["Kernel"];
 	}
 
 	scompiler() {
 		let name = this.runtime.addSymbol_("Compiler");
-		const module = this.runtime.sendLocal_to_with_("load:", this.kernel(), [
-			name,
-		]);
+		const module = this.runtime.sendLocal_to_with_(
+			"load:",
+			this.kernelModule(),
+			[name]
+		);
 		const namespace = this.runtime.sendLocal_to_("namespace", module);
 		name = this.runtime.addSymbol_("SCompiler");
 		const scompiler = this.runtime.sendLocal_to_with_("at:", namespace, [
@@ -48,7 +50,7 @@ class WebsideAPI extends Object {
 	}
 
 	respondWithJson(json) {
-		this.respondWithData(JSON.stringify(json));
+		this.response.json(json);
 	}
 
 	//General endpoints
@@ -113,6 +115,12 @@ class WebsideAPI extends Object {
 	}
 
 	//Code endpoints..."
+	package() {
+		const pack = this.requestedPackage();
+		if (pack.isNil()) return this.notFound();
+		this.respondWithJson(pack.asWebsideJson());
+	}
+
 	packages() {
 		const modules = this.loadedModules();
 		if (this.queryAt("names") === "true") {
@@ -125,12 +133,12 @@ class WebsideAPI extends Object {
 	}
 
 	packageClasses() {
-		const package = this.requestedPackage();
-		if (package.isNil()) return this.notFound();
-		const defined = this.wrapCollection(package.classes());
+		const pack = this.requestedPackage();
+		if (pack.isNil()) return this.notFound();
+		const defined = this.wrapCollection(pack.classes());
 		const extended =
 			this.queryAt("extended") == "true"
-				? this.wrapCollection(package.extensionClasses())
+				? this.wrapCollection(pack.extensionClasses())
 				: [];
 		const all = defined.concat(extended);
 		if (this.queryAt("tree") == "true") {
@@ -138,9 +146,9 @@ class WebsideAPI extends Object {
 			return this.respondWithJson(tree);
 		}
 		if (this.queryAt("names") == "true") {
-			return all.map((c) => c.name());
+			return this.respondWithJson(all.map((c) => c.name()));
 		}
-		return all.map((c) => c.asWebsideJson());
+		return this.respondWithJson(all.map((c) => c.asWebsideJson()));
 	}
 
 	classes() {
@@ -489,7 +497,12 @@ class WebsideAPI extends Object {
 	}
 
 	wrap(object) {
-		return LMRObjectWrapper.on_runtime_(object, this.runtime);
+		const type =
+			this.runtime.sendLocal_to_("isSpecies", object) ===
+			this.runtime.true()
+				? LMRSpeciesWrapper
+				: LMRObjectWrapper;
+		return type.on_runtime_(object, this.runtime);
 	}
 
 	wrapCollection(collection) {
@@ -502,7 +515,7 @@ class WebsideAPI extends Object {
 
 	loadedModules() {
 		const dictionary = this.wrap(
-			this.runtime.sendLocal_to_("loadedModules", this.kernel())
+			this.runtime.sendLocal_to_("loadedModules", this.kernelModule())
 		);
 		return this.wrapCollection(dictionary.values());
 	}
@@ -512,7 +525,7 @@ class WebsideAPI extends Object {
 		return this.wrap(
 			this.runtime.sendLocal_to_with_(
 				"loadedModuleNamed:",
-				this.kernel(),
+				this.kernelModule(),
 				[symbol]
 			)
 		);
@@ -551,28 +564,28 @@ class WebsideAPI extends Object {
 
 	classTreeFromClasses(classes) {
 		const roots = {};
-		let name, superclass, root, superclasses;
+		let moniker, superclass, root, superclasses;
 		classes.forEach((c) => {
-			name = c.name();
-			roots[name] = { name: name };
+			moniker = c.name();
+			roots[moniker] = { name: moniker };
 		});
 		classes.forEach((c) => {
 			superclass = c.superclass();
 			if (superclass.notNil()) {
-				name = superclass.name();
-				root = roots[name];
+				moniker = superclass.name();
+				root = roots[moniker];
 				if (root) {
 					if (!root.subclasses) root.subclasses = [];
-					root.subclasses.push(root[c.name()]);
+					root.subclasses.push(roots[c.name()]);
 				}
 			}
 		});
 		classes.forEach((c) => {
-			superclasses = this.wrapCollection(c.allSuperclasses());
+			superclasses = c.allSuperclasses();
 			if (superclasses.find((sc) => roots[sc.name()]))
 				delete roots[c.name()];
-			return Object.values(roots);
 		});
+		return Object.values(roots);
 	}
 
 	classNamed(name) {
@@ -585,6 +598,7 @@ class WebsideAPI extends Object {
 			.withAllSubclasses()
 			.detect_((c) => c.name() == identifier);
 		if (!species) return null;
+
 		return metaclass ? species.metaclass() : species;
 	}
 
