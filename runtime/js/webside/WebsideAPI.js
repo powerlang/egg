@@ -81,6 +81,9 @@ class WebsideAPI extends Object {
 				this.badRequest(
 					"Change type " + change.type + " not supported"
 				);
+				this.badRequest(
+					"Change type " + change.type + " not supported"
+				);
 		}
 		return this.respondWithJson(result);
 	}
@@ -105,6 +108,11 @@ class WebsideAPI extends Object {
 	compile(source, classname) {
 		const species = this.classNamed(classname).wrappee();
 		const code = this.runtime.newString_(source);
+		const method = this.runtime.sendLocal_to_with_(
+			"compile:in:",
+			this.scompiler(),
+			[code, species]
+		);
 		const method = this.runtime.sendLocal_to_with_(
 			"compile:in:",
 			this.scompiler(),
@@ -414,6 +422,10 @@ class WebsideAPI extends Object {
 			let receiver = LMRObjectWrapper.on_runtime_(frame[1], this.runtime);
 			let label =
 				receiver.objectClass().name() + ">>" + method.selector();
+			let method = LMRMethodWrapper.on_runtime_(frame[0], this.runtime);
+			let receiver = LMRObjectWrapper.on_runtime_(frame[1], this.runtime);
+			let label =
+				receiver.objectClass().name() + ">>" + method.selector();
 			return { index: index, label: label };
 		});
 		this.respondWithJson(json);
@@ -456,10 +468,18 @@ class WebsideAPI extends Object {
 		let bindings = [
 			{ name: "self", type: "variable", value: receiver.printString() },
 		];
+		let bindings = [
+			{ name: "self", type: "variable", value: receiver.printString() },
+		];
 		let object, wrapper, binding;
 		for (let i = 1; i <= code.argumentCount().asLocalObject(); i++) {
 			object = context.argumentAt_frameIndex_(i, index + 1);
 			wrapper = LMRObjectWrapper.on_runtime_(object, this.runtime);
+			binding = {
+				name: "argument" + i,
+				type: "argument",
+				value: wrapper.printString(),
+			};
 			binding = {
 				name: "argument" + i,
 				type: "argument",
@@ -470,6 +490,11 @@ class WebsideAPI extends Object {
 		for (let i = 1; i <= code.tempCount().asLocalObject(); i++) {
 			object = context.stackTemporaryAt_frameIndex_(i, index + 1);
 			wrapper = LMRObjectWrapper.on_runtime_(object, this.runtime);
+			binding = {
+				name: "temporary" + i,
+				type: "temporary",
+				value: wrapper.printString(),
+			};
 			binding = {
 				name: "temporary" + i,
 				type: "temporary",
