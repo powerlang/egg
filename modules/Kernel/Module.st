@@ -136,6 +136,14 @@ Module >> extensions [
 	^extensions
 ]
 
+{ #category : #inquiries }
+Module >> extensionClasses [
+	^extensions keys
+		collect: [:s | | key |
+			key := (s endsWith: ' class') ifTrue: [(s trimTail: ' class') asSymbol] ifFalse: [s].
+			namespace at: key ifAbsent: [Class new name: (s , '__Not_Found') asSymbol]]
+]
+
 { #category : #services }
 Module >> import: moduleName [
 	| module |

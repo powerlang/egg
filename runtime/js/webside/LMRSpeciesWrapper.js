@@ -57,7 +57,8 @@ let LMRSpeciesWrapper = class extends LMRObjectWrapper {
 				: null;
 		json["comment"] = this.instanceClass().comment();
 		json["variable"] = false;
-		json["project"] = "";
+		const module = this.module();
+		json["package"] = module.notNil() ? module.name().asLocalObject() : "";
 		return json;
 	}
 
@@ -212,10 +213,7 @@ let LMRSpeciesWrapper = class extends LMRObjectWrapper {
 	methodFor(aSymbol) {
 		let symbol = this.cachedSymbolFor(aSymbol);
 		let method = this.send(">>", [symbol]);
-		return LMRMethodWrapper.on_runtime_(
-			method.wrappee(),
-			this._runtime
-		);
+		return LMRMethodWrapper.on_runtime_(method.wrappee(), this._runtime);
 	}
 
 	instVarNames() {

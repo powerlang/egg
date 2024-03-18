@@ -1,6 +1,6 @@
 import LMRObjectWrapper from "./LMRObjectWrapper.js";
 // This is required due to circular references between LMRObjectWrapper and LMRSpeciesWrapper..
-import "./LMRSpeciesWrapper.js";
+import LMRSpeciesWrapper from "./LMRSpeciesWrapper.js";
 import PowertalkEvaluatorError from "../interpreter/PowertalkEvaluatorError.js";
 import LMRMethodWrapper from "./LMRMethodWrapper.js";
 import * as logo from "./logo.js";
@@ -14,16 +14,21 @@ class WebsideAPI extends Object {
 		this.response = response;
 	}
 
+	kernelModule() {
+		return this.runtime.bootstrapper().kernel.exports["Kernel"];
+	}
+
 	scompiler() {
-		const compiler = this.runtime.addSymbol_("Compiler");
-		const kernel = this.runtime.bootstrapper().kernel.exports["Kernel"];
-		const module = this.runtime.sendLocal_to_with_("load:", kernel, [
-			compiler,
-		]);
+		let name = this.runtime.addSymbol_("Compiler");
+		const module = this.runtime.sendLocal_to_with_(
+			"load:",
+			this.kernelModule(),
+			[name]
+		);
 		const namespace = this.runtime.sendLocal_to_("namespace", module);
-		const classname = this.runtime.addSymbol_("SCompiler");
+		name = this.runtime.addSymbol_("SCompiler");
 		const scompiler = this.runtime.sendLocal_to_with_("at:", namespace, [
-			classname,
+			name,
 		]);
 		return scompiler;
 	}
@@ -45,7 +50,7 @@ class WebsideAPI extends Object {
 	}
 
 	respondWithJson(json) {
-		this.respondWithData(JSON.stringify(json));
+		this.response.json(json);
 	}
 
 	//General endpoints
@@ -73,6 +78,9 @@ class WebsideAPI extends Object {
 				result = this.applyRemoveMethod(change);
 				break;
 			default:
+				this.badRequest(
+					"Change type " + change.type + " not supported"
+				);
 				this.badRequest(
 					"Change type " + change.type + " not supported"
 				);
@@ -110,6 +118,42 @@ class WebsideAPI extends Object {
 	}
 
 	//Code endpoints..."
+	package() {
+		const pack = this.requestedPackage();
+		if (pack.isNil()) return this.notFound();
+		this.respondWithJson(pack.asWebsideJson());
+	}
+
+	packages() {
+		const modules = this.loadedModules();
+		if (this.queryAt("names") === "true") {
+			const names = modules.map((m) => {
+				return m.name().asLocalObject();
+			});
+			return this.respondWithJson(names);
+		}
+		this.respondWithJson(modules.map((c) => c.asWebsideJson()));
+	}
+
+	packageClasses() {
+		const pack = this.requestedPackage();
+		if (pack.isNil()) return this.notFound();
+		const defined = this.wrapCollection(pack.classes());
+		const extended =
+			this.queryAt("extended") == "true"
+				? this.wrapCollection(pack.extensionClasses())
+				: [];
+		const all = defined.concat(extended);
+		if (this.queryAt("tree") == "true") {
+			const tree = this.classTreeFromClasses(all);
+			return this.respondWithJson(tree);
+		}
+		if (this.queryAt("names") == "true") {
+			return this.respondWithJson(all.map((c) => c.name()));
+		}
+		return this.respondWithJson(all.map((c) => c.asWebsideJson()));
+	}
+
 	classes() {
 		let root = this.queryAt("root");
 		if (root) root = this.classNamed(root);
@@ -188,6 +232,16 @@ class WebsideAPI extends Object {
 		let species = this.requestedClass();
 		if (!species) return this.notFound();
 		this.respondWithJson([]);
+	}
+
+	method() {
+		const species = this.requestedClass();
+		if (!species) return this.notFound();
+		const selector = this.requestedSelector();
+		if (!selector) return this.notFound();
+		if (!species.includesSelector(selector)) return this.notFound();
+		const method = species.methodFor(selector);
+		this.respondWithJson(method.asWebsideJson());
 	}
 
 	methods() {
@@ -424,11 +478,21 @@ class WebsideAPI extends Object {
 				type: "argument",
 				value: wrapper.printString(),
 			};
+			binding = {
+				name: "argument" + i,
+				type: "argument",
+				value: wrapper.printString(),
+			};
 			bindings.push(binding);
 		}
 		for (let i = 1; i <= code.tempCount().asLocalObject(); i++) {
 			object = context.stackTemporaryAt_frameIndex_(i, index + 1);
 			wrapper = LMRObjectWrapper.on_runtime_(object, this.runtime);
+			binding = {
+				name: "temporary" + i,
+				type: "temporary",
+				value: wrapper.printString(),
+			};
 			binding = {
 				name: "temporary" + i,
 				type: "temporary",
@@ -456,14 +520,44 @@ class WebsideAPI extends Object {
 	}
 
 	wrap(object) {
-		return LMRObjectWrapper.on_runtime_(object, this.runtime);
+		const type =
+			this.runtime.sendLocal_to_("isSpecies", object) ===
+			this.runtime.true()
+				? LMRSpeciesWrapper
+				: LMRObjectWrapper;
+		return type.on_runtime_(object, this.runtime);
+	}
+
+	wrapCollection(collection) {
+		return collection
+			.asArray()
+			.wrappee()
+			.slots()
+			.map((e) => this.wrap(e));
+	}
+
+	loadedModules() {
+		const dictionary = this.wrap(
+			this.runtime.sendLocal_to_("loadedModules", this.kernelModule())
+		);
+		return this.wrapCollection(dictionary.values());
+	}
+
+	packageNamed(name) {
+		const symbol = this.runtime.addSymbol_(name);
+		return this.wrap(
+			this.runtime.sendLocal_to_with_(
+				"loadedModuleNamed:",
+				this.kernelModule(),
+				[symbol]
+			)
+		);
 	}
 
 	defaultRootClass() {
 		const nil = this.runtime.nil();
-		let root = this.wrap(this.runtime.nil()).objectClass();
-		while (!(root.superclass().wrappee() === this.runtime.nil()))
-			root = root.superclass();
+		let root = this.wrap(nil).objectClass();
+		while (!(root.superclass().wrappee() === nil)) root = root.superclass();
 		return root;
 	}
 
@@ -491,6 +585,32 @@ class WebsideAPI extends Object {
 		return json;
 	}
 
+	classTreeFromClasses(classes) {
+		const roots = {};
+		let moniker, superclass, root, superclasses;
+		classes.forEach((c) => {
+			moniker = c.name();
+			roots[moniker] = { name: moniker };
+		});
+		classes.forEach((c) => {
+			superclass = c.superclass();
+			if (superclass.notNil()) {
+				moniker = superclass.name();
+				root = roots[moniker];
+				if (root) {
+					if (!root.subclasses) root.subclasses = [];
+					root.subclasses.push(roots[c.name()]);
+				}
+			}
+		});
+		classes.forEach((c) => {
+			superclasses = c.allSuperclasses();
+			if (superclasses.find((sc) => roots[sc.name()]))
+				delete roots[c.name()];
+		});
+		return Object.values(roots);
+	}
+
 	classNamed(name) {
 		if (!name) return null;
 		let identifier = name;
@@ -501,6 +621,7 @@ class WebsideAPI extends Object {
 			.withAllSubclasses()
 			.detect_((c) => c.name() == identifier);
 		if (!species) return null;
+
 		return metaclass ? species.metaclass() : species;
 	}
 
@@ -575,16 +696,25 @@ class WebsideAPI extends Object {
 	}
 
 	queriedSelector() {
-		return this.parameterAt("selector") || this.queryAt("selector");
+		return this.queryAt("selector");
 	}
 
 	queriedSending() {
 		return this.parameterAt("sending");
 	}
 
+	requestedSelector() {
+		return this.parameterAt("selector");
+	}
+
 	requestedClass() {
 		const name = this.parameterAt("classname") || this.queryAt("classname");
 		return this.classNamed(name);
+	}
+
+	requestedPackage() {
+		const name = this.parameterAt("packagename");
+		return this.packageNamed(name);
 	}
 
 	requestedId() {

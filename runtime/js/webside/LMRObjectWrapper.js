@@ -143,10 +143,12 @@ let LMRObjectWrapper = class {
 		return this instanceof aClass;
 	}
 
+	isNil() {
+		return this._wrappee === this._runtime.nil();
+	}
+
 	notNil() {
-		return this._runtime
-			.sendLocal_to_("notNil", this._wrappee)
-			._notEqual(this._runtime.nil());
+		return !this.isNil();
 	}
 
 	object() {

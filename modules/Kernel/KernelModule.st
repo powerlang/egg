@@ -120,6 +120,11 @@ KernelModule >> loadedModules [
 	^loadedModules
 ]
 
+{ #category : #inquiries }
+KernelModule >> loadedModuleNamed: aSymbol [
+	^loadedModules at: aSymbol ifAbsent: []
+]
+
 { #category : #accessing }
 KernelModule >> memory [
 	^memory

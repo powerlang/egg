@@ -48,6 +48,21 @@ class WebsideServer extends Object {
 		});
 
 		//Code endpoints..."
+		this.server.get("/packages", (request, response) => {
+			this.api(request, response).packages();
+		});
+
+		this.server.get("/packages/:packagename", (request, response) => {
+			this.api(request, response).package();
+		});
+
+		this.server.get(
+			"/packages/:packagename/classes",
+			(request, response) => {
+				this.api(request, response).packageClasses();
+			}
+		);
+
 		this.server.get("/classes", (request, response) => {
 			this.api(request, response).classes();
 		});
@@ -86,6 +101,10 @@ class WebsideServer extends Object {
 
 		this.server.get("/classes/:classname/methods", (request, response) => {
 			this.api(request, response).methods();
+		});
+
+		this.server.get("/classes/:classname/methods/:selector", (request, response) => {
+			this.api(request, response).method();
 		});
 
 		this.server.get("/methods", (request, response) => {
