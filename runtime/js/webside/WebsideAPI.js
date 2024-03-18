@@ -234,6 +234,16 @@ class WebsideAPI extends Object {
 		this.respondWithJson([]);
 	}
 
+	method() {
+		const species = this.requestedClass();
+		if (!species) return this.notFound();
+		const selector = this.requestedSelector();
+		if (!selector) return this.notFound();
+		if (!species.includesSelector(selector)) return this.notFound();
+		const method = species.methodFor(selector);
+		this.respondWithJson(method.asWebsideJson());
+	}
+
 	methods() {
 		let methods;
 		let selector = this.queriedSelector();
@@ -686,11 +696,15 @@ class WebsideAPI extends Object {
 	}
 
 	queriedSelector() {
-		return this.parameterAt("selector") || this.queryAt("selector");
+		return this.queryAt("selector");
 	}
 
 	queriedSending() {
 		return this.parameterAt("sending");
+	}
+
+	requestedSelector() {
+		return this.parameterAt("selector");
 	}
 
 	requestedClass() {

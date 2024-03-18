@@ -103,6 +103,10 @@ class WebsideServer extends Object {
 			this.api(request, response).methods();
 		});
 
+		this.server.get("/classes/:classname/methods/:selector", (request, response) => {
+			this.api(request, response).method();
+		});
+
 		this.server.get("/methods", (request, response) => {
 			this.api(request, response).methods();
 		});

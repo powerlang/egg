@@ -25,6 +25,8 @@ let LMRMethodWrapper = class extends LMRObjectWrapper {
 		json.timestamp = "Unknown timeStamp";
 		json.overriding = false;
 		json.overriden = false;
+		const module = this.module();
+		json["package"] = module.notNil() ? module.name().asLocalObject() : "";
 		return json;
 	}
 
