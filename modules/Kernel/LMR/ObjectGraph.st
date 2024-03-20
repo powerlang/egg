@@ -74,7 +74,7 @@ ObjectGraph >> scanNativeCode: aNativeCode [
 
 { #category : #accessing }
 ObjectGraph >> updateAndFollow: root [
-	ActiveProcess stack update.
+	Processor activeProcess stack update.
 	self follow: root
 ]
 

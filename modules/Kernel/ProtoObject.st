@@ -473,12 +473,12 @@ ProtoObject >> requiresFinalization [
 
 { #category : #interrupts }
 ProtoObject >> signalStep [
-	ActiveProcess handleStepSignal
+	Processor activeProcess handleStepSignal
 ]
 
 { #category : #interrupts }
 ProtoObject >> signalStep: aSymbol [
-	ActiveProcess handleStepSignal
+	Processor activeProcess handleStepSignal
 ]
 
 { #category : #system }

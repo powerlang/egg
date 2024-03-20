@@ -159,7 +159,7 @@ SendSite >> _dispatchDebuggableOn: anObject [
 	LookupCount := LookupCount + 1.
 	cm := anObject _cachedLookup: selector.
 	cm == nil ifTrue: [^anObject doesNotUnderstandSelector: selector].
-	invoked := ActiveProcess wantsToStepInto
+	invoked := Processor activeProcess wantsToStepInto
 		ifTrue: [cm debuggableCopy]
 		ifFalse: [cm].
 	invoked prepareForExecution.
@@ -179,7 +179,7 @@ SendSite >> _dispatchDebuggableOn: anObject startingAt: aBehavior [
 	LookupCount := LookupCount + 1.
 	cm := anObject _cachedLookup: selector in: aBehavior.
 	cm == nil ifTrue: [^anObject doesNotUnderstandSelector: selector].
-	invoked := ActiveProcess wantsToStepInto
+	invoked := Processor activeProcess wantsToStepInto
 		ifTrue: [cm debuggableCopy]
 		ifFalse: [cm].
 	invoked prepareForExecution.

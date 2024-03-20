@@ -57,8 +57,8 @@ KernelModule >> bootstrap [
 		at: #WordSize put: WordSize;
 		at: #WordSizeShift put: shift;
 		at: #Kernel put: self;
-		at: #ActiveProcess put: Process new;
-		at: #KnownSymbols put: #(+ - < > <= >= = == not).
+		at: #KnownSymbols put: #(+ - < > <= >= = == not);
+		at: #Processor put: ProcessorScheduler new.
 	StarToken initializeCurrent.
 	Unicode allSubclasses do: [:c | c initializeCurrent].
 	Symbol initializeSymbolTable.

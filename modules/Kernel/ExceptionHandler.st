@@ -52,7 +52,7 @@ ExceptionHandler >> findHandlerFor: anException [
 { #category : #handling }
 ExceptionHandler >> handle: anException [
 	| result |
-	ActiveProcess
+	Processor activeProcess
 		useExceptionHandler: previous
 		while: [result := self evaluateFor: anException].
 	anException reset.
@@ -61,12 +61,13 @@ ExceptionHandler >> handle: anException [
 
 { #category : #activation }
 ExceptionHandler >> handle: exceptionClass with: hBlock during: pBlock [
-	| result |
+	| result active |
 	filter := exceptionClass.
 	handlerBlock := hBlock.
 	protectedBlock := pBlock.
-	previous := ActiveProcess exceptionHandler.
-	ActiveProcess
+	active := Processor activeProcess.
+	previous := active exceptionHandler.
+	active
 		useExceptionHandler: self
 		while: [[
 			result := self evaluateProtectedBlock.

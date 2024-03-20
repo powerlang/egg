@@ -536,7 +536,7 @@ Memory >> reserveSpaceSized: reserved commiting: commited [
 
 { #category : #inquiries }
 Memory >> roots [
-	^{ActiveProcess}
+	^{Processor activeProcess}
 ]
 
 { #category : #services }
@@ -549,7 +549,7 @@ Memory >> scavengeYoungObjects [
 			CRITICAL := false] evaluateAtomically].
 	self rescueEphemerons.
 	Smalltalk transcript cr; print: meter statistics.
-	[ActiveProcess gcFlipInterrupt]
+	[Processor activeProcess gcFlipInterrupt]
 ]
 
 { #category : #copying }

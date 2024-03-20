@@ -34,7 +34,7 @@ Recursion class >> checkOn: anObject while: aBlock onSignal: exceptionBlock [
 { #category : #accessing }
 Recursion class >> recursionSet [
 	| handler set |
-	handler := ActiveProcess.
+	handler := Processor activeProcess.
 	[
 		handler := handler notNil ifTrue: [handler findHandlerFor: self new].
 		handler notNil
@@ -42,7 +42,7 @@ Recursion class >> recursionSet [
 		handler notNil and: [set isNil]]
 		whileTrue: [handler := handler nextHandler].
 	^set ifNil: [
-		ActiveProcess exceptionHandler
+		Processor activeProcess exceptionHandler
 			propertyAt: #recursionSet
 			ifAbsentPut: [IdentitySet new]]
 ]

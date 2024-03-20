@@ -44,7 +44,7 @@ Closure class >> receiverIndex [
 { #category : #handling }
 Closure >> _return: result [
 	self canReturn ifFalse: [^self cannotReturn].
-	^ActiveProcess returnTo: homeFrame methodFrame with: result
+	^Processor activeProcess returnTo: homeFrame methodFrame with: result
 ]
 
 { #category : #accessing }
@@ -114,7 +114,7 @@ Closure >> do: aClosure [
 
 { #category : #handling }
 Closure >> ensure: aBlock [
-	^ActiveProcess evaluate: self ensuring: aBlock
+	^Processor activeProcess evaluate: self ensuring: aBlock
 ]
 
 { #category : #handling }
