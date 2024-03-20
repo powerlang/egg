@@ -7,58 +7,90 @@ Class {
 	#name : #Process,
 	#superclass : #Object,
 	#instVars : [
-		'stack',
 		'name',
-		'protectedFrames'
+		'nativeStack',
+		'topContext',
+		'protectedFrames',
+		'exceptionHandler',
+		'semaphore',
 		'hopping'
 	],
 	#category : #Kernel
 }
 
-{ #category : #evaluation }
-Process >> evaluate: aBlock ensuring: ensuredBlock  [
-	| result |
-	result := aBlock value.
-	ensuredBlock value.
-	^result
+{ #category : #services }
+Process class >> sending: aSymbol to: anObject with: arguments [
+	^SuspendedProcess sending: aSymbol to: anObject with: arguments
+]
+
+{ #category : #services }
+Process >> beActive [
+	self notAllowed
+]
+
+{ #category : #services }
+Process >> beInactive [
+	self notAllowed
 ]
 
 { #category : #private }
+Process >> launch: aMessage [
+	self notAllowed
+]
+
+{ #category : #services }
+Process >> drop [
+	self subclassResponsibility
+]
+
+{ #category : #initializing }
+Process >> evaluating: aMessageSend [
+	self notAllowed
+]
+
+{ #category : #initializing }
 Process >> initialize [
-	hopping := false.
 	name := 'nameless process'.
-	stack := ProcessVirtualStack on: self.
-	self vmSpecificInitialize
 ]
 
 { #category : #private }
-Process >> evaluate: aClosure ensuring: ensuredClosure [
-	"
-	Ensure is easy here: the closure is evaluated, and the only way to skip
-	the ensuredBlock would be from a non-local return, so we assume non-local
-	returns check for protected frames, evaluates all between return source and
-	home frames, and then does the unwinding.
-	The local `cursor` is needed-by and special-to the debugger, because it might
-	have to update the frame indices if the stack frames are changed.
-	"
-	| cursor result prev |
-	cursor := self frameIndex.
-	protectedFrames push: cursor.
-	result := aBlock value.
-	prev := protectedFrames pop.
-	prev == cursor
-		ifFalse: [self
-			_error: 'popped protected frame is not the same that was pushed'].
-	ensuredBlock value.
+Process >> findHandlerFor: anException [
+	| original result |
+	original := exceptionHandler ifNil: [^nil].
+	exceptionHandler := nil.
+	result := original findHandlerFor: anException.
+	exceptionHandler := original.
 	^result
 ]
 
-Process >> frameIndex [
-	self errorVMSpecific
+{ #category : #private }
+Process >> isReified [
+	^topContext notNil
 ]
 
-Process >> vmSpecificInitialize [
-	self errorVMSpecific
+{ #category : #testing }
+Process >> isScheduled [
+	^Processor isScheduled: self
+]
+
+{ #category : #errors }
+Process >> notAllowed [
+	self error: 'this message cannot be executed in current process state'
+]
+
+{ #category : #scheduling }
+Process >> takeControl [
+	self notAllowed
+]
+
+{ #category : #accessing }
+Process >> topContext [
+	^topContext
+]
+
+{ #category : #accessing }
+Process >> topContext: aContext [
+	topContext := aContext
 ]
 
 { #category : #private }
@@ -68,4 +100,3 @@ Process >> wantsToStepInto [
 	answer ifTrue: [hopping := false].
 	^answer
 ]
-

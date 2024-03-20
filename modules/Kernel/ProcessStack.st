@@ -14,12 +14,12 @@ Class {
 
 { #category : #private }
 ProcessStack class >> on: aProcess [
-	^self new process: aProcess
+	^self errorVMSpecific
 ]
 
 { #category : #private }
-ProcessStack >> initialize [
-	self vmSpecificInitialize
+ProcessStack >> contextSwitchTo: next [
+	self subclassResponsibility
 ]
 
 ProcessStack >> process [
@@ -28,8 +28,4 @@ ProcessStack >> process [
 
 ProcessStack >> process: aProcess [
 	process := aProcess
-]
-
-ProcessStack >> release [
-	self invalidate; unregister
 ]
