@@ -112,6 +112,18 @@ Array.prototype._equal = function(value) {
         this.every((val, index) => val === value[index]);
 }
 
+Array.prototype.asLittleEndianPositiveInteger = function() {
+	let bigInteger = 0n;
+	for (let i = 0; i < this.length; i++) {
+		bigInteger += BigInt(this[i]) << BigInt(8 * i);
+	}
+	return bigInteger;
+}
+
+Array.prototype.asLittleEndianNegativeInteger = function() {
+	return this.asLittleEndianPositiveInteger() - (BigInt(1) << BigInt(64));
+}
+
 String.prototype.asByteArray = function() { return Array.from(this).map((char) => char.charCodeAt(0)); }
 String.prototype.beginsWith_ = function(string) { return this.startsWith(string); }
 
