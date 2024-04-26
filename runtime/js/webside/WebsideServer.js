@@ -165,9 +165,14 @@ class WebsideServer extends Object {
 			this.api(request, response).deleteDebugger();
 		});
 
-		//Changes ..."
+		//Changes endpoints...
 		this.server.post("/changes", (request, response) => {
 			this.api(request, response).addChange();
+		});
+
+		//Extensions endpoints...
+		this.server.get("/extensions", (request, response) => {
+			this.api(request, response).extensions();
 		});
 	}
 

@@ -2,7 +2,7 @@ import LMRByteObject from "../interpreter/LMRByteObject.js";
 import LMRObject from "../interpreter/LMRObject.js";
 import LMRSmallInteger from "../interpreter/LMRSmallInteger.js";
 
-let LMRSpeciesWrapper;
+let LMRSpeciesWrapper, LMRModuleWrapper;
 
 let selectorFor = function (selector, args) {
 	if (args.length == 0) return selector;
@@ -41,6 +41,28 @@ let LMRObjectWrapper = class {
 		LMRSpeciesWrapper = obj;
 	}
 
+	static setLMRModuleWrapper(obj) {
+		LMRModuleWrapper = obj;
+	}
+
+	static wrap(object, runtime) {
+		const type =
+			runtime.sendLocal_to_("isSpecies", object) === runtime.true()
+				? LMRSpeciesWrapper
+				: runtime.sendLocal_to_("isModule", object) === runtime.true()
+				? LMRModuleWrapper
+				: LMRObjectWrapper;
+		return type.on_runtime_(object, runtime);
+	}
+
+	static wrapCollection(collection, runtime) {
+		return collection
+			.asArray()
+			.wrappee()
+			.slots()
+			.map((e) => this.wrap(e, runtime));
+	}
+
 	initialize() {}
 
 	static on_runtime_(anLMRObject, aPowerlangLMR) {
@@ -54,6 +76,14 @@ let LMRObjectWrapper = class {
 		let res = this.on_runtime_(anLMRObject, aPowerlangLMR);
 		res._id = id;
 		return res;
+	}
+
+	wrap(object) {
+		return LMRObjectWrapper.wrap(object, this._runtime);
+	}
+
+	wrapCollection(collection) {
+		return LMRObjectWrapper.wrapCollection(collection, this._runtime);
 	}
 
 	_equal(anObject) {
@@ -98,10 +128,13 @@ let LMRObjectWrapper = class {
 			json.class = species.name();
 			json.indexable = variable;
 			json.size = variable ? this.size().wrappee().value() : 0;
-			json.hasNamedSlots = species.instancesHavePointers().asLocalObject();
+			json.hasNamedSlots = species
+				.instancesHavePointers()
+				.asLocalObject();
 			json.hasIndexedSlots = this.hasIndexedSlots().asLocalObject();
+		} catch (error) {
+			json.error = error.message;
 		}
-		catch (error) { json.error = error.message }
 		return json;
 	}
 
@@ -125,8 +158,9 @@ let LMRObjectWrapper = class {
 		);
 		if (!(result instanceof LMRObject)) return result;
 		_class =
-			this._runtime.sendLocal_to_("isSpecies", result) === this._runtime.true() ?
-				LMRSpeciesWrapper
+			this._runtime.sendLocal_to_("isSpecies", result) ===
+			this._runtime.true()
+				? LMRSpeciesWrapper
 				: LMRObjectWrapper;
 		return _class.on_runtime_(result, this._runtime);
 	}

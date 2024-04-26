@@ -1,6 +1,7 @@
 import LMRObjectWrapper from "./LMRObjectWrapper.js";
 // This is required due to circular references between LMRObjectWrapper and LMRSpeciesWrapper..
 import LMRSpeciesWrapper from "./LMRSpeciesWrapper.js";
+import LMRModuleWrapper from "./LMRModuleWrapper.js";
 import PowertalkEvaluatorError from "../interpreter/PowertalkEvaluatorError.js";
 import LMRMethodWrapper from "./LMRMethodWrapper.js";
 import * as logo from "./logo.js";
@@ -514,26 +515,22 @@ class WebsideAPI extends Object {
 		this.respondWithData(id);
 	}
 
+	//Extension endpoints...
+	extensions() {
+		this.respondWithJson([]);
+	}
+
 	//Private...
 	wrapWithId(object, id) {
 		return LMRObjectWrapper.on_runtime_id_(object, this.runtime, id);
 	}
 
 	wrap(object) {
-		const type =
-			this.runtime.sendLocal_to_("isSpecies", object) ===
-			this.runtime.true()
-				? LMRSpeciesWrapper
-				: LMRObjectWrapper;
-		return type.on_runtime_(object, this.runtime);
+		return LMRObjectWrapper.wrap(object, this.runtime);
 	}
 
 	wrapCollection(collection) {
-		return collection
-			.asArray()
-			.wrappee()
-			.slots()
-			.map((e) => this.wrap(e));
+		return LMRObjectWrapper.wrapCollection(collection, this.runtime);
 	}
 
 	loadedModules() {
@@ -587,6 +584,7 @@ class WebsideAPI extends Object {
 
 	classTreeFromClasses(classes) {
 		const roots = {};
+		let removable = [];
 		let moniker, superclass, root, superclasses;
 		classes.forEach((c) => {
 			moniker = c.name();
@@ -599,15 +597,13 @@ class WebsideAPI extends Object {
 				root = roots[moniker];
 				if (root) {
 					if (!root.subclasses) root.subclasses = [];
-					root.subclasses.push(roots[c.name()]);
+					let name = c.name();
+					root.subclasses.push(roots[name]);
+					removable.push(name);
 				}
 			}
 		});
-		classes.forEach((c) => {
-			superclasses = c.allSuperclasses();
-			if (superclasses.find((sc) => roots[sc.name()]))
-				delete roots[c.name()];
-		});
+		removable.forEach((n) => delete roots[n]);
 		return Object.values(roots);
 	}
 

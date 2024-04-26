@@ -36,6 +36,7 @@ let LMRMethodWrapper = class extends LMRObjectWrapper {
 			s = this.send("selector");
 		};
 		if (s) return s.wrappee().asLocalString();
+		"This means the wrappee is a block"
 		return "[]";
 	}
 
