@@ -6,7 +6,6 @@
 Package {
 	#name : #Tonel, 
 	#requires : [
-		'Kernel', 
 		'STON'
 	], 
 	#classes : [
