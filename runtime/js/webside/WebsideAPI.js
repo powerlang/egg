@@ -1,9 +1,5 @@
-import LMRObjectWrapper from "./LMRObjectWrapper.js";
-// This is required due to circular references between LMRObjectWrapper and LMRSpeciesWrapper..
-import LMRSpeciesWrapper from "./LMRSpeciesWrapper.js";
-import LMRModuleWrapper from "./LMRModuleWrapper.js";
+import { LMRObjectWrapper, LMRMethodWrapper } from "./LMRObjectWrapper.js";
 import PowertalkEvaluatorError from "../interpreter/PowertalkEvaluatorError.js";
-import LMRMethodWrapper from "./LMRMethodWrapper.js";
 import * as logo from "./logo.js";
 
 class WebsideAPI extends Object {
