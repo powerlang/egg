@@ -47,7 +47,7 @@ Module >> addOverride: aCompiledMethod [
 	overriden at: aCompiledMethod signature put: aCompiledMethod
 ]
 
-{ #category : #initializing }
+{ #category : #initialization }
 Module >> basicInitialize [
 	name := self defaultName.
 	exports := Set new.
@@ -144,6 +144,11 @@ Module >> extensionClasses [
 			namespace at: key ifAbsent: [Class new name: (s , '__Not_Found') asSymbol]]
 ]
 
+{ #category : #testing }
+Module >> isModule [
+	^true
+]
+
 { #category : #services }
 Module >> import: moduleName [
 	| module |
@@ -192,7 +197,7 @@ Module >> imports [
 	^#()
 ]
 
-{ #category : #initializing }
+{ #category : #initialization }
 Module >> initialize [
 	self basicInitialize.
 	namespace := Namespace new.
