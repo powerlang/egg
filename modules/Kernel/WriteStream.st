@@ -102,6 +102,18 @@ WriteStream >> nextFloatPut: aFloat [
 ]
 
 { #category : #marshalling }
+WriteStream >> nextInt64Put: anInteger [
+	| n |
+	(anInteger < -16r8000000000000000 or: [ anInteger >= 16r8000000000000000 ])
+		ifTrue: [ self error: 'outside 64-bit integer range' ].
+	n := anInteger < 0
+		ifTrue: [ 16r10000000000000000 + anInteger ]
+		ifFalse: [ anInteger ].
+	8 to: 1 by: -1 do: [:i | self nextPut: (n byteAt: i)]
+]
+
+
+{ #category : #marshalling }
 WriteStream >> nextLongPut: anInteger [
 	| bytes |
 	bytes := ByteArray new: 4.

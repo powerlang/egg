@@ -194,7 +194,7 @@ AstcodeEncoder >> method: aCompiledMethod [
 AstcodeEncoder >> nextBigIntegerPut: anInteger [
 	stream
 		nextPut: 16r80;
-		int64: anInteger
+		nextInt64Put: anInteger
 ]
 
 { #category : #visiting }
