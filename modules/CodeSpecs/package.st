@@ -4,13 +4,12 @@
 "
 
 Package {
-	#name : #Tonel, 
-	#requires : [
-		'STON'
-	], 
+	#name : #CodeSpecs, 
 	#classes : [
-		'TonelReader', 
-		'TonelTest', 
-		'TonelWriter'
+		'ClassSpec', 
+		'MetaclassSpec', 
+		'MethodSpec', 
+		'ModuleSpec', 
+		'SpeciesSpec'
 	]
 }

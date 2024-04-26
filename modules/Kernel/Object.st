@@ -586,6 +586,11 @@ Object >> isMethodDictionary [
 ]
 
 { #category : #testing }
+Object >> isModule [
+	^false
+]
+
+{ #category : #testing }
 Object >> isNativeCode [
 	^false
 ]

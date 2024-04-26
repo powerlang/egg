@@ -2,8 +2,6 @@ import LMRByteObject from "../interpreter/LMRByteObject.js";
 import LMRObject from "../interpreter/LMRObject.js";
 import LMRSmallInteger from "../interpreter/LMRSmallInteger.js";
 
-let LMRSpeciesWrapper;
-
 let selectorFor = function (selector, args) {
 	if (args.length == 0) return selector;
 	if (args.length == 1) return selector + ":";
@@ -37,8 +35,22 @@ let LMRObjectWrapper = class {
 		});
 	}
 
-	static setLMRSpeciesWrapper(obj) {
-		LMRSpeciesWrapper = obj;
+	static wrap(object, runtime) {
+		const type =
+			runtime.sendLocal_to_("isSpecies", object) === runtime.true()
+				? LMRSpeciesWrapper
+				: runtime.sendLocal_to_("isModule", object) === runtime.true()
+				? LMRModuleWrapper
+				: LMRObjectWrapper;
+		return type.on_runtime_(object, runtime);
+	}
+
+	static wrapCollection(collection, runtime) {
+		return collection
+			.asArray()
+			.wrappee()
+			.slots()
+			.map((e) => this.wrap(e, runtime));
 	}
 
 	initialize() {}
@@ -54,6 +66,14 @@ let LMRObjectWrapper = class {
 		let res = this.on_runtime_(anLMRObject, aPowerlangLMR);
 		res._id = id;
 		return res;
+	}
+
+	wrap(object) {
+		return LMRObjectWrapper.wrap(object, this._runtime);
+	}
+
+	wrapCollection(collection) {
+		return LMRObjectWrapper.wrapCollection(collection, this._runtime);
 	}
 
 	_equal(anObject) {
@@ -98,10 +118,13 @@ let LMRObjectWrapper = class {
 			json.class = species.name();
 			json.indexable = variable;
 			json.size = variable ? this.size().wrappee().value() : 0;
-			json.hasNamedSlots = species.instancesHavePointers().asLocalObject();
+			json.hasNamedSlots = species
+				.instancesHavePointers()
+				.asLocalObject();
 			json.hasIndexedSlots = this.hasIndexedSlots().asLocalObject();
+		} catch (error) {
+			json.error = error.message;
 		}
-		catch (error) { json.error = error.message }
 		return json;
 	}
 
@@ -125,8 +148,9 @@ let LMRObjectWrapper = class {
 		);
 		if (!(result instanceof LMRObject)) return result;
 		_class =
-			this._runtime.sendLocal_to_("isSpecies", result) === this._runtime.true() ?
-				LMRSpeciesWrapper
+			this._runtime.sendLocal_to_("isSpecies", result) ===
+			this._runtime.true()
+				? LMRSpeciesWrapper
 				: LMRObjectWrapper;
 		return _class.on_runtime_(result, this._runtime);
 	}
@@ -186,4 +210,374 @@ let LMRObjectWrapper = class {
 	}
 };
 
-export default LMRObjectWrapper;
+const cachedSymbols = {};
+
+let LMRSpeciesWrapper = class extends LMRObjectWrapper {
+	_shiftRight(aSymbol) {
+		let symbol;
+		symbol = this._runtime.symbolFromLocal_(aSymbol);
+		return LMRMethodWrapper.on_runtime_(
+			this.send("shiftRight", [symbol]).wrappee(),
+			this._runtime
+		);
+	}
+
+	allInstVarNames() {
+		return this.send("allInstVarNames")
+			.asArray()
+			.wrappee()
+			.slots()
+			.map((s) => s.asLocalString());
+	}
+
+	allSubclasses() {
+		const slots = this.send("allSubclasses").asArray().wrappee().slots();
+		const mapped = slots.map((c) =>
+			LMRSpeciesWrapper.on_runtime_(c, this._runtime)
+		);
+
+		return mapped;
+	}
+
+	allSubspecies() {
+		const slots = this.send("allSubspecies").asArray().wrappee().slots();
+		const mapped = slots.map((c) =>
+			LMRSpeciesWrapper.on_runtime_(c, this._runtime)
+		);
+
+		return mapped;
+	}
+
+	allSuperclasses() {
+		return this.send("allSuperclasses")
+			.asArray()
+			.wrappee()
+			.slots()
+			.map((c) => LMRSpeciesWrapper.on_runtime_(c, this._runtime));
+	}
+
+	asWebsideJson() {
+		let json = super.asWebsideJson();
+		json["name"] = this.name();
+		json["definition"] = this.definition();
+		json["superclass"] =
+			this.superclass().wrappee() !== this._runtime.nil()
+				? this.superclass().name()
+				: null;
+		json["comment"] = this.instanceClass().comment();
+		json["variable"] = false;
+		const module = this.module();
+		json["package"] = module.notNil() ? module.name().asLocalObject() : "";
+		return json;
+	}
+
+	categories() {
+		return this.send("categories")
+			.asArray()
+			.wrappee()
+			.slots()
+			.map((c) => c.asLocalString());
+	}
+
+	cachedSymbolFor(string) {
+		let symbol;
+		symbol = cachedSymbols[string];
+		if (!symbol || typeof symbol !== "object") {
+			symbol = this._runtime.addSymbol_(string);
+			cachedSymbols[string] = symbol;
+		}
+		return symbol;
+	}
+
+	classVarNames() {
+		return this.send("classVarNames")
+			.asArray()
+			.wrappee()
+			.slots()
+			.map((s) => s.asLocalString());
+	}
+
+	classVariablesString() {
+		return String.streamContents_((s) => {
+			return this.classVarNames().do_separatedBy_(
+				(n) => {
+					return s.nextPutAll_(n);
+				},
+				() => {
+					return s.space();
+				}
+			);
+		});
+	}
+
+	comment() {
+		return this.send("comment").wrappee().asLocalString();
+	}
+
+	compile_(aString) {
+		let local,
+			size,
+			kernel,
+			name,
+			_class,
+			method,
+			astcodes,
+			selector,
+			format,
+			code,
+			md;
+		debugger;
+		/*		local = SCompiler.new().compile_(aString);
+		size = this._runtime.newInteger_(local.size());
+		kernel = this._runtime.sendLocal_to_("namespace", this._runtime.kernel());
+		name = this._runtime.symbolFromLocal_("CompiledMethod");
+		_class = this._runtime.sendLocal_to_with_("at:", kernel, [name]);
+		method = this._runtime.sendLocal_to_with_("new:", _class, [size]);
+		astcodes = this._runtime.newByteArray_(local.astcodes());
+		selector = this._runtime.addSymbol_(local.selector());
+		format = this._runtime.newInteger_(local.format());
+		code = this._runtime.newString_(local.source());
+		_cascade(this._runtime, (_recv) => {
+			_recv.sendLocal_to_with_("astcodes:", method, [astcodes]);
+			_recv.sendLocal_to_with_("classBinding:", method, [this._wrappee]);
+			_recv.sendLocal_to_with_("selector:", method, [selector]);
+			_recv.sendLocal_to_with_("format:", method, [format]);
+			return _recv.sendLocal_to_with_("sourceObject:", method, [code]);});
+		local.withIndexDo_((literal, i) => {
+			tliteral = this._runtime.bootstrapper().transferLiteral_(literal);
+			return method.at_put_(i, tliteral)
+		});
+		md = this._runtime.sendLocal_to_("methodDictionary", this._wrappee);
+		this._runtime.sendLocal_to_with_("at:put:", md, [selector, method]);
+		return method;
+	*/
+	}
+
+	definition() {
+		let highest;
+		return String.streamContents_((strm) => {
+			highest = this.superclass().wrappee()._equal(this._runtime.nil());
+			highest.ifTrue_ifFalse_(
+				() => {
+					return strm.nextPutAll_("ProtoObject");
+				},
+				() => {
+					return strm.nextPutAll_(this.superclass().name());
+				}
+			);
+			_cascade(strm, (_recv) => {
+				_recv.space();
+				_recv.nextPutAll_(
+					this.kindOfSubclass().wrappee().asLocalString()
+				);
+				_recv.space();
+				_recv.nextPutAll_("#");
+				_recv.nextPutAll_(this.name());
+				_recv.cr();
+				_recv.tab();
+				_recv.nextPutAll_("instanceVariableNames: '");
+				_recv.nextPutAll_(this.instanceVariablesString());
+				_recv.nextPutAll_("'");
+				_recv.cr();
+				_recv.tab();
+				_recv.nextPutAll_("classVariableNames: '");
+				_recv.nextPutAll_(this.classVariablesString());
+				_recv.nextPutAll_("'");
+				_recv.cr();
+				_recv.tab();
+				_recv.nextPutAll_("poolDictionaries: '");
+				_recv.nextPutAll_(this.sharedPoolsString());
+				_recv.nextPutAll_("'");
+				_recv.cr();
+				_recv.tab();
+				_recv.nextPutAll_("category: ");
+				return _recv.store_("");
+			});
+			return highest.ifTrue_(() => {
+				return _cascade(strm, (_recv) => {
+					_recv.nextPutAll_(".");
+					_recv.cr();
+					_recv.nextPutAll_(this.name());
+					_recv.space();
+					return _recv.nextPutAll_("superclass: nil");
+				});
+			});
+		});
+	}
+
+	canUnderstand(aSymbol) {
+		let symbol = this.cachedSymbolFor(aSymbol);
+		return this.send("canUnderstand:", [symbol]).asLocalObject();
+	}
+
+	includesSelector(aSymbol) {
+		let symbol = this.cachedSymbolFor(aSymbol);
+		return this.send("includesSelector:", [symbol]).asLocalObject();
+	}
+
+	isVariable() {
+		return this.send("isVariable").asLocalObject();
+	}
+
+	methodFor(aSymbol) {
+		let symbol = this.cachedSymbolFor(aSymbol);
+		let method = this.send(">>", [symbol]);
+		return LMRMethodWrapper.on_runtime_(method.wrappee(), this._runtime);
+	}
+
+	instVarNames() {
+		return this.send("instVarNames")
+			.asArray()
+			.wrappee()
+			.slots()
+			.map((s) => s.asLocalString());
+	}
+
+	instanceVariablesString() {
+		return String.streamContents_((s) => {
+			return this.instVarNames().do_separatedBy_(
+				(n) => {
+					return s.nextPutAll_(n);
+				},
+				() => {
+					return s.space();
+				}
+			);
+		});
+	}
+
+	metaclass() {
+		return this.class().on_runtime_(
+			this._runtime.sendLocal_to_("class", this._wrappee),
+			this._runtime
+		);
+	}
+
+	methods() {
+		let md;
+		md = this.methodDictionary();
+		return md
+			.values()
+			.asSet()
+			.asArray()
+			.wrappee()
+			.slots()
+			.map((m) => LMRMethodWrapper.on_runtime_(m, this._runtime));
+	}
+
+	name() {
+		return this.send("name").wrappee().asLocalString();
+	}
+
+	removeSelector_(aSymbol) {
+		let symbol;
+		symbol = this._runtime.symbolFromLocal_(aSymbol);
+		this.send("removeSelector:", [symbol]);
+		return this;
+	}
+
+	sharedPoolsString() {
+		return "";
+	}
+
+	subclasses() {
+		return this.send("subclasses")
+			.asArray()
+			.wrappee()
+			.slots()
+			.map((c) => LMRSpeciesWrapper.on_runtime_(c, this._runtime));
+	}
+
+	withAllSubclasses() {
+		return [this].concat(this.allSubclasses());
+	}
+
+	withAllSubspecies() {
+		return [this].concat(this.allSubspecies());
+	}
+
+	withAllSuperclasses() {
+		return [this].concat(this.allSuperclasses());
+	}
+};
+
+let LMRMethodWrapper = class extends LMRObjectWrapper {
+	asWebsideJson() {
+		let json = super.asWebsideJson();
+		try {
+			json.selector = this.selector();
+		} catch (error) {
+			json.selector = "Error retrieving selector: " + error.message;
+		}
+		let species;
+		try {
+			species = this.classBinding();
+			json.methodClass = species ? species.name() : "Unknown class";
+		} catch (error) {
+			json.methodClass = "Error retrieving class: " + error.message;
+		}
+		try {
+			json.source = this.sourceCode();
+		} catch (error) {
+			json.source = "Error retrieving source: " + error.message;
+		}
+		json.category = "Unknown category";
+		json.author = "Unknown author";
+		json.timestamp = "Unknown timeStamp";
+		json.overriding = false;
+		json.overriden = false;
+		const module = this.module();
+		json["package"] = module.notNil() ? module.name().asLocalObject() : "";
+		return json;
+	}
+
+	selector() {
+		let s;
+		if (this.respondsTo("selector")) {
+			s = this.send("selector");
+		}
+		if (s) return s.wrappee().asLocalString();
+		//This means the wrappee is a block...
+		return "[]";
+	}
+
+	sourceCode() {
+		let source;
+		source = this.sourceObject();
+		if (!source) return "no source";
+		source = source.wrappee();
+		if (source === this._runtime.nil()) return "no source";
+		else return source.asLocalString();
+	}
+};
+
+let LMRModuleWrapper = class extends LMRObjectWrapper {
+	asWebsideJson() {
+		let json = super.asWebsideJson();
+		let classes = this.classes();
+		try {
+			json.name = this.name();
+		} catch (error) {}
+		json.classes = this.wrapCollection(this.classes()).map((c) => c.name());
+		json.methods = {};
+		let extensions = this.wrapCollection(this.extensions().associations());
+		extensions.forEach((a) => {
+			let classname = a.key().asLocalObject();
+			json.methods[classname] = this.wrapCollection(a.value()).map((m) =>
+				m.selector().asLocalObject()
+			);
+		});
+		return json;
+	}
+
+	name() {
+		return this.send("name").wrappee().asLocalString();
+	}
+};
+
+export {
+	LMRObjectWrapper,
+	LMRSpeciesWrapper,
+	LMRMethodWrapper,
+	LMRModuleWrapper,
+};

@@ -5,7 +5,7 @@ var bootstrapper = new Bootstrapper();
 bootstrapper.loadKernelFile("Kernel.json");
 const runtime = bootstrapper.runtime;
 const kernel = bootstrapper.kernel.exports["Kernel"];
-const modules = ["Compiler", "ImageSegmentBuilder", "STON", "Tonel"];
+const modules = ["Compiler", "ImageSegmentBuilder", "STON", "Tonel", "CodeSpecs"];
 modules.forEach(name => {
     const symbol = runtime.addSymbol_(name);
     runtime.sendLocal_to_with_("load:", kernel, [symbol])});
