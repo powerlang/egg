@@ -79,6 +79,25 @@ PowertalkIterativeStackedInterpreter >> linearizer [
 ]
 
 { #category : #initialization }
+PowertalkIterativeStackedInterpreter >> messageNotUnderstood: anSMessage [
+
+	"
+	Having the adaptor causes argument popping work transparently. The adaptor frame's
+	PC is pointed to the instant after the send, so it just pops the message and continues
+"
+
+	| count args array dnu |
+	count := anSMessage arguments size.
+	args := (1 to: count) collect: [ :i | context operandAt: count - i ].
+	array := runtime newArray: args.
+	context
+		push: anSMessage selector;
+		push: array.
+	dnu := runtime doesNotUnderstandMethod.
+	self invoke: dnu with: regR
+]
+
+{ #category : #initialization }
 PowertalkIterativeStackedInterpreter >> nextOperation [
  | pc |
 pc := context incRegPC.
@@ -155,9 +174,10 @@ PowertalkIterativeStackedInterpreter >> visitOpDispatchMessage: anSOpDispatchMes
 		          lookup: message selector
 		          startingAt: behavior
 		          sendSite: message.
+	method ifNil: [ ^self messageNotUnderstood: message ].
 	method isBlock ifTrue: [ 
 		^ self evaluateUndermessage: message with: method ].
-	^self invoke: method with: regR
+	^ self invoke: method with: regR
 ]
 
 { #category : #initialization }

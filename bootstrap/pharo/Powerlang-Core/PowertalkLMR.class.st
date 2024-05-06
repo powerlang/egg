@@ -277,6 +277,11 @@ PowertalkLMR >> doLookup: aSymbol startingAt: aBehavior [
 ]
 
 { #category : #initialization }
+PowertalkLMR >> doesNotUnderstandMethod: anEggObject [
+	doesNotUnderstandMethod := anEggObject
+]
+
+{ #category : #initialization }
 PowertalkLMR >> executableCodeWork: anLMRExecutableCode [
 	self ASSERT: anLMRExecutableCode !== nilObj.
 	^anLMRExecutableCode code

@@ -198,7 +198,8 @@ PowertalkRingModule >> fillClasses [
 			meta := self metaclassFor: def metaclass.
 			self
 				fillSpecies: meta with: def metaclass;
-				fillSpecies: class with: def ]
+				fillSpecies: class with: def ].
+	runtime initializeDNU
 ]
 
 { #category : #initialization }
