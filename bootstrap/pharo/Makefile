@@ -19,7 +19,7 @@ endif
 all: pharo-ui bootstrap.image
 
 pharo pharo-ui Pharo.image:
-	curl https://get.pharo.org/64/90+vm | bash
+	curl https://get.pharo.org/64/90+vm | bash || curl https://get.pharo.org/64/90+vm | bash
 
 bootstrap.image: pharo Pharo.image
 	./pharo Pharo.image save bootstrap
