@@ -41,6 +41,14 @@ PowertalkIterativeInterpreter >> regR: anObject [
 ]
 
 { #category : #accessing }
+PowertalkIterativeInterpreter >> unboundAssignment: aBinding with: assignees [
+			assignees size > 1 ifTrue: [ 
+				self error:
+					'unbound name with multiple assignments not yet supported' ].
+			self doesNotKnow: aBinding name assigned: regR
+]
+
+{ #category : #accessing }
 PowertalkIterativeInterpreter >> underprimitiveRestart [
 	^ self subclassResponsibility 
 ]
@@ -52,7 +60,9 @@ PowertalkIterativeInterpreter >> visitBlock: anSBlock [
 
 { #category : #accessing }
 PowertalkIterativeInterpreter >> visitIdentifier: anSIdentifier [
-	regR := anSIdentifier binding valueWithin: context
+	| binding |
+	binding := anSIdentifier binding.
+	regR := binding valueWithin: context ifUnbound: [ ^self doesNotKnow: binding name ]
 ]
 
 { #category : #accessing }
@@ -62,8 +72,15 @@ PowertalkIterativeInterpreter >> visitLiteral: anSLiteral [
 
 { #category : #accessing }
 PowertalkIterativeInterpreter >> visitOpAssign: anSOpAssign [
-	anSOpAssign assignees
-		do: [ :identifier | identifier binding assign: regR within: context ]
+
+	| assignees binding |
+	assignees := anSOpAssign assignees.
+	assignees do: [ :identifier | 
+		binding := identifier binding.
+		binding
+			assign: regR
+			within: context
+			ifUnbound: [ self unboundAssignment: binding with: assignees ] ]
 ]
 
 { #category : #accessing }

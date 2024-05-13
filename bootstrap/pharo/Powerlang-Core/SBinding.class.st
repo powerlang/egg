@@ -15,6 +15,12 @@ SBinding >> assign: value within: aPowertalkRuntime [
 ]
 
 { #category : #testing }
+SBinding >> assign: value within: aPowertalkRuntime ifUnbound: aClosure [
+	^self assign: value within: aPowertalkRuntime
+
+]
+
+{ #category : #testing }
 SBinding >> isArgument [
 	^false
 ]
@@ -77,4 +83,9 @@ SBinding >> name [
 { #category : #testing }
 SBinding >> valueWithin: anEvaluationContext [
 	^ self subclassResponsibility
+]
+
+{ #category : #testing }
+SBinding >> valueWithin: anEvaluationContext ifUnbound: aClosure [
+	^self valueWithin: anEvaluationContext
 ]

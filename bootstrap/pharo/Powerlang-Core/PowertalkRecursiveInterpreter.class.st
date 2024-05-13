@@ -142,10 +142,13 @@ PowertalkRecursiveInterpreter >> sendLocal: aSymbol to: receiver with: anArray [
 
 { #category : #visiting }
 PowertalkRecursiveInterpreter >> visitAssignment: anSAssignment [
-	| result |
+
+	| result assignees binding |
 	result := anSAssignment expression acceptVisitor: self.
-	anSAssignment assignees
-		do: [ :identifier | identifier binding assign: result within: context ].
+	assignees := anSAssignment assignees.
+	assignees do: [ :identifier | 
+		binding := identifier binding.
+		binding assign: result within: context ifUnbound: [self unboundAssignment: binding with: assignees]].
 	^ result
 ]
 
@@ -172,7 +175,9 @@ PowertalkRecursiveInterpreter >> visitCascade: anSCascade [
 
 { #category : #visiting }
 PowertalkRecursiveInterpreter >> visitIdentifier: anSIdentifier [
-	^ anSIdentifier binding valueWithin: context
+	| binding |
+	binding := anSIdentifier binding.
+	^ binding valueWithin: context ifUnbound: [ self doesNotKnow: binding name ]
 ]
 
 { #category : #visiting }

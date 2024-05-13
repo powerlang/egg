@@ -162,7 +162,7 @@ EvaluationContext >> staticBindingFor: symbol inModule: module [
 	| namespace assoc |
 	namespace := system moduleNamespace: module.
 	assoc := system lookupAssociationFor: symbol in: namespace.
-	assoc ifNil: [ PowertalkEvaluatorError signal: 'unbound variable: ' , symbol asString on: self ].
+	assoc ifNil: [ ^nil ].
 	^ SAssociationBinding new association: assoc
 ]
 
@@ -197,11 +197,13 @@ EvaluationContext >> staticBindingForMvar: symbol [
 ]
 
 { #category : #services }
-EvaluationContext >> staticBindingForNested: name [ 
+EvaluationContext >> staticBindingForNested: name [
+
 	| binding module |
 	binding := self staticBindingFor: (name at: 1).
+	binding ifNil: [ ^nil ].
 	module := binding valueWithin: self.
-	^self staticBindingFor: (name at: 2) inModule: module
+	^ self staticBindingFor: (name at: 2) inModule: module
 ]
 
 { #category : #services }
