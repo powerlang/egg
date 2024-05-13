@@ -33,12 +33,22 @@ let Bootstrapper = class {
 		this.initializeSymbolTable();
 		this.runtime.knownSymbols_(new Map(Object.entries(symbols)));
 		this.runtime.initializeInterpreter();
+		this.initializeDNUMethod();
 	}
 
 	initializeSymbolTable()
 	{
 		const symbol = this.kernel.exports["SymbolTable"];
 		this.runtime.symbolTable_(symbol);
+	}
+
+	initializeDNUMethod()
+	{
+		const proto = this.kernel.exports["ProtoObject"];
+		const symbol = this.runtime.symbolFromLocal_("_doesNotUnderstand:with:");
+		const behavior = this.runtime.speciesInstanceBehavior_(proto);
+		const method = this.runtime.doLookup_startingAt_(symbol, behavior);
+		this.runtime.doesNotUnderstandMethod_(method);
 	}
 
 	loadModule_(name) {
@@ -161,7 +171,8 @@ let Bootstrapper = class {
 			_classModuleIndex: 9,
 			_moduleNamespaceIndex: 4,
 			_closureBlockIndex: 1,
-			_blockMethodIndex: 3
+			_blockMethodIndex: 3,
+			_processStackSPIndex: 2
 		};
 	}
 }
