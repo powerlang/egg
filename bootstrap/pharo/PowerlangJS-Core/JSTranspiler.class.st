@@ -141,13 +141,16 @@ JSTranspiler class >> transpilePowerlangInterpreter [
 
 { #category : #transpiling }
 JSTranspiler >> classImports: aClass [
+
 	| result |
 	result := Set new.
 	result add: aClass superclass name.
 	result addAll: aClass sharedPoolNames.
 	transpilers do: [ :t | result addAll: t imports ].
-	#('Object' 'Map' 'Array' 'Function' 'ArgCount' 'TempCount' 'EnvCount' 'BlockArgCount' 'BlockEnvCount' 'BlockTempCount' 'BlockCapturesHome' 'BlockCapturesSelf')
-		do: [ :name | result remove: name ifAbsent: nil ].
+	#( 'Object' 'Map' 'Array' 'Function' 'ArgCount' 'TempCount'
+	   'EnvCount' 'BlockArgCount' 'BlockEnvCount' 'BlockTempCount'
+	   'BlockCapturesHome' 'BlockCapturesSelf' 'EggProcessSuspended' ) do: [ 
+		:name | result remove: name ifAbsent: nil ].
 	^ result
 ]
 
