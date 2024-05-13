@@ -32,16 +32,20 @@ SuspendedProcess >> drop [
 
 { #category : #initializing }
 SuspendedProcess >> evaluating: aMessageSend [
-	topContext := Context new 
+	| method |
+	method := ActiveProcess >> #launch:.
+	method prepareForExecution.
+	topContext := LaunchContext new 
 		receiver: self;
-		code: self >> #launch:;
+		code: method executableCode method: method;
 		arguments: { aMessageSend }.
 ]
 
 { #category : #executing }
 SuspendedProcess >> prepareForExecution [
 	self isReified ifFalse: [^self].
-	topContext copyAllTo: self.
+	nativeStack ifNil: [self initializeStack].
+	nativeStack fillFrom: topContext.
 	topContext := nil
 ]
 
@@ -51,6 +55,6 @@ SuspendedProcess >> takeControl [
 	self prepareForExecution.
 	current := Processor activeProcess.
 	current beInactive.
-	self beActive.
+	Processor activeProcess: self beActive.
 	current nativeStack contextSwitchTo: nativeStack
 ]

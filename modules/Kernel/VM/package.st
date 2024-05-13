@@ -6,15 +6,16 @@
 Package { #name : #VM,
 	#classes : [
 		'Closure',
+		'CompiledMethod',
 		'Float',
 		'HashTable',
 		'Namespace',
-		'Notification',
+		'ProcessStack',
 		'ProtoObject',
 		'SmallInteger',
-		'SmalltalkSystem',
 		'Species',
-		'String'
+		'String',
+		'Symbol'
 	]
 }
 

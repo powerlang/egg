@@ -7,25 +7,42 @@ Class {
 	#name : #ProcessStack,
 	#superclass : #Object,
 	#instVars : [
-		'process'
+		'process',
+		'sp'
 	],
 	#category : #Kernel
 }
 
-{ #category : #private }
+{ #category : #'instance creation' }
 ProcessStack class >> on: aProcess [
 	^self errorVMSpecific
 ]
 
-{ #category : #private }
+{ #category : #services }
 ProcessStack >> contextSwitchTo: next [
 	self subclassResponsibility
 ]
 
+
+{ #category : #services }
+ProcessStack >> fillFrom: aContext [
+	#CRITICAL.
+	sp := (aContext copyAllTo: self).
+	self at: sp put: aContext lastEnvironment
+]
+
+{ #category : #accessing }
 ProcessStack >> process [
 	^process
 ]
 
+{ #category : #accessing }
 ProcessStack >> process: aProcess [
 	process := aProcess
+]
+
+
+{ #category : #services }
+ProcessStack >> snapshot [
+	self subclassResponsibility
 ]

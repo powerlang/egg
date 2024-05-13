@@ -10,10 +10,10 @@ Class {
 		'caller',
 		'callee',
 		'code',
-		'pc'
+		'pc',
 		'receiver',
 		'stack',
-		'environment',
+		'environment'
 	],
 	#category : #Kernel
 }
@@ -52,44 +52,52 @@ Context >> code [
 ]
 
 { #category : #accessing }
-Context >> code: anExecutableCode [
+Context >> code: anExecutableCode method: aCompiledMethod [
 	| temps |
-	code := anExecutableCode.
-	temps := code compiledCode tempCount.
+"	code := anExecutableCode."
+	code := aCompiledMethod.
+	temps := aCompiledMethod tempCount.
 	stack := OrderedCollection new: temps + 5.
 	stack stretchTo: temps.
-	pc := 1.
+	aCompiledMethod hasEnvironment 
+		ifTrue: [environment := Array new: aCompiledMethod environmentCount].
+	pc := 0.
 ]
 
 { #category : #services }
 Context >> copyAllTo: aProcessStack [
 	| start offset |
+	start := parent copyAllTo: aProcessStack.
+	^self copyTo: aProcessStack at: start
+]
 
-	parent
-		ifNil: [
-			aProcessStack
-				pcAt: 0 put: 0 of: nil;
-				fpAt: 1 put: 0.
-			start := 3]
-		ifNotNil: [ start := parent copyAllTo: aProcessStack].
+{ #category : #private }
+Context >> copyEnvironmentTo: aProcessStack at: start [
+	"environment ifNil: [^2]."
+	aProcessStack
+		at: start - 2 put: self previousEnvironment;
+		at: start - 3 put: environment.
+	^4
+]
 
+{ #category : #private }
+Context >> copyTo: aProcessStack at: start [
+	| delta |
 	aProcessStack
 		at: start put: receiver;
-		at: start + 1 put: code.
+		at: start - 1 put: code.
 
-	environment ifNil: [offset := 0] ifNotNil: [
-		aProcessStack
-			at: start + 2 put: caller lastEnvironment;
-			at: start + 3 put: environment.
-		offset := 2.
-	].
+	delta := self copyEnvironmentTo: aProcessStack at: start.
 
-	stack do: [:temp | aProcessStack at: start + offset put: temp. offset := offset + 1 ].
+	stack do: [:temp |
+		aProcessStack at: start - delta put: temp.
+		delta := delta + 1 ].
+	
 	aProcessStack
-		pcAt: start + offset put: pc of: code;
-		fpAt: start + offset + 1 put: start - 1.
+		pcAt: start - delta put: pc of: code;
+		bpAt: start - delta - 1 put: start + 1.
 
-	^start + offset + 2
+	^start - delta - 2
 ]
 
 { #category : #accessing }
@@ -105,8 +113,14 @@ Context >> environment: anObject [
 
 { #category : #services }
 Context >> lastEnvironment [
-	environment ifNotNil: [^environment].
-	^caller ifNotNil: [caller lastEnvironment]
+	"environment ifNotNil: [^environment].
+	^caller ifNotNil: [caller lastEnvironment]"
+	^environment
+]
+
+{ #category : #private }
+Context >> previousEnvironment [
+	^caller lastEnvironment
 ]
 
 { #category : #accessing }

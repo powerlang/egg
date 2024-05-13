@@ -20,6 +20,16 @@ ProcessVMStack >> at: anInteger put: anObject [
 ]
 
 { #category : 'Primitives' }
+ProcessVMStack >> basicInitialize [
+	<primitive: ProcessVMStackInitialize>
+]
+
+{ #category : #primitives }
+ProcessVMStack >> bp [
+	<primitive: ProcessVMStackBP>
+]
+
+{ #category : 'Primitives' }
 ProcessVMStack >> bpAt: anInteger [
 	<primitive: ProcessVMStackBpAt>
 ]
@@ -30,16 +40,37 @@ ProcessVMStack >> bpAt: anInteger put: anotherInteger [
 ]
 
 { #category : 'Primitives' }
-ProcessVMStack >> pcAt: anInteger [
-	<primitive: ProcessVMStackPcAt>
-]
-
-{ #category : 'Primitives' }
-ProcessVMStack >> pcAt: anInteger put: anotherInteger [
-	<primitive: ProcessVMStackPcAtPut>
+ProcessVMStack >> bufferSize [
+	<primitive: ProcessVMStackBufferSize>
 ]
 
 { #category : 'Primitives' }
 ProcessVMStack >> contextSwitchTo: aProcessStack [
 	<primitive: ProcessVMStackContextSwitchTo>
+]
+
+{ #category : 'initializing' }
+ProcessVMStack >> initialize [
+	super initialize.
+	self basicInitialize
+]
+
+{ #category : 'Primitives' }
+ProcessVMStack >> pcAt: anInteger [
+	<primitive: ProcessVMStackPcAt>
+]
+
+{ #category : 'Primitives' }
+ProcessVMStack >> pcAt: anInteger put: anotherInteger of: code[
+	<primitive: ProcessVMStackPcAtPut>
+]
+
+{ #category : #primitives }
+ProcessVMStack >> snapshot [
+	<primitive: ProcessVMStackSnapshot>
+]
+
+{ #category : #primitives }
+ProcessVMStack >> sp: anInteger [
+	<primitive: ProcessVMStackSPPut>
 ]

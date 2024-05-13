@@ -58,9 +58,7 @@ Exception >> activeHandler: anExceptionHandler [
 
 { #category : #actions }
 Exception >> defaultAction [
-	Processor activeProcess
-		suspendBecause: self description
-		resumable: self isResumable
+	Kernel unhandledException: self
 ]
 
 { #category : #accessing }

@@ -32,7 +32,7 @@ ActiveProcess >> drop [
 ActiveProcess >> evaluate: aClosure ensuring: ensuredClosure [
 	"
 	Ensure is easy: when the closure is being evaluated, the only way to skip
-	the ensuredBlock would be through a non-local return, so we can delegate
+	the ensuredClosure would be through a non-local return, so we can delegate
 	ensure mechanism to the code that does non-local returns.
 	The non-local returns check for protected frames, evaluate all of them
 	between return source and home frames, and then does the unwinding.
@@ -40,14 +40,14 @@ ActiveProcess >> evaluate: aClosure ensuring: ensuredClosure [
 	have to update the frame indices if the stack frames are changed.
 	"
 	| cursor result prev |
-	cursor := nativeStack currentBP.
+	cursor := nativeStack bp.
 	protectedFrames push: cursor.
-	result := aBlock value.
+	result := aClosure value.
 	prev := protectedFrames pop.
 	prev == cursor
 		ifFalse: [self
 			_error: 'protected frame popped is not the same that was pushed originally'].
-	ensuredBlock value.
+	ensuredClosure value.
 	^result
 ]
 
@@ -59,11 +59,11 @@ ActiveProcess >> launch: aMessage [
 ]
 
 { #category : #private }
-ActiveProcess >> suspend [
+ActiveProcess >> snapshot [
 	"
 		Saves current state to allow resuming later
 	"
-	self shouldBeImplemented
+	^nativeStack snapshot
 ]
 
 ActiveProcess >> useExceptionHandler: anExceptionHandler while: aBlock [
@@ -72,5 +72,3 @@ ActiveProcess >> useExceptionHandler: anExceptionHandler while: aBlock [
 	exceptionHandler := anExceptionHandler.
 	^aBlock ensure: [exceptionHandler := handler]
 ]
-
-

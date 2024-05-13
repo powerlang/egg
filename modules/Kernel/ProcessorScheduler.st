@@ -21,6 +21,11 @@ ProcessorScheduler >> activeProcess [
 ]
 
 { #category : #accessing }
+ProcessorScheduler >> activeProcess: anActiveProcess [
+	activeProcess := anActiveProcess
+]
+
+{ #category : #accessing }
 ProcessorScheduler >> dropHandler: aClosure [
 	dropHandler := aClosure
 ]
@@ -30,7 +35,7 @@ ProcessorScheduler >> dropActive [
 	| process |
 	self enableInterrupts: false.
 	self dropping: activeProcess.
-	process := self nextReadyProcess ifNil: [Kernel idle].
+	process := self nextReadyProcess ifNil: [self idle].
 	process takeControl
 ]
 
@@ -52,9 +57,10 @@ ProcessorScheduler >> enableInterrupts: aBoolean [
 	^prev
 ]
 
-{ #category : #priorities }
-ProcessorScheduler >> idlePriority [
-	^1
+{ #category : #services }
+ProcessorScheduler >> idle [
+	"when there's absolutely nothing to do, just try to tell the host we are doomed"
+	self _halt
 ]
 
 { #category : #priorities }
@@ -74,10 +80,10 @@ ProcessorScheduler >> nextReadyProcess [
 { #category : #private }
 ProcessorScheduler >> schedule: aProcess [
 	| process |
-	self enableInterrupts: false.
-	self dropping: activeProcess.
-	process := self nextReadyProcess ifNil: [Kernel idle].
-	process takeControl
+	prev := self enableInterrupts: false.
+	queue := scheduledProcesses at: aProcess priority.
+	queue add: aProcess.
+	prev ifTrue: [self enableInterrupts: true]
 ]
 
 { #category : #private }
@@ -88,4 +94,4 @@ ProcessorScheduler >> unschedule: aProcess [
 		queue := queues at: aProcess priority.
 		queue remove: aProcess ifAbsent: nil.
 		prev ifTrue: [self enableInterrupts: true]
-]	
+]

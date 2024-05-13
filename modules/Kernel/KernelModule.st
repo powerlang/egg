@@ -13,7 +13,8 @@ Class {
 		'loadedModules',
 		'moduleLoaders',
 		'host',
-		'CRITICAL'
+		'CRITICAL',
+		'unhandledErrorHandler'
 	],
 	#category : #Kernel
 }
@@ -47,7 +48,6 @@ KernelModule >> bootstrap [
 	LargeInteger initializeBase.
 	LargeNegativeInteger initializeConstants.
 	SmallInteger initializeConstants.
-	CRITICAL := true.
 	cachedLookups := Dictionary new.
 	shift := WordSize = 8 ifTrue: [3] ifFalse: [2].
 	namespace 
@@ -66,7 +66,9 @@ KernelModule >> bootstrap [
 	Stream initializePools.
 	CharacterArray initializePools.
 	
-	self initialize
+	self initialize.
+	CRITICAL := false.
+	self haltOnUnhandledExceptions
 ]
 
 { #category : #initialization }
@@ -76,7 +78,8 @@ KernelModule >> addModuleLoader: aModuleLoader [
 
 { #category : #services }
 KernelModule >> critical: aBlock [
-	"critical meaning is: run without GC and without interrupts"
+	"critical meaning is: run without GC and without interrupts. On unhandled errors, don't
+	try to halt this process and continue with others, just freeze this OS process or exit."
 	prev := CRITICAL.
 	CRITICAL := true.
 	result := aBlock value.
@@ -88,7 +91,15 @@ KernelModule >> entry: argc argv: argv [
 	<callback: long (long, pointer)>
 	"^Smalltalk startSession"
 	^KernelModule new foo.
+]
 
+KernelModule >> exit [
+	host exit: 0
+]
+
+{ #category : #services }
+KernelModule >> freezeOnUnhandledExceptions [
+	unhandledErrorHandler := [:exception | self _halt]
 ]
 
 { #category : #accessing }
@@ -104,7 +115,7 @@ KernelModule >> initialize [
 		because it creates new symbol instances, which must be
 		avoided during bootstrap (else we would end with duplicated symbols)
 	"
-	self basicInitialize.
+	self basicInitialize; freezeOnUnhandledExceptions.
 	host := HostSystem new.
 	moduleLoaders := OrderedCollection new.
 	loadedModules := Dictionary new.
@@ -147,11 +158,52 @@ KernelModule >> prepareForExecution: aCompiledMethod [
 	self errorVMSpecific
 ]
 
+{ #category : #accessing }
+KernelModule >> processor [
+	^Processor
+]
+
 { #category : #removing }
 KernelModule >> removeKey: aSymbol from: aMethodDictionary ifAbsent: aBlock [
 	| cm |
 	cm := aMethodDictionary at: aSymbol ifAbsent: [^aBlock value].
 	^aMethodDictionary basicRemoveKey: aSymbol asSelector ifAbsent: aBlock
+]
+
+{ #category : #services }
+KernelModule >> suspendOnUnhandledExceptions [
+	unhandledErrorHandler := [:exception | self suspendBecause: exception]
+]
+
+{ #category : #private }
+KernelModule >> suspendBecause: anException [
+	| active process |
+	active := Processor activeProcess.
+	"active snapshot ifNil: [^self]."
+	process := Process sending: #suspended:because: to: host with: {active. anException}.
+	process takeControl
+]
+
+{ #category : #services }
+KernelModule >> terminateOnUnhandledExceptions [
+	unhandledErrorHandler := [:exception | self terminateSessionBecause: exception description]
+]
+
+{ #category : #services }
+KernelModule >> terminateSessionBecause: aString [
+	host logError: aString; logError: Processor activeProcess backtrace; exit: -1
+]
+
+{ #category : #services }
+KernelModule >> unhandledException: anException [
+	| debuggable |
+	CRITICAL ifTrue: [self _error: 'process failed in a critical moment'].
+	unhandledErrorHandler value: anException
+]
+
+{ #category : #accessing }
+KernelModule >> unhandledExceptionHandler: aClosure [
+	unhandledErrorHandler := aClosure
 ]
 
 { #category : #loading }
@@ -166,5 +218,3 @@ KernelModule >> foo [
 	result := 42 factorial "0x10000000000000000 * 1".
 	^result = 0x3C1581D491B28F523C23ABDF35B689C908000000000 ifTrue: [1] ifFalse: [0]
 ]
-
-
