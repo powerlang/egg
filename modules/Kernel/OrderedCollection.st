@@ -333,9 +333,19 @@ OrderedCollection >> makeRoomBehind: anInteger [
 		startingAt: start + anInteger
 ]
 
+{ #category : #removing }
+OrderedCollection >> pop [
+	^self removeLast
+]
+
 { #category : #copying }
 OrderedCollection >> postCopy [
 	contents := contents copy
+]
+
+{ #category : #adding }
+OrderedCollection >> push: anObject [
+	^self add: anObject
 ]
 
 { #category : #removing }
