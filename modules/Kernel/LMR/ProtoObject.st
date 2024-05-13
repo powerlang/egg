@@ -334,6 +334,15 @@ ProtoObject >> behavior: aBehavior [
 			self _basicULongAt: 0 put: aBehavior]
 ]
 
+{ #category : #private }
+ProtoObject >> doesNotUnderstandSelector: selector [
+	| arguments message |
+	arguments := StackFrameCursor top moveNext
+		argumentsWithArity: selector arity.
+	message := Message receiver: self selector: selector arguments: arguments.
+	^self doesNotUnderstand: message
+]
+
 { #category : #'header access' }
 ProtoObject >> initializeExtended: aBoolean contentSize: size [
 	self _basicULongAt: -1 put: 0 _asNative.
