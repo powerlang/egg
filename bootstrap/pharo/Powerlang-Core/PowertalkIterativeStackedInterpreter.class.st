@@ -9,6 +9,20 @@ Class {
 }
 
 { #category : #initialization }
+PowertalkIterativeStackedInterpreter >> contextSwitchTo: vmStack [
+
+	| sp |
+	context := stacks at: vmStack.
+	sp := runtime processStackSP: vmStack.
+	context regSP: sp value.
+	context
+		environment: context pop;
+		regBP: context regSP.
+	self popFrameAndPrepare.
+	^ trueObj
+]
+
+{ #category : #initialization }
 PowertalkIterativeStackedInterpreter >> evaluate [
 	| operation |
 	[ operation := self nextOperation.
@@ -44,7 +58,6 @@ PowertalkIterativeStackedInterpreter >> evaluateUndermessage: message with: bloc
 { #category : #initialization }
 PowertalkIterativeStackedInterpreter >> initialize [
 	super initialize.
-	context := StackedEvaluationContext new.
 	linearizer := SExpressionLinearizer new
 ]
 
@@ -98,12 +111,26 @@ PowertalkIterativeStackedInterpreter >> messageNotUnderstood: anSMessage [
 ]
 
 { #category : #initialization }
+PowertalkIterativeStackedInterpreter >> newEvaluationContext [
+
+	^StackedEvaluationContext new system: runtime
+]
+
+{ #category : #initialization }
 PowertalkIterativeStackedInterpreter >> nextOperation [
  | pc |
 pc := context incRegPC.
 	pc <= work size
 		ifFalse: [ ^ nil ].
 	^ work at: pc
+]
+
+{ #category : #initialization }
+PowertalkIterativeStackedInterpreter >> popFrameAndPrepare [
+	| code |
+	context popFrame.
+	code := runtime methodExecutableCode: context regM.
+	work := runtime executableCodeWork: code
 ]
 
 { #category : #private }
@@ -121,11 +148,12 @@ PowertalkIterativeStackedInterpreter >> prepareBlockExecutableCode: block [
 
 { #category : #initializing }
 PowertalkIterativeStackedInterpreter >> runtime: aPowertalkRuntime [
+
 	super runtime: aPowertalkRuntime.
 	linearizer
 		runtime: aPowertalkRuntime;
 		dropsArguments.
-	context system: runtime
+	context := self newEvaluationContext
 ]
 
 { #category : #initialization }
@@ -219,8 +247,5 @@ PowertalkIterativeStackedInterpreter >> visitOpPrimitive: anSOpPrimtive [
 { #category : #initialization }
 PowertalkIterativeStackedInterpreter >> visitOpReturn: anSOpReturn [
 
-	| code |
-	context popFrame.
-	code := runtime methodExecutableCode: context regM.
-		work := runtime executableCodeWork: code.
+	self popFrameAndPrepare
 ]

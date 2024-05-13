@@ -118,24 +118,13 @@ StackedEvaluationContext >> buildMethodFrameFor: receiver code: code environment
 ]
 
 { #category : #services }
-StackedEvaluationContext >> clone [
+StackedEvaluationContext >> contextSwitchTo: anotherStack sp: anotherSP environment: env [
+	"Only a stack switch is needed (and restoring E), other registers
+	are restored upon return from the currently executing method (prev BP, S, M and PC)"
+	stack := anotherStack.
+	regSP := anotherSP.
+	regE := env
 
-	| copy |
-	copy := stack class new: stack size.
-	copy
-		replaceFrom: 1
-		to: stack size
-		with: stack
-		startingAt: 1.
-	^ self class new
-		  system: system;
-		  regPC: pc;
-		  regBP: regBP;
-		  regSP: regSP;
-		  stack: copy;
-		  receiver: regS;
-		  method: regM;
-		  environment: regE
 ]
 
 { #category : #services }
@@ -256,13 +245,14 @@ StackedEvaluationContext >> pop [
 
 { #category : #initialization }
 StackedEvaluationContext >> popFrame [
+
 	regSP := regBP.
-	regE := stack at: regBP - 3.
+
 	regBP := self pop.
 	pc := self pop.
-		regM := stack at: regBP - 2.
-	regS := stack at: regBP - 1.
-
+	regE := stack at: regBP - 4.
+	regM := stack at: regBP - 2.
+	regS := stack at: regBP - 1
 ]
 
 { #category : #initialization }
@@ -368,6 +358,12 @@ StackedEvaluationContext >> regPC: anInteger [
 ]
 
 { #category : #accessing }
+StackedEvaluationContext >> regSP [
+
+	^regSP
+]
+
+{ #category : #accessing }
 StackedEvaluationContext >> regSP: integer [
 
 	regSP := integer
@@ -397,8 +393,29 @@ StackedEvaluationContext >> self [
 ]
 
 { #category : #services }
+StackedEvaluationContext >> signalSuspension [
+
+	EggProcessSuspended new
+		process: self firstArgument;
+		exception: self secondArgument;
+		signal
+]
+
+{ #category : #services }
+StackedEvaluationContext >> stack [
+
+	^stack
+]
+
+{ #category : #services }
 StackedEvaluationContext >> stack: array [
 	stack := array
+]
+
+{ #category : #services }
+StackedEvaluationContext >> stackSize [
+
+	^stack size
 ]
 
 { #category : #initialization }
