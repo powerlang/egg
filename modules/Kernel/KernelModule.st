@@ -68,7 +68,7 @@ KernelModule >> bootstrap [
 	
 	self initialize.
 	CRITICAL := false.
-	self haltOnUnhandledExceptions
+	self suspendOnUnhandledExceptions
 ]
 
 { #category : #initialization }
