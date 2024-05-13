@@ -85,7 +85,7 @@ Delay >> seconds: n [
 
 { #category : #delaying }
 Delay >> wait [
-	ActiveProcess canBeSuspended
+	Processor activeProcess canBeSuspended
 		ifFalse: [^self error: 'The process can not be suspended at this time'].
 	wait := Semaphore new.
 	self initTimer.

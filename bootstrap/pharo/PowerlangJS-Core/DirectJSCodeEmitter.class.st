@@ -28,6 +28,19 @@ DirectJSCodeEmitter >> basicVisitMessageNode: anRBMessageNode [
 ]
 
 { #category : #visiting }
+DirectJSCodeEmitter >> declareTemporaries: temps [
+
+	temps isEmpty ifTrue: [^self]. 
+		stream nextPutAll: 'let '.
+		temps
+			do: [ :t | stream nextPutAll: (self translateIdentifier: t name) ]
+			separatedBy: [ stream nextPutAll: ', ' ].
+		stream
+			nextPut: $;;
+			crtab: tabs
+]
+
+{ #category : #visiting }
 DirectJSCodeEmitter >> imports [
 	^ imports
 ]
@@ -112,6 +125,7 @@ DirectJSCodeEmitter >> visitBitsAt: message [
 
 { #category : #visiting }
 DirectJSCodeEmitter >> visitBlockNode: anRBBlockNode [
+
 	| prev translated |
 	prev := currentBlock.
 	currentBlock := anRBBlockNode.
@@ -125,7 +139,7 @@ DirectJSCodeEmitter >> visitBlockNode: anRBBlockNode [
 	stream
 		nextPutAll: ') => {';
 		crtab: tabs.
-	self visitBlockStatements: anRBBlockNode statements inline: false.
+	self declareTemporaries: anRBBlockNode temporaries; visitBlockStatements: anRBBlockNode statements inline: false.
 	tabs := tabs - 1.
 	stream
 		crtab: tabs;
@@ -269,7 +283,8 @@ DirectJSCodeEmitter >> visitMessageNode: anRBMessageNode [
 
 { #category : #visiting }
 DirectJSCodeEmitter >> visitMethodNode: anRBMethodNode [
-	| signature nonlocal temps statements |
+
+	| signature nonlocal statements |
 	signature := self methodSignatureFrom: anRBMethodNode.
 	stream tab: 1.
 	classMethod ifTrue: [ stream nextPutAll: 'static ' ].
@@ -277,15 +292,7 @@ DirectJSCodeEmitter >> visitMethodNode: anRBMethodNode [
 		nextPutAll: signature;
 		nextPutAll: ' {';
 		crtab: tabs.
-	temps := anRBMethodNode temporaries.
-	temps isEmpty ifFalse: [ 
-		stream nextPutAll: 'let '.
-		temps
-			do: [ :t | stream nextPutAll: (self translateIdentifier: t name) ]
-			separatedBy: [ stream nextPutAll: ', ' ].
-		stream
-			nextPut: $;;
-			crtab: tabs ].
+	self declareTemporaries: anRBMethodNode temporaries.
 	nonlocal := self methodHasNonLocal: anRBMethodNode.
 	nonlocal ifTrue: [ 
 		stream
@@ -300,9 +307,9 @@ DirectJSCodeEmitter >> visitMethodNode: anRBMethodNode [
 			s acceptVisitor: self.
 			stream nextPut: $; ]
 		separatedBy: [ stream crtab: tabs ].
-	(statements isEmpty orNot: [ statements last isReturn ]) ifTrue: [
+	(statements isEmpty orNot: [ statements last isReturn ]) ifTrue: [ 
 		statements isEmpty ifFalse: [ stream crtab: tabs ].
-		stream			nextPutAll: 'return this;' ].
+		stream nextPutAll: 'return this;' ].
 	nonlocal ifTrue: [ 
 		tabs := tabs - 1.
 		stream

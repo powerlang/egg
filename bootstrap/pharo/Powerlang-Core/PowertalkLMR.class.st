@@ -42,7 +42,8 @@ Class {
 		'largeNegativeIntegerClass',
 		'methodSelectorIndex',
 		'compiledCodeExecutableCodeIndex',
-		'floatClass'
+		'floatClass',
+		'processStackSPIndex'
 	],
 	#pools : [
 		'SCompiledBlockFlags',
@@ -274,6 +275,11 @@ PowertalkLMR >> doLookup: aSymbol startingAt: aBehavior [
 	behavior := self behaviorNext: behavior.
 	behavior != nilObj ] whileTrue.
 	^ nil
+]
+
+{ #category : #initialization }
+PowertalkLMR >> doesNotUnderstandMethod: anEggObject [
+	doesNotUnderstandMethod := anEggObject
 ]
 
 { #category : #initialization }
@@ -816,6 +822,17 @@ PowertalkLMR >> printBehavior: anLMRBehavior on: aStream [
 		nextPutAll: '<' , name , ' instanceBehavior>'
 ]
 
+{ #category : #initialization }
+PowertalkLMR >> processStackSP: anLMRObject [
+
+	^ anLMRObject slotAt: processStackSPIndex
+]
+
+{ #category : #initialization }
+PowertalkLMR >> processStackSPIndex: anInteger [
+ processStackSPIndex := anInteger
+]
+
 { #category : #validating }
 PowertalkLMR >> readKernel [
 	| script |
@@ -981,7 +998,7 @@ PowertalkLMR >> symbolFromLocal: aSymbol [
 		symbol := table slotAt: i.
 		symbol == nilObj ifFalse: [ 
 			symbol bytes = bytes ifTrue: [ ^ symbol ] ] ].
-	PowertalkEvaluatorError signal: 'symbol not found' on: interpreter context
+	self error: 'symbol not found'
 ]
 
 { #category : #initialization }

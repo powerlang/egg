@@ -81,6 +81,7 @@ RingBasedLMRBootstrapper >> closureCompiledBlock: anSCompiledBlock [
 
 { #category : #initialization }
 RingBasedLMRBootstrapper >> convert [
+
 	nilObj := self newMapping: source nil.
 	trueObj := self newMapping: source true.
 	falseObj := self newMapping: source false.
@@ -94,8 +95,8 @@ RingBasedLMRBootstrapper >> convert [
 		convertBootstrapDictionaries;
 		convertClosure;
 		initializeSymbolTable;
-		initializeRuntime.
-
+		initializeRuntime;
+		initializeActiveProcess
 ]
 
 { #category : #initialization }
@@ -372,13 +373,18 @@ RingBasedLMRBootstrapper >> image: aPowertalkRingImage [
 	dest methodAstcodesIndex: index.
 	index := (source => #CompiledMethod) allInstVarNames indexOf: 'class'.
 	dest methodClassBindingIndex: index.
-	index := (source => #CompiledMethod) allInstVarNames indexOf: 'selector'.
+	index := (source => #CompiledMethod) allInstVarNames indexOf:
+		         'selector'.
 	dest methodSelectorIndex: index.
 	index := (source => #CompiledMethod) allInstVarNames indexOf:
 		         'optimizedCode'.
 	dest
 		methodExecutableCodeIndex: index;
-		methodInstSize: (source => #CompiledMethod) allInstVarNames size
+		methodInstSize: (source => #CompiledMethod) allInstVarNames size.
+	index := (source => #ProcessStack) allInstVarNames indexOf:
+		         'sp'.
+	dest processStackSPIndex: index.
+
 ]
 
 { #category : #initialization }
@@ -388,6 +394,16 @@ RingBasedLMRBootstrapper >> initialize [
 	behaviors := IdentityDictionary new.
 	stack := OrderedCollection new.
 	closureMethods := OrderedCollection new
+]
+
+{ #category : #initialization }
+RingBasedLMRBootstrapper >> initializeActiveProcess [
+
+	| processor active |
+	processor := dest sendLocal: #processor to: dest kernel.
+	active := dest
+		sendLocal: #activeProcess to: processor.
+	dest 	sendLocal: #initializeStack to: active
 ]
 
 { #category : #building }
@@ -412,14 +428,14 @@ RingBasedLMRBootstrapper >> initializeEmulationOverrides [
 { #category : #initialization }
 RingBasedLMRBootstrapper >> initializeRuntime [
 
-	| map symbols array method smi block metaclass kernel byteArray string closure behavior lpi lni float |
+	| map symbols array method smi block metaclass kernel byteArray string closure behavior lpi lni float dnu |
 	symbols := Dictionary new.
 	#( + - < > <= >= = == not ) do: [ :symbol | 
 		map := source newSymbol: symbol.
 		symbols at: symbol put: (mapping at: map) ].
 	array := mapping at: (source classNamed: #Array).
 	byteArray := mapping at: (source classNamed: #ByteArray).
-		float := mapping at: (source classNamed: #Float).
+	float := mapping at: (source classNamed: #Float).
 	method := mapping at: (source classNamed: #CompiledMethod).
 	block := mapping at: (source classNamed: #CompiledBlock).
 	closure := mapping at: (source classNamed: #Closure).
@@ -429,6 +445,7 @@ RingBasedLMRBootstrapper >> initializeRuntime [
 	lni := mapping at: (source classNamed: #LargeNegativeInteger).
 	string := mapping at: (source classNamed: #String).
 	metaclass := mapping at: (source classNamed: #Metaclass).
+	dnu := mapping at: source runtime doesNotUnderstandMethod.
 	kernel := mapping at: source kernel.
 	dest
 		arrayClass: array;
@@ -444,6 +461,7 @@ RingBasedLMRBootstrapper >> initializeRuntime [
 		stringClass: string;
 		metaclassClass: metaclass;
 		knownSymbols: symbols;
+		doesNotUnderstandMethod: dnu;
 		wordSize: source wordSize;
 		initializeInterpreter;
 		kernel: kernel.

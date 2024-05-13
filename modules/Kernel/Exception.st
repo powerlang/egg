@@ -58,9 +58,7 @@ Exception >> activeHandler: anExceptionHandler [
 
 { #category : #actions }
 Exception >> defaultAction [
-	Processor activeProcess
-		suspendBecause: self description
-		resumable: self isResumable
+	Kernel unhandledException: self
 ]
 
 { #category : #accessing }
@@ -91,7 +89,7 @@ Exception >> doDefaultAction [
 { #category : #signaling }
 Exception >> doSignal [
 	self isActive ifTrue: [^self ASSERT: false].
-	signalContext := ActiveProcess.
+	signalContext := Processor activeProcess.
 	^self outer
 ]
 
@@ -111,7 +109,7 @@ Exception >> evaluateHandler: anExceptionHandler [
 { #category : #handling }
 Exception >> evaluateHandlers [
 	| handler |
-	handler := ActiveProcess findHandlerFor: self.
+	handler := Processor activeProcess findHandlerFor: self.
 	^self evaluateHandler: handler
 ]
 
@@ -138,7 +136,7 @@ Exception >> isActive [
 { #category : #testing }
 Exception >> isHandled [
 	| handler |
-	handler := ActiveProcess findHandlerFor: self.
+	handler := Processor activeProcess findHandlerFor: self.
 	^handler notNil
 ]
 

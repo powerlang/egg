@@ -25,9 +25,7 @@ MessageNotUnderstood class >> message: aMessage receiver: anObject [
 
 { #category : #actions }
 MessageNotUnderstood >> defaultAction [
-	Processor activeProcess
-		suspendBecause: self defaultDescription
-		resumable: true.
+	super defaultAction.
 	^message performOn: receiver
 ]
 

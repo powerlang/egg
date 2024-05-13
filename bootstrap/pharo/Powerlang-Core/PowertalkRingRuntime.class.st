@@ -134,6 +134,15 @@ PowertalkRingRuntime >> image: aPowertalkImage [
 		initializeInterpreter
 ]
 
+{ #category : #accessing }
+PowertalkRingRuntime >> initializeDNU [
+	| proto selector |
+	proto := image classNamed: #ProtoObject.
+	selector := image newSymbol: #_doesNotUnderstand:with:.
+	doesNotUnderstandMethod := self sendLocal: #at: to: proto instanceBehavior methods with: {selector}.
+
+]
+
 { #category : #initialization }
 PowertalkRingRuntime >> initializeEmulationOverrides [
 	| classes |

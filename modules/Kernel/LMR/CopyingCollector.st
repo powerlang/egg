@@ -506,7 +506,7 @@ CopyingCollector >> update: current at: index [
 
 { #category : #cleaning }
 CopyingCollector >> updateActiveStack [
-	ActiveProcess stack update
+	Processor activeProcess stack update
 ]
 
 { #category : #cleaning }

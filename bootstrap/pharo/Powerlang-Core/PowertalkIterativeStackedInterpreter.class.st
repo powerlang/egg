@@ -9,6 +9,20 @@ Class {
 }
 
 { #category : #initialization }
+PowertalkIterativeStackedInterpreter >> contextSwitchTo: vmStack [
+
+	| sp |
+	context := stacks at: vmStack.
+	sp := runtime processStackSP: vmStack.
+	context regSP: sp value.
+	context
+		environment: context pop;
+		regBP: context regSP.
+	self popFrameAndPrepare.
+	^ trueObj
+]
+
+{ #category : #initialization }
 PowertalkIterativeStackedInterpreter >> evaluate [
 	| operation |
 	[ operation := self nextOperation.
@@ -44,7 +58,6 @@ PowertalkIterativeStackedInterpreter >> evaluateUndermessage: message with: bloc
 { #category : #initialization }
 PowertalkIterativeStackedInterpreter >> initialize [
 	super initialize.
-	context := StackedEvaluationContext new.
 	linearizer := SExpressionLinearizer new
 ]
 
@@ -79,12 +92,45 @@ PowertalkIterativeStackedInterpreter >> linearizer [
 ]
 
 { #category : #initialization }
+PowertalkIterativeStackedInterpreter >> messageNotUnderstood: anSMessage [
+
+	"
+	Having the adaptor causes argument popping work transparently. The adaptor frame's
+	PC is pointed to the instant after the send, so it just pops the message and continues
+"
+
+	| count args array dnu |
+	count := anSMessage arguments size.
+	args := (1 to: count) collect: [ :i | context operandAt: count - i ].
+	array := runtime newArray: args.
+	context
+		push: anSMessage selector;
+		push: array.
+	dnu := runtime doesNotUnderstandMethod.
+	self invoke: dnu with: regR
+]
+
+{ #category : #initialization }
+PowertalkIterativeStackedInterpreter >> newEvaluationContext [
+
+	^StackedEvaluationContext new system: runtime
+]
+
+{ #category : #initialization }
 PowertalkIterativeStackedInterpreter >> nextOperation [
  | pc |
 pc := context incRegPC.
 	pc <= work size
 		ifFalse: [ ^ nil ].
 	^ work at: pc
+]
+
+{ #category : #initialization }
+PowertalkIterativeStackedInterpreter >> popFrameAndPrepare [
+	| code |
+	context popFrame.
+	code := runtime methodExecutableCode: context regM.
+	work := runtime executableCodeWork: code
 ]
 
 { #category : #private }
@@ -102,11 +148,12 @@ PowertalkIterativeStackedInterpreter >> prepareBlockExecutableCode: block [
 
 { #category : #initializing }
 PowertalkIterativeStackedInterpreter >> runtime: aPowertalkRuntime [
+
 	super runtime: aPowertalkRuntime.
 	linearizer
 		runtime: aPowertalkRuntime;
 		dropsArguments.
-	context system: runtime
+	context := self newEvaluationContext
 ]
 
 { #category : #initialization }
@@ -155,9 +202,10 @@ PowertalkIterativeStackedInterpreter >> visitOpDispatchMessage: anSOpDispatchMes
 		          lookup: message selector
 		          startingAt: behavior
 		          sendSite: message.
+	method ifNil: [ ^self messageNotUnderstood: message ].
 	method isBlock ifTrue: [ 
 		^ self evaluateUndermessage: message with: method ].
-	^self invoke: method with: regR
+	^ self invoke: method with: regR
 ]
 
 { #category : #initialization }
@@ -199,8 +247,5 @@ PowertalkIterativeStackedInterpreter >> visitOpPrimitive: anSOpPrimtive [
 { #category : #initialization }
 PowertalkIterativeStackedInterpreter >> visitOpReturn: anSOpReturn [
 
-	| code |
-	context popFrame.
-	code := runtime methodExecutableCode: context regM.
-		work := runtime executableCodeWork: code.
+	self popFrameAndPrepare
 ]

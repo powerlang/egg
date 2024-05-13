@@ -58,14 +58,15 @@ Semaphore >> signal [
 
 { #category : #synchronization }
 Semaphore >> wait [
-	| enabled |
+	| enabled active |
 	enabled := Processor enableInterrupts: false.
 	signals := signals - 1.
 	signals < 0 ifTrue: [
-		ActiveProcess canBeSuspended
+		active := Processor activeProcess.
+		active canBeSuspended
 			ifFalse: [^self error: 'The process can not be suspended at this time'].
-		waiting addLast: ActiveProcess.
-		ActiveProcess sleepOn: self].
+		waiting addLast: active.
+		active sleepOn: self].
 	enabled ifTrue: [Processor enableInterrupts: true]
 ]
 

@@ -8,7 +8,8 @@ Class {
 		'nilObj',
 		'interpreter',
 		'overrides',
-		'symbolCache'
+		'symbolCache',
+		'doesNotUnderstandMethod'
 	],
 	#pools : [
 		'ClosureElementTypes'
@@ -42,6 +43,12 @@ PowertalkRuntime >> booleanFrom: anObject [
 	anObject == trueObj
 		ifTrue: [ ^ true ].
 	self error: 'not a boolean'
+]
+
+{ #category : #initialization }
+PowertalkRuntime >> doesNotUnderstandMethod [
+
+	^doesNotUnderstandMethod
 ]
 
 { #category : #accessing }

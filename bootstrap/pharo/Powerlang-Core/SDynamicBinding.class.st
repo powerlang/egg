@@ -14,8 +14,10 @@ SDynamicBinding class >> decodeUsing: anAstcodeDecoder [
 ]
 
 { #category : #accessing }
-SDynamicBinding >> assign: value within: anEvaluationContext [
+SDynamicBinding >> assign: value within: anEvaluationContext ifUnbound: aClosure [
+
 	cache ifNil: [ self lookupWithin: anEvaluationContext ].
+	cache ifNil: [ ^ aClosure value ].
 	cache assign: value within: anEvaluationContext
 ]
 
@@ -47,7 +49,9 @@ SDynamicBinding >> printOn: aStream [
 ]
 
 { #category : #accessing }
-SDynamicBinding >> valueWithin: anEvaluationContext [
+SDynamicBinding >> valueWithin: anEvaluationContext ifUnbound: aClosure [
+
 	cache ifNil: [ self lookupWithin: anEvaluationContext ].
+	cache ifNil: [ ^ aClosure value ].
 	^ cache valueWithin: anEvaluationContext
 ]

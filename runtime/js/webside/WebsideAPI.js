@@ -1,5 +1,4 @@
 import { LMRObjectWrapper, LMRMethodWrapper } from "./LMRObjectWrapper.js";
-import PowertalkEvaluatorError from "../interpreter/PowertalkEvaluatorError.js";
 import * as logo from "./logo.js";
 
 class WebsideAPI extends Object {
@@ -286,7 +285,7 @@ class WebsideAPI extends Object {
 		let id = this.requestedId();
 		let object = this.objectWithId(id);
 		if (!object) return this.notFound();
-		if (object instanceof PowertalkEvaluatorError) {
+		if (object instanceof EggProcessSuspended) {
 			return this.evaluationError(id);
 		}
 		this.respondWithJson(object.asWebsideJson());
@@ -413,12 +412,18 @@ class WebsideAPI extends Object {
 		this.respondWithJson(_debugger);
 	}
 
+	errorContext(error) {
+		let stack = error._process.slotAt_(2);
+		return this.runtime._interpreter._stacks.get(stack);
+	}
+
 	debuggerFrames() {
 		let id = this.requestedId();
 		let _debugger = this.server.debuggers[id];
 		if (!_debugger) return this.notFound();
 		let error = this.server.evaluations[id];
-		let frames = error.context.backtrace();
+		let context = this.errorContext(error);
+		let frames = context.backtrace();
 		let json = frames.map((frame, index) => {
 			let method = LMRMethodWrapper.on_runtime_(frame[0], this.runtime);
 			let receiver = LMRObjectWrapper.on_runtime_(frame[1], this.runtime);
@@ -435,7 +440,8 @@ class WebsideAPI extends Object {
 		if (!_debugger) return this.notFound();
 		let index = this.requestedIndex();
 		let error = this.server.evaluations[id];
-		let frames = error.context.backtrace();
+		let context = this.errorContext(error);
+		let frames = context.backtrace();
 		if (index > frames.length - 1) return this.notFound();
 		let frame = frames[index];
 		let method = LMRMethodWrapper.on_runtime_(frame[0], this.runtime);
@@ -457,7 +463,7 @@ class WebsideAPI extends Object {
 		if (!_debugger) return this.notFound();
 		let index = this.requestedIndex();
 		let error = this.server.evaluations[id];
-		let context = error.context;
+		let context = this.errorContext(error);
 		let frames = context.backtrace();
 		if (index > frames.length - 1) return this.notFound();
 		let frame = frames[index];
@@ -816,7 +822,7 @@ class WebsideAPI extends Object {
 	evaluationError(id) {
 		let error = this.server.evaluations[id];
 		let json = {
-			description: error.description,
+			description: "Process suspended",
 			evaluation: id.toString(),
 		};
 		this.error(JSON.stringify(json));

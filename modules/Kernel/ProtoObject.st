@@ -101,6 +101,18 @@ ProtoObject >> _copyHeaderSized: byteSize from: anObject [
 ]
 
 { #category : #'header access' }
+ProtoObject >> _doesNotUnderstand: selector with: arguments [
+	"
+		Only the VM sends this. To adapt a message send with arguments in the
+		stack onto a Message object with a selector and an array of arguments
+	"
+	| message result |
+	message := Message selector: selector arguments: arguments.
+	result := self doesNotUnderstand: message.
+	^result _returnPoppingArguments: 2
+]
+
+{ #category : #'header access' }
 ProtoObject >> _hash [
 	^self errorVMSpecific
 ]
@@ -251,31 +263,7 @@ ProtoObject >> class [
 
 { #category : #system }
 ProtoObject >> doesNotUnderstand: aMessage [
-	| stream |
-	(Smalltalk at: #MessageNotUnderstood)
-		ifNotNil: [:cls | ^cls message: aMessage].
-	stream := '' writeStream.
-	aMessage arguments
-		do: [:argument | stream nextPutAll: argument printString]
-		separatedBy: [stream nextPutAll: ' '].
-	self
-		error: 'Message #' , aMessage selector , ' not understood by: '
-			, aMessage receiver printString
-			, ' with: ('
-			, stream contents
-			, ')'
-		title: 'Message not understood'
-		resumable: false.
-	self _halt
-]
-
-{ #category : #private }
-ProtoObject >> doesNotUnderstandSelector: selector [
-	| arguments message |
-	arguments := StackFrameCursor top moveNext
-		argumentsWithArity: selector arity.
-	message := Message receiver: self selector: selector arguments: arguments.
-	^self doesNotUnderstand: message
+	^MessageNotUnderstood message: aMessage
 ]
 
 { #category : #errors }
@@ -473,12 +461,12 @@ ProtoObject >> requiresFinalization [
 
 { #category : #interrupts }
 ProtoObject >> signalStep [
-	ActiveProcess handleStepSignal
+	Processor activeProcess handleStepSignal
 ]
 
 { #category : #interrupts }
 ProtoObject >> signalStep: aSymbol [
-	ActiveProcess handleStepSignal
+	Processor activeProcess handleStepSignal
 ]
 
 { #category : #system }

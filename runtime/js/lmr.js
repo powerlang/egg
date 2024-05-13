@@ -160,6 +160,8 @@ Map.prototype.keysAndValuesDo_ = function(closure) {
 	this.forEach((value, key) => closure(key, value));
 }
 
+Map.prototype.isEmpty = function() { return this.size == 0}
+
 // ~~~~~~~~~~~~~~~~~~~~ Block Closures ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Function.prototype.value = function () {
@@ -414,10 +416,26 @@ String.__proto__.streamContents_ = function(block) { let w = new WriteStream(); 
 
 
 
+
+
+// ~~~~~~~~~~~~~~~~~~~~ EggProcessSuspended ~~~~~~~~~~~~~~~~~~~~~~~~
+
+globalThis.EggProcessSuspended = class {
+	exception_(exception) {this._exception = exception; return this;}
+	exception() { return this._exception; }
+
+	process_(process) {this._process = process; return this;}
+	process() { return this._process; }
+	
+	signal() { throw this; }
+}
+
+
 // ~~~~~~~~~~~~~~ extra for debugging ~~~~~~~~~~~~~~~~~
 
 Object.prototype.ASSERT_ = function (bool) { if (!bool) debugger; }
 Object.prototype.halt = function () { debugger; }
+Object.prototype.error_ = function(string) { debugger; throw string; }
 
 LMRSmallInteger.prototype.toString = function () { return "<" + this._value + ">"; }
 LMRHeapObject.prototype.toString = function () { return "a " + this.classname(); }
@@ -481,4 +499,3 @@ LMRHeapObject.prototype.speciesClassname = function () {
 	else 
 		return this.speciesInstanceClass().className().asLocalString() + " class";
 }
-

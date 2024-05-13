@@ -14,21 +14,16 @@ Class {
 
 { #category : #visiting }
 AbstractJSFunctionEmitter class >> translateIdentifier: aString [
-	aString = 'arguments'
-		ifTrue: [ ^ '_arguments' ].
-	aString = 'class'
-		ifTrue: [ ^ '_class' ].
-	aString = 'Dictionary'
-		ifTrue: [ ^ 'Map' ].
-	aString = 'IdentityDictionary'
-		ifTrue: [ ^ 'Map' ].
-		
-	aString = 'OrderedCollection'
-		ifTrue: [ ^ 'Array' ].
-	aString = 'ByteArray'
-		ifTrue: [ ^ 'Array' ].
-	aString = 'BlockClosure'
-		ifTrue: [ ^ 'Function' ].
+
+	aString = 'arguments' ifTrue: [ ^ '_arguments' ].
+	aString = 'class' ifTrue: [ ^ '_class' ].
+	aString = 'new' ifTrue: [ ^'_new' ].
+	aString = 'Dictionary' ifTrue: [ ^ 'Map' ].
+	aString = 'IdentityDictionary' ifTrue: [ ^ 'Map' ].
+
+	aString = 'OrderedCollection' ifTrue: [ ^ 'Array' ].
+	aString = 'ByteArray' ifTrue: [ ^ 'Array' ].
+	aString = 'BlockClosure' ifTrue: [ ^ 'Function' ].
 	^ aString
 ]
 

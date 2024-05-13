@@ -9,7 +9,8 @@ Class {
 		'context',
 		'undermessages',
 		'primitives',
-		'messageCount'
+		'messageCount',
+		'stacks'
 	],
 	#pools : [
 		'ClosureElementTypes'
@@ -46,6 +47,12 @@ PowertalkEvaluator >> context [
 { #category : #accessing }
 PowertalkEvaluator >> context: anEvaluationContext [ 
 	context := anEvaluationContext
+]
+
+{ #category : #primitives }
+PowertalkEvaluator >> contextSwitchTo: vmStack [
+
+^self subclassResponsibility 
 ]
 
 { #category : #initializing }
@@ -114,7 +121,8 @@ PowertalkEvaluator >> false [
 { #category : #initialization }
 PowertalkEvaluator >> initialize [
 
-	messageCount := 0
+	messageCount := 0.
+	stacks := IdentityDictionary new
 ]
 
 { #category : #accessing }
@@ -183,11 +191,23 @@ PowertalkEvaluator >> initializePrimitives [
 		at: #BootstrapDictKeys put: self primitiveBootstrapDictKeys;
 		at: #BootstrapDictAt put: self primitiveBootstrapDictAt;
 		at: #BootstrapDictAtPut put: self primitiveBootstrapDictAtPut;
+		at: #HostSuspendedBecause put: self primitiveHostSuspendedBecause;
 		at: #HostLoadModule put: self primitiveHostLoadModule;
 		at: #HostFixOverrides put: self primitiveHostFixOverrides;
 		at: #PrimeFor put: self primitivePrimeFor;
 		at: #FlushFromCaches put: self primitiveFlushFromCaches;
-		at: #PrepareForExecution put: self primitivePrepareForExecution
+		at: #PrepareForExecution put: self primitivePrepareForExecution;
+		at: #ProcessVMStackInitialize
+		put: self primitiveProcessVMStackInitialize;
+		at: #ProcessVMStackAt put: self primitiveProcessVMStackAt;
+		at: #ProcessVMStackAtPut put: self primitiveProcessVMStackAtPut;
+		at: #ProcessVMStackBpAtPut put: self primitiveProcessVMStackBpAtPut;
+		at: #ProcessVMStackPcAtPut put: self primitiveProcessVMStackPcAtPut;
+		at: #ProcessVMStackBP put: self primitiveProcessVMStackBP;
+		at: #ProcessVMStackBufferSize
+		put: self primitiveProcessVMStackBufferSize;
+		at: #ProcessVMStackContextSwitchTo
+		put: self primitiveProcessVMStackContextSwitchTo
 ]
 
 { #category : #accessing }
@@ -275,7 +295,7 @@ PowertalkEvaluator >> lookup: aSymbol startingAt: aBehavior sendSite: anSMessage
 					^ block ].
 			symbol := runtime symbolFrom: aSymbol.
 			method := runtime lookup: symbol startingAt: aBehavior.
-			method isNil ifTrue: [PowertalkEvaluatorError signal: symbol asString , ' not found in ', aBehavior asString on: context].
+			method ifNil: [self messageNotUnderstood: anSMessage. ^nil].
 			anSMessage
 				registerCacheWith: runtime;
 				cache: method when: aBehavior ].
@@ -427,6 +447,12 @@ PowertalkEvaluator >> primitiveHostLoadModule [
 ]
 
 { #category : #primitives }
+PowertalkEvaluator >> primitiveHostSuspendedBecause [
+
+	^ [ context signalSuspension]
+]
+
+{ #category : #primitives }
 PowertalkEvaluator >> primitiveNew [
 	^ [ runtime newSlotsOf: context self ]
 ]
@@ -475,6 +501,69 @@ PowertalkEvaluator >> primitivePrimeFor: anInteger [
 	result := #(2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97 101 103 107 109 113 127 131 137 139 149 151 157 163 167 173 179 181 191 193 197 199 211 223 227 229 233 239 241 251 269 359 479 641 857 1151 1549 2069 2237 2423 2617 2797 2999 3167 3359 3539 3727 3911 4441 4787 5119 5471 5801 6143 6521 6827 7177 7517 7853 8783 9601 10243 10867 11549 12239 12919 13679 14293 15013 15731 17569 19051 20443 21767 23159 24611 25847 27397 28571 30047 31397 35771 38201 40841 43973 46633 48989 51631 54371 57349 60139 62969)
 		detect: [ :i | i >= anInteger ].
 	^ runtime newInteger: result
+]
+
+{ #category : #primitives }
+PowertalkEvaluator >> primitiveProcessVMStackAt [
+
+	^ [ 
+	  (stacks at: context receiver) stack
+		  at: context firstArgument value
+		 ]
+]
+
+{ #category : #primitives }
+PowertalkEvaluator >> primitiveProcessVMStackAtPut [
+
+	^ [ (stacks at: context receiver) stack at: context firstArgument value put: context secondArgument ]
+]
+
+{ #category : #primitives }
+PowertalkEvaluator >> primitiveProcessVMStackBP [
+
+	^ [ runtime newSmallInteger: context regBP ]
+]
+
+{ #category : #primitives }
+PowertalkEvaluator >> primitiveProcessVMStackBpAtPut [
+
+	^ [ 
+	  (stacks at: context receiver) stack
+		  at: context firstArgument value
+		  put: context secondArgument value ]
+]
+
+{ #category : #primitives }
+PowertalkEvaluator >> primitiveProcessVMStackBufferSize [
+
+	^ [ runtime newInteger: (stacks at: context receiver) stackSize ]
+]
+
+{ #category : #primitives }
+PowertalkEvaluator >> primitiveProcessVMStackContextSwitchTo [
+
+	^ [ 
+	  self contextSwitchTo: context firstArgument ]
+]
+
+{ #category : #primitives }
+PowertalkEvaluator >> primitiveProcessVMStackInitialize [
+
+	^ [ 
+	  | new |
+	  new := stacks isEmpty
+		         ifTrue: [ context ]
+		         ifFalse: [ self newEvaluationContext ].
+	  stacks at: context self put: new ]
+]
+
+{ #category : #primitives }
+PowertalkEvaluator >> primitiveProcessVMStackPcAtPut [
+
+	^ [ 
+	  (stacks at: context receiver) stack
+		  at: context firstArgument value
+		  put: context secondArgument value ]
 ]
 
 { #category : #primitives }
