@@ -833,6 +833,11 @@ PowertalkLMR >> processStackSPIndex: anInteger [
  processStackSPIndex := anInteger
 ]
 
+{ #category : #initialization }
+PowertalkLMR >> readFile: filename [
+	^ bootstrapper readFile: filename asLocalString
+]
+
 { #category : #validating }
 PowertalkLMR >> readKernel [
 	| script |
