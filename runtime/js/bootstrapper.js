@@ -6,8 +6,7 @@ import PowertalkLMR from "./interpreter/PowertalkLMR.js";
 import ImageSegmentReader from "./ImageSegmentReader.js"
 
 import path from 'path';
-import fs from 'fs';
-
+import { fs, readFileSync } from 'fs';
 
 let Bootstrapper = class {
 	constructor()
@@ -66,7 +65,7 @@ let Bootstrapper = class {
 	{
 		const token = this.transferImportLiteral(descriptor[0]);
 		const linker = descriptor[1] ? this.transferImportLiteral(descriptor[1]) : this.kernel.exports["nil"];
-		
+
 		const ref = this.runtime.sendLocal_to_with_("token:linker:", this.kernel.exports["SymbolicReference"], [token, linker]);
 		return this.runtime.sendLocal_to_("link", ref);
 	}
@@ -142,10 +141,10 @@ let Bootstrapper = class {
 		};
 	}
 
-// TODO:  (difficulty easy)
-// this method should not exist, because the image segment should be self-descriptive.
-// but that needs to be implemented, meanwhile we resort to hardcoded info
-//
+	// TODO:  (difficulty easy)
+	// this method should not exist, because the image segment should be self-descriptive.
+	// but that needs to be implemented, meanwhile we resort to hardcoded info
+	//
 	kernelMeta () {
 		return {
 			_wordSize: 8,
@@ -174,6 +173,15 @@ let Bootstrapper = class {
 			_blockMethodIndex: 3,
 			_processStackSPIndex: 2
 		};
+	}
+
+	readFile_(filename) {
+		let stats;
+		try {
+			stats = fs.statSync(filename);
+			if (!stats.isFile()) return this.runtime.nil()}
+		catch(ignored) {}
+		return (stats)? readFileSync(filename) : this.runtime.nil();
 	}
 }
 
