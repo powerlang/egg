@@ -193,6 +193,7 @@ PowertalkEvaluator >> initializePrimitives [
 		at: #BootstrapDictAtPut put: self primitiveBootstrapDictAtPut;
 		at: #HostSuspendedBecause put: self primitiveHostSuspendedBecause;
 		at: #HostLoadModule put: self primitiveHostLoadModule;
+		at: #HostReadFile put: self primitiveHostReadFile;
 		at: #HostFixOverrides put: self primitiveHostFixOverrides;
 		at: #PrimeFor put: self primitivePrimeFor;
 		at: #FlushFromCaches put: self primitiveFlushFromCaches;
@@ -444,6 +445,11 @@ PowertalkEvaluator >> primitiveHostFixOverrides [
 { #category : #primitives }
 PowertalkEvaluator >> primitiveHostLoadModule [
 	^ [ runtime loadModule: context firstArgument]
+]
+
+{ #category : #primitives }
+PowertalkEvaluator >> primitiveHostReadFile [
+	^ [ runtime readFile: context firstArgument]
 ]
 
 { #category : #primitives }

@@ -595,6 +595,15 @@ RingBasedLMRBootstrapper >> prepareClosuresForExecution [
 ]
 
 { #category : #initialization }
+RingBasedLMRBootstrapper >> readFile: pathname [
+
+	| reference |
+	reference := pathname asFileReference.
+	reference exists ifFalse: [ ^nil ].
+	^reference readStream contents
+]
+
+{ #category : #initialization }
 RingBasedLMRBootstrapper >> readModuleSpec: aSymbol [
 	| path |
 	path := self findModulePath: aSymbol.
