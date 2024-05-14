@@ -245,6 +245,7 @@ class WebsideAPI extends Object {
 		let selector = this.queriedSelector();
 		if (selector) methods = this.implementorsOf(selector);
 		selector = this.queriedSending();
+		console.log(selector);
 		if (selector) {
 			let senders = this.sendersOf(selector);
 			methods = methods ? methods.intersection(senders) : senders;
@@ -662,11 +663,11 @@ class WebsideAPI extends Object {
 	}
 
 	queriedAccessing() {
-		return this.parameterAt("accessing") || this.queryAt("accessing");
+		return this.queryAt("accessing");
 	}
 
 	queriedCategory() {
-		return this.parameterAt("category") || this.queryAt("category");
+		return this.queryAt("category");
 	}
 
 	queriedClass() {
@@ -675,21 +676,15 @@ class WebsideAPI extends Object {
 	}
 
 	queriedReferencingClass() {
-		return (
-			this.parameterAt("referencingClass") ||
-			this.queryAt("referencingClass")
-		);
+		return this.queryAt("referencingClass");
 	}
 
 	queriedReferencingString() {
-		return (
-			this.parameterAt("referencingString") ||
-			this.queryAt("referencingString")
-		);
+		return this.queryAt("referencingString");
 	}
 
 	queriedScope() {
-		let scope = this.parameterAt("scope") || this.queryAt("scope");
+		let scope = this.queryAt("scope");
 		return this.classNamed(scope);
 	}
 
@@ -698,7 +693,7 @@ class WebsideAPI extends Object {
 	}
 
 	queriedSending() {
-		return this.parameterAt("sending");
+		return this.queryAt("sending");
 	}
 
 	requestedSelector() {
