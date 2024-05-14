@@ -28,6 +28,11 @@ HostSystem >> logError: aString [
 	<primitive: HostLogError>
 ]
 
+{ #category : #services }
+HostSystem >> readFile: filename [
+	<primitive: HostReadFile>
+]
+
 { #category : #private }
 HostSystem >> suspended: aProcess because: anException [
 	<primitive: HostSuspendedBecause>
