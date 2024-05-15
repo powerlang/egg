@@ -202,8 +202,7 @@ AST2JSOptimizer >> inlineIfReturn: anRBReturnNode [
 { #category : #visiting }
 AST2JSOptimizer >> method: aCompiledMethod [
 
-	method := aCompiledMethod.
-		self haltIf: method selector == #visitOpDispatchMessage:
+	method := aCompiledMethod
 ]
 
 { #category : #accessing }

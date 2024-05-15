@@ -143,7 +143,7 @@ DirectJSCodeEmitter >> visitBlockNode: anRBBlockNode [
 	stream
 		nextPutAll: ') => {';
 		crtab: tabs.
-	self declareTemporaries: anRBBlockNode temporaries; visitBlockStatements: anRBBlockNode statements inline: false.
+	self visitBlockStatements: anRBBlockNode inline: false.
 	tabs := tabs - 1.
 	stream
 		crtab: tabs;
