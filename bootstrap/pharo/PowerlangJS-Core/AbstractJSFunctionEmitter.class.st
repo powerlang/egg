@@ -29,9 +29,10 @@ AbstractJSFunctionEmitter class >> translateIdentifier: aString [
 
 { #category : #visiting }
 AbstractJSFunctionEmitter >> isSpecialSelector: selector [
+
 	"	^ #(ifTrue: ifFalse: #ifTrue:ifFalse: whileTrue whileFalse whileTrue: whileFalse:)"
 
-	^ #(#bitsAt: + - * /) includes: selector	" #(ifTrue: ifFalse:) includes: selector"
+	^ #( #bitsAt: + - * / ifTrue: ifFalse: ifTrue:ifFalse: ifNil: ifNotNil: ifNil:ifNotNil:) includes: selector
 ]
 
 { #category : #accessing }
