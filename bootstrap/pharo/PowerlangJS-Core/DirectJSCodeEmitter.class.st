@@ -55,7 +55,8 @@ DirectJSCodeEmitter >> initialize [
 
 { #category : #visiting }
 DirectJSCodeEmitter >> methodHasNonLocal: anRBMethodNode [
-	^anRBMethodNode blockNodes anySatisfy: [ :b | b returnCount > 0 ]
+
+	^ anRBMethodNode propertyAt: #hasNonLocal
 ]
 
 { #category : #private }
@@ -77,8 +78,11 @@ DirectJSCodeEmitter >> stream: aWriteStream [
 
 { #category : #accessing }
 DirectJSCodeEmitter >> transpile [
-	method ast
-		acceptVisitor: self
+
+	ast := AST2JSOptimizer new
+		             method: method;
+		             transform.
+	ast acceptVisitor: self
 ]
 
 { #category : #visiting }
@@ -139,7 +143,7 @@ DirectJSCodeEmitter >> visitBlockNode: anRBBlockNode [
 	stream
 		nextPutAll: ') => {';
 		crtab: tabs.
-	self declareTemporaries: anRBBlockNode temporaries; visitBlockStatements: anRBBlockNode statements inline: false.
+	self visitBlockStatements: anRBBlockNode inline: false.
 	tabs := tabs - 1.
 	stream
 		crtab: tabs;
@@ -148,22 +152,23 @@ DirectJSCodeEmitter >> visitBlockNode: anRBBlockNode [
 ]
 
 { #category : #visiting }
-DirectJSCodeEmitter >> visitBlockStatements: statements inline: aBoolean [
-	| last separator |
-	statements isEmpty
-		ifTrue: [ aBoolean
-				ifFalse: [ stream nextPutAll: 'return ' ].
-			^ stream nextPutAll: 'nil' ].
-	separator := aBoolean ifTrue: [ $, ] ifFalse: [ $; ].
-	statements allButLast
-		do: [ :statement | 
-			statement acceptVisitor: self.
-			stream
-				nextPut: separator;
-				crtab: tabs ].
+DirectJSCodeEmitter >> visitBlockStatements: anRBBlockNode inline: aBoolean [
+
+	| statements last separator |
+	self declareTemporaries: anRBBlockNode temporaries.
+	statements := anRBBlockNode statements.
+	statements isEmpty ifTrue: [ 
+		aBoolean ifFalse: [ stream nextPutAll: 'return ' ].
+		^ stream nextPutAll: 'nil' ].
+	separator := $;.
+	statements allButLast do: [ :statement | 
+		statement acceptVisitor: self.
+		stream
+			nextPut: separator;
+			crtab: tabs ].
 	last := statements last.
-	(last isReturn or: [ aBoolean ])
-		ifFalse: [ stream nextPutAll: 'return ' ].
+	(last isReturn or: [ aBoolean ]) ifFalse: [ 
+		stream nextPutAll: 'return ' ].
 	last acceptVisitor: self
 ]
 
@@ -228,22 +233,58 @@ DirectJSCodeEmitter >> visitGlobalVariableNode: anRBGlobalNode [
 ]
 
 { #category : #visiting }
-DirectJSCodeEmitter >> visitIf: message true: aBoolean [
-	
-	| block statements |
-	block := message arguments first.
-	block isBlock ifFalse: [^self basicVisitMessageNode: message]. 
-	statements := block statements.
-	statements size > 1 ifTrue: [ ^self basicVisitMessageNode: message ].
-	stream nextPutAll: 'if ('.
-	aBoolean ifFalse: [ stream nextPut: $! ].
-	message receiver acceptVisitor: self.
-	stream nextPut: $); crtab: tabs; nextPut: ${.
-	tabs := tabs + 1.
-	self visitBlockStatements: statements inline: true. 
-	tabs := tabs - 1.
-	stream nextPut: $}; crtab: tabs.
+DirectJSCodeEmitter >> visitIf: message check: aBlock [
 
+	| block |
+	block := message arguments first.
+	block isBlock ifFalse: [ ^ self basicVisitMessageNode: message ].
+	stream nextPutAll: 'if ('.
+	aBlock value.
+	message receiver acceptVisitor: self.
+	stream
+		nextPut: $);
+		crtab: tabs;
+		nextPut: ${.
+	tabs := tabs + 1.
+	stream crtab: tabs.
+	self visitBlockStatements: block inline: true.
+	tabs := tabs - 1.
+	stream
+		crtab: tabs;
+		nextPut: $};
+		crtab: tabs
+]
+
+{ #category : #visiting }
+DirectJSCodeEmitter >> visitIfElse: message check: aBlock [
+
+	| blockT blockF  |
+	blockT := message arguments first.
+	blockF := message arguments second.
+	(blockT isBlock and: [ blockF isBlock ]) ifFalse: [ 
+		^ self basicVisitMessageNode: message ].
+
+	stream nextPutAll: 'if ('.
+	aBlock value.
+	message receiver acceptVisitor: self.
+	stream
+		nextPut: $);
+		crtab: tabs;
+		nextPut: ${.
+	tabs := tabs + 1.
+	stream crtab: tabs.
+
+	self visitBlockStatements: blockT inline: true.
+	stream
+		crtab: tabs - 1;
+		nextPutAll: '} else {';
+		crtab: tabs.
+	self visitBlockStatements: blockF inline: true.
+	tabs := tabs - 1.
+	stream
+		crtab: tabs;
+		nextPut: $};
+		crtab: tabs
 ]
 
 { #category : #visiting }
@@ -354,28 +395,33 @@ DirectJSCodeEmitter >> visitSpecialIntegerBinaryMessage: message selector: opera
 
 { #category : #visiting }
 DirectJSCodeEmitter >> visitSpecialMessage: message [
+
 	| selector |
 	selector := message selector.
-	selector == #+ ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message].
-	selector == #- ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message].
-	selector == #* ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message].
-	selector == #/ ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message].
-	selector == #bitsAt:
-		ifTrue: [ ^ self visitBitsAt: message ].
-	selector == #ifTrue:
-		ifTrue: [ ^ self visitIf: message true: true ].
-	selector == #ifFalse:
-		ifTrue: [ self visitIf: message true: false ].
-	selector == #ifTrue:ifFalse:
-		ifTrue: [ self visitIfTrueIfFalse: message ].
-	selector == #whileTrue
-		ifTrue: [ self visitWhileTrue: message ].
-	selector == #whileFalse
-		ifTrue: [ self visitWhileFalse: message ].
-	selector == #whileTrue:
-		ifTrue: [ self visitWhileTrue_: message ].
-	selector == #whileFalse:
-		ifTrue: [ self visitWhileFalse_: message ].
+	selector == #+ ifTrue: [ 
+		^ self visitSpecialIntegerBinaryMessage: message ].
+	selector == #- ifTrue: [ 
+		^ self visitSpecialIntegerBinaryMessage: message ].
+	selector == #* ifTrue: [ 
+		^ self visitSpecialIntegerBinaryMessage: message ].
+	selector == #/ ifTrue: [ 
+		^ self visitSpecialIntegerBinaryMessage: message ].
+	selector == #bitsAt: ifTrue: [ ^ self visitBitsAt: message ].
+	selector == #ifTrue: ifTrue: [ ^ self visitIf: message check: [  ] ].
+	selector == #ifFalse: ifTrue: [ 
+		^ self visitIf: message check: [ stream nextPut: $! ] ].
+	selector == #ifNil: ifTrue: [ 
+		^ self visitIf: message check: [ stream nextPutAll: 'nil === ' ] ].
+	selector == #ifNotNil: ifTrue: [ 
+		^ self visitIf: message check: [ stream nextPutAll: 'nil !== ' ] ].
+	selector == #ifTrue:ifFalse: ifTrue: [ 
+		^ self visitIfElse: message check: []].
+	selector == #ifNil:ifNotNil: ifTrue: [ 
+		^ self visitIfElse: message check: [stream nextPutAll: 'nil === ']].
+	selector == #whileTrue ifTrue: [ ^ self visitWhileTrue: message ].
+	selector == #whileFalse ifTrue: [ ^ self visitWhileFalse: message ].
+	selector == #whileTrue: ifTrue: [ ^ self visitWhileTrue_: message ].
+	selector == #whileFalse: ifTrue: [ ^ self visitWhileFalse_: message ].
 	self assert: false
 ]
 
