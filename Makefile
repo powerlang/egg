@@ -11,11 +11,11 @@ native-vm:
 native-lmr:
 	make -C runtime/native lmr
 
-bootstrap/pharo:
-	make -C bootstrap/pharo all
+runtime/pharo:
+	make -C runtime/pharo all
 
-test: bootstrap/pharo
-	./bootstrap/pharo/pharo $< test --junit-xml-output Powerlang-Tests
+test: runtime/pharo
+	./runtime/pharo/pharo $< test --junit-xml-output Powerlang-Tests
 	mkdir -p test-reports
 	mv Powerlang-Tests-Test.xml test-reports
 
@@ -41,7 +41,7 @@ release-js:
 
 
 clean:
-	make -C bootstrap/pharo clean
+	make -C runtime/pharo clean
 	make -C runtime/js clean
 	rm -rf build
 	#make -C runtime/js clean
