@@ -99,13 +99,13 @@ JSTranspiler class >> interpreterDirectory [
 
 { #category : #private }
 JSTranspiler class >> powerlangInterpreterClasses [
-	^ LMRObject withAllSubclasses
+	^ EggObject withAllSubclasses
 		,
-			{LMRObjectHeader.
+			{EggObjectHeader.
 			EvaluationContext.
 			StackedEvaluationContext.
 			PowertalkRuntime.
-			PowertalkLMR.
+			PowertalkMetacircularRuntime.
 			SExpressionLinearizer.
 			AstNodeTypes.
 			AstBindingTypes.

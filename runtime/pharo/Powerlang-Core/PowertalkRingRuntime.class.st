@@ -171,7 +171,7 @@ PowertalkRingRuntime >> isBlock: anSCompiledMethod [
 
 { #category : #services }
 PowertalkRingRuntime >> isClosure: anObjectMap [
-	^anObjectMap class = ClosureMap
+	^anObjectMap class = ProtoeggClosure
 ]
 
 { #category : #services }
@@ -437,7 +437,7 @@ PowertalkRingRuntime >> transferMethodLiterals: method [
 	| class |
 	method withIndexDo: [:literal :i | 
 		class := literal class.
-		((class inheritsFrom: ObjectMap)
+		((class inheritsFrom: ProtoeggObject)
 			or: [ class = SCompiledBlock ])
 			ifFalse: [ method at: i put: (image transferLiteralDeep: literal) ] ].
 	^ method

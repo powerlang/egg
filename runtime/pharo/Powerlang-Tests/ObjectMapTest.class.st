@@ -23,8 +23,8 @@ ObjectMapTest >> tearDown [
 ObjectMapTest >> test_01a [
 	| map |
 	
-	map := ObjectMap new: (kernel at: #Object).
-	self assert: map class == SlotObjectMap.
+	map := ProtoeggObject new: (kernel at: #Object).
+	self assert: map class == ProtoeggSlotObject.
 	self assert: map size == 0.
 	
 ]
@@ -35,9 +35,9 @@ ObjectMapTest >> test_01b [
 	undefined := kernel at: #UndefinedObject.
 	fraction := kernel at: #Fraction.
 	
-	null := ObjectMap new: undefined.
-	frac := ObjectMap new: fraction.
-	self assert: frac class == SlotObjectMap.
+	null := ProtoeggObject new: undefined.
+	frac := ProtoeggObject new: fraction.
+	self assert: frac class == ProtoeggSlotObject.
 	self assert: frac size == 2.
 	
 	frac slotAt: 1 put: null.
@@ -85,9 +85,9 @@ ObjectMapTest >> test_01c [
 	
 	undefined := kernel at: #UndefinedObject.
 	array := kernel at: #Array.
-	null := ObjectMap new: undefined.
-	indexed := ObjectMap new: array size: 2.
-	self assert: indexed class == SlotObjectMap.
+	null := ProtoeggObject new: undefined.
+	indexed := ProtoeggObject new: array size: 2.
+	self assert: indexed class == ProtoeggSlotObject.
 	self assert: indexed size == 2.
 	
 	indexed at: 1 put: null.

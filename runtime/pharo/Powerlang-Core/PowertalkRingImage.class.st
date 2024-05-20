@@ -114,7 +114,7 @@ PowertalkRingImage >> newBootstrapDictionaryOf: anRGBehavior [
 	"
 
 	| result |
-	result := BootstrapDictionaryMap new
+	result := ProtoeggBootstrapDictionary new
 		initializeAs: self => #BootstrapDictionary.
 	bootstrapDicts add: result.
 	^ result
@@ -124,7 +124,7 @@ PowertalkRingImage >> newBootstrapDictionaryOf: anRGBehavior [
 
 { #category : #accessing }
 PowertalkRingImage >> newClosure: anInteger [
-	^ ClosureMap new: closureSpec size: anInteger withAll: nilObj
+	^ ProtoeggClosure new: closureSpec size: anInteger withAll: nilObj
 ]
 
 { #category : #accessing }
@@ -138,7 +138,7 @@ PowertalkRingImage >> newInteger: anInteger [
 		ifTrue: [ ^ self newLargePositiveInteger: anInteger ].
 	anInteger < minSMI
 		ifTrue: [ ^ self newLargeNegativeInteger: anInteger ].
-	^ SmallintObjectMap new: smiSpec valued: anInteger
+	^ ProtoeggSmallInteger new: smiSpec valued: anInteger
 ]
 
 { #category : #initialization }
@@ -184,7 +184,7 @@ PowertalkRingImage >> newStringArray: strings [
 PowertalkRingImage >> newSymbol: aSymbol [
 	| new |
 	identityMap at: aSymbol ifPresent: [ :s | ^ s ].
-	new := SymbolMap new: symbolSpec symbol: aSymbol.
+	new := ProtoeggSymbol new: symbolSpec symbol: aSymbol.
 	symbols add: new.
 	^ identityMap at: aSymbol put: new
 ]

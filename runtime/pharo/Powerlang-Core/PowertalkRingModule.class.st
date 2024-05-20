@@ -90,7 +90,7 @@ PowertalkRingModule >> basicNewBytes: classname contents: aByteObject [
 
 { #category : #services }
 PowertalkRingModule >> basicNewBytesOf: anRGBehavior  contents: aByteObject [
-	^ ByteObjectMap new: anRGBehavior valued: aByteObject
+	^ ProtoeggByteObject new: anRGBehavior valued: aByteObject
 ]
 
 { #category : #accessing }
@@ -117,7 +117,7 @@ PowertalkRingModule >> basicNewSlots: classname sized: size [
 
 { #category : #accessing }
 PowertalkRingModule >> basicNewSlotsOf: anRGBehavior sized: size [
-	^ SlotObjectMap new: anRGBehavior size: size withAll: nilObj
+	^ ProtoeggSlotObject new: anRGBehavior size: size withAll: nilObj
 ]
 
 { #category : #'own services' }
@@ -165,9 +165,9 @@ PowertalkRingModule >> createMethodDictionary: species sized: anInteger [
 { #category : #accessing }
 PowertalkRingModule >> createSpecies: definition [
 	| class meta ibehavior cbehavior |
-	class := ClassMap new: definition metaclass size: 0 withAll: nilObj.
+	class := ProtoeggClass new: definition metaclass size: 0 withAll: nilObj.
 	class instanceSpec: definition.
-	meta := MetaclassMap
+	meta := ProtoeggMetaclass
 		new: (self => #Metaclass) metaclass
 		size: 0
 		withAll: nilObj.
@@ -451,7 +451,7 @@ PowertalkRingModule >> specs: anRGEnvironment [
 PowertalkRingModule >> transferLiteral: anObject [
 	| class transferred slot |
 	class := anObject class.
-	(class inheritsFrom: ObjectMap)
+	(class inheritsFrom: ProtoeggObject)
 		ifTrue: [ ^ anObject ].
 	(class inheritsFrom: Integer)
 		ifTrue: [ ^ self newInteger: anObject ].
@@ -490,7 +490,7 @@ PowertalkRingModule >> transferLiteralDeep: anObject [
 		ifTrue: [ ^ self newBytesFrom: anObject ].
 	(class == Float or: [ class inheritsFrom: Float ])
 		ifTrue: [ ^ self newFloatFrom: anObject ].
-	(class inheritsFrom: ObjectMap)
+	(class inheritsFrom: ProtoeggObject)
 		ifTrue: [ ^ anObject ].
 	class == SCompiledBlock
 		ifTrue: [ ^ self transferBlock: anObject ].

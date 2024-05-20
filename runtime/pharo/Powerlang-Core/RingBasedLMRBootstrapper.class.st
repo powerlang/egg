@@ -317,7 +317,7 @@ RingBasedLMRBootstrapper >> fixBehaviors [
 RingBasedLMRBootstrapper >> headerFor: aRingObject [
 	| behavior |
 	behavior := behaviors at: aRingObject spec ifAbsent: nil.
-	^ LMRObjectHeader new
+	^ EggObjectHeader new
 		behavior: behavior;
 		bytes: aRingObject isBytes
 			arrayed: aRingObject spec isVariable
@@ -389,7 +389,7 @@ RingBasedLMRBootstrapper >> image: aPowertalkRingImage [
 
 { #category : #initialization }
 RingBasedLMRBootstrapper >> initialize [
-	dest := PowertalkLMR new.
+	dest := PowertalkMetacircularRuntime new.
 	mapping := IdentityDictionary new.
 	behaviors := IdentityDictionary new.
 	stack := OrderedCollection new.
@@ -532,7 +532,7 @@ RingBasedLMRBootstrapper >> map: aRingObject to: anLMRObject [
 RingBasedLMRBootstrapper >> newBehaviorMapping: aRingObject [
 	| header mapped |
 	header := self headerFor: aRingObject.
-	mapped := LMRBehaviorObject new header: header; runtime: dest.
+	mapped := EggBehaviorObject new header: header; runtime: dest.
 	stack add: aRingObject -> mapped.
 	^ mapped
 ]
@@ -557,13 +557,13 @@ RingBasedLMRBootstrapper >> newCallback: aNativeCode bytesFrom: aByteArray [
 RingBasedLMRBootstrapper >> newMapping: aRingObject [
 	| header mapped |
 	aRingObject isImmediate
-		ifTrue: [ ^ LMRSmallInteger new value: aRingObject value ].
+		ifTrue: [ ^ EggSmallInteger new value: aRingObject value ].
 	header := self headerFor: aRingObject.
 	aRingObject isBytes
-		ifTrue: [ ^ LMRByteObject new
+		ifTrue: [ ^ EggByteObject new
 				header: header;
 				bytes: aRingObject bytes ].
-	mapped := LMRSlotObject new header: header.
+	mapped := EggSlotObject new header: header.
 	stack add: aRingObject -> mapped.
 	^ mapped
 ]

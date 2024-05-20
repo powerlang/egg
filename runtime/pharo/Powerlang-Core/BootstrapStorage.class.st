@@ -30,7 +30,7 @@ BootstrapStorage >> new: oid [
 	self ASSERT: meta isMeta.
 	base := meta baseClass.
 	behavior := bootstrapper instanceBehaviorOfSpec: base.
-	^ (ObjectMap new: base) behavior: behavior; atAllPut: bootstrapper nilObject
+	^ (ProtoeggObject new: base) behavior: behavior; atAllPut: bootstrapper nilObject
 ]
 
 { #category : #storage }
@@ -40,7 +40,7 @@ BootstrapStorage >> new: oid sized: anInteger [
 	self ASSERT: meta isMeta.
 	base := meta baseClass.
 	behavior := bootstrapper instanceBehaviorOfSpec: base.
-	^ (ObjectMap new: base size: anInteger)
+	^ (ProtoeggObject new: base size: anInteger)
 		behavior: behavior;
 		atAllPut: bootstrapper nilObject
 ]
