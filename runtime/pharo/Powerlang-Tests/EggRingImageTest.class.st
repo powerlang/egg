@@ -1,5 +1,5 @@
 Class {
-	#name : #PowertalkRingImageTest,
+	#name : #EggRingImageTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'image'
@@ -8,14 +8,14 @@ Class {
 }
 
 { #category : #tests }
-PowertalkRingImageTest >> setUp [
+EggRingImageTest >> setUp [
 	image := EggRingImage fromSpec
 		wordSize: 8;
 		genesis
 ]
 
 { #category : #tests }
-PowertalkRingImageTest >> test010nil [
+EggRingImageTest >> test010nil [
 	| nilObj class classname |
 	nilObj := image nil.
 	class := image classNamed: #UndefinedObject.
@@ -28,7 +28,7 @@ PowertalkRingImageTest >> test010nil [
 ]
 
 { #category : #tests }
-PowertalkRingImageTest >> test020true [
+EggRingImageTest >> test020true [
 	| trueObj class classname |
 	trueObj := image true.
 	class := image classNamed: #True.
@@ -40,7 +40,7 @@ PowertalkRingImageTest >> test020true [
 ]
 
 { #category : #tests }
-PowertalkRingImageTest >> test030false [
+EggRingImageTest >> test030false [
 	| falseObj class classname |
 	falseObj := image false.
 	class := image classNamed: #False.
@@ -52,7 +52,7 @@ PowertalkRingImageTest >> test030false [
 ]
 
 { #category : #tests }
-PowertalkRingImageTest >> test040superclasses [
+EggRingImageTest >> test040superclasses [
 	|  proto object collection class metaproto |
 	proto := image classNamed: #ProtoObject.
 	object := image classNamed: #Object.
@@ -67,7 +67,7 @@ PowertalkRingImageTest >> test040superclasses [
 ]
 
 { #category : #tests }
-PowertalkRingImageTest >> test050metaclasses [
+EggRingImageTest >> test050metaclasses [
 	| proto metaproto |
 	proto := image classNamed: #ProtoObject.
 	metaproto := image metaclassFor: (image => #ProtoObject) metaclass.

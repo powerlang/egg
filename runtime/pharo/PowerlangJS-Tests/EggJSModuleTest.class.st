@@ -1,5 +1,5 @@
 Class {
-	#name : #PowertalkJSModuleTest,
+	#name : #EggJSModuleTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'runtime',
@@ -9,12 +9,12 @@ Class {
 }
 
 { #category : #accessing }
-PowertalkJSModuleTest class >> defaultTimeLimit [
+EggJSModuleTest class >> defaultTimeLimit [
 	^ 1000 seconds
 ]
 
 { #category : #running }
-PowertalkJSModuleTest >> setUp [
+EggJSModuleTest >> setUp [
 
 	| image |
 	super setUp.
@@ -30,7 +30,7 @@ PowertalkJSModuleTest >> setUp [
 ]
 
 { #category : #running }
-PowertalkJSModuleTest >> testWriteModuleSegment [
+EggJSModuleTest >> testWriteModuleSegment [
 
 	| st p module json output builder |
 	(bootstrapper rootDirectory / 'A') ensureCreateDirectory.

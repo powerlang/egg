@@ -1,5 +1,5 @@
 Class {
-	#name : #PowertalkLMRBootstrapTest,
+	#name : #EggMetacircularRuntimeBootstrapTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'runtime',
@@ -9,20 +9,20 @@ Class {
 }
 
 { #category : #accessing }
-PowertalkLMRBootstrapTest class >> defaultTimeLimit [
+EggMetacircularRuntimeBootstrapTest class >> defaultTimeLimit [
 	^ 1000 seconds
 ]
 
 { #category : #tests }
-PowertalkLMRBootstrapTest >> setUp [
-	bootstrapper := PowertalkLMRTestResource new
+EggMetacircularRuntimeBootstrapTest >> setUp [
+	bootstrapper := EggMetacircularRuntimeTestResource new
 		setUp;
 		bootstrapper.
 	runtime := bootstrapper result.
 ]
 
 { #category : #tests }
-PowertalkLMRBootstrapTest >> test010GenenerateKernelSegment [
+EggMetacircularRuntimeBootstrapTest >> test010GenenerateKernelSegment [
 
 	| output module  |
 	output := bootstrapper outputDirectory / 'bootstrap' / 'Kernel.is'.

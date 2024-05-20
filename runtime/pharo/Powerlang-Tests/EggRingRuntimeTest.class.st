@@ -1,5 +1,5 @@
 Class {
-	#name : #PowertalkRingRuntimeTest,
+	#name : #EggRingRuntimeTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'image',
@@ -9,17 +9,17 @@ Class {
 }
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> ==> anObject [
+EggRingRuntimeTest >> ==> anObject [
 	^image transferLiteralDeep: anObject
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> assertNoLeftoverFrames [
+EggRingRuntimeTest >> assertNoLeftoverFrames [
 	self assert: runtime interpreter hasFinished
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> compile: aString in: classname during: aBlock [
+EggRingRuntimeTest >> compile: aString in: classname during: aBlock [
 	| class selector method |
 	class := image => classname.
 	selector := class compile: aString notifying: nil.
@@ -29,7 +29,7 @@ PowertalkRingRuntimeTest >> compile: aString in: classname during: aBlock [
 ]
 
 { #category : #running }
-PowertalkRingRuntimeTest >> setUp [
+EggRingRuntimeTest >> setUp [
 	image := EggRingImage fromSpec
 		wordSize: 8;
 		genesis.
@@ -37,14 +37,14 @@ PowertalkRingRuntimeTest >> setUp [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test100yourself [
+EggRingRuntimeTest >> test100yourself [
 	| result |
 	result := runtime sendLocal: #yourself to: image nil.
 	self assert: result equals: image nil
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test110compute1plus1 [
+EggRingRuntimeTest >> test110compute1plus1 [
 	| one result |
 	one := self ==> 1.
 	result := runtime sendLocal: #+ to: one with: {one}.
@@ -52,7 +52,7 @@ PowertalkRingRuntimeTest >> test110compute1plus1 [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test111compute1minus1 [
+EggRingRuntimeTest >> test111compute1minus1 [
 	| one result |
 	one := self ==> 1.
 	result := runtime sendLocal: #- to: one with: {one}.
@@ -60,14 +60,14 @@ PowertalkRingRuntimeTest >> test111compute1minus1 [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test112compute3times4 [
+EggRingRuntimeTest >> test112compute3times4 [
 	| result |
 	result := runtime sendLocal: #* to: self ==> 3 with: {self ==> 4}.
 	self assert: result equals: self ==> 12
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test113compute20quotient5 [
+EggRingRuntimeTest >> test113compute20quotient5 [
 	|  result |
 
 	result := runtime sendLocal: #// to: self ==>20 with: {self ==>5}.
@@ -75,7 +75,7 @@ PowertalkRingRuntimeTest >> test113compute20quotient5 [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test120sendSizeMinusOne [
+EggRingRuntimeTest >> test120sendSizeMinusOne [
 	| result |
 	self
 		compile: 'foo ^#abc _size - 1'
@@ -85,7 +85,7 @@ PowertalkRingRuntimeTest >> test120sendSizeMinusOne [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test121sendCascade [
+EggRingRuntimeTest >> test121sendCascade [
 	| result |
 	self
 		compile: 'foo ^#abc yourself; size'
@@ -95,7 +95,7 @@ PowertalkRingRuntimeTest >> test121sendCascade [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test130sendIfTrueToFalse [
+EggRingRuntimeTest >> test130sendIfTrueToFalse [
 	| result |
 	self
 		compile: 'foo ^false ifTrue: [#failed]'
@@ -107,7 +107,7 @@ PowertalkRingRuntimeTest >> test130sendIfTrueToFalse [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test131sendIfFalseToTrue [
+EggRingRuntimeTest >> test131sendIfFalseToTrue [
 	| result |
 	self
 		compile: 'foo ^true ifFalse: [#failed]'
@@ -118,7 +118,7 @@ PowertalkRingRuntimeTest >> test131sendIfFalseToTrue [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test132sendIfTrueToTrue [
+EggRingRuntimeTest >> test132sendIfTrueToTrue [
 	| result |
 	self
 		compile: 'foo ^true ifTrue: [5]'
@@ -129,7 +129,7 @@ PowertalkRingRuntimeTest >> test132sendIfTrueToTrue [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test133sendIfTrueToTrueAndTrue [
+EggRingRuntimeTest >> test133sendIfTrueToTrueAndTrue [
 	| result |
 	self
 		compile: 'foo ^(true and: [true]) ifTrue: [5]'
@@ -140,7 +140,7 @@ PowertalkRingRuntimeTest >> test133sendIfTrueToTrueAndTrue [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test134sendIfTrueToTrueAndFalse [
+EggRingRuntimeTest >> test134sendIfTrueToTrueAndFalse [
 	| result |
 	self
 		compile: 'foo ^(true and: [false]) ifTrue: [5]'
@@ -151,7 +151,7 @@ PowertalkRingRuntimeTest >> test134sendIfTrueToTrueAndFalse [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test135sendIfTrueToFalseAndTrue [
+EggRingRuntimeTest >> test135sendIfTrueToFalseAndTrue [
 	| result |
 	self
 		compile: 'foo ^(false and: [true]) ifTrue: [5]'
@@ -162,7 +162,7 @@ PowertalkRingRuntimeTest >> test135sendIfTrueToFalseAndTrue [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test136sendIfTrueToFalseOrTrue [
+EggRingRuntimeTest >> test136sendIfTrueToFalseOrTrue [
 	| result |
 	self
 		compile: 'foo ^(false or: [true]) ifTrue: [5]'
@@ -173,7 +173,7 @@ PowertalkRingRuntimeTest >> test136sendIfTrueToFalseOrTrue [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test137sendIfTrueToFalseOrFalse [
+EggRingRuntimeTest >> test137sendIfTrueToFalseOrFalse [
 	| result |
 	self
 		compile: 'foo ^(false or: [false]) ifTrue: [5]'
@@ -184,7 +184,7 @@ PowertalkRingRuntimeTest >> test137sendIfTrueToFalseOrFalse [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test138sendIfTrueToTrueOrFalse [
+EggRingRuntimeTest >> test138sendIfTrueToTrueOrFalse [
 	| result |
 	self
 		compile: 'foo ^(true or: [false]) ifTrue: [5]'
@@ -195,7 +195,7 @@ PowertalkRingRuntimeTest >> test138sendIfTrueToTrueOrFalse [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test139sendIfNilIfNotNilToNil [
+EggRingRuntimeTest >> test139sendIfNilIfNotNilToNil [
 	| result |
 	self
 		compile: 'foo ^nil ifNil: [3] ifNotNil: [4]'
@@ -206,7 +206,7 @@ PowertalkRingRuntimeTest >> test139sendIfNilIfNotNilToNil [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test139sendIfNilIfNotNilToNotNil [
+EggRingRuntimeTest >> test139sendIfNilIfNotNilToNotNil [
 	| result |
 	self
 		compile: 'foo ^#abc ifNil: [3] ifNotNil: [4]'
@@ -217,7 +217,7 @@ PowertalkRingRuntimeTest >> test139sendIfNilIfNotNilToNotNil [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test139sendIfNilIfNotNilWithArg [
+EggRingRuntimeTest >> test139sendIfNilIfNotNilWithArg [
 	| result |
 	self
 		compile: 'foo ^5 ifNil: [3] ifNotNil: [:a | a]'
@@ -228,7 +228,7 @@ PowertalkRingRuntimeTest >> test139sendIfNilIfNotNilWithArg [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test139sendIfNilIfNotNilWithArgToNil [
+EggRingRuntimeTest >> test139sendIfNilIfNotNilWithArgToNil [
 	| result |
 	self
 		compile: 'foo ^nil ifNil: [3] ifNotNil: [:a | a]'
@@ -239,7 +239,7 @@ PowertalkRingRuntimeTest >> test139sendIfNilIfNotNilWithArgToNil [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test139sendIfNilToNil [
+EggRingRuntimeTest >> test139sendIfNilToNil [
 	| result |
 	self
 		compile: 'foo ^nil ifNil: [self]'
@@ -250,7 +250,7 @@ PowertalkRingRuntimeTest >> test139sendIfNilToNil [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test139sendIfNilToNotNil [
+EggRingRuntimeTest >> test139sendIfNilToNotNil [
 	| result |
 	self
 		compile: 'foo ^false ifNil: [self]'
@@ -261,7 +261,7 @@ PowertalkRingRuntimeTest >> test139sendIfNilToNotNil [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test139sendIfNotNilWithArg [
+EggRingRuntimeTest >> test139sendIfNotNilWithArg [
 	| result |
 	self
 		compile: 'foo ^5 ifNotNil: [:a | a]'
@@ -272,7 +272,7 @@ PowertalkRingRuntimeTest >> test139sendIfNotNilWithArg [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test140evaluateClosure [
+EggRingRuntimeTest >> test140evaluateClosure [
 	| result |
 	self
 		compile: 'foo ^[5] value'
@@ -283,7 +283,7 @@ PowertalkRingRuntimeTest >> test140evaluateClosure [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test141evaluateClosureFrames [
+EggRingRuntimeTest >> test141evaluateClosureFrames [
 	| result |
 	self
 		compile: 'foo [5] value'
@@ -294,7 +294,7 @@ PowertalkRingRuntimeTest >> test141evaluateClosureFrames [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test142evaluateClosureReceiver [
+EggRingRuntimeTest >> test142evaluateClosureReceiver [
 	| result |
 	self
 		compile: 'foo [self] value'
@@ -305,7 +305,7 @@ PowertalkRingRuntimeTest >> test142evaluateClosureReceiver [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test150sendWhileTrue [
+EggRingRuntimeTest >> test150sendWhileTrue [
 	| result |
 	self
 		compile: 'foo
@@ -320,7 +320,7 @@ PowertalkRingRuntimeTest >> test150sendWhileTrue [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test151sendToDo [
+EggRingRuntimeTest >> test151sendToDo [
 	| result |
 	self
 		compile:
@@ -336,7 +336,7 @@ PowertalkRingRuntimeTest >> test151sendToDo [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test152compute20dividedBy5 [
+EggRingRuntimeTest >> test152compute20dividedBy5 [
 	| result |
 	result := runtime sendLocal: #/ to: self ==> 20 with: {(self ==> 5)}.
 	self 
@@ -345,7 +345,7 @@ PowertalkRingRuntimeTest >> test152compute20dividedBy5 [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test152sendToDoWithInterval [
+EggRingRuntimeTest >> test152sendToDoWithInterval [
 	| result |
 	self
 		compile:
@@ -361,7 +361,7 @@ PowertalkRingRuntimeTest >> test152sendToDoWithInterval [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test161evaluateClosureWithArgs [
+EggRingRuntimeTest >> test161evaluateClosureWithArgs [
 	| result |
 	self
 		compile: 'foo ^[:a :b | a + b] value: 3 value: 4'
@@ -371,7 +371,7 @@ PowertalkRingRuntimeTest >> test161evaluateClosureWithArgs [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test162evaluateClosureWithArgsAndTemps [
+EggRingRuntimeTest >> test162evaluateClosureWithArgsAndTemps [
 	| result |
 	self
 		compile: 'foo ^[:a :b | | t | t := a + b. t] value: 3 value: 4'
@@ -381,7 +381,7 @@ PowertalkRingRuntimeTest >> test162evaluateClosureWithArgsAndTemps [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test163evaluateClosureWithArgsAndMethodTemps [
+EggRingRuntimeTest >> test163evaluateClosureWithArgsAndMethodTemps [
 	| result |
 	self
 		compile: 'foo | t | ^[:a :b | t := a + b. t] value: 3 value: 4'
@@ -391,7 +391,7 @@ PowertalkRingRuntimeTest >> test163evaluateClosureWithArgsAndMethodTemps [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test164evaluateClosureWithArgsAndMultipleTemps [
+EggRingRuntimeTest >> test164evaluateClosureWithArgsAndMultipleTemps [
 	| result |
 	self
 		compile:
@@ -408,7 +408,7 @@ PowertalkRingRuntimeTest >> test164evaluateClosureWithArgsAndMultipleTemps [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test165evaluateClosureNonLocalReturn [
+EggRingRuntimeTest >> test165evaluateClosureNonLocalReturn [
 	| result |
 	self
 		compile:
@@ -423,7 +423,7 @@ PowertalkRingRuntimeTest >> test165evaluateClosureNonLocalReturn [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test166evaluateNestedClosure [
+EggRingRuntimeTest >> test166evaluateNestedClosure [
 	| result |
 	self
 		compile: 'foo ^[ [ 7 ] value ] value'
@@ -433,7 +433,7 @@ PowertalkRingRuntimeTest >> test166evaluateNestedClosure [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test167evaluateNestedClosureWithArgs [
+EggRingRuntimeTest >> test167evaluateNestedClosureWithArgs [
 	| result |
 	self
 		compile: 'foo ^[:a | [:b | a + b ] value: 4 ] value: 3'
@@ -443,7 +443,7 @@ PowertalkRingRuntimeTest >> test167evaluateNestedClosureWithArgs [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test168evaluateNestedClosureNonLocalReturn [
+EggRingRuntimeTest >> test168evaluateNestedClosureNonLocalReturn [
 	| result |
 	self
 		compile: 'foo [ [ ^7 ] value ] value'
@@ -453,7 +453,7 @@ PowertalkRingRuntimeTest >> test168evaluateNestedClosureNonLocalReturn [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test168evaluateNestedClosureWithTemps [
+EggRingRuntimeTest >> test168evaluateNestedClosureWithTemps [
 	| result |
 	self
 		compile:
@@ -471,7 +471,7 @@ PowertalkRingRuntimeTest >> test168evaluateNestedClosureWithTemps [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test169evaluateInlinedClosureInClosureWithMethodTemps [
+EggRingRuntimeTest >> test169evaluateInlinedClosureInClosureWithMethodTemps [
 	| result |
 	self
 		compile:
@@ -486,7 +486,7 @@ PowertalkRingRuntimeTest >> test169evaluateInlinedClosureInClosureWithMethodTemp
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test170evaluateNonInlinedClosureIfTrue [
+EggRingRuntimeTest >> test170evaluateNonInlinedClosureIfTrue [
 	| result |
 	self
 		compile:
@@ -502,7 +502,7 @@ PowertalkRingRuntimeTest >> test170evaluateNonInlinedClosureIfTrue [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test180evaluateToDo [
+EggRingRuntimeTest >> test180evaluateToDo [
 	| result |
 	self
 		compile:
@@ -516,7 +516,7 @@ PowertalkRingRuntimeTest >> test180evaluateToDo [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test181evaluateIntervalSize [
+EggRingRuntimeTest >> test181evaluateIntervalSize [
 	| result |
 	self
 		compile:
@@ -530,7 +530,7 @@ PowertalkRingRuntimeTest >> test181evaluateIntervalSize [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test185evaluateArrayDo [
+EggRingRuntimeTest >> test185evaluateArrayDo [
 	| result |
 	self
 		compile:
@@ -549,7 +549,7 @@ PowertalkRingRuntimeTest >> test185evaluateArrayDo [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test186evaluateOrderedCollectionDo [
+EggRingRuntimeTest >> test186evaluateOrderedCollectionDo [
 	| result |
 	self
 		compile:
@@ -568,7 +568,7 @@ PowertalkRingRuntimeTest >> test186evaluateOrderedCollectionDo [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test187evaluateArrayToDo [
+EggRingRuntimeTest >> test187evaluateArrayToDo [
 	| result |
 	self
 		compile:
@@ -585,7 +585,7 @@ PowertalkRingRuntimeTest >> test187evaluateArrayToDo [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test188evaluateReplaceFromToWith [
+EggRingRuntimeTest >> test188evaluateReplaceFromToWith [
 	| result |
 	self
 		compile: 'foo ^#(1 2) replaceFrom: 1 to: 2 with: #(3 4) startingAt: 1'
@@ -599,7 +599,7 @@ PowertalkRingRuntimeTest >> test188evaluateReplaceFromToWith [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test189evaluateArrayConcatenation [
+EggRingRuntimeTest >> test189evaluateArrayConcatenation [
 	| result |
 	self
 		compile: 'foo ^#(3), #(4)'
@@ -610,7 +610,7 @@ PowertalkRingRuntimeTest >> test189evaluateArrayConcatenation [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test190evaluateStringConcatenation [
+EggRingRuntimeTest >> test190evaluateStringConcatenation [
 	| result |
 	self
 		compile: 'foo ^''ABC'', ''DE'''
@@ -621,7 +621,7 @@ PowertalkRingRuntimeTest >> test190evaluateStringConcatenation [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test191evaluateIntervalCollect [
+EggRingRuntimeTest >> test191evaluateIntervalCollect [
 	| result |
 	self
 		compile:
@@ -637,7 +637,7 @@ PowertalkRingRuntimeTest >> test191evaluateIntervalCollect [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test200createDictionary [
+EggRingRuntimeTest >> test200createDictionary [
 	| class d |
 	class := image classNamed: #Dictionary.
 	d := runtime sendLocal: #new to: class with: {}.
@@ -645,7 +645,7 @@ PowertalkRingRuntimeTest >> test200createDictionary [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test210addAssociationToDictionary [
+EggRingRuntimeTest >> test210addAssociationToDictionary [
 	| class d assoc |
 	class := image classNamed: #Dictionary.
 	assoc := image newAssociation: #foo -> nil.

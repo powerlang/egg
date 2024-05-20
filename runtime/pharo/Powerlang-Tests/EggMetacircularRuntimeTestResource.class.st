@@ -1,5 +1,5 @@
 Class {
-	#name : #PowertalkLMRTestResource,
+	#name : #EggMetacircularRuntimeTestResource,
 	#superclass : #TestResource,
 	#instVars : [
 		'image',
@@ -9,18 +9,18 @@ Class {
 }
 
 { #category : #running }
-PowertalkLMRTestResource >> bootstrapper [
+EggMetacircularRuntimeTestResource >> bootstrapper [
 	^bootstrapper ifNil: [ bootstrapper := image generateLMR ]
 
 ]
 
 { #category : #running }
-PowertalkLMRTestResource >> runtime [
+EggMetacircularRuntimeTestResource >> runtime [
 	^ self bootstrapper result
 ]
 
 { #category : #running }
-PowertalkLMRTestResource >> setUp [
+EggMetacircularRuntimeTestResource >> setUp [
 	super setUp.
 	image := EggRingImage fromSpec
 		wordSize: 8;

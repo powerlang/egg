@@ -1,5 +1,5 @@
 Class {
-	#name : #PowertalkJSTest,
+	#name : #EggJSTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'runtime',
@@ -9,20 +9,20 @@ Class {
 }
 
 { #category : #accessing }
-PowertalkJSTest class >> defaultTimeLimit [
+EggJSTest class >> defaultTimeLimit [
 	^ 1000 seconds
 ]
 
 { #category : #tests }
-PowertalkJSTest >> setUp [
-	bootstrapper := PowertalkLMRTestResource new
+EggJSTest >> setUp [
+	bootstrapper := EggMetacircularRuntimeTestResource new
 		setUp;
 		bootstrapper.
 	runtime := bootstrapper result.
 ]
 
 { #category : #tests }
-PowertalkJSTest >> test010WriteKernelAsJSON [
+EggJSTest >> test010WriteKernelAsJSON [
 
 	| output module json |
 	output := bootstrapper rootDirectory / 'LMRjs' / 'Kernel.json'.

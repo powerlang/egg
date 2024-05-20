@@ -1,5 +1,5 @@
 Class {
-	#name : #ObjectMapTest,
+	#name : #ProtoeggObjectTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'kernel'
@@ -8,19 +8,19 @@ Class {
 }
 
 { #category : #running }
-ObjectMapTest >> setUp [
+ProtoeggObjectTest >> setUp [
 	super setUp.
 	kernel := EggRingImage kernelSpec
 ]
 
 { #category : #running }
-ObjectMapTest >> tearDown [
+ProtoeggObjectTest >> tearDown [
 	super tearDown.
 	kernel := nil
 ]
 
 { #category : #tests }
-ObjectMapTest >> test_01a [
+ProtoeggObjectTest >> test_01a [
 	| map |
 	
 	map := ProtoeggObject new: (kernel at: #Object).
@@ -30,7 +30,7 @@ ObjectMapTest >> test_01a [
 ]
 
 { #category : #tests }
-ObjectMapTest >> test_01b [
+ProtoeggObjectTest >> test_01b [
 	| undefined fraction null frac |
 	undefined := kernel at: #UndefinedObject.
 	fraction := kernel at: #Fraction.
@@ -80,7 +80,7 @@ ObjectMapTest >> test_01b [
 ]
 
 { #category : #tests }
-ObjectMapTest >> test_01c [
+ProtoeggObjectTest >> test_01c [
 	| undefined array null indexed |
 	
 	undefined := kernel at: #UndefinedObject.

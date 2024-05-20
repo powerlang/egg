@@ -1,5 +1,5 @@
 Class {
-	#name : #PowertalkLMRTest,
+	#name : #EggMetacircularRuntimeTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'runtime'
@@ -8,17 +8,17 @@ Class {
 }
 
 { #category : #accessing }
-PowertalkLMRTest class >> defaultTimeLimit [
+EggMetacircularRuntimeTest class >> defaultTimeLimit [
 	^ 100 seconds
 ]
 
 { #category : #accessing }
-PowertalkLMRTest class >> resources [
-	^ Array with: PowertalkLMRTestResource
+EggMetacircularRuntimeTest class >> resources [
+	^ Array with: EggMetacircularRuntimeTestResource
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> ==> anObject [
+EggMetacircularRuntimeTest >> ==> anObject [
 	| class |
 	class := anObject class.
 	anObject isInteger
@@ -39,12 +39,12 @@ PowertalkLMRTest >> ==> anObject [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> assertNoLeftoverFrames [
+EggMetacircularRuntimeTest >> assertNoLeftoverFrames [
 	self assert: runtime interpreter hasFinished
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> compile: aString in: classname during: aBlock [
+EggMetacircularRuntimeTest >> compile: aString in: classname during: aBlock [
 
 	| class behavior md selector method |
 	class := self globalNamed: classname.
@@ -62,7 +62,7 @@ PowertalkLMRTest >> compile: aString in: classname during: aBlock [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> convert: anObject with: map [
+EggMetacircularRuntimeTest >> convert: anObject with: map [
 	map at: anObject ifPresent: [:mapped | ^mapped ].
 	anObject ifNil: [ ^runtime nil ].
 	anObject isInteger
@@ -78,7 +78,7 @@ PowertalkLMRTest >> convert: anObject with: map [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> convertBlock: anSCompiledBlock with: map [
+EggMetacircularRuntimeTest >> convertBlock: anSCompiledBlock with: map [
 	| class result instsize slot |
 	class := self globalNamed: #CompiledBlock.
 	result := runtime newSlots: class size: 0.
@@ -91,7 +91,7 @@ PowertalkLMRTest >> convertBlock: anSCompiledBlock with: map [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> convertMethod: anSCompiledMethod [
+EggMetacircularRuntimeTest >> convertMethod: anSCompiledMethod [
 	| class result map instsize slot |
 	class := self globalNamed: #CompiledMethod.
 	result := runtime newSlots: class size: anSCompiledMethod size.
@@ -109,7 +109,7 @@ PowertalkLMRTest >> convertMethod: anSCompiledMethod [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> globalNamed: aSymbol [
+EggMetacircularRuntimeTest >> globalNamed: aSymbol [
 	| symbol namespace assoc |
 	symbol := runtime symbolFromLocal: aSymbol.
 	namespace := runtime moduleNamespace: runtime kernel.
@@ -118,19 +118,19 @@ PowertalkLMRTest >> globalNamed: aSymbol [
 ]
 
 { #category : #running }
-PowertalkLMRTest >> setUp [
-	runtime := PowertalkLMRTestResource current runtime
+EggMetacircularRuntimeTest >> setUp [
+	runtime := EggMetacircularRuntimeTestResource current runtime
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test100yourself [
+EggMetacircularRuntimeTest >> test100yourself [
 	| result |
 	result := runtime sendLocal: #yourself to: runtime nil.
 	self assert: result equals: runtime nil
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test110compute1plus1 [
+EggMetacircularRuntimeTest >> test110compute1plus1 [
 	| one result |
 	one := self ==> 1.
 	result := runtime sendLocal: #+ to: one with: {one}.
@@ -138,7 +138,7 @@ PowertalkLMRTest >> test110compute1plus1 [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test111compute1minus1 [
+EggMetacircularRuntimeTest >> test111compute1minus1 [
 	| one result |
 	one := self ==> 1.
 	result := runtime sendLocal: #- to: one with: {one}.
@@ -146,14 +146,14 @@ PowertalkLMRTest >> test111compute1minus1 [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test112compute3times4 [
+EggMetacircularRuntimeTest >> test112compute3times4 [
 	| result |
 	result := runtime sendLocal: #* to: self ==> 3 with: {self ==> 4}.
 	self assert: result equals: self ==> 12
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test113compute20quotient5 [
+EggMetacircularRuntimeTest >> test113compute20quotient5 [
 	|  result |
 
 	result := runtime sendLocal: #// to: self ==>20 with: {self ==>5}.
@@ -161,7 +161,7 @@ PowertalkLMRTest >> test113compute20quotient5 [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test130sendIfTrueToFalse [
+EggMetacircularRuntimeTest >> test130sendIfTrueToFalse [
 	| result |
 	self
 		compile: 'foo ^false ifTrue: [#failed]'
@@ -172,7 +172,7 @@ PowertalkLMRTest >> test130sendIfTrueToFalse [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test131sendIfFalseToTrue [
+EggMetacircularRuntimeTest >> test131sendIfFalseToTrue [
 	| result |
 	self
 		compile: 'foo ^true ifFalse: [#failed]'
@@ -183,7 +183,7 @@ PowertalkLMRTest >> test131sendIfFalseToTrue [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test132sendIfTrueToTrue [
+EggMetacircularRuntimeTest >> test132sendIfTrueToTrue [
 	| result |
 	self
 		compile: 'foo ^true ifTrue: [5]'
@@ -194,7 +194,7 @@ PowertalkLMRTest >> test132sendIfTrueToTrue [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test140evaluateClosure [
+EggMetacircularRuntimeTest >> test140evaluateClosure [
 	| result |
 	self
 		compile: 'foo ^[5] value'
@@ -205,7 +205,7 @@ PowertalkLMRTest >> test140evaluateClosure [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test141evaluateClosureFrames [
+EggMetacircularRuntimeTest >> test141evaluateClosureFrames [
 	| result |
 	self
 		compile: 'foo [5] value'
@@ -216,7 +216,7 @@ PowertalkLMRTest >> test141evaluateClosureFrames [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test150sendWhileTrue [
+EggMetacircularRuntimeTest >> test150sendWhileTrue [
 	| result |
 	self
 		compile:
@@ -232,7 +232,7 @@ PowertalkLMRTest >> test150sendWhileTrue [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test151sendToDo [
+EggMetacircularRuntimeTest >> test151sendToDo [
 	| result |
 	self
 		compile:
@@ -248,7 +248,7 @@ PowertalkLMRTest >> test151sendToDo [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test152compute20dividedBy5 [
+EggMetacircularRuntimeTest >> test152compute20dividedBy5 [
 	| result |
 	result := runtime sendLocal: #/ to: self ==> 20 with: {(self ==> 5)}.
 	self 
@@ -257,7 +257,7 @@ PowertalkLMRTest >> test152compute20dividedBy5 [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test153sendTimesRepeat [
+EggMetacircularRuntimeTest >> test153sendTimesRepeat [
 	| result |
 	self
 		compile:
@@ -273,7 +273,7 @@ PowertalkLMRTest >> test153sendTimesRepeat [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test154sendTimesRepeatInsideBlock [
+EggMetacircularRuntimeTest >> test154sendTimesRepeatInsideBlock [
 	| result |
 	self
 		compile:
@@ -289,7 +289,7 @@ PowertalkLMRTest >> test154sendTimesRepeatInsideBlock [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test161evaluateClosureWithArgs [
+EggMetacircularRuntimeTest >> test161evaluateClosureWithArgs [
 	| result |
 	self
 		compile: 'foo ^[:a :b | a + b] value: 3 value: 4'
@@ -299,7 +299,7 @@ PowertalkLMRTest >> test161evaluateClosureWithArgs [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test162evaluateClosureWithArgsAndTemps [
+EggMetacircularRuntimeTest >> test162evaluateClosureWithArgsAndTemps [
 	| result |
 	self
 		compile: 'foo ^[:a :b | | t | t := a + b. t] value: 3 value: 4'
@@ -309,7 +309,7 @@ PowertalkLMRTest >> test162evaluateClosureWithArgsAndTemps [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test163evaluateClosureWithArgsAndMethodTemps [
+EggMetacircularRuntimeTest >> test163evaluateClosureWithArgsAndMethodTemps [
 	| result |
 	self
 		compile: 'foo | t | ^[:a :b | t := a + b. t] value: 3 value: 4'
@@ -319,7 +319,7 @@ PowertalkLMRTest >> test163evaluateClosureWithArgsAndMethodTemps [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test164evaluateClosureWithArgsAndMultipleTemps [
+EggMetacircularRuntimeTest >> test164evaluateClosureWithArgsAndMultipleTemps [
 	| result |
 	self
 		compile:
@@ -336,7 +336,7 @@ PowertalkLMRTest >> test164evaluateClosureWithArgsAndMultipleTemps [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test165evaluateClosureNonLocalReturn [
+EggMetacircularRuntimeTest >> test165evaluateClosureNonLocalReturn [
 	| result |
 	self
 		compile:
@@ -351,7 +351,7 @@ PowertalkLMRTest >> test165evaluateClosureNonLocalReturn [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test166evaluateNestedClosure [
+EggMetacircularRuntimeTest >> test166evaluateNestedClosure [
 	| result |
 	self
 		compile: 'foo ^[ [ 7 ] value ] value'
@@ -361,7 +361,7 @@ PowertalkLMRTest >> test166evaluateNestedClosure [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test167evaluateNestedClosureWithArgs [
+EggMetacircularRuntimeTest >> test167evaluateNestedClosureWithArgs [
 	| result |
 	self
 		compile: 'foo ^[:a | [:b | a + b ] value: 4 ] value: 3'
@@ -371,7 +371,7 @@ PowertalkLMRTest >> test167evaluateNestedClosureWithArgs [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test168evaluateNestedClosureWithTemps [
+EggMetacircularRuntimeTest >> test168evaluateNestedClosureWithTemps [
 	| result |
 	self
 		compile:
@@ -389,7 +389,7 @@ PowertalkLMRTest >> test168evaluateNestedClosureWithTemps [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test169evaluateInlinedClosureInClosureWithMethodTemps [
+EggMetacircularRuntimeTest >> test169evaluateInlinedClosureInClosureWithMethodTemps [
 	| result |
 	self
 		compile:
@@ -404,7 +404,7 @@ PowertalkLMRTest >> test169evaluateInlinedClosureInClosureWithMethodTemps [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test180evaluateToDo [
+EggMetacircularRuntimeTest >> test180evaluateToDo [
 	| result |
 	self
 		compile:
@@ -418,7 +418,7 @@ PowertalkLMRTest >> test180evaluateToDo [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test190evaluateStringConcatenation [
+EggMetacircularRuntimeTest >> test190evaluateStringConcatenation [
 	| result |
 	self
 		compile: 'foo ^''ABC'', ''DE'''
@@ -429,7 +429,7 @@ PowertalkLMRTest >> test190evaluateStringConcatenation [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test200createDictionary [
+EggMetacircularRuntimeTest >> test200createDictionary [
 	| class d |
 	class := self globalNamed: #Dictionary.
 	d := runtime sendLocal: #new to: class with: {}.
@@ -439,7 +439,7 @@ PowertalkLMRTest >> test200createDictionary [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test210addAssociationToDictionary [
+EggMetacircularRuntimeTest >> test210addAssociationToDictionary [
 	| class symbol assoc d |
 	class := self globalNamed: #Dictionary.
 	symbol := runtime addSymbol: #foo.
@@ -452,7 +452,7 @@ PowertalkLMRTest >> test210addAssociationToDictionary [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test300smallIntegerPrintString [
+EggMetacircularRuntimeTest >> test300smallIntegerPrintString [
 	| result |
 	self
 		compile: 'foo | result | result := 16r1000 printString. ^result'
@@ -465,7 +465,7 @@ PowertalkLMRTest >> test300smallIntegerPrintString [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test301smallIntegerPrintString [
+EggMetacircularRuntimeTest >> test301smallIntegerPrintString [
 	| result |
 	self
 		compile: 'foo | result | result := 4611686018427387903 printString. ^result'
@@ -478,7 +478,7 @@ PowertalkLMRTest >> test301smallIntegerPrintString [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test302smallIntegerPrintString [
+EggMetacircularRuntimeTest >> test302smallIntegerPrintString [
 	| result |
 	self
 		compile: 'foo | result | result := -4. ^result printString'
@@ -492,7 +492,7 @@ PowertalkLMRTest >> test302smallIntegerPrintString [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test310smiFallbackToLNI [
+EggMetacircularRuntimeTest >> test310smiFallbackToLNI [
 	| result |
 	self
 		compile:
@@ -507,7 +507,7 @@ PowertalkLMRTest >> test310smiFallbackToLNI [
 ]
 
 { #category : #tests }
-PowertalkLMRTest >> test310smiFallbackToLPI [
+EggMetacircularRuntimeTest >> test310smiFallbackToLPI [
 	| result expected |
 	self
 		compile:

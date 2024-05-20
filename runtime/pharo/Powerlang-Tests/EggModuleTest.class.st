@@ -1,5 +1,5 @@
 Class {
-	#name : #PowertalkModuleTest,
+	#name : #EggModuleTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'runtime',
@@ -9,12 +9,12 @@ Class {
 }
 
 { #category : #accessing }
-PowertalkModuleTest class >> defaultTimeLimit [
+EggModuleTest class >> defaultTimeLimit [
 	^ 1000 seconds
 ]
 
 { #category : #running }
-PowertalkModuleTest >> setUp [
+EggModuleTest >> setUp [
 
 	| image |
 	super setUp.
@@ -30,7 +30,7 @@ PowertalkModuleTest >> setUp [
 ]
 
 { #category : #running }
-PowertalkModuleTest >> test010LoadClassAndMethod [
+EggModuleTest >> test010LoadClassAndMethod [
 
 	| st p module classes class a str |
 	(bootstrapper rootDirectory / 'A') ensureCreateDirectory.
@@ -67,7 +67,7 @@ A >> a [
 ]
 
 { #category : #running }
-PowertalkModuleTest >> test020LoadClassMethodAndRequire [
+EggModuleTest >> test020LoadClassMethodAndRequire [
 
 	| st p module classes class b str |
 	(bootstrapper rootDirectory / 'B') ensureCreateDirectory.
@@ -129,7 +129,7 @@ ModuleB >> imports [
 ]
 
 { #category : #running }
-PowertalkModuleTest >> test100LoadCompiler [
+EggModuleTest >> test100LoadCompiler [
 
 	| module namespace name compiler object code method foo |
 
