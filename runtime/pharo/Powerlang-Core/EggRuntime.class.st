@@ -1,5 +1,5 @@
 Class {
-	#name : #PowertalkRuntime,
+	#name : #EggRuntime,
 	#superclass : #Object,
 	#instVars : [
 		'methodCache',
@@ -18,26 +18,26 @@ Class {
 }
 
 { #category : #services }
-PowertalkRuntime >> argumentCountOf: code [
+EggRuntime >> argumentCountOf: code [
 	^(self isBlock: code)
 		        ifTrue: [ self blockArgumentCount: code ]
 		        ifFalse: [ self methodArgumentCount: code ]
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> behaviorOf: anObject [
+EggRuntime >> behaviorOf: anObject [
 	^self subclassResponsibility
 ]
 
 { #category : #services }
-PowertalkRuntime >> booleanFor: aBoolean [
+EggRuntime >> booleanFor: aBoolean [
 	^ aBoolean
 		ifTrue: [ trueObj ]
 		ifFalse: [ falseObj ]
 ]
 
 { #category : #services }
-PowertalkRuntime >> booleanFrom: anObject [
+EggRuntime >> booleanFrom: anObject [
 	anObject == falseObj
 		ifTrue: [ ^ false ].
 	anObject == trueObj
@@ -46,13 +46,13 @@ PowertalkRuntime >> booleanFrom: anObject [
 ]
 
 { #category : #initialization }
-PowertalkRuntime >> doesNotUnderstandMethod [
+EggRuntime >> doesNotUnderstandMethod [
 
 	^doesNotUnderstandMethod
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> evaluatePrimitiveHash: receiver [
+EggRuntime >> evaluatePrimitiveHash: receiver [
 	| hash |
 	hash := receiver headerHash.
 	hash = 0
@@ -62,24 +62,24 @@ PowertalkRuntime >> evaluatePrimitiveHash: receiver [
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> executableCodeWork: anLMRExecutableCode [
+EggRuntime >> executableCodeWork: anLMRExecutableCode [
 
 	^ self subclassResponsibility
 ]
 
 { #category : #services }
-PowertalkRuntime >> extensionMethodModule: method [
+EggRuntime >> extensionMethodModule: method [
 
 	self subclassResponsibility
 ]
 
 { #category : #initialization }
-PowertalkRuntime >> false [
+EggRuntime >> false [
 	^ falseObj
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> flushDispatchCache: aSymbol [
+EggRuntime >> flushDispatchCache: aSymbol [
 
 	| cached |
 	symbolCache
@@ -90,7 +90,7 @@ PowertalkRuntime >> flushDispatchCache: aSymbol [
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> flushDispatchCache: aSymbol in: class [
+EggRuntime >> flushDispatchCache: aSymbol in: class [
 	| behavior |
 	behavior := self speciesInstanceBehavior: class.
 	symbolCache at: aSymbol ifPresent: [ :messages | messages do: [:m | m flushCache ]].
@@ -98,87 +98,87 @@ PowertalkRuntime >> flushDispatchCache: aSymbol in: class [
 ]
 
 { #category : #initialization }
-PowertalkRuntime >> initialize [
+EggRuntime >> initialize [
 	methodCache := Dictionary new.
 	symbolCache := Dictionary new.
 	overrides := Dictionary new
 ]
 
 { #category : #initialization }
-PowertalkRuntime >> initializeInterpreter [
+EggRuntime >> initializeInterpreter [
 	"interpreter := PowertalkRecursiveInterpreter new runtime: self"
 
 	"interpreter := PowertalkIterativeTreeInterpreter new runtime: self"
 
 	"interpreter := PowertalkLinkedLinearInterpreter new runtime: self"
 
-	interpreter := PowertalkIterativeStackedInterpreter new runtime: self
+	interpreter := EggIterativeStackedInterpreter new runtime: self
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> instanceVarOf: receiver at: anInteger [
+EggRuntime >> instanceVarOf: receiver at: anInteger [
 	^ receiver slotAt: anInteger
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> instanceVarOf: receiver at: anInteger put: value [
+EggRuntime >> instanceVarOf: receiver at: anInteger put: value [
 	^ receiver slotAt: anInteger put: value
 ]
 
 { #category : #initialization }
-PowertalkRuntime >> interpreter [
+EggRuntime >> interpreter [
 	^interpreter
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> isClosure: anObjectMap [
+EggRuntime >> isClosure: anObjectMap [
 	^ self subclassResponsibility
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> literalFor: anObject [
+EggRuntime >> literalFor: anObject [
 	^anObject
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> localMethodAstcodes: method [
+EggRuntime >> localMethodAstcodes: method [
 
 	^ self subclassResponsibility
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> localSymbolFrom: anObject [
+EggRuntime >> localSymbolFrom: anObject [
 	^ anObject bytes allButLast asString asSymbol
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> lookup: aSymbol startingAt: aBehavior [
+EggRuntime >> lookup: aSymbol startingAt: aBehavior [
 	^methodCache at: aSymbol -> aBehavior ifAbsentPut: [ self doLookup: aSymbol startingAt: aBehavior ]
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> methodAstcodes: method [
+EggRuntime >> methodAstcodes: method [
 
 	^ self subclassResponsibility
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> methodClassBinding: method [
+EggRuntime >> methodClassBinding: method [
 	^ self subclassResponsibility
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> methodEnvironmentSize: anObject [
+EggRuntime >> methodEnvironmentSize: anObject [
 	^self subclassResponsibility
 ]
 
 { #category : #services }
-PowertalkRuntime >> methodIsExtension: method [
+EggRuntime >> methodIsExtension: method [
 		self subclassResponsibility 
 ]
 
 { #category : #services }
-PowertalkRuntime >> methodModule: method [
+EggRuntime >> methodModule: method [
 	| species |
 	^(self methodIsExtension: method)
 		ifTrue: [ self extensionMethodModule: method ]
@@ -188,73 +188,73 @@ PowertalkRuntime >> methodModule: method [
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> newBootstrapDictionaryOf: receiver [
+EggRuntime >> newBootstrapDictionaryOf: receiver [
 	^ self subclassResponsibility
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> newBytesOf: receiver sized: size [
+EggRuntime >> newBytesOf: receiver sized: size [
 	^ self subclassResponsibility
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> newClosureFor: compiledBlock [
+EggRuntime >> newClosureFor: compiledBlock [
 	^ self subclassResponsibility
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> newEnvironmentSized: anInteger [
+EggRuntime >> newEnvironmentSized: anInteger [
 	^self subclassResponsibility
 
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> newExecutableCodeFor: anObject [
+EggRuntime >> newExecutableCodeFor: anObject [
 	^ self subclassResponsibility
 
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> newInteger: anInteger [
+EggRuntime >> newInteger: anInteger [
 	^self subclassResponsibility
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> newOf: receiver sized: size [
+EggRuntime >> newOf: receiver sized: size [
 	^ self subclassResponsibility
 
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> newSlotsOf: receiver [
+EggRuntime >> newSlotsOf: receiver [
 ^self subclassResponsibility
 ]
 
 { #category : #initialization }
-PowertalkRuntime >> nil [
+EggRuntime >> nil [
 	^nilObj
 	
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> registerCache: anSMessage for: symbol [
+EggRuntime >> registerCache: anSMessage for: symbol [
 	| messages |
 	messages := symbolCache at: symbol ifAbsentPut: [OrderedCollection new].
 	messages add: anSMessage 
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> sendLocal: aSymbol to: receiver [
+EggRuntime >> sendLocal: aSymbol to: receiver [
 	^ self sendLocal: aSymbol to: receiver with: {}
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> sendLocal: aSymbol to: receiver with: anArray [
+EggRuntime >> sendLocal: aSymbol to: receiver with: anArray [
 	^interpreter sendLocal: aSymbol to: receiver with: anArray
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> sexpressionsOf: method [
+EggRuntime >> sexpressionsOf: method [
 
 	| astcodes decoder |
 	astcodes := self localMethodAstcodes: method.
@@ -266,32 +266,32 @@ PowertalkRuntime >> sexpressionsOf: method [
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> speciesFor: anObject [
+EggRuntime >> speciesFor: anObject [
 	^ self subclassResponsibility
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> speciesInstanceBehavior: class [
+EggRuntime >> speciesInstanceBehavior: class [
 ^	self subclassResponsibility 
 ]
 
 { #category : #services }
-PowertalkRuntime >> speciesModule: method [
+EggRuntime >> speciesModule: method [
 
 	self subclassResponsibility
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> symbolFrom: anObject [
+EggRuntime >> symbolFrom: anObject [
 	^anObject
 ]
 
 { #category : #initialization }
-PowertalkRuntime >> symbolFromLocal: aSymbol [
+EggRuntime >> symbolFromLocal: aSymbol [
 	^self subclassResponsibility
 ]
 
 { #category : #initialization }
-PowertalkRuntime >> true [
+EggRuntime >> true [
 	^ trueObj
 ]

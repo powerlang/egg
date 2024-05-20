@@ -1,5 +1,5 @@
 Class {
-	#name : #PowertalkEvaluator,
+	#name : #EggEvaluator,
 	#superclass : #Object,
 	#instVars : [
 		'runtime',
@@ -19,19 +19,19 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-PowertalkEvaluator class >> undermessages [
+EggEvaluator class >> undermessages [
 	^#(_basicAt: #_basicAt:put: _bitShiftLeft: _byteAt: #_byteAt:put: _smallSize _largeSize _isSmallInteger _basicHash _basicHash: _smallIntegerByteAt: _uShortAtOffset: #_uShortAtOffset:put:)
 ]
 
 { #category : #services }
-PowertalkEvaluator >> booleanFor: aBoolean [
+EggEvaluator >> booleanFor: aBoolean [
 	^ aBoolean
 		ifTrue: [ trueObj ]
 		ifFalse: [ falseObj ]
 ]
 
 { #category : #services }
-PowertalkEvaluator >> booleanFrom: anObject [
+EggEvaluator >> booleanFrom: anObject [
 	anObject == falseObj
 		ifTrue: [ ^ false ].
 	anObject == trueObj
@@ -40,23 +40,23 @@ PowertalkEvaluator >> booleanFrom: anObject [
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> context [
+EggEvaluator >> context [
 	^ context 
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> context: anEvaluationContext [ 
+EggEvaluator >> context: anEvaluationContext [ 
 	context := anEvaluationContext
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> contextSwitchTo: vmStack [
+EggEvaluator >> contextSwitchTo: vmStack [
 
 ^self subclassResponsibility 
 ]
 
 { #category : #initializing }
-PowertalkEvaluator >> convertPrimitives [
+EggEvaluator >> convertPrimitives [
 	| original |
 	original := primitives.
 	primitives := IdentityDictionary new.
@@ -66,7 +66,7 @@ PowertalkEvaluator >> convertPrimitives [
 ]
 
 { #category : #initializing }
-PowertalkEvaluator >> convertUndermessages [
+EggEvaluator >> convertUndermessages [
 	| original |
 	original := undermessages.
 	undermessages := IdentityDictionary new.
@@ -75,27 +75,27 @@ PowertalkEvaluator >> convertUndermessages [
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> evaluateClosure: receiver [
+EggEvaluator >> evaluateClosure: receiver [
 	^ self evaluateClosure: receiver withArgs: #()
 ]
 
 { #category : #visiting }
-PowertalkEvaluator >> evaluateClosure: aPClosure with: anObject [
+EggEvaluator >> evaluateClosure: aPClosure with: anObject [
 	 ^self evaluateClosure: aPClosure withArgs: { anObject }
 ]
 
 { #category : #visiting }
-PowertalkEvaluator >> evaluateClosure: aPClosure with: anObject with: anotherObject [
+EggEvaluator >> evaluateClosure: aPClosure with: anObject with: anotherObject [
 	^ self evaluateClosure: aPClosure withArgs: {anObject. anotherObject}
 ]
 
 { #category : #private }
-PowertalkEvaluator >> evaluateClosure: receiver withArgs: arguments [
+EggEvaluator >> evaluateClosure: receiver withArgs: arguments [
 	^self subclassResponsibility
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> evaluatePerform: aSymbol in: receiver withArgs: arguments [
+EggEvaluator >> evaluatePerform: aSymbol in: receiver withArgs: arguments [
 	| behavior method |
 	behavior := runtime behaviorOf: receiver.
 	method := runtime lookup: aSymbol startingAt: behavior.
@@ -104,7 +104,7 @@ PowertalkEvaluator >> evaluatePerform: aSymbol in: receiver withArgs: arguments 
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> evaluatePrimitiveHash: receiver [
+EggEvaluator >> evaluatePrimitiveHash: receiver [
 	| hash |
 	hash := receiver headerHash.
 	hash = 0
@@ -114,25 +114,25 @@ PowertalkEvaluator >> evaluatePrimitiveHash: receiver [
 ]
 
 { #category : #initialization }
-PowertalkEvaluator >> false [
+EggEvaluator >> false [
 	^ falseObj
 ]
 
 { #category : #initialization }
-PowertalkEvaluator >> initialize [
+EggEvaluator >> initialize [
 
 	messageCount := 0.
 	stacks := IdentityDictionary new
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> initializeExecutableCodeOf: method [
+EggEvaluator >> initializeExecutableCodeOf: method [
 
 	^self subclassResponsibility
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> initializeLinearExecutableCodeOf: method [
+EggEvaluator >> initializeLinearExecutableCodeOf: method [
 
 	| sexpressions executable |
 	sexpressions := runtime sexpressionsOf: method.
@@ -143,7 +143,7 @@ PowertalkEvaluator >> initializeLinearExecutableCodeOf: method [
 ]
 
 { #category : #initializing }
-PowertalkEvaluator >> initializePrimitives [
+EggEvaluator >> initializePrimitives [
 
 	primitives := IdentityDictionary new.
 	primitives
@@ -211,7 +211,7 @@ PowertalkEvaluator >> initializePrimitives [
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> initializeRecursiveExecutableCodeOf: method [
+EggEvaluator >> initializeRecursiveExecutableCodeOf: method [
 
 	| sexpressions executable |
 	sexpressions := runtime sexpressionsOf: method.
@@ -220,7 +220,7 @@ PowertalkEvaluator >> initializeRecursiveExecutableCodeOf: method [
 ]
 
 { #category : #initializing }
-PowertalkEvaluator >> initializeUndermessages [
+EggEvaluator >> initializeUndermessages [
 	undermessages := IdentityDictionary new.
 	undermessages
 		at: #_isSmallInteger put: self underprimitiveIsSmallInteger;
@@ -266,12 +266,12 @@ PowertalkEvaluator >> initializeUndermessages [
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> invoke: method with: receiver [
+EggEvaluator >> invoke: method with: receiver [
 	^self subclassResponsibility
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> isIdentical: anObject to: anotherObject [
+EggEvaluator >> isIdentical: anObject to: anotherObject [
 	^ anObject == anotherObject
 		or: [ anObject isImmediate
 				and: [ anotherObject isImmediate
@@ -279,12 +279,12 @@ PowertalkEvaluator >> isIdentical: anObject to: anotherObject [
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> linearizer [
+EggEvaluator >> linearizer [
 	^self subclassResponsibility
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> lookup: aSymbol startingAt: aBehavior sendSite: anSMessage [
+EggEvaluator >> lookup: aSymbol startingAt: aBehavior sendSite: anSMessage [
 	| method symbol |
 	method := anSMessage methodFor: aBehavior.
 	method
@@ -303,13 +303,13 @@ PowertalkEvaluator >> lookup: aSymbol startingAt: aBehavior sendSite: anSMessage
 ]
 
 { #category : #initialization }
-PowertalkEvaluator >> nil [
+EggEvaluator >> nil [
 	^nilObj
 	
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> prepareExecutableCode: method [
+EggEvaluator >> prepareExecutableCode: method [
 
 	| code |
 	code := runtime methodExecutableCode: method.
@@ -318,7 +318,7 @@ PowertalkEvaluator >> prepareExecutableCode: method [
 ]
 
 { #category : #visiting }
-PowertalkEvaluator >> prepareForExecuting: method [
+EggEvaluator >> prepareForExecuting: method [
 
 	| code |
 	code := self prepareExecutableCode: method.
@@ -326,7 +326,7 @@ PowertalkEvaluator >> prepareForExecuting: method [
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveAt [
+EggEvaluator >> primitiveAt [
 	| receiver index value |
 	^ [ receiver := context self.
 	index := context firstArgument value.
@@ -337,14 +337,14 @@ PowertalkEvaluator >> primitiveAt [
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveAtPut [
+EggEvaluator >> primitiveAtPut [
 	| index |
 	^ [ index := context firstArgument value.
 	context self at: index put: context secondArgument ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveBehavior [
+EggEvaluator >> primitiveBehavior [
 	| receiver |
 	^ [ receiver := context self.
 	receiver isImmediate
@@ -353,149 +353,149 @@ PowertalkEvaluator >> primitiveBehavior [
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveBootstrapDictAt [
+EggEvaluator >> primitiveBootstrapDictAt [
 	| string |
 	^ [ string := context firstArgument asString.
 	context self at: string ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveBootstrapDictAtPut [
+EggEvaluator >> primitiveBootstrapDictAtPut [
 	| string |
 	^ [ string := context firstArgument asString.
 	context self at: string put: context secondArgument ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveBootstrapDictBeConstant [
+EggEvaluator >> primitiveBootstrapDictBeConstant [
 	^ [ context self beConstant ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveBootstrapDictKeys [
+EggEvaluator >> primitiveBootstrapDictKeys [
 	^ [ context self keys ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveBootstrapDictNew [
+EggEvaluator >> primitiveBootstrapDictNew [
 	^ [ runtime newBootstrapDictionaryOf: context self ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveClass [
+EggEvaluator >> primitiveClass [
 	^ [ runtime speciesFor: context self ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveClosureArgumentCount [
+EggEvaluator >> primitiveClosureArgumentCount [
 	^ [ runtime newInteger: context self block argumentCount ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveClosureValue [
+EggEvaluator >> primitiveClosureValue [
 	^ [ self evaluateClosure: context self ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveClosureValueWithArgs [
+EggEvaluator >> primitiveClosureValueWithArgs [
 	^ [ self
 		evaluateClosure: context self
 		withArgs: context methodArguments ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveEqual [
+EggEvaluator >> primitiveEqual [
 	^ [ runtime booleanFor: context self = context firstArgument ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveFloatNew [
+EggEvaluator >> primitiveFloatNew [
 	^ [ runtime newBytesOf: context self sized: 8 ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveFlushDispatchCaches [
+EggEvaluator >> primitiveFlushDispatchCaches [
 	^ [ runtime
 		flushDispatchCache: context self
 		in: context firstArgument ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveFlushFromCaches [
+EggEvaluator >> primitiveFlushFromCaches [
 
 	^ [ runtime flushDispatchCache: (runtime methodSelector: context self)]
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> primitiveFor: aSymbol [
+EggEvaluator >> primitiveFor: aSymbol [
 	^primitives at: aSymbol
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveHash [
+EggEvaluator >> primitiveHash [
 	^ [ runtime newInteger: (runtime hashFor: context self) ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveHostFixOverrides [
+EggEvaluator >> primitiveHostFixOverrides [
 	^ [ runtime fixOverrides ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveHostLoadModule [
+EggEvaluator >> primitiveHostLoadModule [
 	^ [ runtime loadModule: context firstArgument]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveHostSuspendedBecause [
+EggEvaluator >> primitiveHostSuspendedBecause [
 
 	^ [ context signalSuspension]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveNew [
+EggEvaluator >> primitiveNew [
 	^ [ runtime newSlotsOf: context self ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveNewBytes [
+EggEvaluator >> primitiveNewBytes [
 	| size |
 	^ [ size := context firstArgument value.
 	runtime newBytesOf: context self sized: size ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveNewObjectHeap [
+EggEvaluator >> primitiveNewObjectHeap [
 	^ [ runtime newObjectHeap ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveNewSized [
+EggEvaluator >> primitiveNewSized [
 	| size |
 	^ [ size := context firstArgument value.
 	runtime newOf: context self sized: size ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitivePerformWithArguments [
+EggEvaluator >> primitivePerformWithArguments [
 	^ [ self
 		evaluatePerform: context firstArgument in: context self
 		withArgs: context secondArgument ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitivePrepareForExecution [
+EggEvaluator >> primitivePrepareForExecution [
 
 	^ [ self prepareForExecuting: context self ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitivePrimeFor [
+EggEvaluator >> primitivePrimeFor [
 	^ [ self primitivePrimeFor: context firstArgument value ]
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> primitivePrimeFor: anInteger [
+EggEvaluator >> primitivePrimeFor: anInteger [
 	| result |
 
 	result := #(2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97 101 103 107 109 113 127 131 137 139 149 151 157 163 167 173 179 181 191 193 197 199 211 223 227 229 233 239 241 251 269 359 479 641 857 1151 1549 2069 2237 2423 2617 2797 2999 3167 3359 3539 3727 3911 4441 4787 5119 5471 5801 6143 6521 6827 7177 7517 7853 8783 9601 10243 10867 11549 12239 12919 13679 14293 15013 15731 17569 19051 20443 21767 23159 24611 25847 27397 28571 30047 31397 35771 38201 40841 43973 46633 48989 51631 54371 57349 60139 62969)
@@ -504,7 +504,7 @@ PowertalkEvaluator >> primitivePrimeFor: anInteger [
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveProcessVMStackAt [
+EggEvaluator >> primitiveProcessVMStackAt [
 
 	^ [ 
 	  (stacks at: context receiver) stack
@@ -513,19 +513,19 @@ PowertalkEvaluator >> primitiveProcessVMStackAt [
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveProcessVMStackAtPut [
+EggEvaluator >> primitiveProcessVMStackAtPut [
 
 	^ [ (stacks at: context receiver) stack at: context firstArgument value put: context secondArgument ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveProcessVMStackBP [
+EggEvaluator >> primitiveProcessVMStackBP [
 
 	^ [ runtime newSmallInteger: context regBP ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveProcessVMStackBpAtPut [
+EggEvaluator >> primitiveProcessVMStackBpAtPut [
 
 	^ [ 
 	  (stacks at: context receiver) stack
@@ -534,20 +534,20 @@ PowertalkEvaluator >> primitiveProcessVMStackBpAtPut [
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveProcessVMStackBufferSize [
+EggEvaluator >> primitiveProcessVMStackBufferSize [
 
 	^ [ runtime newInteger: (stacks at: context receiver) stackSize ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveProcessVMStackContextSwitchTo [
+EggEvaluator >> primitiveProcessVMStackContextSwitchTo [
 
 	^ [ 
 	  self contextSwitchTo: context firstArgument ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveProcessVMStackInitialize [
+EggEvaluator >> primitiveProcessVMStackInitialize [
 
 	^ [ 
 	  | new |
@@ -558,7 +558,7 @@ PowertalkEvaluator >> primitiveProcessVMStackInitialize [
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveProcessVMStackPcAtPut [
+EggEvaluator >> primitiveProcessVMStackPcAtPut [
 
 	^ [ 
 	  (stacks at: context receiver) stack
@@ -567,7 +567,7 @@ PowertalkEvaluator >> primitiveProcessVMStackPcAtPut [
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveSMIBitAnd [
+EggEvaluator >> primitiveSMIBitAnd [
 	^ [ runtime
 		newInteger:
 			(context self value
@@ -575,7 +575,7 @@ PowertalkEvaluator >> primitiveSMIBitAnd [
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveSMIBitOr [
+EggEvaluator >> primitiveSMIBitOr [
 	^ [ runtime
 		newInteger:
 			(context self value
@@ -583,7 +583,7 @@ PowertalkEvaluator >> primitiveSMIBitOr [
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveSMIBitShift [
+EggEvaluator >> primitiveSMIBitShift [
 	^ [ runtime
 		newInteger:
 			(context self value
@@ -591,7 +591,7 @@ PowertalkEvaluator >> primitiveSMIBitShift [
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveSMIBitXor [
+EggEvaluator >> primitiveSMIBitXor [
 	^ [ runtime
 		newInteger:
 			(context self value
@@ -599,7 +599,7 @@ PowertalkEvaluator >> primitiveSMIBitXor [
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveSMIEqual [
+EggEvaluator >> primitiveSMIEqual [
 	^ [ runtime
 		booleanFor: (
 			context self value = 
@@ -607,7 +607,7 @@ PowertalkEvaluator >> primitiveSMIEqual [
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveSMIGreaterEqualThan [
+EggEvaluator >> primitiveSMIGreaterEqualThan [
 	^ [ runtime
 		booleanFor:
 			context self value
@@ -615,18 +615,18 @@ PowertalkEvaluator >> primitiveSMIGreaterEqualThan [
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveSMIGreaterThan [
+EggEvaluator >> primitiveSMIGreaterThan [
 	^ [ runtime
 		booleanFor: context self value > (runtime integerFrom: context firstArgument) ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveSMIHighBit [
+EggEvaluator >> primitiveSMIHighBit [
 	^ [ runtime newInteger: context self value highBit ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveSMIIntDiv [
+EggEvaluator >> primitiveSMIIntDiv [
 	^ [ runtime
 		newInteger:
 			context self value
@@ -634,7 +634,7 @@ PowertalkEvaluator >> primitiveSMIIntDiv [
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveSMIIntQuot [
+EggEvaluator >> primitiveSMIIntQuot [
 	^ [ runtime
 		newInteger:
 			context self value
@@ -642,7 +642,7 @@ PowertalkEvaluator >> primitiveSMIIntQuot [
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveSMIMinus [
+EggEvaluator >> primitiveSMIMinus [
 	^ [ runtime
 		newInteger:
 			context self value
@@ -650,7 +650,7 @@ PowertalkEvaluator >> primitiveSMIMinus [
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveSMINotEqual [
+EggEvaluator >> primitiveSMINotEqual [
 	^ [ runtime
 		booleanFor:
 			context self value
@@ -658,7 +658,7 @@ PowertalkEvaluator >> primitiveSMINotEqual [
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveSMIPlus [
+EggEvaluator >> primitiveSMIPlus [
 	^ [ runtime
 		newInteger:
 			context self value
@@ -666,12 +666,12 @@ PowertalkEvaluator >> primitiveSMIPlus [
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveSMISize [
+EggEvaluator >> primitiveSMISize [
 	^ [ runtime newInteger: context self value bytesCount ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveSMITimes [
+EggEvaluator >> primitiveSMITimes [
 	^ [ runtime
 		newInteger:
 			context self value
@@ -679,7 +679,7 @@ PowertalkEvaluator >> primitiveSMITimes [
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveSetBehavior [
+EggEvaluator >> primitiveSetBehavior [
 	| receiver |
 	^ [ receiver := context self.
 	receiver behavior: context firstArgument.
@@ -687,12 +687,12 @@ PowertalkEvaluator >> primitiveSetBehavior [
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveSize [
+EggEvaluator >> primitiveSize [
 	^ [ runtime newInteger: (runtime arrayedSizeOf: context self) ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveStringReplaceFromToWithStartingAt [
+EggEvaluator >> primitiveStringReplaceFromToWithStartingAt [
 	| receiver |
 	^ [ receiver := context self.
 	receiver bytes
@@ -704,33 +704,33 @@ PowertalkEvaluator >> primitiveStringReplaceFromToWithStartingAt [
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveUnderHash [
+EggEvaluator >> primitiveUnderHash [
 	^ [ runtime newInteger: context self headerHash ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveUnderIsBytes [
+EggEvaluator >> primitiveUnderIsBytes [
 	^ [ runtime booleanFor: context self isBytes ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveUnderPointersSize [
+EggEvaluator >> primitiveUnderPointersSize [
 	^ [ runtime newInteger: context self pointersSize ]
 ]
 
 { #category : #primitives }
-PowertalkEvaluator >> primitiveUnderSize [
+EggEvaluator >> primitiveUnderSize [
 	^ [ runtime newInteger: context self size ]
 ]
 
 { #category : #initializing }
-PowertalkEvaluator >> runtime [
+EggEvaluator >> runtime [
 	^runtime
 
 ]
 
 { #category : #initializing }
-PowertalkEvaluator >> runtime: aPowertalkRuntime [
+EggEvaluator >> runtime: aPowertalkRuntime [
 	runtime := aPowertalkRuntime.
 	nilObj := runtime nil.
 	trueObj := runtime true.
@@ -741,27 +741,27 @@ PowertalkEvaluator >> runtime: aPowertalkRuntime [
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> sendLocal: aSymbol to: receiver [
+EggEvaluator >> sendLocal: aSymbol to: receiver [
 	^ self sendLocal: aSymbol to: receiver with: {}
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> stackSize [
+EggEvaluator >> stackSize [
 	^context framesCount
 ]
 
 { #category : #initialization }
-PowertalkEvaluator >> true [
+EggEvaluator >> true [
 	^ trueObj
 ]
 
 { #category : #underprimitives }
-PowertalkEvaluator >> underprimitiveBasicAt [
+EggEvaluator >> underprimitiveBasicAt [
 	^ [ :receiver :arguments | receiver slots at: arguments first value ]
 ]
 
 { #category : #underprimitives }
-PowertalkEvaluator >> underprimitiveBasicAtPut [
+EggEvaluator >> underprimitiveBasicAtPut [
 
 	^ [ :receiver :arguments | 
 	  receiver slots
@@ -771,22 +771,22 @@ PowertalkEvaluator >> underprimitiveBasicAtPut [
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveBasicFlags [
+EggEvaluator >> underprimitiveBasicFlags [
 	^ [ :receiver :arguments | runtime newInteger: receiver headerFlags ]
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveBasicHash [
+EggEvaluator >> underprimitiveBasicHash [
 	^ [ :receiver :arguments | runtime newInteger: receiver headerHash ]
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveBasicHashPut [
+EggEvaluator >> underprimitiveBasicHashPut [
 	^ [ :receiver :arguments | receiver headerHash: arguments first value ]
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveBitShiftLeft [
+EggEvaluator >> underprimitiveBitShiftLeft [
 	| result |
 	^ [ :receiver :arguments | 
 	result := receiver value bitShift: arguments first value.
@@ -794,7 +794,7 @@ PowertalkEvaluator >> underprimitiveBitShiftLeft [
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveByteAt [
+EggEvaluator >> underprimitiveByteAt [
 	| result |
 	^ [ :receiver :arguments | 
 	result := receiver bytes at: arguments first value.
@@ -802,7 +802,7 @@ PowertalkEvaluator >> underprimitiveByteAt [
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveByteAtPut [
+EggEvaluator >> underprimitiveByteAtPut [
 
 	^ [ :receiver :arguments | 
 	receiver bytes
@@ -812,27 +812,27 @@ PowertalkEvaluator >> underprimitiveByteAtPut [
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveHalt [
+EggEvaluator >> underprimitiveHalt [
 	^ [ :receiver :arguments | receiver halt ]
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveIdentityEquals [
+EggEvaluator >> underprimitiveIdentityEquals [
 	^ [ :receiver :arguments | runtime booleanFor: (self isIdentical: receiver to: arguments first)]
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveIsLarge [
+EggEvaluator >> underprimitiveIsLarge [
 	^ [ :receiver :arguments | runtime booleanFor: receiver isSmall not ]
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveIsSmallInteger [
+EggEvaluator >> underprimitiveIsSmallInteger [
 	^ [ :receiver :arguments | runtime booleanFor: receiver isImmediate ]
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveLargeSize [
+EggEvaluator >> underprimitiveLargeSize [
 	^ [ :receiver :arguments | 
 	receiver isSmall
 		ifTrue: [ self error ].
@@ -840,7 +840,7 @@ PowertalkEvaluator >> underprimitiveLargeSize [
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveLeadingZeroBitCount [
+EggEvaluator >> underprimitiveLeadingZeroBitCount [
 	^ [ :receiver :arguments | 
 	runtime
 		newInteger: (self
@@ -848,86 +848,86 @@ PowertalkEvaluator >> underprimitiveLeadingZeroBitCount [
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveLeadingZeroBitCount: anInteger [
+EggEvaluator >> underprimitiveLeadingZeroBitCount: anInteger [
 	^ anInteger < 0
 		ifTrue: [ 0 ]
 		ifFalse: [ runtime wordSize * 8 - anInteger highBit ]
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveSMIBitAnd [
+EggEvaluator >> underprimitiveSMIBitAnd [
 	^ [ :receiver :arguments | runtime newInteger: (receiver value bitAnd: arguments first value) ]
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveSMIBitOr [
+EggEvaluator >> underprimitiveSMIBitOr [
 	^ [ :receiver :arguments | runtime newInteger: (receiver value bitOr: arguments first value) ]
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveSMIBitShiftLeft [
+EggEvaluator >> underprimitiveSMIBitShiftLeft [
 	^ [ :receiver :arguments | runtime newInteger: receiver value << arguments first value ]
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveSMIBitShiftRight [
+EggEvaluator >> underprimitiveSMIBitShiftRight [
 	^ [ :receiver :arguments | 
 	runtime
 		newInteger: (receiver value >> arguments first value) ]
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveSMIEquals [
+EggEvaluator >> underprimitiveSMIEquals [
 	^ [ :receiver :arguments | runtime booleanFor: receiver value = arguments first value ]
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveSMIGreaterEqualThan [
+EggEvaluator >> underprimitiveSMIGreaterEqualThan [
 	^ [ :receiver :arguments | runtime booleanFor: receiver value >= arguments first value ]
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveSMIGreaterThan [
+EggEvaluator >> underprimitiveSMIGreaterThan [
 	^ [ :receiver :arguments | runtime booleanFor: receiver value > arguments first value ]
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveSMILowerEqualThan [
+EggEvaluator >> underprimitiveSMILowerEqualThan [
 	^ [ :receiver :arguments | runtime booleanFor: receiver value <= arguments first value ]
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveSMILowerThan [
+EggEvaluator >> underprimitiveSMILowerThan [
 	^ [ :receiver :arguments | runtime booleanFor: receiver value < arguments first value ]
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveSMIMinus [
+EggEvaluator >> underprimitiveSMIMinus [
 	^ [ :receiver :arguments | runtime newInteger: receiver value - arguments first value ]
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveSMIPlus [
+EggEvaluator >> underprimitiveSMIPlus [
 	^ [ :receiver :arguments | runtime newInteger: receiver value + arguments first value ]
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveSMIQuotientTowardZero [
+EggEvaluator >> underprimitiveSMIQuotientTowardZero [
 	^ [ :receiver :arguments | runtime newInteger: (receiver value quo: arguments first value) ]
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveSMIRemainderTowardZero [
+EggEvaluator >> underprimitiveSMIRemainderTowardZero [
 	^ [ :receiver :arguments | runtime newInteger: (receiver value \\ arguments first value) ]
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveSMITimes [
+EggEvaluator >> underprimitiveSMITimes [
 	^ [ :receiver :arguments | runtime newInteger: receiver value * arguments first value ]
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveSmallIntegerByteAt [
+EggEvaluator >> underprimitiveSmallIntegerByteAt [
 	| result |
 	^ [ :receiver :arguments | 
 	result := receiver value byteAt: arguments first value.
@@ -935,7 +935,7 @@ PowertalkEvaluator >> underprimitiveSmallIntegerByteAt [
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveSmallSize [
+EggEvaluator >> underprimitiveSmallSize [
 	^ [ :receiver :arguments | 
 	receiver isSmall
 		ifFalse: [ self error ].
@@ -943,7 +943,7 @@ PowertalkEvaluator >> underprimitiveSmallSize [
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveULongAtOffset [
+EggEvaluator >> underprimitiveULongAtOffset [
 	| result |
 	^ [ :receiver :arguments | 
 	result := receiver bytes unsignedLongAt: arguments second value + 1.
@@ -951,7 +951,7 @@ PowertalkEvaluator >> underprimitiveULongAtOffset [
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveULongAtOffsetPut [
+EggEvaluator >> underprimitiveULongAtOffsetPut [
 	| value |
 	^ [ :receiver :arguments | 
 	value := arguments second.
@@ -962,7 +962,7 @@ PowertalkEvaluator >> underprimitiveULongAtOffsetPut [
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveUShortAtOffset [
+EggEvaluator >> underprimitiveUShortAtOffset [
 	| result |
 	^ [ :receiver :arguments | 
 	result := receiver bytes
@@ -971,7 +971,7 @@ PowertalkEvaluator >> underprimitiveUShortAtOffset [
 ]
 
 { #category : #accessing }
-PowertalkEvaluator >> underprimitiveUShortAtOffsetPut [
+EggEvaluator >> underprimitiveUShortAtOffsetPut [
 	| value |
 	^ [ :receiver :arguments | 
 	value := arguments second.

@@ -70,7 +70,7 @@ EggRingImage >> genesis [
 	module := self basicNewSlots: #KernelModule.
 	super genesis.
 	self createBootstrapNamespace.
-	runtime := PowertalkRingRuntime new.
+	runtime := EggRingRuntime new.
 	runtime image: self
 ]
 

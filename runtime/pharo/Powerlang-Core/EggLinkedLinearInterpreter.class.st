@@ -1,6 +1,6 @@
 Class {
-	#name : #PowertalkLinkedLinearInterpreter,
-	#superclass : #PowertalkIterativeLinkedInterpreter,
+	#name : #EggLinkedLinearInterpreter,
+	#superclass : #EggIterativeLinkedInterpreter,
 	#instVars : [
 		'linearizer'
 	],
@@ -8,7 +8,7 @@ Class {
 }
 
 { #category : #visiting }
-PowertalkLinkedLinearInterpreter >> evaluate [
+EggLinkedLinearInterpreter >> evaluate [
 	| operation |
 	[ operation := context nextOperation. operation notNil]
 		whileTrue: [ 			operation acceptVisitor: self ].
@@ -17,41 +17,41 @@ PowertalkLinkedLinearInterpreter >> evaluate [
 ]
 
 { #category : #visiting }
-PowertalkLinkedLinearInterpreter >> evaluationContextClass [
+EggLinkedLinearInterpreter >> evaluationContextClass [
 	^ LinkedLinearEvaluationContext
 ]
 
 { #category : #visiting }
-PowertalkLinkedLinearInterpreter >> initialize [
+EggLinkedLinearInterpreter >> initialize [
 	super initialize.
 	linearizer := SExpressionLinearizer new.
 
 ]
 
 { #category : #private }
-PowertalkLinkedLinearInterpreter >> initializeExecutableCodeOf: method [
+EggLinkedLinearInterpreter >> initializeExecutableCodeOf: method [
 
 	^ self initializeLinearExecutableCodeOf: method
 ]
 
 { #category : #visiting }
-PowertalkLinkedLinearInterpreter >> initializePrimitives [
+EggLinkedLinearInterpreter >> initializePrimitives [
 	super initializePrimitives.
 	linearizer primitives: primitives
 ]
 
 { #category : #private }
-PowertalkLinkedLinearInterpreter >> linearizer [
+EggLinkedLinearInterpreter >> linearizer [
 	^linearizer
 ]
 
 { #category : #visiting }
-PowertalkLinkedLinearInterpreter >> prepareDispatch: dispatch [
+EggLinkedLinearInterpreter >> prepareDispatch: dispatch [
 	context work:  {dispatch}
 ]
 
 { #category : #visiting }
-PowertalkLinkedLinearInterpreter >> prepareForBlock: sblock [
+EggLinkedLinearInterpreter >> prepareForBlock: sblock [
 	| operations |
 	operations := sblock optimizedCode.
 	context work: operations; restart .
@@ -59,48 +59,48 @@ PowertalkLinkedLinearInterpreter >> prepareForBlock: sblock [
 ]
 
 { #category : #visiting }
-PowertalkLinkedLinearInterpreter >> prepareForExecuting: method [
+EggLinkedLinearInterpreter >> prepareForExecuting: method [
 | work |
 work := self prepareForExecuting: method.
 	context work: work
 ]
 
 { #category : #initializing }
-PowertalkLinkedLinearInterpreter >> runtime: aPowertalkRuntime [
+EggLinkedLinearInterpreter >> runtime: aPowertalkRuntime [
 	super runtime: aPowertalkRuntime.
 	linearizer runtime: aPowertalkRuntime
 ]
 
 { #category : #visiting }
-PowertalkLinkedLinearInterpreter >> underprimitiveRestart [
+EggLinkedLinearInterpreter >> underprimitiveRestart [
 	^ [ :receiver :arguments | 
 	context
 		restart]
 ]
 
 { #category : #visiting }
-PowertalkLinkedLinearInterpreter >> visitOpJump: anSOpJump [
+EggLinkedLinearInterpreter >> visitOpJump: anSOpJump [
 	context regPC: anSOpJump target + 1
 ]
 
 { #category : #visiting }
-PowertalkLinkedLinearInterpreter >> visitOpJumpFalse: anSOpJumpFalse [
+EggLinkedLinearInterpreter >> visitOpJumpFalse: anSOpJumpFalse [
 	regR == falseObj
 		ifTrue: [ context regPC: anSOpJumpFalse target+1 ]
 ]
 
 { #category : #visiting }
-PowertalkLinkedLinearInterpreter >> visitOpJumpTrue: anSOpJumpTrue [
+EggLinkedLinearInterpreter >> visitOpJumpTrue: anSOpJumpTrue [
 	regR == trueObj
 		ifTrue: [ context regPC: anSOpJumpTrue target +1]
 ]
 
 { #category : #visiting }
-PowertalkLinkedLinearInterpreter >> visitOpPopR: anSOpPopR [
+EggLinkedLinearInterpreter >> visitOpPopR: anSOpPopR [
 	regR := context popOperand
 ]
 
 { #category : #visiting }
-PowertalkLinkedLinearInterpreter >> visitOpPrimitive: anSOpPrimtive [
+EggLinkedLinearInterpreter >> visitOpPrimitive: anSOpPrimtive [
 	regR := anSOpPrimtive block value
 ]

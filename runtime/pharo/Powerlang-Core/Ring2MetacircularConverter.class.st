@@ -389,7 +389,7 @@ Ring2MetacircularConverter >> image: aPowertalkRingImage [
 
 { #category : #initialization }
 Ring2MetacircularConverter >> initialize [
-	dest := PowertalkMetacircularRuntime new.
+	dest := EggMetacircularRuntime new.
 	mapping := IdentityDictionary new.
 	behaviors := IdentityDictionary new.
 	stack := OrderedCollection new.

@@ -1,11 +1,11 @@
 Class {
-	#name : #PowertalkIterativeLinkedInterpreter,
-	#superclass : #PowertalkIterativeInterpreter,
+	#name : #EggIterativeLinkedInterpreter,
+	#superclass : #EggIterativeInterpreter,
 	#category : #'Powerlang-Core-Execution'
 }
 
 { #category : #private }
-PowertalkIterativeLinkedInterpreter >> evaluateClosure: closure withArgs: arguments [
+EggIterativeLinkedInterpreter >> evaluateClosure: closure withArgs: arguments [
 	| frame sblock |
 	frame := closure builder.
 	sblock := closure executionTree.
@@ -17,12 +17,12 @@ PowertalkIterativeLinkedInterpreter >> evaluateClosure: closure withArgs: argume
 ]
 
 { #category : #accessing }
-PowertalkIterativeLinkedInterpreter >> evaluationContextClass [
+EggIterativeLinkedInterpreter >> evaluationContextClass [
 	^self subclassResponsibility
 ]
 
 { #category : #accessing }
-PowertalkIterativeLinkedInterpreter >> sendLocal: aSymbol to: receiver with: anArray [
+EggIterativeLinkedInterpreter >> sendLocal: aSymbol to: receiver with: anArray [
 	| symbol literal dummy message dispatch |
 	symbol := runtime symbolFromLocal: aSymbol.
 	literal := SLiteral new value: nilObj.
@@ -43,7 +43,7 @@ PowertalkIterativeLinkedInterpreter >> sendLocal: aSymbol to: receiver with: anA
 ]
 
 { #category : #accessing }
-PowertalkIterativeLinkedInterpreter >> visitOpDispatchMessage: anSOpDispatchMessage [
+EggIterativeLinkedInterpreter >> visitOpDispatchMessage: anSOpDispatchMessage [
 
 	| message argcount arguments behavior method size environment |
 	message := anSOpDispatchMessage message.
@@ -75,11 +75,11 @@ PowertalkIterativeLinkedInterpreter >> visitOpDispatchMessage: anSOpDispatchMess
 ]
 
 { #category : #accessing }
-PowertalkIterativeLinkedInterpreter >> visitOpNonLocalReturn: anSOpReturn [
+EggIterativeLinkedInterpreter >> visitOpNonLocalReturn: anSOpReturn [
 	context := context homeContext parent
 ]
 
 { #category : #accessing }
-PowertalkIterativeLinkedInterpreter >> visitOpReturn: anSOpReturn [
+EggIterativeLinkedInterpreter >> visitOpReturn: anSOpReturn [
 	context := context parent
 ]

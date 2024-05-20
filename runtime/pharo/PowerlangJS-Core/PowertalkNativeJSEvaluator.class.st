@@ -1,6 +1,6 @@
 Class {
 	#name : #PowertalkNativeJSEvaluator,
-	#superclass : #PowertalkEvaluator,
+	#superclass : #EggEvaluator,
 	#category : #'PowerlangJS-Core'
 }
 

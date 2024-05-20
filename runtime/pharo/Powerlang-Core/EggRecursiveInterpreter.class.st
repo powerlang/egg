@@ -1,11 +1,11 @@
 Class {
-	#name : #PowertalkRecursiveInterpreter,
-	#superclass : #PowertalkEvaluator,
+	#name : #EggRecursiveInterpreter,
+	#superclass : #EggEvaluator,
 	#category : #'Powerlang-Core-Execution'
 }
 
 { #category : #visiting }
-PowertalkRecursiveInterpreter >> evaluateClosure: receiver whileFalse: arg [
+EggRecursiveInterpreter >> evaluateClosure: receiver whileFalse: arg [
 	| result |
 	[ result := self evaluateClosure: receiver.
 	self booleanFrom: result ]
@@ -14,7 +14,7 @@ PowertalkRecursiveInterpreter >> evaluateClosure: receiver whileFalse: arg [
 ]
 
 { #category : #visiting }
-PowertalkRecursiveInterpreter >> evaluateClosure: receiver whileTrue: arg [
+EggRecursiveInterpreter >> evaluateClosure: receiver whileTrue: arg [
 	| result |
 	[ result := self evaluateClosure: receiver.
 	self booleanFrom: result ] whileTrue: [ self evaluateClosure: arg ].
@@ -22,7 +22,7 @@ PowertalkRecursiveInterpreter >> evaluateClosure: receiver whileTrue: arg [
 ]
 
 { #category : #private }
-PowertalkRecursiveInterpreter >> evaluateClosure: closure withArgs: arguments [
+EggRecursiveInterpreter >> evaluateClosure: closure withArgs: arguments [
 	| frame sblock result |
 	frame := closure builder.
 	sblock := closure executionTree.
@@ -36,7 +36,7 @@ PowertalkRecursiveInterpreter >> evaluateClosure: closure withArgs: arguments [
 ]
 
 { #category : #services }
-PowertalkRecursiveInterpreter >> evaluateMethodStatements: anSMethod [
+EggRecursiveInterpreter >> evaluateMethodStatements: anSMethod [
 	| last result |
 	last := nil.
 	anSMethod statements
@@ -49,18 +49,18 @@ PowertalkRecursiveInterpreter >> evaluateMethodStatements: anSMethod [
 ]
 
 { #category : #visiting }
-PowertalkRecursiveInterpreter >> hasFinished [
+EggRecursiveInterpreter >> hasFinished [
 	^context isNil
 ]
 
 { #category : #visiting }
-PowertalkRecursiveInterpreter >> initializeExecutableCodeOf: method [
+EggRecursiveInterpreter >> initializeExecutableCodeOf: method [
 
 	^self initializeRecursiveExecutableCodeOf: method
 ]
 
 { #category : #visiting }
-PowertalkRecursiveInterpreter >> initializePrimitives [ 
+EggRecursiveInterpreter >> initializePrimitives [ 
 	super initializePrimitives.
 	primitives 
 		at: #ClosureWhileTrue put: self primitiveClosureWhileTrue;
@@ -68,27 +68,27 @@ PowertalkRecursiveInterpreter >> initializePrimitives [
 ]
 
 { #category : #initializing }
-PowertalkRecursiveInterpreter >> linearizer [
+EggRecursiveInterpreter >> linearizer [
 
 	self shouldNotImplement
 ]
 
 { #category : #visiting }
-PowertalkRecursiveInterpreter >> primitiveClosureWhileFalse [
+EggRecursiveInterpreter >> primitiveClosureWhileFalse [
 	^ [ self
 		evaluateClosure: context self
 		whileFalse: context arguments first ]
 ]
 
 { #category : #visiting }
-PowertalkRecursiveInterpreter >> primitiveClosureWhileTrue [
+EggRecursiveInterpreter >> primitiveClosureWhileTrue [
 	^ [ self
 		evaluateClosure: context self
 		whileTrue: context arguments first ]
 ]
 
 { #category : #initializing }
-PowertalkRecursiveInterpreter >> runtime: aPowertalkRuntime [
+EggRecursiveInterpreter >> runtime: aPowertalkRuntime [
 	super runtime: aPowertalkRuntime.
 	aPowertalkRuntime
 		override: #Closure -> #whileTrue: withPrimitive: 'ClosureWhileTrue';
@@ -96,13 +96,13 @@ PowertalkRecursiveInterpreter >> runtime: aPowertalkRuntime [
 ]
 
 { #category : #visiting }
-PowertalkRecursiveInterpreter >> send: aSymbol to: receiver with: arguments super: aBoolean [
+EggRecursiveInterpreter >> send: aSymbol to: receiver with: arguments super: aBoolean [
 	^self send: aSymbol to: receiver with: arguments super: aBoolean sendSite: SMessage new
 
 ]
 
 { #category : #visiting }
-PowertalkRecursiveInterpreter >> send: aSymbol to: receiver with: arguments super: aBoolean sendSite: anSMessage [
+EggRecursiveInterpreter >> send: aSymbol to: receiver with: arguments super: aBoolean sendSite: anSMessage [
 	| behavior method environment size |
 	anSMessage cachedUndermessage
 		ifNotNil: [ :block | ^ block value: receiver value: arguments ].
@@ -129,7 +129,7 @@ PowertalkRecursiveInterpreter >> send: aSymbol to: receiver with: arguments supe
 ]
 
 { #category : #visiting }
-PowertalkRecursiveInterpreter >> sendLocal: aSymbol to: receiver with: anArray [
+EggRecursiveInterpreter >> sendLocal: aSymbol to: receiver with: anArray [
 	| symbol res |
 	symbol := runtime symbolFromLocal: aSymbol.
 	res := self
@@ -141,7 +141,7 @@ PowertalkRecursiveInterpreter >> sendLocal: aSymbol to: receiver with: anArray [
 ]
 
 { #category : #visiting }
-PowertalkRecursiveInterpreter >> visitAssignment: anSAssignment [
+EggRecursiveInterpreter >> visitAssignment: anSAssignment [
 
 	| result assignees binding |
 	result := anSAssignment expression acceptVisitor: self.
@@ -153,12 +153,12 @@ PowertalkRecursiveInterpreter >> visitAssignment: anSAssignment [
 ]
 
 { #category : #visiting }
-PowertalkRecursiveInterpreter >> visitBlock: anSBlock [
+EggRecursiveInterpreter >> visitBlock: anSBlock [
 	^ context captureClosure: anSBlock
 ]
 
 { #category : #visiting }
-PowertalkRecursiveInterpreter >> visitCascade: anSCascade [
+EggRecursiveInterpreter >> visitCascade: anSCascade [
 	| recv args  last |
 	recv := anSCascade receiver acceptVisitor: self.
 	anSCascade messages
@@ -174,19 +174,19 @@ PowertalkRecursiveInterpreter >> visitCascade: anSCascade [
 ]
 
 { #category : #visiting }
-PowertalkRecursiveInterpreter >> visitIdentifier: anSIdentifier [
+EggRecursiveInterpreter >> visitIdentifier: anSIdentifier [
 	| binding |
 	binding := anSIdentifier binding.
 	^ binding valueWithin: context ifUnbound: [ self doesNotKnow: binding name ]
 ]
 
 { #category : #visiting }
-PowertalkRecursiveInterpreter >> visitLiteral: anSLiteral [
+EggRecursiveInterpreter >> visitLiteral: anSLiteral [
 	^ runtime literalFor: anSLiteral value
 ]
 
 { #category : #visiting }
-PowertalkRecursiveInterpreter >> visitMessage: anSMessage [
+EggRecursiveInterpreter >> visitMessage: anSMessage [
 	| recv args |
 	recv := anSMessage receiver acceptVisitor: self.
 	args := anSMessage arguments
@@ -200,7 +200,7 @@ PowertalkRecursiveInterpreter >> visitMessage: anSMessage [
 ]
 
 { #category : #visiting }
-PowertalkRecursiveInterpreter >> visitMethod: anSMethod [
+EggRecursiveInterpreter >> visitMethod: anSMethod [
 	| primitive |
 	primitive := anSMethod pragma.
 	primitive ifNil: [ ^ self evaluateMethodStatements: anSMethod ].
@@ -211,7 +211,7 @@ PowertalkRecursiveInterpreter >> visitMethod: anSMethod [
 ]
 
 { #category : #visiting }
-PowertalkRecursiveInterpreter >> visitReturn: anSReturn [
+EggRecursiveInterpreter >> visitReturn: anSReturn [
 	| value |
 	value := anSReturn expression acceptVisitor: self.
 	^context return: value

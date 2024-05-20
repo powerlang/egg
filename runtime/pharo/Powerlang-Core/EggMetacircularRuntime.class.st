@@ -1,6 +1,6 @@
 Class {
-	#name : #PowertalkMetacircularRuntime,
-	#superclass : #PowertalkRuntime,
+	#name : #EggMetacircularRuntime,
+	#superclass : #EggRuntime,
 	#instVars : [
 		'kernel',
 		'wordSize',
@@ -53,19 +53,19 @@ Class {
 }
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> addSymbol: aSymbol [
+EggMetacircularRuntime >> addSymbol: aSymbol [
 	| string |
 	string := self newString: aSymbol asString.
 	^ self sendLocal: #asSymbol to: string
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> arrayClass: anLMRObject [
+EggMetacircularRuntime >> arrayClass: anLMRObject [
 	arrayClass := anLMRObject 
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> arrayedSizeOf: anLMRObject [
+EggMetacircularRuntime >> arrayedSizeOf: anLMRObject [
 	| species ivars |
 	anLMRObject isImmediate ifTrue: [ ^0 ].
 	species := self speciesFor: anLMRObject.
@@ -74,179 +74,179 @@ PowertalkMetacircularRuntime >> arrayedSizeOf: anLMRObject [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> associationValue: association [
+EggMetacircularRuntime >> associationValue: association [
 
 	^association slotAt: 2
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> behaviorClass: anLMRObject [
+EggMetacircularRuntime >> behaviorClass: anLMRObject [
 	^ anLMRObject slotAt: behaviorClassIndex
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> behaviorClassIndex: anInteger [
+EggMetacircularRuntime >> behaviorClassIndex: anInteger [
 	behaviorClassIndex := anInteger
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> behaviorClass_: anLMRObject [
+EggMetacircularRuntime >> behaviorClass_: anLMRObject [
 	behaviorClass := anLMRObject
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> behaviorMethodDictionary: anLMRObject [
+EggMetacircularRuntime >> behaviorMethodDictionary: anLMRObject [
 	^ anLMRObject slotAt: behaviorMethodDictionaryIndex
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> behaviorMethodDictionaryIndex: anInteger [
+EggMetacircularRuntime >> behaviorMethodDictionaryIndex: anInteger [
 	behaviorMethodDictionaryIndex := anInteger
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> behaviorNext: anLMRObject [
+EggMetacircularRuntime >> behaviorNext: anLMRObject [
 	^ anLMRObject slotAt: behaviorNextIndex
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> behaviorNextIndex: anInteger [
+EggMetacircularRuntime >> behaviorNextIndex: anInteger [
 	behaviorNextIndex := anInteger
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> behaviorOf: anLMRObject [
+EggMetacircularRuntime >> behaviorOf: anLMRObject [
 	^anLMRObject isImmediate ifTrue: [ self smallIntegerBehavior ] ifFalse: [anLMRObject behavior]
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> blockArgumentCount: anLMRObject [
+EggMetacircularRuntime >> blockArgumentCount: anLMRObject [
 	| flags |
 	flags := anLMRObject slotAt: methodFlagsIndex.
 	^ flags value bitsAt: BlockArgCount
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> blockCapturesHome: block [
+EggMetacircularRuntime >> blockCapturesHome: block [
 	| flags |
 	flags := block slotAt: methodFlagsIndex.
 	^ flags value anyMask: BlockCapturesHome
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> blockCapturesSelf: block [
+EggMetacircularRuntime >> blockCapturesSelf: block [
 	| flags |
 	flags := block slotAt: methodFlagsIndex.
 	^ flags value anyMask: BlockCapturesSelf
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> blockClass: anLMRObject [
+EggMetacircularRuntime >> blockClass: anLMRObject [
 	blockClass := anLMRObject
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> blockEnvironmentCount: anLMRObject [
+EggMetacircularRuntime >> blockEnvironmentCount: anLMRObject [
 	| flags |
 	flags := anLMRObject slotAt: methodFlagsIndex.
 	^ flags value bitsAt: BlockEnvCount
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> blockExecutableCode: anLMRObject [
+EggMetacircularRuntime >> blockExecutableCode: anLMRObject [
 
 	^ self methodExecutableCode: anLMRObject
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> blockExecutableCode: anLMRObject put: anObject [
+EggMetacircularRuntime >> blockExecutableCode: anLMRObject put: anObject [
 	^ self methodExecutableCode: anLMRObject put: anObject
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> blockExecutionTree: anLMRObject [
+EggMetacircularRuntime >> blockExecutionTree: anLMRObject [
 	^ anLMRObject slotAt: compiledCodeExecutableCodeIndex
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> blockMethod: anLMRObject [
+EggMetacircularRuntime >> blockMethod: anLMRObject [
 	^ anLMRObject slotAt: blockMethodIndex
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> blockMethodIndex: anInteger [
+EggMetacircularRuntime >> blockMethodIndex: anInteger [
 	blockMethodIndex := anInteger
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> blockTempCount: anLMRObject [
+EggMetacircularRuntime >> blockTempCount: anLMRObject [
 	| flags |
 	flags := anLMRObject slotAt: methodFlagsIndex.
 	^ flags value bitsAt: BlockTempCount
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> bootstrapper [
+EggMetacircularRuntime >> bootstrapper [
 	^bootstrapper
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> bootstrapper: aBootstrapper [
+EggMetacircularRuntime >> bootstrapper: aBootstrapper [
 	bootstrapper := aBootstrapper
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> byteArrayClass: anLMRObject [
+EggMetacircularRuntime >> byteArrayClass: anLMRObject [
 	byteArrayClass := anLMRObject
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> classIvars: anLMRObject [
+EggMetacircularRuntime >> classIvars: anLMRObject [
 	^ anLMRObject slotAt: speciesIvarsIndex
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> classModule: class [
+EggMetacircularRuntime >> classModule: class [
 	^ class slotAt: classModuleIndex
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> classModuleIndex: anInteger [
+EggMetacircularRuntime >> classModuleIndex: anInteger [
 	classModuleIndex := anInteger
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> className: anLMRObject [
+EggMetacircularRuntime >> className: anLMRObject [
 	^ anLMRObject slotAt: classNameIndex
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> classNameIndex: anInteger [
+EggMetacircularRuntime >> classNameIndex: anInteger [
 	classNameIndex := anInteger
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> classNamespacesIndex: anInteger [
+EggMetacircularRuntime >> classNamespacesIndex: anInteger [
 	classNamespacesIndex := anInteger
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> closureBlock: closure [ 
+EggMetacircularRuntime >> closureBlock: closure [ 
 	^closure slotAt: closureBlockIndex
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> closureBlockIndex: anInteger [
+EggMetacircularRuntime >> closureBlockIndex: anInteger [
 	closureBlockIndex := anInteger
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> closureClass: anLMRObject [
+EggMetacircularRuntime >> closureClass: anLMRObject [
 	closureClass := anLMRObject
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> closureHome: closure [
+EggMetacircularRuntime >> closureHome: closure [
 	| block |
 	block := self closureBlock: closure.
 	(self blockCapturesHome: block)
@@ -257,17 +257,17 @@ PowertalkMetacircularRuntime >> closureHome: closure [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> dictionaryTable: anLMRObject [
+EggMetacircularRuntime >> dictionaryTable: anLMRObject [
 	^anLMRObject slotAt: dictionaryTableIndex
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> dictionaryTableIndex: anInteger [
+EggMetacircularRuntime >> dictionaryTableIndex: anInteger [
 	dictionaryTableIndex := anInteger
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> doLookup: aSymbol startingAt: aBehavior [
+EggMetacircularRuntime >> doLookup: aSymbol startingAt: aBehavior [
 	| behavior m |
 	behavior := aBehavior.
 	[ m := self methodFor: aSymbol in: behavior.
@@ -278,25 +278,25 @@ PowertalkMetacircularRuntime >> doLookup: aSymbol startingAt: aBehavior [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> doesNotUnderstandMethod: anEggObject [
+EggMetacircularRuntime >> doesNotUnderstandMethod: anEggObject [
 	doesNotUnderstandMethod := anEggObject
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> executableCodeWork: anLMRExecutableCode [
+EggMetacircularRuntime >> executableCodeWork: anLMRExecutableCode [
 	self ASSERT: anLMRExecutableCode !== nilObj.
 	^anLMRExecutableCode code
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> extensionMethodModule: anLMRObject [
+EggMetacircularRuntime >> extensionMethodModule: anLMRObject [
 	| association |
 	association := anLMRObject slotAt: anLMRObject size.
 	^ self associationValue: association
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> fixOverrides [
+EggMetacircularRuntime >> fixOverrides [
 	| selector md |
 	overrides
 		keysAndValuesDo: [ :assoc :method | 
@@ -311,13 +311,13 @@ PowertalkMetacircularRuntime >> fixOverrides [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> floatClass: anLMRObject [
+EggMetacircularRuntime >> floatClass: anLMRObject [
 
 	floatClass := anLMRObject
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> hashFor: anLMRObject [
+EggMetacircularRuntime >> hashFor: anLMRObject [
 	| shifted hash current |
 	anLMRObject isImmediate
 		ifTrue: [ ^ anLMRObject value ].
@@ -333,13 +333,13 @@ PowertalkMetacircularRuntime >> hashFor: anLMRObject [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> initialize [
+EggMetacircularRuntime >> initialize [
 	lastHash := 1.
 	super initialize
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> integerFrom: anLMRObject [
+EggMetacircularRuntime >> integerFrom: anLMRObject [
 	| behavior class |
 	anLMRObject isImmediate
 		ifTrue: [ ^ anLMRObject value ].
@@ -351,65 +351,65 @@ PowertalkMetacircularRuntime >> integerFrom: anLMRObject [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> isBlock: compiledCode [
+EggMetacircularRuntime >> isBlock: compiledCode [
 	^ (self behaviorClass: compiledCode behavior) ==
 	blockClass 
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> isExecutableCode: code [
+EggMetacircularRuntime >> isExecutableCode: code [
 	^code class == EggExecutableCode
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> isMetaclass: anLMRObject [
+EggMetacircularRuntime >> isMetaclass: anLMRObject [
 	^ (self speciesFor: anLMRObject) == metaclassClass
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> kernel [
+EggMetacircularRuntime >> kernel [
 	^kernel
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> kernel: anLMRObject [ 
+EggMetacircularRuntime >> kernel: anLMRObject [ 
 	kernel := anLMRObject
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> knownSymbols: associations [
+EggMetacircularRuntime >> knownSymbols: associations [
 	knownSymbols := Dictionary withAll: associations
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> largeNegativeIntegerClass: anLMRObject [
+EggMetacircularRuntime >> largeNegativeIntegerClass: anLMRObject [
 	largeNegativeIntegerClass := anLMRObject
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> largePositiveIntegerClass: anLMRObject [
+EggMetacircularRuntime >> largePositiveIntegerClass: anLMRObject [
 	largePositiveIntegerClass := anLMRObject
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> loadAssociationValue: association [
+EggMetacircularRuntime >> loadAssociationValue: association [
 	^ association slotAt: 2.
 
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> loadModule: symbol [
+EggMetacircularRuntime >> loadModule: symbol [
 	^ bootstrapper loadModule: symbol asLocalString
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> localMethodAstcodes: method [
+EggMetacircularRuntime >> localMethodAstcodes: method [
 
 	^ (self methodAstcodes: method) bytes
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> lookupAssociationFor: aSymbol in: dictionary [
+EggMetacircularRuntime >> lookupAssociationFor: aSymbol in: dictionary [
 	|  table assoc key |
 	table := self dictionaryTable: dictionary.
 	2 to: table size do: [ :index | 
@@ -421,89 +421,89 @@ PowertalkMetacircularRuntime >> lookupAssociationFor: aSymbol in: dictionary [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> metaclassClass: anLMRObject [
+EggMetacircularRuntime >> metaclassClass: anLMRObject [
 	metaclassClass := anLMRObject
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> metaclassInstanceClass: anLMRObject [
+EggMetacircularRuntime >> metaclassInstanceClass: anLMRObject [
 	^ anLMRObject slotAt: metaclassInstanceClassIndex
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> metaclassInstanceClassIndex: anInteger [
+EggMetacircularRuntime >> metaclassInstanceClassIndex: anInteger [
 	metaclassInstanceClassIndex := anInteger
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> method: method literalAt: index [
+EggMetacircularRuntime >> method: method literalAt: index [
 	^ method slotAt: methodInstSize + index
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> methodArgumentCount: anLMRObject [
+EggMetacircularRuntime >> methodArgumentCount: anLMRObject [
 	| flags |
 	flags := anLMRObject slotAt: methodFlagsIndex.
 	^ flags value bitsAt: ArgCount
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> methodAstcodes: anLMRObject [
+EggMetacircularRuntime >> methodAstcodes: anLMRObject [
 	^ anLMRObject slotAt: methodAstcodesIndex
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> methodAstcodesIndex: anInteger [
+EggMetacircularRuntime >> methodAstcodesIndex: anInteger [
 	methodAstcodesIndex := anInteger
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> methodClass: anLMRObject [
+EggMetacircularRuntime >> methodClass: anLMRObject [
 	methodClass := anLMRObject
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> methodClassBinding: anLMRObject [
+EggMetacircularRuntime >> methodClassBinding: anLMRObject [
 	^ anLMRObject slotAt: methodClassBindingIndex
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> methodClassBindingIndex: anInteger [
+EggMetacircularRuntime >> methodClassBindingIndex: anInteger [
 	methodClassBindingIndex := anInteger
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> methodEnvironmentSize: anLMRObject [
+EggMetacircularRuntime >> methodEnvironmentSize: anLMRObject [
 	| flags |
 	flags := anLMRObject slotAt: methodFlagsIndex.
 	^ flags value bitsAt: EnvCount
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> methodExecutableCode: anLMRObject [
+EggMetacircularRuntime >> methodExecutableCode: anLMRObject [
 
 ^anLMRObject slotAt: compiledCodeExecutableCodeIndex.
 	
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> methodExecutableCode: anLMRObject put: anObject [
+EggMetacircularRuntime >> methodExecutableCode: anLMRObject put: anObject [
 
 	^ anLMRObject slotAt: compiledCodeExecutableCodeIndex put: anObject 
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> methodExecutableCodeIndex: anInteger [
+EggMetacircularRuntime >> methodExecutableCodeIndex: anInteger [
 	compiledCodeExecutableCodeIndex := anInteger
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> methodFlagsIndex: anInteger [
+EggMetacircularRuntime >> methodFlagsIndex: anInteger [
 	methodFlagsIndex := anInteger
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> methodFor: aSymbol in: behavior [
+EggMetacircularRuntime >> methodFor: aSymbol in: behavior [
 	| md table  |
 	overrides at: behavior -> aSymbol ifPresent: [ :m | ^ m ].
 	md := self behaviorMethodDictionary: behavior.
@@ -515,12 +515,12 @@ PowertalkMetacircularRuntime >> methodFor: aSymbol in: behavior [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> methodInstSize: anInteger [
+EggMetacircularRuntime >> methodInstSize: anInteger [
 	methodInstSize := anInteger
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> methodIsExtension: anLMRObject [
+EggMetacircularRuntime >> methodIsExtension: anLMRObject [
 
 	| flags |
 	flags := anLMRObject slotAt: methodFlagsIndex.
@@ -528,38 +528,38 @@ PowertalkMetacircularRuntime >> methodIsExtension: anLMRObject [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> methodSelector: anLMRObject [
+EggMetacircularRuntime >> methodSelector: anLMRObject [
 
 	^ anLMRObject slotAt: methodSelectorIndex
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> methodSelectorIndex: anInteger [
+EggMetacircularRuntime >> methodSelectorIndex: anInteger [
 
 	methodSelectorIndex := anInteger
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> methodTempCount: anLMRObject [
+EggMetacircularRuntime >> methodTempCount: anLMRObject [
 	| flags |
 	flags := anLMRObject slotAt: methodFlagsIndex.
 	^ flags value bitsAt: TempCount
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> moduleNamespace: anLMRObject [
+EggMetacircularRuntime >> moduleNamespace: anLMRObject [
 	^anLMRObject slotAt: moduleNamespaceIndex
 
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> moduleNamespaceIndex: anInteger [
+EggMetacircularRuntime >> moduleNamespaceIndex: anInteger [
 
 	moduleNamespaceIndex := anInteger
 ]
 
 { #category : #validating }
-PowertalkMetacircularRuntime >> nativizeForLMR [
+EggMetacircularRuntime >> nativizeForLMR [
 	| script |
 	script := 'nativizeForLMR
 	lmr := Kernel loadModule: ''Nativization/LMR''. 
@@ -570,7 +570,7 @@ PowertalkMetacircularRuntime >> nativizeForLMR [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> newArray: anArray [
+EggMetacircularRuntime >> newArray: anArray [
 | result |
 result := 	self newArraySized: anArray size.
 	anArray withIndexDo: [ :elem :i | result at: i put: elem ].
@@ -578,7 +578,7 @@ result := 	self newArraySized: anArray size.
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> newArraySized: anInteger [
+EggMetacircularRuntime >> newArraySized: anInteger [
 	| behavior header |
 	behavior := self speciesInstanceBehavior: arrayClass.
 	header := EggObjectHeader new
@@ -590,7 +590,7 @@ PowertalkMetacircularRuntime >> newArraySized: anInteger [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> newByteArray: aByteArray [
+EggMetacircularRuntime >> newByteArray: aByteArray [
 
 	| behavior header |
 	behavior := self speciesInstanceBehavior: byteArrayClass.
@@ -605,7 +605,7 @@ PowertalkMetacircularRuntime >> newByteArray: aByteArray [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> newBytes: species size: anInteger [
+EggMetacircularRuntime >> newBytes: species size: anInteger [
 	| behavior header |
 	behavior := self speciesInstanceBehavior: species.
 	header := EggObjectHeader new
@@ -619,12 +619,12 @@ PowertalkMetacircularRuntime >> newBytes: species size: anInteger [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> newBytesOf: species sized: size [
+EggMetacircularRuntime >> newBytesOf: species sized: size [
 	^ self newBytes: species size: size
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> newCharacter: aCharacter [
+EggMetacircularRuntime >> newCharacter: aCharacter [
 	| value |
 	value := self newInteger: aCharacter asInteger.
 	^self sendLocal: #asCharacter to: value.
@@ -632,7 +632,7 @@ PowertalkMetacircularRuntime >> newCharacter: aCharacter [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> newClosureFor: compiledBlock [
+EggMetacircularRuntime >> newClosureFor: compiledBlock [
 	| size closure |
 	size := self blockEnvironmentCount: compiledBlock.
 	closure := self newSlots: closureClass size:  size.
@@ -641,7 +641,7 @@ PowertalkMetacircularRuntime >> newClosureFor: compiledBlock [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> newCompiledMethod [
+EggMetacircularRuntime >> newCompiledMethod [
 	| behavior header method |
 	behavior := self speciesInstanceBehavior: methodClass.
 	header := EggObjectHeader new
@@ -655,12 +655,12 @@ PowertalkMetacircularRuntime >> newCompiledMethod [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> newEnvironmentSized: anInteger [
+EggMetacircularRuntime >> newEnvironmentSized: anInteger [
 	^ self newArraySized: anInteger
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> newExecutableCodeFor: anObject [
+EggMetacircularRuntime >> newExecutableCodeFor: anObject [
 		| behavior header |
 	behavior := self speciesInstanceBehavior: arrayClass.
 	header := EggObjectHeader new
@@ -674,7 +674,7 @@ PowertalkMetacircularRuntime >> newExecutableCodeFor: anObject [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> newFloat: aFloat [
+EggMetacircularRuntime >> newFloat: aFloat [
 
 	| behavior header |
 	behavior := self speciesInstanceBehavior: floatClass.
@@ -689,7 +689,7 @@ PowertalkMetacircularRuntime >> newFloat: aFloat [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> newInteger: anInteger [
+EggMetacircularRuntime >> newInteger: anInteger [
 	anInteger > maxSMI
 		ifTrue: [ ^ self newLargePositiveInteger: anInteger ].
 	anInteger < minSMI
@@ -698,7 +698,7 @@ PowertalkMetacircularRuntime >> newInteger: anInteger [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> newLargeNegativeInteger: anInteger [
+EggMetacircularRuntime >> newLargeNegativeInteger: anInteger [
 	| size bytes byte result complement |
 	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
 	complement := anInteger negated - 1.
@@ -713,7 +713,7 @@ PowertalkMetacircularRuntime >> newLargeNegativeInteger: anInteger [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> newLargePositiveInteger: anInteger [
+EggMetacircularRuntime >> newLargePositiveInteger: anInteger [
 	| size bytes result |
 	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
 	bytes := anInteger asByteArrayOfSize: size.
@@ -722,19 +722,19 @@ PowertalkMetacircularRuntime >> newLargePositiveInteger: anInteger [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> newOf: aSpecies sized: anInteger [
+EggMetacircularRuntime >> newOf: aSpecies sized: anInteger [
 	^(self speciesIsBytes: aSpecies)
 		ifTrue: [ self newBytes: aSpecies size: anInteger ]
 		ifFalse: [ self newSlots: aSpecies size: anInteger ]
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> newSlots: class [
+EggMetacircularRuntime >> newSlots: class [
 	^self newSlots: class size: 0
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> newSlots: class size: anInteger [
+EggMetacircularRuntime >> newSlots: class size: anInteger [
 	| ivars behavior header result |
 	ivars := self speciesInstanceSize: class.
 	behavior := self speciesInstanceBehavior: class.
@@ -752,17 +752,17 @@ PowertalkMetacircularRuntime >> newSlots: class size: anInteger [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> newSlotsOf: class [
+EggMetacircularRuntime >> newSlotsOf: class [
 	^ self newSlots: class size: 0
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> newSmallInteger: anInteger [
+EggMetacircularRuntime >> newSmallInteger: anInteger [
 	^ EggSmallInteger new value: anInteger
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> newString: aString [
+EggMetacircularRuntime >> newString: aString [
 	| behavior header bytes |
 	behavior := self speciesInstanceBehavior: stringClass.
 	bytes := aString asByteArray copyWith: 0.
@@ -777,19 +777,19 @@ PowertalkMetacircularRuntime >> newString: aString [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> nil: n true: t false: f [
+EggMetacircularRuntime >> nil: n true: t false: f [
 	nilObj := n.
 	trueObj := t.
 	falseObj := f
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> override: assoc with: method [
+EggMetacircularRuntime >> override: assoc with: method [
 	overrides at: assoc put: method
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> print: anLMRObject on: aStream [
+EggMetacircularRuntime >> print: anLMRObject on: aStream [
 	| species name selector |
 	species := self behaviorClass: anLMRObject behavior.
 	name := self speciesLocalName: species.
@@ -814,7 +814,7 @@ PowertalkMetacircularRuntime >> print: anLMRObject on: aStream [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> printBehavior: anLMRBehavior on: aStream [
+EggMetacircularRuntime >> printBehavior: anLMRBehavior on: aStream [
 	| species name |
 	species := self behaviorClass: anLMRBehavior.
 	name := self speciesLocalName: species.
@@ -823,18 +823,18 @@ PowertalkMetacircularRuntime >> printBehavior: anLMRBehavior on: aStream [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> processStackSP: anLMRObject [
+EggMetacircularRuntime >> processStackSP: anLMRObject [
 
 	^ anLMRObject slotAt: processStackSPIndex
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> processStackSPIndex: anInteger [
+EggMetacircularRuntime >> processStackSPIndex: anInteger [
  processStackSPIndex := anInteger
 ]
 
 { #category : #validating }
-PowertalkMetacircularRuntime >> readKernel [
+EggMetacircularRuntime >> readKernel [
 	| script |
 	script := 'readKernel
 	| reader |
@@ -847,7 +847,7 @@ PowertalkMetacircularRuntime >> readKernel [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> removeOverride: assoc [
+EggMetacircularRuntime >> removeOverride: assoc [
 	| species selector |
 	species := assoc key.
 	selector := assoc value.
@@ -859,17 +859,17 @@ PowertalkMetacircularRuntime >> removeOverride: assoc [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> smallIntegerBehavior [
+EggMetacircularRuntime >> smallIntegerBehavior [
 	^self speciesInstanceBehavior: smallIntegerClass
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> smallIntegerClass: anLMRObject [
+EggMetacircularRuntime >> smallIntegerClass: anLMRObject [
 	smallIntegerClass := anLMRObject
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> speciesFor: anLMRObject [
+EggMetacircularRuntime >> speciesFor: anLMRObject [
 	| behavior |
 	behavior := self behaviorOf: anLMRObject.
 	^self behaviorClass: behavior.
@@ -878,22 +878,22 @@ PowertalkMetacircularRuntime >> speciesFor: anLMRObject [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> speciesFormatIndex: anInteger [
+EggMetacircularRuntime >> speciesFormatIndex: anInteger [
 	speciesFormatIndex := anInteger
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> speciesInstanceBehavior: anLMRObject [
+EggMetacircularRuntime >> speciesInstanceBehavior: anLMRObject [
 	^anLMRObject slotAt: speciesInstanceBehaviorIndex
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> speciesInstanceBehaviorIndex: anInteger [
+EggMetacircularRuntime >> speciesInstanceBehaviorIndex: anInteger [
 	speciesInstanceBehaviorIndex := anInteger 
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> speciesInstanceClass: anLMRObject [
+EggMetacircularRuntime >> speciesInstanceClass: anLMRObject [
 	| metaclass |
 	metaclass := self isMetaclass: anLMRObject.
 	^ metaclass
@@ -902,22 +902,22 @@ PowertalkMetacircularRuntime >> speciesInstanceClass: anLMRObject [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> speciesInstanceSize: anLMRObject [
+EggMetacircularRuntime >> speciesInstanceSize: anLMRObject [
 	^ (anLMRObject slotAt: speciesFormatIndex) value bitAnd: 16r7F.
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> speciesIsBytes: anLMRObject [
+EggMetacircularRuntime >> speciesIsBytes: anLMRObject [
 	^ (anLMRObject slotAt: speciesFormatIndex) value noMask: 16r4000
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> speciesIvarsIndex: anInteger [
+EggMetacircularRuntime >> speciesIvarsIndex: anInteger [
 	speciesIvarsIndex := anInteger
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> speciesLocalName: species [
+EggMetacircularRuntime >> speciesLocalName: species [
 	| name class |
 	(self isMetaclass: species) ifFalse: [
 		name :=self className: species.
@@ -929,7 +929,7 @@ PowertalkMetacircularRuntime >> speciesLocalName: species [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> speciesModule: species [
+EggMetacircularRuntime >> speciesModule: species [
 	| class |
 	(self isMetaclass: species)
 		ifFalse: [ ^ self classModule: species ].
@@ -938,24 +938,24 @@ PowertalkMetacircularRuntime >> speciesModule: species [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> speciesNamespaces: anLMRObject [
+EggMetacircularRuntime >> speciesNamespaces: anLMRObject [
 	| class |
 	class := self speciesInstanceClass: anLMRObject.
 	^class slotAt: classNamespacesIndex
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> speciesSuperclass: anLMRObject [
+EggMetacircularRuntime >> speciesSuperclass: anLMRObject [
 	^ anLMRObject slotAt: speciesSuperclassIndex
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> speciesSuperclassIndex: anInteger [
+EggMetacircularRuntime >> speciesSuperclassIndex: anInteger [
 	speciesSuperclassIndex := anInteger
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> staticBindingForIvar: aSymbol in: receiver [
+EggMetacircularRuntime >> staticBindingForIvar: aSymbol in: receiver [
 	| class all slots bytes |
 	
 	class := self speciesFor: receiver.
@@ -971,24 +971,24 @@ PowertalkMetacircularRuntime >> staticBindingForIvar: aSymbol in: receiver [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> storeAssociation: association value: anObject [
+EggMetacircularRuntime >> storeAssociation: association value: anObject [
 	association slotAt: 2 put: anObject
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> stringClass: anLMRObject [
+EggMetacircularRuntime >> stringClass: anLMRObject [
 	stringClass := anLMRObject
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> superBehaviorOf: class [
+EggMetacircularRuntime >> superBehaviorOf: class [
 	| superclass |
 	superclass := self speciesSuperclass: class.
 	^ self speciesInstanceBehavior: superclass
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> symbolFromLocal: aSymbol [
+EggMetacircularRuntime >> symbolFromLocal: aSymbol [
 
 	| bytes table symbol |
 	knownSymbols at: aSymbol ifPresent: [ :s | ^ s ].
@@ -1002,24 +1002,24 @@ PowertalkMetacircularRuntime >> symbolFromLocal: aSymbol [
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> symbolTable: anLMRObject [
+EggMetacircularRuntime >> symbolTable: anLMRObject [
 	symbolTable:= anLMRObject
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> wordSize [
+EggMetacircularRuntime >> wordSize [
 	^wordSize
 ]
 
 { #category : #initialization }
-PowertalkMetacircularRuntime >> wordSize: anInteger [
+EggMetacircularRuntime >> wordSize: anInteger [
 	wordSize := anInteger.
 	maxSMI := (1 bitShift: wordSize * 8 - 2) - 1.
 	minSMI := maxSMI negated - 1
 ]
 
 { #category : #validating }
-PowertalkMetacircularRuntime >> writeKernelAt: anInteger [
+EggMetacircularRuntime >> writeKernelAt: anInteger [
 	| script |
 	script := 'writeKernel
 	| writer |

@@ -1,6 +1,6 @@
 Class {
-	#name : #PowertalkIterativeStackedInterpreter,
-	#superclass : #PowertalkIterativeInterpreter,
+	#name : #EggIterativeStackedInterpreter,
+	#superclass : #EggIterativeInterpreter,
 	#instVars : [
 		'linearizer',
 		'work'
@@ -9,7 +9,7 @@ Class {
 }
 
 { #category : #initialization }
-PowertalkIterativeStackedInterpreter >> contextSwitchTo: vmStack [
+EggIterativeStackedInterpreter >> contextSwitchTo: vmStack [
 
 	| sp |
 	context := stacks at: vmStack.
@@ -23,7 +23,7 @@ PowertalkIterativeStackedInterpreter >> contextSwitchTo: vmStack [
 ]
 
 { #category : #initialization }
-PowertalkIterativeStackedInterpreter >> evaluate [
+EggIterativeStackedInterpreter >> evaluate [
 	| operation |
 	[ operation := self nextOperation.
 	operation notNil ] whileTrue: [ operation acceptVisitor: self ].
@@ -31,7 +31,7 @@ PowertalkIterativeStackedInterpreter >> evaluate [
 ]
 
 { #category : #private }
-PowertalkIterativeStackedInterpreter >> evaluateClosure: closure withArgs: arguments [
+EggIterativeStackedInterpreter >> evaluateClosure: closure withArgs: arguments [
 
 	| block code receiver |
 	block := runtime closureBlock: closure.
@@ -47,7 +47,7 @@ PowertalkIterativeStackedInterpreter >> evaluateClosure: closure withArgs: argum
 ]
 
 { #category : #initialization }
-PowertalkIterativeStackedInterpreter >> evaluateUndermessage: message with: block [
+EggIterativeStackedInterpreter >> evaluateUndermessage: message with: block [
 	| argcount arguments |
 	argcount := message argumentCount.
 	arguments := context popOperands: argcount.
@@ -56,25 +56,25 @@ PowertalkIterativeStackedInterpreter >> evaluateUndermessage: message with: bloc
 ]
 
 { #category : #initialization }
-PowertalkIterativeStackedInterpreter >> initialize [
+EggIterativeStackedInterpreter >> initialize [
 	super initialize.
 	linearizer := SExpressionLinearizer new
 ]
 
 { #category : #private }
-PowertalkIterativeStackedInterpreter >> initializeExecutableCodeOf: method [
+EggIterativeStackedInterpreter >> initializeExecutableCodeOf: method [
 
 	^ self initializeLinearExecutableCodeOf: method
 ]
 
 { #category : #initialization }
-PowertalkIterativeStackedInterpreter >> initializePrimitives [
+EggIterativeStackedInterpreter >> initializePrimitives [
 	super initializePrimitives.
 	linearizer primitives: primitives
 ]
 
 { #category : #initialization }
-PowertalkIterativeStackedInterpreter >> invoke: method with: receiver [
+EggIterativeStackedInterpreter >> invoke: method with: receiver [
 	| size environment |
 	size := runtime methodEnvironmentSize: method.
 	environment := runtime newEnvironmentSized: size.
@@ -87,12 +87,12 @@ PowertalkIterativeStackedInterpreter >> invoke: method with: receiver [
 ]
 
 { #category : #private }
-PowertalkIterativeStackedInterpreter >> linearizer [
+EggIterativeStackedInterpreter >> linearizer [
 	^linearizer
 ]
 
 { #category : #initialization }
-PowertalkIterativeStackedInterpreter >> messageNotUnderstood: anSMessage [
+EggIterativeStackedInterpreter >> messageNotUnderstood: anSMessage [
 
 	"
 	Having the adaptor causes argument popping work transparently. The adaptor frame's
@@ -111,13 +111,13 @@ PowertalkIterativeStackedInterpreter >> messageNotUnderstood: anSMessage [
 ]
 
 { #category : #initialization }
-PowertalkIterativeStackedInterpreter >> newEvaluationContext [
+EggIterativeStackedInterpreter >> newEvaluationContext [
 
 	^StackedEvaluationContext new system: runtime
 ]
 
 { #category : #initialization }
-PowertalkIterativeStackedInterpreter >> nextOperation [
+EggIterativeStackedInterpreter >> nextOperation [
  | pc |
 pc := context incRegPC.
 	pc <= work size
@@ -126,7 +126,7 @@ pc := context incRegPC.
 ]
 
 { #category : #initialization }
-PowertalkIterativeStackedInterpreter >> popFrameAndPrepare [
+EggIterativeStackedInterpreter >> popFrameAndPrepare [
 	| code |
 	context popFrame.
 	code := runtime methodExecutableCode: context regM.
@@ -134,7 +134,7 @@ PowertalkIterativeStackedInterpreter >> popFrameAndPrepare [
 ]
 
 { #category : #private }
-PowertalkIterativeStackedInterpreter >> prepareBlockExecutableCode: block [
+EggIterativeStackedInterpreter >> prepareBlockExecutableCode: block [
 
 	| code method |
 	code := runtime blockExecutableCode: block.
@@ -147,7 +147,7 @@ PowertalkIterativeStackedInterpreter >> prepareBlockExecutableCode: block [
 ]
 
 { #category : #initializing }
-PowertalkIterativeStackedInterpreter >> runtime: aPowertalkRuntime [
+EggIterativeStackedInterpreter >> runtime: aPowertalkRuntime [
 
 	super runtime: aPowertalkRuntime.
 	linearizer
@@ -157,7 +157,7 @@ PowertalkIterativeStackedInterpreter >> runtime: aPowertalkRuntime [
 ]
 
 { #category : #initialization }
-PowertalkIterativeStackedInterpreter >> sendLocal: aSymbol to: receiver with: anArray [
+EggIterativeStackedInterpreter >> sendLocal: aSymbol to: receiver with: anArray [
 	| symbol literal dummy message dispatch prevWork prevPC |
 	symbol := runtime symbolFromLocal: aSymbol.
 	literal := SLiteral new value: nilObj.
@@ -184,12 +184,12 @@ PowertalkIterativeStackedInterpreter >> sendLocal: aSymbol to: receiver with: an
 ]
 
 { #category : #initialization }
-PowertalkIterativeStackedInterpreter >> underprimitiveRestart [
+EggIterativeStackedInterpreter >> underprimitiveRestart [
 	^ [ :receiver :arguments | context restart ]
 ]
 
 { #category : #initialization }
-PowertalkIterativeStackedInterpreter >> visitOpDispatchMessage: anSOpDispatchMessage [
+EggIterativeStackedInterpreter >> visitOpDispatchMessage: anSOpDispatchMessage [
 
 	| message behavior method |
 	message := anSOpDispatchMessage message.
@@ -209,24 +209,24 @@ PowertalkIterativeStackedInterpreter >> visitOpDispatchMessage: anSOpDispatchMes
 ]
 
 { #category : #initialization }
-PowertalkIterativeStackedInterpreter >> visitOpJump: anSOpJump [
+EggIterativeStackedInterpreter >> visitOpJump: anSOpJump [
 	context regPC: anSOpJump target
 ]
 
 { #category : #initialization }
-PowertalkIterativeStackedInterpreter >> visitOpJumpFalse: anSOpJumpFalse [
+EggIterativeStackedInterpreter >> visitOpJumpFalse: anSOpJumpFalse [
 	regR == falseObj
 		ifTrue: [ context regPC: anSOpJumpFalse target ]
 ]
 
 { #category : #initialization }
-PowertalkIterativeStackedInterpreter >> visitOpJumpTrue: anSOpJumpTrue [
+EggIterativeStackedInterpreter >> visitOpJumpTrue: anSOpJumpTrue [
 	regR == trueObj
 		ifTrue: [ context regPC: anSOpJumpTrue target ]
 ]
 
 { #category : #initialization }
-PowertalkIterativeStackedInterpreter >> visitOpNonLocalReturn: anSOpReturn [
+EggIterativeStackedInterpreter >> visitOpNonLocalReturn: anSOpReturn [
 
 	| code |
 	context unwind.
@@ -235,17 +235,17 @@ PowertalkIterativeStackedInterpreter >> visitOpNonLocalReturn: anSOpReturn [
 ]
 
 { #category : #initialization }
-PowertalkIterativeStackedInterpreter >> visitOpPopR: anSOpPopR [
+EggIterativeStackedInterpreter >> visitOpPopR: anSOpPopR [
 	regR := context pop
 ]
 
 { #category : #initialization }
-PowertalkIterativeStackedInterpreter >> visitOpPrimitive: anSOpPrimtive [
+EggIterativeStackedInterpreter >> visitOpPrimitive: anSOpPrimtive [
 	regR := anSOpPrimtive block value
 ]
 
 { #category : #initialization }
-PowertalkIterativeStackedInterpreter >> visitOpReturn: anSOpReturn [
+EggIterativeStackedInterpreter >> visitOpReturn: anSOpReturn [
 
 	self popFrameAndPrepare
 ]

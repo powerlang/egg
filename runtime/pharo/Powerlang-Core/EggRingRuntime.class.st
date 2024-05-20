@@ -5,8 +5,8 @@ that virtual image, and our semantics tries to mimic as much as possible
 the one of the final system.
 "
 Class {
-	#name : #PowertalkRingRuntime,
-	#superclass : #PowertalkRuntime,
+	#name : #EggRingRuntime,
+	#superclass : #EggRuntime,
 	#instVars : [
 		'image',
 		'sexpressionsCache'
@@ -15,7 +15,7 @@ Class {
 }
 
 { #category : #'instance creation' }
-PowertalkRingRuntime class >> new [
+EggRingRuntime class >> new [
 	"return an initialized instance"
 
 	^ self basicNew initialize.
@@ -23,62 +23,62 @@ PowertalkRingRuntime class >> new [
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> arrayedSizeOf: anObjectMap [
+EggRingRuntime >> arrayedSizeOf: anObjectMap [
 	^anObjectMap arrayedSize
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> behaviorOf: anObjectMap [
+EggRingRuntime >> behaviorOf: anObjectMap [
 	^ anObjectMap spec
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> blockArgumentCount: block [
+EggRingRuntime >> blockArgumentCount: block [
 	^ block argumentCount
 ]
 
 { #category : #'own services' }
-PowertalkRingRuntime >> blockCapturesSelf: block [
+EggRingRuntime >> blockCapturesSelf: block [
 	^ block capturesSelf 
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> blockExecutableCode: block [
+EggRingRuntime >> blockExecutableCode: block [
 	^block optimizedCode
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> blockExecutableCode: block put: anObject [
+EggRingRuntime >> blockExecutableCode: block put: anObject [
 	block optimizedCode: anObject
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> blockExecutionTree: block [
+EggRingRuntime >> blockExecutionTree: block [
 	^ block executionTree
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> blockMethod: anObjectMap [
+EggRingRuntime >> blockMethod: anObjectMap [
 	^ anObjectMap method
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> blockTempCount: block [
+EggRingRuntime >> blockTempCount: block [
 	^ block tempCount
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> closureBlock: aClosureMap [
+EggRingRuntime >> closureBlock: aClosureMap [
 	^aClosureMap block
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> closureHome: anObjectMap [
+EggRingRuntime >> closureHome: anObjectMap [
 	^ anObjectMap home
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> compile: anRGMethod [
+EggRingRuntime >> compile: anRGMethod [
 	| class |
 	class := image speciesFor: anRGMethod parent.
 	^ SCompiler new
@@ -87,7 +87,7 @@ PowertalkRingRuntime >> compile: anRGMethod [
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> doLookup: aSymbol startingAt: aBehavior [
+EggRingRuntime >> doLookup: aSymbol startingAt: aBehavior [
 	| behavior m c smethod |
 	self ASSERT: aSymbol !== #error:.
 	behavior := aBehavior.
@@ -103,28 +103,28 @@ PowertalkRingRuntime >> doLookup: aSymbol startingAt: aBehavior [
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> executableCodeWork: code [
+EggRingRuntime >> executableCodeWork: code [
 	^code
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> extensionMethodModule: method [
+EggRingRuntime >> extensionMethodModule: method [
 
 	^ method module
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> homeEnvironmentOf: aClosureMap [
+EggRingRuntime >> homeEnvironmentOf: aClosureMap [
 	^ aClosureMap slotAt: 2
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> image [
+EggRingRuntime >> image [
 	^image
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> image: aPowertalkImage [
+EggRingRuntime >> image: aPowertalkImage [
 	image := aPowertalkImage.
 	nilObj := image nil.
 	trueObj := image true.
@@ -135,7 +135,7 @@ PowertalkRingRuntime >> image: aPowertalkImage [
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> initializeDNU [
+EggRingRuntime >> initializeDNU [
 	| proto selector |
 	proto := image classNamed: #ProtoObject.
 	selector := image newSymbol: #_doesNotUnderstand:with:.
@@ -144,7 +144,7 @@ PowertalkRingRuntime >> initializeDNU [
 ]
 
 { #category : #initialization }
-PowertalkRingRuntime >> initializeEmulationOverrides [
+EggRingRuntime >> initializeEmulationOverrides [
 	| classes |
 	classes := image vmPrimitivesSpec allExtensionClasses.
 	classes
@@ -155,7 +155,7 @@ PowertalkRingRuntime >> initializeEmulationOverrides [
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> integerFrom: anObjectMap [
+EggRingRuntime >> integerFrom: anObjectMap [
 	anObjectMap isImmediate
 		ifTrue: [ ^ anObjectMap value ].
 		self halt.
@@ -165,82 +165,82 @@ PowertalkRingRuntime >> integerFrom: anObjectMap [
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> isBlock: anSCompiledMethod [
+EggRingRuntime >> isBlock: anSCompiledMethod [
 	^anSCompiledMethod isBlock
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> isClosure: anObjectMap [
+EggRingRuntime >> isClosure: anObjectMap [
 	^anObjectMap class = ProtoeggClosure
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> isExecutableCode: code [
+EggRingRuntime >> isExecutableCode: code [
 
 	^ code !== nil and: [code !== nilObj]
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> literalFor: anObject [
+EggRingRuntime >> literalFor: anObject [
 	^ image transferLiteral: anObject
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> loadAssociationValue: association [
+EggRingRuntime >> loadAssociationValue: association [
 	^association value
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> localMethodAstcodes: anSCompiledMethod [
+EggRingRuntime >> localMethodAstcodes: anSCompiledMethod [
 
 	^ self methodAstcodes: anSCompiledMethod
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> localSymbolFrom: anObjectMap [
+EggRingRuntime >> localSymbolFrom: anObjectMap [
 	^ anObjectMap symbol
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> lookupAssociationFor: aSymbol in: dictionary [
+EggRingRuntime >> lookupAssociationFor: aSymbol in: dictionary [
 ^dictionary
 				associationAt: aSymbol
 				ifPresent: [ :assoc | assoc]
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> method: anSCompiledMethod literalAt: index [
+EggRingRuntime >> method: anSCompiledMethod literalAt: index [
 	^anSCompiledMethod at: index
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> methodArgumentCount: method [
+EggRingRuntime >> methodArgumentCount: method [
 	^ method argumentCount
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> methodAstcodes: anSCompiledMethod [
+EggRingRuntime >> methodAstcodes: anSCompiledMethod [
 
 	^ anSCompiledMethod astcodes
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> methodClassBinding: method [
+EggRingRuntime >> methodClassBinding: method [
 	^ method classBinding
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> methodEnvironmentSize: anSCompiledMethod [
+EggRingRuntime >> methodEnvironmentSize: anSCompiledMethod [
 	^anSCompiledMethod environmentCount
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> methodExecutableCode: anSCompiledMethod [
+EggRingRuntime >> methodExecutableCode: anSCompiledMethod [
 	^ anSCompiledMethod optimizedCode
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> methodExecutableCode: method put: anObject [
+EggRingRuntime >> methodExecutableCode: method put: anObject [
 
 	method optimizedCode: anObject.
 		^anObject 
@@ -248,44 +248,44 @@ PowertalkRingRuntime >> methodExecutableCode: method put: anObject [
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> methodFor: aSymbol in: anRGBehavior [
+EggRingRuntime >> methodFor: aSymbol in: anRGBehavior [
 	overrides at: anRGBehavior->aSymbol ifPresent: [:m | ^m].
 	^anRGBehavior methodNamed: aSymbol
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> methodIsExtension: method [
+EggRingRuntime >> methodIsExtension: method [
 
 	^ method isExtension
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> methodTempCount: method [
+EggRingRuntime >> methodTempCount: method [
 	^ method tempCount
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> moduleNamespace: anObjectMap [ 
+EggRingRuntime >> moduleNamespace: anObjectMap [ 
 	^ anObjectMap namespace
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> newArraySized: anInteger [
+EggRingRuntime >> newArraySized: anInteger [
 	^ image newArraySized: anInteger
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> newBootstrapDictionaryOf: aSpeciesMap [
+EggRingRuntime >> newBootstrapDictionaryOf: aSpeciesMap [
 	^ image newBootstrapDictionaryOf: aSpeciesMap spec instanceSide
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> newBytesOf:  aSpeciesMap sized: size [
+EggRingRuntime >> newBytesOf:  aSpeciesMap sized: size [
 	^ image newOf: aSpeciesMap spec instanceSide sized: size
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> newClosureFor: compiledBlock [
+EggRingRuntime >> newClosureFor: compiledBlock [
 	| closure |
 	closure :=  image newClosure: compiledBlock environmentCount.
 	^closure
@@ -294,42 +294,42 @@ PowertalkRingRuntime >> newClosureFor: compiledBlock [
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> newCompiledMethod [
+EggRingRuntime >> newCompiledMethod [
 	^ SCompiledMethod new
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> newEnvironmentSized: anInteger [
+EggRingRuntime >> newEnvironmentSized: anInteger [
 	^ image newArraySized: anInteger
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> newExecutableCodeFor: anObject [
+EggRingRuntime >> newExecutableCodeFor: anObject [
 	^anObject
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> newInteger: anInteger [
+EggRingRuntime >> newInteger: anInteger [
 	^image newInteger: anInteger
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> newOf: aSpeciesMap sized: size [
+EggRingRuntime >> newOf: aSpeciesMap sized: size [
 	^ image newOf: aSpeciesMap spec instanceSide sized: size
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> newSlotsOf: aSpeciesMap [
+EggRingRuntime >> newSlotsOf: aSpeciesMap [
 	^image newSlotsOf: aSpeciesMap spec instanceSide sized: 0
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> newSymbol: aSymbol [
+EggRingRuntime >> newSymbol: aSymbol [
 	^ image newSymbol: aSymbol
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> override: classname with: rgMethod [
+EggRingRuntime >> override: classname with: rgMethod [
 	| species selector method override |
 	species := image specs at: classname.
 	selector := rgMethod selector.
@@ -339,7 +339,7 @@ PowertalkRingRuntime >> override: classname with: rgMethod [
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> override: assoc withPrimitive: primitive [
+EggRingRuntime >> override: assoc withPrimitive: primitive [
 	| species selector method override count source |
 	species := image specs at: assoc key.
 	selector := assoc value.
@@ -363,14 +363,14 @@ PowertalkRingRuntime >> override: assoc withPrimitive: primitive [
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> removeBootstrapDictionaryOverrides [
+EggRingRuntime >> removeBootstrapDictionaryOverrides [
 self
 		removeOverride: #'Namespace class' -> #new
 
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> removeOverride: assoc [
+EggRingRuntime >> removeOverride: assoc [
 	| species selector symbol |
 	species := image specs at: assoc key.
 	selector := assoc value.
@@ -383,57 +383,57 @@ PowertalkRingRuntime >> removeOverride: assoc [
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> speciesFor: anObjectMap [
+EggRingRuntime >> speciesFor: anObjectMap [
 	^ image speciesFor: anObjectMap spec
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> speciesModule: aSpeciesMap [
+EggRingRuntime >> speciesModule: aSpeciesMap [
 	^ aSpeciesMap module
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> speciesNamespaces: aSpeciesMap [
+EggRingRuntime >> speciesNamespaces: aSpeciesMap [
 	^ aSpeciesMap namespaces
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> speciesSuperclass: aSpeciesMap [
+EggRingRuntime >> speciesSuperclass: aSpeciesMap [
 	^ aSpeciesMap superclass
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> staticBindingForIvar: aSymbol in: receiver [
+EggRingRuntime >> staticBindingForIvar: aSymbol in: receiver [
 	^receiver allSlotNames indexOf: aSymbol.
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> storeAssociation: association value: anObject [
+EggRingRuntime >> storeAssociation: association value: anObject [
 	association value: anObject
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> superBehaviorOf: aSpeciesMap [
+EggRingRuntime >> superBehaviorOf: aSpeciesMap [
 	^ aSpeciesMap superclass instanceSpec
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> symbolFrom: anObjectMap [
+EggRingRuntime >> symbolFrom: anObjectMap [
 	^ anObjectMap symbol
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> symbolFromLocal: aSymbol [
+EggRingRuntime >> symbolFromLocal: aSymbol [
 	^ image newSymbol: aSymbol
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> transferLiteral: anObject [
+EggRingRuntime >> transferLiteral: anObject [
 	^image transferLiteral: anObject
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> transferMethodLiterals: method [
+EggRingRuntime >> transferMethodLiterals: method [
 	| class |
 	method withIndexDo: [:literal :i | 
 		class := literal class.

@@ -104,8 +104,8 @@ JSTranspiler class >> powerlangInterpreterClasses [
 			{EggObjectHeader.
 			EvaluationContext.
 			StackedEvaluationContext.
-			PowertalkRuntime.
-			PowertalkMetacircularRuntime.
+			EggRuntime.
+			EggMetacircularRuntime.
 			SExpressionLinearizer.
 			AstNodeTypes.
 			AstBindingTypes.
@@ -113,9 +113,9 @@ JSTranspiler class >> powerlangInterpreterClasses [
 			SCompiledBlockFlags.
 			SCompiledMethodFlags.
 			ClosureElementTypes.
-			PowertalkEvaluator.
-			PowertalkIterativeInterpreter.
-			PowertalkIterativeStackedInterpreter} , SBinding withAllSubclasses
+			EggEvaluator.
+			EggIterativeInterpreter.
+			EggIterativeStackedInterpreter} , SBinding withAllSubclasses
 		, SExpression withAllSubclasses
 		,
 			{JSNativeCode.

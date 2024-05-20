@@ -1,6 +1,6 @@
 Class {
-	#name : #PowertalkIterativeInterpreter,
-	#superclass : #PowertalkEvaluator,
+	#name : #EggIterativeInterpreter,
+	#superclass : #EggEvaluator,
 	#instVars : [
 		'regR'
 	],
@@ -8,40 +8,40 @@ Class {
 }
 
 { #category : #accessing }
-PowertalkIterativeInterpreter >> evaluate [
+EggIterativeInterpreter >> evaluate [
 	^self subclassResponsibility
 
 ]
 
 { #category : #accessing }
-PowertalkIterativeInterpreter >> hasFinished [
+EggIterativeInterpreter >> hasFinished [
 	^ context hasFinished
 ]
 
 { #category : #initializing }
-PowertalkIterativeInterpreter >> initializeUndermessages [
+EggIterativeInterpreter >> initializeUndermessages [
 	super initializeUndermessages.
 	undermessages 		at: #_restart put: self underprimitiveRestart
 	
 ]
 
 { #category : #accessing }
-PowertalkIterativeInterpreter >> prepareDispatch: dispatch [
+EggIterativeInterpreter >> prepareDispatch: dispatch [
 	self subclassResponsibility
 ]
 
 { #category : #accessing }
-PowertalkIterativeInterpreter >> prepareForBlock: sblock [
+EggIterativeInterpreter >> prepareForBlock: sblock [
 	^self subclassResponsibility	
 ]
 
 { #category : #accessing }
-PowertalkIterativeInterpreter >> regR: anObject [ 
+EggIterativeInterpreter >> regR: anObject [ 
 	regR := anObject
 ]
 
 { #category : #accessing }
-PowertalkIterativeInterpreter >> unboundAssignment: aBinding with: assignees [
+EggIterativeInterpreter >> unboundAssignment: aBinding with: assignees [
 			assignees size > 1 ifTrue: [ 
 				self error:
 					'unbound name with multiple assignments not yet supported' ].
@@ -49,29 +49,29 @@ PowertalkIterativeInterpreter >> unboundAssignment: aBinding with: assignees [
 ]
 
 { #category : #accessing }
-PowertalkIterativeInterpreter >> underprimitiveRestart [
+EggIterativeInterpreter >> underprimitiveRestart [
 	^ self subclassResponsibility 
 ]
 
 { #category : #accessing }
-PowertalkIterativeInterpreter >> visitBlock: anSBlock [
+EggIterativeInterpreter >> visitBlock: anSBlock [
 	regR := context captureClosure: anSBlock
 ]
 
 { #category : #accessing }
-PowertalkIterativeInterpreter >> visitIdentifier: anSIdentifier [
+EggIterativeInterpreter >> visitIdentifier: anSIdentifier [
 	| binding |
 	binding := anSIdentifier binding.
 	regR := binding valueWithin: context ifUnbound: [ ^self doesNotKnow: binding name ]
 ]
 
 { #category : #accessing }
-PowertalkIterativeInterpreter >> visitLiteral: anSLiteral [
+EggIterativeInterpreter >> visitLiteral: anSLiteral [
 	regR := runtime literalFor: anSLiteral value
 ]
 
 { #category : #accessing }
-PowertalkIterativeInterpreter >> visitOpAssign: anSOpAssign [
+EggIterativeInterpreter >> visitOpAssign: anSOpAssign [
 
 	| assignees binding |
 	assignees := anSOpAssign assignees.
@@ -84,36 +84,36 @@ PowertalkIterativeInterpreter >> visitOpAssign: anSOpAssign [
 ]
 
 { #category : #accessing }
-PowertalkIterativeInterpreter >> visitOpDropToS: anSOpDropToS [
+EggIterativeInterpreter >> visitOpDropToS: anSOpDropToS [
 	context dropOperands: anSOpDropToS count
 ]
 
 { #category : #accessing }
-PowertalkIterativeInterpreter >> visitOpLoadRfromFrame: anSOpLoadRfromFrame [
+EggIterativeInterpreter >> visitOpLoadRfromFrame: anSOpLoadRfromFrame [
 	regR := context stackTemporaryAt: anSOpLoadRfromFrame index
 ]
 
 { #category : #accessing }
-PowertalkIterativeInterpreter >> visitOpLoadRfromStack: anSOpLoadRfromStack [
+EggIterativeInterpreter >> visitOpLoadRfromStack: anSOpLoadRfromStack [
 	regR := context operandAt: anSOpLoadRfromStack index
 ]
 
 { #category : #accessing }
-PowertalkIterativeInterpreter >> visitOpLoadRwithNil: anSOpLoadRwithNil [
+EggIterativeInterpreter >> visitOpLoadRwithNil: anSOpLoadRwithNil [
 	regR := nilObj
 ]
 
 { #category : #accessing }
-PowertalkIterativeInterpreter >> visitOpLoadRwithSelf: anSOpLoadRwithSelf [
+EggIterativeInterpreter >> visitOpLoadRwithSelf: anSOpLoadRwithSelf [
 	regR := context self
 ]
 
 { #category : #accessing }
-PowertalkIterativeInterpreter >> visitOpPushR: anSOpPushR [
+EggIterativeInterpreter >> visitOpPushR: anSOpPushR [
 	context pushOperand: regR
 ]
 
 { #category : #accessing }
-PowertalkIterativeInterpreter >> visitOpStoreRintoFrame: anSOpStoreRintoFrame [
+EggIterativeInterpreter >> visitOpStoreRintoFrame: anSOpStoreRintoFrame [
 	context stackTemporaryAt: anSOpStoreRintoFrame index put: regR
 ]
