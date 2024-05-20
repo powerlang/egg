@@ -23,7 +23,7 @@ JSTranspiler class >> generateKernelSegment [
 JSTranspiler class >> generateLMRBootstrapper [
 
 	| image |
-	image := PowertalkRingImage fromSpec
+	image := EggRingImage fromSpec
 		         wordSize: 8;
 		         genesis;
 		         bootstrap;
@@ -99,13 +99,13 @@ JSTranspiler class >> interpreterDirectory [
 
 { #category : #private }
 JSTranspiler class >> powerlangInterpreterClasses [
-	^ LMRObject withAllSubclasses
+	^ EggObject withAllSubclasses
 		,
-			{LMRObjectHeader.
+			{EggObjectHeader.
 			EvaluationContext.
 			StackedEvaluationContext.
-			PowertalkRuntime.
-			PowertalkLMR.
+			EggRuntime.
+			EggMetacircularRuntime.
 			SExpressionLinearizer.
 			AstNodeTypes.
 			AstBindingTypes.
@@ -113,14 +113,14 @@ JSTranspiler class >> powerlangInterpreterClasses [
 			SCompiledBlockFlags.
 			SCompiledMethodFlags.
 			ClosureElementTypes.
-			PowertalkEvaluator.
-			PowertalkIterativeInterpreter.
-			PowertalkIterativeStackedInterpreter} , SBinding withAllSubclasses
+			EggEvaluator.
+			EggIterativeInterpreter.
+			EggIterativeStackedInterpreter} , SBinding withAllSubclasses
 		, SExpression withAllSubclasses
 		,
 			{JSNativeCode.
 			JSSExpressionTranspiler.
-			PowertalkNativeJSEvaluator.
+			EggNativeJSEvaluator.
 			LinkedEvaluationContext.
 			NativeJSEvaluationContext}
 ]
