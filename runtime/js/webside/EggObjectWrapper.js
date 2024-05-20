@@ -1,6 +1,6 @@
-import LMRByteObject from "../interpreter/LMRByteObject.js";
-import LMRObject from "../interpreter/LMRObject.js";
-import LMRSmallInteger from "../interpreter/LMRSmallInteger.js";
+import EggByteObject from "../interpreter/EggByteObject.js";
+import EggObject from "../interpreter/EggObject.js";
+import EggSmallInteger from "../interpreter/EggSmallInteger.js";
 
 let selectorFor = function (selector, args) {
 	if (args.length == 0) return selector;
@@ -9,7 +9,7 @@ let selectorFor = function (selector, args) {
 	throw "should be implemented";
 };
 
-let LMRObjectWrapper = class {
+let EggObjectWrapper = class {
 	/*				if (typeof prop == "function")
 						return function(...args) {
 							return prop.call(args);
@@ -38,10 +38,10 @@ let LMRObjectWrapper = class {
 	static wrap(object, runtime) {
 		const type =
 			runtime.sendLocal_to_("isSpecies", object) === runtime.true()
-				? LMRSpeciesWrapper
+				? EggSpeciesWrapper
 				: runtime.sendLocal_to_("isModule", object) === runtime.true()
-				? LMRModuleWrapper
-				: LMRObjectWrapper;
+				? EggModuleWrapper
+				: EggObjectWrapper;
 		return type.on_runtime_(object, runtime);
 	}
 
@@ -55,30 +55,30 @@ let LMRObjectWrapper = class {
 
 	initialize() {}
 
-	static on_runtime_(anLMRObject, aPowerlangLMR) {
+	static on_runtime_(anEggObject, anEggRuntime) {
 		let res = this.new();
-		res.wrappee_(anLMRObject);
-		res.runtime_(aPowerlangLMR);
+		res.wrappee_(anEggObject);
+		res.runtime_(anEggRuntime);
 		return res;
 	}
 
-	static on_runtime_id_(anLMRObject, aPowerlangLMR, id) {
-		let res = this.on_runtime_(anLMRObject, aPowerlangLMR);
+	static on_runtime_id_(anEggObject, anEggRuntime, id) {
+		let res = this.on_runtime_(anEggObject, anEggRuntime);
 		res._id = id;
 		return res;
 	}
 
 	wrap(object) {
-		return LMRObjectWrapper.wrap(object, this._runtime);
+		return EggObjectWrapper.wrap(object, this._runtime);
 	}
 
 	wrapCollection(collection) {
-		return LMRObjectWrapper.wrapCollection(collection, this._runtime);
+		return EggObjectWrapper.wrapCollection(collection, this._runtime);
 	}
 
 	_equal(anObject) {
 		let object =
-			anObject instanceof LMRObjectWrapper
+			anObject instanceof EggObjectWrapper
 				? anObject.wrappee()
 				: anObject;
 		return this._wrappee == object;
@@ -88,9 +88,9 @@ let LMRObjectWrapper = class {
 		if (this._wrappee === this._runtime.nil()) return nil;
 		if (this._wrappee === this._runtime.true()) return true;
 		if (this._wrappee === this._runtime.false()) return false;
-		if (this._wrappee.class() === LMRSmallInteger)
+		if (this._wrappee.class() === EggSmallInteger)
 			return this._wrappee.value();
-		if (this._wrappee.class() === LMRByteObject)
+		if (this._wrappee.class() === EggByteObject)
 			return this._wrappee.asLocalString();
 		this.error_(
 			"Cannot determine local equivalent of "._comma(
@@ -139,19 +139,19 @@ let LMRObjectWrapper = class {
 	send(selector, args = []) {
 		let _arguments, result, _class;
 		_arguments = args.map((a) => {
-			return a instanceof LMRObjectWrapper ? a.wrappee() : a;
+			return a instanceof EggObjectWrapper ? a.wrappee() : a;
 		});
 		result = this._runtime.sendLocal_to_with_(
 			selector,
 			this._wrappee,
 			_arguments
 		);
-		if (!(result instanceof LMRObject)) return result;
+		if (!(result instanceof EggObject)) return result;
 		_class =
 			this._runtime.sendLocal_to_("isSpecies", result) ===
 			this._runtime.true()
-				? LMRSpeciesWrapper
-				: LMRObjectWrapper;
+				? EggSpeciesWrapper
+				: EggObjectWrapper;
 		return _class.on_runtime_(result, this._runtime);
 	}
 
@@ -181,15 +181,15 @@ let LMRObjectWrapper = class {
 
 	objectClass() {
 		let _class = this._runtime.sendLocal_to_("class", this._wrappee);
-		return LMRSpeciesWrapper.on_runtime_(_class, this._runtime);
+		return EggSpeciesWrapper.on_runtime_(_class, this._runtime);
 	}
 
 	respondsTo(aSymbol) {
 		return this.objectClass().canUnderstand(aSymbol);
 	}
 
-	runtime_(aPowerlangLMR) {
-		this._runtime = aPowerlangLMR;
+	runtime_(anEggRuntime) {
+		this._runtime = anEggRuntime;
 		return this;
 	}
 
@@ -204,19 +204,19 @@ let LMRObjectWrapper = class {
 		return this._wrappee;
 	}
 
-	wrappee_(anLMRObject) {
-		this._wrappee = anLMRObject;
+	wrappee_(anEggObject) {
+		this._wrappee = anEggObject;
 		return this;
 	}
 };
 
 const cachedSymbols = {};
 
-let LMRSpeciesWrapper = class extends LMRObjectWrapper {
+let EggSpeciesWrapper = class extends EggObjectWrapper {
 	_shiftRight(aSymbol) {
 		let symbol;
 		symbol = this._runtime.symbolFromLocal_(aSymbol);
-		return LMRMethodWrapper.on_runtime_(
+		return EggMethodWrapper.on_runtime_(
 			this.send("shiftRight", [symbol]).wrappee(),
 			this._runtime
 		);
@@ -233,7 +233,7 @@ let LMRSpeciesWrapper = class extends LMRObjectWrapper {
 	allSubclasses() {
 		const slots = this.send("allSubclasses").asArray().wrappee().slots();
 		const mapped = slots.map((c) =>
-			LMRSpeciesWrapper.on_runtime_(c, this._runtime)
+			EggSpeciesWrapper.on_runtime_(c, this._runtime)
 		);
 
 		return mapped;
@@ -242,7 +242,7 @@ let LMRSpeciesWrapper = class extends LMRObjectWrapper {
 	allSubspecies() {
 		const slots = this.send("allSubspecies").asArray().wrappee().slots();
 		const mapped = slots.map((c) =>
-			LMRSpeciesWrapper.on_runtime_(c, this._runtime)
+			EggSpeciesWrapper.on_runtime_(c, this._runtime)
 		);
 
 		return mapped;
@@ -253,7 +253,7 @@ let LMRSpeciesWrapper = class extends LMRObjectWrapper {
 			.asArray()
 			.wrappee()
 			.slots()
-			.map((c) => LMRSpeciesWrapper.on_runtime_(c, this._runtime));
+			.map((c) => EggSpeciesWrapper.on_runtime_(c, this._runtime));
 	}
 
 	asWebsideJson() {
@@ -422,7 +422,7 @@ let LMRSpeciesWrapper = class extends LMRObjectWrapper {
 	methodFor(aSymbol) {
 		let symbol = this.cachedSymbolFor(aSymbol);
 		let method = this.send(">>", [symbol]);
-		return LMRMethodWrapper.on_runtime_(method.wrappee(), this._runtime);
+		return EggMethodWrapper.on_runtime_(method.wrappee(), this._runtime);
 	}
 
 	instVarNames() {
@@ -462,7 +462,7 @@ let LMRSpeciesWrapper = class extends LMRObjectWrapper {
 			.asArray()
 			.wrappee()
 			.slots()
-			.map((m) => LMRMethodWrapper.on_runtime_(m, this._runtime));
+			.map((m) => EggMethodWrapper.on_runtime_(m, this._runtime));
 	}
 
 	name() {
@@ -485,7 +485,7 @@ let LMRSpeciesWrapper = class extends LMRObjectWrapper {
 			.asArray()
 			.wrappee()
 			.slots()
-			.map((c) => LMRSpeciesWrapper.on_runtime_(c, this._runtime));
+			.map((c) => EggSpeciesWrapper.on_runtime_(c, this._runtime));
 	}
 
 	withAllSubclasses() {
@@ -501,7 +501,7 @@ let LMRSpeciesWrapper = class extends LMRObjectWrapper {
 	}
 };
 
-let LMRMethodWrapper = class extends LMRObjectWrapper {
+let EggMethodWrapper = class extends EggObjectWrapper {
 	asWebsideJson() {
 		let json = super.asWebsideJson();
 		try {
@@ -551,7 +551,7 @@ let LMRMethodWrapper = class extends LMRObjectWrapper {
 	}
 };
 
-let LMRModuleWrapper = class extends LMRObjectWrapper {
+let EggModuleWrapper = class extends EggObjectWrapper {
 	asWebsideJson() {
 		let json = super.asWebsideJson();
 		let classes = this.classes();
@@ -576,8 +576,8 @@ let LMRModuleWrapper = class extends LMRObjectWrapper {
 };
 
 export {
-	LMRObjectWrapper,
-	LMRSpeciesWrapper,
-	LMRMethodWrapper,
-	LMRModuleWrapper,
+	EggObjectWrapper,
+	EggSpeciesWrapper,
+	EggMethodWrapper,
+	EggModuleWrapper,
 };

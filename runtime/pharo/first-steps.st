@@ -2,19 +2,19 @@
     Browsing kernel code (load kernel smalltalk from files and browse it).
 "
 
-PowertalkRingImage resetSpecs.
+EggRingImage resetSpecs.
 
 JSTranspiler generateKernelSegment.
 JSTranspiler generateCompilerSegment.
-JSTranspiler transpilePowerlangInterpreter.
+JSTranspiler transpileEggInterpreter.
 
-PowertalkRingImage kernelSpec browse.
+EggRingImage kernelSpec browse.
 
 "
     Executing Smalltalk code in a virtual image:
 "
 
-image := PowertalkRingImage fromSpec wordSize: 8; genesis.
+image := EggRingImage fromSpec wordSize: 8; genesis.
 runtime := image runtime.
 three := image newInteger: 3.
 four := image newInteger: 4.

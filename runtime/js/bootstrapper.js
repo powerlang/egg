@@ -1,7 +1,7 @@
 'use strict';
 
 import './lmr.js';
-import PowertalkLMR from "./interpreter/PowertalkLMR.js";
+import EggMetacircularRuntime from "./interpreter/EggMetacircularRuntime.js";
 
 import ImageSegmentReader from "./ImageSegmentReader.js"
 
@@ -13,7 +13,7 @@ let Bootstrapper = class {
 	constructor()
 	{
 		this.modules = new Map;
-		this.runtime = PowertalkLMR.new();
+		this.runtime = EggMetacircularRuntime.new();
 	}
 
 	loadKernelFile(kernelPath = 'Kernel.json')

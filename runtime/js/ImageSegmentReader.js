@@ -15,7 +15,7 @@ export const ObjectTypes = Object.freeze({
 /**
  * @param {*} environment is a dictionary mapping names to objects, that is used for module imports
  *
- * An ImageSegmentReader is an object that creates a Powertalk module by reading it from a JSON file.
+ * An ImageSegmentReader is an object that creates an Egg module by reading it from a JSON file.
  * The format of the module is pretty simple: it has an object table, and an export map.
  * Objects in the table can be of four types: SmallInteger, ByteObject, SlotObject and Import
  *  - Import objects have a name, which is used to find the corresponding object passed in
