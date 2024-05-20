@@ -730,8 +730,8 @@ EggEvaluator >> runtime [
 ]
 
 { #category : #initializing }
-EggEvaluator >> runtime: aPowertalkRuntime [
-	runtime := aPowertalkRuntime.
+EggEvaluator >> runtime: anEggRuntime [
+	runtime := anEggRuntime.
 	nilObj := runtime nil.
 	trueObj := runtime true.
 	falseObj := runtime false.

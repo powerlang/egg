@@ -66,9 +66,9 @@ work := self prepareForExecuting: method.
 ]
 
 { #category : #initializing }
-EggLinkedLinearInterpreter >> runtime: aPowertalkRuntime [
-	super runtime: aPowertalkRuntime.
-	linearizer runtime: aPowertalkRuntime
+EggLinkedLinearInterpreter >> runtime: anEggRuntime [
+	super runtime: anEggRuntime.
+	linearizer runtime: anEggRuntime
 ]
 
 { #category : #visiting }

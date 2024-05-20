@@ -25,7 +25,7 @@ StackedEvaluationContext >> argumentAt: anInteger frameIndex: anotherInteger [
 	| bp code count |
 	bp := self bpForFrameAt: anotherInteger.
 	code := stack at: bp - 2.
-	count := system argumentCountOf: code.
+	count := runtime argumentCountOf: code.
 	^ stack at: bp + 1 + (count - anInteger + 1)
 ]
 
@@ -39,7 +39,7 @@ StackedEvaluationContext >> argumentAt: index in: environmentIndex [
 { #category : #initialization }
 StackedEvaluationContext >> arguments [
 	| count |
-	count := system argumentCountOf: regM.
+	count := runtime argumentCountOf: regM.
 	^ (count to: 1 by: -1) collect: [ :i | self argumentAt: i ]
 ]
 
@@ -70,7 +70,7 @@ StackedEvaluationContext >> bpForFrameAt: anInteger [
 { #category : #initialization }
 StackedEvaluationContext >> buildClosureFrameFor: receiver code: code environment: environment [
 	| temps |
-	temps := system blockTempCount: code.
+	temps := runtime blockTempCount: code.
 	self buildFrameFor: receiver code: code environment: environment temps: temps
 ]
 
@@ -96,20 +96,20 @@ StackedEvaluationContext >> buildFrameFor: receiver code: code environment: envi
 { #category : #initialization }
 StackedEvaluationContext >> buildLaunchFrame [
 	| launcher code executable |
-	launcher := system newCompiledMethod.
-	code := system newArraySized: 0.
-	executable := system newExecutableCodeFor: code.
-	system methodExecutableCode: launcher put: executable.
+	launcher := runtime newCompiledMethod.
+	code := runtime newArraySized: 0.
+	executable := runtime newExecutableCodeFor: code.
+	runtime methodExecutableCode: launcher put: executable.
 	self
-		buildMethodFrameFor: system nil
+		buildMethodFrameFor: runtime nil
 		code: launcher
-		environment: system nil
+		environment: runtime nil
 ]
 
 { #category : #initialization }
 StackedEvaluationContext >> buildMethodFrameFor: receiver code: code environment: environment [
 	| temps |
-	temps := system methodTempCount: code.
+	temps := runtime methodTempCount: code.
 	self
 		buildFrameFor: receiver
 		code: code
@@ -206,26 +206,26 @@ StackedEvaluationContext >> initialize [
 
 { #category : #initialization }
 StackedEvaluationContext >> isBlock [
-	^ system isBlock: regM
+	^ runtime isBlock: regM
 ]
 
 { #category : #initialization }
 StackedEvaluationContext >> method [
 	^ self isBlock
-		ifTrue: [ system blockMethod: regM ]
+		ifTrue: [ runtime blockMethod: regM ]
 		ifFalse: [ regM ]
 ]
 
 { #category : #initialization }
-StackedEvaluationContext >> method: anSCompiledMethod [
-	regM := anSCompiledMethod
+StackedEvaluationContext >> method: aMethod [
+	regM := aMethod
 
 ]
 
 { #category : #initialization }
 StackedEvaluationContext >> methodArguments [
 	| count |
-	count := system methodArgumentCount: regM.
+	count := runtime methodArgumentCount: regM.
 	^ (count to: 1 by: -1) collect: [ :i | self argumentAt: i ]
 ]
 
@@ -377,9 +377,15 @@ StackedEvaluationContext >> reserveStackSlots: anInteger [
 { #category : #initialization }
 StackedEvaluationContext >> restart [
 	| nilObj |
-	nilObj := system nil.
+	nilObj := runtime nil.
 	regBP - self tempOffset to: regSP by: -1 do: [ :i | stack at: i put: nilObj ].
 	pc := 1
+]
+
+{ #category : #initialization }
+StackedEvaluationContext >> runtime: anEggRuntime [
+	super runtime: anEggRuntime.
+	regE := regS := runtime nil
 ]
 
 { #category : #initialization }
@@ -445,12 +451,6 @@ StackedEvaluationContext >> stackTemporaryAt: anInteger put: anObject [
 ]
 
 { #category : #initialization }
-StackedEvaluationContext >> system: aPowertalkRuntime [
-	super system: aPowertalkRuntime.
-	regE := regS := system nil
-]
-
-{ #category : #initialization }
 StackedEvaluationContext >> tempOffset [ 
 "should be 2 or 4 if we had methods without environment"
 	^4
@@ -476,8 +476,8 @@ StackedEvaluationContext >> thirdArgument [
 { #category : #initialization }
 StackedEvaluationContext >> unwind [
 	| home bp environment |
-	home := system closureHome: self environment.
-	home == system nil ifTrue: [ self error: 'cannot return because closure has no home' ].
+	home := runtime closureHome: self environment.
+	home == runtime nil ifTrue: [ self error: 'cannot return because closure has no home' ].
 	bp := regBP.
 	[ bp != 0 ]
 		whileTrue: [ environment := stack at: bp - 4.

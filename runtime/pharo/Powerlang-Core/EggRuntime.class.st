@@ -62,7 +62,7 @@ EggRuntime >> evaluatePrimitiveHash: receiver [
 ]
 
 { #category : #accessing }
-EggRuntime >> executableCodeWork: anLMRExecutableCode [
+EggRuntime >> executableCodeWork: code [
 
 	^ self subclassResponsibility
 ]
@@ -131,7 +131,7 @@ EggRuntime >> interpreter [
 ]
 
 { #category : #accessing }
-EggRuntime >> isClosure: anObjectMap [
+EggRuntime >> isClosure: anObject [
 	^ self subclassResponsibility
 ]
 

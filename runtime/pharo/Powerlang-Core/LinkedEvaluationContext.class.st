@@ -114,7 +114,7 @@ LinkedEvaluationContext >> homeContext [
 	isBlock
 		ifFalse: [ ^ self ].
 	frame := parent.
-	searched := system closureHome: environment.
+	searched := runtime closureHome: environment.
 	[ frame notNil ]
 		whileTrue: [ frame environment == searched
 				ifTrue: [ ^ frame ].
@@ -163,7 +163,7 @@ LinkedEvaluationContext >> method [
 LinkedEvaluationContext >> method: aMethod [
 	| count |
 	method := aMethod.
-	count := system methodTempCount: aMethod.
+	count := runtime methodTempCount: aMethod.
 	temporaries := Array new: count
 ]
 

@@ -77,8 +77,8 @@ JSSExpressionTranspiler >> end [
 ]
 
 { #category : #accessing }
-JSSExpressionTranspiler >> evaluator: aJSPowertalkEvaluator [ 
- evaluator := aJSPowertalkEvaluator.
+JSSExpressionTranspiler >> evaluator: aJSEggEvaluator [ 
+ evaluator := aJSEggEvaluator.
 	self runtime: evaluator runtime
 ]
 
@@ -322,8 +322,8 @@ JSSExpressionTranspiler >> returnSelf [
 ]
 
 { #category : #accessing }
-JSSExpressionTranspiler >> runtime: aPowertalkRuntime [
-	runtime := aPowertalkRuntime.
+JSSExpressionTranspiler >> runtime: anEggRuntime [
+	runtime := anEggRuntime.
 	one := runtime newInteger: 1.
 	plus := runtime symbolFromLocal: #+.
 	greaterThan := runtime symbolFromLocal: #>.

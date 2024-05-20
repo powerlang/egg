@@ -88,9 +88,9 @@ EggRecursiveInterpreter >> primitiveClosureWhileTrue [
 ]
 
 { #category : #initializing }
-EggRecursiveInterpreter >> runtime: aPowertalkRuntime [
-	super runtime: aPowertalkRuntime.
-	aPowertalkRuntime
+EggRecursiveInterpreter >> runtime: anEggRuntime [
+	super runtime: anEggRuntime.
+	anEggRuntime
 		override: #Closure -> #whileTrue: withPrimitive: 'ClosureWhileTrue';
 		override: #Closure -> #whileFalse: withPrimitive: 'ClosureWhileFalse'
 ]
@@ -124,7 +124,7 @@ EggRecursiveInterpreter >> send: aSymbol to: receiver with: arguments super: aBo
 		environment: environment;
 		parent: context;
 		method: method;
-		system: runtime.
+		runtime: runtime.
 	^ context evaluateFor: self
 ]
 

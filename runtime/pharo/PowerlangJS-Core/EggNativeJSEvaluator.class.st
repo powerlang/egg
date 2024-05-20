@@ -51,7 +51,7 @@ EggNativeJSEvaluator >> send: anSMessage super: aBoolean to: receiver with: argu
 	self ASSERT: method notNil.
 	prev := context.
 	context := NativeJSEvaluationContext new
-		system: runtime;
+		runtime: runtime;
 		self: receiver;
 		arguments: arguments;
 		parent: prev;

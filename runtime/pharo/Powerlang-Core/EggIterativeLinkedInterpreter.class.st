@@ -33,7 +33,7 @@ EggIterativeLinkedInterpreter >> sendLocal: aSymbol to: receiver with: anArray [
 		arguments: dummy.
 	dispatch := SOpDispatchMessage new message: message.
 	regR := receiver.
-	context := self evaluationContextClass new system: self.
+	context := self evaluationContextClass new runtime: self.
 	self prepareDispatch: dispatch.
 	dummy isEmpty
 		ifFalse: [ context pushOperand: receiver ].
@@ -68,7 +68,7 @@ EggIterativeLinkedInterpreter >> visitOpDispatchMessage: anSOpDispatchMessage [
 		           self: regR;
 		           arguments: arguments;
 		           environment: environment;
-		           system: runtime;
+		           runtime: runtime;
 		           method: method;
 		           parent: context.
 	self prepareForExecuting: method

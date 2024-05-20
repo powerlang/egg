@@ -16,8 +16,8 @@ EggObjectHeader >> behavior [
 ]
 
 { #category : #accessing }
-EggObjectHeader >> behavior: anLMRHeapObject [
-	behavior := anLMRHeapObject
+EggObjectHeader >> behavior: anEggHeapObject [
+	behavior := anEggHeapObject
 ]
 
 { #category : #accessing }

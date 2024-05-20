@@ -113,7 +113,7 @@ EggIterativeStackedInterpreter >> messageNotUnderstood: anSMessage [
 { #category : #initialization }
 EggIterativeStackedInterpreter >> newEvaluationContext [
 
-	^StackedEvaluationContext new system: runtime
+	^StackedEvaluationContext new runtime: runtime
 ]
 
 { #category : #initialization }
@@ -147,11 +147,11 @@ EggIterativeStackedInterpreter >> prepareBlockExecutableCode: block [
 ]
 
 { #category : #initializing }
-EggIterativeStackedInterpreter >> runtime: aPowertalkRuntime [
+EggIterativeStackedInterpreter >> runtime: anEggRuntime [
 
-	super runtime: aPowertalkRuntime.
+	super runtime: anEggRuntime.
 	linearizer
-		runtime: aPowertalkRuntime;
+		runtime: anEggRuntime;
 		dropsArguments.
 	context := self newEvaluationContext
 ]

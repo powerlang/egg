@@ -439,9 +439,9 @@ SExpressionLinearizer >> return: isLocal [
 ]
 
 { #category : #initialization }
-SExpressionLinearizer >> runtime: aPowertalkRuntime [
+SExpressionLinearizer >> runtime: anEggRuntime [
 	| literal |
-	runtime := aPowertalkRuntime.
+	runtime := anEggRuntime.
 	literal := runtime newInteger: 1.
 	one := SLiteral new value: literal.
 	plus := runtime symbolFromLocal: #+.

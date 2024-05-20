@@ -407,10 +407,10 @@ Ring2MetacircularConverter >> initializeActiveProcess [
 ]
 
 { #category : #building }
-Ring2MetacircularConverter >> initializeBehavior: anLMRHeapObject spec: anRGBehavior [
+Ring2MetacircularConverter >> initializeBehavior: anEggHeapObject spec: anRGBehavior [
 	| behavior |
 	behavior := behaviors at: anRGBehavior.
-	anLMRHeapObject behavior: behavior
+	anEggHeapObject behavior: behavior
 ]
 
 { #category : #initialization }
@@ -632,8 +632,8 @@ Ring2MetacircularConverter >> sendLoadModule: aSymbol [
 ]
 
 { #category : #initialization }
-Ring2MetacircularConverter >> source: aPowertalkRingImage [
-	source := aPowertalkRingImage
+Ring2MetacircularConverter >> source: anEggRingImage [
+	source := anEggRingImage
 ]
 
 { #category : #initialization }
