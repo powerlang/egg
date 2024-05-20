@@ -24,7 +24,7 @@ EggModuleTest >> setUp [
 		         bootstrap;
 		         fillClasses;
 		         fillSymbols.
-	bootstrapper := image generateLMR.
+	bootstrapper := image generateMetacircularImage.
 	runtime := bootstrapper result.
 	bootstrapper useHostModuleLoader
 ]

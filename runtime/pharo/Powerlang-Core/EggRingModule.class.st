@@ -260,7 +260,7 @@ EggRingModule >> formatOfMetaclass: definition [
 ]
 
 { #category : #building }
-EggRingModule >> generateLMR [
+EggRingModule >> generateMetacircularImage [
 	^(Ring2MetacircularConverter new image: self) convert
 ]
 

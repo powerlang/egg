@@ -10,7 +10,7 @@ Class {
 
 { #category : #running }
 EggMetacircularRuntimeTestResource >> bootstrapper [
-	^bootstrapper ifNil: [ bootstrapper := image generateLMR ]
+	^bootstrapper ifNil: [ bootstrapper := image generateMetacircularImage ]
 
 ]
 
