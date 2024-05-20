@@ -2,7 +2,7 @@ MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 GIT_PATH := $(realpath $(dir $(MKFILE_PATH))/../..)
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 IMAGE_SEGMENTS_DIR=$(ROOT_DIR)/image-segments
-POWERLANG_DIR=$(GIT_PATH)/bootstrap/pharo
+POWERLANG_DIR=$(GIT_PATH)/runtime/pharo
 
 .PHONY: all interpreter kernel compiler
 
