@@ -1,7 +1,7 @@
 Class {
 	#name : #LMRObject,
 	#superclass : #Object,
-	#category : #'Powerlang-Core-Execution-LMR'
+	#category : #'Powerlang-Core-Execution-Metacircular'
 }
 
 { #category : #accessing }

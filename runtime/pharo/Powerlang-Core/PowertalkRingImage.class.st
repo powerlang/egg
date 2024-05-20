@@ -11,7 +11,7 @@ Class {
 		'minSMI',
 		'maxSMI'
 	],
-	#category : #'Powerlang-Core-Execution-Ring'
+	#category : #'Powerlang-Core-Execution-Bootstrap-Ring'
 }
 
 { #category : #'own services' }

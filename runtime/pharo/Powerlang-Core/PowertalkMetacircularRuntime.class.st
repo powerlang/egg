@@ -49,7 +49,7 @@ Class {
 		'SCompiledBlockFlags',
 		'SCompiledMethodFlags'
 	],
-	#category : #'Powerlang-Core-Execution-LMR'
+	#category : #'Powerlang-Core-Execution-Metacircular'
 }
 
 { #category : #initialization }

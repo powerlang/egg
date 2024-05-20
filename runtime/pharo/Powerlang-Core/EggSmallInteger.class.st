@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'value'
 	],
-	#category : #'Powerlang-Core-Execution-LMR'
+	#category : #'Powerlang-Core-Execution-Metacircular'
 }
 
 { #category : #comparing }

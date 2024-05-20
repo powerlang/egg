@@ -27,7 +27,7 @@ Class {
 		'KernelSpec',
 		'VMPrimitivesSpec'
 	],
-	#category : #'Powerlang-Core-Execution-Ring'
+	#category : #'Powerlang-Core-Execution-Bootstrap-Ring'
 }
 
 { #category : #accessing }

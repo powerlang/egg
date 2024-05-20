@@ -7,7 +7,7 @@ Class {
 		'size',
 		'hash'
 	],
-	#category : #'Powerlang-Core-Execution-LMR'
+	#category : #'Powerlang-Core-Execution-Metacircular'
 }
 
 { #category : #accessing }

@@ -1,7 +1,7 @@
 Class {
 	#name : #ProtoeggClass,
 	#superclass : #ProtoeggSpecies,
-	#category : #'Powerlang-Core-Execution-Ring'
+	#category : #'Powerlang-Core-Execution-Bootstrap-Ring'
 }
 
 { #category : #accessing }
