@@ -10,7 +10,7 @@ Class {
 { #category : #running }
 ObjectMapTest >> setUp [
 	super setUp.
-	kernel := PowertalkRingImage kernelSpec
+	kernel := EggRingImage kernelSpec
 ]
 
 { #category : #running }

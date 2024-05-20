@@ -4,7 +4,7 @@ and barely anything else. I am in charge of adding the Kernel module object to i
 methods to the classes.
 "
 Class {
-	#name : #RingBasedLMRBootstrapper,
+	#name : #Ring2MetacircularConverter,
 	#superclass : #Object,
 	#instVars : [
 		'source',
@@ -21,7 +21,7 @@ Class {
 }
 
 { #category : #'instance creation' }
-RingBasedLMRBootstrapper class >> new [
+Ring2MetacircularConverter class >> new [
 	"return an initialized instance"
 
 	^ self basicNew initialize.
@@ -29,14 +29,14 @@ RingBasedLMRBootstrapper class >> new [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> => aSymbol [
+Ring2MetacircularConverter >> => aSymbol [
 	| classmap |
 	classmap := source classNamed: aSymbol.
 	^mapping at: classmap
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> addClasses: classes to: module [
+Ring2MetacircularConverter >> addClasses: classes to: module [
 	classes
 		do: [ :c | 
 			dest
@@ -45,7 +45,7 @@ RingBasedLMRBootstrapper >> addClasses: classes to: module [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> classesSortedBySuperclass: anArray [
+Ring2MetacircularConverter >> classesSortedBySuperclass: anArray [
 
 	| result seen s dfs |
 	result := OrderedCollection new.
@@ -62,7 +62,7 @@ RingBasedLMRBootstrapper >> classesSortedBySuperclass: anArray [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> closureCompiledBlock: anSCompiledBlock [
+Ring2MetacircularConverter >> closureCompiledBlock: anSCompiledBlock [
 	| method index spec species table s selector m |
 	method := anSCompiledBlock method.
 	selector := source newSymbol: method selector.
@@ -80,7 +80,7 @@ RingBasedLMRBootstrapper >> closureCompiledBlock: anSCompiledBlock [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> convert [
+Ring2MetacircularConverter >> convert [
 
 	nilObj := self newMapping: source nil.
 	trueObj := self newMapping: source true.
@@ -100,12 +100,12 @@ RingBasedLMRBootstrapper >> convert [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> convertBootstrapDictionaries [
+Ring2MetacircularConverter >> convertBootstrapDictionaries [
 	source bootstrapDictionaries do: [ :dict | self convertBootstrapDictionary: dict ]
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> convertBootstrapDictionary: aBootstrapDictionary [
+Ring2MetacircularConverter >> convertBootstrapDictionary: aBootstrapDictionary [
 	| class dict converted |
 	class := source classes at: aBootstrapDictionary realSpec.
 	dict := source runtime sendLocal: #new to: class.
@@ -122,7 +122,7 @@ RingBasedLMRBootstrapper >> convertBootstrapDictionary: aBootstrapDictionary [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> convertClosure [
+Ring2MetacircularConverter >> convertClosure [
 	| obj |
 	[ stack isEmpty ]
 		whileFalse: [ obj := stack removeFirst.
@@ -130,7 +130,7 @@ RingBasedLMRBootstrapper >> convertClosure [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> convertSlotsOf: ringObj in: lmrObj [
+Ring2MetacircularConverter >> convertSlotsOf: ringObj in: lmrObj [
 	| mapped block |
 	ringObj isPointers
 		ifFalse: [ ^ self ].
@@ -144,7 +144,7 @@ RingBasedLMRBootstrapper >> convertSlotsOf: ringObj in: lmrObj [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> createExtensionMethodsOf: spec in: module [
+Ring2MetacircularConverter >> createExtensionMethodsOf: spec in: module [
 
 	| name namespace class metaclass |
 	name := dest addSymbol: spec name.
@@ -160,7 +160,7 @@ RingBasedLMRBootstrapper >> createExtensionMethodsOf: spec in: module [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> createNamespaceWith: aCollection [
+Ring2MetacircularConverter >> createNamespaceWith: aCollection [
 
 	| namespace |
 	namespace := dest sendLocal: #new to: self => #Namespace.
@@ -172,7 +172,7 @@ RingBasedLMRBootstrapper >> createNamespaceWith: aCollection [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> createNewBlock: sblock [
+Ring2MetacircularConverter >> createNewBlock: sblock [
 	| format transferred method literal tliteral |
 	format := dest newInteger: sblock format.
 	transferred := dest
@@ -191,7 +191,7 @@ RingBasedLMRBootstrapper >> createNewBlock: sblock [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> createNewClassFrom: spec in: module [
+Ring2MetacircularConverter >> createNewClassFrom: spec in: module [
 
 	| supername superclass namespace metaclass class instanceBehavior classBehavior ivars |
 	supername := spec superclass name.
@@ -229,7 +229,7 @@ RingBasedLMRBootstrapper >> createNewClassFrom: spec in: module [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> createNewMethod: m in: species [
+Ring2MetacircularConverter >> createNewMethod: m in: species [
 
 	| smethod size transferred astcodes selector format tliteral md organizer code category |
 	smethod := SCompiler new compile: m sourceCode.
@@ -266,7 +266,7 @@ RingBasedLMRBootstrapper >> createNewMethod: m in: species [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> createNewModule: spec [
+Ring2MetacircularConverter >> createNewModule: spec [
 	| behavior class module |
 	behavior := behaviors at: spec.
 	class := dest behaviorClass: behavior.
@@ -280,7 +280,7 @@ RingBasedLMRBootstrapper >> createNewModule: spec [
 ]
 
 { #category : #paths }
-RingBasedLMRBootstrapper >> findModulePath: moduleName [
+Ring2MetacircularConverter >> findModulePath: moduleName [
 	| parts path candidates dir |
 	parts := '.' split: moduleName.
 	path := ('/' join: parts) asFileReference path.
@@ -293,7 +293,7 @@ RingBasedLMRBootstrapper >> findModulePath: moduleName [
 ]
 
 { #category : #building }
-RingBasedLMRBootstrapper >> fixBehaviors [
+Ring2MetacircularConverter >> fixBehaviors [
 	| metaspec behaviorspec mclass mmetaclass |
 	self
 		initializeBehavior: nilObj spec: source => #UndefinedObject;
@@ -314,7 +314,7 @@ RingBasedLMRBootstrapper >> fixBehaviors [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> headerFor: aRingObject [
+Ring2MetacircularConverter >> headerFor: aRingObject [
 	| behavior |
 	behavior := behaviors at: aRingObject spec ifAbsent: nil.
 	^ EggObjectHeader new
@@ -327,7 +327,7 @@ RingBasedLMRBootstrapper >> headerFor: aRingObject [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> image: aPowertalkRingImage [
+Ring2MetacircularConverter >> image: aPowertalkRingImage [
 
 	| index |
 	source := aPowertalkRingImage.
@@ -388,7 +388,7 @@ RingBasedLMRBootstrapper >> image: aPowertalkRingImage [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> initialize [
+Ring2MetacircularConverter >> initialize [
 	dest := PowertalkMetacircularRuntime new.
 	mapping := IdentityDictionary new.
 	behaviors := IdentityDictionary new.
@@ -397,7 +397,7 @@ RingBasedLMRBootstrapper >> initialize [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> initializeActiveProcess [
+Ring2MetacircularConverter >> initializeActiveProcess [
 
 	| processor active |
 	processor := dest sendLocal: #processor to: dest kernel.
@@ -407,14 +407,14 @@ RingBasedLMRBootstrapper >> initializeActiveProcess [
 ]
 
 { #category : #building }
-RingBasedLMRBootstrapper >> initializeBehavior: anLMRHeapObject spec: anRGBehavior [
+Ring2MetacircularConverter >> initializeBehavior: anLMRHeapObject spec: anRGBehavior [
 	| behavior |
 	behavior := behaviors at: anRGBehavior.
 	anLMRHeapObject behavior: behavior
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> initializeEmulationOverrides [
+Ring2MetacircularConverter >> initializeEmulationOverrides [
 	| classes |
 	classes := source vmPrimitivesSpec allExtensionClasses.
 	classes
@@ -426,7 +426,7 @@ RingBasedLMRBootstrapper >> initializeEmulationOverrides [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> initializeRuntime [
+Ring2MetacircularConverter >> initializeRuntime [
 
 	| map symbols array method smi block metaclass kernel byteArray string closure behavior lpi lni float dnu |
 	symbols := Dictionary new.
@@ -471,7 +471,7 @@ RingBasedLMRBootstrapper >> initializeRuntime [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> initializeSymbolTable [
+Ring2MetacircularConverter >> initializeSymbolTable [
 	| symbol namespaces cvars table mapped |
 	symbol := source classNamed: #Symbol.
 	namespaces := symbol namespaces.
@@ -482,7 +482,7 @@ RingBasedLMRBootstrapper >> initializeSymbolTable [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> instantiateMetaobjects [
+Ring2MetacircularConverter >> instantiateMetaobjects [
 	| ibehavior mspecies mbehavior |
 	source classes , source metaclasses
 		do: [ :species | 
@@ -496,7 +496,7 @@ RingBasedLMRBootstrapper >> instantiateMetaobjects [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> loadModule: symbol [
+Ring2MetacircularConverter >> loadModule: symbol [
 
 	| spec classes moduleName moduleSpec module extensions name |
 	spec := self readModuleSpec: symbol.
@@ -524,12 +524,12 @@ RingBasedLMRBootstrapper >> loadModule: symbol [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> map: aRingObject to: anLMRObject [
+Ring2MetacircularConverter >> map: aRingObject to: anLMRObject [
 	mapping at: aRingObject put: anLMRObject
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> newBehaviorMapping: aRingObject [
+Ring2MetacircularConverter >> newBehaviorMapping: aRingObject [
 	| header mapped |
 	header := self headerFor: aRingObject.
 	mapped := EggBehaviorObject new header: header; runtime: dest.
@@ -538,7 +538,7 @@ RingBasedLMRBootstrapper >> newBehaviorMapping: aRingObject [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> newCallback: aNativeCode bytesFrom: aByteArray [
+Ring2MetacircularConverter >> newCallback: aNativeCode bytesFrom: aByteArray [
 	| code original behavior class |
 	code := source newBytesFrom: aByteArray.
 	original := code behavior.
@@ -554,7 +554,7 @@ RingBasedLMRBootstrapper >> newCallback: aNativeCode bytesFrom: aByteArray [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> newMapping: aRingObject [
+Ring2MetacircularConverter >> newMapping: aRingObject [
 	| header mapped |
 	aRingObject isImmediate
 		ifTrue: [ ^ EggSmallInteger new value: aRingObject value ].
@@ -569,12 +569,12 @@ RingBasedLMRBootstrapper >> newMapping: aRingObject [
 ]
 
 { #category : #paths }
-RingBasedLMRBootstrapper >> outputDirectory [
+Ring2MetacircularConverter >> outputDirectory [
 	^ self rootDirectory / 'build' 
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> override: classname with: rgMethod [
+Ring2MetacircularConverter >> override: classname with: rgMethod [
 	| spec species behavior smethod rmethod lmrmethod selector |
 	spec := source specs at: classname.
 	species := (source speciesFor: spec).
@@ -588,23 +588,23 @@ RingBasedLMRBootstrapper >> override: classname with: rgMethod [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> prepareClosuresForExecution [
+Ring2MetacircularConverter >> prepareClosuresForExecution [
 	| mapped |
 	closureMethods
 		do: [ :method | mapped := mapping at: method. dest interpreter prepareExecutableCode: mapped ]
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> readModuleSpec: aSymbol [
+Ring2MetacircularConverter >> readModuleSpec: aSymbol [
 	| path |
 	path := self findModulePath: aSymbol.
-	^PowertalkRingModule readSpec: aSymbol at: path parent
+	^EggRingModule readSpec: aSymbol at: path parent
 
 	
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> removeBootstrapDictionaryNewOverride [
+Ring2MetacircularConverter >> removeBootstrapDictionaryNewOverride [
 	| spec species behavior selector |
 	spec := source specs at: #'Namespace class'.
 	species := source speciesFor: spec.
@@ -614,17 +614,17 @@ RingBasedLMRBootstrapper >> removeBootstrapDictionaryNewOverride [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> result [
+Ring2MetacircularConverter >> result [
 	^dest
 ]
 
 { #category : #paths }
-RingBasedLMRBootstrapper >> rootDirectory [
+Ring2MetacircularConverter >> rootDirectory [
 	^ '../../modules' asFileReference
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> sendLoadModule: aSymbol [
+Ring2MetacircularConverter >> sendLoadModule: aSymbol [
 
 	| symbol |
 	symbol := dest addSymbol: aSymbol.
@@ -632,12 +632,12 @@ RingBasedLMRBootstrapper >> sendLoadModule: aSymbol [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> source: aPowertalkRingImage [
+Ring2MetacircularConverter >> source: aPowertalkRingImage [
 	source := aPowertalkRingImage
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> transferLiteral: anObject [
+Ring2MetacircularConverter >> transferLiteral: anObject [
 
 	| transferred |
 	anObject isInteger ifTrue: [ ^ dest newInteger: anObject ].
@@ -658,7 +658,7 @@ RingBasedLMRBootstrapper >> transferLiteral: anObject [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> useHostModuleLoader [
+Ring2MetacircularConverter >> useHostModuleLoader [
 dest
 		          sendLocal: #useHostModuleLoader
 		          to: dest kernel

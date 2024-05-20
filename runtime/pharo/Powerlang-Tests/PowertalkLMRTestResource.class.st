@@ -22,7 +22,7 @@ PowertalkLMRTestResource >> runtime [
 { #category : #running }
 PowertalkLMRTestResource >> setUp [
 	super setUp.
-	image := PowertalkRingImage fromSpec
+	image := EggRingImage fromSpec
 		wordSize: 8;
 		genesis;
 		bootstrap;

@@ -30,7 +30,7 @@ PowertalkRingRuntimeTest >> compile: aString in: classname during: aBlock [
 
 { #category : #running }
 PowertalkRingRuntimeTest >> setUp [
-	image := PowertalkRingImage fromSpec
+	image := EggRingImage fromSpec
 		wordSize: 8;
 		genesis.
 	runtime := image runtime

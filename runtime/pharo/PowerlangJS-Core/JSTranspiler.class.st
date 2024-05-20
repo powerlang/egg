@@ -23,7 +23,7 @@ JSTranspiler class >> generateKernelSegment [
 JSTranspiler class >> generateLMRBootstrapper [
 
 	| image |
-	image := PowertalkRingImage fromSpec
+	image := EggRingImage fromSpec
 		         wordSize: 8;
 		         genesis;
 		         bootstrap;

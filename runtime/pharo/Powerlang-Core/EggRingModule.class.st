@@ -7,7 +7,7 @@ the `VirtualRuntime`. That step is left to the `VirtualImage`
 that also creates the Kernel module.
 "
 Class {
-	#name : #PowertalkRingModule,
+	#name : #EggRingModule,
 	#superclass : #Object,
 	#instVars : [
 		'nilObj',
@@ -31,17 +31,17 @@ Class {
 }
 
 { #category : #accessing }
-PowertalkRingModule class >> fromSpec [
+EggRingModule class >> fromSpec [
 	^ self new specs: self kernelSpec; vmPrimitivesSpec: self vmPrimitivesSpec
 ]
 
 { #category : #accessing }
-PowertalkRingModule class >> kernelSpec [
+EggRingModule class >> kernelSpec [
 	^ KernelSpec ifNil: [ KernelSpec := self readSpec: #Kernel at: '.' ]
 ]
 
 { #category : #'instance creation' }
-PowertalkRingModule class >> new [
+EggRingModule class >> new [
 	"return an initialized instance"
 
 	^ self basicNew initialize.
@@ -49,7 +49,7 @@ PowertalkRingModule class >> new [
 ]
 
 { #category : #accessing }
-PowertalkRingModule class >> readSpec: specName at: path [
+EggRingModule class >> readSpec: specName at: path [
 	| dir  repo spec subdir |
 	dir := '../../modules' asFileReference.
 	subdir := path isString ifTrue: [ path ] ifFalse: [ path asPath pathString ].
@@ -62,7 +62,7 @@ PowertalkRingModule class >> readSpec: specName at: path [
 ]
 
 { #category : #accessing }
-PowertalkRingModule class >> resetSpecs [
+EggRingModule class >> resetSpecs [
 
 	"
 		self resetSpecs
@@ -73,55 +73,55 @@ PowertalkRingModule class >> resetSpecs [
 ]
 
 { #category : #accessing }
-PowertalkRingModule class >> vmPrimitivesSpec [
+EggRingModule class >> vmPrimitivesSpec [
 	^ VMPrimitivesSpec
 		ifNil: [ VMPrimitivesSpec := self readSpec: #VM at: 'Kernel' ]
 ]
 
 { #category : #initialization }
-PowertalkRingModule >> => aSymbol [
+EggRingModule >> => aSymbol [
 	^ specs at: aSymbol
 ]
 
 { #category : #services }
-PowertalkRingModule >> basicNewBytes: classname contents: aByteObject [
+EggRingModule >> basicNewBytes: classname contents: aByteObject [
 	^ self basicNewBytesOf: self => classname contents: aByteObject
 ]
 
 { #category : #services }
-PowertalkRingModule >> basicNewBytesOf: anRGBehavior  contents: aByteObject [
+EggRingModule >> basicNewBytesOf: anRGBehavior  contents: aByteObject [
 	^ ProtoeggByteObject new: anRGBehavior valued: aByteObject
 ]
 
 { #category : #accessing }
-PowertalkRingModule >> basicNewSlots: classname [
+EggRingModule >> basicNewSlots: classname [
 	^ self basicNewSlots: classname sized: 0
 ]
 
 { #category : #accessing }
-PowertalkRingModule >> basicNewSlots: classname in: spec [
+EggRingModule >> basicNewSlots: classname in: spec [
 	^ self basicNewSlots: classname in: spec sized: 0
 ]
 
 { #category : #accessing }
-PowertalkRingModule >> basicNewSlots: classname in: spec sized: size [
+EggRingModule >> basicNewSlots: classname in: spec sized: size [
 	| species |
 	species := spec at: classname.
 	^self basicNewSlotsOf: species sized: size
 ]
 
 { #category : #accessing }
-PowertalkRingModule >> basicNewSlots: classname sized: size [
+EggRingModule >> basicNewSlots: classname sized: size [
 	^ self basicNewSlots: classname in: specs sized: size
 ]
 
 { #category : #accessing }
-PowertalkRingModule >> basicNewSlotsOf: anRGBehavior sized: size [
+EggRingModule >> basicNewSlotsOf: anRGBehavior sized: size [
 	^ ProtoeggSlotObject new: anRGBehavior size: size withAll: nilObj
 ]
 
 { #category : #'own services' }
-PowertalkRingModule >> buildSpecies: spec [
+EggRingModule >> buildSpecies: spec [
 	| sspec sclass sbehavior metasuper  |
 	sspec := spec superclass.
 	sspec
@@ -137,22 +137,22 @@ PowertalkRingModule >> buildSpecies: spec [
 ]
 
 { #category : #accessing }
-PowertalkRingModule >> classFor: anRGBehavior [
+EggRingModule >> classFor: anRGBehavior [
 	^classes at: anRGBehavior
 ]
 
 { #category : #building }
-PowertalkRingModule >> classNamed: aString [
+EggRingModule >> classNamed: aString [
 	^self classFor: self => aString
 ]
 
 { #category : #accessing }
-PowertalkRingModule >> classes [
+EggRingModule >> classes [
 	^ classes
 ]
 
 { #category : #initialization }
-PowertalkRingModule >> createMethodDictionary: species sized: anInteger [
+EggRingModule >> createMethodDictionary: species sized: anInteger [
 	| behavior md size dictionary |
 	behavior := species instanceBehavior.
 	md := self classNamed: #MethodDictionary.
@@ -163,7 +163,7 @@ PowertalkRingModule >> createMethodDictionary: species sized: anInteger [
 ]
 
 { #category : #accessing }
-PowertalkRingModule >> createSpecies: definition [
+EggRingModule >> createSpecies: definition [
 	| class meta ibehavior cbehavior |
 	class := ProtoeggClass new: definition metaclass size: 0 withAll: nilObj.
 	class instanceSpec: definition.
@@ -185,12 +185,12 @@ PowertalkRingModule >> createSpecies: definition [
 ]
 
 { #category : #accessing }
-PowertalkRingModule >> false [
+EggRingModule >> false [
 	^ falseObj
 ]
 
 { #category : #initialization }
-PowertalkRingModule >> fillClasses [
+EggRingModule >> fillClasses [
 	| class meta |
 	specs allClasses
 		do: [ :def | 
@@ -203,7 +203,7 @@ PowertalkRingModule >> fillClasses [
 ]
 
 { #category : #initialization }
-PowertalkRingModule >> fillSpecies: species with: classDefinition [
+EggRingModule >> fillSpecies: species with: classDefinition [
 
 	| dictionary smethod transferred organization category |
 	dictionary := self
@@ -224,7 +224,7 @@ PowertalkRingModule >> fillSpecies: species with: classDefinition [
 ]
 
 { #category : #initialization }
-PowertalkRingModule >> fillSymbols [
+EggRingModule >> fillSymbols [
 	| table namespaces cvars |
 	namespaces := (self classNamed: #Symbol) namespaces.
 	cvars := namespaces at: 1.
@@ -234,7 +234,7 @@ PowertalkRingModule >> fillSymbols [
 ]
 
 { #category : #initialization }
-PowertalkRingModule >> formatOfClass: definition [
+EggRingModule >> formatOfClass: definition [
 	| variable pointers  |
 	variable := definition isVariable
 		ifTrue: [ 16r2000 ]
@@ -246,7 +246,7 @@ PowertalkRingModule >> formatOfClass: definition [
 ]
 
 { #category : #initialization }
-PowertalkRingModule >> formatOfMetaclass: definition [
+EggRingModule >> formatOfMetaclass: definition [
 	| variable pointers size |
 	variable := definition isVariable
 		ifTrue: [ 16r2000 ]
@@ -260,19 +260,19 @@ PowertalkRingModule >> formatOfMetaclass: definition [
 ]
 
 { #category : #building }
-PowertalkRingModule >> generateLMR [
-	^(RingBasedLMRBootstrapper new image: self) convert
+EggRingModule >> generateLMR [
+	^(Ring2MetacircularConverter new image: self) convert
 ]
 
 { #category : #accessing }
-PowertalkRingModule >> genesis [
+EggRingModule >> genesis [
 	specs allClasses do: [ :def | self createSpecies: def ].
 	specs allClasses do: [ :def | self buildSpecies: def ].
 
 ]
 
 { #category : #initialization }
-PowertalkRingModule >> initialize [
+EggRingModule >> initialize [
 	classes := OrderedDictionary new.
 	metaclasses := OrderedDictionary new.
 	identityMap := IdentityDictionary new.
@@ -280,7 +280,7 @@ PowertalkRingModule >> initialize [
 ]
 
 { #category : #initialization }
-PowertalkRingModule >> initializeBehavior: anObjectMap [
+EggRingModule >> initializeBehavior: anObjectMap [
 	| class |
 	class := classes at: anObjectMap spec.
 	anObjectMap behavior: class instanceBehavior.
@@ -288,7 +288,7 @@ PowertalkRingModule >> initializeBehavior: anObjectMap [
 ]
 
 { #category : #building }
-PowertalkRingModule >> initializeClass: definition superclass: superclass superbehavior: superbehavior [
+EggRingModule >> initializeClass: definition superclass: superclass superbehavior: superbehavior [
 	| class name flag ivars namespaces subclasses format |
 	class := classes at: definition.
 	class instanceBehavior next: superbehavior.
@@ -314,7 +314,7 @@ PowertalkRingModule >> initializeClass: definition superclass: superclass superb
 ]
 
 { #category : #building }
-PowertalkRingModule >> initializeMetaclass: definition superclass: superclass [
+EggRingModule >> initializeMetaclass: definition superclass: superclass [
 	| meta ivars flags format superbehavior |
 	meta := metaclasses at: definition.
 	superbehavior := superclass instanceBehavior.
@@ -330,7 +330,7 @@ PowertalkRingModule >> initializeMetaclass: definition superclass: superclass [
 ]
 
 { #category : #initialization }
-PowertalkRingModule >> kernel: aPowertalkRingKernelModule [
+EggRingModule >> kernel: aPowertalkRingKernelModule [
 	kernel := aPowertalkRingKernelModule.
 	nilObj := kernel nil.
 	trueObj := kernel true.
@@ -339,24 +339,24 @@ PowertalkRingModule >> kernel: aPowertalkRingKernelModule [
 ]
 
 { #category : #initialization }
-PowertalkRingModule >> log: aString [
+EggRingModule >> log: aString [
 	Transcript
 		show: aString;
 		cr
 ]
 
 { #category : #accessing }
-PowertalkRingModule >> metaclassFor: anRGBehavior [
+EggRingModule >> metaclassFor: anRGBehavior [
 	^ metaclasses at: anRGBehavior
 ]
 
 { #category : #initialization }
-PowertalkRingModule >> metaclasses [
+EggRingModule >> metaclasses [
 	^metaclasses
 ]
 
 { #category : #initialization }
-PowertalkRingModule >> newArray: anArray [
+EggRingModule >> newArray: anArray [
 	| array |
 	array := self newArraySized: anArray size.
 	anArray withIndexDo: [ :obj :i | array at: i put: obj ].
@@ -364,42 +364,42 @@ PowertalkRingModule >> newArray: anArray [
 ]
 
 { #category : #accessing }
-PowertalkRingModule >> newBytes: classname contents: aByteObject [
+EggRingModule >> newBytes: classname contents: aByteObject [
 	^self basicNewBytes: classname contents: aByteObject
 ]
 
 { #category : #initialization }
-PowertalkRingModule >> newBytesFrom: aByteObject [
+EggRingModule >> newBytesFrom: aByteObject [
 	^self newBytes: aByteObject class name contents: aByteObject
 ]
 
 { #category : #accessing }
-PowertalkRingModule >> newBytesOf: anRGBehavior contents: aByteObject [
+EggRingModule >> newBytesOf: anRGBehavior contents: aByteObject [
 ^ self basicNewBytesOf: anRGBehavior contents: aByteObject
 
 ]
 
 { #category : #initialization }
-PowertalkRingModule >> newBytesOf: anRGBehavior sized: anInteger [
+EggRingModule >> newBytesOf: anRGBehavior sized: anInteger [
 	| contents |
 	contents := ByteArray new: anInteger.
 	^ self newBytesOf: anRGBehavior contents: contents
 ]
 
 { #category : #accessing }
-PowertalkRingModule >> newOf: anRGBehavior sized: anInteger [
+EggRingModule >> newOf: anRGBehavior sized: anInteger [
 	^ anRGBehavior isBytes
 		ifTrue: [ self newBytesOf: anRGBehavior sized: anInteger ]
 		ifFalse: [ self newSlotsOf: anRGBehavior sized: anInteger ]
 ]
 
 { #category : #initialization }
-PowertalkRingModule >> newSlots: classname [
+EggRingModule >> newSlots: classname [
 	^self newSlots: classname sized: 0
 ]
 
 { #category : #accessing }
-PowertalkRingModule >> newSlots: classname sized: size [
+EggRingModule >> newSlots: classname sized: size [
 	"
 	Allocate an object of pointer type (as SlotObjectMap).
 	It is niled-out, and 	`size` is the size of indexed part (i.e.,
@@ -410,7 +410,7 @@ PowertalkRingModule >> newSlots: classname sized: size [
 ]
 
 { #category : #accessing }
-PowertalkRingModule >> newSlotsOf: anRGBehavior sized: size [
+EggRingModule >> newSlotsOf: anRGBehavior sized: size [
 	"
 	Allocate an object of pointer type (as SlotObjectMap).
 	It is niled-out, and 	`size` is the size of indexed part (i.e.,
@@ -422,33 +422,33 @@ PowertalkRingModule >> newSlotsOf: anRGBehavior sized: size [
 ]
 
 { #category : #accessing }
-PowertalkRingModule >> nil [
+EggRingModule >> nil [
 	^ nilObj
 ]
 
 { #category : #accessing }
-PowertalkRingModule >> runtime [
+EggRingModule >> runtime [
 	^ runtime
 ]
 
 { #category : #accessing }
-PowertalkRingModule >> speciesFor: anRGBehavior [
+EggRingModule >> speciesFor: anRGBehavior [
 	^ anRGBehavior isMeta ifTrue: [metaclasses at: anRGBehavior] ifFalse: [ classes at: anRGBehavior ]
 ]
 
 { #category : #accessing }
-PowertalkRingModule >> specs [
+EggRingModule >> specs [
 	^specs
 ]
 
 { #category : #accessing }
-PowertalkRingModule >> specs: anRGEnvironment [
+EggRingModule >> specs: anRGEnvironment [
 	specs := anRGEnvironment.
 
 ]
 
 { #category : #accessing }
-PowertalkRingModule >> transferLiteral: anObject [
+EggRingModule >> transferLiteral: anObject [
 	| class transferred slot |
 	class := anObject class.
 	(class inheritsFrom: ProtoeggObject)
@@ -470,7 +470,7 @@ PowertalkRingModule >> transferLiteral: anObject [
 ]
 
 { #category : #accessing }
-PowertalkRingModule >> transferLiteralDeep: anObject [
+EggRingModule >> transferLiteralDeep: anObject [
 	| class transferred slot size ivar |
 	class := anObject class.
 	anObject isInteger
@@ -512,16 +512,16 @@ PowertalkRingModule >> transferLiteralDeep: anObject [
 ]
 
 { #category : #accessing }
-PowertalkRingModule >> true [
+EggRingModule >> true [
 	^ trueObj
 ]
 
 { #category : #accessing }
-PowertalkRingModule >> vmPrimitivesSpec [
+EggRingModule >> vmPrimitivesSpec [
 	^vmPrimitivesSpec
 ]
 
 { #category : #accessing }
-PowertalkRingModule >> vmPrimitivesSpec: anRGEnvironment [
+EggRingModule >> vmPrimitivesSpec: anRGEnvironment [
 	vmPrimitivesSpec := anRGEnvironment
 ]

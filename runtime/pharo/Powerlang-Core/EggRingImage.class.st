@@ -1,6 +1,6 @@
 Class {
-	#name : #PowertalkRingImage,
-	#superclass : #PowertalkRingModule,
+	#name : #EggRingImage,
+	#superclass : #EggRingModule,
 	#instVars : [
 		'bootstrapDicts',
 		'arraySpec',
@@ -15,24 +15,24 @@ Class {
 }
 
 { #category : #'own services' }
-PowertalkRingImage >> bootstrap [
+EggRingImage >> bootstrap [
 	runtime
 		sendLocal: #bootstrap to: module;
 		removeBootstrapDictionaryOverrides
 ]
 
 { #category : #'own services' }
-PowertalkRingImage >> bootstrapDictionaries [
+EggRingImage >> bootstrapDictionaries [
 	^bootstrapDicts
 ]
 
 { #category : #'own services' }
-PowertalkRingImage >> builder [
-	^	RingBasedLMRBootstrapper new image: self.
+EggRingImage >> builder [
+	^	Ring2MetacircularConverter new image: self.
 ]
 
 { #category : #accessing }
-PowertalkRingImage >> createBootstrapNamespace [
+EggRingImage >> createBootstrapNamespace [
 	| namespace |
 	namespace := self newBootstrapDictionaryOf: self => #Namespace.
 	module namespace: namespace.
@@ -43,7 +43,7 @@ PowertalkRingImage >> createBootstrapNamespace [
 ]
 
 { #category : #accessing }
-PowertalkRingImage >> createClassNamespaces: spec [
+EggRingImage >> createClassNamespaces: spec [
 	| names cvars array |
 	names := spec classVariables.
 	names isEmpty
@@ -56,7 +56,7 @@ PowertalkRingImage >> createClassNamespaces: spec [
 ]
 
 { #category : #building }
-PowertalkRingImage >> genesis [
+EggRingImage >> genesis [
 	"
 	Create the world (should take less than 6 days). This is named 'genesis' to remind us those who had
 	done this (and much more) before us. Namely SELF people. I (JV) would like to use this opportunity and point you to
@@ -75,25 +75,25 @@ PowertalkRingImage >> genesis [
 ]
 
 { #category : #accessing }
-PowertalkRingImage >> initialize [
+EggRingImage >> initialize [
 	super initialize.
 	bootstrapDicts := OrderedCollection new.
 	kernel := self
 ]
 
 { #category : #building }
-PowertalkRingImage >> kernel [
+EggRingImage >> kernel [
 	^module
 ]
 
 { #category : #initialization }
-PowertalkRingImage >> newArraySized: anInteger [
+EggRingImage >> newArraySized: anInteger [
 ^self basicNewSlotsOf: arraySpec sized: anInteger.
 
 ]
 
 { #category : #initialization }
-PowertalkRingImage >> newAssociation: anAssociation [
+EggRingImage >> newAssociation: anAssociation [
 	| assoc key value |
 	assoc := self newSlots: 'Association'.
 	key := self transferLiteralDeep: anAssociation key.
@@ -104,7 +104,7 @@ PowertalkRingImage >> newAssociation: anAssociation [
 ]
 
 { #category : #accessing }
-PowertalkRingImage >> newBootstrapDictionaryOf: anRGBehavior [
+EggRingImage >> newBootstrapDictionaryOf: anRGBehavior [
 	"
 	Allocate a bootstrap dictionary object. Its contents is managed by the
 	mother image, but in the baby smalltalk can do	at: and at:put:, via primitives.
@@ -123,17 +123,17 @@ PowertalkRingImage >> newBootstrapDictionaryOf: anRGBehavior [
 ]
 
 { #category : #accessing }
-PowertalkRingImage >> newClosure: anInteger [
+EggRingImage >> newClosure: anInteger [
 	^ ProtoeggClosure new: closureSpec size: anInteger withAll: nilObj
 ]
 
 { #category : #accessing }
-PowertalkRingImage >> newFloatFrom: aFloat [
+EggRingImage >> newFloatFrom: aFloat [
 	^ self newBytes: 'Float' contents: aFloat pointerDouble
 ]
 
 { #category : #initialization }
-PowertalkRingImage >> newInteger: anInteger [
+EggRingImage >> newInteger: anInteger [
 	anInteger > maxSMI
 		ifTrue: [ ^ self newLargePositiveInteger: anInteger ].
 	anInteger < minSMI
@@ -142,7 +142,7 @@ PowertalkRingImage >> newInteger: anInteger [
 ]
 
 { #category : #initialization }
-PowertalkRingImage >> newLargeNegativeInteger: anInteger [
+EggRingImage >> newLargeNegativeInteger: anInteger [
 	| size bytes byte |
 	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
 	bytes := ByteArray new: size withAll: 16rFF.
@@ -155,7 +155,7 @@ PowertalkRingImage >> newLargeNegativeInteger: anInteger [
 ]
 
 { #category : #initialization }
-PowertalkRingImage >> newLargePositiveInteger: anInteger [
+EggRingImage >> newLargePositiveInteger: anInteger [
 	| size bytes |
 	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
 	bytes := anInteger asByteArrayOfSize: size.
@@ -163,14 +163,14 @@ PowertalkRingImage >> newLargePositiveInteger: anInteger [
 ]
 
 { #category : #initialization }
-PowertalkRingImage >> newString: aString [
+EggRingImage >> newString: aString [
 	| bytes |
 	bytes := aString copyWith: Character null.
 	^self newBytes: 'String' contents: bytes
 ]
 
 { #category : #initialization }
-PowertalkRingImage >> newStringArray: strings [
+EggRingImage >> newStringArray: strings [
 	| array bytes |
 	array := self newSlots: 'Array' sized: strings size.
 	strings
@@ -181,7 +181,7 @@ PowertalkRingImage >> newStringArray: strings [
 ]
 
 { #category : #accessing }
-PowertalkRingImage >> newSymbol: aSymbol [
+EggRingImage >> newSymbol: aSymbol [
 	| new |
 	identityMap at: aSymbol ifPresent: [ :s | ^ s ].
 	new := ProtoeggSymbol new: symbolSpec symbol: aSymbol.
@@ -190,7 +190,7 @@ PowertalkRingImage >> newSymbol: aSymbol [
 ]
 
 { #category : #accessing }
-PowertalkRingImage >> specs: anRGEnvironment [
+EggRingImage >> specs: anRGEnvironment [
 	super specs: anRGEnvironment.
 	closureSpec := self => #Closure.
 	arraySpec := self => #Array.
@@ -199,7 +199,7 @@ PowertalkRingImage >> specs: anRGEnvironment [
 ]
 
 { #category : #accessing }
-PowertalkRingImage >> transferBlock: anSCompiledBlock [
+EggRingImage >> transferBlock: anSCompiledBlock [
 	| transferred method format |
 	identityMap at: anSCompiledBlock
 		ifPresent: [ :b | ^ b ].
@@ -215,7 +215,7 @@ PowertalkRingImage >> transferBlock: anSCompiledBlock [
 ]
 
 { #category : #accessing }
-PowertalkRingImage >> transferCharacter: aCharacter [
+EggRingImage >> transferCharacter: aCharacter [
 	| class bytechars value transferred int |
 	identityMap at: aCharacter ifPresent: [ :c | ^ c ].
 	class := self classNamed: #Character.
@@ -230,7 +230,7 @@ PowertalkRingImage >> transferCharacter: aCharacter [
 ]
 
 { #category : #initialization }
-PowertalkRingImage >> transferMethod: anSCompiledMethod in: species [
+EggRingImage >> transferMethod: anSCompiledMethod in: species [
 
 	| size classname transferred astcodes selector format literal tliteral source |
 	(identityMap includesKey: anSCompiledMethod) ifTrue: [ 
@@ -259,12 +259,12 @@ PowertalkRingImage >> transferMethod: anSCompiledMethod in: species [
 ]
 
 { #category : #accessing }
-PowertalkRingImage >> wordSize [
+EggRingImage >> wordSize [
 	^ wordSize
 ]
 
 { #category : #accessing }
-PowertalkRingImage >> wordSize: anInteger [
+EggRingImage >> wordSize: anInteger [
 	wordSize := anInteger.
 	maxSMI := (1 bitShift: wordSize * 8 - 2) - 1.
 	minSMI := maxSMI negated - 1

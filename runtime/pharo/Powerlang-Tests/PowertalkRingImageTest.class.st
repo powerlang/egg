@@ -9,7 +9,7 @@ Class {
 
 { #category : #tests }
 PowertalkRingImageTest >> setUp [
-	image := PowertalkRingImage fromSpec
+	image := EggRingImage fromSpec
 		wordSize: 8;
 		genesis
 ]

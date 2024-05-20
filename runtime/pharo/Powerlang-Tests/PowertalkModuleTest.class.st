@@ -18,7 +18,7 @@ PowertalkModuleTest >> setUp [
 
 	| image |
 	super setUp.
-	image := PowertalkRingImage fromSpec
+	image := EggRingImage fromSpec
 		         wordSize: 8;
 		         genesis;
 		         bootstrap;
