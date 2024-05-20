@@ -256,14 +256,14 @@ Number.prototype.to_by_do_ = function(limit, increment, closure) {
 		for (let i = this; i >= limit; i=i+increment) { closure(i); }
 }
 
-import LMRByteObject from "./interpreter/LMRByteObject.js";
-import LMRSlotObject from "./interpreter/LMRSlotObject.js";
-import LMRHeapObject from "./interpreter/LMRHeapObject.js";
-import LMRSmallInteger from "./interpreter/LMRSmallInteger.js";
+import EggByteObject from "./interpreter/EggByteObject.js";
+import EggSlotObject from "./interpreter/EggSlotObject.js";
+import EggHeapObject from "./interpreter/EggHeapObject.js";
+import EggSmallInteger from "./interpreter/EggSmallInteger.js";
 
-LMRSlotObject.prototype.pointersSize = function() { return this.size(); }
-LMRSlotObject.prototype.size = function() { return this._slots.length; }
-LMRByteObject.prototype.size = function() { return this._bytes.length; }
+EggSlotObject.prototype.pointersSize = function() { return this.size(); }
+EggSlotObject.prototype.size = function() { return this._slots.length; }
+EggByteObject.prototype.size = function() { return this._bytes.length; }
 
 
 // ~~~~~~~~~~~~~~~~~~~~ Stretch ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -437,9 +437,9 @@ Object.prototype.ASSERT_ = function (bool) { if (!bool) debugger; }
 Object.prototype.halt = function () { debugger; }
 Object.prototype.error_ = function(string) { debugger; throw string; }
 
-LMRSmallInteger.prototype.toString = function () { return "<" + this._value + ">"; }
-LMRHeapObject.prototype.toString = function () { return "a " + this.classname(); }
-LMRSlotObject.prototype.toString = function () { 
+EggSmallInteger.prototype.toString = function () { return "<" + this._value + ">"; }
+EggHeapObject.prototype.toString = function () { return "a " + this.classname(); }
+EggSlotObject.prototype.toString = function () { 
 	if (this === nil)
 		return "nil";
 
@@ -472,7 +472,7 @@ LMRSlotObject.prototype.toString = function () {
 	return "a " + this.classname();;
 }
 
-LMRByteObject.prototype.toString = function () { 
+EggByteObject.prototype.toString = function () { 
 
 	const classname = this.classname();
 
@@ -485,15 +485,15 @@ LMRByteObject.prototype.toString = function () {
 	return "a " + this.classname();;
 }
 
-LMRHeapObject.prototype.species = function () { return this._header._behavior._slots[0]; }
-LMRHeapObject.prototype.speciesIsClass = function () { return this._slots[5].constructor == LMRByteObject; }
-LMRHeapObject.prototype.speciesInstanceClass = function () { 
+EggHeapObject.prototype.species = function () { return this._header._behavior._slots[0]; }
+EggHeapObject.prototype.speciesIsClass = function () { return this._slots[5].constructor == EggByteObject; }
+EggHeapObject.prototype.speciesInstanceClass = function () { 
 	return this.speciesIsClass() ? this : this._slots[5];
 }
-LMRHeapObject.prototype.className = function () { return this._slots[5]; }
+EggHeapObject.prototype.className = function () { return this._slots[5]; }
 
-LMRHeapObject.prototype.classname = function () { return this.species().speciesClassname() }
-LMRHeapObject.prototype.speciesClassname = function () { 
+EggHeapObject.prototype.classname = function () { return this.species().speciesClassname() }
+EggHeapObject.prototype.speciesClassname = function () { 
 	if (this.speciesIsClass())
 		return this.className().asLocalString();
 	else 

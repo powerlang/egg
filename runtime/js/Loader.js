@@ -1,6 +1,6 @@
 'use strict';
 
-import './lmr.js';
+import './st-glue.js';
 import EggMetacircularRuntime from "./interpreter/EggMetacircularRuntime.js";
 
 import ImageSegmentReader from "./ImageSegmentReader.js"

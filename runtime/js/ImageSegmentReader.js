@@ -1,8 +1,8 @@
 
-import LMRObjectHeader from './interpreter/LMRObjectHeader.js';
-import LMRSlotObject from './interpreter/LMRSlotObject.js';
-import LMRByteObject from './interpreter/LMRByteObject.js';
-import LMRSmallInteger from './interpreter/LMRSmallInteger.js';
+import EggObjectHeader from './interpreter/EggObjectHeader.js';
+import EggSlotObject from './interpreter/EggSlotObject.js';
+import EggByteObject from './interpreter/EggByteObject.js';
+import EggSmallInteger from './interpreter/EggSmallInteger.js';
 
 import { readFileSync } from 'fs';
 
@@ -69,9 +69,9 @@ const ImageSegmentReader = class {
 
 	newSlotObject(object)
 	{
-		let result = new LMRSlotObject();
+		let result = new EggSlotObject();
 		result._slots = this.objectSlots(object);
-		result._header = new LMRObjectHeader();
+		result._header = new EggObjectHeader();
 		result._header._behavior = this.objectBehavior(object);
 		result._header._hash = this.objectHash(object);
 		return result;
@@ -79,9 +79,9 @@ const ImageSegmentReader = class {
 
 	newByteObject(object)
 	{
-		let result = new LMRByteObject();
+		let result = new EggByteObject();
 		result._bytes = this.objectBytes(object);
-		result._header = new LMRObjectHeader();
+		result._header = new EggObjectHeader();
 		result._header._behavior = this.objectBehavior(object);
 		result._header._hash = this.objectHash(object);
 		return result;
@@ -89,7 +89,7 @@ const ImageSegmentReader = class {
 
 	newSmallInteger(object)
 	{
-		let result = new LMRSmallInteger();
+		let result = new EggSmallInteger();
 		result._value = object[1];
 		return result;
 	}
