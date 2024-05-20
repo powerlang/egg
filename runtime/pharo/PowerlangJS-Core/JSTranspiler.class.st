@@ -120,7 +120,7 @@ JSTranspiler class >> powerlangInterpreterClasses [
 		,
 			{JSNativeCode.
 			JSSExpressionTranspiler.
-			PowertalkNativeJSEvaluator.
+			EggNativeJSEvaluator.
 			LinkedEvaluationContext.
 			NativeJSEvaluationContext}
 ]

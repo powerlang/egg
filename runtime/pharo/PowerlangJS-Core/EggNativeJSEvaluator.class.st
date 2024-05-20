@@ -1,11 +1,11 @@
 Class {
-	#name : #PowertalkNativeJSEvaluator,
+	#name : #EggNativeJSEvaluator,
 	#superclass : #EggEvaluator,
 	#category : #'PowerlangJS-Core'
 }
 
 { #category : #private }
-PowertalkNativeJSEvaluator >> initializeExecutableCodeOf: method [
+EggNativeJSEvaluator >> initializeExecutableCodeOf: method [
 
 	| sexpressions js executable |
 	sexpressions := runtime sexpressionsOf: method.
@@ -18,7 +18,7 @@ PowertalkNativeJSEvaluator >> initializeExecutableCodeOf: method [
 ]
 
 { #category : #private }
-PowertalkNativeJSEvaluator >> lookup: anSMessage startingAt: aBehavior [
+EggNativeJSEvaluator >> lookup: anSMessage startingAt: aBehavior [
 	| method symbol |
 	method := anSMessage methodFor: aBehavior.
 	method ifNotNil: [ ^method ].
@@ -38,7 +38,7 @@ PowertalkNativeJSEvaluator >> lookup: anSMessage startingAt: aBehavior [
 ]
 
 { #category : #private }
-PowertalkNativeJSEvaluator >> send: anSMessage super: aBoolean to: receiver with: arguments [
+EggNativeJSEvaluator >> send: anSMessage super: aBoolean to: receiver with: arguments [
 	| behavior method code prev result |
 	anSMessage cachedUndermessage
 		ifNotNil: [ :block | ^ block value: receiver value: arguments ].
@@ -63,7 +63,7 @@ PowertalkNativeJSEvaluator >> send: anSMessage super: aBoolean to: receiver with
 ]
 
 { #category : #private }
-PowertalkNativeJSEvaluator >> sendLocal: aSymbol to: receiver with: anArray [
+EggNativeJSEvaluator >> sendLocal: aSymbol to: receiver with: anArray [
 	| symbol res message |
 	symbol := runtime symbolFromLocal: aSymbol.
 	message := SMessage new selector: symbol.
