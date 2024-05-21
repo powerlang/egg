@@ -17,10 +17,10 @@ $(POWERLANG_DIR)/powerlangjs.image:
 
 kernel: $(IMAGE_SEGMENTS_DIR)/Kernel.json
 
-interpreter/PowertalkEvaluator.js: $(POWERLANG_DIR)/powerlangjs.image
-	cd $(POWERLANG_DIR) && ./pharo powerlangjs.image eval "JSTranspiler transpilePowerlangInterpreter"
+interpreter/EggEvaluator.js: $(POWERLANG_DIR)/powerlangjs.image
+	cd $(POWERLANG_DIR) && ./pharo powerlangjs.image eval "JSTranspiler transpileEggInterpreter"
 
-interpreter: interpreter/PowertalkEvaluator.js
+interpreter: interpreter/EggEvaluator.js
 
 $(IMAGE_SEGMENTS_DIR)/Kernel.json: $(POWERLANG_DIR)/powerlangjs.image
 	export IMAGE_SEGMENTS_DIR

@@ -1,4 +1,4 @@
-# powerlang.js - A Smalltalk VM that runs on top of JavaScript
+# Egg.js - A Smalltalk VM that runs on top of JavaScript
 
 In a nutshell, here you get a bunch of js files that allow how to load an image file in a JSON format and execute Smalltalk code by evaluating Egg code.
 
@@ -23,7 +23,7 @@ of bootstrapping does the following (it's all done automatically through `make`)
 
 1 - generates an bootstrap pharo image with the needed pharo code
 2 - loads the Powerlang-* packages using Iceberg
-3 - executes `JSTranspiler transpilePowerlangInterpreter` to generate the js files of the interpreter. Those files get
+3 - executes `JSTranspiler transpileEggInterpreter` to generate the js files of the interpreter. Those files get
     writen `egg/runtimes/js/interpreter`.
 4 - executes `JSTranspiler generateKernelModule` et al
 
@@ -36,7 +36,7 @@ of bootstrapping does the following (it's all done automatically through `make`)
 
     ## Opening a Smalltalk REPL
     $ node repl.js
-    Welcome to powerlang.js!
+    Welcome to egg.js!
     [1] > 3 + 4
     7
     [2] > q
@@ -46,9 +46,9 @@ of bootstrapping does the following (it's all done automatically through `make`)
     ## Using Smalltalk as a library from nodejs
 
     # bench.js
-    import powerlang from 'powerlang.js';
+    import egg from 'egg.js';
     import { performance } from "perf_hooks";
-    let runtime = powerlang.launch();
+    let runtime = egg.launch();
     var startTime = performance.now();
     const result =  runtime.sendLocalTo_("bytecodeIntensiveBenchmark", number);
     var endTime = performance.now();
@@ -64,26 +64,26 @@ of bootstrapping does the following (it's all done automatically through `make`)
     <!DOCTYPE html>
     <html>
       <head>
-        <script src="https://cdn.jsdelivr.net/npm/powerlang/dist/powerlang.js">
+        <script src="https://cdn.jsdelivr.net/npm/powerlang/dist/egg.js">
         <script>
-          const runtime = powerlang.launch();
-          const result = powerlang.evalExpression("(3 + 4) printString");
+          const runtime = egg.launch();
+          const result = egg.evalExpression("(3 + 4) printString");
           document.body.appendChild(result.toLocalString());
         </script>
-        <title>powerlang.js in action</title>
+        <title>egg.js in action</title>
       </head>
       <body>
       </body>
     </html>
 
-# System overview - A.K.A. how powerlang.js works
+# System overview - A.K.A. how egg.js works
 
 To run Smalltalk code you need a Smalltalk image and a Smalltalk evaluator (usually an interpreter).
 To run it on top of JavaScript the interpreter needs to be made of JavaScript code.
 
-Instead of writing the evaluator directly in JavaScript, in powerlang.js we take Powerlang evaluator, written in Smalltalk, and transpile its sources to JavaScript.
+Instead of writing the evaluator directly in JavaScript, in egg.js we take Egg evaluator, written in Smalltalk, and transpile its sources to JavaScript.
 
-For the Smalltalk image, we use Powerlang to bootstrap a virtual Smalltalk kernel image from sources, and then make that kernel write an image file tailored for the web, in JSON format.
+For the Smalltalk image, we use Egg/Pharo to bootstrap a virtual Smalltalk kernel image from sources, and then make that kernel write an image file tailored for the web, in JSON format.
 
 Both the json image and js interpreter are generated using the `Makefile`. The image will be created in `image-segments` folder and the interpreter is written in `interpreter` folder.
 
