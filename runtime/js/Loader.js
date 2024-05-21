@@ -9,7 +9,7 @@ import path from 'path';
 import fs from 'fs';
 
 
-let Bootstrapper = class {
+let Loader = class {
 	constructor()
 	{
 		this.modules = new Map;
@@ -177,5 +177,5 @@ let Bootstrapper = class {
 	}
 }
 
-export default Bootstrapper
+export default Loader
 
