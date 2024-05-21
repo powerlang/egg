@@ -283,9 +283,9 @@ EggMetacircularRuntime >> doesNotUnderstandMethod: anEggObject [
 ]
 
 { #category : #initialization }
-EggMetacircularRuntime >> executableCodeWork: anLMRExecutableCode [
-	self ASSERT: anLMRExecutableCode !== nilObj.
-	^anLMRExecutableCode code
+EggMetacircularRuntime >> executableCodeWork: anEggExecutableCode [
+	self ASSERT: anEggExecutableCode !== nilObj.
+	^anEggExecutableCode code
 ]
 
 { #category : #initialization }

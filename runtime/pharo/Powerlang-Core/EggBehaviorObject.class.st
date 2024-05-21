@@ -22,8 +22,8 @@ EggBehaviorObject >> localClassName [
 ]
 
 { #category : #accessing }
-EggBehaviorObject >> printInstance: anLMRObject on: aStream [
-	runtime print: anLMRObject on: aStream
+EggBehaviorObject >> printInstance: anEggObject on: aStream [
+	runtime print: anEggObject on: aStream
 ]
 
 { #category : #accessing }
@@ -32,6 +32,6 @@ EggBehaviorObject >> printOn: aStream [
 ]
 
 { #category : #accessing }
-EggBehaviorObject >> runtime: aPowertalkLMR [
-	runtime := aPowertalkLMR
+EggBehaviorObject >> runtime: anEggRuntime [
+	runtime := anEggRuntime
 ]

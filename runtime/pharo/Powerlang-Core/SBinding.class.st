@@ -10,13 +10,13 @@ SBinding class >> decodeUsing: anAstcodeDecoder [
 ]
 
 { #category : #testing }
-SBinding >> assign: value within: aPowertalkRuntime [
+SBinding >> assign: value within: anEggRuntime [
 	^ self subclassResponsibility
 ]
 
 { #category : #testing }
-SBinding >> assign: value within: aPowertalkRuntime ifUnbound: aClosure [
-	^self assign: value within: aPowertalkRuntime
+SBinding >> assign: value within: anEvaluationContext ifUnbound: aClosure [
+	^self assign: value within: anEvaluationContext
 
 ]
 

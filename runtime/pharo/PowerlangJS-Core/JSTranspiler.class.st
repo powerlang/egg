@@ -7,6 +7,34 @@ Class {
 	#category : #'PowerlangJS-Core'
 }
 
+{ #category : #private }
+JSTranspiler class >> eggInterpreterClasses [
+	^ EggObject withAllSubclasses
+		,
+			{EggObjectHeader.
+			EvaluationContext.
+			StackedEvaluationContext.
+			EggRuntime.
+			EggMetacircularRuntime.
+			SExpressionLinearizer.
+			AstNodeTypes.
+			AstBindingTypes.
+			AstcodeDecoder.
+			SCompiledBlockFlags.
+			SCompiledMethodFlags.
+			ClosureElementTypes.
+			EggEvaluator.
+			EggIterativeInterpreter.
+			EggIterativeStackedInterpreter} , SBinding withAllSubclasses
+		, SExpression withAllSubclasses
+		,
+			{JSNativeCode.
+			JSSExpressionTranspiler.
+			EggNativeJSEvaluator.
+			LinkedEvaluationContext.
+			NativeJSEvaluationContext}
+]
+
 { #category : #services }
 JSTranspiler class >> generateCompilerSegment [
 
@@ -20,7 +48,7 @@ JSTranspiler class >> generateKernelSegment [
 ]
 
 { #category : #services }
-JSTranspiler class >> generateLMRBootstrapper [
+JSTranspiler class >> generateMetacircularImage [
 
 	| image |
 	image := EggRingImage fromSpec
@@ -29,7 +57,7 @@ JSTranspiler class >> generateLMRBootstrapper [
 		         bootstrap;
 		         fillClasses;
 		         fillSymbols.
-	^ image generateLMR
+	^ image generateMetacircularImage
 ]
 
 { #category : #services }
@@ -45,7 +73,7 @@ JSTranspiler class >> generateModuleSystemSegments [
 JSTranspiler class >> generateRuntimeForModules [
 
 	| bootstrapper runtime builder |
-	bootstrapper := self generateLMRBootstrapper.
+	bootstrapper := self generateMetacircularImage.
 	runtime := bootstrapper result.
 	bootstrapper useHostModuleLoader.
 	builder := bootstrapper sendLoadModule: #ImageSegmentBuilder.
@@ -98,34 +126,6 @@ JSTranspiler class >> interpreterDirectory [
 ]
 
 { #category : #private }
-JSTranspiler class >> powerlangInterpreterClasses [
-	^ EggObject withAllSubclasses
-		,
-			{EggObjectHeader.
-			EvaluationContext.
-			StackedEvaluationContext.
-			EggRuntime.
-			EggMetacircularRuntime.
-			SExpressionLinearizer.
-			AstNodeTypes.
-			AstBindingTypes.
-			AstcodeDecoder.
-			SCompiledBlockFlags.
-			SCompiledMethodFlags.
-			ClosureElementTypes.
-			EggEvaluator.
-			EggIterativeInterpreter.
-			EggIterativeStackedInterpreter} , SBinding withAllSubclasses
-		, SExpression withAllSubclasses
-		,
-			{JSNativeCode.
-			JSSExpressionTranspiler.
-			EggNativeJSEvaluator.
-			LinkedEvaluationContext.
-			NativeJSEvaluationContext}
-]
-
-{ #category : #private }
 JSTranspiler class >> rootDirectory [
 	| root |
 	root := Smalltalk os environment at: 'POWERLANG_JS_ROOT' ifAbsent: '../../runtime/js'.
@@ -133,10 +133,10 @@ JSTranspiler class >> rootDirectory [
 ]
 
 { #category : #services }
-JSTranspiler class >> transpilePowerlangInterpreter [
+JSTranspiler class >> transpileEggInterpreter [
 	| transpiler |
 	transpiler := self new.
-	self powerlangInterpreterClasses do: [ :c | transpiler transpileClass: c ]
+	self eggInterpreterClasses do: [ :c | transpiler transpileClass: c ]
 ]
 
 { #category : #transpiling }

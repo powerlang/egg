@@ -2,7 +2,7 @@ Class {
 	#name : #EvaluationContext,
 	#superclass : #Object,
 	#instVars : [
-		'system'
+		'runtime'
 	],
 	#pools : [
 		'ClosureElementTypes'
@@ -33,7 +33,7 @@ EvaluationContext >> backtrace [
 { #category : #visiting }
 EvaluationContext >> captureClosure: anSBlock [
 	| closure s i type env arg |
-	closure := system newClosureFor: anSBlock compiledCode.
+	closure := runtime newClosureFor: anSBlock compiledCode.
 	s := anSBlock capturedVariables readStream.
 	i := 1.
 	[ s atEnd ]
@@ -54,7 +54,7 @@ EvaluationContext >> captureClosure: anSBlock [
 
 { #category : #services }
 EvaluationContext >> classBinding [
-	^system methodClassBinding: self method
+	^runtime methodClassBinding: self method
 ]
 
 { #category : #visiting }
@@ -64,7 +64,7 @@ EvaluationContext >> environment [
 
 { #category : #visiting }
 EvaluationContext >> false [
-	^ system false
+	^ runtime false
 ]
 
 { #category : #visiting }
@@ -79,17 +79,17 @@ EvaluationContext >> fourthArgument [
 
 { #category : #visiting }
 EvaluationContext >> instanceVarAt: index [
-	^ system instanceVarOf: self self at: index
+	^ runtime instanceVarOf: self self at: index
 ]
 
 { #category : #visiting }
 EvaluationContext >> instanceVarAt: index put: value [
-	^ system instanceVarOf: self self at: index put: value
+	^ runtime instanceVarOf: self self at: index put: value
 ]
 
 { #category : #services }
 EvaluationContext >> loadAssociationValue: anObject [
-	^system loadAssociationValue: anObject
+	^runtime loadAssociationValue: anObject
 ]
 
 { #category : #visiting }
@@ -109,7 +109,7 @@ EvaluationContext >> methodArguments [
 
 { #category : #visiting }
 EvaluationContext >> nil [
-	^ system nil
+	^ runtime nil
 ]
 
 { #category : #printing }
@@ -125,6 +125,11 @@ EvaluationContext >> printOn: aStream [
 { #category : #visiting }
 EvaluationContext >> receiver [
 	^self subclassResponsibility
+]
+
+{ #category : #visiting }
+EvaluationContext >> runtime: anEggRuntime [
+	runtime := anEggRuntime
 ]
 
 { #category : #visiting }
@@ -150,7 +155,7 @@ EvaluationContext >> stackTemporaryAt: index put: value [
 { #category : #visiting }
 EvaluationContext >> staticBindingFor: aSymbol [
 	| symbol |
-	symbol := system symbolFrom: aSymbol.
+	symbol := runtime symbolFrom: aSymbol.
 	(self staticBindingForIvar: symbol) ifNotNil: [ :b | ^ b ].
 	(self staticBindingForCvar: symbol) ifNotNil: [ :b | ^ b ].
 	^ self staticBindingForMvar: symbol
@@ -160,8 +165,8 @@ EvaluationContext >> staticBindingFor: aSymbol [
 EvaluationContext >> staticBindingFor: symbol inModule: module [
 
 	| namespace assoc |
-	namespace := system moduleNamespace: module.
-	assoc := system lookupAssociationFor: symbol in: namespace.
+	namespace := runtime moduleNamespace: module.
+	assoc := runtime lookupAssociationFor: symbol in: namespace.
 	assoc ifNil: [ ^nil ].
 	^ SAssociationBinding new association: assoc
 ]
@@ -169,14 +174,14 @@ EvaluationContext >> staticBindingFor: symbol inModule: module [
 { #category : #accessing }
 EvaluationContext >> staticBindingForCvar: aSymbol [
 	| species namespaces namespace nilObj |
-	species := system methodClassBinding: self method.
-	nilObj := system nil.
-	[ namespaces := system speciesNamespaces: species.
+	species := runtime methodClassBinding: self method.
+	nilObj := runtime nil.
+	[ namespaces := runtime speciesNamespaces: species.
 	1 to: namespaces size do: [ :i | 
 		namespace := namespaces at: i. 
-		(system lookupAssociationFor: aSymbol in: namespace)
+		(runtime lookupAssociationFor: aSymbol in: namespace)
 			ifNotNil: [ :assoc | ^ SAssociationBinding new association: assoc ] ].
-	species := system speciesSuperclass: species.
+	species := runtime speciesSuperclass: species.
 	species = nilObj ] whileFalse.
 	^ nil
 ]
@@ -184,7 +189,7 @@ EvaluationContext >> staticBindingForCvar: aSymbol [
 { #category : #accessing }
 EvaluationContext >> staticBindingForIvar: aSymbol [
 	| ivar |
-	ivar := system staticBindingForIvar: aSymbol in: self self.
+	ivar := runtime staticBindingForIvar: aSymbol in: self self.
 	^ ivar > 0
 		ifTrue: [ SInstVarBinding new index: ivar ]
 ]
@@ -192,7 +197,7 @@ EvaluationContext >> staticBindingForIvar: aSymbol [
 { #category : #accessing }
 EvaluationContext >> staticBindingForMvar: symbol [
 	| module |
-	module := system methodModule: self method.
+	module := runtime methodModule: self method.
 	^ self staticBindingFor: symbol inModule: module
 ]
 
@@ -208,12 +213,7 @@ EvaluationContext >> staticBindingForNested: name [
 
 { #category : #services }
 EvaluationContext >> storeAssociation: association value: anObject [ 
-	system storeAssociation: association value: anObject 
-]
-
-{ #category : #visiting }
-EvaluationContext >> system: aPowertalkRuntime [
-	system := aPowertalkRuntime
+	runtime storeAssociation: association value: anObject 
 ]
 
 { #category : #visiting }
@@ -233,5 +233,5 @@ EvaluationContext >> thirdArgument [
 
 { #category : #visiting }
 EvaluationContext >> true [
-	^ system true
+	^ runtime true
 ]

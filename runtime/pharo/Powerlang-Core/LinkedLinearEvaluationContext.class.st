@@ -10,7 +10,7 @@ Class {
 { #category : #visiting }
 LinkedLinearEvaluationContext >> initialize [
 	super initialize.
-pc := 1
+	pc := 1
 ]
 
 { #category : #accessing }
