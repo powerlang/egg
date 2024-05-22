@@ -48,6 +48,15 @@ JSTranspiler class >> generateKernelSegment [
 ]
 
 { #category : #services }
+JSTranspiler class >> generateMainSegments [
+
+	self generateSegmentsFromModulesNamed:
+	#( 'ImageSegmentBuilder' 'ImageSegmentBuilder.JSON'
+	   'STON' 'Tonel' 'CodeSpecs' )
+		
+]
+
+{ #category : #services }
 JSTranspiler class >> generateMetacircularImage [
 
 	| image |
@@ -58,15 +67,6 @@ JSTranspiler class >> generateMetacircularImage [
 		         fillClasses;
 		         fillSymbols.
 	^ image generateMetacircularImage
-]
-
-{ #category : #services }
-JSTranspiler class >> generateModuleSystemSegments [
-	| runtime |
-	runtime := self generateRuntimeForModules.
-	#( 'ImageSegmentBuilder' 'ImageSegmentBuilder.JSON'
-	   'STON' 'Tonel' ) do: [ :n | 
-		self generateSegmentFromModuleNamed: n in: runtime]
 ]
 
 { #category : #services }
@@ -104,6 +104,16 @@ JSTranspiler class >> generateSegmentFromModuleNamed: aString in: runtime [
 		stream truncate.
 		ws := ZnNewLineWriterStream on: stream.
 		ws nextPutAll: json asLocalString ]
+]
+
+{ #category : #services }
+JSTranspiler class >> generateSegmentsFromModulesNamed: aCollection [
+
+| runtime |
+runtime := self generateRuntimeForModules.
+	aCollection do: [ :n | 
+
+	self generateSegmentFromModuleNamed: n in: self generateRuntimeForModules]
 ]
 
 { #category : #private }
