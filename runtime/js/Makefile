@@ -10,25 +10,25 @@ all: interpreter kernel compiler
 
 clean:
 
-$(POWERLANG_DIR)/powerlangjs.image:
-	make -C $(POWERLANG_DIR) bootstrap.image
-	cd $(POWERLANG_DIR) && ./pharo bootstrap.image save powerlangjs
-	cd $(POWERLANG_DIR) && ./pharo powerlangjs.image metacello install tonel://. BaselineOfPowerlang --groups=powerlangjs
+$(POWERLANG_DIR)/eggjs.image:
+	make -C $(POWERLANG_DIR) egg.image
+	cd $(POWERLANG_DIR) && ./pharo egg.image save eggjs
+	cd $(POWERLANG_DIR) && ./pharo eggjs.image metacello install tonel://. BaselineOfPowerlang --groups=powerlangjs
 
 kernel: $(IMAGE_SEGMENTS_DIR)/Kernel.json
 
-interpreter/EggEvaluator.js: $(POWERLANG_DIR)/powerlangjs.image
-	cd $(POWERLANG_DIR) && ./pharo powerlangjs.image eval "JSTranspiler transpileEggInterpreter"
+interpreter/EggEvaluator.js: $(POWERLANG_DIR)/eggjs.image
+	cd $(POWERLANG_DIR) && ./pharo eggjs.image eval "JSTranspiler transpileEggInterpreter"
 
 interpreter: interpreter/EggEvaluator.js
 
-$(IMAGE_SEGMENTS_DIR)/Kernel.json: $(POWERLANG_DIR)/powerlangjs.image
+$(IMAGE_SEGMENTS_DIR)/Kernel.json: $(POWERLANG_DIR)/eggjs.image
 	export IMAGE_SEGMENTS_DIR
-	cd $(POWERLANG_DIR) && ./pharo powerlangjs.image eval "JSTranspiler generateKernelSegment"
+	cd $(POWERLANG_DIR) && ./pharo eggjs.image eval "JSTranspiler generateKernelSegment"
 
 compiler: $(IMAGE_SEGMENTS_DIR)/Compiler.json
 
-$(IMAGE_SEGMENTS_DIR)/Compiler.json: $(POWERLANG_DIR)/powerlangjs.image
+$(IMAGE_SEGMENTS_DIR)/Compiler.json: $(POWERLANG_DIR)/eggjs.image
 	export IMAGE_SEGMENTS_DIR
-	cd $(POWERLANG_DIR) && ./pharo powerlangjs.image eval "JSTranspiler generateCompilerSegment"
+	cd $(POWERLANG_DIR) && ./pharo eggjs.image eval "JSTranspiler generateCompilerSegment"
 

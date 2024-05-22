@@ -16,44 +16,44 @@ else
 ICEBERG_URL=file://$(GIT_PATH)
 endif
 
-all: pharo-ui bootstrap.image
+all: pharo-ui egg.image
 
 pharo pharo-ui Pharo.image:
 	curl https://get.pharo.org/64/90+vm | bash || curl https://get.pharo.org/64/90+vm | bash
 
-bootstrap.image: pharo Pharo.image
-	./pharo Pharo.image save bootstrap
+egg.image: pharo Pharo.image
+	./pharo Pharo.image save egg
 	./pharo $@ eval --save "(IceRepositoryCreator new url: '$(ICEBERG_URL)'; createRepository) register"
 	./pharo $@ metacello install tonel://. BaselineOfPowerlang --groups=$(GROUP)
 	./pharo $@ eval --save "SystemWindow closeTopWindow. GTPlayground openContents: 'first-steps.st' asFileReference contents withSqueakLineEndings"
 	@echo ""
 	@echo "To open Pharo bootstrap image run:"
 	@echo ""
-	@echo "    ./pharo-ui bootstrap.image"
+	@echo "    ./pharo-ui egg.image"
 	@echo ""
-	git remote -v | grep -w pharo-bootstrap || git remote add pharo-bootstrap bootstrap/pharo/pharo-local/iceberg/local/egg/
+	git remote -v | grep -w pharo-egg || git remote add pharo-egg egg/pharo/pharo-local/iceberg/local/egg/
 
-test: bootstrap.image pharo
+test: egg.image pharo
 	./pharo $< test --junit-xml-output Powerlang-Tests
 	mkdir -p test-reports
 	mv Powerlang-Tests-Test.xml test-reports
 
-test-ci: bootstrap.image pharo
+test-ci: egg.image pharo
 	./pharo $< test --junit-xml-output Powerlang-Tests
 	mkdir -p test-reports
 	mv Powerlang-Tests-Test.xml test-reports
 
 clean:
-	rm -f bootstrap.image bootstrap.changes powerlangjs.image powerlangjs.changes
+	rm -f egg.image egg.changes eggjs.image eggjs.changes
 
 mrproper: clean
 	rm -rf Pharo* pharo* icon-packs
 
-powerlangjs-kernel: bootstrap.image pharo |
+eggjs-kernel: egg.image pharo |
 	test -n "$(KERNEL_FILE)" || (echo "you must define KERNEL_FILE variable to set the output filename" && exit 1)
-	./pharo bootstrap.image eval \
+	./pharo egg.image eval \
 		"| bootstrapper module runtime filename | \
-		bootstrapper := PowertalkRingImage fromSpec wordSize: 8; genesis; bootstrap; fillClasses; fillSymbols; generateLMR. \
+		bootstrapper := EggRingImage fromSpec wordSize: 8; genesis; bootstrap; fillClasses; fillSymbols; generateMetacircularImage. \
 		module := bootstrapper loadBootstrapModule. \
 		runtime := bootstrapper result. \
 		filename := runtme newString: '$(KERNEL_FILE)'. \

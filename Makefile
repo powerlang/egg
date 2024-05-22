@@ -19,7 +19,7 @@ test: runtime/pharo
 	mkdir -p test-reports
 	mv Powerlang-Tests-Test.xml test-reports
 
-test-ci: bootstrap.image pharo
+test-ci: egg.image pharo
 	./pharo $< test --junit-xml-output Powerlang-Tests
 	mkdir -p test-reports
 	mv Powerlang-Tests-Test.xml test-reports
