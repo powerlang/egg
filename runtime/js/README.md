@@ -21,14 +21,22 @@ the parts of the image, like `kernel.json` and `compiler.json`.
 A bootstrap process generates those files from bare egg code, using pharo (see `egg/bootstrap/pharo`). The process
 of bootstrapping does the following (it's all done automatically through `make`):
 
-1 - generates an bootstrap pharo image with the needed pharo code
+1 - generates a bootstrap pharo image, with the needed pharo code, where it is possible to create a little virtual egg image from egg sources
 2 - loads the Powerlang-* packages using Iceberg
 3 - executes `JSTranspiler transpileEggInterpreter` to generate the js files of the interpreter. Those files get
     writen `egg/runtimes/js/interpreter`.
 4 - executes `JSTranspiler generateKernelModule` et al
 
 ## Evaluating Smalltalk code using nodejs
-    $ node sample-server/index.js
+
+This creates a small webserver that loads an egg image and responds [webside](https://github.com/guillermoamaral/Webside)
+requests, so that you can browse and debug it remotely:
+
+    ## first install webside server dependencies
+    $ cd webside && npm install && cd .. 
+
+    ## Now run the server
+    $ node example-server/index.js
 
 ## In the future it will be possible the following
 

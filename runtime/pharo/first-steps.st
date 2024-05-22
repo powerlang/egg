@@ -3,12 +3,14 @@
 "
 
 EggRingImage resetSpecs.
+EggRingImage kernelSpec browse.
+
+JSTranspiler transpileEggInterpreter.
 
 JSTranspiler generateKernelSegment.
 JSTranspiler generateCompilerSegment.
-JSTranspiler transpileEggInterpreter.
+JSTranspiler generateMainSegments.
 
-EggRingImage kernelSpec browse.
 
 "
     Executing Smalltalk code in a virtual image:
