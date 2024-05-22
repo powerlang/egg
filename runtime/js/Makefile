@@ -4,9 +4,9 @@ ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 IMAGE_SEGMENTS_DIR=$(ROOT_DIR)/image-segments
 POWERLANG_DIR=$(GIT_PATH)/runtime/pharo
 
-.PHONY: all interpreter kernel compiler
+.PHONY: all interpreter kernel compiler example-server
 
-all: interpreter kernel compiler
+all: interpreter kernel compiler example-server
 
 clean:
 
@@ -28,7 +28,15 @@ $(IMAGE_SEGMENTS_DIR)/Kernel.json: $(POWERLANG_DIR)/eggjs.image
 
 compiler: $(IMAGE_SEGMENTS_DIR)/Compiler.json
 
+example-server: #$(IMAGE_SEGMENTS_DIR)/ImageSegmentBuilder.json $(IMAGE_SEGMENTS_DIR)/ImageSegmentBuilder.JSON.json $(IMAGE_SEGMENTS_DIR)/STON.json $(IMAGE_SEGMENTS_DIR)/Tonel.json $(IMAGE_SEGMENTS_DIR)/CodeSpecs.json
+	export IMAGE_SEGMENTS_DIR
+	cd $(POWERLANG_DIR) && ./pharo eggjs.image eval "JSTranspiler generateMainSegments"
+
 $(IMAGE_SEGMENTS_DIR)/Compiler.json: $(POWERLANG_DIR)/eggjs.image
 	export IMAGE_SEGMENTS_DIR
 	cd $(POWERLANG_DIR) && ./pharo eggjs.image eval "JSTranspiler generateCompilerSegment"
+
+$(IMAGE_SEGMENTS_DIR)/%.json: $(POWERLANG_DIR)/eggjs.image
+	export IMAGE_SEGMENTS_DIR
+	cd $(POWERLANG_DIR) && ./pharo eggjs.image eval "JSTranspiler generateSegmentFromModuleNamed: $@"
 
