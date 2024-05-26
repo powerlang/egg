@@ -479,8 +479,7 @@ startingAt: position [
 ]
 
 { #category : #unclassified }
-LargeInteger >> shortAtOffset: [
-offset
+LargeInteger >> shortAtOffset: offset [
 	offset _isSmallInteger ifFalse: [^self outOfBoundsIndex: offset].
 	(0 <= offset and: [offset + 2 <= self _size])
 		ifFalse: [^self outOfBoundsIndex: offset].
