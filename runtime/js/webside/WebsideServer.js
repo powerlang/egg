@@ -103,9 +103,12 @@ class WebsideServer extends Object {
 			this.api(request, response).methods();
 		});
 
-		this.server.get("/classes/:classname/methods/:selector", (request, response) => {
-			this.api(request, response).method();
-		});
+		this.server.get(
+			"/classes/:classname/methods/:selector",
+			(request, response) => {
+				this.api(request, response).method();
+			}
+		);
 
 		this.server.get("/methods", (request, response) => {
 			this.api(request, response).methods();
@@ -137,6 +140,14 @@ class WebsideServer extends Object {
 		});
 
 		//Evaluation endpoints..."
+		this.server.get("/evaluations", (request, response) => {
+			this.api(request, response).evaluations();
+		});
+
+		this.server.get("/evaluations/:id", (request, response) => {
+			this.api(request, response).evaluation();
+		});
+
 		this.server.post("/evaluations", (request, response) => {
 			this.api(request, response).evaluateExpression();
 		});
