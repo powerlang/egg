@@ -285,9 +285,6 @@ class WebsideAPI extends Object {
 		let id = this.requestedId();
 		let object = this.objectWithId(id);
 		if (!object) return this.notFound();
-		if (object instanceof EggProcessSuspended) {
-			return this.evaluationError(id);
-		}
 		this.respondWithJson(object.asWebsideJson());
 	}
 
@@ -297,7 +294,7 @@ class WebsideAPI extends Object {
 		if (!object) return this.notFound();
 		let path = this.request.path.split("/");
 		let index = path.indexOf("objects");
-		for (let i = index + 2; i < path.length - 2; i++) {
+		for (let i = index + 2; i < path.length - 1; i++) {
 			object = this.slotOf(path[i], object);
 			if (!object) return this.notFound();
 		}
@@ -364,6 +361,41 @@ class WebsideAPI extends Object {
 	}
 
 	//Evaluation endpoints...
+	evaluations() {
+		let evaluations = Object.values(this.server.evaluations).map((e) => {
+			let json = {
+				id: e.id.toString(),
+				state: e.state,
+			};
+			if (e.error)
+				json.error = {
+					description: this.errorDescription(e.error),
+				};
+			return json;
+		});
+		this.respondWithJson(evaluations);
+	}
+
+	evaluation() {
+		let id = this.requestedId();
+		let evaluation = this.evaluationWithId(id);
+		if (evaluation) {
+			let json = {
+				id: evaluation.id.toString(),
+				state: evaluation.state,
+			};
+			if (evaluation.error)
+				json.error = {
+					description: this.errorDescription(evaluation.error),
+				};
+			return this.respondWithJson(json);
+		}
+		let object = this.objectWithId(id);
+		if (!object) return this.notFound();
+		fake = { id: id, state: "finished" };
+		return this.respondWithJson(fake);
+	}
+
 	evaluateExpression() {
 		let debug = this.bodyAt("debug");
 		if (debug == true) return this.debugExpression();
@@ -375,54 +407,69 @@ class WebsideAPI extends Object {
 		let id = this.server.newId();
 		let object;
 		let source = "doIt ^(" + expression + ")";
+		let evaluation = {
+			id: id,
+			expression: expression,
+			state: "pending",
+		};
+		this.server.evaluations[id] = evaluation;
 		try {
 			this.compile(source, "Object");
 			object = this.runtime.sendLocal_to_("doIt", this.runtime.nil());
 			//this.runtime.sendLocal_to_with_("removeSelector:", species, [selector]);
 			object = this.wrapWithId(object, id);
-			if (!sync || pin) {
-				this.server.pinnedObjects[id] = object;
-			}
+			evaluation.state = "finished";
 		} catch (error) {
-			this.server.evaluations[id] = error;
-			this.server.pinnedObjects[id] = error;
+			evaluation.state = "failed";
+			evaluation.error = error;
 		}
+		// Despite the value of 'sync', only synchronous evaluations are supported by the moment:
+		// This execution point is reached only when the expression is already evaluated (or an error was found).
+		// However, from this point on, the we respond according to the 'sync' value:
+		// 	- If sync=true, we respond with either the resulting object or the error found, as specified by Webside API.
+		// 	  See https://github.com/guillermoamaral/Webside/tree/main/docs/api/evaluations for more details
+		//	- If sync=false, we respond with it.
 		if (sync) {
-			if (!object) return this.evaluationError(id);
+			if (evaluation.state === "failed")
+				return this.evaluationError(evaluation);
+			delete this.server.evaluations[id];
 			let json = object.asWebsideJson();
 			if (pin) {
-				json["id"] = id.toString();
+				this.server.pinnedObjects[id] = object;
+				json.id = id.toString();
 			}
 			return this.respondWithJson(json);
 		}
-		this.respondWithJson({
-			id: id.toString(),
-			expression: expression,
-		});
+		if (evaluation.state === "finished")
+			this.server.pinnedObjects[id] = object;
+		let json = { id: evaluation.id.toString(), state: evaluation.state };
+		if (evaluation.error)
+			json.error = {
+				description: this.errorDescription(evaluation.error),
+			};
+		return this.respondWithJson(json);
 	}
 
 	//Debugging endpoints...
 	createDebugger() {
 		let id = this.bodyAt("evaluation");
 		if (!id) return this.notFound();
-		let error = this.server.evaluations[id];
-		if (!error) return this.notFound();
-		let _debugger = { id: id, description: error.message };
+		let evaluation = this.server.evaluations[id];
+		if (!evaluation) return this.notFound();
+		let _debugger = {
+			id: id,
+			description: this.errorDescription(evaluation.error),
+		};
 		this.server.debuggers[id] = _debugger;
 		this.respondWithJson(_debugger);
-	}
-
-	errorContext(error) {
-		let stack = error._process.slotAt_(2);
-		return this.runtime._interpreter._stacks.get(stack);
 	}
 
 	debuggerFrames() {
 		let id = this.requestedId();
 		let _debugger = this.server.debuggers[id];
 		if (!_debugger) return this.notFound();
-		let error = this.server.evaluations[id];
-		let context = this.errorContext(error);
+		let evaluation = this.server.evaluations[id];
+		let context = this.errorContext(evaluation.error);
 		let frames = context.backtrace();
 		let json = frames.map((frame, index) => {
 			let method = EggMethodWrapper.on_runtime_(frame[0], this.runtime);
@@ -439,8 +486,8 @@ class WebsideAPI extends Object {
 		let _debugger = this.server.debuggers[id];
 		if (!_debugger) return this.notFound();
 		let index = this.requestedIndex();
-		let error = this.server.evaluations[id];
-		let context = this.errorContext(error);
+		let evaluation = this.server.evaluations[id];
+		let context = this.errorContext(evaluation.error);
 		let frames = context.backtrace();
 		if (index > frames.length - 1) return this.notFound();
 		let frame = frames[index];
@@ -462,8 +509,8 @@ class WebsideAPI extends Object {
 		let _debugger = this.server.debuggers[id];
 		if (!_debugger) return this.notFound();
 		let index = this.requestedIndex();
-		let error = this.server.evaluations[id];
-		let context = this.errorContext(error);
+		let evaluation = this.server.evaluations[id];
+		let context = this.errorContext(evaluation.error);
 		let frames = context.backtrace();
 		if (index > frames.length - 1) return this.notFound();
 		let frame = frames[index];
@@ -720,11 +767,11 @@ class WebsideAPI extends Object {
 		return id;
 	}
 
+	evaluationWithId(id) {
+		return this.server.evaluations[id];
+	}
+
 	objectWithId(id) {
-		let evaluation = this.server.evaluations[id];
-		if (evaluation) {
-			//evaluation.waitForResult
-		}
 		return this.server.pinnedObjects[id];
 	}
 
@@ -780,7 +827,7 @@ class WebsideAPI extends Object {
 			.map((v) => {
 				let slot = this.slotOf(v, object);
 				let json = slot.asWebsideJson();
-				json["slot"] = v;
+				json.slot = v;
 				return json;
 			});
 	}
@@ -794,9 +841,10 @@ class WebsideAPI extends Object {
 		let to = this.queryAt("to");
 		to = to ? parseInt(to) : object.size().asLocalObject();
 		let slots = [];
-		for (let i = from; i <= from; i++) {
-			let slot = object.slotAt_(i).asWebsideJson();
-			slot["slot"] = i;
+		for (let i = from; i <= to; i++) {
+			//let slot = object.slotAt_(i).asWebsideJson();
+			let slot = this.slotOf(i, object).asWebsideJson();
+			slot.slot = i;
 			slots.push(slot);
 		}
 		return slots;
@@ -809,28 +857,43 @@ class WebsideAPI extends Object {
 	slotOf(slot, object) {
 		if (parseInt(slot).toString() == slot) {
 			let index = parseInt(slot);
-			if (object.objectClass().instancesAreArrayed().asLocalObject()) {
-				return index <= object.size().asLocalObject()
-					? object.at_(index)
-					: null;
+			if (object.hasIndexedSlots().asLocalObject()) {
+				if (index > object.size().asLocalObject()) return;
+				// object.slotAt_(index)
+				let element = this.runtime.sendLocal_to_with_(
+					"at:",
+					object.wrappee(),
+					[this.runtime.newInteger_(index)]
+				);
+				return this.wrap(element);
 			}
 		}
 		let index = object.objectClass().allInstVarNames().indexOf(slot);
 		return index != -1 ? object.slotAt_(index + 1) : null;
 	}
 
-	evaluationError(id) {
-		let error = this.server.evaluations[id];
+	requestedIndex() {
+		let index = this.urlAt("index");
+		return index ? parseInt(index) : null;
+	}
+
+	evaluationError(evaluation) {
 		let json = {
-			description: "Process suspended",
-			evaluation: id.toString(),
+			description: this.errorDescription(evaluation.error),
+			evaluation: id,
 		};
 		this.error(JSON.stringify(json));
 	}
 
-	requestedIndex() {
-		let index = this.urlAt("index");
-		return index ? parseInt(index) : null;
+	errorContext(error) {
+		let stack = error._process.slotAt_(2);
+		return this.runtime._interpreter._stacks.get(stack);
+	}
+
+	errorDescription(error) {
+		return this.runtime
+			.sendLocal_to_("description", error._exception)
+			.asLocalString();
 	}
 }
 
