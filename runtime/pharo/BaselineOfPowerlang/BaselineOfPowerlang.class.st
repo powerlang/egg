@@ -19,6 +19,11 @@ BaselineOfPowerlang >> baseline: spec [
 		spec package: 'Powerlang-Tests'.
 		spec package: 'Powerlang-TestsFailing'.
 
+		self setUpWebsideDependency: spec.
+		spec
+			package: 'Powerlang-EggWebside'
+			with: [ spec requires: #( 'Webside' ) ].
+
 		"compiler group: just compiler and compiler tests"
 		spec group: 'base-compiler' with: #(
 											'Powerlang-Compatibility-Pharo'
@@ -85,4 +90,15 @@ BaselineOfPowerlang >> powerlangjs: spec [
 { #category : #accessing }
 BaselineOfPowerlang >> repository [
 	^ self packageRepositoryURL
+]
+
+{ #category : #accessing }
+BaselineOfPowerlang >> setUpWebsideDependency: spec [
+
+	spec
+		baseline: 'Webside'
+		with: [ 
+		spec repository: 'github://guillermoamaral/Pharo-Webside:main' ].
+
+
 ]
