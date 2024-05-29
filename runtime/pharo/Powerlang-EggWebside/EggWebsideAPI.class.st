@@ -5,7 +5,7 @@ self startServer
 self allInstances
 "
 Class {
-	#name : #PowerlangWebsideAPI,
+	#name : #EggWebsideAPI,
 	#superclass : #Object,
 	#instVars : [
 		'request',
@@ -21,12 +21,12 @@ Class {
 }
 
 { #category : #'instance creation' }
-PowerlangWebsideAPI class >> new [
+EggWebsideAPI class >> new [
 	^ super new initialize
 ]
 
 { #category : #services }
-PowerlangWebsideAPI class >> startServer [
+EggWebsideAPI class >> startServer [
 
 	"
 	self startServer
@@ -39,9 +39,9 @@ PowerlangWebsideAPI class >> startServer [
 		            bootstrap;
 		            fillClasses;
 		            fillSymbols;
-		            generateLMR) result.
+		            generateMetacircularImage) result.
 	^ WebsideServer new
-		  apiClass: PowerlangWebsideAPI;
+		  apiClass: EggWebsideAPI;
 		  baseUri: '/powerlang';
 		  port: 9010;
 		  resourcesAt: #runtime put: runtime;
@@ -49,7 +49,7 @@ PowerlangWebsideAPI class >> startServer [
 ]
 
 { #category : #services }
-PowerlangWebsideAPI class >> stopServer [
+EggWebsideAPI class >> stopServer [
 	"
 	self stopServer
 	"
@@ -58,7 +58,7 @@ PowerlangWebsideAPI class >> stopServer [
 ]
 
 { #category : #'changes endpoints' }
-PowerlangWebsideAPI >> addChange [
+EggWebsideAPI >> addChange [
 
 	| change author |
 	change := self requestedChange.
@@ -72,13 +72,13 @@ PowerlangWebsideAPI >> addChange [
 ]
 
 { #category : #'private - changes' }
-PowerlangWebsideAPI >> applyAddClassChange: aRBAddClassChange [
+EggWebsideAPI >> applyAddClassChange: aRBAddClassChange [
 self halt.
 	
 ]
 
 { #category : #'private - changes' }
-PowerlangWebsideAPI >> applyAddMethodChange: aRBAddMethodChange [
+EggWebsideAPI >> applyAddMethodChange: aRBAddMethodChange [
 
 	| class |
 	class := self classNamed: aRBAddMethodChange changeClassName.
@@ -87,7 +87,7 @@ PowerlangWebsideAPI >> applyAddMethodChange: aRBAddMethodChange [
 ]
 
 { #category : #'private - changes' }
-PowerlangWebsideAPI >> applyChange: change [
+EggWebsideAPI >> applyChange: change [
 
 	(change isKindOf: RBAddClassChange) ifTrue: [ 
 		^ self applyAddClassChange: change ].
@@ -99,7 +99,7 @@ PowerlangWebsideAPI >> applyChange: change [
 ]
 
 { #category : #'private - changes' }
-PowerlangWebsideAPI >> applyRemoveMethodChange: aRBRemoveMethodChange [
+EggWebsideAPI >> applyRemoveMethodChange: aRBRemoveMethodChange [
 
 	| class |
 	self halt.
@@ -109,13 +109,13 @@ PowerlangWebsideAPI >> applyRemoveMethodChange: aRBRemoveMethodChange [
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> bodyAt: aString [
+EggWebsideAPI >> bodyAt: aString [
 
 	^ self bodyAt: aString ifAbsent: nil
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> bodyAt: aString ifAbsent: aBlock [
+EggWebsideAPI >> bodyAt: aString ifAbsent: aBlock [
 
 	| json |
 	json := NeoJSONReader fromString: request entity.
@@ -123,7 +123,7 @@ PowerlangWebsideAPI >> bodyAt: aString ifAbsent: aBlock [
 ]
 
 { #category : #'code endpoints' }
-PowerlangWebsideAPI >> categories [
+EggWebsideAPI >> categories [
 	| class |
 	class := self requestedClass.
 	class ifNil: [ ^ self notFound ].
@@ -131,7 +131,7 @@ PowerlangWebsideAPI >> categories [
 ]
 
 { #category : #'code endpoints' }
-PowerlangWebsideAPI >> classDefinition [
+EggWebsideAPI >> classDefinition [
 
 	| class |
 	class := self requestedClass.
@@ -140,7 +140,7 @@ PowerlangWebsideAPI >> classDefinition [
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> classNamed: aString [
+EggWebsideAPI >> classNamed: aString [
 
 	| name metaclass root class |
 	name := aString.
@@ -156,7 +156,7 @@ PowerlangWebsideAPI >> classNamed: aString [
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> classTreeFrom: aPowerlangSpeciesWrapper depth: anInteger [
+EggWebsideAPI >> classTreeFrom: aPowerlangSpeciesWrapper depth: anInteger [
 	| json subclasses depth names superclass |
 	names := self queryAt: 'names'.
 	json := names = 'true'
@@ -181,7 +181,7 @@ PowerlangWebsideAPI >> classTreeFrom: aPowerlangSpeciesWrapper depth: anInteger 
 ]
 
 { #category : #'code endpoints' }
-PowerlangWebsideAPI >> classVariables [
+EggWebsideAPI >> classVariables [
 	| class |
 	class := self requestedClass.
 	class ifNil: [ ^ self notFound ].
@@ -197,7 +197,7 @@ PowerlangWebsideAPI >> classVariables [
 ]
 
 { #category : #'code endpoints' }
-PowerlangWebsideAPI >> classes [
+EggWebsideAPI >> classes [
 
 	| root tree classes names depth json |
 	root := self queryAt: 'root'.
@@ -217,7 +217,7 @@ PowerlangWebsideAPI >> classes [
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> compilationError: error [
+EggWebsideAPI >> compilationError: error [
 
 	| entity json suggestions |
 	json := error asWebsideJson.
@@ -233,7 +233,7 @@ PowerlangWebsideAPI >> compilationError: error [
 ]
 
 { #category : #'debugging endpoints' }
-PowerlangWebsideAPI >> createDebugger [
+EggWebsideAPI >> createDebugger [
 
 	| id process exception context debugger |
 	id := self bodyAt: 'evaluation' ifAbsent: [ ^ self notFound ].
@@ -241,7 +241,7 @@ PowerlangWebsideAPI >> createDebugger [
 	process := self evaluations at: id ifAbsent: [ ^ self notFound ].
 	exception := process suspendedContext exception.
 	context := exception signalerContext.
-	debugger := PowerlangDebuggerWrapper new context: exception context.
+	debugger := EggDebuggerWrapper new context: exception context.
 	self debuggers at: id put: debugger.
 	^ debugger asWebsideJson
 		  at: 'id' put: id asString;
@@ -250,7 +250,7 @@ PowerlangWebsideAPI >> createDebugger [
 ]
 
 { #category : #'debugging endpoints' }
-PowerlangWebsideAPI >> debuggerFrame [
+EggWebsideAPI >> debuggerFrame [
 
 	| debugger index frame interval runtime method receiver class |
 	debugger := self debuggers
@@ -265,8 +265,8 @@ PowerlangWebsideAPI >> debuggerFrame [
 		            at: 'end' put: 0;
 		            yourself.
 	runtime := self runtime.
-	method := PowerlangMethodWrapper on: frame first runtime: runtime.
-	receiver := PowerlangObjectWrapper on: frame second runtime: runtime.
+	method := EggMethodWrapper on: frame first runtime: runtime.
+	receiver := EggObjectWrapper on: frame second runtime: runtime.
 	class := receiver objectClass.
 	^ self newJsonObject
 		  at: 'index' put: index;
@@ -282,7 +282,7 @@ PowerlangWebsideAPI >> debuggerFrame [
 ]
 
 { #category : #'debugging endpoints' }
-PowerlangWebsideAPI >> debuggerFrames [
+EggWebsideAPI >> debuggerFrames [
 
 	| debugger runtime method receiver |
 	debugger := self debuggers
@@ -290,8 +290,8 @@ PowerlangWebsideAPI >> debuggerFrames [
 		            ifAbsent: [ ^ self notFound ].
 	runtime := self runtime.
 	^ debugger context backtrace withIndexCollect: [ :array :i | 
-		  method := PowerlangMethodWrapper on: array first runtime: runtime.
-		  receiver := PowerlangObjectWrapper
+		  method := EggMethodWrapper on: array first runtime: runtime.
+		  receiver := EggObjectWrapper
 			              on: array second
 			              runtime: runtime.
 		  self newJsonObject
@@ -302,17 +302,17 @@ PowerlangWebsideAPI >> debuggerFrames [
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> debuggers [
+EggWebsideAPI >> debuggers [
 
 	^ server debuggers
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> defaultRootClass [
+EggWebsideAPI >> defaultRootClass [
 
 	| runtime root |
 	runtime := self runtime.
-	root := (PowerlangObjectWrapper on: runtime nil runtime: runtime)
+	root := (EggObjectWrapper on: runtime nil runtime: runtime)
 		        objectClass.
 	[ root superclass wrappee == runtime nil ] whileFalse: [ 
 		root := root superclass ].
@@ -320,7 +320,7 @@ PowerlangWebsideAPI >> defaultRootClass [
 ]
 
 { #category : #'debugging endpoints' }
-PowerlangWebsideAPI >> deleteDebugger [
+EggWebsideAPI >> deleteDebugger [
 
 	| id debugger |
 	id := self requestedId.
@@ -333,13 +333,13 @@ PowerlangWebsideAPI >> deleteDebugger [
 ]
 
 { #category : #'code endpoints' }
-PowerlangWebsideAPI >> dialect [
+EggWebsideAPI >> dialect [
 
 	^ 'Powerlang'
 ]
 
 { #category : #'evaluation  endpoints' }
-PowerlangWebsideAPI >> evaluateExpression [
+EggWebsideAPI >> evaluateExpression [
 
 	| debug expression sync pin id semaphore object process block json |
 	debug := self bodyAt: 'debug'.
@@ -378,7 +378,7 @@ PowerlangWebsideAPI >> evaluateExpression [
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> evaluateExpression: aString [
+EggWebsideAPI >> evaluateExpression: aString [
 
 	| class  |
 	class := self classNamed: 'Object'.
@@ -387,7 +387,7 @@ PowerlangWebsideAPI >> evaluateExpression: aString [
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> evaluationError: id [
+EggWebsideAPI >> evaluationError: id [
 
 	| process json entity |
 	process := self evaluations at: id.
@@ -405,13 +405,13 @@ PowerlangWebsideAPI >> evaluationError: id [
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> evaluations [
+EggWebsideAPI >> evaluations [
 
 	^ server evaluations
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> filterByCategory: aCollection [
+EggWebsideAPI >> filterByCategory: aCollection [
 	| category |
 	category := self queriedCategory.
 	^ (category notNil and: [ category notEmpty ])
@@ -420,7 +420,7 @@ PowerlangWebsideAPI >> filterByCategory: aCollection [
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> filterByVariable: aCollection [
+EggWebsideAPI >> filterByVariable: aCollection [
 	| variable class slot classVar |
 	variable := self queriedAccessing.
 	variable ifNil: [ ^ aCollection ].
@@ -437,7 +437,7 @@ PowerlangWebsideAPI >> filterByVariable: aCollection [
 ]
 
 { #category : #'debugging endpoints' }
-PowerlangWebsideAPI >> frameBindings [
+EggWebsideAPI >> frameBindings [
 
 	| debugger frame |
 	debugger := self debuggers
@@ -456,12 +456,12 @@ PowerlangWebsideAPI >> frameBindings [
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> image [
+EggWebsideAPI >> image [
 	^ self runtime image
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> implementorsOf: aSymbol [
+EggWebsideAPI >> implementorsOf: aSymbol [
 	| scope root |
 	scope := self queriedScope.
 	scope
@@ -473,7 +473,7 @@ PowerlangWebsideAPI >> implementorsOf: aSymbol [
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> indexedSlotsOf: anObject [
+EggWebsideAPI >> indexedSlotsOf: anObject [
 
 	| from to slot |
 	anObject class isVariable ifFalse: [ ^ self notFound ].
@@ -493,7 +493,7 @@ PowerlangWebsideAPI >> indexedSlotsOf: anObject [
 ]
 
 { #category : #'code endpoints' }
-PowerlangWebsideAPI >> instanceVariables [
+EggWebsideAPI >> instanceVariables [
 	| class |
 	class := self requestedClass.
 	class ifNil: [ ^ self notFound ].
@@ -509,7 +509,7 @@ PowerlangWebsideAPI >> instanceVariables [
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> instanceVariablesOf: anObject [
+EggWebsideAPI >> instanceVariablesOf: anObject [
 
 	^ anObject objectClass allInstVarNames collect: [ :n | 
 		  self newJsonObject
@@ -518,7 +518,7 @@ PowerlangWebsideAPI >> instanceVariablesOf: anObject [
 ]
 
 { #category : #'code endpoints' }
-PowerlangWebsideAPI >> method [
+EggWebsideAPI >> method [
 
 	| class selector symbol |
 	class := self requestedClass.
@@ -530,7 +530,7 @@ PowerlangWebsideAPI >> method [
 ]
 
 { #category : #'code endpoints' }
-PowerlangWebsideAPI >> methods [
+EggWebsideAPI >> methods [
 
 	| selector methods senders global references class |
 	selector := self queriedSelector.
@@ -558,7 +558,7 @@ PowerlangWebsideAPI >> methods [
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> namedSlotsOf: anObject [
+EggWebsideAPI >> namedSlotsOf: anObject [
 
 	| slot |
 	^ anObject objectClass allInstVarNames collect: [ :n | 
@@ -569,30 +569,30 @@ PowerlangWebsideAPI >> namedSlotsOf: anObject [
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> newID [
+EggWebsideAPI >> newID [
 
 	^ UUID new
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> newJsonObject [
+EggWebsideAPI >> newJsonObject [
 
 	^ NeoJSONObject new
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> notFound [
+EggWebsideAPI >> notFound [
 	^ ZnResponse notFound: 'resource not found'
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> objects [
+EggWebsideAPI >> objects [
 
 	^ server objects
 ]
 
 { #category : #'objects endpoints' }
-PowerlangWebsideAPI >> pinnedObject [
+EggWebsideAPI >> pinnedObject [
 
 	| id object |
 	id := self requestedId.
@@ -605,7 +605,7 @@ PowerlangWebsideAPI >> pinnedObject [
 ]
 
 { #category : #'objects endpoints' }
-PowerlangWebsideAPI >> pinnedObjectSlots [
+EggWebsideAPI >> pinnedObjectSlots [
 
 	| id object path index last |
 	id := self requestedId.
@@ -624,72 +624,72 @@ PowerlangWebsideAPI >> pinnedObjectSlots [
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> queriedAccessing [
+EggWebsideAPI >> queriedAccessing [
 	^ self queryAt: 'accessing' 
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> queriedCategory [
+EggWebsideAPI >> queriedCategory [
 	| category |
 	category := request at: 'category' ifAbsent: nil.
 	^ category ifNotNil: [ category asSymbol ]
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> queriedClass [
+EggWebsideAPI >> queriedClass [
 	| name |
 	name := request at: 'class' ifAbsent: nil.
 	^ name ifNotNil: [ self classNamed: name ]
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> queriedReferencingClass [
+EggWebsideAPI >> queriedReferencingClass [
 	^self queryAt: 'referencingClass' ifPresent: [:n | self classNamed: n ]
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> queriedReferencingString [
+EggWebsideAPI >> queriedReferencingString [
 	^self queryAt: 'referencingString'
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> queriedScope [
+EggWebsideAPI >> queriedScope [
 	| scope |
 	scope := request at: 'scope' ifAbsent: nil.
 	^ scope ifNotNil: [ self classNamed: scope ]
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> queriedSelector [
+EggWebsideAPI >> queriedSelector [
 	| selector |
 	selector := request at: 'selector' ifAbsent: nil.
 	^ selector ifNotNil: [ selector asSymbol ]
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> queriedSending [
+EggWebsideAPI >> queriedSending [
 	| selector |
 	selector := request at: 'sending' ifAbsent: nil.
 	^ selector ifNotNil: [ selector asSymbol ]
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> queryAt: aString [
+EggWebsideAPI >> queryAt: aString [
 	^ self queryAt: aString ifAbsent: nil
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> queryAt: aString ifAbsent: aBlock [
+EggWebsideAPI >> queryAt: aString ifAbsent: aBlock [
 	^ self queryAt: aString ifPresent: nil ifAbsent: aBlock
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> queryAt: aString ifPresent: aBlock [
+EggWebsideAPI >> queryAt: aString ifPresent: aBlock [
 	^ self queryAt: aString ifPresent: aBlock ifAbsent: nil
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> queryAt: aString ifPresent: aBlock ifAbsent: anotherBlock [
+EggWebsideAPI >> queryAt: aString ifPresent: aBlock ifAbsent: anotherBlock [
 
 	| value |
 	value := request at: aString ifAbsent: nil.
@@ -700,14 +700,14 @@ PowerlangWebsideAPI >> queryAt: aString ifPresent: aBlock ifAbsent: anotherBlock
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> referencesToClass: aClass [
+EggWebsideAPI >> referencesToClass: aClass [
 	| binding |
 	binding := Smalltalk bindingOf: aClass name asSymbol.
 	^ SystemNavigation default allReferencesTo: binding
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> referencesToString: aString [
+EggWebsideAPI >> referencesToString: aString [
 	| scope |
 	scope := self queriedScope ifNil: [ self queriedClass ].
 	
@@ -722,12 +722,12 @@ PowerlangWebsideAPI >> referencesToString: aString [
 ]
 
 { #category : #accessing }
-PowerlangWebsideAPI >> request: aTeaRequest [
+EggWebsideAPI >> request: aTeaRequest [
 	request := aTeaRequest
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> requestedChange [
+EggWebsideAPI >> requestedChange [
 
 	| json change |
 	json := NeoJSONReader fromString: request entity.
@@ -737,14 +737,14 @@ PowerlangWebsideAPI >> requestedChange [
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> requestedClass [
+EggWebsideAPI >> requestedClass [
 	| name |
 	name := self urlAt: 'name'.
 	^ name ifNotNil: [ self classNamed: name ]
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> requestedId [
+EggWebsideAPI >> requestedId [
 
 	| id |
 	id := self urlAt: 'id'.
@@ -752,7 +752,7 @@ PowerlangWebsideAPI >> requestedId [
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> requestedIndex [
+EggWebsideAPI >> requestedIndex [
 
 	| index |
 	index := self urlAt: 'index'.
@@ -760,7 +760,7 @@ PowerlangWebsideAPI >> requestedIndex [
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> requestedSelector [
+EggWebsideAPI >> requestedSelector [
 
 	| selector |
 	selector := self urlAt: 'selector'.
@@ -768,12 +768,12 @@ PowerlangWebsideAPI >> requestedSelector [
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> runtime [
+EggWebsideAPI >> runtime [
 	^ server resourcesAt: #runtime
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> sendersOf: aSymbol [
+EggWebsideAPI >> sendersOf: aSymbol [
 
 	| scope |
 	scope := self queriedScope.
@@ -784,7 +784,7 @@ PowerlangWebsideAPI >> sendersOf: aSymbol [
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> sendersOf: aSymbol among: aCollection [
+EggWebsideAPI >> sendersOf: aSymbol among: aCollection [
 	| index |
 	index := Smalltalk specialSelectorIndexOrNil: aSymbol.
 	^ aCollection
@@ -792,12 +792,12 @@ PowerlangWebsideAPI >> sendersOf: aSymbol among: aCollection [
 ]
 
 { #category : #accessing }
-PowerlangWebsideAPI >> server: aWebsideServer [
+EggWebsideAPI >> server: aWebsideServer [
 	server := aWebsideServer
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> slot: aString of: anObject ifAbsent: aBlock [
+EggWebsideAPI >> slot: aString of: anObject ifAbsent: aBlock [
 
 	| index |
 	aString asInteger asString = aString ifTrue: [ 
@@ -822,7 +822,7 @@ PowerlangWebsideAPI >> slot: aString of: anObject ifAbsent: aBlock [
 ]
 
 { #category : #'code endpoints' }
-PowerlangWebsideAPI >> subclasses [
+EggWebsideAPI >> subclasses [
 
 	| class |
 	class := self requestedClass.
@@ -831,7 +831,7 @@ PowerlangWebsideAPI >> subclasses [
 ]
 
 { #category : #'objects endpoints' }
-PowerlangWebsideAPI >> unpinObject [
+EggWebsideAPI >> unpinObject [
 
 	self objects
 		removeKey: self requestedId
@@ -840,12 +840,12 @@ PowerlangWebsideAPI >> unpinObject [
 ]
 
 { #category : #private }
-PowerlangWebsideAPI >> urlAt: aString [
+EggWebsideAPI >> urlAt: aString [
 	^ request at: aString ifAbsent: nil
 ]
 
 { #category : #'code endpoints' }
-PowerlangWebsideAPI >> variables [
+EggWebsideAPI >> variables [
 	| class |
 	class := self requestedClass.
 	class ifNil: [ ^ self notFound ].

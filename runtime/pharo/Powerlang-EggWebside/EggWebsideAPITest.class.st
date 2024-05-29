@@ -1,5 +1,5 @@
 Class {
-	#name : #PowerlangWebsideAPITest,
+	#name : #EggWebsideAPITest,
 	#superclass : #TestCase,
 	#instVars : [
 		'server',
@@ -12,13 +12,13 @@ Class {
 }
 
 { #category : #accessing }
-PowerlangWebsideAPITest class >> defaultTimeLimit [
+EggWebsideAPITest class >> defaultTimeLimit [
 
 	^ 100 seconds
 ]
 
 { #category : #initialization }
-PowerlangWebsideAPITest class >> initializeCache [
+EggWebsideAPITest class >> initializeCache [
 
 	"
 	self initializeCache 
@@ -30,18 +30,18 @@ PowerlangWebsideAPITest class >> initializeCache [
 		          bootstrap;
 		          fillClasses;
 		          fillSymbols;
-		          generateLMR) result
+		          generateMetacircularImage) result
 ]
 
 { #category : #private }
-PowerlangWebsideAPITest >> delete: uri [
+EggWebsideAPITest >> delete: uri [
 	| data |
 	data := client delete: server baseUrl / uri.
 	^ data ifNotNil: [ NeoJSONObject fromString: data ]
 ]
 
 { #category : #private }
-PowerlangWebsideAPITest >> get: uri [
+EggWebsideAPITest >> get: uri [
 
 	| url data |
 	url := server baseUrl asString.
@@ -54,19 +54,19 @@ PowerlangWebsideAPITest >> get: uri [
 ]
 
 { #category : #private }
-PowerlangWebsideAPITest >> post: uri [
+EggWebsideAPITest >> post: uri [
 	^ self post: uri with: ''
 ]
 
 { #category : #private }
-PowerlangWebsideAPITest >> post: uri with: body [
+EggWebsideAPITest >> post: uri with: body [
 	| data |
 	data := client post: server baseUrl / uri contents: body asString.
 	^ NeoJSONObject fromString: data
 ]
 
 { #category : #running }
-PowerlangWebsideAPITest >> setUp [
+EggWebsideAPITest >> setUp [
 
 	| runtime |
 	super setUp.
@@ -77,10 +77,10 @@ PowerlangWebsideAPITest >> setUp [
 			            bootstrap;
 			            fillClasses;
 			            fillSymbols;
-			            generateLMR) result ].
+			            generateMetacircularImage) result ].
 	server := WebsideServer new.
 	server
-		apiClass: PowerlangWebsideAPI;
+		apiClass: EggWebsideAPI;
 		baseUri: '/websideapitest';
 		port: 9999;
 		resourcesAt: #runtime put: runtime;
@@ -89,13 +89,13 @@ PowerlangWebsideAPITest >> setUp [
 ]
 
 { #category : #running }
-PowerlangWebsideAPITest >> tearDown [
+EggWebsideAPITest >> tearDown [
 	super tearDown.
 	server stop.
 ]
 
 { #category : #'code endpoints' }
-PowerlangWebsideAPITest >> testAccessors [
+EggWebsideAPITest >> testAccessors [
 	| accessors |
 	accessors := self get: 'methods?class=Fraction&referencing=numerator'.
 	self
@@ -112,7 +112,7 @@ PowerlangWebsideAPITest >> testAccessors [
 ]
 
 { #category : #'evaluation  endpoints' }
-PowerlangWebsideAPITest >> testActiveEvaluations [
+EggWebsideAPITest >> testActiveEvaluations [
 	| evaluation result id |
 	evaluation := NeoJSONObject new
 		at: 'expression' put: '(Delay forSeconds: 1) wait';
@@ -129,7 +129,7 @@ PowerlangWebsideAPITest >> testActiveEvaluations [
 ]
 
 { #category : #'evaluation  endpoints' }
-PowerlangWebsideAPITest >> testAsynchronousEvaluation [
+EggWebsideAPITest >> testAsynchronousEvaluation [
 	| evaluation result id |
 	evaluation := NeoJSONObject new
 		at: 'expression' put: '3 + 4';
@@ -156,7 +156,7 @@ PowerlangWebsideAPITest >> testAsynchronousEvaluation [
 ]
 
 { #category : #'evaluation  endpoints' }
-PowerlangWebsideAPITest >> testCancelEvaluation [
+EggWebsideAPITest >> testCancelEvaluation [
 	| evaluation result id active |
 	evaluation := NeoJSONObject new
 		at: 'expression' put: 'Delay wait: 10000';
@@ -170,7 +170,7 @@ PowerlangWebsideAPITest >> testCancelEvaluation [
 ]
 
 { #category : #'changes endpoints' }
-PowerlangWebsideAPITest >> testCassDefinition [
+EggWebsideAPITest >> testCassDefinition [
 	| definition |
 	definition := NeoJSONObject new
 		at: 'type' put: 'ClassDefinition';
@@ -199,7 +199,7 @@ PowerlangWebsideAPITest >> testCassDefinition [
 ]
 
 { #category : #'code endpoints' }
-PowerlangWebsideAPITest >> testCategories [
+EggWebsideAPITest >> testCategories [
 
 	| categories |
 	categories := self get: 'classes/Number/categories'.
@@ -210,7 +210,7 @@ PowerlangWebsideAPITest >> testCategories [
 ]
 
 { #category : #'changes endpoints' }
-PowerlangWebsideAPITest >> testCategoryRemove [
+EggWebsideAPITest >> testCategoryRemove [
 	| class method remotion |
 	class := NeoJSONObject new
 		at: 'type' put: 'ClassDefinition';
@@ -251,7 +251,7 @@ PowerlangWebsideAPITest >> testCategoryRemove [
 ]
 
 { #category : #'changes endpoints' }
-PowerlangWebsideAPITest >> testCategoryRename [
+EggWebsideAPITest >> testCategoryRename [
 	| class method renaming |
 	class := NeoJSONObject new
 		at: 'type' put: 'ClassDefinition';
@@ -296,7 +296,7 @@ PowerlangWebsideAPITest >> testCategoryRename [
 ]
 
 { #category : #'changes endpoints' }
-PowerlangWebsideAPITest >> testChanges [
+EggWebsideAPITest >> testChanges [
 
 	| change changes |
 	change := NeoJSONObject new
@@ -327,7 +327,7 @@ PowerlangWebsideAPITest >> testChanges [
 ]
 
 { #category : #'changes endpoints' }
-PowerlangWebsideAPITest >> testClassCommentDefinition [
+EggWebsideAPITest >> testClassCommentDefinition [
 
 	| definition comment |
 	definition := NeoJSONObject new
@@ -363,7 +363,7 @@ PowerlangWebsideAPITest >> testClassCommentDefinition [
 ]
 
 { #category : #'code endpoints' }
-PowerlangWebsideAPITest >> testClassDefinition [
+EggWebsideAPITest >> testClassDefinition [
 	| definition |
 	definition := self get: 'classes/Point'.
 	self
@@ -373,7 +373,7 @@ PowerlangWebsideAPITest >> testClassDefinition [
 ]
 
 { #category : #'changes endpoints' }
-PowerlangWebsideAPITest >> testClassRemove [
+EggWebsideAPITest >> testClassRemove [
 
 	| definition remotion class |
 	definition := NeoJSONObject new
@@ -398,7 +398,7 @@ PowerlangWebsideAPITest >> testClassRemove [
 ]
 
 { #category : #'changes endpoints' }
-PowerlangWebsideAPITest >> testClassRename [
+EggWebsideAPITest >> testClassRename [
 
 	| definition renaming class |
 	definition := NeoJSONObject new
@@ -433,14 +433,14 @@ PowerlangWebsideAPITest >> testClassRename [
 ]
 
 { #category : #'code endpoints' }
-PowerlangWebsideAPITest >> testClassVariables [
+EggWebsideAPITest >> testClassVariables [
 	| variables |
 	variables := self get: 'classes/Float/class-variables'.
 	self assert: (variables anySatisfy: [ :v | v name = 'Infinity' ])
 ]
 
 { #category : #'code endpoints' }
-PowerlangWebsideAPITest >> testClasses [
+EggWebsideAPITest >> testClasses [
 	| classes names tree root integer |
 	classes := self get: 'classes'.
 	self assert: classes notEmpty.
@@ -469,7 +469,7 @@ PowerlangWebsideAPITest >> testClasses [
 ]
 
 { #category : #'changes endpoints' }
-PowerlangWebsideAPITest >> testCodeSuggestion [
+EggWebsideAPITest >> testCodeSuggestion [
 
 	| change method error changes |
 	change := NeoJSONObject new
@@ -506,7 +506,7 @@ PowerlangWebsideAPITest >> testCodeSuggestion [
 ]
 
 { #category : #'debugging endpoints' }
-PowerlangWebsideAPITest >> testCreateDebugger [
+EggWebsideAPITest >> testCreateDebugger [
 	| evaluation halt id debugger |
 	evaluation := NeoJSONObject new
 		at: 'expression' put: '1 halt factorial';
@@ -542,7 +542,7 @@ PowerlangWebsideAPITest >> testCreateDebugger [
 ]
 
 { #category : #'evaluation  endpoints' }
-PowerlangWebsideAPITest >> testDebuggerContext [
+EggWebsideAPITest >> testDebuggerContext [
 	| evaluation id debugger error |
 	evaluation := NeoJSONObject new
 		at: 'expression' put: '3 halt factorial';
@@ -577,7 +577,7 @@ PowerlangWebsideAPITest >> testDebuggerContext [
 ]
 
 { #category : #'debugging endpoints' }
-PowerlangWebsideAPITest >> testDebuggerFrames [
+EggWebsideAPITest >> testDebuggerFrames [
 	| evaluation id debugger |
 	evaluation := NeoJSONObject new
 		at: 'expression' put: '1 halt factorial';
@@ -600,7 +600,7 @@ PowerlangWebsideAPITest >> testDebuggerFrames [
 ]
 
 { #category : #'code endpoints' }
-PowerlangWebsideAPITest >> testDialect [
+EggWebsideAPITest >> testDialect [
 
 	| dialect |
 	dialect := self get: 'dialect'.
@@ -608,7 +608,7 @@ PowerlangWebsideAPITest >> testDialect [
 ]
 
 { #category : #'evaluation  endpoints' }
-PowerlangWebsideAPITest >> testEvaluationError [
+EggWebsideAPITest >> testEvaluationError [
 	| evaluation error description |
 	evaluation := NeoJSONObject new
 		at: 'expression' put: '3 + ';
@@ -625,7 +625,7 @@ PowerlangWebsideAPITest >> testEvaluationError [
 ]
 
 { #category : #'debugging endpoints' }
-PowerlangWebsideAPITest >> testFrameBindings [
+EggWebsideAPITest >> testFrameBindings [
 	| evaluation id debugger |
 	evaluation := NeoJSONObject new
 		at: 'expression' put: '1 halt factorial';
@@ -650,7 +650,7 @@ PowerlangWebsideAPITest >> testFrameBindings [
 ]
 
 { #category : #'code endpoints' }
-PowerlangWebsideAPITest >> testImplementors [
+EggWebsideAPITest >> testImplementors [
 
 	| implementors local |
 	implementors := self get: 'methods?selector=reciprocal'.
@@ -668,7 +668,7 @@ PowerlangWebsideAPITest >> testImplementors [
 ]
 
 { #category : #'changes endpoints' }
-PowerlangWebsideAPITest >> testInstanceVariableAddition [
+EggWebsideAPITest >> testInstanceVariableAddition [
 
 	| definition addition |
 	definition := NeoJSONObject new
@@ -705,7 +705,7 @@ PowerlangWebsideAPITest >> testInstanceVariableAddition [
 ]
 
 { #category : #'changes endpoints' }
-PowerlangWebsideAPITest >> testInstanceVariableMoveDown [
+EggWebsideAPITest >> testInstanceVariableMoveDown [
 
 	| superclass class movement |
 	superclass := NeoJSONObject new
@@ -762,7 +762,7 @@ PowerlangWebsideAPITest >> testInstanceVariableMoveDown [
 ]
 
 { #category : #'changes endpoints' }
-PowerlangWebsideAPITest >> testInstanceVariableMoveUp [
+EggWebsideAPITest >> testInstanceVariableMoveUp [
 
 	| superclass class movement |
 	superclass := NeoJSONObject new
@@ -822,7 +822,7 @@ PowerlangWebsideAPITest >> testInstanceVariableMoveUp [
 ]
 
 { #category : #'changes endpoints' }
-PowerlangWebsideAPITest >> testInstanceVariableRemove [
+EggWebsideAPITest >> testInstanceVariableRemove [
 
 	| definition remotion |
 	definition := NeoJSONObject new
@@ -856,7 +856,7 @@ PowerlangWebsideAPITest >> testInstanceVariableRemove [
 ]
 
 { #category : #'changes endpoints' }
-PowerlangWebsideAPITest >> testInstanceVariableRename [
+EggWebsideAPITest >> testInstanceVariableRename [
 
 	| definition renaming |
 	definition := NeoJSONObject new
@@ -894,7 +894,7 @@ PowerlangWebsideAPITest >> testInstanceVariableRename [
 ]
 
 { #category : #'code endpoints' }
-PowerlangWebsideAPITest >> testInstanceVariables [
+EggWebsideAPITest >> testInstanceVariables [
 	| variables |
 	variables := self get: 'classes/Fraction/instance-variables'.
 	self
@@ -903,7 +903,7 @@ PowerlangWebsideAPITest >> testInstanceVariables [
 ]
 
 { #category : #'code endpoints' }
-PowerlangWebsideAPITest >> testMethod [
+EggWebsideAPITest >> testMethod [
 	| method |
 	method := self get: 'classes/Point/methods/x'.
 	self
@@ -914,7 +914,7 @@ PowerlangWebsideAPITest >> testMethod [
 ]
 
 { #category : #'changes endpoints' }
-PowerlangWebsideAPITest >> testMethodDefinition [
+EggWebsideAPITest >> testMethodDefinition [
 
 	| change method |
 	change := NeoJSONObject new
@@ -944,7 +944,7 @@ PowerlangWebsideAPITest >> testMethodDefinition [
 ]
 
 { #category : #'changes endpoints' }
-PowerlangWebsideAPITest >> testMethodRemove [
+EggWebsideAPITest >> testMethodRemove [
 
 	| definition remotion method |
 	definition := NeoJSONObject new
@@ -968,7 +968,7 @@ PowerlangWebsideAPITest >> testMethodRemove [
 ]
 
 { #category : #'code endpoints' }
-PowerlangWebsideAPITest >> testMethods [
+EggWebsideAPITest >> testMethods [
 	| methods |
 	methods := self get: 'classes/Point/methods'.
 	self
@@ -977,7 +977,7 @@ PowerlangWebsideAPITest >> testMethods [
 ]
 
 { #category : #'evaluation  endpoints' }
-PowerlangWebsideAPITest >> testObjectContext [
+EggWebsideAPITest >> testObjectContext [
 	| evaluation object |
 	evaluation := NeoJSONObject new
 		at: 'expression' put: '3 @ 4';
@@ -1003,7 +1003,7 @@ PowerlangWebsideAPITest >> testObjectContext [
 ]
 
 { #category : #'evaluation  endpoints' }
-PowerlangWebsideAPITest >> testPinEvaluationResult [
+EggWebsideAPITest >> testPinEvaluationResult [
 	| evaluation result |
 	evaluation := NeoJSONObject new
 		at: 'expression' put: '3 + 4';
@@ -1019,7 +1019,7 @@ PowerlangWebsideAPITest >> testPinEvaluationResult [
 ]
 
 { #category : #'objects endpoints' }
-PowerlangWebsideAPITest >> testPinnedObject [
+EggWebsideAPITest >> testPinnedObject [
 	| evaluation result id |
 	evaluation := NeoJSONObject new
 		at: 'expression' put: '3 + 4';
@@ -1038,7 +1038,7 @@ PowerlangWebsideAPITest >> testPinnedObject [
 ]
 
 { #category : #'objects endpoints' }
-PowerlangWebsideAPITest >> testPinnedObjectInstanceVariables [
+EggWebsideAPITest >> testPinnedObjectInstanceVariables [
 	| evaluation result id vars |
 	evaluation := NeoJSONObject new
 		at: 'expression' put: '3 @ 4 extent: 1 @ 1';
@@ -1064,7 +1064,7 @@ PowerlangWebsideAPITest >> testPinnedObjectInstanceVariables [
 ]
 
 { #category : #'objects endpoints' }
-PowerlangWebsideAPITest >> testPinnedObjectSlot [
+EggWebsideAPITest >> testPinnedObjectSlot [
 	| evaluation result id x |
 	evaluation := NeoJSONObject new
 		at: 'expression' put: '3 @ 4';
@@ -1081,7 +1081,7 @@ PowerlangWebsideAPITest >> testPinnedObjectSlot [
 ]
 
 { #category : #'objects endpoints' }
-PowerlangWebsideAPITest >> testPinnedObjects [
+EggWebsideAPITest >> testPinnedObjects [
 	| evaluation result id |
 	evaluation := NeoJSONObject new
 		at: 'expression' put: '3 + 4';
@@ -1103,7 +1103,7 @@ PowerlangWebsideAPITest >> testPinnedObjects [
 ]
 
 { #category : #'code endpoints' }
-PowerlangWebsideAPITest >> testReferences [
+EggWebsideAPITest >> testReferences [
 	| references |
 	references := self get: 'methods?referencing=Fraction'.
 	self
@@ -1114,7 +1114,7 @@ PowerlangWebsideAPITest >> testReferences [
 ]
 
 { #category : #'changes endpoints' }
-PowerlangWebsideAPITest >> testSelectorRename2 [
+EggWebsideAPITest >> testSelectorRename2 [
 
 	| definition renaming |
 	definition := NeoJSONObject new
@@ -1151,7 +1151,7 @@ PowerlangWebsideAPITest >> testSelectorRename2 [
 ]
 
 { #category : #'code endpoints' }
-PowerlangWebsideAPITest >> testSenders [
+EggWebsideAPITest >> testSenders [
 	| senders local |
 	senders := self get: 'methods?sending=reciprocal'.
 	self
@@ -1166,7 +1166,7 @@ PowerlangWebsideAPITest >> testSenders [
 ]
 
 { #category : #'debugging endpoints' }
-PowerlangWebsideAPITest >> testStepInto [
+EggWebsideAPITest >> testStepInto [
 	| evaluation id debugger |
 	evaluation := NeoJSONObject new
 		at: 'expression' put: '1 halt factorial';
@@ -1188,7 +1188,7 @@ PowerlangWebsideAPITest >> testStepInto [
 ]
 
 { #category : #'code endpoints' }
-PowerlangWebsideAPITest >> testSubclasses [
+EggWebsideAPITest >> testSubclasses [
 	| subclasses |
 	subclasses := self get: 'classes/Magnitude/subclasses'.
 	self
@@ -1197,7 +1197,7 @@ PowerlangWebsideAPITest >> testSubclasses [
 ]
 
 { #category : #'evaluation  endpoints' }
-PowerlangWebsideAPITest >> testSynchronousEvaluation [
+EggWebsideAPITest >> testSynchronousEvaluation [
 	| evaluation result |
 	evaluation := NeoJSONObject new
 		at: 'expression' put: '3 + 4';
@@ -1210,7 +1210,7 @@ PowerlangWebsideAPITest >> testSynchronousEvaluation [
 ]
 
 { #category : #'objects endpoints' }
-PowerlangWebsideAPITest >> testUnpinObject [
+EggWebsideAPITest >> testUnpinObject [
 	| evaluation result id pinned |
 	evaluation := NeoJSONObject new
 		at: 'expression' put: '3 + 4';
@@ -1225,7 +1225,7 @@ PowerlangWebsideAPITest >> testUnpinObject [
 ]
 
 { #category : #'code endpoints' }
-PowerlangWebsideAPITest >> testVariables [
+EggWebsideAPITest >> testVariables [
 	| variables |
 	variables := self get: 'classes/Float/variables'.
 	self assert: (variables anySatisfy: [ :v | v name = 'Infinity' ]).
@@ -1236,7 +1236,7 @@ PowerlangWebsideAPITest >> testVariables [
 ]
 
 { #category : #'workspaces endpoints' }
-PowerlangWebsideAPITest >> testWorkspace [
+EggWebsideAPITest >> testWorkspace [
 	| id |
 	id := self post: '/workspaces'.
 	[ | context assignment evaluation result |
@@ -1262,7 +1262,7 @@ PowerlangWebsideAPITest >> testWorkspace [
 ]
 
 { #category : #'workspaces endpoints' }
-PowerlangWebsideAPITest >> testWorkspaces [
+EggWebsideAPITest >> testWorkspaces [
 	| id result |
 	id := self post: '/workspaces'.
 	[result := self get: '/workspaces'.

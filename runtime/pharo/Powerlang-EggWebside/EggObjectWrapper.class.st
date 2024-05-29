@@ -1,5 +1,5 @@
 Class {
-	#name : #PowerlangObjectWrapper,
+	#name : #EggObjectWrapper,
 	#superclass : #ProtoObject,
 	#instVars : [
 		'wrappee',
@@ -9,33 +9,33 @@ Class {
 }
 
 { #category : #'instance creation' }
-PowerlangObjectWrapper class >> on: anLMRObject runtime: aPowerlangLMR [ 
+EggObjectWrapper class >> on: anLMRObject runtime: aPowerlangLMR [ 
 ^self new wrappee: anLMRObject ; runtime: aPowerlangLMR 
 ]
 
 { #category : #comparing }
-PowerlangObjectWrapper >> = anObject [
+EggObjectWrapper >> = anObject [
 
 	| object  |
-	object := (anObject isKindOf: PowerlangObjectWrapper)
+	object := (anObject isKindOf: EggObjectWrapper)
 		          ifTrue: [ anObject wrappee ]
 		          ifFalse: [ anObject ].
 	^ wrappee = object
 ]
 
 { #category : #converting }
-PowerlangObjectWrapper >> asLocalObject [
+EggObjectWrapper >> asLocalObject [
 	wrappee == runtime nil ifTrue: [ ^nil ].
 	wrappee == runtime true ifTrue: [ ^true ].
 	wrappee == runtime false ifTrue: [ ^false ].
-	wrappee class == LMRSmallInteger ifTrue: [ ^wrappee value ].
-	wrappee class == LMRByteObject ifTrue: [ ^wrappee asLocalString ].
+	wrappee class == EggSmallInteger ifTrue: [ ^wrappee value ].
+	wrappee class == EggByteObject ifTrue: [ ^wrappee asLocalString ].
 	self error: 'Cannot determine local equivalent of ', wrappee printString.
 	^nil
 ]
 
 { #category : #converting }
-PowerlangObjectWrapper >> asWebsideJson [
+EggObjectWrapper >> asWebsideJson [
 
 	| variable printed |
 	variable := self objectClass isVariable wrappee = runtime true.
@@ -51,101 +51,101 @@ PowerlangObjectWrapper >> asWebsideJson [
 ]
 
 { #category : #printing }
-PowerlangObjectWrapper >> displayString [
+EggObjectWrapper >> displayString [
 
 	^ self printString
 ]
 
 { #category : #accessing }
-PowerlangObjectWrapper >> doesNotUnderstand: aMessage [
+EggObjectWrapper >> doesNotUnderstand: aMessage [
 	| arguments result class |
-	arguments := aMessage arguments collect: [ :a | (a class == PowerlangObjectWrapper or: [ a class inheritsFrom: PowerlangObjectWrapper]) ifTrue: [a wrappee] ifFalse: [ a ]].
+	arguments := aMessage arguments collect: [ :a | (a class == EggObjectWrapper or: [ a class inheritsFrom: EggObjectWrapper]) ifTrue: [a wrappee] ifFalse: [ a ]].
 	result := runtime
 		sendLocal: aMessage selector
 		to: wrappee
 		with: arguments.
-	(result isKindOf: LMRObject)
+	(result isKindOf: EggObject)
 		ifFalse: [ ^ result ].
 	class := (runtime sendLocal: #isSpecies to: result) = runtime true
-		ifTrue: [ PowerlangSpeciesWrapper ]
-		ifFalse: [ PowerlangObjectWrapper ].
+		ifTrue: [ EggSpeciesWrapper ]
+		ifFalse: [ EggObjectWrapper ].
 	^ class on: result runtime: runtime
 ]
 
 { #category : #comparing }
-PowerlangObjectWrapper >> hash [
+EggObjectWrapper >> hash [
 	^wrappee hash
 ]
 
 { #category : #inspecting }
-PowerlangObjectWrapper >> inspect [
+EggObjectWrapper >> inspect [
 
 	^ wrappee inspect
 ]
 
 { #category : #testing }
-PowerlangObjectWrapper >> isKindOf: aClass [
+EggObjectWrapper >> isKindOf: aClass [
 
 	^ self class == aClass or: [ self class inheritsFrom: aClass ]
 ]
 
 { #category : #testing }
-PowerlangObjectWrapper >> notNil [
+EggObjectWrapper >> notNil [
 	^(runtime sendLocal: #notNil to: wrappee) != runtime nil
 ]
 
 { #category : #inquiries }
-PowerlangObjectWrapper >> object [
+EggObjectWrapper >> object [
 	^wrappee
 ]
 
 { #category : #inquiries }
-PowerlangObjectWrapper >> objectClass [
+EggObjectWrapper >> objectClass [
 	| class |
 	class := runtime sendLocal: #class to: wrappee.
-	^ PowerlangSpeciesWrapper on: class runtime: runtime
+	^ EggSpeciesWrapper on: class runtime: runtime
 ]
 
 { #category : #printing }
-PowerlangObjectWrapper >> printOn: aStream [
+EggObjectWrapper >> printOn: aStream [
 	"aStream
 		nextPutAll: (runtime sendLocal: #printString to: wrappee) wrappee asLocalString"
 		wrappee printOn: aStream
 ]
 
 { #category : #printing }
-PowerlangObjectWrapper >> printString [
+EggObjectWrapper >> printString [
 	^ String streamContents: [ :strm | self printOn: strm ]
 ]
 
 { #category : #testing }
-PowerlangObjectWrapper >> respondsTo: aSymbol [
+EggObjectWrapper >> respondsTo: aSymbol [
 
 	^ self class canUnderstand: aSymbol
 ]
 
 { #category : #accessing }
-PowerlangObjectWrapper >> runtime: aPowerlangLMR [
+EggObjectWrapper >> runtime: aPowerlangLMR [
 	runtime := aPowerlangLMR
 ]
 
 { #category : #testing }
-PowerlangObjectWrapper >> slotAt: index [
+EggObjectWrapper >> slotAt: index [
 	^self class on: (wrappee slotAt: index) runtime: runtime 
 ]
 
 { #category : #printing }
-PowerlangObjectWrapper >> stDisplayString [
+EggObjectWrapper >> stDisplayString [
 
 	^ self printString
 ]
 
 { #category : #accessing }
-PowerlangObjectWrapper >> wrappee [
+EggObjectWrapper >> wrappee [
 	^wrappee 
 ]
 
 { #category : #accessing }
-PowerlangObjectWrapper >> wrappee: anLMRObject [
+EggObjectWrapper >> wrappee: anLMRObject [
 	wrappee := anLMRObject
 ]

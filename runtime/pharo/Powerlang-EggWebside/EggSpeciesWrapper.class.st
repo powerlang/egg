@@ -1,40 +1,40 @@
 Class {
-	#name : #PowerlangSpeciesWrapper,
-	#superclass : #PowerlangObjectWrapper,
+	#name : #EggSpeciesWrapper,
+	#superclass : #EggObjectWrapper,
 	#category : #'Powerlang-EggWebside-Base'
 }
 
 { #category : #inquiries }
-PowerlangSpeciesWrapper >> >> aSymbol [
+EggSpeciesWrapper >> >> aSymbol [
 	
 	| symbol |
 	symbol := runtime symbolFromLocal: aSymbol.
-	^ PowerlangMethodWrapper
+	^ EggMethodWrapper
 		  on: (super >> symbol) wrappee
 		  runtime: runtime
 ]
 
 { #category : #inquiries }
-PowerlangSpeciesWrapper >> allInstVarNames [
+EggSpeciesWrapper >> allInstVarNames [
 
 	^ super allInstVarNames asArray wrappee slots collect: [ :s | 
 		  s asLocalString ]
 ]
 
 { #category : #inquiries }
-PowerlangSpeciesWrapper >> allSubclasses [
+EggSpeciesWrapper >> allSubclasses [
 	^ super allSubclasses asArray wrappee slots
-		collect: [ :c | PowerlangSpeciesWrapper on: c runtime: runtime ]
+		collect: [ :c | EggSpeciesWrapper on: c runtime: runtime ]
 ]
 
 { #category : #inquiries }
-PowerlangSpeciesWrapper >> allSuperclasses [
+EggSpeciesWrapper >> allSuperclasses [
 	^ super allSuperclasses asArray wrappee slots
-		collect: [ :c | PowerlangSpeciesWrapper on: c runtime: runtime ]
+		collect: [ :c | EggSpeciesWrapper on: c runtime: runtime ]
 ]
 
 { #category : #converting }
-PowerlangSpeciesWrapper >> asWebsideJson [
+EggSpeciesWrapper >> asWebsideJson [
 
 	^ super asWebsideJson
 		  at: 'name' put: self name;
@@ -49,19 +49,19 @@ PowerlangSpeciesWrapper >> asWebsideJson [
 ]
 
 { #category : #inquiries }
-PowerlangSpeciesWrapper >> categories [
+EggSpeciesWrapper >> categories [
 	^ super categories asArray wrappee slots
 		collect: [ :c | c asLocalString  ]
 ]
 
 { #category : #inquiries }
-PowerlangSpeciesWrapper >> classVarNames [
+EggSpeciesWrapper >> classVarNames [
 	^ super classVarNames asArray wrappee slots
 		collect: [ :s | s asLocalString ]
 ]
 
 { #category : #private }
-PowerlangSpeciesWrapper >> classVariablesString [
+EggSpeciesWrapper >> classVariablesString [
 	^ String
 		streamContents: [ :s | 
 			self classVarNames
@@ -70,12 +70,12 @@ PowerlangSpeciesWrapper >> classVariablesString [
 ]
 
 { #category : #inquiries }
-PowerlangSpeciesWrapper >> comment [
+EggSpeciesWrapper >> comment [
 	^ super comment wrappee asLocalString
 ]
 
 { #category : #services }
-PowerlangSpeciesWrapper >> compile: aString [
+EggSpeciesWrapper >> compile: aString [
 
 	| local size kernel name class method astcodes selector format code md |
 	local := SCompiler new compile: aString.
@@ -106,7 +106,7 @@ PowerlangSpeciesWrapper >> compile: aString [
 ]
 
 { #category : #inquiries }
-PowerlangSpeciesWrapper >> definition [
+EggSpeciesWrapper >> definition [
 
 	| highest |
 	^ String streamContents: [ :strm | 
@@ -145,20 +145,20 @@ PowerlangSpeciesWrapper >> definition [
 ]
 
 { #category : #testing }
-PowerlangSpeciesWrapper >> includesSelector: aSymbol [
+EggSpeciesWrapper >> includesSelector: aSymbol [
 	| symbol |
 	symbol := runtime addSymbol: aSymbol.
 	^(super includesSelector: symbol) asLocalObject
 ]
 
 { #category : #inquiries }
-PowerlangSpeciesWrapper >> instVarNames [
+EggSpeciesWrapper >> instVarNames [
 	^ super instVarNames asArray wrappee slots
 		collect: [ :s |  s asLocalString]
 ]
 
 { #category : #private }
-PowerlangSpeciesWrapper >> instanceVariablesString [
+EggSpeciesWrapper >> instanceVariablesString [
 	^ String
 		streamContents: [ :s | 
 			self instVarNames
@@ -167,26 +167,26 @@ PowerlangSpeciesWrapper >> instanceVariablesString [
 ]
 
 { #category : #inquiries }
-PowerlangSpeciesWrapper >> metaclass [
+EggSpeciesWrapper >> metaclass [
 	^self class on: (runtime sendLocal: #class to: wrappee) runtime: runtime 
 ]
 
 { #category : #inquiries }
-PowerlangSpeciesWrapper >> methods [
+EggSpeciesWrapper >> methods [
 	| md |
 	md := self methodDictionary.
 	^ md keys asSet asArray wrappee slots
 		collect:
-			[ :k | PowerlangMethodWrapper on: (md at: k) wrappee runtime: runtime ]
+			[ :k | EggMethodWrapper on: (md at: k) wrappee runtime: runtime ]
 ]
 
 { #category : #inquiries }
-PowerlangSpeciesWrapper >> name [
+EggSpeciesWrapper >> name [
 	^super name wrappee asLocalString
 ]
 
 { #category : #services }
-PowerlangSpeciesWrapper >> removeSelector: aSymbol [
+EggSpeciesWrapper >> removeSelector: aSymbol [
 
 	| symbol |
 	symbol := runtime symbolFromLocal: aSymbol.
@@ -194,24 +194,24 @@ PowerlangSpeciesWrapper >> removeSelector: aSymbol [
 ]
 
 { #category : #private }
-PowerlangSpeciesWrapper >> sharedPoolsString [
+EggSpeciesWrapper >> sharedPoolsString [
 
 	^ ''
 ]
 
 { #category : #inquiries }
-PowerlangSpeciesWrapper >> subclasses [
+EggSpeciesWrapper >> subclasses [
 	^ super subclasses asArray wrappee slots
-		collect: [ :c | PowerlangSpeciesWrapper on: c runtime: runtime ]
+		collect: [ :c | EggSpeciesWrapper on: c runtime: runtime ]
 ]
 
 { #category : #inquiries }
-PowerlangSpeciesWrapper >> withAllSubclasses [
+EggSpeciesWrapper >> withAllSubclasses [
 	^ OrderedCollection with: self withAll: self allSubclasses
 ]
 
 { #category : #inquiries }
-PowerlangSpeciesWrapper >> withAllSuperclasses [
+EggSpeciesWrapper >> withAllSuperclasses [
 	^ OrderedCollection with:
 		self withAll: self allSuperclasses
 ]

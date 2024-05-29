@@ -1,5 +1,5 @@
 Class {
-	#name : #PowerlangDebuggerWrapper,
+	#name : #EggDebuggerWrapper,
 	#superclass : #Object,
 	#instVars : [
 		'context'
@@ -8,12 +8,12 @@ Class {
 }
 
 { #category : #accessing }
-PowerlangDebuggerWrapper >> context [
+EggDebuggerWrapper >> context [
 	^context
 ]
 
 { #category : #accessing }
-PowerlangDebuggerWrapper >> context: anEvaluatorContext [
+EggDebuggerWrapper >> context: anEvaluatorContext [
 
 	context := anEvaluatorContext
 ]

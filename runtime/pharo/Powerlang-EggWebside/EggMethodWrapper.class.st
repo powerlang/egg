@@ -1,11 +1,11 @@
 Class {
-	#name : #PowerlangMethodWrapper,
-	#superclass : #PowerlangObjectWrapper,
+	#name : #EggMethodWrapper,
+	#superclass : #EggObjectWrapper,
 	#category : #'Powerlang-EggWebside-Base'
 }
 
 { #category : #converting }
-PowerlangMethodWrapper >> asWebsideJson [
+EggMethodWrapper >> asWebsideJson [
 
 	^ super asWebsideJson
 		  at: 'selector' put: self selector;
@@ -20,12 +20,12 @@ PowerlangMethodWrapper >> asWebsideJson [
 ]
 
 { #category : #inquiries }
-PowerlangMethodWrapper >> selector [
+EggMethodWrapper >> selector [
 	^ super selector ifNotNil: [ :s | s wrappee asLocalString] 
 ]
 
 { #category : #inquiries }
-PowerlangMethodWrapper >> sourceCode [
+EggMethodWrapper >> sourceCode [
 	| source |
 	source := self sourceObject wrappee.
 	^source = runtime nil ifTrue: ['no source'] ifFalse: [source asLocalString]
