@@ -26,12 +26,13 @@ egg.image: pharo Pharo.image
 	./pharo $@ eval --save "(IceRepositoryCreator new url: '$(ICEBERG_URL)'; createRepository) register"
 	./pharo $@ metacello install tonel://. BaselineOfPowerlang --groups=$(GROUP)
 	./pharo $@ eval --save "SystemWindow closeTopWindow. GTPlayground openContents: 'first-steps.st' asFileReference contents withSqueakLineEndings"
+
 	@echo ""
 	@echo "To open Pharo bootstrap image run:"
 	@echo ""
 	@echo "    ./pharo-ui egg.image"
 	@echo ""
-	git remote -v | grep -w pharo-egg || git remote add pharo-egg egg/pharo/pharo-local/iceberg/local/egg/
+	git remote -v | grep -w pharo-egg || git remote add pharo-egg runtime/pharo/pharo-local/iceberg/local/egg/
 
 test: egg.image pharo
 	./pharo $< test --junit-xml-output Powerlang-Tests
@@ -59,5 +60,9 @@ eggjs-kernel: egg.image pharo |
 		filename := runtme newString: '$(KERNEL_FILE)'. \
 		runtime sendLocal: #writeJsonKernelTo: to: module with: {filename}"
 
+webside:
+	./pharo egg.image metacello install github://guillermoamaral/Pharo-Webside:main BaselineOfWebside
+	./pharo egg.image eval --save "WebsideServer new baseUri: '/pharo/v1'; port: 9002; start"
 
+.PHONY: webside
 
