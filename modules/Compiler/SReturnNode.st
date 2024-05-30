@@ -3,7 +3,8 @@ Class {
 	#superclass : #SParseNode,
 	#instVars : [
 		'expression',
-		'return'
+		'return',
+		'local'
 	],
 	#category : #'Powerlang-Core-SCompiler-Smalltalk-Parser'
 }
@@ -42,4 +43,19 @@ SReturnNode >> nodesDo: aBlock includingDeclarations: aBoolean [
 { #category : #accessing }
 SReturnNode >> return: aSmalltalkToken [
 	return := aSmalltalkToken
+]
+
+{ #category : #accessing }
+SReturnNode >> local: aBoolean [
+	local := aBoolean
+]
+
+{ #category : #accessing }
+SReturnNode >> local [
+	^local
+]
+
+{ #category : #decoding }
+SReturnNode class >> decodeUsing: anAstcodeDecoder [
+	^anAstcodeDecoder decodeReturn
 ]

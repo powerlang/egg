@@ -42,3 +42,8 @@ DynamicBinding >> isDynamic [
 DynamicBinding >> literal [
 	^name asSymbol
 ]
+
+{ #category : #decoding }
+DynamicBinding class >> decodeUsing: anAstcodeDecoder [
+	^ anAstcodeDecoder decodeDynamicVar
+]

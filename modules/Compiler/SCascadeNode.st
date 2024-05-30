@@ -52,3 +52,8 @@ SCascadeNode >> receiver [
 SCascadeNode >> receiver: rcvr [
 	receiver := rcvr
 ]
+
+{ #category : #decoding }
+SCascadeNode class >> decodeUsing: anAstcodeDecoder [
+       ^anAstcodeDecoder decodeCascade
+]

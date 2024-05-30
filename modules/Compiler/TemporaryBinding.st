@@ -32,3 +32,8 @@ TemporaryBinding >> initialize [
 TemporaryBinding >> isTemporary [
 	^true
 ]
+
+{ #category : #decoding }
+TemporaryBinding class >> decodeUsing: anAstcodeDecoder [
+	^anAstcodeDecoder decodeTemporary
+]
