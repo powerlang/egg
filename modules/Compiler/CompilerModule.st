@@ -13,13 +13,12 @@ Class {
 { #category : #initializing }
 CompilerModule >> justLoaded [
 	super justLoaded.
-	AstcodeEncoder initializeBindingIds; initializeTreecodeIds; initializeClosureElementIds
+	TreecodeEncoder initializeBindingIds; initializeTreecodeIds; initializeClosureElementIds
 ]
 
 { #category : #spec }
 CompilerModule >> imports [
 	^{
-		#Kernel -> #Error. #Kernel -> #ByteArray. #Kernel -> #Module. #Kernel -> #NumberParser. #Kernel -> #Species.
-		#Kernel -> #OrderedDictionary
+		#Kernel -> #(Error ByteArray Module NumberParser Species OrderedDictionary)
 	}
 ] 

@@ -30,7 +30,7 @@ SMethodNode >> buildMethod [
 		classBinding: compiler frontend classBinding.
 	cm pragma: pragma.
 	cm blocks do: [ :block | block method: cm ].
-	encoder := AstcodeEncoder new method: cm.
+	encoder := TreecodeEncoder new method: cm.
 	astcodes := self acceptVisitor: encoder.
 	^ cm astcodes: astcodes
 ]
