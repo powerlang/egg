@@ -21,14 +21,13 @@ globalThis._cascade = function(receiver, cascadeStatements) { return cascadeStat
 
 globalThis.nil = {}
 
-Object.prototype.ifNil_ = function(closure) { if (this == nil) { return closure() } else { return this } }
-
-Object.prototype.ifNotNil_ = function(closure) { if (this == nil) { return nil } else {return closure(this)} }
+Object.prototype.ifNil_ = function(closure) { return nil === this? closure() : this }
+Object.prototype.ifNotNil_ = function(closure) { return nil === this? nil : closure(this)}
 Object.prototype.ifNil_ifNotNil_ = function(closureNil, closureNotNil) {
-	if (this == nil) { return closureNil() } else {return closureNotNil(this) } }
+	return nil === this? closureNil() : closureNotNil(this) }
 
 
-Object.prototype.isNil = function() { return (this === nil) }
+Object.prototype.isNil = function() { return (nil === this) }
 Object.prototype.notNil = function() { return (!this.isNil()) }
 
 //Object.prototype.value = function () { return this; }
@@ -53,9 +52,9 @@ Object.prototype.asString = function() { return this.toString(); }
 
 // add some Smalltalk-ish methods to JS booleans
 
-Boolean.prototype.ifTrue_  = function(closure) { if (this == true) { return closure() } else {return nil } }
-Boolean.prototype.ifFalse_ = function(closure) { if (this == true) { return nil } else { return closure() } }
-Boolean.prototype.ifTrue_ifFalse_ = function(closureTrue, closureFalse) { if (this == true) { return closureTrue() } else {return closureFalse() } }
+Boolean.prototype.ifTrue_  = function(closure) { return true === this? closure() : nil }
+Boolean.prototype.ifFalse_ = function(closure) { return true === this? nil : closure() }
+Boolean.prototype.ifTrue_ifFalse_ = function(closureTrue, closureFalse) { return true === this? closureTrue() : closureFalse() }
 
 Boolean.prototype.or_  = function (closure) { return this || closure() }
 Boolean.prototype.orNot_  = function (closure) { return this || !closure() }
