@@ -13,7 +13,7 @@ Class {
 { #category : #initializing }
 CompilerModule >> justLoaded [
 	super justLoaded.
-	AstcodeEncoder initializeBindingIds; initializeTreecodeIds; initializeClosureElementIds
+	TreecodeEncoder initializeBindingIds; initializeTreecodeIds; initializeClosureElementIds
 ]
 
 { #category : #spec }

@@ -18,8 +18,8 @@ TemporaryBinding >> description [
 ]
 
 { #category : #initialization }
-TemporaryBinding >> encodeUsing: anAstcodeEncoder [
-	anAstcodeEncoder encodeTemporary: index env: environment
+TemporaryBinding >> encodeUsing: anTreecodeEncoder [
+	anTreecodeEncoder encodeTemporary: index env: environment
 ]
 
 { #category : #initialization }
