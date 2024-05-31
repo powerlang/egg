@@ -22,8 +22,8 @@ Class {
 SpeciesSpec class >> initializeFormatMasks [
 	Format := PoolDictionary newConstantPool.
 	Format
-		at: 'IsArrayed' put: 0x1;
-		at: 'IsBytes' put: 0x2
+		at: 'IsArrayed' put: 1;
+		at: 'IsBytes' put: 2
 ]
 
 {#category : #'instance creation'}
