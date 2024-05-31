@@ -1,2 +1,2 @@
-# powerlangjs-server
-a node app that loads a Smalltalk image through PowerlangJS, and allows developing it through PowerlangJS-Webside
+# example-server
+A node app that uses egg.js to load an Egg image, and allows developing it through an EggJS-Webside backend
