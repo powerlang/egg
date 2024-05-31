@@ -18,7 +18,7 @@ Class {
 		'metaclassClass',
 		'speciesInstanceBehaviorIndex',
 		'speciesFormatIndex',
-		'methodAstcodesIndex',
+		'methodTreecodesIndex',
 		'methodInstSize',
 		'methodClassBindingIndex',
 		'speciesSuperclassIndex',
@@ -403,9 +403,9 @@ EggMetacircularRuntime >> loadModule: symbol [
 ]
 
 { #category : #initialization }
-EggMetacircularRuntime >> localMethodAstcodes: method [
+EggMetacircularRuntime >> localMethodTreecodes: method [
 
-	^ (self methodAstcodes: method) bytes
+	^ (self methodTreecodes: method) bytes
 ]
 
 { #category : #initialization }
@@ -448,13 +448,13 @@ EggMetacircularRuntime >> methodArgumentCount: anLMRObject [
 ]
 
 { #category : #initialization }
-EggMetacircularRuntime >> methodAstcodes: anLMRObject [
-	^ anLMRObject slotAt: methodAstcodesIndex
+EggMetacircularRuntime >> methodTreecodes: anLMRObject [
+	^ anLMRObject slotAt: methodTreecodesIndex
 ]
 
 { #category : #initialization }
-EggMetacircularRuntime >> methodAstcodesIndex: anInteger [
-	methodAstcodesIndex := anInteger
+EggMetacircularRuntime >> methodTreecodesIndex: anInteger [
+	methodTreecodesIndex := anInteger
 ]
 
 { #category : #initialization }

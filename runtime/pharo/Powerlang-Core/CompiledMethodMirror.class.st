@@ -16,8 +16,8 @@ CompiledMethodMirror >> argumentCount [
 ]
 
 { #category : #constants }
-CompiledMethodMirror >> astcodes [
-	^self getInstVarNamed: #astcodes.
+CompiledMethodMirror >> treecodes [
+	^self getInstVarNamed: #treecodes.
 ]
 
 { #category : #accessing }
@@ -43,11 +43,11 @@ CompiledMethodMirror >> currentVersion [
 ]
 
 { #category : #constants }
-CompiledMethodMirror >> decodedAstcodes [
-	| astcodes |
-	astcodes := self astcodes localDeepCopy.
-	^ AstcodeDecoder new
-		stream: astcodes readStream;
+CompiledMethodMirror >> decodedTreecodes [
+	| treecodes |
+	treecodes := self treecodes localDeepCopy.
+	^ TreecodeDecoder new
+		stream: treecodes readStream;
 		method: self;
 		decodeMethod
 ]

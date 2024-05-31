@@ -5,7 +5,7 @@ Class {
 }
 
 { #category : #unclassified }
-SLiteralBinding class >> decodeUsing: anAstcodeDecoder [
+SLiteralBinding class >> decodeUsing: aTreecodeDecoder [
 	^self new
 ]
 

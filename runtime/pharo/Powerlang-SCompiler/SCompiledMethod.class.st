@@ -5,7 +5,7 @@ Class {
 	#instVars : [
 		'format',
 		'optimizedCode',
-		'astcodes',
+		'treecodes',
 		'class',
 		'selector',
 		'source'
@@ -40,13 +40,13 @@ SCompiledMethod >> argumentCount: anInteger [
 ]
 
 { #category : #constants }
-SCompiledMethod >> astcodes [
-	^astcodes
+SCompiledMethod >> treecodes [
+	^treecodes
 ]
 
 { #category : #constants }
-SCompiledMethod >> astcodes: aCollection [
-	astcodes := aCollection
+SCompiledMethod >> treecodes: aCollection [
+	treecodes := aCollection
 ]
 
 { #category : #constants }
@@ -97,7 +97,7 @@ SCompiledMethod >> copyWithLiterals: aCollection [
 	| result |
 	result := self species withAll: aCollection.
 	^ result
-		astcodes: astcodes;
+		treecodes: treecodes;
 		classBinding: class;
 		format: format;
 		optimizedCode: optimizedCode;
@@ -262,8 +262,8 @@ SCompiledMethod >> selector: aSymbol [
 { #category : #constants }
 SCompiledMethod >> sexpressions [
 	| decoder |
-	decoder := AstcodeDecoder new
-		stream: astcodes readStream;
+	decoder := TreecodeDecoder new
+		stream: treecodes readStream;
 		method: self.
 	^decoder decodeMethod
 ]

@@ -15,8 +15,8 @@ SelfBinding >> canBeAssigned [
 ]
 
 { #category : #testing }
-SelfBinding >> encodeUsing: anAstcodeEmitter [
-	anAstcodeEmitter encodeSelf
+SelfBinding >> encodeUsing: aTreecodeEmitter [
+	aTreecodeEmitter encodeSelf
 ]
 
 { #category : #testing }

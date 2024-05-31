@@ -10,7 +10,7 @@ Class {
 		'method',
 		'parent',
 		'gateBuilder',
-		'blockAstcodes',
+		'blockTreecodes',
 		'environment'
 	],
 	#pools : [
@@ -116,7 +116,7 @@ SExpressionInterpreter >> evaluateClosure: aPClosure with: anObject with: anothe
 SExpressionInterpreter >> evaluateClosure: aPClosure withArgs: anArray [
 	| oldArgs oldTemps oldEnv block sblock result |
 	block := aPClosure block.
-	sblock := blockAstcodes at: block.
+	sblock := blockTreecodes at: block.
 	sblock isInlined ifTrue: [
 			 anArray with: sblock inlinedArgs do: [:arg :i | temporaries at: i put: arg].
 			^ self visitScript: sblock ].
@@ -136,7 +136,7 @@ SExpressionInterpreter >> evaluateClosure: aPClosure withArgs: anArray [
 { #category : #visiting }
 SExpressionInterpreter >> initialize [
 	returned := false.
-	blockAstcodes := IdentityDictionary new
+	blockTreecodes := IdentityDictionary new
 ]
 
 { #category : #visiting }
@@ -296,7 +296,7 @@ SExpressionInterpreter >> visitBlock: anSBlock [
 	closure := anSBlock isInlined
 				   ifTrue: [ SCompiledBlock new newClosure home: self ]
 				   ifFalse: [ self captureClosure: anSBlock ].
-	blockAstcodes at: closure block put: anSBlock.
+	blockTreecodes at: closure block put: anSBlock.
 	self halt.
 	"	handle := LocalHandle on: closure within: localRuntime."
 	^ handle mirage

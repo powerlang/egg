@@ -191,9 +191,9 @@ EggRingRuntime >> loadAssociationValue: association [
 ]
 
 { #category : #services }
-EggRingRuntime >> localMethodAstcodes: anSCompiledMethod [
+EggRingRuntime >> localMethodTreecodes: anSCompiledMethod [
 
-	^ self methodAstcodes: anSCompiledMethod
+	^ self methodTreecodes: anSCompiledMethod
 ]
 
 { #category : #services }
@@ -219,9 +219,9 @@ EggRingRuntime >> methodArgumentCount: method [
 ]
 
 { #category : #services }
-EggRingRuntime >> methodAstcodes: anSCompiledMethod [
+EggRingRuntime >> methodTreecodes: anSCompiledMethod [
 
-	^ anSCompiledMethod astcodes
+	^ anSCompiledMethod treecodes
 ]
 
 { #category : #services }

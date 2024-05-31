@@ -5,7 +5,7 @@ Class {
 }
 
 { #category : #unclassified }
-SBinding class >> decodeUsing: anAstcodeDecoder [
+SBinding class >> decodeUsing: aTreecodeDecoder [
 	^self subclassResponsibility
 ]
 

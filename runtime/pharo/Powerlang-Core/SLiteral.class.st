@@ -8,8 +8,8 @@ Class {
 }
 
 { #category : #initialization }
-SLiteral class >> decodeUsing: anAstcodeDecoder [
-	^anAstcodeDecoder decodeLiteral
+SLiteral class >> decodeUsing: aTreecodeDecoder [
+	^aTreecodeDecoder decodeLiteral
 ]
 
 { #category : #visiting }

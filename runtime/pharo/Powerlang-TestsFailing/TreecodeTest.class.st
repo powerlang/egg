@@ -1,5 +1,5 @@
 Class {
-	#name : #AstcodeTest,
+	#name : #TreecodeTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'method'
@@ -12,48 +12,48 @@ Class {
 }
 
 { #category : #private }
-AstcodeTest >> compile: source in: aSpecies [
+TreecodeTest >> compile: source in: aSpecies [
 	^SCompiler compile: source in: aSpecies
 ]
 
 { #category : #private }
-AstcodeTest >> decode: anArray of: aCompiledMethod [
+TreecodeTest >> decode: anArray of: aCompiledMethod [
 	| decoder |
-	decoder := AstcodeDecoder new
+	decoder := TreecodeDecoder new
 		stream: anArray readStream;
 		method: aCompiledMethod.
 	^decoder decodeMethod
 ]
 
 { #category : #private }
-AstcodeTest >> encode: source [
+TreecodeTest >> encode: source [
 	^self encode: source in: UndefinedObject
 ]
 
 { #category : #private }
-AstcodeTest >> encode: source in: aSpecies [
+TreecodeTest >> encode: source in: aSpecies [
 	| ring compiler |
 	ring := VirtualImage kernelSpec bindingOf: aSpecies name.
 	compiler := SCompiler forClass: ring value.
 	method := compiler compile: source.
-	^ method astcodes
+	^ method treecodes
 ]
 
 { #category : #private }
-AstcodeTest >> test010emptyMethod [
-	| astcodes root |
-	astcodes := self encode: 'm'.
-	self assert: astcodes = {MethodId}.
-	root := self decode: astcodes of: method.
+TreecodeTest >> test010emptyMethod [
+	| treecodes root |
+	treecodes := self encode: 'm'.
+	self assert: treecodes = {MethodId}.
+	root := self decode: treecodes of: method.
 	self assert: root isMethod; assert: root statements isEmpty
 ]
 
 { #category : #private }
-AstcodeTest >> test020encodeFalse [
-	| astcodes root identifier |
-	astcodes := self encode: 'm false'.
-	self assert: astcodes = {MethodId. {IdentifierId. FalseId}}.
-	root := self decode: astcodes of: method.
+TreecodeTest >> test020encodeFalse [
+	| treecodes root identifier |
+	treecodes := self encode: 'm false'.
+	self assert: treecodes = {MethodId. {IdentifierId. FalseId}}.
+	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
 		assert: root statements size = 1.
@@ -65,11 +65,11 @@ AstcodeTest >> test020encodeFalse [
 ]
 
 { #category : #private }
-AstcodeTest >> test020encodeNil [
-	| astcodes root identifier |
-	astcodes := self encode: 'm nil'.
-	self assert: astcodes = {MethodId. {IdentifierId. NilId}}.
-	root := self decode: astcodes of: method.
+TreecodeTest >> test020encodeNil [
+	| treecodes root identifier |
+	treecodes := self encode: 'm nil'.
+	self assert: treecodes = {MethodId. {IdentifierId. NilId}}.
+	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
 		assert: root statements size = 1.
@@ -81,11 +81,11 @@ AstcodeTest >> test020encodeNil [
 ]
 
 { #category : #private }
-AstcodeTest >> test020encodeSelf [
-	| astcodes root identifier |
-	astcodes := self encode: 'm self'.
-	self assert: astcodes = {MethodId. {IdentifierId. SelfId}}.
-	root := self decode: astcodes of: method.
+TreecodeTest >> test020encodeSelf [
+	| treecodes root identifier |
+	treecodes := self encode: 'm self'.
+	self assert: treecodes = {MethodId. {IdentifierId. SelfId}}.
+	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
 		assert: root statements size = 1.
@@ -94,11 +94,11 @@ AstcodeTest >> test020encodeSelf [
 ]
 
 { #category : #private }
-AstcodeTest >> test020encodeTrue [
-	| astcodes root identifier |
-	astcodes := self encode: 'm true'.
-	self assert: astcodes = {MethodId. {IdentifierId. TrueId}}.
-	root := self decode: astcodes of: method.
+TreecodeTest >> test020encodeTrue [
+	| treecodes root identifier |
+	treecodes := self encode: 'm true'.
+	self assert: treecodes = {MethodId. {IdentifierId. TrueId}}.
+	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
 		assert: root statements size = 1.
@@ -110,11 +110,11 @@ AstcodeTest >> test020encodeTrue [
 ]
 
 { #category : #private }
-AstcodeTest >> test021encodeClassVar [
-	| astcodes root identifier |
-	astcodes := self encode: 'm Flags' in: Class.
-	self assert: astcodes = {MethodId. {IdentifierId. ClassVarId. 1}}.
-	root := self decode: astcodes of: method.
+TreecodeTest >> test021encodeClassVar [
+	| treecodes root identifier |
+	treecodes := self encode: 'm Flags' in: Class.
+	self assert: treecodes = {MethodId. {IdentifierId. ClassVarId. 1}}.
+	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
 		assert: root statements size = 1.
@@ -128,11 +128,11 @@ AstcodeTest >> test021encodeClassVar [
 ]
 
 { #category : #private }
-AstcodeTest >> test021encodeInstVar [
-	| astcodes root identifier |
-	astcodes := self encode: 'm name' in: Class.
-	self assert: astcodes = {MethodId. {IdentifierId. InstVarId. 6}}.
-	root := self decode: astcodes of: method.
+TreecodeTest >> test021encodeInstVar [
+	| treecodes root identifier |
+	treecodes := self encode: 'm name' in: Class.
+	self assert: treecodes = {MethodId. {IdentifierId. InstVarId. 6}}.
+	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
 		assert: root statements size = 1.
@@ -144,11 +144,11 @@ AstcodeTest >> test021encodeInstVar [
 ]
 
 { #category : #private }
-AstcodeTest >> test021encodePoolVar [
-	| astcodes root identifier |
-	astcodes := self encode: 'm Pointers' in: Class.
-	self assert: astcodes = {MethodId. {IdentifierId. PoolVarId. 1}}.
-	root := self decode: astcodes of: method.
+TreecodeTest >> test021encodePoolVar [
+	| treecodes root identifier |
+	treecodes := self encode: 'm Pointers' in: Class.
+	self assert: treecodes = {MethodId. {IdentifierId. PoolVarId. 1}}.
+	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
 		assert: root statements size = 1.
@@ -162,11 +162,11 @@ AstcodeTest >> test021encodePoolVar [
 ]
 
 { #category : #private }
-AstcodeTest >> test022encodeReturn [
-	| astcodes root return identifier |
-	astcodes := self encode: 'm ^self'.
-	self assert: astcodes = {MethodId. {ReturnId. true. {IdentifierId. SelfId}}}.
-	root := self decode: astcodes of: method.
+TreecodeTest >> test022encodeReturn [
+	| treecodes root return identifier |
+	treecodes := self encode: 'm ^self'.
+	self assert: treecodes = {MethodId. {ReturnId. true. {IdentifierId. SelfId}}}.
+	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
 		assert: root statements size = 1.
@@ -177,13 +177,13 @@ AstcodeTest >> test022encodeReturn [
 ]
 
 { #category : #private }
-AstcodeTest >> test023encodeClass [
-	| astcodes root return identifier |
-	astcodes := self encode: 'm ^Array'.
+TreecodeTest >> test023encodeClass [
+	| treecodes root return identifier |
+	treecodes := self encode: 'm ^Array'.
 	self
-		assert: astcodes
+		assert: treecodes
 			= {MethodId. {ReturnId. true. {IdentifierId. GlobalClassId. 1}}}.
-	root := self decode: astcodes of: method.
+	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
 		assert: root statements size = 1.
@@ -198,11 +198,11 @@ AstcodeTest >> test023encodeClass [
 ]
 
 { #category : #private }
-AstcodeTest >> test024encodeLiteral [
-	| astcodes root literal |
-	astcodes := self encode: 'm #foo'.
-	self assert: astcodes = {MethodId. {LiteralId. 1}}.
-	root := self decode: astcodes of: method.
+TreecodeTest >> test024encodeLiteral [
+	| treecodes root literal |
+	treecodes := self encode: 'm #foo'.
+	self assert: treecodes = {MethodId. {LiteralId. 1}}.
+	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
 		assert: root statements size = 1.
@@ -213,13 +213,13 @@ AstcodeTest >> test024encodeLiteral [
 ]
 
 { #category : #private }
-AstcodeTest >> test030encodeUnaryMessage [
-	| astcodes root return message identifier |
-	astcodes := self encode: 'm ^self foo'.
+TreecodeTest >> test030encodeUnaryMessage [
+	| treecodes root return message identifier |
+	treecodes := self encode: 'm ^self foo'.
 	self
-		assert: astcodes
+		assert: treecodes
 			= {MethodId. {ReturnId. true. {MessageId. 1. {IdentifierId. SelfId}}}}.
-	root := self decode: astcodes of: method.
+	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
 		assert: root statements size = 1.
@@ -235,13 +235,13 @@ AstcodeTest >> test030encodeUnaryMessage [
 ]
 
 { #category : #private }
-AstcodeTest >> test035encodeBinaryMessage [
-	| astcodes root return message receiver argument |
-	astcodes := self encode: 'm ^self foo: true'.
+TreecodeTest >> test035encodeBinaryMessage [
+	| treecodes root return message receiver argument |
+	treecodes := self encode: 'm ^self foo: true'.
 	self
-		assert: astcodes
+		assert: treecodes
 			= {MethodId. {ReturnId. true. {MessageId. 1. {IdentifierId. SelfId}. {IdentifierId. TrueId}}}}.
-	root := self decode: astcodes of: method.
+	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
 		assert: root statements size = 1.
@@ -260,15 +260,15 @@ AstcodeTest >> test035encodeBinaryMessage [
 ]
 
 { #category : #private }
-AstcodeTest >> test036encodeTernaryMessage [
-	| astcodes root return message receiver arg1 arg2 |
-	astcodes := self encode: 'm ^self foo: true bar: false'.
+TreecodeTest >> test036encodeTernaryMessage [
+	| treecodes root return message receiver arg1 arg2 |
+	treecodes := self encode: 'm ^self foo: true bar: false'.
 	self
-		assert: astcodes = {MethodId. {ReturnId. true. {MessageId. 1.
+		assert: treecodes = {MethodId. {ReturnId. true. {MessageId. 1.
 					{IdentifierId. SelfId}.
 					{IdentifierId. TrueId}.
 					{IdentifierId. FalseId}}}}.
-	root := self decode: astcodes of: method.
+	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
 		assert: root statements size = 1.
@@ -291,13 +291,13 @@ AstcodeTest >> test036encodeTernaryMessage [
 ]
 
 { #category : #private }
-AstcodeTest >> test050instVarAssignment [
-	| astcodes root assignment assignee expression |
-	astcodes := self encode: 'm name := true' in: Class.
+TreecodeTest >> test050instVarAssignment [
+	| treecodes root assignment assignee expression |
+	treecodes := self encode: 'm name := true' in: Class.
 	self
-		assert: astcodes
+		assert: treecodes
 			= {MethodId. {AssignmentId. {IdentifierId. InstVarId. 6}. {IdentifierId. TrueId}}}.
-	root := self decode: astcodes of: method.
+	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
 		assert: root statements size = 1.

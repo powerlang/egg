@@ -11,8 +11,8 @@ Class {
 }
 
 { #category : #unclassified }
-SCascadeMessage class >> decodeUsing: anAstcodeDecoder [
-	^anAstcodeDecoder decodeCascadeMessage
+SCascadeMessage class >> decodeUsing: aTreecodeDecoder [
+	^aTreecodeDecoder decodeCascadeMessage
 ]
 
 { #category : #accessing }

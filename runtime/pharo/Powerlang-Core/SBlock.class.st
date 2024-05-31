@@ -10,8 +10,8 @@ Class {
 }
 
 { #category : #unclassified }
-SBlock class >> decodeUsing: anAstcodeDecoder [
-	^anAstcodeDecoder decodeBlock
+SBlock class >> decodeUsing: aTreecodeDecoder [
+	^aTreecodeDecoder decodeBlock
 ]
 
 { #category : #visiting }

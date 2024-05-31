@@ -15,7 +15,7 @@ SMethodNode >> acceptVisitor: visitor [
 
 { #category : #parsing }
 SMethodNode >> buildMethod [
-	| cm encoder astcodes |
+	| cm encoder treecodes |
 	cm := self methodClass withAll: self literals.
 	cm
 		blockCount: compiler blockCount;
@@ -31,8 +31,8 @@ SMethodNode >> buildMethod [
 	cm pragma: pragma.
 	cm blocks do: [ :block | block method: cm ].
 	encoder := TreecodeEncoder new method: cm.
-	astcodes := self acceptVisitor: encoder.
-	^ cm astcodes: astcodes
+	treecodes := self acceptVisitor: encoder.
+	^ cm treecodes: treecodes
 ]
 
 { #category : #parsing }

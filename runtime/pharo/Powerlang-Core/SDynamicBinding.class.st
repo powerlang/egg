@@ -9,8 +9,8 @@ Class {
 }
 
 { #category : #unclassified }
-SDynamicBinding class >> decodeUsing: anAstcodeDecoder [
-	^ anAstcodeDecoder decodeDynamicVar
+SDynamicBinding class >> decodeUsing: aTreecodeDecoder [
+	^ aTreecodeDecoder decodeDynamicVar
 ]
 
 { #category : #accessing }

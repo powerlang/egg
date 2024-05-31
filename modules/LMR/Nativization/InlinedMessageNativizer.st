@@ -501,13 +501,13 @@ InlinedMessageNativizer >> inlineUnitaryWhile: aBoolean [
 ]
 
 { #category : #accessing }
-InlinedMessageNativizer >> message: aMessageAstcode [
-	message := aMessageAstcode 
+InlinedMessageNativizer >> message: aMessageTreecode [
+	message := aMessageTreecode 
 ]
 
 { #category : #accessing }
-InlinedMessageNativizer >> nativizer: anAstcodeNativizer [
-	nativizer := anAstcodeNativizer 
+InlinedMessageNativizer >> nativizer: aTreecodeNativizer [
+	nativizer := aTreecodeNativizer 
 ]
 
 { #category : #nativizing }

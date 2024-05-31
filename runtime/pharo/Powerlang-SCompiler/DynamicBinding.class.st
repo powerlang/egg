@@ -29,8 +29,8 @@ DynamicBinding >> beReferencedFrom: aScriptNode [
 ]
 
 { #category : #testing }
-DynamicBinding >> encodeUsing: anAstcodeEmitter [
-	anAstcodeEmitter encodeDynamicVar: name
+DynamicBinding >> encodeUsing: aTreecodeEmitter [
+	aTreecodeEmitter encodeDynamicVar: name
 ]
 
 { #category : #testing }

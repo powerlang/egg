@@ -28,8 +28,8 @@ ArgumentBinding >> description [
 ]
 
 { #category : #actions }
-ArgumentBinding >> encodeUsing: anTreecodeEncoder [
-	anTreecodeEncoder encodeArgument: index env: environment
+ArgumentBinding >> encodeUsing: aTreecodeEncoder [
+	aTreecodeEncoder encodeArgument: index env: environment
 ]
 
 { #category : #testing }

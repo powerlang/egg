@@ -11,7 +11,7 @@ Class {
 	#instVars : [
 		'format',
 		'optimizedCode',
-		'astcodes',
+		'treecodes',
 		'class',
 		'selector',
 		'source'
@@ -24,7 +24,7 @@ Class {
 
 { #category : #inspecting }
 CompiledMethod class >> aspects [
-	^#(#astcodeString #disassembledText)
+	^#(#treecodeString #disassembledText)
 ]
 
 { #category : #initialization }
@@ -67,7 +67,7 @@ CompiledMethod class >> new: anInteger [
 { #category : #comparing }
 CompiledMethod >> ~ aCompiledMethod [
 	self literals = aCompiledMethod literals ifFalse: [^false].
-	^astcodes = aCompiledMethod astcodes
+	^treecodes = aCompiledMethod treecodes
 ]
 
 { #category : #comparing }
@@ -104,7 +104,7 @@ CompiledMethod >> asExtensionFor: aModule [
 		selector: selector;
 		sourceObject: source;
 		classBinding: class;
-		astcodes: astcodes.
+		treecodes: treecodes.
 	extension blocks do: [:block | block method: extension].
 	^extension
 ]
@@ -144,13 +144,13 @@ CompiledMethod >> blocksDo: aBlock [
 ]
 
 { #category : #accessing }
-CompiledMethod >> astcodes [
-	^astcodes
+CompiledMethod >> treecodes [
+	^treecodes
 ]
 
 { #category : #accessing }
-CompiledMethod >> astcodes: aByteArray [
-	astcodes := aByteArray
+CompiledMethod >> treecodes: aByteArray [
+	treecodes := aByteArray
 ]
 
 { #category : #testing }

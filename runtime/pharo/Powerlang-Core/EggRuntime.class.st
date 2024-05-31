@@ -141,7 +141,7 @@ EggRuntime >> literalFor: anObject [
 ]
 
 { #category : #accessing }
-EggRuntime >> localMethodAstcodes: method [
+EggRuntime >> localMethodTreecodes: method [
 
 	^ self subclassResponsibility
 ]
@@ -157,7 +157,7 @@ EggRuntime >> lookup: aSymbol startingAt: aBehavior [
 ]
 
 { #category : #accessing }
-EggRuntime >> methodAstcodes: method [
+EggRuntime >> methodTreecodes: method [
 
 	^ self subclassResponsibility
 ]
@@ -256,10 +256,10 @@ EggRuntime >> sendLocal: aSymbol to: receiver with: anArray [
 { #category : #accessing }
 EggRuntime >> sexpressionsOf: method [
 
-	| astcodes decoder |
-	astcodes := self localMethodAstcodes: method.
-	decoder := AstcodeDecoder new
-		           stream: astcodes readStream;
+	| treecodes decoder |
+	treecodes := self localMethodTreecodes: method.
+	decoder := TreecodeDecoder new
+		           stream: treecodes readStream;
 		           method: method;
 		           builder: self.
 	^ decoder decodeMethod

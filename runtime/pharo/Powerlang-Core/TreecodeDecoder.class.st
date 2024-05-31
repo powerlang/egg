@@ -1,5 +1,5 @@
 Class {
-	#name : #AstcodeDecoder,
+	#name : #TreecodeDecoder,
 	#superclass : #Object,
 	#instVars : [
 		'method',
@@ -18,7 +18,7 @@ Class {
 }
 
 { #category : #'class initialization' }
-AstcodeDecoder class >> initialize [
+TreecodeDecoder class >> initialize [
 	NodeTypes := Dictionary new.
 	BindingTypes := Dictionary new.
 	NodeTypes
@@ -42,7 +42,7 @@ AstcodeDecoder class >> initialize [
 ]
 
 { #category : #'instance creation' }
-AstcodeDecoder class >> new [
+TreecodeDecoder class >> new [
 	"return an initialized instance"
 
 	^ self basicNew initialize.
@@ -50,24 +50,24 @@ AstcodeDecoder class >> new [
 ]
 
 { #category : #public }
-AstcodeDecoder >> bindingTypeOf: id [
+TreecodeDecoder >> bindingTypeOf: id [
 	^ BindingTypes at: id
 ]
 
 { #category : #accessing }
-AstcodeDecoder >> builder: aRuntime [ 
+TreecodeDecoder >> builder: aRuntime [ 
 	builder := aRuntime
 ]
 
 { #category : #public }
-AstcodeDecoder >> decodeArgument [
+TreecodeDecoder >> decodeArgument [
 	^ SArgumentBinding new
 		index: self nextInteger;
 		environment: self nextEnvironment
 ]
 
 { #category : #public }
-AstcodeDecoder >> decodeAssignment [
+TreecodeDecoder >> decodeAssignment [
 	| assignment assignees |
 	assignment := SAssignment new.
 	
@@ -78,7 +78,7 @@ AstcodeDecoder >> decodeAssignment [
 ]
 
 { #category : #public }
-AstcodeDecoder >> decodeBlock [
+TreecodeDecoder >> decodeBlock [
 
 	| expression inlined block index code |
 	expression := SBlock new.
@@ -100,7 +100,7 @@ AstcodeDecoder >> decodeBlock [
 ]
 
 { #category : #public }
-AstcodeDecoder >> decodeCascade [
+TreecodeDecoder >> decodeCascade [
 	| cascade receiver messages message count |
 	cascade := SCascade new.
 	receiver := self nextExpression.
@@ -115,7 +115,7 @@ AstcodeDecoder >> decodeCascade [
 ]
 
 { #category : #public }
-AstcodeDecoder >> decodeCascadeMessage [
+TreecodeDecoder >> decodeCascadeMessage [
 	| selector arguments |
 	selector := self nextSymbol.
 	arguments := self nextExpressionArray.
@@ -125,12 +125,12 @@ AstcodeDecoder >> decodeCascadeMessage [
 ]
 
 { #category : #public }
-AstcodeDecoder >> decodeDynamicVar [
+TreecodeDecoder >> decodeDynamicVar [
 	^ SDynamicBinding new name: self nextSymbol
 ]
 
 { #category : #public }
-AstcodeDecoder >> decodeIdentifier [
+TreecodeDecoder >> decodeIdentifier [
 	| type binding |
 	type := self bindingTypeOf: self nextInteger.
 	binding := type decodeUsing: self.
@@ -138,7 +138,7 @@ AstcodeDecoder >> decodeIdentifier [
 ]
 
 { #category : #public }
-AstcodeDecoder >> decodeLiteral [
+TreecodeDecoder >> decodeLiteral [
 	| index value |
 	index := self nextInteger.
 	value := index = 0
@@ -150,7 +150,7 @@ AstcodeDecoder >> decodeLiteral [
 ]
 
 { #category : #public }
-AstcodeDecoder >> decodeMessage [
+TreecodeDecoder >> decodeMessage [
 	| inlined selector receiver arguments |
 	inlined := self nextBoolean.
 	selector := self nextSymbol.
@@ -164,11 +164,11 @@ AstcodeDecoder >> decodeMessage [
 ]
 
 { #category : #public }
-AstcodeDecoder >> decodeMethod [
+TreecodeDecoder >> decodeMethod [
 	| type node next pragma |
 	type := stream next.
 	type != MethodId
-		ifTrue: [ self error: 'method astcode expected' ].
+		ifTrue: [ self error: 'method treecode expected' ].
 	node := SMethod new.
 	next := stream peek.
 	next = PragmaId
@@ -182,7 +182,7 @@ AstcodeDecoder >> decodeMethod [
 ]
 
 { #category : #public }
-AstcodeDecoder >> decodeNestedDynamicVar [
+TreecodeDecoder >> decodeNestedDynamicVar [
 	^ SNestedDynamicBinding new
 		name:
 			self nextSymbol.
@@ -190,7 +190,7 @@ AstcodeDecoder >> decodeNestedDynamicVar [
 ]
 
 { #category : #public }
-AstcodeDecoder >> decodeReturn [
+TreecodeDecoder >> decodeReturn [
 	| expression local |
 	local := self nextBoolean.
 	expression := self nextExpression.
@@ -200,36 +200,36 @@ AstcodeDecoder >> decodeReturn [
 ]
 
 { #category : #public }
-AstcodeDecoder >> decodeTemporary [
+TreecodeDecoder >> decodeTemporary [
 	^ STemporaryBinding new
 		index: self nextInteger;
 		environment: self nextEnvironment
 ]
 
 { #category : #unclassified }
-AstcodeDecoder >> literalAt: anInteger [
+TreecodeDecoder >> literalAt: anInteger [
 	^ builder ifNil: [method at: anInteger] ifNotNil: [builder method: method literalAt: anInteger]
 ]
 
 { #category : #accessing }
-AstcodeDecoder >> method: aMethod [
+TreecodeDecoder >> method: aMethod [
 	method := aMethod
 ]
 
 { #category : #public }
-AstcodeDecoder >> nextArray [
+TreecodeDecoder >> nextArray [
 	| count |
 	count := self nextInteger.
 	^ stream next: count
 ]
 
 { #category : #initialization }
-AstcodeDecoder >> nextBoolean [
+TreecodeDecoder >> nextBoolean [
 	^ stream next = 1
 ]
 
 { #category : #public }
-AstcodeDecoder >> nextEnvironment [
+TreecodeDecoder >> nextEnvironment [
 	| value |
 	value := self nextInteger.
 	^ value != -2
@@ -237,7 +237,7 @@ AstcodeDecoder >> nextEnvironment [
 ]
 
 { #category : #public }
-AstcodeDecoder >> nextExpression [
+TreecodeDecoder >> nextExpression [
 	| type |
 	type := self nodeTypeOf: stream next.
 	^type decodeUsing: self.
@@ -245,14 +245,14 @@ AstcodeDecoder >> nextExpression [
 ]
 
 { #category : #public }
-AstcodeDecoder >> nextExpressionArray [
+TreecodeDecoder >> nextExpressionArray [
 	| count |
 	count := self nextInteger.
 	^(1 to: count) collect: [ :arg | self nextExpression ]
 ]
 
 { #category : #initialization }
-AstcodeDecoder >> nextInteger [
+TreecodeDecoder >> nextInteger [
 	| value |
 	value := stream next.
 	value = 16r80
@@ -263,7 +263,7 @@ AstcodeDecoder >> nextInteger [
 ]
 
 { #category : #unclassified }
-AstcodeDecoder >> nextLiteralInteger [
+TreecodeDecoder >> nextLiteralInteger [
 	| value |
 	value := self nextInteger.
 	^ builder
@@ -272,21 +272,21 @@ AstcodeDecoder >> nextLiteralInteger [
 ]
 
 { #category : #public }
-AstcodeDecoder >> nextSymbol [
+TreecodeDecoder >> nextSymbol [
 	| index |
 	index := self nextInteger.
 	^ self literalAt: index
 ]
 
 { #category : #public }
-AstcodeDecoder >> nextSymbolOrNil [
+TreecodeDecoder >> nextSymbolOrNil [
 	| index |
 	index := self nextInteger.
 	^index != 0 ifTrue: [ self literalAt: index]
 ]
 
 { #category : #initialization }
-AstcodeDecoder >> nextUnsignedInteger [
+TreecodeDecoder >> nextUnsignedInteger [
 	| value |
 	value := self nextByte.
 	^value < 128
@@ -295,11 +295,11 @@ AstcodeDecoder >> nextUnsignedInteger [
 ]
 
 { #category : #public }
-AstcodeDecoder >> nodeTypeOf: id [
+TreecodeDecoder >> nodeTypeOf: id [
 	^NodeTypes at: id
 ]
 
 { #category : #accessing }
-AstcodeDecoder >> stream: aStream [
+TreecodeDecoder >> stream: aStream [
 	stream := aStream
 ]

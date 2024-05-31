@@ -5,8 +5,8 @@ Class {
 }
 
 { #category : #accessing }
-NilBinding >> encodeUsing: anAstcodeEmitter [
-	anAstcodeEmitter encodeNil
+NilBinding >> encodeUsing: aTreecodeEmitter [
+	aTreecodeEmitter encodeNil
 ]
 
 { #category : #accessing }
