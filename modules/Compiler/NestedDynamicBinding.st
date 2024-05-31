@@ -8,8 +8,8 @@ Class {
 }
 
 { #category : #testing }
-NestedDynamicBinding >> encodeUsing: anAstcodeEmitter [
-	anAstcodeEmitter encodeNestedDynamicVar: name
+NestedDynamicBinding >> encodeUsing: aTreecodeEmitter [
+	aTreecodeEmitter encodeNestedDynamicVar: name
 ]
 
 { #category : #testing }

@@ -5,8 +5,8 @@ Class {
 }
 
 { #category : #unclassified }
-STemporaryBinding class >> decodeUsing: anAstcodeDecoder [
-	^anAstcodeDecoder decodeTemporary
+STemporaryBinding class >> decodeUsing: aTreecodeDecoder [
+	^aTreecodeDecoder decodeTemporary
 ]
 
 { #category : #'as yet unclassified' }

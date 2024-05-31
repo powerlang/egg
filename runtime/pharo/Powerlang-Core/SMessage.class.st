@@ -12,8 +12,8 @@ Class {
 }
 
 { #category : #unclassified }
-SMessage class >> decodeUsing: anAstcodeDecoder [
-	^anAstcodeDecoder decodeMessage
+SMessage class >> decodeUsing: aTreecodeDecoder [
+	^aTreecodeDecoder decodeMessage
 ]
 
 { #category : #'instance creation' }

@@ -231,7 +231,7 @@ Ring2MetacircularConverter >> createNewClassFrom: spec in: module [
 { #category : #initialization }
 Ring2MetacircularConverter >> createNewMethod: m in: species [
 
-	| smethod size transferred astcodes selector format tliteral md organizer code category |
+	| smethod size transferred treecodes selector format tliteral md organizer code category |
 	smethod := SCompiler new compile: m sourceCode.
 	smethod classBinding: species.
 	size := dest newInteger: smethod size.
@@ -240,12 +240,12 @@ Ring2MetacircularConverter >> createNewMethod: m in: species [
 		               to: self => #CompiledMethod
 		               with: { size }.
 	mapping at: smethod put: transferred.
-	astcodes := dest newByteArray: smethod astcodes.
+	treecodes := dest newByteArray: smethod treecodes.
 	selector := dest addSymbol: smethod selector.
 	format := dest newInteger: smethod format.
 	code := dest newString: smethod source.
 	dest
-		sendLocal: #astcodes: to: transferred with: { astcodes };
+		sendLocal: #treecodes: to: transferred with: { treecodes };
 		sendLocal: #classBinding: to: transferred with: { species };
 		sendLocal: #selector: to: transferred with: { selector };
 		sendLocal: #format: to: transferred with: { format };
@@ -369,8 +369,8 @@ Ring2MetacircularConverter >> image: aPowertalkRingImage [
 		         'format'.
 	dest methodFlagsIndex: index.
 	index := (source => #CompiledMethod) allInstVarNames indexOf:
-		         'astcodes'.
-	dest methodAstcodesIndex: index.
+		         'treecodes'.
+	dest methodTreecodesIndex: index.
 	index := (source => #CompiledMethod) allInstVarNames indexOf: 'class'.
 	dest methodClassBindingIndex: index.
 	index := (source => #CompiledMethod) allInstVarNames indexOf:

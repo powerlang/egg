@@ -9,8 +9,8 @@ Class {
 }
 
 { #category : #unclassified }
-SCascade class >> decodeUsing: anAstcodeDecoder [
-	^anAstcodeDecoder decodeCascade
+SCascade class >> decodeUsing: aTreecodeDecoder [
+	^aTreecodeDecoder decodeCascade
 ]
 
 { #category : #visiting }

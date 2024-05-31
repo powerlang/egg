@@ -23,9 +23,9 @@ SExpressionEmulatorTest >> handleFor: anObjectMap [
 ]
 
 { #category : #tests }
-SExpressionEmulatorTest >> injectMethod: anAstcode selector: selector for: classname [
+SExpressionEmulatorTest >> injectMethod: aTreecode selector: selector for: classname [
 	^ builder
-		newMethod: anAstcode
+		newMethod: aTreecode
 		selector: selector
 		in: classname
 		format: 0

@@ -19,7 +19,7 @@ JSTranspiler class >> eggInterpreterClasses [
 			SExpressionLinearizer.
 			AstNodeTypes.
 			AstBindingTypes.
-			AstcodeDecoder.
+			TreecodeDecoder.
 			SCompiledBlockFlags.
 			SCompiledMethodFlags.
 			ClosureElementTypes.

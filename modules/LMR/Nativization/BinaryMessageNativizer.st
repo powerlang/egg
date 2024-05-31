@@ -411,8 +411,8 @@ BinaryMessageNativizer >> loadRwithTemporary: index env: environment [
 ]
 
 { #category : #private }
-BinaryMessageNativizer >> message: aMessageAstcode [
-	message := aMessageAstcode 
+BinaryMessageNativizer >> message: aMessageTreecode [
+	message := aMessageTreecode 
 ]
 
 { #category : #private }
@@ -426,8 +426,8 @@ BinaryMessageNativizer >> methodLiteralAt: index [
 ]
 
 { #category : #private }
-BinaryMessageNativizer >> nativizer: anAstcodeNativizer [
-	nativizer := anAstcodeNativizer 
+BinaryMessageNativizer >> nativizer: aTreecodeNativizer [
+	nativizer := aTreecodeNativizer 
 ]
 
 { #category : #private }

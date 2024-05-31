@@ -23,9 +23,9 @@ SExpressionInterpreterTest >> handleFor: anObjectMap [
 ]
 
 { #category : #tests }
-SExpressionInterpreterTest >> injectMethod: anAstcode selector: selector for: classname [
+SExpressionInterpreterTest >> injectMethod: aTreecode selector: selector for: classname [
 	^ builder
-		newMethod: anAstcode
+		newMethod: aTreecode
 		selector: selector
 		in: classname
 		format: 0
@@ -53,10 +53,10 @@ SExpressionInterpreterTest >> setUp [
 
 { #category : #tests }
 SExpressionInterpreterTest >> test100empty [
-	| object astcodes method result original |
+	| object treecodes method result original |
 	object := self injectObject.
-	astcodes := {MethodId. {IdentifierId. SelfId}}.	"foo self"
-	method := self injectMethod: astcodes selector: #foo for: 'Object'.
+	treecodes := {MethodId. {IdentifierId. SelfId}}.	"foo self"
+	method := self injectMethod: treecodes selector: #foo for: 'Object'.
 	self write.
 	result := self invoke: method with: object.
 	original := self handleFor: object.

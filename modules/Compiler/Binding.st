@@ -23,7 +23,7 @@ Binding >> declaration [
 ]
 
 { #category : #testing }
-Binding >> encodeUsing: anAstcodeEncoder [
+Binding >> encodeUsing: aTreecodeEncoder [
 	self ASSERT: false
 ]
 

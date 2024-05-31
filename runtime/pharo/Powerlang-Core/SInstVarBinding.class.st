@@ -8,8 +8,8 @@ Class {
 }
 
 { #category : #unclassified }
-SInstVarBinding class >> decodeUsing: anAstcodeDecoder [
-	^anAstcodeDecoder decodeInstVar
+SInstVarBinding class >> decodeUsing: aTreecodeDecoder [
+	^aTreecodeDecoder decodeInstVar
 ]
 
 { #category : #testing }

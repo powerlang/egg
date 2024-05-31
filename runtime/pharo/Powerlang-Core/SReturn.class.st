@@ -9,8 +9,8 @@ Class {
 }
 
 { #category : #unclassified }
-SReturn class >> decodeUsing: anAstcodeDecoder [
-	^anAstcodeDecoder decodeReturn
+SReturn class >> decodeUsing: aTreecodeDecoder [
+	^aTreecodeDecoder decodeReturn
 ]
 
 { #category : #visiting }

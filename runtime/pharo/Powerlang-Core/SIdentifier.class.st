@@ -8,8 +8,8 @@ Class {
 }
 
 { #category : #unclassified }
-SIdentifier class >> decodeUsing: anAstcodeDecoder [
-	^anAstcodeDecoder decodeIdentifier
+SIdentifier class >> decodeUsing: aTreecodeDecoder [
+	^aTreecodeDecoder decodeIdentifier
 ]
 
 { #category : #visiting }

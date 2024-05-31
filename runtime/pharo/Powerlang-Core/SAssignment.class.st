@@ -9,8 +9,8 @@ Class {
 }
 
 { #category : #unclassified }
-SAssignment class >> decodeUsing: anAstcodeDecoder [
-	^anAstcodeDecoder decodeAssignment
+SAssignment class >> decodeUsing: aTreecodeDecoder [
+	^aTreecodeDecoder decodeAssignment
 ]
 
 { #category : #'instance creation' }

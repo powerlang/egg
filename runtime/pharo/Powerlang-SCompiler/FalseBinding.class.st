@@ -5,8 +5,8 @@ Class {
 }
 
 { #category : #accessing }
-FalseBinding >> encodeUsing: anAstcodeEmitter [
-	anAstcodeEmitter encodeFalse
+FalseBinding >> encodeUsing: aTreecodeEmitter [
+	aTreecodeEmitter encodeFalse
 ]
 
 { #category : #accessing }

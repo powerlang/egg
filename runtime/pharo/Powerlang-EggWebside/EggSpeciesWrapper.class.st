@@ -77,19 +77,19 @@ EggSpeciesWrapper >> comment [
 { #category : #services }
 EggSpeciesWrapper >> compile: aString [
 
-	| local size kernel name class method astcodes selector format code md |
+	| local size kernel name class method treecodes selector format code md |
 	local := SCompiler new compile: aString.
 	size := runtime newInteger: local size.
 	kernel := runtime sendLocal: #namespace to: runtime kernel.
 	name := runtime symbolFromLocal: #CompiledMethod.
 	class := runtime sendLocal: #at: to: kernel with: { name }.
 	method := runtime sendLocal: #new: to: class with: { size }.
-	astcodes := runtime newByteArray: local astcodes.
+	treecodes := runtime newByteArray: local treecodes.
 	selector := runtime addSymbol: local selector.
 	format := runtime newInteger: local format.
 	code := runtime newString: local source.
 	runtime
-		sendLocal: #astcodes: to: method with: { astcodes };
+		sendLocal: #treecodes: to: method with: { treecodes };
 		sendLocal: #classBinding: to: method with: { wrappee };
 		sendLocal: #selector: to: method with: { selector };
 		sendLocal: #format: to: method with: { format };

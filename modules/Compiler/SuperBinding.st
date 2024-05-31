@@ -5,8 +5,8 @@ Class {
 }
 
 { #category : #accessing }
-SuperBinding >> encodeUsing: anAstcodeEmitter [
-	anAstcodeEmitter encodeSuper
+SuperBinding >> encodeUsing: aTreecodeEmitter [
+	aTreecodeEmitter encodeSuper
 ]
 
 { #category : #testing }

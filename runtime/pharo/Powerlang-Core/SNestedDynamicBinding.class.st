@@ -5,8 +5,8 @@ Class {
 }
 
 { #category : #unclassified }
-SNestedDynamicBinding class >> decodeUsing: anAstcodeDecoder [
-	^ anAstcodeDecoder decodeNestedDynamicVar
+SNestedDynamicBinding class >> decodeUsing: aTreecodeDecoder [
+	^ aTreecodeDecoder decodeNestedDynamicVar
 ]
 
 { #category : #accessing }

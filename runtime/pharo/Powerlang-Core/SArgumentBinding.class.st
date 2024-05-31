@@ -8,8 +8,8 @@ Class {
 }
 
 { #category : #unclassified }
-SArgumentBinding class >> decodeUsing: anAstcodeDecoder [
-	^anAstcodeDecoder decodeArgument
+SArgumentBinding class >> decodeUsing: aTreecodeDecoder [
+	^aTreecodeDecoder decodeArgument
 ]
 
 { #category : #testing }
