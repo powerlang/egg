@@ -2,11 +2,13 @@
 
 In a nutshell, here you get a bunch of js files that allow how to load an image file in a JSON format and execute Smalltalk code by evaluating Egg code.
 
+*IMPORTANT NOTE* this is heavily w.i.p and there are quite a few things that may not work.
+
 # Getting Started
 
-*IMPORTANT NOTE* this doc is a little bit outdated and there are quite a few things that may not work.
 
-Unless you want to build the whole thing, you could just download a release from the appropriate section in github.
+If you want the typical image and VM files, you can just download an eggjs release from the appropriate
+section in github. Else you can build the whole thing, y
 
 ## Building
 
@@ -27,10 +29,22 @@ of bootstrapping does the following (it's all done automatically through `make`)
     writen `egg/runtimes/js/interpreter`.
 4 - executes `JSTranspiler generateKernelModule` et al
 
-## Evaluating Smalltalk code using nodejs
+# Running the code
+
+There are different ways in which you could run Egg code in a JS platform. You could
+run it on top of node.js or inside a web browser. We started by supporting
+running on top of node.js.
+
+
+## Exploring a Smalltalk image that runs on top of nodejs
 
 This creates a small webserver that loads an egg image and responds [webside](https://github.com/guillermoamaral/Webside)
 requests, so that you can browse and debug it remotely:
+
+
+    ## clone and enter the main dir for js platform
+    $ git clone git@github.com:powerlang/egg.git
+    $ cd egg/runtime/js
 
     ## first install webside server dependencies
     $ cd webside && npm install && cd .. 
@@ -38,7 +52,48 @@ requests, so that you can browse and debug it remotely:
     ## Now run the server
     $ node example-server/index.js
 
-## In the future it will be possible the following
+    ## Now connect from a webside client to address http://localhost:9005/
+
+## Using Smalltalk as a library from nodejs
+
+For this example, let's look at `runtime/js/example-bench`.
+
+    // bench.js
+    import { performance } from "perf_hooks"; // nodejs built-in for measuring time
+    import Egg from '../Egg.js';
+
+    var egg = new Egg();
+    egg.loadKernelFile("Kernel.json");
+
+    let n1 = 1, t1;
+    do {
+        let startTime = performance.now();
+        egg.send(egg.runtime.newInteger_(n1), "benchSieve");
+        let endTime = performance.now();
+        t1 = endTime - startTime;
+        if (t1 >= 1000) break;
+        n1 = n1 * 2;
+    } while (true)
+
+    let n2 = 28, t2, r;
+    do {
+        let startTime = performance.now();
+        r = egg.send(egg.runtime.newInteger_(n2), "benchFibonacci").value();
+        let endTime = performance.now();
+        t2 = endTime - startTime;
+        if (t2 >= 1000) break;
+        n2 = n2 + 1;
+    } while (true)
+
+    console.log(`${(n1 * 500000.0 * 1000 / t1).toFixed()} bytecodes/sec; ${(r * 1000.0 / t2).toFixed()} sends/sec`)
+      
+
+You can run it with the following lines:
+
+    $ node example-bench/bench.js
+    1242848 bytecodes/sec; 95553 sends/sec
+
+## Using egg as a node module (not yet implemented)
 
     npm install egg-js
 
@@ -51,22 +106,8 @@ requests, so that you can browse and debug it remotely:
     See you soon!
     $
 
-    ## Using Smalltalk as a library from nodejs
 
-    # bench.js
-    import egg from 'egg.js';
-    import { performance } from "perf_hooks";
-    let runtime = egg.launch();
-    var startTime = performance.now();
-    const result =  runtime.sendLocalTo_("bytecodeIntensiveBenchmark", number);
-    var endTime = performance.now();
-    console.log(`bytecodeIntensiveBenchmark returned ${result.value()} and took ${endTime - startTime} milliseconds`)
-
-    # run bench.js
-    $ node bench.js
-    bytecodeIntensiveBenchmark returned 1028 and took 3233.994176030159 milliseconds
-
-    ## Using Smalltalk as a library in a web page
+## Using Smalltalk as a library in a web page (not yet implemented)
 
     # bench.html
     <!DOCTYPE html>
@@ -89,13 +130,12 @@ requests, so that you can browse and debug it remotely:
 To run Smalltalk code you need a Smalltalk image and a Smalltalk evaluator (usually an interpreter).
 To run it on top of JavaScript the interpreter needs to be made of JavaScript code.
 
-Instead of writing the evaluator directly in JavaScript, in egg.js we take Egg evaluator, written in Smalltalk, and transpile its sources to JavaScript.
+Instead of writing the evaluator directly in JavaScript, in egg.js we take Egg/Pharo evaluator, written in Smalltalk, and transpile its sources to JavaScript.
 
-For the Smalltalk image, we use Egg/Pharo to bootstrap a virtual Smalltalk kernel image from sources, and then make that kernel write an image file tailored for the web, in JSON format.
+For the Smalltalk image, again we use Egg/Pharo, this time to bootstrap a virtual Smalltalk kernel image from sources, and then to make that kernel write an image file tailored for the web, in JSON format.
 
-Both the json image and js interpreter are generated using the `Makefile`. The image will be created in `image-segments` folder and the interpreter is written in `interpreter` folder.
+Both the JSON image and JS interpreter are generated using the `Makefile`. The image will be created in `image-segments` folder and the interpreter is written in `interpreter` folder.
 
-Additionally, the repo contains some glue JS code to support the evaluator, debugging and launching the image.
-
+Additionally, the repo contains some glue JS code in `st-glue.js` to support the evaluator, debugging and launching the image.
 
 

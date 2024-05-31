@@ -32,8 +32,16 @@ mechanisms to generate images from scratch (`bootstrap` directory).
 ## Using
 
 If you just want to use egg, download the corresponding build artifact from releases.
-Currently, our only working platform is JS, native ones will come soon™.
+Currently, our only working platforms are Pharo and JS, native ones will come soon™. You'll find
+supported platforms in /runtime subdirectories. Look for individual README.md on each
+of them to find specific help about using that platform.
 
+Each subdir of runtime implements a VM that can run Egg code in a different platform. All
+platforms use the same Egg code, which is stored in [modules](modules) directory. For
+now we have the following runtimes:
+
+[Egg/Pharo](runtime/pharo) - Our main platform for bootstrapping and modifying Egg kernel.
+[Egg/JS](runtime/js) - An implementation a VM for Egg that can run in node.js or a web browser.
 
 ## Building
 
@@ -61,8 +69,8 @@ To be implemented
 
 ## Project status
 
-There are (at least) two mostly orthogonal sides in this project: runtimes and Smalltalk.
-In Smalltalk axis, we already have: kernel, compiler, modules and image-segment builder, among others.
+There are (at least) two mostly orthogonal sides in this project: runtimes and Egg Smalltalk modules.
+In the Egg Smalltalk axis, we already have: kernel, compiler, modules and image-segment builder, among others.
 In runtime axis, we started with JS platform as it is the easiest to get working (JS
 already includes a GC and JIT).
 We are also developing other VMs: a traditional C++-based VM with interpreter and JIT and an LMR (Live Metacircular Runtime, a.k.a. Smalltalk-in-Smalltalk VM)
