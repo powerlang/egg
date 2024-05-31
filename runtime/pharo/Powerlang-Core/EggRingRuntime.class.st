@@ -219,12 +219,6 @@ EggRingRuntime >> methodArgumentCount: method [
 ]
 
 { #category : #services }
-EggRingRuntime >> methodTreecodes: anSCompiledMethod [
-
-	^ anSCompiledMethod treecodes
-]
-
-{ #category : #services }
 EggRingRuntime >> methodClassBinding: method [
 	^ method classBinding
 ]
@@ -262,6 +256,12 @@ EggRingRuntime >> methodIsExtension: method [
 { #category : #services }
 EggRingRuntime >> methodTempCount: method [
 	^ method tempCount
+]
+
+{ #category : #services }
+EggRingRuntime >> methodTreecodes: anSCompiledMethod [
+
+	^ anSCompiledMethod treecodes
 ]
 
 { #category : #accessing }

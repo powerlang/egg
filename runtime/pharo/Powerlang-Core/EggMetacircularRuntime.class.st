@@ -448,16 +448,6 @@ EggMetacircularRuntime >> methodArgumentCount: anLMRObject [
 ]
 
 { #category : #initialization }
-EggMetacircularRuntime >> methodTreecodes: anLMRObject [
-	^ anLMRObject slotAt: methodTreecodesIndex
-]
-
-{ #category : #initialization }
-EggMetacircularRuntime >> methodTreecodesIndex: anInteger [
-	methodTreecodesIndex := anInteger
-]
-
-{ #category : #initialization }
 EggMetacircularRuntime >> methodClass: anLMRObject [
 	methodClass := anLMRObject
 ]
@@ -544,6 +534,16 @@ EggMetacircularRuntime >> methodTempCount: anLMRObject [
 	| flags |
 	flags := anLMRObject slotAt: methodFlagsIndex.
 	^ flags value bitsAt: TempCount
+]
+
+{ #category : #initialization }
+EggMetacircularRuntime >> methodTreecodes: anLMRObject [
+	^ anLMRObject slotAt: methodTreecodesIndex
+]
+
+{ #category : #initialization }
+EggMetacircularRuntime >> methodTreecodesIndex: anInteger [
+	methodTreecodesIndex := anInteger
 ]
 
 { #category : #initialization }

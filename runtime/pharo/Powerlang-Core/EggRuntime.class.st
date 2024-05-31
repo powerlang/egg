@@ -157,12 +157,6 @@ EggRuntime >> lookup: aSymbol startingAt: aBehavior [
 ]
 
 { #category : #accessing }
-EggRuntime >> methodTreecodes: method [
-
-	^ self subclassResponsibility
-]
-
-{ #category : #accessing }
 EggRuntime >> methodClassBinding: method [
 	^ self subclassResponsibility
 ]
@@ -185,6 +179,12 @@ EggRuntime >> methodModule: method [
 		ifFalse: [ 
 	species := self methodClassBinding: method.
 	self speciesModule: species].
+]
+
+{ #category : #accessing }
+EggRuntime >> methodTreecodes: method [
+
+	^ self subclassResponsibility
 ]
 
 { #category : #accessing }

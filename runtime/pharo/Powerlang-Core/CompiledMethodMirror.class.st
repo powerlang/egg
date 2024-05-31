@@ -15,11 +15,6 @@ CompiledMethodMirror >> argumentCount [
 	^self flags asLocalInteger bitAnd: ArgCount
 ]
 
-{ #category : #constants }
-CompiledMethodMirror >> treecodes [
-	^self getInstVarNamed: #treecodes.
-]
-
 { #category : #accessing }
 CompiledMethodMirror >> at: index [
 	^ self slotAt: self fixedInstSize + index
@@ -140,4 +135,9 @@ CompiledMethodMirror >> structureType [
 { #category : #testing }
 CompiledMethodMirror >> timestamp [
 	^nil
+]
+
+{ #category : #constants }
+CompiledMethodMirror >> treecodes [
+	^self getInstVarNamed: #treecodes.
 ]
