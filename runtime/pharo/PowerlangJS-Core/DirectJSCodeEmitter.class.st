@@ -78,7 +78,7 @@ DirectJSCodeEmitter >> stream: aWriteStream [
 
 { #category : #accessing }
 DirectJSCodeEmitter >> transpile [
-
+	| ast |
 	ast := AST2JSOptimizer new
 		             method: method;
 		             transform.
