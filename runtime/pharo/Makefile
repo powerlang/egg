@@ -16,23 +16,30 @@ else
 ICEBERG_URL=file://$(GIT_PATH)
 endif
 
+PHARO_VERSION ?= 100
+
 all: pharo-ui egg.image
 
 pharo pharo-ui Pharo.image:
-	curl https://get.pharo.org/64/90+vm | bash || curl https://get.pharo.org/64/90+vm | bash
+	curl https://get.pharo.org/64/$(PHARO_VERSION)+vm | bash || curl https://get.pharo.org/64/$(PHARO_VERSION)+vm | bash
 
+# if there's an existing local git repo, then use it, else create it and add the remote to the root git repo
 egg.image: pharo Pharo.image
 	./pharo Pharo.image save egg
-	./pharo $@ eval --save "(IceRepositoryCreator new url: '$(ICEBERG_URL)'; createRepository) register"
+	@if [ -d "$(ICEBERG_URL)" ]; then \
+		./pharo $@ eval --save "(IceRepositoryCreator new url: '$(ICEBERG_URL/runtime/pharo/pharo-local/iceberg/local/egg)'; addLocalRepository) register"; \
+	else \
+		./pharo $@ eval --save "(IceRepositoryCreator new url: '$(ICEBERG_URL)'; createRepository) register"; \
+		git remote -v | grep -w pharo-egg || git remote add pharo-egg runtime/pharo/pharo-local/iceberg/local/egg/; \
+	fi
 	./pharo $@ metacello install tonel://. BaselineOfPowerlang --groups=$(GROUP)
-	./pharo $@ eval --save "SystemWindow closeTopWindow. GTPlayground openContents: 'first-steps.st' asFileReference contents withSqueakLineEndings"
+	./pharo $@ eval --save "SystemWindow closeTopWindow. Smalltalk tools workspace openContents: 'first-steps.st' asFileReference contents withInternalLineEndings"
 
 	@echo ""
 	@echo "To open Pharo bootstrap image run:"
 	@echo ""
 	@echo "    ./pharo-ui egg.image"
 	@echo ""
-	git remote -v | grep -w pharo-egg || git remote add pharo-egg runtime/pharo/pharo-local/iceberg/local/egg/
 
 test: egg.image pharo
 	./pharo $< test --junit-xml-output Powerlang-Tests
