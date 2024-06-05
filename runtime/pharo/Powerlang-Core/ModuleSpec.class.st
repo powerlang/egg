@@ -14,6 +14,10 @@ Class {
 		'imports',
 		'dependencies'
 	],
+	#classVars : [
+		'ClassInstVarNames',
+		'MetaclassInstVarNames'
+	],
 	#category : #'Powerlang-Core-CodeSpecs'
 }
 
@@ -29,7 +33,17 @@ ModuleSpec >> addClass: aClassSpec [
 
 { #category : #'adding / removing' }
 ModuleSpec >> addClassExtension: aClassSpec [
-	extendedClasses add: aClassSpec
+	^extendedClasses add: aClassSpec
+]
+
+{ #category : #'adding / removing' }
+ModuleSpec >> addClassExtensionNamed: classname [
+
+	| class metaclass |
+	class := ClassSpec new name: classname; module: self.
+	metaclass := MetaclassSpec new instanceClass: class; module: self.
+	class metaclass: metaclass.
+	^ self addClassExtension: class
 ]
 
 { #category : #'adding / removing' }
@@ -58,7 +72,8 @@ ModuleSpec >> addImports: aCollection [
 
 { #category : #'adding / removing' }
 ModuleSpec >> addSubclassifiedClass: aClassSpec [
-	subclassifiedClasses addIfAbsent: aClassSpec
+
+	subclassifiedClasses addIfNotPresent: aClassSpec
 ]
 
 { #category : #inquiries }
@@ -99,12 +114,19 @@ ModuleSpec >> at: aSymbol [
 
 { #category : #accessing }
 ModuleSpec >> at: aSymbol ifAbsent: aBlock [
+
 	| string |
 	string := aSymbol asString.
-	classes do: [:c | c name = string ifTrue: [^c]].
-	extendedClasses do: [:c | c name = string ifTrue: [^c]].
-	subclassifiedClasses do: [:c | c name = string ifTrue: [^c]].
-	^imports at: aSymbol ifAbsent: aBlock
+	(string
+		endsWith: ' class')
+		ifTrue:
+			[ 
+			^ self metaclassAt: (string allButLast: ' class' size) ifAbsent: aBlock ].
+	classes
+		do: [ :c | c name = string ifTrue: [ ^ c ] ].
+	extendedClasses do: [ :c | c name = string ifTrue: [ ^ c ] ].
+	subclassifiedClasses do: [ :c | c name = string ifTrue: [ ^ c ] ].
+	^ imports at: aSymbol ifAbsent: aBlock
 ]
 
 { #category : #resolving }
@@ -113,6 +135,18 @@ ModuleSpec >> basicResolveClass: aString [
 	extendedClasses do: [:c | c name asString = aString ifTrue: [^c]].
 	subclassifiedClasses do: [:c | c name asString = aString ifTrue: [^c]].
 	^nil
+]
+
+{ #category : #'adding / removing' }
+ModuleSpec >> classInstVarNames [
+
+	^ ClassInstVarNames
+]
+
+{ #category : #'adding / removing' }
+ModuleSpec >> classInstVarNames: anArray [
+
+	ClassInstVarNames := anArray
 ]
 
 { #category : #accessing }
@@ -196,6 +230,37 @@ ModuleSpec >> initialize [
 	subclassifiedClasses := OrderedCollection new.
 	imports := Dictionary new.
 	dependencies := Dictionary new
+]
+
+{ #category : #enumerating }
+ModuleSpec >> initializeConstants [
+
+	| ivars |
+	ivars := (self at: #Class) allInstVarNames.
+	self classInstVarNames: ivars.
+	ivars := (self at: #Metaclass) allInstVarNames.
+	self metaclassInstVarNames: ivars
+
+]
+
+{ #category : #accessing }
+ModuleSpec >> metaclassAt: aSymbol ifAbsent: aBlock [
+
+	| class |
+	class := self at: aSymbol asString ifAbsent: aBlock.
+	^class metaclass
+]
+
+{ #category : #'adding / removing' }
+ModuleSpec >> metaclassInstVarNames [
+
+	^ MetaclassInstVarNames
+]
+
+{ #category : #'adding / removing' }
+ModuleSpec >> metaclassInstVarNames: anArray [
+
+	MetaclassInstVarNames := anArray
 ]
 
 { #category : #'adding / removing' }

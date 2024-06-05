@@ -11,6 +11,16 @@ Class {
 	#category : #'Powerlang-Core-CodeSpecs'
 }
 
+{ #category : #testing }
+MetaclassSpec >> allInstVarNames [
+
+	allIvars ifNotNil: [ ^ allIvars ].
+	^ allIvars := module classInstVarNames
+	              ,
+		              (self withAllSuperclasses reversed gather: [ :c | 
+			               c instVarNames ]) asArray
+]
+
 { #category : #enumerating }
 MetaclassSpec >> allSuperclassesDo: aBlock [
 	| s c |
@@ -29,6 +39,13 @@ MetaclassSpec >> classVarNames [
 	^class classVarNames
 ]
 
+{ #category : #testing }
+MetaclassSpec >> instSize [
+
+	^ instSize ifNil: [ 
+		  instSize := module classInstVarNames size + class allClassVarNames size ]
+]
+
 { #category : #accessing }
 MetaclassSpec >> instanceClass [
 	^class
@@ -39,9 +56,26 @@ MetaclassSpec >> instanceClass: aClassSpec [
 	class := aClassSpec
 ]
 
+{ #category : #inquiries }
+MetaclassSpec >> isBytes [
+
+	^ self isPointers not
+]
+
 { #category : #testing }
 MetaclassSpec >> isMetaclass [
 	^true
+]
+
+{ #category : #inquiries }
+MetaclassSpec >> isPointers [
+	^true
+]
+
+{ #category : #inquiries }
+MetaclassSpec >> isVariable [
+
+	^ false
 ]
 
 { #category : #inquiries }

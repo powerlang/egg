@@ -45,7 +45,7 @@ EggRingImage >> createBootstrapNamespace [
 { #category : #accessing }
 EggRingImage >> createClassNamespaces: spec [
 	| names cvars array |
-	names := spec classVariables.
+	names := spec classVarNames.
 	names isEmpty
 		ifTrue: [ ^ self newArraySized: 0 ].
 	cvars := self newBootstrapDictionaryOf: self => #Namespace.

@@ -60,7 +60,7 @@ MethodSpec >> cannonicalAst [
 { #category : #accessing }
 MethodSpec >> category [
 	^self isExtension
-		ifTrue: ['*' , (module name readStream upToLast: $-)]
+		ifTrue: ['*' , module name]
 		ifFalse: [category]
 ]
 

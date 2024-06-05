@@ -32,9 +32,8 @@ ProtoeggSlotObject class >> new: anRGBehavior size: size withAll: value [
 
 { #category : #accessing }
 ProtoeggSlotObject >> allSlotNames [
-	^ spec properties
-		at: #allSlotNames
-		ifAbsentPut: [ self computeAllSlotNames ]
+
+	^ spec allInstVarNames
 ]
 
 { #category : #accessing }
@@ -94,11 +93,6 @@ ProtoeggSlotObject >> bodySizeInBytes [
 ]
 
 { #category : #accessing }
-ProtoeggSlotObject >> computeAllSlotNames [
-	^spec allInstVarNames
-]
-
-{ #category : #accessing }
 ProtoeggSlotObject >> doesNotUnderstand: aMessage [
 	| sel ivars |
 	sel := aMessage selector.
@@ -148,12 +142,7 @@ ProtoeggSlotObject >> initializeAs: anRGBehavior sized: size [
 
 { #category : #accessing }
 ProtoeggSlotObject >> instSize [
-	| c |
-	^ spec properties at: #instSize ifAbsentPut: [spec isMeta
-		ifTrue: [ c := spec environment at: #Class.
-			
-			c instSize + spec instSize ]
-		ifFalse: [ spec instSize ]]
+	^ spec instSize
 ]
 
 { #category : #accessing }

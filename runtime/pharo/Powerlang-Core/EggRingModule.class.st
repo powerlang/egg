@@ -37,7 +37,11 @@ EggRingModule class >> fromSpec [
 
 { #category : #accessing }
 EggRingModule class >> kernelSpec [
-	^ KernelSpec ifNil: [ KernelSpec := self readSpec: #Kernel at: '.' ]
+
+	KernelSpec ifNil: [ 
+		KernelSpec := self readSpec: #Kernel at: '.'.
+		KernelSpec initializeConstants ].
+	^ KernelSpec
 ]
 
 { #category : #'instance creation' }
@@ -50,15 +54,15 @@ EggRingModule class >> new [
 
 { #category : #accessing }
 EggRingModule class >> readSpec: specName at: path [
-	| dir  repo spec subdir |
+	| dir subdir repo |
 	dir := '../../modules' asFileReference.
 	subdir := path isString ifTrue: [ path ] ifFalse: [ path asPath pathString ].
 	subdir notEmpty ifTrue: [ dir := dir  / subdir].
 	repo := TonelRepository new
 		directory: dir.
 		
-	spec := repo asRingEnvironmentWith: {('.' split: specName) last}.
-	^ spec clean
+	^repo asCodeSpecsModuleWith: ('.' split: specName) last.
+	 
 ]
 
 { #category : #accessing }
@@ -168,7 +172,7 @@ EggRingModule >> createSpecies: definition [
 	class := ProtoeggClass new: definition metaclass size: 0 withAll: nilObj.
 	class instanceSpec: definition.
 	meta := ProtoeggMetaclass
-		new: (self => #Metaclass) metaclass
+		new: (self => #Metaclass)
 		size: 0
 		withAll: nilObj.
 	meta instanceSpec: definition metaclass.
@@ -308,9 +312,7 @@ EggRingModule >> initializeClass: definition superclass: superclass superbehavio
 		organization: nilObj;
 		name: name;
 		subclasses: subclasses;
-		module: module.
-	definition metaclass allInstVarNames
-		do: [ :ivar | class slotNamed: ivar put: nilObj ]
+		module: module
 ]
 
 { #category : #building }
@@ -433,7 +435,7 @@ EggRingModule >> runtime [
 
 { #category : #accessing }
 EggRingModule >> speciesFor: anRGBehavior [
-	^ anRGBehavior isMeta ifTrue: [metaclasses at: anRGBehavior] ifFalse: [ classes at: anRGBehavior ]
+	^ anRGBehavior isMetaclass ifTrue: [metaclasses at: anRGBehavior] ifFalse: [ classes at: anRGBehavior ]
 ]
 
 { #category : #accessing }

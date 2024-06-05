@@ -166,7 +166,7 @@ Ring2MetacircularConverter >> createNamespaceWith: aCollection [
 	namespace := dest sendLocal: #new to: self => #Namespace.
 	aCollection do: [ :variable | 
 		dest sendLocal: #at:put: to: namespace with: { 
-				(dest addSymbol: variable name).
+				(dest addSymbol: variable).
 				nilObj } ].
 	^ namespace
 ]
@@ -194,7 +194,7 @@ Ring2MetacircularConverter >> createNewBlock: sblock [
 Ring2MetacircularConverter >> createNewClassFrom: spec in: module [
 
 	| supername superclass namespace metaclass class instanceBehavior classBehavior ivars |
-	supername := spec superclass name.
+	supername := spec supername.
 	superclass := module ifNil: [ self => supername ] ifNotNil: [ 
 		              namespace := dest sendLocal: #namespace to: module.
 		              dest
@@ -212,7 +212,7 @@ Ring2MetacircularConverter >> createNewClassFrom: spec in: module [
 		with: { (dest newString: spec name) }.
 	ivars := self transferLiteral: spec instVarNames.
 	dest sendLocal: #instVarNames: to: class with: { ivars }.
-	dest sendLocal: #classVariables: to: class with: { self createNamespaceWith: spec classVariables}. 
+	dest sendLocal: #classVariables: to: class with: { self createNamespaceWith: spec classVarNames}. 
 	instanceBehavior := dest sendLocal: #instanceBehavior to: class.
 	classBehavior := dest sendLocal: #instanceBehavior to: metaclass.
 	behaviors
@@ -416,7 +416,7 @@ Ring2MetacircularConverter >> initializeBehavior: anEggHeapObject spec: anRGBeha
 { #category : #initialization }
 Ring2MetacircularConverter >> initializeEmulationOverrides [
 	| classes |
-	classes := source vmPrimitivesSpec allExtensionClasses.
+	classes := source vmPrimitivesSpec extendedClasses.
 	classes
 		do: [ :class | 
 			class methods do: [ :m | self override: class name with: m ].
@@ -500,7 +500,7 @@ Ring2MetacircularConverter >> loadModule: symbol [
 
 	| spec classes moduleName moduleSpec module extensions name |
 	spec := self readModuleSpec: symbol.
-	classes := spec allClasses.
+	classes := spec classes.
 	moduleName := ('.' split: symbol) last asSymbol.
 	moduleSpec := spec at: moduleName , #Module.
 	moduleSpec ifNil: [ moduleSpec := spec at: #Module , moduleName ].
@@ -517,7 +517,7 @@ Ring2MetacircularConverter >> loadModule: symbol [
 	classes := self classesSortedBySuperclass: classes.
 	classes := classes collect: [ :classSpec | 
 		           self createNewClassFrom: classSpec in: module ].
-	extensions := spec allExtensionClasses do: [ :classSpec | 
+	extensions := spec extendedClasses do: [ :classSpec | 
 		              self createExtensionMethodsOf: classSpec in: module ].
 	dest sendLocal: #justLoaded to: module.
 	^ module

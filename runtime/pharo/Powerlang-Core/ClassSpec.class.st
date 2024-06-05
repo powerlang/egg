@@ -8,14 +8,29 @@ Class {
 	#instVars : [
 		'name',
 		'supername',
-		'classVariables',
 		'sharedPools',
 		'metaclass',
 		'variable',
-		'pointers'
+		'pointers',
+		'classVarNames'
 	],
 	#category : #'Powerlang-Core-CodeSpecs'
 }
+
+{ #category : #inquiries }
+ClassSpec >> allClassVarNames [
+
+	^ (self withAllSuperclasses reversed gather: [ :c | c classVarNames ])
+		  asArray
+]
+
+{ #category : #accessing }
+ClassSpec >> allInstVarNames [
+
+	allIvars ifNotNil: [ ^ allIvars ].
+	^ allIvars := (self withAllSuperclasses reversed gather: [ :c | 
+		               c instVarNames ]) asArray
+]
 
 { #category : #inquiries }
 ClassSpec >> allMethods [
@@ -32,14 +47,20 @@ ClassSpec >> allSuperclassesDo: aBlock [
 	s allSuperclassesDo: aBlock
 ]
 
-{ #category : #inquiries }
-ClassSpec >> classVarNames [
-	^classVariables keys
+{ #category : #accessing }
+ClassSpec >> beArrayed [
+	variable := true
 ]
 
 { #category : #accessing }
-ClassSpec >> classVariables [
-	^classVariables
+ClassSpec >> beBytes [
+	pointers := false
+]
+
+{ #category : #inquiries }
+ClassSpec >> classVarNames [
+
+	^ classVarNames
 ]
 
 { #category : #accessing }
@@ -49,12 +70,12 @@ ClassSpec >> configureCompiler: aCompiler [
 
 { #category : #accessing }
 ClassSpec >> cvarNames: aCollection [
-	aCollection do: [:cvar | classVariables at: cvar put: nil]
+	aCollection do: [:cvar | classVarNames at: cvar put: nil]
 ]
 
 { #category : #accessing }
 ClassSpec >> cvars: aCollection [
-	classVariables := aCollection
+	classVarNames := aCollection
 ]
 
 { #category : #testing }
@@ -65,13 +86,21 @@ ClassSpec >> hasMethods [
 { #category : #initialization }
 ClassSpec >> initialize [
 	super initialize.
-	classVariables := OrderedDictionary new.
-	sharedPools := OrderedCollection new
+	classVarNames := OrderedDictionary new.
+	sharedPools := OrderedCollection new.
+	pointers := true.
+	variable := false
 ]
 
 { #category : #accessing }
 ClassSpec >> instanceClass [
 	^self
+]
+
+{ #category : #accessing }
+ClassSpec >> isBytes [
+
+	^ pointers not
 ]
 
 { #category : #accessing }
@@ -96,7 +125,7 @@ ClassSpec >> isVariable: aBoolean [
 
 { #category : #inquiries }
 ClassSpec >> localPools [
-	^classVariables select: [:c | c isKindOf: PoolDictionary]
+	^classVarNames select: [:c | c isKindOf: PoolDictionary]
 ]
 
 { #category : #inquiries }
@@ -147,5 +176,6 @@ ClassSpec >> supername [
 
 { #category : #accessing }
 ClassSpec >> supername: aString [
+self haltIf: aString = #ByteSymbol.
 	supername := aString
 ]

@@ -78,28 +78,28 @@ EggRingRuntime >> closureHome: anObjectMap [
 ]
 
 { #category : #accessing }
-EggRingRuntime >> compile: anRGMethod [
+EggRingRuntime >> compile: method [
 	| class |
-	class := image speciesFor: anRGMethod parent.
+	class := image speciesFor: method classBinding.
 	^ SCompiler new
 		forClass: class;
-		compile: anRGMethod sourceCode
+		compile: method source
 ]
 
 { #category : #accessing }
-EggRingRuntime >> doLookup: aSymbol startingAt: aBehavior [
-	| behavior m c smethod |
+EggRingRuntime >> doLookup: aSymbol startingAt: aSpecies [
+	| species m c smethod |
 	self ASSERT: aSymbol !== #error:.
-	behavior := aBehavior.
-	[ m := self methodFor: aSymbol in: behavior.
+	species := aSpecies.
+	[ m := self methodFor: aSymbol in: species.
 	m
 		ifNotNil: [ smethod := self compile: m.
 			^ self transferMethodLiterals: smethod ].
-	behavior := behavior superclass.
-	behavior notNil ] whileTrue.
-	^ aBehavior isMeta
-		ifTrue: [ c := aBehavior environment at: #Class.
-			self doLookup: aSymbol startingAt: c ]
+	species := species superclass.
+	species notNil ] whileTrue.
+	^ aSpecies isMetaclass
+		ifTrue: [ c := image => #Class.
+			self doLookup: aSymbol startingAt: c]
 ]
 
 { #category : #accessing }
@@ -146,7 +146,7 @@ EggRingRuntime >> initializeDNU [
 { #category : #initialization }
 EggRingRuntime >> initializeEmulationOverrides [
 	| classes |
-	classes := image vmPrimitivesSpec allExtensionClasses.
+	classes := image vmPrimitivesSpec extendedClasses.
 	classes
 		do: [ :class | 
 			class methods do: [ :m | self override: class name with: m ].
@@ -334,7 +334,7 @@ EggRingRuntime >> override: classname with: rgMethod [
 	species := image specs at: classname.
 	selector := rgMethod selector.
 	method := species methodNamed: selector.
-	override := method copy sourceCode: rgMethod sourceCode.
+	override := method copy source: rgMethod sourceCode.
 	overrides at: species -> selector put: override
 ]
 

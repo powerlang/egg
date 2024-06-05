@@ -6,10 +6,12 @@ Class {
 	#name : #SpeciesSpec,
 	#superclass : #Object,
 	#instVars : [
-		'instanceVariables',
 		'methods',
 		'module',
-		'format'
+		'format',
+		'instSize',
+		'allIvars',
+		'instVarNames'
 	],
 	#classVars : [
 		'Format'
@@ -40,9 +42,20 @@ SpeciesSpec >> addMethods: aCollection [
 	aCollection do: [:m | self addMethod: m]
 ]
 
+{ #category : #'adding / removing' }
+SpeciesSpec >> addReplacingMethod: aMethodSpec [
+	| s index |
+	s := aMethodSpec selector.
+	index := methods indexOf: [ :m | m selector == s ] ifAbsent: [^methods add: aMethodSpec].
+	methods at: index put: aMethodSpec
+]
+
 { #category : #inquiries }
 SpeciesSpec >> allInstVarNames [
-	^(self withAllSuperclasses reversed gather: [:c | c instVarNames]) asArray
+
+	allIvars ifNotNil: [^allIvars]. 
+	^allIvars := (self withAllSuperclasses reversed gather: [ :c | 
+			               c instVarNames ]) asArray 
 ]
 
 { #category : #inquiries }
@@ -76,16 +89,6 @@ SpeciesSpec >> allSuperclasses [
 	^superclasses
 ]
 
-{ #category : #accessing }
-SpeciesSpec >> beArrayed [
-	format := format | IsArrayed
-]
-
-{ #category : #accessing }
-SpeciesSpec >> beBytes [
-	format := format | IsBytes
-]
-
 { #category : #testing }
 SpeciesSpec >> hasMethods [
 	^methods notEmpty
@@ -95,28 +98,44 @@ SpeciesSpec >> hasMethods [
 SpeciesSpec >> initialize [
 	super initialize.
 	methods := OrderedCollection new.
-	instanceVariables := #().
+	instVarNames := #().
 	format := 0
 ]
 
 { #category : #accessing }
+SpeciesSpec >> instSize [
+
+	^ instSize ifNil: [ 
+		  instSize := self allInstVarNames size]
+]
+
+{ #category : #accessing }
 SpeciesSpec >> instVarNames [
-	^instanceVariables
+
+	^ instVarNames asArray
 ]
 
 { #category : #accessing }
 SpeciesSpec >> instVarNames: aCollection [
-	instanceVariables := aCollection asOrderedCollection
+
+	instVarNames := aCollection asOrderedCollection
+]
+
+{ #category : #accessing }
+SpeciesSpec >> instanceClass [
+	^self instanceSide
+]
+
+{ #category : #accessing }
+SpeciesSpec >> instanceSide [
+
+	^ self instanceClass
 ]
 
 { #category : #testing }
-SpeciesSpec >> instancesAreArrayed [
-	^format anyMask: IsArrayed
-]
+SpeciesSpec >> isBytes [
 
-{ #category : #testing }
-SpeciesSpec >> instancesHavePointers [
-	^(format anyMask: IsBytes) not
+	^ false
 ]
 
 { #category : #testing }
@@ -129,9 +148,28 @@ SpeciesSpec >> isMetaclass [
 	^false
 ]
 
+{ #category : #testing }
+SpeciesSpec >> isPointers [
+
+	^ true
+]
+
+{ #category : #testing }
+SpeciesSpec >> isVariable [
+
+	^ false
+]
+
 { #category : #accessing }
 SpeciesSpec >> ivars: aCollection [
-	instanceVariables := aCollection asOrderedCollection
+	self haltIf: (aCollection anySatisfy: [:each | each isString not]).
+	instVarNames := aCollection asOrderedCollection
+]
+
+{ #category : #initialization }
+SpeciesSpec >> methodNamed: aSymbol [
+
+	^methods detect: [ :m | m selector = aSymbol ] ifNone: nil
 ]
 
 { #category : #accessing }

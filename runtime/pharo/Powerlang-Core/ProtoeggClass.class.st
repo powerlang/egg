@@ -5,18 +5,6 @@ Class {
 }
 
 { #category : #accessing }
-ProtoeggClass >> allInstVarNames [
-	^ (spec environment at: #Class)allInstVarNames, spec allInstVarNames
-]
-
-{ #category : #accessing }
-ProtoeggClass >> computeAllSlotNames [
-	| c |
-	c := spec environment at: #Class.
-	^slotNames := c allInstVarNames , spec allInstVarNames
-]
-
-{ #category : #accessing }
 ProtoeggClass >> instanceSide [
 	^ self
 ]

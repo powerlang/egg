@@ -22,10 +22,10 @@ EggRingRuntimeTest >> assertNoLeftoverFrames [
 EggRingRuntimeTest >> compile: aString in: classname during: aBlock [
 	| class selector method |
 	class := image => classname.
-	selector := class compile: aString notifying: nil.
-	method := class methodNamed: selector.
+	method := SCompiler compile: aString in: class.
+	class addReplacingMethod: method.
 	self assert: method notNil.
-	aBlock 		ensure: [ class removeLocalMethod: method ]
+	aBlock 		ensure: [ class removeMethod: method ]
 ]
 
 { #category : #running }

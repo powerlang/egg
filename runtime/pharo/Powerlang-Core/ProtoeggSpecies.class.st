@@ -2,8 +2,7 @@ Class {
 	#name : #ProtoeggSpecies,
 	#superclass : #ProtoeggSlotObject,
 	#instVars : [
-		'instanceSpec',
-		'slotNames'
+		'instanceSpec'
 	],
 	#category : #'Powerlang-Core-Execution-Bootstrap-Ring'
 }
@@ -11,16 +10,6 @@ Class {
 { #category : #'instance creation' }
 ProtoeggSpecies class >> classFor: anRGBehavior [
 	^self
-]
-
-{ #category : #accessing }
-ProtoeggSpecies >> allInstVarNames [
-	^self subclassResponsibility
-]
-
-{ #category : #accessing }
-ProtoeggSpecies >> allSlotNames [
-	^ slotNames ifNil: [ self computeAllSlotNames ]
 ]
 
 { #category : #accessing }
