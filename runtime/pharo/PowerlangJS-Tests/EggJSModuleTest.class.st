@@ -18,7 +18,7 @@ EggJSModuleTest >> setUp [
 
 	| image |
 	super setUp.
-	image := EggRingImage fromSpec
+	image := EggBootstrapImage fromSpec
 		         wordSize: 8;
 		         genesis;
 		         bootstrap;
