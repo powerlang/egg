@@ -1,25 +1,27 @@
 Class {
-	#name : #ProtoeggObjectTest,
-	#superclass : #TestCase,
+	#name : 'ProtoeggObjectTest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'kernel'
 	],
-	#category : #'Powerlang-Tests-Bootstrap'
+	#category : 'Powerlang-Tests-Bootstrap',
+	#package : 'Powerlang-Tests',
+	#tag : 'Bootstrap'
 }
 
-{ #category : #running }
+{ #category : 'running' }
 ProtoeggObjectTest >> setUp [
 	super setUp.
-	kernel := EggRingImage kernelSpec
+	kernel := EggBootstrapImage kernelSpec
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ProtoeggObjectTest >> tearDown [
 	super tearDown.
 	kernel := nil
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ProtoeggObjectTest >> test_01a [
 	| map |
 	
@@ -29,7 +31,7 @@ ProtoeggObjectTest >> test_01a [
 	
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ProtoeggObjectTest >> test_01b [
 	| undefined fraction null frac |
 	undefined := kernel at: #UndefinedObject.
@@ -79,7 +81,7 @@ ProtoeggObjectTest >> test_01b [
 	
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ProtoeggObjectTest >> test_01c [
 	| undefined array null indexed |
 	

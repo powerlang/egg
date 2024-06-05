@@ -174,7 +174,7 @@ let Egg = class {
 			_speciesInstanceBehaviorIndex: 2,
 			_speciesFormatIndex: 3,
 			_compiledCodeExecutableCodeIndex: 2,
-			_methodAstcodesIndex: 3,
+			_methodTreecodesIndex: 3,
 			_methodInstSize: 6,
 			_methodClassBindingIndex: 4,
 			_speciesSuperclassIndex: 1,

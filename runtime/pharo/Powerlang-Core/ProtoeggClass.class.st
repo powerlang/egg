@@ -1,42 +1,32 @@
 Class {
-	#name : #ProtoeggClass,
-	#superclass : #ProtoeggSpecies,
-	#category : #'Powerlang-Core-Execution-Bootstrap-Ring'
+	#name : 'ProtoeggClass',
+	#superclass : 'ProtoeggSpecies',
+	#category : 'Powerlang-Core-Execution-Bootstrap',
+	#package : 'Powerlang-Core',
+	#tag : 'Execution-Bootstrap'
 }
 
-{ #category : #accessing }
-ProtoeggClass >> allInstVarNames [
-	^ (spec environment at: #Class)allInstVarNames, spec allInstVarNames
-]
-
-{ #category : #accessing }
-ProtoeggClass >> computeAllSlotNames [
-	| c |
-	c := spec environment at: #Class.
-	^slotNames := c allInstVarNames , spec allInstVarNames
-]
-
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggClass >> instanceSide [
 	^ self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggClass >> name [
 	^instanceSpec name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggClass >> namespaces [
 	^ self slotNamed: #namespaces
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggClass >> namespaces: array [
 	^ self slotNamed: #namespaces put: array
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggClass >> printOn: aStream [
 	aStream
 		nextPutAll: '<<';
@@ -44,7 +34,7 @@ ProtoeggClass >> printOn: aStream [
 		nextPutAll: '>>'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggClass >> withAllSuperclasses [
 	^self superclass isNil ifTrue: [ OrderedCollection with: self ]
 		ifFalse: [self superclass withAllSuperclasses

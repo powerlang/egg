@@ -1,23 +1,25 @@
 Class {
-	#name : #SOpLoadRfromFrame,
-	#superclass : #SInlinerOperation,
+	#name : 'SOpLoadRfromFrame',
+	#superclass : 'SInlinerOperation',
 	#instVars : [
 		'index'
 	],
-	#category : #'Powerlang-Core-SExpressions'
+	#category : 'Powerlang-Core-SExpressions',
+	#package : 'Powerlang-Core',
+	#tag : 'SExpressions'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SOpLoadRfromFrame >> acceptVisitor: visitor [
 	^ visitor visitOpLoadRfromFrame: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SOpLoadRfromFrame >> index [
 ^	index
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SOpLoadRfromFrame >> index: anInteger [
 	index := anInteger
 ]

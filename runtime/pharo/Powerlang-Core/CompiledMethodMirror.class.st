@@ -1,48 +1,45 @@
 Class {
-	#name : #CompiledMethodMirror,
-	#superclass : #ObjectMirror,
+	#name : 'CompiledMethodMirror',
+	#superclass : 'ObjectMirror',
 	#classVars : [
 		'Flags'
 	],
 	#pools : [
 		'CompiledMethodFormatMasks'
 	],
-	#category : #'Powerlang-Core-Mirrors'
+	#category : 'Powerlang-Core-Mirrors',
+	#package : 'Powerlang-Core',
+	#tag : 'Mirrors'
 }
 
-{ #category : #constants }
+{ #category : 'constants' }
 CompiledMethodMirror >> argumentCount [
 	^self flags asLocalInteger bitAnd: ArgCount
 ]
 
-{ #category : #constants }
-CompiledMethodMirror >> treecodes [
-	^self getInstVarNamed: #treecodes.
-]
-
-{ #category : #accessing }
+{ #category : 'accessing' }
 CompiledMethodMirror >> at: index [
 	^ self slotAt: self fixedInstSize + index
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 CompiledMethodMirror >> classBinding [
 	| class |
 	class := self getInstVarNamed: #class.
 	^class asSpeciesMirror
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 CompiledMethodMirror >> compiler [
 	^self ASSERT: false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 CompiledMethodMirror >> currentVersion [
 	^self classBinding compiledMethodFor: self selector asLocalString asSymbol
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 CompiledMethodMirror >> decodedTreecodes [
 	| treecodes |
 	treecodes := self treecodes localDeepCopy.
@@ -52,44 +49,44 @@ CompiledMethodMirror >> decodedTreecodes [
 		decodeMethod
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 CompiledMethodMirror >> fixedInstSize [
 	^ self reflectedClass instSize
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 CompiledMethodMirror >> flags [
 	^self getInstVarNamed: #flags
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 CompiledMethodMirror >> fullName [
 	^self classBinding localName , '>>#' , self selector asLocalString
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 CompiledMethodMirror >> isExpression [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 CompiledMethodMirror >> isValid [
 	[^self reflectedClass localEquivalent inheritsFrom: CompiledMethod]
 		on: Error
 		do: [^false]
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 CompiledMethodMirror >> nativeCodeBytes [
 	^self optimizedCode slotAt: 1
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 CompiledMethodMirror >> optimizedCode [
 	^self getInstVarNamed: #optimizedCode
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 CompiledMethodMirror >> printOn: aStream [
 	| signature |
 	signature := ([ self fullName ]
@@ -101,29 +98,29 @@ CompiledMethodMirror >> printOn: aStream [
 			; nextPutAll: signature; nextPut: $)
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 CompiledMethodMirror >> readSourceFrom: encodedPosition [
 	self ASSERT: false
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 CompiledMethodMirror >> selector [
 	| selector |
 	selector := self getInstVarNamed: #selector.
 	^selector asStringMirror
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 CompiledMethodMirror >> size [
 	^ handle size - self fixedInstSize
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 CompiledMethodMirror >> source [
 	^self sourceCode
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 CompiledMethodMirror >> sourceCode [
 	| source |
 	source := self getInstVarNamed: #source.
@@ -132,12 +129,17 @@ CompiledMethodMirror >> sourceCode [
 	^self readSourceFrom: source
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 CompiledMethodMirror >> structureType [
 	^#CompiledMethod
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 CompiledMethodMirror >> timestamp [
 	^nil
+]
+
+{ #category : 'constants' }
+CompiledMethodMirror >> treecodes [
+	^self getInstVarNamed: #treecodes.
 ]

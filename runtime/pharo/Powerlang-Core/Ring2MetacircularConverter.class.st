@@ -4,8 +4,8 @@ and barely anything else. I am in charge of adding the Kernel module object to i
 methods to the classes.
 "
 Class {
-	#name : #Ring2MetacircularConverter,
-	#superclass : #Object,
+	#name : 'Ring2MetacircularConverter',
+	#superclass : 'Object',
 	#instVars : [
 		'source',
 		'dest',
@@ -17,10 +17,12 @@ Class {
 		'stack',
 		'closureMethods'
 	],
-	#category : #'Powerlang-Core-Execution-Metacircular'
+	#category : 'Powerlang-Core-Execution-Metacircular',
+	#package : 'Powerlang-Core',
+	#tag : 'Execution-Metacircular'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 Ring2MetacircularConverter class >> new [
 	"return an initialized instance"
 
@@ -28,14 +30,14 @@ Ring2MetacircularConverter class >> new [
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> => aSymbol [
 	| classmap |
 	classmap := source classNamed: aSymbol.
 	^mapping at: classmap
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> addClasses: classes to: module [
 	classes
 		do: [ :c | 
@@ -44,7 +46,7 @@ Ring2MetacircularConverter >> addClasses: classes to: module [
 				sendLocal: #module: to: c with: {module} ].
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> classesSortedBySuperclass: anArray [
 
 	| result seen s dfs |
@@ -61,7 +63,7 @@ Ring2MetacircularConverter >> classesSortedBySuperclass: anArray [
 	^ result
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> closureCompiledBlock: anSCompiledBlock [
 	| method index spec species table s selector m |
 	method := anSCompiledBlock method.
@@ -79,7 +81,7 @@ Ring2MetacircularConverter >> closureCompiledBlock: anSCompiledBlock [
 	^ self halt
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> convert [
 
 	nilObj := self newMapping: source nil.
@@ -99,12 +101,12 @@ Ring2MetacircularConverter >> convert [
 		initializeActiveProcess
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> convertBootstrapDictionaries [
 	source bootstrapDictionaries do: [ :dict | self convertBootstrapDictionary: dict ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> convertBootstrapDictionary: aBootstrapDictionary [
 	| class dict converted |
 	class := source classes at: aBootstrapDictionary realSpec.
@@ -121,7 +123,7 @@ Ring2MetacircularConverter >> convertBootstrapDictionary: aBootstrapDictionary [
 	self map: aBootstrapDictionary to: converted
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> convertClosure [
 	| obj |
 	[ stack isEmpty ]
@@ -129,7 +131,7 @@ Ring2MetacircularConverter >> convertClosure [
 			self convertSlotsOf: obj key in: obj value ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> convertSlotsOf: ringObj in: lmrObj [
 	| mapped block |
 	ringObj isPointers
@@ -143,7 +145,7 @@ Ring2MetacircularConverter >> convertSlotsOf: ringObj in: lmrObj [
 			lmrObj basicAt: 1 put: mapped
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> createExtensionMethodsOf: spec in: module [
 
 	| name namespace class metaclass |
@@ -159,19 +161,19 @@ Ring2MetacircularConverter >> createExtensionMethodsOf: spec in: module [
 	^ module
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> createNamespaceWith: aCollection [
 
 	| namespace |
 	namespace := dest sendLocal: #new to: self => #Namespace.
 	aCollection do: [ :variable | 
 		dest sendLocal: #at:put: to: namespace with: { 
-				(dest addSymbol: variable name).
+				(dest addSymbol: variable).
 				nilObj } ].
 	^ namespace
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> createNewBlock: sblock [
 	| format transferred method literal tliteral |
 	format := dest newInteger: sblock format.
@@ -190,11 +192,11 @@ Ring2MetacircularConverter >> createNewBlock: sblock [
 	^ transferred
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> createNewClassFrom: spec in: module [
 
 	| supername superclass namespace metaclass class instanceBehavior classBehavior ivars |
-	supername := spec superclass name.
+	supername := spec supername.
 	superclass := module ifNil: [ self => supername ] ifNotNil: [ 
 		              namespace := dest sendLocal: #namespace to: module.
 		              dest
@@ -212,7 +214,7 @@ Ring2MetacircularConverter >> createNewClassFrom: spec in: module [
 		with: { (dest newString: spec name) }.
 	ivars := self transferLiteral: spec instVarNames.
 	dest sendLocal: #instVarNames: to: class with: { ivars }.
-	dest sendLocal: #classVariables: to: class with: { self createNamespaceWith: spec classVariables}. 
+	dest sendLocal: #classVariables: to: class with: { self createNamespaceWith: spec classVarNames}. 
 	instanceBehavior := dest sendLocal: #instanceBehavior to: class.
 	classBehavior := dest sendLocal: #instanceBehavior to: metaclass.
 	behaviors
@@ -228,7 +230,7 @@ Ring2MetacircularConverter >> createNewClassFrom: spec in: module [
 	^ class
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> createNewMethod: m in: species [
 
 	| smethod size transferred treecodes selector format tliteral md organizer code category |
@@ -265,7 +267,7 @@ Ring2MetacircularConverter >> createNewMethod: m in: species [
 	^ transferred
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> createNewModule: spec [
 	| behavior class module |
 	behavior := behaviors at: spec.
@@ -279,7 +281,7 @@ Ring2MetacircularConverter >> createNewModule: spec [
 	^ module
 ]
 
-{ #category : #paths }
+{ #category : 'paths' }
 Ring2MetacircularConverter >> findModulePath: moduleName [
 	| parts path candidates dir |
 	parts := '.' split: moduleName.
@@ -292,7 +294,7 @@ Ring2MetacircularConverter >> findModulePath: moduleName [
 
 ]
 
-{ #category : #building }
+{ #category : 'building' }
 Ring2MetacircularConverter >> fixBehaviors [
 	| metaspec behaviorspec mclass mmetaclass |
 	self
@@ -313,7 +315,7 @@ Ring2MetacircularConverter >> fixBehaviors [
 		do: [ :behavior | self initializeBehavior: behavior spec: behaviorspec ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> headerFor: aRingObject [
 	| behavior |
 	behavior := behaviors at: aRingObject spec ifAbsent: nil.
@@ -326,7 +328,7 @@ Ring2MetacircularConverter >> headerFor: aRingObject [
 		hash: aRingObject headerHash
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> image: aPowertalkRingImage [
 
 	| index |
@@ -387,7 +389,7 @@ Ring2MetacircularConverter >> image: aPowertalkRingImage [
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> initialize [
 	dest := EggMetacircularRuntime new.
 	mapping := IdentityDictionary new.
@@ -396,7 +398,7 @@ Ring2MetacircularConverter >> initialize [
 	closureMethods := OrderedCollection new
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> initializeActiveProcess [
 
 	| processor active |
@@ -406,17 +408,17 @@ Ring2MetacircularConverter >> initializeActiveProcess [
 	dest 	sendLocal: #initializeStack to: active
 ]
 
-{ #category : #building }
+{ #category : 'building' }
 Ring2MetacircularConverter >> initializeBehavior: anEggHeapObject spec: anRGBehavior [
 	| behavior |
 	behavior := behaviors at: anRGBehavior.
 	anEggHeapObject behavior: behavior
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> initializeEmulationOverrides [
 	| classes |
-	classes := source vmPrimitivesSpec allExtensionClasses.
+	classes := source vmPrimitivesSpec extendedClasses.
 	classes
 		do: [ :class | 
 			class methods do: [ :m | self override: class name with: m ].
@@ -425,7 +427,7 @@ Ring2MetacircularConverter >> initializeEmulationOverrides [
 	self removeBootstrapDictionaryNewOverride
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> initializeRuntime [
 
 	| map symbols array method smi block metaclass kernel byteArray string closure behavior lpi lni float dnu |
@@ -470,7 +472,7 @@ Ring2MetacircularConverter >> initializeRuntime [
 		initializeEmulationOverrides
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> initializeSymbolTable [
 	| symbol namespaces cvars table mapped |
 	symbol := source classNamed: #Symbol.
@@ -481,7 +483,7 @@ Ring2MetacircularConverter >> initializeSymbolTable [
 	dest symbolTable: mapped
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> instantiateMetaobjects [
 	| ibehavior mspecies mbehavior |
 	source classes , source metaclasses
@@ -495,12 +497,12 @@ Ring2MetacircularConverter >> instantiateMetaobjects [
 				at: ibehavior put: mbehavior ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> loadModule: symbol [
 
 	| spec classes moduleName moduleSpec module extensions name |
 	spec := self readModuleSpec: symbol.
-	classes := spec allClasses.
+	classes := spec classes.
 	moduleName := ('.' split: symbol) last asSymbol.
 	moduleSpec := spec at: moduleName , #Module.
 	moduleSpec ifNil: [ moduleSpec := spec at: #Module , moduleName ].
@@ -517,18 +519,18 @@ Ring2MetacircularConverter >> loadModule: symbol [
 	classes := self classesSortedBySuperclass: classes.
 	classes := classes collect: [ :classSpec | 
 		           self createNewClassFrom: classSpec in: module ].
-	extensions := spec allExtensionClasses do: [ :classSpec | 
+	extensions := spec extendedClasses do: [ :classSpec | 
 		              self createExtensionMethodsOf: classSpec in: module ].
 	dest sendLocal: #justLoaded to: module.
 	^ module
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> map: aRingObject to: anLMRObject [
 	mapping at: aRingObject put: anLMRObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> newBehaviorMapping: aRingObject [
 	| header mapped |
 	header := self headerFor: aRingObject.
@@ -537,7 +539,7 @@ Ring2MetacircularConverter >> newBehaviorMapping: aRingObject [
 	^ mapped
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> newCallback: aNativeCode bytesFrom: aByteArray [
 	| code original behavior class |
 	code := source newBytesFrom: aByteArray.
@@ -553,7 +555,7 @@ Ring2MetacircularConverter >> newCallback: aNativeCode bytesFrom: aByteArray [
 	^ code
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> newMapping: aRingObject [
 	| header mapped |
 	aRingObject isImmediate
@@ -568,12 +570,12 @@ Ring2MetacircularConverter >> newMapping: aRingObject [
 	^ mapped
 ]
 
-{ #category : #paths }
+{ #category : 'paths' }
 Ring2MetacircularConverter >> outputDirectory [
 	^ self rootDirectory / 'build' 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> override: classname with: rgMethod [
 	| spec species behavior smethod rmethod lmrmethod selector |
 	spec := source specs at: classname.
@@ -587,23 +589,23 @@ Ring2MetacircularConverter >> override: classname with: rgMethod [
 	dest override: behavior -> selector with: lmrmethod
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> prepareClosuresForExecution [
 	| mapped |
 	closureMethods
 		do: [ :method | mapped := mapping at: method. dest interpreter prepareExecutableCode: mapped ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> readModuleSpec: aSymbol [
 	| path |
 	path := self findModulePath: aSymbol.
-	^EggRingModule readSpec: aSymbol at: path parent
+	^EggBootstrapModule readSpec: aSymbol at: path parent
 
 	
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> removeBootstrapDictionaryNewOverride [
 	| spec species behavior selector |
 	spec := source specs at: #'Namespace class'.
@@ -613,17 +615,17 @@ Ring2MetacircularConverter >> removeBootstrapDictionaryNewOverride [
 	dest removeOverride: behavior -> selector
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> result [
 	^dest
 ]
 
-{ #category : #paths }
+{ #category : 'paths' }
 Ring2MetacircularConverter >> rootDirectory [
 	^ '../../modules' asFileReference
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> sendLoadModule: aSymbol [
 
 	| symbol |
@@ -631,12 +633,12 @@ Ring2MetacircularConverter >> sendLoadModule: aSymbol [
 	^ dest sendLocal: #load: to: dest kernel with: { symbol }
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> source: anEggRingImage [
 	source := anEggRingImage
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> transferLiteral: anObject [
 
 	| transferred |
@@ -657,7 +659,7 @@ Ring2MetacircularConverter >> transferLiteral: anObject [
 	self ASSERT: false
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> useHostModuleLoader [
 dest
 		          sendLocal: #useHostModuleLoader

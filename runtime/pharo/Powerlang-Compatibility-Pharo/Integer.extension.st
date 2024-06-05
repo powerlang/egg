@@ -1,6 +1,6 @@
-Extension { #name : #Integer }
+Extension { #name : 'Integer' }
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 Integer >> bin [
 	"
 	255 bin
@@ -8,7 +8,7 @@ Integer >> bin [
 	^self radix: 2
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 Integer >> bin: bits [
 	"
 	(2 bin: 7) size = 7
@@ -19,12 +19,12 @@ Integer >> bin: bits [
 	^ bin copyFrom: bin size - bits + 1 to: bin size
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 Integer >> bitShiftRight: anInteger [
 	^self bitShift: 0 - anInteger
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 Integer >> bitsAt: aStretch [
 	"
 	(2r001101010 bitField: (3 thru: 6)) bin = '1010'
@@ -36,7 +36,7 @@ Integer >> bitsAt: aStretch [
 	^shifted bitAnd: mask - 1
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 Integer >> bitsAt: aStretch put: anInteger [
 	"
 	((2r001101100 bitsAt: (3 thru: 6) put: 2r1101) bitField: (3 thru: 6)) bin = '1101'
@@ -50,7 +50,7 @@ Integer >> bitsAt: aStretch put: anInteger [
 	^(self bitsClear: aStretch) bitOr: shifted
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 Integer >> bitsClear: aStretch [
 	"
 	(2r111100110 bitsClear: (3 thru: 6)) = 2r111000010
@@ -60,12 +60,12 @@ Integer >> bitsClear: aStretch [
 	^self bitAnd: mask bitInvert
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 Integer >> isOnBit: n [
 	^(self bitAnd: n) = n
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 Integer >> linearFeedbackShiftRandom: key [
 	"
 	LFSR implementation (avoids 0 by definition).

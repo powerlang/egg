@@ -1,6 +1,6 @@
 Class {
-	#name : #EggRuntime,
-	#superclass : #Object,
+	#name : 'EggRuntime',
+	#superclass : 'Object',
 	#instVars : [
 		'methodCache',
 		'falseObj',
@@ -14,29 +14,31 @@ Class {
 	#pools : [
 		'ClosureElementTypes'
 	],
-	#category : #'Powerlang-Core-Execution'
+	#category : 'Powerlang-Core-Execution',
+	#package : 'Powerlang-Core',
+	#tag : 'Execution'
 }
 
-{ #category : #services }
+{ #category : 'services' }
 EggRuntime >> argumentCountOf: code [
 	^(self isBlock: code)
 		        ifTrue: [ self blockArgumentCount: code ]
 		        ifFalse: [ self methodArgumentCount: code ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> behaviorOf: anObject [
 	^self subclassResponsibility
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRuntime >> booleanFor: aBoolean [
 	^ aBoolean
 		ifTrue: [ trueObj ]
 		ifFalse: [ falseObj ]
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRuntime >> booleanFrom: anObject [
 	anObject == falseObj
 		ifTrue: [ ^ false ].
@@ -45,13 +47,13 @@ EggRuntime >> booleanFrom: anObject [
 	self error: 'not a boolean'
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRuntime >> doesNotUnderstandMethod [
 
 	^doesNotUnderstandMethod
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> evaluatePrimitiveHash: receiver [
 	| hash |
 	hash := receiver headerHash.
@@ -61,24 +63,24 @@ EggRuntime >> evaluatePrimitiveHash: receiver [
 	^ self newInteger: hash
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> executableCodeWork: code [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRuntime >> extensionMethodModule: method [
 
 	self subclassResponsibility
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRuntime >> false [
 	^ falseObj
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> flushDispatchCache: aSymbol [
 
 	| cached |
@@ -89,7 +91,7 @@ EggRuntime >> flushDispatchCache: aSymbol [
 	cached do: [ :key | methodCache removeKey: key]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> flushDispatchCache: aSymbol in: class [
 	| behavior |
 	behavior := self speciesInstanceBehavior: class.
@@ -97,14 +99,14 @@ EggRuntime >> flushDispatchCache: aSymbol in: class [
 	^ methodCache removeKey: aSymbol -> behavior ifAbsent: []
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRuntime >> initialize [
 	methodCache := Dictionary new.
 	symbolCache := Dictionary new.
 	overrides := Dictionary new
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRuntime >> initializeInterpreter [
 	"interpreter := PowertalkRecursiveInterpreter new runtime: self"
 
@@ -115,69 +117,63 @@ EggRuntime >> initializeInterpreter [
 	interpreter := EggIterativeStackedInterpreter new runtime: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> instanceVarOf: receiver at: anInteger [
 	^ receiver slotAt: anInteger
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> instanceVarOf: receiver at: anInteger put: value [
 	^ receiver slotAt: anInteger put: value
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRuntime >> interpreter [
 	^interpreter
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> isClosure: anObject [
 	^ self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> literalFor: anObject [
 	^anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> localMethodTreecodes: method [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> localSymbolFrom: anObject [
 	^ anObject bytes allButLast asString asSymbol
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> lookup: aSymbol startingAt: aBehavior [
 	^methodCache at: aSymbol -> aBehavior ifAbsentPut: [ self doLookup: aSymbol startingAt: aBehavior ]
 ]
 
-{ #category : #accessing }
-EggRuntime >> methodTreecodes: method [
-
-	^ self subclassResponsibility
-]
-
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> methodClassBinding: method [
 	^ self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> methodEnvironmentSize: anObject [
 	^self subclassResponsibility
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRuntime >> methodIsExtension: method [
 		self subclassResponsibility 
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRuntime >> methodModule: method [
 	| species |
 	^(self methodIsExtension: method)
@@ -187,73 +183,79 @@ EggRuntime >> methodModule: method [
 	self speciesModule: species].
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
+EggRuntime >> methodTreecodes: method [
+
+	^ self subclassResponsibility
+]
+
+{ #category : 'accessing' }
 EggRuntime >> newBootstrapDictionaryOf: receiver [
 	^ self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> newBytesOf: receiver sized: size [
 	^ self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> newClosureFor: compiledBlock [
 	^ self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> newEnvironmentSized: anInteger [
 	^self subclassResponsibility
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> newExecutableCodeFor: anObject [
 	^ self subclassResponsibility
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> newInteger: anInteger [
 	^self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> newOf: receiver sized: size [
 	^ self subclassResponsibility
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> newSlotsOf: receiver [
 ^self subclassResponsibility
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRuntime >> nil [
 	^nilObj
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> registerCache: anSMessage for: symbol [
 	| messages |
 	messages := symbolCache at: symbol ifAbsentPut: [OrderedCollection new].
 	messages add: anSMessage 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> sendLocal: aSymbol to: receiver [
 	^ self sendLocal: aSymbol to: receiver with: {}
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> sendLocal: aSymbol to: receiver with: anArray [
 	^interpreter sendLocal: aSymbol to: receiver with: anArray
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> sexpressionsOf: method [
 
 	| treecodes decoder |
@@ -265,33 +267,33 @@ EggRuntime >> sexpressionsOf: method [
 	^ decoder decodeMethod
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> speciesFor: anObject [
 	^ self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> speciesInstanceBehavior: class [
 ^	self subclassResponsibility 
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRuntime >> speciesModule: method [
 
 	self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRuntime >> symbolFrom: anObject [
 	^anObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRuntime >> symbolFromLocal: aSymbol [
 	^self subclassResponsibility
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRuntime >> true [
 	^ trueObj
 ]

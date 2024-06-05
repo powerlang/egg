@@ -1,6 +1,6 @@
-Extension { #name : #SmallInteger }
+Extension { #name : 'SmallInteger' }
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 SmallInteger >> isSmallInteger [
 	^ true
 ]

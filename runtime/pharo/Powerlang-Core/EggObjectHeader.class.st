@@ -1,26 +1,28 @@
 Class {
-	#name : #EggObjectHeader,
-	#superclass : #Object,
+	#name : 'EggObjectHeader',
+	#superclass : 'Object',
 	#instVars : [
 		'behavior',
 		'flags',
 		'size',
 		'hash'
 	],
-	#category : #'Powerlang-Core-Execution-Metacircular'
+	#category : 'Powerlang-Core-Execution-Metacircular',
+	#package : 'Powerlang-Core',
+	#tag : 'Execution-Metacircular'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggObjectHeader >> behavior [
 	^behavior
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggObjectHeader >> behavior: anEggHeapObject [
 	behavior := anEggHeapObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggObjectHeader >> bytes: bytes arrayed: arrayed named: named [
 	| b a n |
 	b := bytes
@@ -34,27 +36,27 @@ EggObjectHeader >> bytes: bytes arrayed: arrayed named: named [
 	flags := b | a | n 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggObjectHeader >> flags [
 	^flags
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggObjectHeader >> hash [
 	^hash
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggObjectHeader >> hash: anInteger [
 	hash := anInteger
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggObjectHeader >> isSmall [
 	^ self size < 256
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggObjectHeader >> printOn: aStream [
 
 	aStream
@@ -69,12 +71,12 @@ EggObjectHeader >> printOn: aStream [
 		nextPut: $]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggObjectHeader >> size [
 	^size 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggObjectHeader >> size: anInteger [
 	size := anInteger.
 	self isSmall ifTrue: [ flags := flags | 16r80]

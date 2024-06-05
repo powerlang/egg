@@ -1,19 +1,21 @@
 Class {
-	#name : #LinkedLinearEvaluationContext,
-	#superclass : #IterativeLinkedEvaluationContext,
+	#name : 'LinkedLinearEvaluationContext',
+	#superclass : 'IterativeLinkedEvaluationContext',
 	#instVars : [
 		'pc'
 	],
-	#category : #'Powerlang-Core-Execution'
+	#category : 'Powerlang-Core-Execution',
+	#package : 'Powerlang-Core',
+	#tag : 'Execution'
 }
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 LinkedLinearEvaluationContext >> initialize [
 	super initialize.
 	pc := 1
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LinkedLinearEvaluationContext >> nextOperation [
 	| op |
 	pc <= work size ifFalse: [^nil].
@@ -22,18 +24,18 @@ LinkedLinearEvaluationContext >> nextOperation [
 	^ op
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LinkedLinearEvaluationContext >> regPC: anInteger [
 	pc := anInteger
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 LinkedLinearEvaluationContext >> restart [
 	super restart.
 	pc := 1
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LinkedLinearEvaluationContext >> stackTemporaryAt: index [
 	| size |
 	size := temporaries size.
@@ -42,7 +44,7 @@ LinkedLinearEvaluationContext >> stackTemporaryAt: index [
 		ifFalse: [ temporaries at: index ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LinkedLinearEvaluationContext >> stackTemporaryAt: index put: value [
 	| size |
 	size := temporaries size.
@@ -51,7 +53,7 @@ LinkedLinearEvaluationContext >> stackTemporaryAt: index put: value [
 		ifFalse: [ temporaries at: index put: value ]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 LinkedLinearEvaluationContext >> work: aCollection [
 	work := aCollection
 ]

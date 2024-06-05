@@ -1,6 +1,6 @@
-Extension { #name : #ByteArray }
+Extension { #name : 'ByteArray' }
 
-{ #category : #'*Powerlang-Core' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 ByteArray >> asLittleEndianNegativeInteger [
 	| integer |
 	integer := LargeNegativeInteger new: self size.
@@ -8,7 +8,7 @@ ByteArray >> asLittleEndianNegativeInteger [
 	^ integer - 1
 ]
 
-{ #category : #'*Powerlang-Core' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 ByteArray >> asLittleEndianPositiveInteger [
 	| integer |
 	integer := LargePositiveInteger new: self size.

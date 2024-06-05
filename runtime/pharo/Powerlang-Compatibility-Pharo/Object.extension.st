@@ -1,36 +1,36 @@
-Extension { #name : #Object }
+Extension { #name : 'Object' }
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 Object >> != anObject [
 		^ self ~= anObject
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 Object >> ASSERT: aBoolean [
 	self assert: aBoolean
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 Object >> DENY: aBoolean [
 	self ASSERT: aBoolean not
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 Object class >> disableCode: aBlock [
 	"the block has been disabled"
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 Object >> evaluate [
 	^self
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 Object >> evaluateWithArguments: anArray [
 	^self evaluate
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 Object >> hashWith: a [
 	^self
 		hashedWith: a
@@ -42,7 +42,7 @@ Object >> hashWith: a [
 		count: 2
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 Object >> hashWith: a with: b [
 	^ self
 		hashedWith: a
@@ -54,7 +54,7 @@ Object >> hashWith: a with: b [
 		count: 3
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 Object >> hashWith: a with: b with: c [
 	^self
 		hashedWith: a
@@ -67,7 +67,7 @@ Object >> hashWith: a with: b with: c [
 
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 Object >> hashWith: a with: b with: c with: d [
 	^ self
 		hashedWith: a
@@ -79,7 +79,7 @@ Object >> hashWith: a with: b with: c with: d [
 		count: 5
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 Object >> hashWith: a with: b with: c with: d with: e [
 	^ self
 		hashedWith: a
@@ -91,7 +91,7 @@ Object >> hashWith: a with: b with: c with: d with: e [
 		count: 6
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 Object >> hashedWith: a
 with: b
 with: c
@@ -116,22 +116,22 @@ count: n [
 	self error: 'Invalid argument count'
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 Object >> isBoolean [
 	^false
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 Object >> isEmptyOrNil [
 	^false
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 Object >> isSmallInteger [
 	^false
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 Object >> isSpecies [
 	^false
 ]

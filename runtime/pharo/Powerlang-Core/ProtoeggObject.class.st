@@ -1,13 +1,15 @@
 Class {
-	#name : #ProtoeggObject,
-	#superclass : #Object,
+	#name : 'ProtoeggObject',
+	#superclass : 'Object',
 	#instVars : [
 		'spec'
 	],
-	#category : #'Powerlang-Core-Execution-Bootstrap-Ring'
+	#category : 'Powerlang-Core-Execution-Bootstrap',
+	#package : 'Powerlang-Core',
+	#tag : 'Execution-Bootstrap'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ProtoeggObject class >> classFor: anRGBehavior [
 	anRGBehavior name == #SmallInteger ifTrue: [^ProtoeggSmallInteger].
 	^anRGBehavior isBytes
@@ -15,12 +17,12 @@ ProtoeggObject class >> classFor: anRGBehavior [
 		ifFalse: [ ProtoeggSlotObject ]
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ProtoeggObject class >> new: anRGBehavior [
 	^self new: anRGBehavior size: 0
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ProtoeggObject class >> new: anRGBehavior size: size [
 	| class |
 	"self assert: (anRGBehavior isVariable or: [ size == 0 ]). isVariable too slow to assert"
@@ -28,36 +30,36 @@ ProtoeggObject class >> new: anRGBehavior size: size [
 	^ class new initializeAs: anRGBehavior sized: size
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 ProtoeggObject >> allSlotNames [
 	^#()
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggObject >> arrayedSize [
 	^self size
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggObject >> behavior: aSlotObjectMap [
 	| class |
 	class := aSlotObjectMap slotAt: 1.
 	spec := class instanceSpec
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggObject >> bodySizeInBytes [
 	"Return the size of object body(s) in bytes,
 	 padded if a byte object"
 	^ self subclassResponsibility 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggObject >> classname [
 	^spec name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggObject >> headerSizeInBytes [
 	"
 		Return the size of object header in bytes, 
@@ -68,7 +70,7 @@ ProtoeggObject >> headerSizeInBytes [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggObject >> headerSmallSize [
 	"Return value of 'size' field of small header"
 	 | size |	
@@ -76,61 +78,61 @@ ProtoeggObject >> headerSmallSize [
    ^ size < 256 ifTrue: [ size ] ifFalse: [ 0 ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ProtoeggObject >> initializeAs: anRGBehavior sized: size [
 	self subclassResponsibility
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ProtoeggObject >> isBytes [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ProtoeggObject >> isClosure [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ProtoeggObject >> isDictionaryMap [ 
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ProtoeggObject >> isImmediate [ 
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ProtoeggObject >> isNil [
 	^ spec notNil and: [spec name = #UndefinedObject]
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ProtoeggObject >> isPointers [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ProtoeggObject >> isSmall [
 	^self size < 256
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ProtoeggObject >> loadIvar: aSymbol [
 	^nil
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ProtoeggObject >> nilAll: nilObject [
 	
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ProtoeggObject >> nilWith: nilObject [
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggObject >> size [
 	"Return the size if this object, that this, the value of
 	 size field in object header. 
@@ -141,13 +143,13 @@ ProtoeggObject >> size [
 	self subclassResponsibility 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggObject >> sizeInBytes [
 	"Return the size of object in bytes without padding"
 	^ self subclassResponsibility 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggObject >> slotAt: index [
 	"Get named slot at given `index`, starting with 1. This CANNOT be used 
 	 for accessing indexed slots  (i.e., variable part of array-like objects), 
@@ -156,7 +158,7 @@ ProtoeggObject >> slotAt: index [
 	self subclassResponsibility  
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggObject >> slotAt: index put: value [
 	"Set named slot at given `index` to `value`. This CANNOT be used 
 	 for setting indexed slots  (i.e., variable part of array-like objects), 
@@ -165,7 +167,7 @@ ProtoeggObject >> slotAt: index put: value [
 	self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggObject >> slotNamed: name [
 	"Get a named slot with given `name`"
 
@@ -176,7 +178,7 @@ ProtoeggObject >> slotNamed: name [
 	^ self slotAt: index
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggObject >> slotNamed: name put: value [
 	"Set a named slot with given `name` to `value`"
 
@@ -187,22 +189,22 @@ ProtoeggObject >> slotNamed: name put: value [
 	^ self slotAt: index put: value
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggObject >> slotsDo: aBlock [
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggObject >> spec [
 	^ spec
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ProtoeggObject >> storeIvar: aSymbol with: anObjectMap [
 	^ nil
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggObject >> wordSize [
 	"Return the size in bytes of the word (i.e, a reference to an object)"
 	

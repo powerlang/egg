@@ -1,6 +1,6 @@
 Class {
-	#name : #SExpressionEmulatorTest,
-	#superclass : #TestCase,
+	#name : 'SExpressionEmulatorTest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'builder',
 		'writer',
@@ -11,10 +11,12 @@ Class {
 		'AstBindingTypes',
 		'SExpressionTypes'
 	],
-	#category : #'Powerlang-TestsFailing-Metaphysics'
+	#category : 'Powerlang-TestsFailing-Metaphysics',
+	#package : 'Powerlang-TestsFailing',
+	#tag : 'Metaphysics'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 SExpressionEmulatorTest >> handleFor: anObjectMap [
 	| oid |
 	oid := writer offsetOf: anObjectMap.
@@ -22,7 +24,7 @@ SExpressionEmulatorTest >> handleFor: anObjectMap [
 
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 SExpressionEmulatorTest >> injectMethod: aTreecode selector: selector for: classname [
 	^ builder
 		newMethod: aTreecode
@@ -32,12 +34,12 @@ SExpressionEmulatorTest >> injectMethod: aTreecode selector: selector for: class
 		literals: #()
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 SExpressionEmulatorTest >> injectObject [
 	^ builder newSlots: 'Object'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 SExpressionEmulatorTest >> invoke: method with: object [
 	| m receiver |
 	m := self handleFor: method.
@@ -45,13 +47,13 @@ SExpressionEmulatorTest >> invoke: method with: object [
 	^receiver mirror invoke: m mirror asMethodMirror with: #()
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 SExpressionEmulatorTest >> setUp [
 	super setUp.
 	builder := VirtualImage kernelSpec build
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 SExpressionEmulatorTest >> test100yourself [
 	| object handle result |
 	object := self injectObject.
@@ -61,7 +63,7 @@ SExpressionEmulatorTest >> test100yourself [
 		assert: object == result
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 SExpressionEmulatorTest >> write [
 	writer := builder writer write.
 	runtime := Runtime

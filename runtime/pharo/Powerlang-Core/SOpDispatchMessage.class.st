@@ -1,23 +1,25 @@
 Class {
-	#name : #SOpDispatchMessage,
-	#superclass : #SOperation,
+	#name : 'SOpDispatchMessage',
+	#superclass : 'SOperation',
 	#instVars : [
 		'message'
 	],
-	#category : #'Powerlang-Core-SExpressions'
+	#category : 'Powerlang-Core-SExpressions',
+	#package : 'Powerlang-Core',
+	#tag : 'SExpressions'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SOpDispatchMessage >> acceptVisitor: visitor [
 	^ visitor visitOpDispatchMessage: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SOpDispatchMessage >> message [
 	^ message
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SOpDispatchMessage >> message: anSMessage [
 	message := anSMessage
 ]

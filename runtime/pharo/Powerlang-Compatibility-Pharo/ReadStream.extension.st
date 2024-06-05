@@ -1,6 +1,6 @@
-Extension { #name : #ReadStream }
+Extension { #name : 'ReadStream' }
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 ReadStream >> copyFrom: start to: stop [
 	| pos result |
 	pos := self position.
@@ -10,7 +10,7 @@ ReadStream >> copyFrom: start to: stop [
 	^result
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 ReadStream >> peek: n [
 	| pos safe data |
 	pos := self position.
@@ -20,7 +20,7 @@ ReadStream >> peek: n [
 	^data
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 ReadStream >> prev [
 	^self position > 0
 		ifTrue: [self position: self position - 1; peek]

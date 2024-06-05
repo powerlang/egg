@@ -1,6 +1,6 @@
-Extension { #name : #NumberParser }
+Extension { #name : 'NumberParser' }
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 NumberParser >> nextNumber [
 	"main method for reading a number.
 	This one can read Float Integer and ScaledDecimal"

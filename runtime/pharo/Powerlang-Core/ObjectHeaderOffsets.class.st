@@ -1,6 +1,6 @@
 Class {
-	#name : #ObjectHeaderOffsets,
-	#superclass : #PSharedPool,
+	#name : 'ObjectHeaderOffsets',
+	#superclass : 'PSharedPool',
 	#classVars : [
 		'BehaviorOffset',
 		'FlagsOffset',
@@ -8,10 +8,12 @@ Class {
 		'LargeSizeOffset',
 		'SizeOffset'
 	],
-	#category : #'Powerlang-Core-Metaphysics'
+	#category : 'Powerlang-Core-Metaphysics',
+	#package : 'Powerlang-Core',
+	#tag : 'Metaphysics'
 }
 
-{ #category : #'class initialization' }
+{ #category : 'class initialization' }
 ObjectHeaderOffsets class >> initialize [
 	BehaviorOffset := -4.
 	FlagsOffset := -5.

@@ -1,45 +1,47 @@
 Class {
-	#name : #ProtoeggSmallInteger,
-	#superclass : #ProtoeggObject,
+	#name : 'ProtoeggSmallInteger',
+	#superclass : 'ProtoeggObject',
 	#instVars : [
 		'value'
 	],
-	#category : #'Powerlang-Core-Execution-Bootstrap-Ring'
+	#category : 'Powerlang-Core-Execution-Bootstrap',
+	#package : 'Powerlang-Core',
+	#tag : 'Execution-Bootstrap'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ProtoeggSmallInteger class >> new: anRGBehavior valued: anInteger [
 	^self new initializeAs: anRGBehavior valued: anInteger
 ]
 
-{ #category : #comparing }
+{ #category : 'comparing' }
 ProtoeggSmallInteger >> = anObject [
 	anObject class == self class
 		ifFalse: [ ^ false ].
 	^ value = anObject value
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggSmallInteger >> at: index [
 	self errorNotIndexable
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggSmallInteger >> at: index put: anObject [
 	self errorNotIndexable
 ]
 
-{ #category : #comparing }
+{ #category : 'comparing' }
 ProtoeggSmallInteger >> hash [
 	^ value hash
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ProtoeggSmallInteger >> initializeAs: anRGBehavior sized: size [
 	self shouldNotImplement
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ProtoeggSmallInteger >> initializeAs: anRGBehavior valued: anInteger [
 	self assert: anRGBehavior name == #SmallInteger.
 	self assert: anInteger isInteger.
@@ -47,12 +49,12 @@ ProtoeggSmallInteger >> initializeAs: anRGBehavior valued: anInteger [
 	value := anInteger
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ProtoeggSmallInteger >> isImmediate [
 	^ true
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 ProtoeggSmallInteger >> printOn: aStream [
 	aStream
 		nextPutAll: '<<';
@@ -60,33 +62,33 @@ ProtoeggSmallInteger >> printOn: aStream [
 		nextPutAll: '>>'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggSmallInteger >> size [ 
 	^ 0
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggSmallInteger >> slotAt: index [
 	self errorNotIndexable
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggSmallInteger >> slotAt: index put: anObject [
 	self errorNotIndexable
 ]
 
-{ #category : #validation }
+{ #category : 'validation' }
 ProtoeggSmallInteger >> validate [ 
 	super validate.
 	self assert: value isSmallInteger 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggSmallInteger >> value [
 	^value
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggSmallInteger >> value: aSmallInteger [
 	value := aSmallInteger
 ]

@@ -6,6 +6,11 @@ Class {
 		'stream',
 		'script'
 	],
+	#pools : [
+		'AstBindingTypes',
+		'AstNodeTypes',
+		'ClosureElementTypes'
+	],
 	#category : #'Powerlang-Core-SExpressions'
 }
 
@@ -19,8 +24,9 @@ TreecodeEncoder class >> new [
 
 { #category : #'class initialization' }
 TreecodeEncoder class >> initializeTreecodeIds [
-	self addNamespaceAs: #TreecodeIds.
-	TreecodeIds
+	| named |
+	named := self addNamespaceAs: #TreecodeIds.
+	named
 		at: #MethodId put: 101;
 		at: #BlockId put: 102;
 		at: #IdentifierId put: 103;
@@ -35,8 +41,9 @@ TreecodeEncoder class >> initializeTreecodeIds [
 
 { #category : #'class initialization' }
 TreecodeEncoder class >> initializeBindingIds [
-	self addNamespaceAs: #BindingIds.
-	BindingIds
+	| named |
+	named := self addNamespaceAs: #BindingIds.
+	named
 		at: #NilId put: 1;
 		at: #TrueId put: 2;
 		at: #FalseId put: 3;
@@ -53,8 +60,9 @@ TreecodeEncoder class >> initializeBindingIds [
 
 { #category : #'class initialization' }
 TreecodeEncoder class >> initializeClosureElementIds [
-	self addNamespaceAs: #ClosureElementIds.
-	ClosureElementIds
+	| named |
+	named := self addNamespaceAs: #ClosureElementIds.
+	named
 		at: #Self put: 0;
 		at: #LocalArgument put: 1;
 		at: #Environment put: 2;

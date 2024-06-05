@@ -3,8 +3,8 @@ I represent the format of objects in the DMR. Ask me questions about
 the header of an object.
 "
 Class {
-	#name : #DmrObjectFormat,
-	#superclass : #ObjectFormat,
+	#name : 'DmrObjectFormat',
+	#superclass : 'ObjectFormat',
 	#instVars : [
 		'wordSize'
 	],
@@ -12,10 +12,12 @@ Class {
 		'ObjectHeaderMasks',
 		'ObjectHeaderOffsets'
 	],
-	#category : #'Powerlang-Core-Metaphysics'
+	#category : 'Powerlang-Core-Metaphysics',
+	#package : 'Powerlang-Core',
+	#tag : 'Metaphysics'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 DmrObjectFormat class >> new [
 	"return an initialized instance"
 
@@ -23,12 +25,12 @@ DmrObjectFormat class >> new [
 
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 DmrObjectFormat >> behaviorOf: oid [
 	^ storage uint32of: oid atOffset: BehaviorOffset
 ]
 
-{ #category : #sizes }
+{ #category : 'sizes' }
 DmrObjectFormat >> bodySizeInBytesOf: oid [
 	| total |
 	total := self sizeOf: oid.
@@ -37,12 +39,12 @@ DmrObjectFormat >> bodySizeInBytesOf: oid [
 		ifFalse: [ total * wordSize ]
 ]
 
-{ #category : #sizes }
+{ #category : 'sizes' }
 DmrObjectFormat >> bytesOf: oid count: size [
 	^ storage bytesAt: oid sized: size
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 DmrObjectFormat >> classOf: anObjectHandle [
 	| oid class behavior handle |
 	oid := anObjectHandle oid.
@@ -53,23 +55,23 @@ DmrObjectFormat >> classOf: anObjectHandle [
 	^ handle mirror asBehaviorMirror instanceClass
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 DmrObjectFormat >> flagsOf: anObject [
 	^ storage uint8of: anObject atOffset: FlagsOffset
 ]
 
-{ #category : #sizes }
+{ #category : 'sizes' }
 DmrObjectFormat >> headerSizeInBytesOf: oid [
 	^(self isSmall: oid) ifTrue: [8] ifFalse: [16]
 
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 DmrObjectFormat >> initialize [
 	wordSize := 8
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 DmrObjectFormat >> integerOf: oid [
 	| shifted complement |
 	self ASSERT: oid odd.
@@ -80,47 +82,47 @@ DmrObjectFormat >> integerOf: oid [
 		ifFalse: [ shifted ]
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 DmrObjectFormat >> isArrayed: anObject [
 	^ (self flagsOf: anObject) anyMask: IsArrayed
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 DmrObjectFormat >> isBytes: anObject [
 	^ ((self flagsOf: anObject) anyMask: IsBytes)
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 DmrObjectFormat >> isInteger: oid [
 	^oid odd
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 DmrObjectFormat >> isLarge: anObject [
 	^(self isSmall: anObject) not
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 DmrObjectFormat >> isNamed: anObject [
 	^ (self flagsOf: anObject) anyMask: IsNamed
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 DmrObjectFormat >> isSmall: oid [
 	^ (self flagsOf: oid) anyMask: IsSmall
 ]
 
-{ #category : #sizes }
+{ #category : 'sizes' }
 DmrObjectFormat >> labelFor: oid [
 	^oid hex
 ]
 
-{ #category : #sizes }
+{ #category : 'sizes' }
 DmrObjectFormat >> largeSizeOf: oid [
 	^ storage uint32of: oid atOffset: LargeSizeOffset
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 DmrObjectFormat >> nextObjectHandleOf: anObjectHandle [
 	| addr size |
 	addr := anObjectHandle oid.
@@ -129,7 +131,7 @@ DmrObjectFormat >> nextObjectHandleOf: anObjectHandle [
 	
 ]
 
-{ #category : #sizes }
+{ #category : 'sizes' }
 DmrObjectFormat >> print: oid on: aStream [
 	| size |
 	aStream
@@ -147,7 +149,7 @@ DmrObjectFormat >> print: oid on: aStream [
 
 ]
 
-{ #category : #sizes }
+{ #category : 'sizes' }
 DmrObjectFormat >> printFlagsOf: oid on: aStream [
 	| char |
 	aStream nextPut: $(.
@@ -171,29 +173,29 @@ DmrObjectFormat >> printFlagsOf: oid on: aStream [
 		nextPut: $)
 ]
 
-{ #category : #sizes }
+{ #category : 'sizes' }
 DmrObjectFormat >> sizeInBytesOf: oid [
 	^ (self headerSizeInBytesOf: oid) + (self bodySizeInBytesOf: oid)
 ]
 
-{ #category : #sizes }
+{ #category : 'sizes' }
 DmrObjectFormat >> sizeOf: oid [
 	^ (self isSmall: oid)
 		ifTrue: [ self smallSizeOf: oid ]
 		ifFalse: [ self largeSizeOf: oid ]
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 DmrObjectFormat >> slotOf: base at: index [
 	^ storage uint64atOffset: base + (8 * (index - 1))
 ]
 
-{ #category : #sizes }
+{ #category : 'sizes' }
 DmrObjectFormat >> smallSizeOf: oid [
 	^ storage uint8of: oid atOffset: SizeOffset
 ]
 
-{ #category : #sizes }
+{ #category : 'sizes' }
 DmrObjectFormat >> stringOf: oid count: anInteger [
 	^storage stringAt: oid sized: anInteger
 ]
