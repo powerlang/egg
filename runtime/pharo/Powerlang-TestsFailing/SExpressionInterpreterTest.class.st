@@ -1,6 +1,6 @@
 Class {
-	#name : #SExpressionInterpreterTest,
-	#superclass : #TestCase,
+	#name : 'SExpressionInterpreterTest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'builder',
 		'writer',
@@ -11,10 +11,12 @@ Class {
 		'AstBindingTypes',
 		'SExpressionTypes'
 	],
-	#category : #'Powerlang-TestsFailing-Metaphysics'
+	#category : 'Powerlang-TestsFailing-Metaphysics',
+	#package : 'Powerlang-TestsFailing',
+	#tag : 'Metaphysics'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 SExpressionInterpreterTest >> handleFor: anObjectMap [
 	| oid |
 	oid := writer offsetOf: anObjectMap.
@@ -22,7 +24,7 @@ SExpressionInterpreterTest >> handleFor: anObjectMap [
 
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 SExpressionInterpreterTest >> injectMethod: aTreecode selector: selector for: classname [
 	^ builder
 		newMethod: aTreecode
@@ -32,12 +34,12 @@ SExpressionInterpreterTest >> injectMethod: aTreecode selector: selector for: cl
 		literals: #()
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 SExpressionInterpreterTest >> injectObject [
 	^ builder newSlots: 'Object'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 SExpressionInterpreterTest >> invoke: method with: object [
 	| m receiver |
 	m := self handleFor: method.
@@ -45,13 +47,13 @@ SExpressionInterpreterTest >> invoke: method with: object [
 	^receiver mirror invoke: m mirror asMethodMirror with: #()
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 SExpressionInterpreterTest >> setUp [
 	super setUp.
 	builder := VirtualImage kernelSpec build
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 SExpressionInterpreterTest >> test100empty [
 	| object treecodes method result original |
 	object := self injectObject.
@@ -65,7 +67,7 @@ SExpressionInterpreterTest >> test100empty [
 		assert: (result equals: original mirror)
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 SExpressionInterpreterTest >> write [
 	writer := builder writer write.
 	runtime := Runtime

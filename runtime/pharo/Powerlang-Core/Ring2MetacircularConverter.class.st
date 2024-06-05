@@ -600,7 +600,7 @@ Ring2MetacircularConverter >> prepareClosuresForExecution [
 Ring2MetacircularConverter >> readModuleSpec: aSymbol [
 	| path |
 	path := self findModulePath: aSymbol.
-	^EggRingModule readSpec: aSymbol at: path parent
+	^EggBootstrapModule readSpec: aSymbol at: path parent
 
 	
 ]

@@ -1,6 +1,6 @@
 Class {
-	#name : #TreecodeTest,
-	#superclass : #TestCase,
+	#name : 'TreecodeTest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'method'
 	],
@@ -8,15 +8,17 @@ Class {
 		'AstBindingTypes',
 		'AstNodeTypes'
 	],
-	#category : #'Powerlang-TestsFailing-SExpressions'
+	#category : 'Powerlang-TestsFailing-SExpressions',
+	#package : 'Powerlang-TestsFailing',
+	#tag : 'SExpressions'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 TreecodeTest >> compile: source in: aSpecies [
 	^SCompiler compile: source in: aSpecies
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 TreecodeTest >> decode: anArray of: aCompiledMethod [
 	| decoder |
 	decoder := TreecodeDecoder new
@@ -25,12 +27,12 @@ TreecodeTest >> decode: anArray of: aCompiledMethod [
 	^decoder decodeMethod
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 TreecodeTest >> encode: source [
 	^self encode: source in: UndefinedObject
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 TreecodeTest >> encode: source in: aSpecies [
 	| ring compiler |
 	ring := VirtualImage kernelSpec bindingOf: aSpecies name.
@@ -39,7 +41,7 @@ TreecodeTest >> encode: source in: aSpecies [
 	^ method treecodes
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 TreecodeTest >> test010emptyMethod [
 	| treecodes root |
 	treecodes := self encode: 'm'.
@@ -48,7 +50,7 @@ TreecodeTest >> test010emptyMethod [
 	self assert: root isMethod; assert: root statements isEmpty
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 TreecodeTest >> test020encodeFalse [
 	| treecodes root identifier |
 	treecodes := self encode: 'm false'.
@@ -64,7 +66,7 @@ TreecodeTest >> test020encodeFalse [
 		assert: identifier binding value = false
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 TreecodeTest >> test020encodeNil [
 	| treecodes root identifier |
 	treecodes := self encode: 'm nil'.
@@ -80,7 +82,7 @@ TreecodeTest >> test020encodeNil [
 		assert: identifier binding value = nil
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 TreecodeTest >> test020encodeSelf [
 	| treecodes root identifier |
 	treecodes := self encode: 'm self'.
@@ -93,7 +95,7 @@ TreecodeTest >> test020encodeSelf [
 	self assert: identifier isVariable; assert: identifier binding isSelf
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 TreecodeTest >> test020encodeTrue [
 	| treecodes root identifier |
 	treecodes := self encode: 'm true'.
@@ -109,7 +111,7 @@ TreecodeTest >> test020encodeTrue [
 		assert: identifier binding value = true
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 TreecodeTest >> test021encodeClassVar [
 	| treecodes root identifier |
 	treecodes := self encode: 'm Flags' in: Class.
@@ -127,7 +129,7 @@ TreecodeTest >> test021encodeClassVar [
 		assert: identifier binding association value class = PoolDictionary
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 TreecodeTest >> test021encodeInstVar [
 	| treecodes root identifier |
 	treecodes := self encode: 'm name' in: Class.
@@ -143,7 +145,7 @@ TreecodeTest >> test021encodeInstVar [
 		assert: identifier binding index = 6
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 TreecodeTest >> test021encodePoolVar [
 	| treecodes root identifier |
 	treecodes := self encode: 'm Pointers' in: Class.
@@ -161,7 +163,7 @@ TreecodeTest >> test021encodePoolVar [
 		assert: identifier binding association value = 16r200
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 TreecodeTest >> test022encodeReturn [
 	| treecodes root return identifier |
 	treecodes := self encode: 'm ^self'.
@@ -176,7 +178,7 @@ TreecodeTest >> test022encodeReturn [
 	self assert: identifier isVariable; assert: identifier binding isSelf
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 TreecodeTest >> test023encodeClass [
 	| treecodes root return identifier |
 	treecodes := self encode: 'm ^Array'.
@@ -197,7 +199,7 @@ TreecodeTest >> test023encodeClass [
 		assert: identifier binding association value = Array
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 TreecodeTest >> test024encodeLiteral [
 	| treecodes root literal |
 	treecodes := self encode: 'm #foo'.
@@ -212,7 +214,7 @@ TreecodeTest >> test024encodeLiteral [
 		assert: literal value = #foo
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 TreecodeTest >> test030encodeUnaryMessage [
 	| treecodes root return message identifier |
 	treecodes := self encode: 'm ^self foo'.
@@ -234,7 +236,7 @@ TreecodeTest >> test030encodeUnaryMessage [
 		assert: identifier binding isSelf
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 TreecodeTest >> test035encodeBinaryMessage [
 	| treecodes root return message receiver argument |
 	treecodes := self encode: 'm ^self foo: true'.
@@ -259,7 +261,7 @@ TreecodeTest >> test035encodeBinaryMessage [
 		assert: argument binding value = true
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 TreecodeTest >> test036encodeTernaryMessage [
 	| treecodes root return message receiver arg1 arg2 |
 	treecodes := self encode: 'm ^self foo: true bar: false'.
@@ -290,7 +292,7 @@ TreecodeTest >> test036encodeTernaryMessage [
 		assert: arg2 binding value = false
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 TreecodeTest >> test050instVarAssignment [
 	| treecodes root assignment assignee expression |
 	treecodes := self encode: 'm name := true' in: Class.

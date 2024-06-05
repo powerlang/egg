@@ -10,7 +10,7 @@ Class {
 PstBridge >> findFalseObject [
 	| s handle |
 	s := runtime storage.
-	handle := s class = EggRingImage
+	handle := s class = EggBootstrapImage
 		ifTrue: [ s false ]
 		ifFalse: [ self ASSERT: false ].
 	^ falseObj := ObjectHandle on: handle within: runtime

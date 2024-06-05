@@ -1,27 +1,29 @@
 Class {
-	#name : #ObjectMirrorTest,
-	#superclass : #TestCase,
+	#name : 'ObjectMirrorTest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'storage'
 	],
-	#category : #'Powerlang-TestsFailing-Metaphysics'
+	#category : 'Powerlang-TestsFailing-Metaphysics',
+	#package : 'Powerlang-TestsFailing',
+	#tag : 'Metaphysics'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ObjectMirrorTest >> runtime [
 	| vimage builder |
-	vimage := EggRingImage fromSpec
+	vimage := EggBootstrapImage fromSpec
 		wordSize: 8;
 		genesis;
 		bootstrap.
 	builder := vimage builder.
 	builder addGenesisObjects.
 	^ Runtime
-		forSimulating: EggRingImage kernelSpec
+		forSimulating: EggBootstrapImage kernelSpec
 		memory: builder writer write image
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ObjectMirrorTest >> test010nilObjectHandle [
 	| runtime handle |
 	runtime := self runtime.
@@ -32,7 +34,7 @@ ObjectMirrorTest >> test010nilObjectHandle [
 		assert: handle size = 0
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ObjectMirrorTest >> test015nilObjectMirror [
 	| runtime handle mirror |
 	runtime := self runtime.
@@ -48,7 +50,7 @@ ObjectMirrorTest >> test015nilObjectMirror [
 		assert: mirror reflectedClass localName = 'UndefinedObject'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ObjectMirrorTest >> test040UndefinedObjectMirror [
 	| runtime nilMirror mirror |
 	runtime := self runtime.
@@ -58,7 +60,7 @@ ObjectMirrorTest >> test040UndefinedObjectMirror [
 		assert: mirror reflectsMethodDictionary
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ObjectMirrorTest >> test100findKernel [
 	| smalltalk |
 	smalltalk := self runtime objectNamed: 'kernel'.

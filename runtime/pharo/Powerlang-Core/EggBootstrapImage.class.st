@@ -1,6 +1,6 @@
 Class {
-	#name : 'EggRingImage',
-	#superclass : 'EggRingModule',
+	#name : 'EggBootstrapImage',
+	#superclass : 'EggBootstrapModule',
 	#instVars : [
 		'bootstrapDicts',
 		'arraySpec',
@@ -17,24 +17,24 @@ Class {
 }
 
 { #category : 'own services' }
-EggRingImage >> bootstrap [
+EggBootstrapImage >> bootstrap [
 	runtime
 		sendLocal: #bootstrap to: module;
 		removeBootstrapDictionaryOverrides
 ]
 
 { #category : 'own services' }
-EggRingImage >> bootstrapDictionaries [
+EggBootstrapImage >> bootstrapDictionaries [
 	^bootstrapDicts
 ]
 
 { #category : 'own services' }
-EggRingImage >> builder [
+EggBootstrapImage >> builder [
 	^	Ring2MetacircularConverter new image: self.
 ]
 
 { #category : 'accessing' }
-EggRingImage >> createBootstrapNamespace [
+EggBootstrapImage >> createBootstrapNamespace [
 	| namespace |
 	namespace := self newBootstrapDictionaryOf: self => #Namespace.
 	module namespace: namespace.
@@ -45,7 +45,7 @@ EggRingImage >> createBootstrapNamespace [
 ]
 
 { #category : 'accessing' }
-EggRingImage >> createClassNamespaces: spec [
+EggBootstrapImage >> createClassNamespaces: spec [
 	| names cvars array |
 	names := spec classVarNames.
 	names isEmpty
@@ -58,7 +58,7 @@ EggRingImage >> createClassNamespaces: spec [
 ]
 
 { #category : 'building' }
-EggRingImage >> genesis [
+EggBootstrapImage >> genesis [
 	"
 	Create the world (should take less than 6 days). This is named 'genesis' to remind us those who had
 	done this (and much more) before us. Namely SELF people. I (JV) would like to use this opportunity and point you to
@@ -72,30 +72,30 @@ EggRingImage >> genesis [
 	module := self basicNewSlots: #KernelModule.
 	super genesis.
 	self createBootstrapNamespace.
-	runtime := EggRingRuntime new.
+	runtime := EggBootstrapRuntime new.
 	runtime image: self
 ]
 
 { #category : 'accessing' }
-EggRingImage >> initialize [
+EggBootstrapImage >> initialize [
 	super initialize.
 	bootstrapDicts := OrderedCollection new.
 	kernel := self
 ]
 
 { #category : 'building' }
-EggRingImage >> kernel [
+EggBootstrapImage >> kernel [
 	^module
 ]
 
 { #category : 'initialization' }
-EggRingImage >> newArraySized: anInteger [
+EggBootstrapImage >> newArraySized: anInteger [
 ^self basicNewSlotsOf: arraySpec sized: anInteger.
 
 ]
 
 { #category : 'initialization' }
-EggRingImage >> newAssociation: anAssociation [
+EggBootstrapImage >> newAssociation: anAssociation [
 	| assoc key value |
 	assoc := self newSlots: 'Association'.
 	key := self transferLiteralDeep: anAssociation key.
@@ -106,7 +106,7 @@ EggRingImage >> newAssociation: anAssociation [
 ]
 
 { #category : 'accessing' }
-EggRingImage >> newBootstrapDictionaryOf: anRGBehavior [
+EggBootstrapImage >> newBootstrapDictionaryOf: anRGBehavior [
 	"
 	Allocate a bootstrap dictionary object. Its contents is managed by the
 	mother image, but in the baby smalltalk can do	at: and at:put:, via primitives.
@@ -125,17 +125,17 @@ EggRingImage >> newBootstrapDictionaryOf: anRGBehavior [
 ]
 
 { #category : 'accessing' }
-EggRingImage >> newClosure: anInteger [
+EggBootstrapImage >> newClosure: anInteger [
 	^ ProtoeggClosure new: closureSpec size: anInteger withAll: nilObj
 ]
 
 { #category : 'accessing' }
-EggRingImage >> newFloatFrom: aFloat [
+EggBootstrapImage >> newFloatFrom: aFloat [
 	^ self newBytes: 'Float' contents: aFloat pointerDouble
 ]
 
 { #category : 'initialization' }
-EggRingImage >> newInteger: anInteger [
+EggBootstrapImage >> newInteger: anInteger [
 	anInteger > maxSMI
 		ifTrue: [ ^ self newLargePositiveInteger: anInteger ].
 	anInteger < minSMI
@@ -144,7 +144,7 @@ EggRingImage >> newInteger: anInteger [
 ]
 
 { #category : 'initialization' }
-EggRingImage >> newLargeNegativeInteger: anInteger [
+EggBootstrapImage >> newLargeNegativeInteger: anInteger [
 	| size bytes byte |
 	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
 	bytes := ByteArray new: size withAll: 16rFF.
@@ -157,7 +157,7 @@ EggRingImage >> newLargeNegativeInteger: anInteger [
 ]
 
 { #category : 'initialization' }
-EggRingImage >> newLargePositiveInteger: anInteger [
+EggBootstrapImage >> newLargePositiveInteger: anInteger [
 	| size bytes |
 	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
 	bytes := anInteger asByteArrayOfSize: size.
@@ -165,14 +165,14 @@ EggRingImage >> newLargePositiveInteger: anInteger [
 ]
 
 { #category : 'initialization' }
-EggRingImage >> newString: aString [
+EggBootstrapImage >> newString: aString [
 	| bytes |
 	bytes := aString copyWith: Character null.
 	^self newBytes: 'String' contents: bytes
 ]
 
 { #category : 'initialization' }
-EggRingImage >> newStringArray: strings [
+EggBootstrapImage >> newStringArray: strings [
 	| array bytes |
 	array := self newSlots: 'Array' sized: strings size.
 	strings
@@ -183,7 +183,7 @@ EggRingImage >> newStringArray: strings [
 ]
 
 { #category : 'accessing' }
-EggRingImage >> newSymbol: aSymbol [
+EggBootstrapImage >> newSymbol: aSymbol [
 	| new |
 	identityMap at: aSymbol ifPresent: [ :s | ^ s ].
 	new := ProtoeggSymbol new: symbolSpec symbol: aSymbol.
@@ -192,7 +192,7 @@ EggRingImage >> newSymbol: aSymbol [
 ]
 
 { #category : 'accessing' }
-EggRingImage >> specs: anRGEnvironment [
+EggBootstrapImage >> specs: anRGEnvironment [
 	super specs: anRGEnvironment.
 	closureSpec := self => #Closure.
 	arraySpec := self => #Array.
@@ -201,7 +201,7 @@ EggRingImage >> specs: anRGEnvironment [
 ]
 
 { #category : 'accessing' }
-EggRingImage >> transferBlock: anSCompiledBlock [
+EggBootstrapImage >> transferBlock: anSCompiledBlock [
 	| transferred method format |
 	identityMap at: anSCompiledBlock
 		ifPresent: [ :b | ^ b ].
@@ -217,7 +217,7 @@ EggRingImage >> transferBlock: anSCompiledBlock [
 ]
 
 { #category : 'accessing' }
-EggRingImage >> transferCharacter: aCharacter [
+EggBootstrapImage >> transferCharacter: aCharacter [
 	| class bytechars value transferred int |
 	identityMap at: aCharacter ifPresent: [ :c | ^ c ].
 	class := self classNamed: #Character.
@@ -232,7 +232,7 @@ EggRingImage >> transferCharacter: aCharacter [
 ]
 
 { #category : 'initialization' }
-EggRingImage >> transferMethod: anSCompiledMethod in: species [
+EggBootstrapImage >> transferMethod: anSCompiledMethod in: species [
 
 	| size classname transferred treecodes selector format literal tliteral source |
 	(identityMap includesKey: anSCompiledMethod) ifTrue: [ 
@@ -261,12 +261,12 @@ EggRingImage >> transferMethod: anSCompiledMethod in: species [
 ]
 
 { #category : 'accessing' }
-EggRingImage >> wordSize [
+EggBootstrapImage >> wordSize [
 	^ wordSize
 ]
 
 { #category : 'accessing' }
-EggRingImage >> wordSize: anInteger [
+EggBootstrapImage >> wordSize: anInteger [
 	wordSize := anInteger.
 	maxSMI := (1 bitShift: wordSize * 8 - 2) - 1.
 	minSMI := maxSMI negated - 1

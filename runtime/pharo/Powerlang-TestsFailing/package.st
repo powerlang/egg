@@ -1,1 +1,1 @@
-Package { #name : #'Powerlang-TestsFailing' }
+Package { #name : 'Powerlang-TestsFailing' }
