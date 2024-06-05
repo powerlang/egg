@@ -2,72 +2,74 @@
 I am a Smalltalk expression, the minimal unit of Smalltalk semantics, expressed as a tree
 "
 Class {
-	#name : #SExpression,
-	#superclass : #Object,
-	#category : #'Powerlang-Core-SExpressions'
+	#name : 'SExpression',
+	#superclass : 'Object',
+	#category : 'Powerlang-Core-SExpressions',
+	#package : 'Powerlang-Core',
+	#tag : 'SExpressions'
 }
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SExpression >> acceptVisitor: visitor [
 	^self subclassResponsibility
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SExpression >> isAssignment [
 	^false
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SExpression >> isCascade [
 	^false
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SExpression >> isCascadeMessage [
 	^false
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SExpression >> isIdentifier [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SExpression >> isInstVar [
 	^false
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SExpression >> isLiteral [
 	^false
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SExpression >> isMessage [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SExpression >> isMethod [
 	^false
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SExpression >> isReturn [
 	^false
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SExpression >> isSuper [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SExpression >> printOn: aStream [
 	self printOn: aStream indent: 0
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SExpression >> printOn: aStream indent: anInteger [
 	super printOn: aStream
 ]

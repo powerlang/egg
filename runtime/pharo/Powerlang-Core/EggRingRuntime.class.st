@@ -5,16 +5,18 @@ that virtual image, and our semantics tries to mimic as much as possible
 the one of the final system.
 "
 Class {
-	#name : #EggRingRuntime,
-	#superclass : #EggRuntime,
+	#name : 'EggRingRuntime',
+	#superclass : 'EggRuntime',
 	#instVars : [
 		'image',
 		'sexpressionsCache'
 	],
-	#category : #'Powerlang-Core-Execution-Bootstrap-Ring'
+	#category : 'Powerlang-Core-Execution-Bootstrap-Ring',
+	#package : 'Powerlang-Core',
+	#tag : 'Execution-Bootstrap-Ring'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 EggRingRuntime class >> new [
 	"return an initialized instance"
 
@@ -22,62 +24,62 @@ EggRingRuntime class >> new [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> arrayedSizeOf: anObjectMap [
 	^anObjectMap arrayedSize
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> behaviorOf: anObjectMap [
 	^ anObjectMap spec
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> blockArgumentCount: block [
 	^ block argumentCount
 ]
 
-{ #category : #'own services' }
+{ #category : 'own services' }
 EggRingRuntime >> blockCapturesSelf: block [
 	^ block capturesSelf 
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> blockExecutableCode: block [
 	^block optimizedCode
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> blockExecutableCode: block put: anObject [
 	block optimizedCode: anObject
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> blockExecutionTree: block [
 	^ block executionTree
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> blockMethod: anObjectMap [
 	^ anObjectMap method
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> blockTempCount: block [
 	^ block tempCount
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> closureBlock: aClosureMap [
 	^aClosureMap block
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> closureHome: anObjectMap [
 	^ anObjectMap home
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> compile: method [
 	| class |
 	class := image speciesFor: method classBinding.
@@ -86,7 +88,7 @@ EggRingRuntime >> compile: method [
 		compile: method source
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> doLookup: aSymbol startingAt: aSpecies [
 	| species m c smethod |
 	self ASSERT: aSymbol !== #error:.
@@ -102,28 +104,28 @@ EggRingRuntime >> doLookup: aSymbol startingAt: aSpecies [
 			self doLookup: aSymbol startingAt: c]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> executableCodeWork: code [
 	^code
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> extensionMethodModule: method [
 
 	^ method module
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> homeEnvironmentOf: aClosureMap [
 	^ aClosureMap slotAt: 2
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> image [
 	^image
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> image: aPowertalkImage [
 	image := aPowertalkImage.
 	nilObj := image nil.
@@ -134,7 +136,7 @@ EggRingRuntime >> image: aPowertalkImage [
 		initializeInterpreter
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> initializeDNU [
 	| proto selector |
 	proto := image classNamed: #ProtoObject.
@@ -143,7 +145,7 @@ EggRingRuntime >> initializeDNU [
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRingRuntime >> initializeEmulationOverrides [
 	| classes |
 	classes := image vmPrimitivesSpec extendedClasses.
@@ -154,7 +156,7 @@ EggRingRuntime >> initializeEmulationOverrides [
 				do: [ :m | self override: class metaclass name with: m ] ]
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> integerFrom: anObjectMap [
 	anObjectMap isImmediate
 		ifTrue: [ ^ anObjectMap value ].
@@ -164,76 +166,76 @@ EggRingRuntime >> integerFrom: anObjectMap [
 		ifFalse: [ anObjectMap bytes asLittleEndianNegativeInteger ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> isBlock: anSCompiledMethod [
 	^anSCompiledMethod isBlock
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> isClosure: anObjectMap [
 	^anObjectMap class = ProtoeggClosure
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> isExecutableCode: code [
 
 	^ code !== nil and: [code !== nilObj]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> literalFor: anObject [
 	^ image transferLiteral: anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> loadAssociationValue: association [
 	^association value
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> localMethodTreecodes: anSCompiledMethod [
 
 	^ self methodTreecodes: anSCompiledMethod
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> localSymbolFrom: anObjectMap [
 	^ anObjectMap symbol
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> lookupAssociationFor: aSymbol in: dictionary [
 ^dictionary
 				associationAt: aSymbol
 				ifPresent: [ :assoc | assoc]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> method: anSCompiledMethod literalAt: index [
 	^anSCompiledMethod at: index
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> methodArgumentCount: method [
 	^ method argumentCount
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> methodClassBinding: method [
 	^ method classBinding
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> methodEnvironmentSize: anSCompiledMethod [
 	^anSCompiledMethod environmentCount
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> methodExecutableCode: anSCompiledMethod [
 	^ anSCompiledMethod optimizedCode
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> methodExecutableCode: method put: anObject [
 
 	method optimizedCode: anObject.
@@ -241,50 +243,50 @@ EggRingRuntime >> methodExecutableCode: method put: anObject [
 		
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> methodFor: aSymbol in: anRGBehavior [
 	overrides at: anRGBehavior->aSymbol ifPresent: [:m | ^m].
 	^anRGBehavior methodNamed: aSymbol
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> methodIsExtension: method [
 
 	^ method isExtension
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> methodTempCount: method [
 	^ method tempCount
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> methodTreecodes: anSCompiledMethod [
 
 	^ anSCompiledMethod treecodes
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> moduleNamespace: anObjectMap [ 
 	^ anObjectMap namespace
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> newArraySized: anInteger [
 	^ image newArraySized: anInteger
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> newBootstrapDictionaryOf: aSpeciesMap [
 	^ image newBootstrapDictionaryOf: aSpeciesMap spec instanceSide
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> newBytesOf:  aSpeciesMap sized: size [
 	^ image newOf: aSpeciesMap spec instanceSide sized: size
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> newClosureFor: compiledBlock [
 	| closure |
 	closure :=  image newClosure: compiledBlock environmentCount.
@@ -293,42 +295,42 @@ EggRingRuntime >> newClosureFor: compiledBlock [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> newCompiledMethod [
 	^ SCompiledMethod new
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> newEnvironmentSized: anInteger [
 	^ image newArraySized: anInteger
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> newExecutableCodeFor: anObject [
 	^anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> newInteger: anInteger [
 	^image newInteger: anInteger
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> newOf: aSpeciesMap sized: size [
 	^ image newOf: aSpeciesMap spec instanceSide sized: size
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> newSlotsOf: aSpeciesMap [
 	^image newSlotsOf: aSpeciesMap spec instanceSide sized: 0
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> newSymbol: aSymbol [
 	^ image newSymbol: aSymbol
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> override: classname with: rgMethod [
 	| species selector method override |
 	species := image specs at: classname.
@@ -338,7 +340,7 @@ EggRingRuntime >> override: classname with: rgMethod [
 	overrides at: species -> selector put: override
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> override: assoc withPrimitive: primitive [
 	| species selector method override count source |
 	species := image specs at: assoc key.
@@ -362,14 +364,14 @@ EggRingRuntime >> override: assoc withPrimitive: primitive [
 	overrides at: species -> selector put: override
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> removeBootstrapDictionaryOverrides [
 self
 		removeOverride: #'Namespace class' -> #new
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> removeOverride: assoc [
 	| species selector symbol |
 	species := image specs at: assoc key.
@@ -382,57 +384,57 @@ EggRingRuntime >> removeOverride: assoc [
 		ifPresent: [ :messages | messages do: #flushCache ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> speciesFor: anObjectMap [
 	^ image speciesFor: anObjectMap spec
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> speciesModule: aSpeciesMap [
 	^ aSpeciesMap module
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> speciesNamespaces: aSpeciesMap [
 	^ aSpeciesMap namespaces
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> speciesSuperclass: aSpeciesMap [
 	^ aSpeciesMap superclass
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> staticBindingForIvar: aSymbol in: receiver [
 	^receiver allSlotNames indexOf: aSymbol.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> storeAssociation: association value: anObject [
 	association value: anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> superBehaviorOf: aSpeciesMap [
 	^ aSpeciesMap superclass instanceSpec
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> symbolFrom: anObjectMap [
 	^ anObjectMap symbol
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingRuntime >> symbolFromLocal: aSymbol [
 	^ image newSymbol: aSymbol
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> transferLiteral: anObject [
 	^image transferLiteral: anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingRuntime >> transferMethodLiterals: method [
 	| class |
 	method withIndexDo: [:literal :i | 

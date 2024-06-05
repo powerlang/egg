@@ -1,83 +1,85 @@
 Class {
-	#name : #SIdentifier,
-	#superclass : #SExpression,
+	#name : 'SIdentifier',
+	#superclass : 'SExpression',
 	#instVars : [
 		'binding'
 	],
-	#category : #'Powerlang-Core-SExpressions'
+	#category : 'Powerlang-Core-SExpressions',
+	#package : 'Powerlang-Core',
+	#tag : 'SExpressions'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 SIdentifier class >> decodeUsing: aTreecodeDecoder [
 	^aTreecodeDecoder decodeIdentifier
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SIdentifier >> acceptVisitor: visitor [
 	^visitor visitIdentifier: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SIdentifier >> binding [
 	^binding
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SIdentifier >> binding: aBinding [
 	binding := aBinding
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SIdentifier >> isArgument [
 	^binding isArgument
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SIdentifier >> isAssociation [
 	^binding isAssociation
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SIdentifier >> isIdentifier [
 	^true
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SIdentifier >> isInstVar [
 	^binding isInstVar
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SIdentifier >> isLiteral [
 	^binding isLiteral
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SIdentifier >> isSelf [
 	^binding isSelf
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SIdentifier >> isSelfOrSuper [
 	^binding isSelf or: [binding isSuper]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SIdentifier >> isSuper [
 	^binding isSuper
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SIdentifier >> isTemporary [
 	^binding isTemporary
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SIdentifier >> isVariable [
 	^true
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SIdentifier >> printOn: aStream indent: anInteger [
 	aStream
 		tab: anInteger;

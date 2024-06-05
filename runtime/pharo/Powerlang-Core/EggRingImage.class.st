@@ -1,6 +1,6 @@
 Class {
-	#name : #EggRingImage,
-	#superclass : #EggRingModule,
+	#name : 'EggRingImage',
+	#superclass : 'EggRingModule',
 	#instVars : [
 		'bootstrapDicts',
 		'arraySpec',
@@ -11,27 +11,29 @@ Class {
 		'minSMI',
 		'maxSMI'
 	],
-	#category : #'Powerlang-Core-Execution-Bootstrap-Ring'
+	#category : 'Powerlang-Core-Execution-Bootstrap-Ring',
+	#package : 'Powerlang-Core',
+	#tag : 'Execution-Bootstrap-Ring'
 }
 
-{ #category : #'own services' }
+{ #category : 'own services' }
 EggRingImage >> bootstrap [
 	runtime
 		sendLocal: #bootstrap to: module;
 		removeBootstrapDictionaryOverrides
 ]
 
-{ #category : #'own services' }
+{ #category : 'own services' }
 EggRingImage >> bootstrapDictionaries [
 	^bootstrapDicts
 ]
 
-{ #category : #'own services' }
+{ #category : 'own services' }
 EggRingImage >> builder [
 	^	Ring2MetacircularConverter new image: self.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingImage >> createBootstrapNamespace [
 	| namespace |
 	namespace := self newBootstrapDictionaryOf: self => #Namespace.
@@ -42,7 +44,7 @@ EggRingImage >> createBootstrapNamespace [
 	classes do: [ :c | namespace at: c name asSymbol put: c ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingImage >> createClassNamespaces: spec [
 	| names cvars array |
 	names := spec classVarNames.
@@ -55,7 +57,7 @@ EggRingImage >> createClassNamespaces: spec [
 	^ array
 ]
 
-{ #category : #building }
+{ #category : 'building' }
 EggRingImage >> genesis [
 	"
 	Create the world (should take less than 6 days). This is named 'genesis' to remind us those who had
@@ -74,25 +76,25 @@ EggRingImage >> genesis [
 	runtime image: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingImage >> initialize [
 	super initialize.
 	bootstrapDicts := OrderedCollection new.
 	kernel := self
 ]
 
-{ #category : #building }
+{ #category : 'building' }
 EggRingImage >> kernel [
 	^module
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRingImage >> newArraySized: anInteger [
 ^self basicNewSlotsOf: arraySpec sized: anInteger.
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRingImage >> newAssociation: anAssociation [
 	| assoc key value |
 	assoc := self newSlots: 'Association'.
@@ -103,7 +105,7 @@ EggRingImage >> newAssociation: anAssociation [
 		value: value; yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingImage >> newBootstrapDictionaryOf: anRGBehavior [
 	"
 	Allocate a bootstrap dictionary object. Its contents is managed by the
@@ -122,17 +124,17 @@ EggRingImage >> newBootstrapDictionaryOf: anRGBehavior [
 		image: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingImage >> newClosure: anInteger [
 	^ ProtoeggClosure new: closureSpec size: anInteger withAll: nilObj
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingImage >> newFloatFrom: aFloat [
 	^ self newBytes: 'Float' contents: aFloat pointerDouble
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRingImage >> newInteger: anInteger [
 	anInteger > maxSMI
 		ifTrue: [ ^ self newLargePositiveInteger: anInteger ].
@@ -141,7 +143,7 @@ EggRingImage >> newInteger: anInteger [
 	^ ProtoeggSmallInteger new: smiSpec valued: anInteger
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRingImage >> newLargeNegativeInteger: anInteger [
 	| size bytes byte |
 	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
@@ -154,7 +156,7 @@ EggRingImage >> newLargeNegativeInteger: anInteger [
 	^ self newBytes: #LargeNegativeInteger contents: bytes
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRingImage >> newLargePositiveInteger: anInteger [
 	| size bytes |
 	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
@@ -162,14 +164,14 @@ EggRingImage >> newLargePositiveInteger: anInteger [
 	^ self newBytes: #LargePositiveInteger contents: bytes reversed
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRingImage >> newString: aString [
 	| bytes |
 	bytes := aString copyWith: Character null.
 	^self newBytes: 'String' contents: bytes
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRingImage >> newStringArray: strings [
 	| array bytes |
 	array := self newSlots: 'Array' sized: strings size.
@@ -180,7 +182,7 @@ EggRingImage >> newStringArray: strings [
 	^ array
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingImage >> newSymbol: aSymbol [
 	| new |
 	identityMap at: aSymbol ifPresent: [ :s | ^ s ].
@@ -189,7 +191,7 @@ EggRingImage >> newSymbol: aSymbol [
 	^ identityMap at: aSymbol put: new
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingImage >> specs: anRGEnvironment [
 	super specs: anRGEnvironment.
 	closureSpec := self => #Closure.
@@ -198,7 +200,7 @@ EggRingImage >> specs: anRGEnvironment [
 	symbolSpec := self => #Symbol
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingImage >> transferBlock: anSCompiledBlock [
 	| transferred method format |
 	identityMap at: anSCompiledBlock
@@ -214,7 +216,7 @@ EggRingImage >> transferBlock: anSCompiledBlock [
 	^ transferred
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingImage >> transferCharacter: aCharacter [
 	| class bytechars value transferred int |
 	identityMap at: aCharacter ifPresent: [ :c | ^ c ].
@@ -229,7 +231,7 @@ EggRingImage >> transferCharacter: aCharacter [
 	^ transferred
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRingImage >> transferMethod: anSCompiledMethod in: species [
 
 	| size classname transferred treecodes selector format literal tliteral source |
@@ -258,12 +260,12 @@ EggRingImage >> transferMethod: anSCompiledMethod in: species [
 	^ transferred
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingImage >> wordSize [
 	^ wordSize
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingImage >> wordSize: anInteger [
 	wordSize := anInteger.
 	maxSMI := (1 bitShift: wordSize * 8 - 2) - 1.

@@ -1,30 +1,32 @@
 Class {
-	#name : #STemporaryBinding,
-	#superclass : #SLocalBinding,
-	#category : #'Powerlang-Core-SExpressions'
+	#name : 'STemporaryBinding',
+	#superclass : 'SLocalBinding',
+	#category : 'Powerlang-Core-SExpressions',
+	#package : 'Powerlang-Core',
+	#tag : 'SExpressions'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 STemporaryBinding class >> decodeUsing: aTreecodeDecoder [
 	^aTreecodeDecoder decodeTemporary
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 STemporaryBinding >> assign: value within: anEvaluationContext [
 	anEvaluationContext temporaryAt: position in: environment put: value
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 STemporaryBinding >> isInCurrentEnvironment [
 	^environment = 1
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 STemporaryBinding >> isTemporary [
 	^true
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 STemporaryBinding >> printOn: aStream [
 	aStream
 		nextPutAll: 'STemporary ';
@@ -33,7 +35,7 @@ STemporaryBinding >> printOn: aStream [
 		print: environment
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 STemporaryBinding >> valueWithin: anEvaluationContext [
 	^ anEvaluationContext temporaryAt: position in: environment
 ]

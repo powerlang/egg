@@ -1,15 +1,16 @@
 Class {
-	#name : #PSharedPool,
-	#superclass : #SharedPool,
-	#category : #'Powerlang-Compatibility-Pharo'
+	#name : 'PSharedPool',
+	#superclass : 'SharedPool',
+	#category : 'Powerlang-Compatibility-Pharo',
+	#package : 'Powerlang-Compatibility-Pharo'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 PSharedPool class >> asArray [
 	^self classPool asArray
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 PSharedPool class >> at: aString [
 	| var |
 	var :=  self classPool
@@ -18,27 +19,27 @@ PSharedPool class >> at: aString [
 	^var value
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 PSharedPool class >> at: aString ifAbsent: aBlock [
 	| var |
 	var := self classPool associationAt: aString asSymbol ifAbsent: [^aBlock value].
 	^ var value
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 PSharedPool class >> at: aString put: anObject [
 	^self classPool
 		at: aString 
 		put: anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 PSharedPool class >> detect: aBlock ifNone: anotherBlock [
 	^self classPool detect: aBlock  ifNone: [ ^ anotherBlock value ].
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 PSharedPool class >> do: aBlock [
 	^self classPool do: aBlock
 

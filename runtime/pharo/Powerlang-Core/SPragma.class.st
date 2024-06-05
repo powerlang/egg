@@ -1,18 +1,20 @@
 Class {
-	#name : #SPragma,
-	#superclass : #SExpression,
+	#name : 'SPragma',
+	#superclass : 'SExpression',
 	#instVars : [
 		'name'
 	],
-	#category : #'Powerlang-Core-SExpressions'
+	#category : 'Powerlang-Core-SExpressions',
+	#package : 'Powerlang-Core',
+	#tag : 'SExpressions'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SPragma >> name [
 	^ name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SPragma >> name: aString [
 	name := aString
 ]

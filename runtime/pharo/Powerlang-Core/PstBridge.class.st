@@ -1,10 +1,12 @@
 Class {
-	#name : #PstBridge,
-	#superclass : #SmalltalkBridge,
-	#category : #'Powerlang-Core-Metaphysics'
+	#name : 'PstBridge',
+	#superclass : 'SmalltalkBridge',
+	#category : 'Powerlang-Core-Metaphysics',
+	#package : 'Powerlang-Core',
+	#tag : 'Metaphysics'
 }
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 PstBridge >> findFalseObject [
 	| s handle |
 	s := runtime storage.
@@ -14,7 +16,7 @@ PstBridge >> findFalseObject [
 	^ falseObj := ObjectHandle on: handle within: runtime
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 PstBridge >> findKernelModule [
 	| handle |
 	handle := nilObj.
@@ -25,14 +27,14 @@ PstBridge >> findKernelModule [
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 PstBridge >> findNilObject [
 	^ nilObj := ObjectHandle
 		on: #ImageSegmentWriter nilOffset
 		within: runtime
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 PstBridge >> findObjectNamed: name [
 	| namespace array |
 	namespace := self kernel slotOf: #Kernel named: #namespace.
@@ -47,7 +49,7 @@ PstBridge >> findObjectNamed: name [
 	self error: 'object not found'
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 PstBridge >> findRootClasses [
 	| object subclasses |
 	object := self objectNamed: 'Object'.
@@ -59,7 +61,7 @@ PstBridge >> findRootClasses [
 		self name: subclass as: name ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 PstBridge >> findRootObjects [
 	| class |
 	nilObj := self findNilObject.
@@ -72,7 +74,7 @@ PstBridge >> findRootObjects [
 	self findRootClasses; findKernelModule
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 PstBridge >> findTrueObject [
 	self ASSERT: false.
 	^ trueObj := ObjectHandle on: 0 within: runtime

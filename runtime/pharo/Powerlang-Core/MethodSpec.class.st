@@ -3,8 +3,8 @@ Copyright (c) 2024 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #MethodSpec,
-	#superclass : #Object,
+	#name : 'MethodSpec',
+	#superclass : 'Object',
 	#instVars : [
 		'selector',
 		'class',
@@ -13,17 +13,19 @@ Class {
 		'module',
 		'ast'
 	],
-	#category : #'Powerlang-Core-CodeSpecs'
+	#category : 'Powerlang-Core-CodeSpecs',
+	#package : 'Powerlang-Core',
+	#tag : 'CodeSpecs'
 }
 
-{ #category : #comparing }
+{ #category : 'comparing' }
 MethodSpec >> = aMethodSpec [
 	^aMethodSpec class = self class
 		and: [aMethodSpec selector == selector]
 		and: [aMethodSpec classBinding = class]
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 MethodSpec >> asCompiledMethod [
 	self canBeCompiled ifFalse: [^nil].
 	^self
@@ -31,60 +33,60 @@ MethodSpec >> asCompiledMethod [
 		ifAbsentPut: [self compiler compileMethod: source]
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 MethodSpec >> ast [
 	self canBeCompiled ifFalse: [^nil].
 	^ast ifNil: [ast := self compiler parseMethod: source]
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 MethodSpec >> bytecodes [
 	^self canBeCompiled ifTrue: [self asCompiledMethod bytecodes]
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 MethodSpec >> canBeCompiled [
 	^self compiler notNil
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 MethodSpec >> canBeParsed [
 	^self cannonicalAst notNil
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 MethodSpec >> cannonicalAst [
 	^self halt propertyAt: #cannonicalAst ifAbsentPut: [self ast]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 MethodSpec >> category [
 	^self isExtension
 		ifTrue: ['*' , module name]
 		ifFalse: [category]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 MethodSpec >> category: aString [
 	category := aString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 MethodSpec >> classBinding [
 	^class
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 MethodSpec >> classBinding: aSpeciesSpec [
 	class := aSpeciesSpec
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 MethodSpec >> classname [
 	^class name
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 MethodSpec >> equals: aMethodSpec [
 	^self canBeCompiled
 		and: [aMethodSpec canBeCompiled]
@@ -92,12 +94,12 @@ MethodSpec >> equals: aMethodSpec [
 		and: [self isEquivalentTo: aMethodSpec]
 ]
 
-{ #category : #comparing }
+{ #category : 'comparing' }
 MethodSpec >> hash [
 	^class name hash hashWith: selector
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 MethodSpec >> isEquivalentTo: aMethodSpec [
 	| m1 m2 |
 	selector == aMethodSpec selector ifFalse: [^false].
@@ -109,79 +111,79 @@ MethodSpec >> isEquivalentTo: aMethodSpec [
 	^m1 equals: m2
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 MethodSpec >> isExtension [
 	^class isExtension
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 MethodSpec >> isFrameless [
 	^self halt asCompiledMethod isFrameless
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 MethodSpec >> module [
 	^module
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 MethodSpec >> module: aModuleSpec [
 	module := aModuleSpec
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 MethodSpec >> printOn: aStream [
 	aStream nextPutAll: class name asString , '>>#' , selector asString
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 MethodSpec >> referencedIdentifiers [
 	^self ast ifNil: [#()] ifNotNil: [:node | node identifiers]
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 MethodSpec >> referencesIdentifier: aString [
 	^self referencedIdentifiers
 		anySatisfy: [:identifier | identifier name = aString]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 MethodSpec >> removeFromClass [
 	class removeMethod: self
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 MethodSpec >> resolveClass [
 	^module resolveClass: class name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 MethodSpec >> selector [
 	^selector
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 MethodSpec >> selector: aSymbol [
 	selector := aSymbol
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 MethodSpec >> source [
 	^source
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 MethodSpec >> source: aString [
 	source := aString.
 	ast := nil
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 MethodSpec >> sourceCode [
 	^source
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 MethodSpec >> usesInstanceVariableNamed: aString [
 	^(self ast variableNamed: aString) notNil
 ]

@@ -1,6 +1,6 @@
-Extension { #name : #ClassOrganization }
+Extension { #name : 'ClassOrganization' }
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 ClassOrganization >> selectorsFor: aString [
 	| protocol |
 	protocol := self protocolNamed: aString.

@@ -1,11 +1,11 @@
-Extension { #name : #SmalltalkImage }
+Extension { #name : 'SmalltalkImage' }
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 SmalltalkImage >> associationAt: aSymbol [
 	^globals associationAt: aSymbol
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 SmalltalkImage >> getPackageDirectoryForPackage: anRPackage [
 	"Return a directory from which given package has been loaded.
 	 
@@ -20,7 +20,7 @@ SmalltalkImage >> getPackageDirectoryForPackage: anRPackage [
 
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 SmalltalkImage >> host [
 	"Return current host identification string (that is, identification
 	of machine the smalltalk is currently running on). 

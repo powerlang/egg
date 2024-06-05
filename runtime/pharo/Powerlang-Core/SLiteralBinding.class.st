@@ -1,15 +1,17 @@
 Class {
-	#name : #SLiteralBinding,
-	#superclass : #SBinding,
-	#category : #'Powerlang-Core-SExpressions'
+	#name : 'SLiteralBinding',
+	#superclass : 'SBinding',
+	#category : 'Powerlang-Core-SExpressions',
+	#package : 'Powerlang-Core',
+	#tag : 'SExpressions'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 SLiteralBinding class >> decodeUsing: aTreecodeDecoder [
 	^self new
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SLiteralBinding >> isLiteral [
 	^true
 ]

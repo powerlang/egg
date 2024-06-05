@@ -1,1 +1,1 @@
-Package { #name : #'Powerlang-Compatibility-Pharo' }
+Package { #name : 'Powerlang-Compatibility-Pharo' }

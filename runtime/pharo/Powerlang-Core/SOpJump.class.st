@@ -1,28 +1,30 @@
 Class {
-	#name : #SOpJump,
-	#superclass : #SInlinerOperation,
+	#name : 'SOpJump',
+	#superclass : 'SInlinerOperation',
 	#instVars : [
 		'target'
 	],
-	#category : #'Powerlang-Core-SExpressions'
+	#category : 'Powerlang-Core-SExpressions',
+	#package : 'Powerlang-Core',
+	#tag : 'SExpressions'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SOpJump >> acceptVisitor: visitor [
 	^ visitor visitOpJump: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SOpJump >> printOn: aStream [
 	aStream nextPutAll: self class name withArticle; nextPutAll: ' after '; print: target
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SOpJump >> target [ 
 	^target
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SOpJump >> target: anInteger [
 	 target := anInteger
 ]

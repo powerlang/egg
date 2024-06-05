@@ -1,15 +1,16 @@
 Class {
-	#name : #NumberParser2,
-	#superclass : #Object,
+	#name : 'NumberParser2',
+	#superclass : 'Object',
 	#instVars : [
 		'stream',
 		'error',
 		'return'
 	],
-	#category : #'Powerlang-Compatibility-Pharo'
+	#category : 'Powerlang-Compatibility-Pharo',
+	#package : 'Powerlang-Compatibility-Pharo'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 NumberParser2 >> checkNumberEnd: position [
 	| char |
 	stream atEnd ifTrue: [^self].
@@ -22,14 +23,14 @@ NumberParser2 >> checkNumberEnd: position [
 	stream skip: -1
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 NumberParser2 >> completeFloat: anInteger [
 	| tenth |
 	tenth := 10 raisedToInteger: self nextExponent.
 	^(anInteger * tenth) asFloat
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 NumberParser2 >> completeNumber: anInteger after: aCharacter [
 	aCharacter = $. ifTrue: [
 		^(stream peekFor: $s)
@@ -45,7 +46,7 @@ NumberParser2 >> completeNumber: anInteger after: aCharacter [
 	^anInteger
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 NumberParser2 >> completeNumber: anInteger at: start [
 	| number |
 	stream atEnd ifTrue: [^anInteger].
@@ -55,7 +56,7 @@ NumberParser2 >> completeNumber: anInteger at: start [
 	^number
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 NumberParser2 >> digitFromChar: char base: radix [
 	| c |
 	char isDigit ifTrue: [^char digitValue].
@@ -69,23 +70,23 @@ NumberParser2 >> digitFromChar: char base: radix [
 	^c digitValue
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 NumberParser2 >> endToken [
 	self error: 'end of stream' at: stream position
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 NumberParser2 >> error [
 	^error
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 NumberParser2 >> error: aString at: position [
 	error := aString -> position.
 	return value: nil
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 NumberParser2 >> negativeNumber [
 	| position |
 	stream atEnd ifTrue: [^nil].
@@ -94,7 +95,7 @@ NumberParser2 >> negativeNumber [
 	^self next key negated -> position
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 NumberParser2 >> next [
 	| char |
 	return isNil ifTrue: [return := [:value | ^value]].
@@ -106,12 +107,12 @@ NumberParser2 >> next [
 	^nil
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 NumberParser2 >> nextChar [
 	^stream skipSeparators atEnd ifFalse: [stream next]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 NumberParser2 >> nextDigit: radix [
 	| char digit |
 	stream atEnd ifTrue: [^nil].
@@ -125,7 +126,7 @@ NumberParser2 >> nextDigit: radix [
 	^digit
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 NumberParser2 >> nextExponent [
 	| negated exp |
 	negated := false.
@@ -135,7 +136,7 @@ NumberParser2 >> nextExponent [
 	^exp
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 NumberParser2 >> nextFloat: aNumber [
 	| base digit e exp |
 	digit := self nextDigit: 10.
@@ -157,7 +158,7 @@ NumberParser2 >> nextFloat: aNumber [
 	^(base * (10 raisedToInteger: e negated)) asFloat
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 NumberParser2 >> nextIntegerRadix: radix [
 	| value valid digit |
 	value := 0.
@@ -172,7 +173,7 @@ NumberParser2 >> nextIntegerRadix: radix [
 	^value
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 NumberParser2 >> nextNumber: aCharacter [
 	| start number digit |
 	start := stream position.
@@ -185,7 +186,7 @@ NumberParser2 >> nextNumber: aCharacter [
 	^number -> (start thru: stream position)
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 NumberParser2 >> nextScaledFrom: aNumber fractionDigits: digits [
 	| scale denominator sd |
 	scale := (stream atEnd not and: [stream peek isDigit])
@@ -198,18 +199,18 @@ NumberParser2 >> nextScaledFrom: aNumber fractionDigits: digits [
 	^sd reduced
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 NumberParser2 >> nextValue [
 	^self next ifNil: [0] ifNotNil: [:assoc | assoc key]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 NumberParser2 >> on: aString [
 	stream := aString readStream.
 	return := nil
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 NumberParser2 >> positiveNumber [
 	| position |
 	stream peek isDigit ifFalse: [^nil].
@@ -217,7 +218,7 @@ NumberParser2 >> positiveNumber [
 	^self next key -> position
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 NumberParser2 >> reset [
 	stream reset.
 	return := nil

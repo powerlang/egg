@@ -1,35 +1,37 @@
 Class {
-	#name : #ProtoeggMetaclass,
-	#superclass : #ProtoeggSpecies,
-	#category : #'Powerlang-Core-Execution-Bootstrap-Ring'
+	#name : 'ProtoeggMetaclass',
+	#superclass : 'ProtoeggSpecies',
+	#category : 'Powerlang-Core-Execution-Bootstrap-Ring',
+	#package : 'Powerlang-Core',
+	#tag : 'Execution-Bootstrap-Ring'
 }
 
-{ #category : #'accessing - parallel hierarchy' }
+{ #category : 'accessing - parallel hierarchy' }
 ProtoeggMetaclass >> class: aClassMap [
 	self slotNamed: #class put: aClassMap
 ]
 
-{ #category : #'accessing - parallel hierarchy' }
+{ #category : 'accessing - parallel hierarchy' }
 ProtoeggMetaclass >> createClassAssociationsWith: aVirtualImage [
 	
 ]
 
-{ #category : #'accessing - parallel hierarchy' }
+{ #category : 'accessing - parallel hierarchy' }
 ProtoeggMetaclass >> instanceSide [
 	^ self slotNamed: #class
 ]
 
-{ #category : #'accessing - parallel hierarchy' }
+{ #category : 'accessing - parallel hierarchy' }
 ProtoeggMetaclass >> module [
 	^ self instanceSide module
 ]
 
-{ #category : #'accessing - parallel hierarchy' }
+{ #category : 'accessing - parallel hierarchy' }
 ProtoeggMetaclass >> namespaces [
 	^ self instanceSide namespaces
 ]
 
-{ #category : #'accessing - parallel hierarchy' }
+{ #category : 'accessing - parallel hierarchy' }
 ProtoeggMetaclass >> printOn: aStream [
 	aStream
 		nextPutAll: '<<';

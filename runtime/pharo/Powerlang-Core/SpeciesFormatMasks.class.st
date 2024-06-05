@@ -1,9 +1,11 @@
 Class {
-	#name : #SpeciesFormatMasks,
-	#superclass : #PSharedPool,
+	#name : 'SpeciesFormatMasks',
+	#superclass : 'PSharedPool',
 	#classVars : [
 		'InstSize',
 		'IsPointers'
 	],
-	#category : #'Powerlang-Core-Mirrors'
+	#category : 'Powerlang-Core-Mirrors',
+	#package : 'Powerlang-Core',
+	#tag : 'Mirrors'
 }

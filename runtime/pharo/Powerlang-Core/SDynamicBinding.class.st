@@ -1,19 +1,21 @@
 Class {
-	#name : #SDynamicBinding,
-	#superclass : #SBinding,
+	#name : 'SDynamicBinding',
+	#superclass : 'SBinding',
 	#instVars : [
 		'name',
 		'cache'
 	],
-	#category : #'Powerlang-Core-SExpressions'
+	#category : 'Powerlang-Core-SExpressions',
+	#package : 'Powerlang-Core',
+	#tag : 'SExpressions'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 SDynamicBinding class >> decodeUsing: aTreecodeDecoder [
 	^ aTreecodeDecoder decodeDynamicVar
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SDynamicBinding >> assign: value within: anEvaluationContext ifUnbound: aClosure [
 
 	cache ifNil: [ self lookupWithin: anEvaluationContext ].
@@ -21,34 +23,34 @@ SDynamicBinding >> assign: value within: anEvaluationContext ifUnbound: aClosure
 	cache assign: value within: anEvaluationContext
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SDynamicBinding >> isDynamic [
 	^true
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SDynamicBinding >> lookupWithin: anEvaluationContext [
 	cache := anEvaluationContext staticBindingFor: name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SDynamicBinding >> name [ ^
 	name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SDynamicBinding >> name: aSymbol [
 	name := aSymbol
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SDynamicBinding >> printOn: aStream [
 	aStream
 		nextPutAll: 'DinamicVarId. ';
 		nextPutAll: name printString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SDynamicBinding >> valueWithin: anEvaluationContext ifUnbound: aClosure [
 
 	cache ifNil: [ self lookupWithin: anEvaluationContext ].

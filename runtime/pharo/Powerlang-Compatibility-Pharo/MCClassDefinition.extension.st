@@ -1,6 +1,6 @@
-Extension { #name : #MCClassDefinition }
+Extension { #name : 'MCClassDefinition' }
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 MCClassDefinition >> addCodeSpecTo: module [
 
 	| class metaclass |
@@ -21,7 +21,7 @@ MCClassDefinition >> addCodeSpecTo: module [
 	^ module addClass: class
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 MCClassDefinition >> instancesAreArrayed [
 
 	"
@@ -34,7 +34,7 @@ MCClassDefinition >> instancesAreArrayed [
 		  or: [ type == #compiledMethod ]
 ]
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 MCClassDefinition >> instancesHavePointers [
 
 	^ type != #bytes

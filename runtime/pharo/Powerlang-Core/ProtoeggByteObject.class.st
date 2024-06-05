@@ -1,14 +1,16 @@
 Class {
-	#name : #ProtoeggByteObject,
-	#superclass : #ProtoeggObject,
+	#name : 'ProtoeggByteObject',
+	#superclass : 'ProtoeggObject',
 	#instVars : [
 		'bytes',
 		'hash'
 	],
-	#category : #'Powerlang-Core-Execution-Bootstrap-Ring'
+	#category : 'Powerlang-Core-Execution-Bootstrap-Ring',
+	#package : 'Powerlang-Core',
+	#tag : 'Execution-Bootstrap-Ring'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ProtoeggByteObject class >> new [
 	"return an initialized instance"
 
@@ -16,27 +18,27 @@ ProtoeggByteObject class >> new [
 
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ProtoeggByteObject class >> new: anRGBehavior size: anInteger [
 
 	^ self new
 		initializeAs: anRGBehavior sized: anInteger
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ProtoeggByteObject class >> new: anRGBehavior valued: bytes [
 	"self assert: anRGBehavior isBytes."
 	^self new initializeAs: anRGBehavior sized: bytes size; fillFrom: bytes
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ProtoeggByteObject >> asString [
 	| string |
 	string := bytes allButLast asString.
 	^spec name = #String ifTrue: [ string ] ifFalse: [ string asSymbol ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggByteObject >> at: index [
 	"Return indexed value at given index, starting with 1. This CANNOT be 
 	 used for accessing named slots (aka, instance variables), to access 
@@ -46,7 +48,7 @@ ProtoeggByteObject >> at: index [
 	^bytes at: index
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggByteObject >> at: index put: anObjectMap [
 	"Set indexed value at given `index` to `value`. This CANNOT be used for 
 	 setting named slots (aka, instance variables), to access them use 
@@ -61,18 +63,18 @@ ProtoeggByteObject >> at: index put: anObjectMap [
 	^anObjectMap
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggByteObject >> bodySizeInBytes [
 	"Return the size of object body(s) in bytes, padded"
 	^ self size alignedTo: self wordSize
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ProtoeggByteObject >> bytes [
 	^ bytes
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ProtoeggByteObject >> contentsString [
 		spec name == #String
 		ifTrue: [ ^bytes allButLast asString storeString ].
@@ -83,13 +85,13 @@ ProtoeggByteObject >> contentsString [
 		^spec name withArticle, ': ', bytes printString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggByteObject >> fillFrom: anObject [
 	self assert: anObject size == bytes size.
 	bytes replaceFrom: 1 to: bytes size with: anObject startingAt: 1
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ProtoeggByteObject >> headerFlags [
 	| byte variable small |
 	byte := 1.
@@ -98,22 +100,22 @@ ProtoeggByteObject >> headerFlags [
 	^ byte | variable | small
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ProtoeggByteObject >> headerHash [
 	^ hash
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ProtoeggByteObject >> headerHash: anInteger [
 	hash := anInteger
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ProtoeggByteObject >> initialize [
 	hash := 0
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ProtoeggByteObject >> initializeAs: anRGBehavior sized: size [
 	self assert: anRGBehavior notNil.
 "	self assert: anRGBehavior isBytes.
@@ -123,12 +125,12 @@ ProtoeggByteObject >> initializeAs: anRGBehavior sized: size [
 	bytes := ByteArray new: size
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ProtoeggByteObject >> isBytes [
 	^true
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ProtoeggByteObject >> printOn: aStream [
 	spec ifNil: [ ^ super printOn: aStream ].
 	aStream
@@ -137,7 +139,7 @@ ProtoeggByteObject >> printOn: aStream [
 		nextPutAll: '>>'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggByteObject >> size [
 	"Return the size if this object, that this, the value of
 	 size field in object header. 

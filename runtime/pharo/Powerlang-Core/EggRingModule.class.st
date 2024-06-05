@@ -7,8 +7,8 @@ the `VirtualRuntime`. That step is left to the `VirtualImage`
 that also creates the Kernel module.
 "
 Class {
-	#name : #EggRingModule,
-	#superclass : #Object,
+	#name : 'EggRingModule',
+	#superclass : 'Object',
 	#instVars : [
 		'nilObj',
 		'falseObj',
@@ -27,15 +27,17 @@ Class {
 		'KernelSpec',
 		'VMPrimitivesSpec'
 	],
-	#category : #'Powerlang-Core-Execution-Bootstrap-Ring'
+	#category : 'Powerlang-Core-Execution-Bootstrap-Ring',
+	#package : 'Powerlang-Core',
+	#tag : 'Execution-Bootstrap-Ring'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule class >> fromSpec [
 	^ self new specs: self kernelSpec; vmPrimitivesSpec: self vmPrimitivesSpec
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule class >> kernelSpec [
 
 	KernelSpec ifNil: [ 
@@ -44,7 +46,7 @@ EggRingModule class >> kernelSpec [
 	^ KernelSpec
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 EggRingModule class >> new [
 	"return an initialized instance"
 
@@ -52,20 +54,34 @@ EggRingModule class >> new [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule class >> readSpec: specName at: path [
 	| dir subdir repo |
 	dir := '../../modules' asFileReference.
 	subdir := path isString ifTrue: [ path ] ifFalse: [ path asPath pathString ].
 	subdir notEmpty ifTrue: [ dir := dir  / subdir].
-	repo := TonelRepository new
-		directory: dir.
 		
-	^repo asCodeSpecsModuleWith: ('.' split: specName) last.
+	^self readSpec: ('.' split: specName) last atDir: dir
 	 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
+EggRingModule class >> readSpec: specName atDir: dir [
+
+	| definitions module classDefs methodDefs class |
+	definitions := (TonelReader on: dir fileName: specName) loadDefinitions; definitions.
+
+	module := ModuleSpec new name: specName.
+	classDefs := definitions select: #isClassDefinition.
+	methodDefs := definitions select: #isMethodDefinition.
+	classDefs do: [ :cdef | cdef addCodeSpecTo: module ].
+	methodDefs do: [ :mdef |
+		class := module ensureClassNamed: mdef className.
+		mdef addCodeSpecTo: module class: class ].
+	^ module
+]
+
+{ #category : 'accessing' }
 EggRingModule class >> resetSpecs [
 
 	"
@@ -76,55 +92,55 @@ EggRingModule class >> resetSpecs [
 	VMPrimitivesSpec := nil
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule class >> vmPrimitivesSpec [
 	^ VMPrimitivesSpec
 		ifNil: [ VMPrimitivesSpec := self readSpec: #VM at: 'Kernel' ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRingModule >> => aSymbol [
 	^ specs at: aSymbol
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingModule >> basicNewBytes: classname contents: aByteObject [
 	^ self basicNewBytesOf: self => classname contents: aByteObject
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRingModule >> basicNewBytesOf: anRGBehavior  contents: aByteObject [
 	^ ProtoeggByteObject new: anRGBehavior valued: aByteObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule >> basicNewSlots: classname [
 	^ self basicNewSlots: classname sized: 0
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule >> basicNewSlots: classname in: spec [
 	^ self basicNewSlots: classname in: spec sized: 0
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule >> basicNewSlots: classname in: spec sized: size [
 	| species |
 	species := spec at: classname.
 	^self basicNewSlotsOf: species sized: size
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule >> basicNewSlots: classname sized: size [
 	^ self basicNewSlots: classname in: specs sized: size
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule >> basicNewSlotsOf: anRGBehavior sized: size [
 	^ ProtoeggSlotObject new: anRGBehavior size: size withAll: nilObj
 ]
 
-{ #category : #'own services' }
+{ #category : 'own services' }
 EggRingModule >> buildSpecies: spec [
 	| sspec sclass sbehavior metasuper  |
 	sspec := spec superclass.
@@ -140,22 +156,22 @@ EggRingModule >> buildSpecies: spec [
 		initializeMetaclass: spec metaclass superclass: metasuper
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule >> classFor: anRGBehavior [
 	^classes at: anRGBehavior
 ]
 
-{ #category : #building }
+{ #category : 'building' }
 EggRingModule >> classNamed: aString [
 	^self classFor: self => aString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule >> classes [
 	^ classes
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRingModule >> createMethodDictionary: species sized: anInteger [
 	| behavior md size dictionary |
 	behavior := species instanceBehavior.
@@ -166,7 +182,7 @@ EggRingModule >> createMethodDictionary: species sized: anInteger [
 	^ dictionary
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule >> createSpecies: definition [
 	| class meta ibehavior cbehavior |
 	class := ProtoeggClass new: definition metaclass size: 0 withAll: nilObj.
@@ -188,12 +204,12 @@ EggRingModule >> createSpecies: definition [
 	metaclasses at: definition metaclass put: meta
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule >> false [
 	^ falseObj
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRingModule >> fillClasses [
 	| class meta |
 	specs allClasses
@@ -206,7 +222,7 @@ EggRingModule >> fillClasses [
 	runtime initializeDNU
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRingModule >> fillSpecies: species with: classDefinition [
 
 	| dictionary smethod transferred organization category |
@@ -227,7 +243,7 @@ EggRingModule >> fillSpecies: species with: classDefinition [
 			category }].
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRingModule >> fillSymbols [
 	| table namespaces cvars |
 	namespaces := (self classNamed: #Symbol) namespaces.
@@ -237,7 +253,7 @@ EggRingModule >> fillSymbols [
 		do: [ :sym | kernel runtime sendLocal: #add: to: table with: {sym} ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRingModule >> formatOfClass: definition [
 	| variable pointers  |
 	variable := definition isVariable
@@ -249,7 +265,7 @@ EggRingModule >> formatOfClass: definition [
 	^ variable | pointers | definition allInstVarNames size
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRingModule >> formatOfMetaclass: definition [
 	| variable pointers size |
 	variable := definition isVariable
@@ -263,19 +279,19 @@ EggRingModule >> formatOfMetaclass: definition [
 	^ variable | pointers | size
 ]
 
-{ #category : #building }
+{ #category : 'building' }
 EggRingModule >> generateMetacircularImage [
 	^(Ring2MetacircularConverter new image: self) convert
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule >> genesis [
 	specs allClasses do: [ :def | self createSpecies: def ].
 	specs allClasses do: [ :def | self buildSpecies: def ].
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRingModule >> initialize [
 	classes := OrderedDictionary new.
 	metaclasses := OrderedDictionary new.
@@ -283,7 +299,7 @@ EggRingModule >> initialize [
 	symbols := OrderedCollection new
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRingModule >> initializeBehavior: anObjectMap [
 	| class |
 	class := classes at: anObjectMap spec.
@@ -291,7 +307,7 @@ EggRingModule >> initializeBehavior: anObjectMap [
 
 ]
 
-{ #category : #building }
+{ #category : 'building' }
 EggRingModule >> initializeClass: definition superclass: superclass superbehavior: superbehavior [
 	| class name flag ivars namespaces subclasses format |
 	class := classes at: definition.
@@ -315,7 +331,7 @@ EggRingModule >> initializeClass: definition superclass: superclass superbehavio
 		module: module
 ]
 
-{ #category : #building }
+{ #category : 'building' }
 EggRingModule >> initializeMetaclass: definition superclass: superclass [
 	| meta ivars flags format superbehavior |
 	meta := metaclasses at: definition.
@@ -331,7 +347,7 @@ EggRingModule >> initializeMetaclass: definition superclass: superclass [
 		organization: nilObj
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRingModule >> kernel: aPowertalkRingKernelModule [
 	kernel := aPowertalkRingKernelModule.
 	nilObj := kernel nil.
@@ -340,24 +356,24 @@ EggRingModule >> kernel: aPowertalkRingKernelModule [
 	
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRingModule >> log: aString [
 	Transcript
 		show: aString;
 		cr
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule >> metaclassFor: anRGBehavior [
 	^ metaclasses at: anRGBehavior
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRingModule >> metaclasses [
 	^metaclasses
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRingModule >> newArray: anArray [
 	| array |
 	array := self newArraySized: anArray size.
@@ -365,42 +381,42 @@ EggRingModule >> newArray: anArray [
 	^ array
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule >> newBytes: classname contents: aByteObject [
 	^self basicNewBytes: classname contents: aByteObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRingModule >> newBytesFrom: aByteObject [
 	^self newBytes: aByteObject class name contents: aByteObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule >> newBytesOf: anRGBehavior contents: aByteObject [
 ^ self basicNewBytesOf: anRGBehavior contents: aByteObject
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRingModule >> newBytesOf: anRGBehavior sized: anInteger [
 	| contents |
 	contents := ByteArray new: anInteger.
 	^ self newBytesOf: anRGBehavior contents: contents
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule >> newOf: anRGBehavior sized: anInteger [
 	^ anRGBehavior isBytes
 		ifTrue: [ self newBytesOf: anRGBehavior sized: anInteger ]
 		ifFalse: [ self newSlotsOf: anRGBehavior sized: anInteger ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggRingModule >> newSlots: classname [
 	^self newSlots: classname sized: 0
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule >> newSlots: classname sized: size [
 	"
 	Allocate an object of pointer type (as SlotObjectMap).
@@ -411,7 +427,7 @@ EggRingModule >> newSlots: classname sized: size [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule >> newSlotsOf: anRGBehavior sized: size [
 	"
 	Allocate an object of pointer type (as SlotObjectMap).
@@ -423,33 +439,33 @@ EggRingModule >> newSlotsOf: anRGBehavior sized: size [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule >> nil [
 	^ nilObj
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule >> runtime [
 	^ runtime
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule >> speciesFor: anRGBehavior [
 	^ anRGBehavior isMetaclass ifTrue: [metaclasses at: anRGBehavior] ifFalse: [ classes at: anRGBehavior ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule >> specs [
 	^specs
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule >> specs: anRGEnvironment [
 	specs := anRGEnvironment.
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule >> transferLiteral: anObject [
 	| class transferred slot |
 	class := anObject class.
@@ -471,7 +487,7 @@ EggRingModule >> transferLiteral: anObject [
 	^ transferred
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule >> transferLiteralDeep: anObject [
 	| class transferred slot size ivar |
 	class := anObject class.
@@ -513,17 +529,17 @@ EggRingModule >> transferLiteralDeep: anObject [
 	^ transferred
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule >> true [
 	^ trueObj
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule >> vmPrimitivesSpec [
 	^vmPrimitivesSpec
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggRingModule >> vmPrimitivesSpec: anRGEnvironment [
 	vmPrimitivesSpec := anRGEnvironment
 ]

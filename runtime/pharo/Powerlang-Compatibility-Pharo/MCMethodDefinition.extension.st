@@ -1,6 +1,6 @@
-Extension { #name : #MCMethodDefinition }
+Extension { #name : 'MCMethodDefinition' }
 
-{ #category : #'*Powerlang-Compatibility-Pharo' }
+{ #category : '*Powerlang-Compatibility-Pharo' }
 MCMethodDefinition >> addCodeSpecTo: module class: aClassSpec [
 	| method species |
 	species := classIsMeta ifTrue: [aClassSpec metaclass] ifFalse: [aClassSpec].
