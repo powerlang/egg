@@ -16,7 +16,7 @@ else
 ICEBERG_URL=file://$(GIT_PATH)
 endif
 
-PHARO_VERSION ?= 100
+PHARO_VERSION ?= 120
 
 all: pharo-ui egg.image
 
