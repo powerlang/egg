@@ -60,7 +60,7 @@ JSTranspiler class >> generateMainSegments [
 JSTranspiler class >> generateMetacircularImage [
 
 	| image |
-	image := EggRingImage fromSpec
+	image := EggBootstrapImage fromSpec
 		         wordSize: 8;
 		         genesis;
 		         bootstrap;
