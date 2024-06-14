@@ -4,8 +4,9 @@ Class {
 	#instVars : [
 		'message'
 	],
-	#category : 'Powerlang-SCompiler',
-	#package : 'Powerlang-SCompiler'
+	#category : 'Powerlang-SCompiler-Frontend',
+	#package : 'Powerlang-SCompiler',
+	#tag : 'Frontend'
 }
 
 { #category : 'transforming' }
