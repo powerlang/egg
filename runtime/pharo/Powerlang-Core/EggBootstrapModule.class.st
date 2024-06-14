@@ -74,10 +74,10 @@ EggBootstrapModule class >> readSpec: specName atDir: dir [
 	module := ModuleSpec new name: specName.
 	classDefs := definitions select: #isClassDefinition.
 	methodDefs := definitions select: #isMethodDefinition.
-	classDefs do: [ :cdef | cdef addCodeSpecTo: module ].
+	classDefs do: [ :cdef | module addClassFromDefinition: cdef].
 	methodDefs do: [ :mdef |
 		class := module ensureClassNamed: mdef className.
-		mdef addCodeSpecTo: module class: class ].
+		class addMethodFromDefinition: mdef in: module ].
 	^ module
 ]
 

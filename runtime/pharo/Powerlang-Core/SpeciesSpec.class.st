@@ -125,7 +125,7 @@ SpeciesSpec >> instVarNames: aCollection [
 
 { #category : 'accessing' }
 SpeciesSpec >> instanceClass [
-	^self instanceSide
+	^self subclassResponsibility
 ]
 
 { #category : 'accessing' }

@@ -19,6 +19,20 @@ Class {
 	#tag : 'CodeSpecs'
 }
 
+{ #category : 'adding / removing' }
+ClassSpec >> addMethodFromDefinition: aMethodDefinition in: aModuleSpec [
+	| method species |
+	species := aMethodDefinition classIsMeta ifTrue: [self metaclass] ifFalse: [self].
+	method := MethodSpec new
+		module: aModuleSpec;
+		selector: aMethodDefinition selector;
+		classBinding: species;
+		source: aMethodDefinition source;
+		category: aMethodDefinition protocol.
+	species addMethod: method
+
+]
+
 { #category : 'inquiries' }
 ClassSpec >> allClassVarNames [
 

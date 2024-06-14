@@ -49,6 +49,26 @@ ModuleSpec >> addClassExtensionNamed: classname [
 ]
 
 { #category : 'adding / removing' }
+ModuleSpec >> addClassFromDefinition: aClassDefinition [
+	| class metaclass |
+	class := ClassSpec new.
+	metaclass := MetaclassSpec new
+		             instanceClass: class;
+		             module: self;
+		             ivars: aClassDefinition classInstVarNames.
+	class
+		module: self;
+		metaclass: metaclass;
+		name: name;
+		supername: aClassDefinition superclassName;
+		ivars: aClassDefinition instVarNames asOrderedCollection;
+		cvars: aClassDefinition classVariables.
+	aClassDefinition instancesAreArrayed ifTrue: [ class beArrayed ].
+	aClassDefinition instancesHavePointers ifFalse: [ class beBytes ].
+	^ self addClass: class
+]
+
+{ #category : 'adding / removing' }
 ModuleSpec >> addClasses: aCollection [
 	aCollection do: [:c | self addClass: c]
 ]
