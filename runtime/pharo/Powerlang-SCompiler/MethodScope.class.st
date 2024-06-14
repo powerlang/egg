@@ -1,42 +1,43 @@
 Class {
-	#name : #MethodScope,
-	#superclass : #ScriptScope,
+	#name : 'MethodScope',
+	#superclass : 'ScriptScope',
 	#instVars : [
 		'pseudo'
 	],
-	#category : #'Powerlang-SCompiler-Parser'
+	#category : 'Powerlang-SCompiler-Parser',
+	#package : 'Powerlang-SCompiler-Parser'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 MethodScope >> captureEnvironment: aScriptNode [
 	self ASSERT: aScriptNode == script
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 MethodScope >> captureLocal: aLocalBinding [
 	self ASSERT: (self resolveLocal: aLocalBinding name) notNil.
 	^aLocalBinding
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 MethodScope >> captureSelf [
 	captureSelf := true.
 
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 MethodScope >> environmentIndexOf: aScriptNode [
 	self ASSERT: aScriptNode == script.
 	^nil
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 MethodScope >> initialize [
 	super initialize.
 	self initializePseudoVars
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 MethodScope >> initializePseudoVars [
 	pseudo := StaticBinder new.
 	pseudo
@@ -47,27 +48,27 @@ MethodScope >> initializePseudoVars [
 		at: 'super' put: SuperBinding new
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 MethodScope >> resolve: aString [
 	(self resolveLocal: aString) ifNotNil: [ :binding | ^ binding ].
 	(self resolvePseudo: aString) ifNotNil: [ :binding | ^ binding ].
 	^ DynamicBinding named: aString
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 MethodScope >> resolvePseudo: aString [
 	^pseudo at: aString
 
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 MethodScope >> scriptDefining: aString [
 	(self resolveLocal: aString) ifNotNil: [^script].
 	self ASSERT: false.
 	^nil
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 MethodScope >> transferLocal: name [
 	^self resolveLocal: name
 ]

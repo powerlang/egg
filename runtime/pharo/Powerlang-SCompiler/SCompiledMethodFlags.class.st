@@ -1,6 +1,6 @@
 Class {
-	#name : #SCompiledMethodFlags,
-	#superclass : #PSharedPool,
+	#name : 'SCompiledMethodFlags',
+	#superclass : 'PSharedPool',
 	#classVars : [
 		'ArgCount',
 		'BlockCount',
@@ -12,10 +12,11 @@ Class {
 		'IsExtension',
 		'TempCount'
 	],
-	#category : #'Powerlang-SCompiler-Backend'
+	#category : 'Powerlang-SCompiler-Backend',
+	#package : 'Powerlang-SCompiler-Backend'
 }
 
-{ #category : #'class initialization' }
+{ #category : 'class initialization' }
 SCompiledMethodFlags class >> initialize [
 
 	ArgCount := 1 thru: 6.

@@ -1,130 +1,131 @@
 Class {
-	#name : #Binding,
-	#superclass : #Object,
+	#name : 'Binding',
+	#superclass : 'Object',
 	#instVars : [
 		'name'
 	],
-	#category : #'Powerlang-SCompiler-Bindings'
+	#category : 'Powerlang-SCompiler-Bindings',
+	#package : 'Powerlang-SCompiler-Bindings'
 }
 
-{ #category : #actions }
+{ #category : 'actions' }
 Binding >> beReferencedFrom: aScriptNode [
 	
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 Binding >> canBeAssigned [
 	^true
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 Binding >> declaration [
 	^self
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 Binding >> encodeUsing: aTreecodeEncoder [
 	self ASSERT: false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 Binding >> isArgument [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 Binding >> isClassBinding [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 Binding >> isClassVariable [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 Binding >> isConstantBinding [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 Binding >> isDynamic [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 Binding >> isGlobal [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 Binding >> isInStack [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 Binding >> isInstVar [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 Binding >> isLiteral [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 Binding >> isLocal [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 Binding >> isPoolVariableBinding [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 Binding >> isSelf [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 Binding >> isSelfOrSuper [
 	^self isSelf or: [self isSuper]
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 Binding >> isSuper [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 Binding >> isTemporary [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 Binding >> literal [
 	^nil
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Binding >> name [
 	^name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Binding >> name: aString [
 	name := aString
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 Binding >> printNameOn: aStream [
 		aStream
 		print: name
 
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 Binding >> printOn: aStream [
 	self printNameOn: aStream.
 	aStream

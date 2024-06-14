@@ -1,6 +1,6 @@
 Class {
-	#name : #SSmalltalkCompiler,
-	#superclass : #Object,
+	#name : 'SSmalltalkCompiler',
+	#superclass : 'Object',
 	#instVars : [
 		'frontend',
 		'source',
@@ -11,10 +11,11 @@ Class {
 		'leaf',
 		'activeScript'
 	],
-	#category : #'Powerlang-SCompiler-Frontend'
+	#category : 'Powerlang-SCompiler-Frontend',
+	#package : 'Powerlang-SCompiler-Frontend'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 SSmalltalkCompiler class >> new [
 	"return an initialized instance"
 
@@ -22,7 +23,7 @@ SSmalltalkCompiler class >> new [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSmalltalkCompiler >> activate: aScriptNode while: aBlock [
 	| current |
 	current := activeScript.
@@ -31,73 +32,73 @@ SSmalltalkCompiler >> activate: aScriptNode while: aBlock [
 	activeScript := current
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSmalltalkCompiler >> activeScope [
 	^activeScript scope
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSmalltalkCompiler >> activeScript [
 	^activeScript
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSmalltalkCompiler >> activeScript: aParseNode [
 	activeScript := aParseNode
 ]
 
-{ #category : #nodes }
+{ #category : 'nodes' }
 SSmalltalkCompiler >> assignmentNode [
 	^SAssignmentNode new compiler: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSmalltalkCompiler >> ast [
 	^ast
 ]
 
-{ #category : #emitting }
+{ #category : 'emitting' }
 SSmalltalkCompiler >> blockCount [
 	^blocks
 ]
 
-{ #category : #emitting }
+{ #category : 'emitting' }
 SSmalltalkCompiler >> blockIndex [
 	blocks := blocks + 1.
 	^blocks - 1
 ]
 
-{ #category : #nodes }
+{ #category : 'nodes' }
 SSmalltalkCompiler >> blockNode [
 	^SBlockNode new compiler: self
 ]
 
-{ #category : #nodes }
+{ #category : 'nodes' }
 SSmalltalkCompiler >> braceNode [
 	^SBraceNode new compiler: self
 ]
 
-{ #category : #nodes }
+{ #category : 'nodes' }
 SSmalltalkCompiler >> buildMethod [
 	result method: ast buildMethod
 ]
 
-{ #category : #nodes }
+{ #category : 'nodes' }
 SSmalltalkCompiler >> cascadeMessageNode [
 	^SCascadeMessageNode new compiler: self
 ]
 
-{ #category : #nodes }
+{ #category : 'nodes' }
 SSmalltalkCompiler >> cascadeNode [
 	^SCascadeNode new compiler: self
 ]
 
-{ #category : #nodes }
+{ #category : 'nodes' }
 SSmalltalkCompiler >> commentNode [
 	^SCommentNode new compiler: self
 ]
 
-{ #category : #errors }
+{ #category : 'errors' }
 SSmalltalkCompiler >> compilationError: aString stretch: aStretch [
 	^SCompilationError new
 		compiler: self;
@@ -105,7 +106,7 @@ SSmalltalkCompiler >> compilationError: aString stretch: aStretch [
 		description: aString
 ]
 
-{ #category : #nodes }
+{ #category : 'nodes' }
 SSmalltalkCompiler >> compileMethod: aString [
 	source := aString.
 	frontend protect: [
@@ -116,87 +117,87 @@ SSmalltalkCompiler >> compileMethod: aString [
 	^result
 ]
 
-{ #category : #nodes }
+{ #category : 'nodes' }
 SSmalltalkCompiler >> delimiterToken [
 	^SDelimiterToken new compiler: self
 ]
 
-{ #category : #nodes }
+{ #category : 'nodes' }
 SSmalltalkCompiler >> endToken [
 	^SEndToken new compiler: self
 ]
 
-{ #category : #errors }
+{ #category : 'errors' }
 SSmalltalkCompiler >> error: aString at: anInteger [
 	| stretch |
 	stretch := anInteger thru: anInteger.
 	^self error: aString stretch: stretch
 ]
 
-{ #category : #errors }
+{ #category : 'errors' }
 SSmalltalkCompiler >> error: aString stretch: aStretch [
 	| error |
 	error := self compilationError: aString stretch: aStretch.
 	^error beFatal; signal
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSmalltalkCompiler >> frontend [
 	^frontend
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSmalltalkCompiler >> frontend: aCompiler [
 	frontend := aCompiler
 ]
 
-{ #category : #nodes }
+{ #category : 'nodes' }
 SSmalltalkCompiler >> hasBlocks [
 	^ blocks > 0
 ]
 
-{ #category : #nodes }
+{ #category : 'nodes' }
 SSmalltalkCompiler >> hasSends [
 ^ leaf not
 ]
 
-{ #category : #nodes }
+{ #category : 'nodes' }
 SSmalltalkCompiler >> identifierNode [
 	^SIdentifierNode new compiler: self
 ]
 
-{ #category : #nodes }
+{ #category : 'nodes' }
 SSmalltalkCompiler >> initialize [
 	self reset
 
 ]
 
-{ #category : #nodes }
+{ #category : 'nodes' }
 SSmalltalkCompiler >> literalNode [
 	^SLiteralNode new compiler: self
 ]
 
-{ #category : #nodes }
+{ #category : 'nodes' }
 SSmalltalkCompiler >> messageNode [
 	^SMessageNode new compiler: self
 ]
 
-{ #category : #nodes }
+{ #category : 'nodes' }
 SSmalltalkCompiler >> methodNode [
 	^SMethodNode new compiler: self
 ]
 
-{ #category : #nodes }
+{ #category : 'nodes' }
 SSmalltalkCompiler >> noticeSend [
 	leaf := false
 ]
 
-{ #category : #nodes }
+{ #category : 'nodes' }
 SSmalltalkCompiler >> numericLiteralNode [
 	^SNumberNode new compiler: self
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 SSmalltalkCompiler >> parseFragment [
 	headless := false.
 	self reset.
@@ -204,14 +205,14 @@ SSmalltalkCompiler >> parseFragment [
 	result ast: ast
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 SSmalltalkCompiler >> parseFragment: aString [
 	source := aString.
 	[self parseFragment; resolveSemantics] on: SCompilationError do: [].
 	^ast
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 SSmalltalkCompiler >> parseMethod [
 	headless := false.
 	self reset.
@@ -219,81 +220,81 @@ SSmalltalkCompiler >> parseMethod [
 	result ast: ast
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 SSmalltalkCompiler >> parseMethod: aString [
 	source := aString.
 	frontend protect: [self parseMethod; resolveSemantics].
 	^result
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSmalltalkCompiler >> parser [
 	^SSmalltalkParser new compiler: self
 ]
 
-{ #category : #nodes }
+{ #category : 'nodes' }
 SSmalltalkCompiler >> pragmaNode [
 	^SPragmaNode new compiler: self
 ]
 
-{ #category : #nodes }
+{ #category : 'nodes' }
 SSmalltalkCompiler >> reset [
 	self resetResult.
 	leaf := true.
 	blocks := 0.
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkCompiler >> resetResult [
 	result := SCompilationResult new compiler: self
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 SSmalltalkCompiler >> resolveSemantics [
 	ast acceptVisitor: SSemanticVisitor new
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSmalltalkCompiler >> result [
 	^result
 ]
 
-{ #category : #nodes }
+{ #category : 'nodes' }
 SSmalltalkCompiler >> returnNode [
 	^SReturnNode new compiler: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSmalltalkCompiler >> scanner [
 	^SSmalltalkScanner new compiler: self
 ]
 
-{ #category : #nodes }
+{ #category : 'nodes' }
 SSmalltalkCompiler >> selectorNode [
 	^SSelectorNode new compiler: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSmalltalkCompiler >> sourceCode [
 	^source
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSmalltalkCompiler >> sourceCode: aString [
 	source := aString
 ]
 
-{ #category : #nodes }
+{ #category : 'nodes' }
 SSmalltalkCompiler >> stringToken [
 	^SStringToken new compiler: self
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SSmalltalkCompiler >> supportsBraceNodes [
 	^true
 ]
 
-{ #category : #errors }
+{ #category : 'errors' }
 SSmalltalkCompiler >> warning: aString at: aStretch [
 	| error |
 	error := self compilationError: aString stretch: aStretch.

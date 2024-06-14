@@ -1,19 +1,20 @@
 Class {
-	#name : #SIdentifierNode,
-	#superclass : #SParseNode,
+	#name : 'SIdentifierNode',
+	#superclass : 'SParseNode',
 	#instVars : [
 		'name',
 		'binding'
 	],
-	#category : #'Powerlang-SCompiler-Parser'
+	#category : 'Powerlang-SCompiler-Parser',
+	#package : 'Powerlang-SCompiler-Parser'
 }
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SIdentifierNode >> acceptVisitor: visitor [
 	^visitor visitIdentifier: self
 ]
 
-{ #category : #binding }
+{ #category : 'binding' }
 SIdentifierNode >> beAssigned [
 	| immutable |
 	binding canBeAssigned ifTrue: [^self].
@@ -23,17 +24,17 @@ SIdentifierNode >> beAssigned [
 	self compileError: 'cannot assign to ' , immutable
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SIdentifierNode >> binding [
 	^binding
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SIdentifierNode >> binding: aBinding [
 	binding := aBinding
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SIdentifierNode >> checkLowercase [
 	| char |
 	char := name first.
@@ -41,40 +42,40 @@ SIdentifierNode >> checkLowercase [
 	self compileWarning: name storeString , ' should start with lowercase'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SIdentifierNode >> declaration [
 	^binding declaration
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SIdentifierNode >> defineArgumentIn: aScriptScope [
 	binding := aScriptScope defineArgument: name.
 	binding declaration: self
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SIdentifierNode >> defineTemporaryIn: scope [
 	binding := scope defineTemporary: name.
 	binding declaration: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SIdentifierNode >> initialize [
 	super initialize.
 	binding := DynamicBinding default
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SIdentifierNode >> isEvaluable [
 	^self isIdentifierLiteral
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SIdentifierNode >> isIdentifier [
 	^true
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SIdentifierNode >> isIdentifierLiteral [
 	binding isDynamic ifFalse: [^binding isLiteral].
 	^self ast ifNil: [false] ifNotNil: [:ast | | b |
@@ -82,17 +83,17 @@ SIdentifierNode >> isIdentifierLiteral [
 		b isLiteral]
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SIdentifierNode >> isImmediate [
 	^true
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SIdentifierNode >> isLocal [
 	^binding isLocal
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SIdentifierNode >> isMethodArgument [
 	| ast |
 	binding isArgument ifFalse: [^false].
@@ -100,32 +101,32 @@ SIdentifierNode >> isMethodArgument [
 	^ast arguments includes: self declaration
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SIdentifierNode >> isMethodTemporary [
 	^self ast temporaries includes: self declaration
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SIdentifierNode >> isSelf [
 	^binding isSelf
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SIdentifierNode >> isSuper [
 	^binding isSuper
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SIdentifierNode >> name [
 	^name
 ]
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 SIdentifierNode >> name: aString [
 	name := aString reduced
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SIdentifierNode >> printOn: aStream [
 	aStream nextPut: $<;
 	nextPutAll: name;
@@ -134,14 +135,14 @@ SIdentifierNode >> printOn: aStream [
 	aStream nextPut: $)
 ]
 
-{ #category : #binding }
+{ #category : 'binding' }
 SIdentifierNode >> resolveAssigning: aBoolean [
 	binding := compiler activeScope resolve: name.
 	^binding
 
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SIdentifierNode >> sourceIntervals [
 	| stretchs declaration ast string code index |
 	stretchs := OrderedCollection new.

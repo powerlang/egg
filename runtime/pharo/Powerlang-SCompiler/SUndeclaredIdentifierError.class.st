@@ -1,34 +1,35 @@
 Class {
-	#name : #SUndeclaredIdentifierError,
-	#superclass : #SCompilationError,
+	#name : 'SUndeclaredIdentifierError',
+	#superclass : 'SCompilationError',
 	#instVars : [
 		'identifier',
 		'assigned'
 	],
-	#category : #'Powerlang-SCompiler-Frontend'
+	#category : 'Powerlang-SCompiler-Frontend',
+	#package : 'Powerlang-SCompiler-Frontend'
 }
 
-{ #category : #'accessing-token' }
+{ #category : 'accessing-token' }
 SUndeclaredIdentifierError >> assignment: aBoolean [
 	assigned := aBoolean
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SUndeclaredIdentifierError >> identifier [
 	^ identifier
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SUndeclaredIdentifierError >> isUndeclaredAccess [
 	^assigned not
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SUndeclaredIdentifierError >> isUndeclaredAssignment [
 	^assigned
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SUndeclaredIdentifierError >> stretch: aStretch [
 	super stretch: aStretch.
 	identifier := self source

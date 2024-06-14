@@ -1,10 +1,11 @@
 Class {
-	#name : #TemporaryBinding,
-	#superclass : #LocalBinding,
-	#category : #'Powerlang-SCompiler-Bindings'
+	#name : 'TemporaryBinding',
+	#superclass : 'LocalBinding',
+	#category : 'Powerlang-SCompiler-Bindings',
+	#package : 'Powerlang-SCompiler-Bindings'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 TemporaryBinding class >> new [
 	"return an initialized instance"
 
@@ -12,23 +13,23 @@ TemporaryBinding class >> new [
 
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 TemporaryBinding >> description [
 	^'temporary ' , name
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 TemporaryBinding >> encodeUsing: aTreecodeEncoder [
 	aTreecodeEncoder encodeTemporary: index env: environment
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 TemporaryBinding >> initialize [
 	super initialize.
 	environment := StackEnvironment new
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 TemporaryBinding >> isTemporary [
 	^true
 ]

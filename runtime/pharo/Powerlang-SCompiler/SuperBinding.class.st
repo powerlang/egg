@@ -1,25 +1,26 @@
 Class {
-	#name : #SuperBinding,
-	#superclass : #SelfBinding,
-	#category : #'Powerlang-SCompiler-Bindings'
+	#name : 'SuperBinding',
+	#superclass : 'SelfBinding',
+	#category : 'Powerlang-SCompiler-Bindings',
+	#package : 'Powerlang-SCompiler-Bindings'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SuperBinding >> encodeUsing: aTreecodeEmitter [
 	aTreecodeEmitter encodeSuper
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SuperBinding >> isSelf [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SuperBinding >> isSuper [
 	^true
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SuperBinding >> name [
 	^'super'
 ]

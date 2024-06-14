@@ -1,10 +1,11 @@
 Class {
-	#name : #ArgumentBinding,
-	#superclass : #LocalBinding,
-	#category : #'Powerlang-SCompiler-Bindings'
+	#name : 'ArgumentBinding',
+	#superclass : 'LocalBinding',
+	#category : 'Powerlang-SCompiler-Bindings',
+	#package : 'Powerlang-SCompiler-Bindings'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ArgumentBinding class >> new [
 	"return an initialized instance"
 
@@ -12,44 +13,44 @@ ArgumentBinding class >> new [
 
 ]
 
-{ #category : #actions }
+{ #category : 'actions' }
 ArgumentBinding >> beInlined [
 	environment := InlinedArgEnvironment new
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ArgumentBinding >> canBeAssigned [
 	^false
 ]
 
-{ #category : #actions }
+{ #category : 'actions' }
 ArgumentBinding >> description [
 	^'argument ' , name
 ]
 
-{ #category : #actions }
+{ #category : 'actions' }
 ArgumentBinding >> encodeUsing: aTreecodeEncoder [
 	aTreecodeEncoder encodeArgument: index env: environment
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ArgumentBinding >> index: aNumber [
 	index := aNumber.
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ArgumentBinding >> initialize [
 	super initialize.
 	environment := ArgumentEnvironment new
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ArgumentBinding >> isArgument [
 	^true
 ]
 
-{ #category : #actions }
+{ #category : 'actions' }
 ArgumentBinding >> isInlined [
 	^environment isInlinedArgument
 ]

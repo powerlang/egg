@@ -64,7 +64,7 @@ SmalltalkInterpreter >> falseLiteral [
 SmalltalkInterpreter >> gateOnBlock: aPCompiledBlock [
 	| runtime closure handle |
 	runtime := receiver _gate handle runtime.
-	closure := aPCompiledBlock newClosure home: self.
+	closure := self newClosureFor: aPCompiledBlock.
 	handle := LocalHandle on: closure within: localRuntime.
 	^ closure mirage
 ]

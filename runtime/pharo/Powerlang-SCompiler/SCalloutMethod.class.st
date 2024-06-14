@@ -1,16 +1,17 @@
 Class {
-	#name : #SCalloutMethod,
-	#superclass : #SCompiledMethod,
-	#type : #variable,
+	#name : 'SCalloutMethod',
+	#superclass : 'SCompiledMethod',
+	#type : 'variable',
 	#instVars : [
 		'descriptor',
 		'symbol',
 		'address'
 	],
-	#category : #'Powerlang-SCompiler-Backend'
+	#category : 'Powerlang-SCompiler-Backend',
+	#package : 'Powerlang-SCompiler-Backend'
 }
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCalloutMethod >> pragma: anSPragmaNode [
 	descriptor := anSPragmaNode info.
 	symbol := anSPragmaNode name

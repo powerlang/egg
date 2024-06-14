@@ -1,10 +1,11 @@
 Class {
-	#name : #StaticBinder,
-	#superclass : #IdentifierBinder,
-	#category : #'Powerlang-SCompiler-Parser'
+	#name : 'StaticBinder',
+	#superclass : 'IdentifierBinder',
+	#category : 'Powerlang-SCompiler-Parser',
+	#package : 'Powerlang-SCompiler-Parser'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 StaticBinder class >> new [
 	"return an initialized instance"
 
@@ -12,43 +13,43 @@ StaticBinder class >> new [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 StaticBinder >> at: aString [
 	^contents at: aString ifAbsent: nil
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 StaticBinder >> at: aString ifAbsentPut: aBlock [
 	^contents at: aString ifAbsentPut: aBlock
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 StaticBinder >> at: aString put: aBinding [
 	contents at: aString put: aBinding
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 StaticBinder >> define: aString as: aBinding [
 	contents at: aString put: aBinding
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 StaticBinder >> defines: identifier [
 	^contents includesKey: identifier
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 StaticBinder >> do: aBlock [
 	contents do: aBlock
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 StaticBinder >> initialize [
 	super initialize.
 	contents := OrderedDictionary new
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 StaticBinder >> printOn: aStream indent: anInteger [
 	aStream tab: anInteger; nextPut: $<.
 	contents keys
@@ -57,17 +58,17 @@ StaticBinder >> printOn: aStream indent: anInteger [
 	aStream nextPut: $>
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 StaticBinder >> select: aBlock [
 	^contents select: aBlock
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 StaticBinder >> values [
 	^contents values
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 StaticBinder >> withIndexDo: aBlock [
 	contents withIndexDo: aBlock
 ]

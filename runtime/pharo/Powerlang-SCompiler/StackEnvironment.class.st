@@ -1,15 +1,16 @@
 Class {
-	#name : #StackEnvironment,
-	#superclass : #LocalEnvironment,
-	#category : #'Powerlang-SCompiler-Bindings'
+	#name : 'StackEnvironment',
+	#superclass : 'LocalEnvironment',
+	#category : 'Powerlang-SCompiler-Bindings',
+	#package : 'Powerlang-SCompiler-Bindings'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 StackEnvironment >> index [
 	^nil
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 StackEnvironment >> isStack [
 	^true
 ]

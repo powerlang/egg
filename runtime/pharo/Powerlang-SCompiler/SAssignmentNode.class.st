@@ -1,6 +1,6 @@
 Class {
-	#name : #SAssignmentNode,
-	#superclass : #SParseNode,
+	#name : 'SAssignmentNode',
+	#superclass : 'SParseNode',
 	#instVars : [
 		'assignees',
 		'expression',
@@ -9,62 +9,63 @@ Class {
 	#classVars : [
 		'Token'
 	],
-	#category : #'Powerlang-SCompiler-Parser'
+	#category : 'Powerlang-SCompiler-Parser',
+	#package : 'Powerlang-SCompiler-Parser'
 }
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SAssignmentNode >> acceptVisitor: visitor [
 	^visitor visitAssignment: self
 ]
 
-{ #category : #'adding / removing' }
+{ #category : 'adding / removing' }
 SAssignmentNode >> assign: anIdentifierNode operator: aDelimiterToken [
 	assignees add: anIdentifierNode.
 	operators add: aDelimiterToken
 ]
 
-{ #category : #'adding / removing' }
+{ #category : 'adding / removing' }
 SAssignmentNode >> assign: anIdentifierNode with: aParseNode operator: aDelimiterToken [
 	assignees add: anIdentifierNode.
 	operators add: aDelimiterToken.
 	expression := aParseNode
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SAssignmentNode >> assignees [
 	^assignees
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SAssignmentNode >> expression [
 	^expression
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SAssignmentNode >> hasAssign [
 	^true
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SAssignmentNode >> initialize [
 	super initialize.
 	assignees := OrderedCollection new: 1.
 	operators := OrderedCollection new: 1
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SAssignmentNode >> isAssign [
 	^true
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 SAssignmentNode >> nodesDo: aBlock includingDeclarations: aBoolean [
 	super nodesDo: aBlock includingDeclarations: aBoolean.
 	assignees do: [:v | v nodesDo: aBlock includingDeclarations: aBoolean].
 	expression nodesDo: aBlock includingDeclarations: aBoolean
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SAssignmentNode >> operators [
 	^operators
 ]

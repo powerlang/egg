@@ -1,6 +1,6 @@
 Class {
-	#name : #AstNodeTypes,
-	#superclass : #PSharedPool,
+	#name : 'AstNodeTypes',
+	#superclass : 'PSharedPool',
 	#classVars : [
 		'AssignmentId',
 		'BlockId',
@@ -13,10 +13,11 @@ Class {
 		'PragmaId',
 		'ReturnId'
 	],
-	#category : #'Powerlang-SCompiler-Backend'
+	#category : 'Powerlang-SCompiler-Backend',
+	#package : 'Powerlang-SCompiler-Backend'
 }
 
-{ #category : #'class initialization' }
+{ #category : 'class initialization' }
 AstNodeTypes class >> initialize [
 	MethodId := 101.
 	BlockId := 102.

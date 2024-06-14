@@ -1,1 +1,1 @@
-Package { #name : #'Powerlang-SCompiler' }
+Package { #name : 'Powerlang-SCompiler' }

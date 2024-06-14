@@ -1,26 +1,27 @@
 Class {
-	#name : #SSmalltalkScanner,
-	#superclass : #Object,
+	#name : 'SSmalltalkScanner',
+	#superclass : 'Object',
 	#instVars : [
 		'compiler',
 		'stream'
 	],
-	#category : #'Powerlang-SCompiler-Parser'
+	#category : 'Powerlang-SCompiler-Parser',
+	#package : 'Powerlang-SCompiler-Parser'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkScanner >> buildToken: aSmalltalkToken [
 	^self buildToken: aSmalltalkToken at: stream position
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkScanner >> buildToken: aSmalltalkToken at: anInteger [
 	| string |
 	string := stream copyFrom: anInteger to: stream position.
 	^self buildToken: aSmalltalkToken at: anInteger with: string
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkScanner >> buildToken: aSmalltalkToken at: anInteger with: anObject [
 	^aSmalltalkToken
 		position: anInteger;
@@ -28,12 +29,12 @@ SSmalltalkScanner >> buildToken: aSmalltalkToken at: anInteger with: anObject [
 		end: stream position
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SSmalltalkScanner >> canBeInIdentifier: aCharacter [
 	^compiler frontend canBeInIdentifier: aCharacter
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SSmalltalkScanner >> canStartIdentifier: aCharacter [
 	(compiler frontend canStartIdentifier: aCharacter) ifFalse: [^false].
 	aCharacter = $_
@@ -41,33 +42,33 @@ SSmalltalkScanner >> canStartIdentifier: aCharacter [
 	^true
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSmalltalkScanner >> compiler [
 	^compiler
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSmalltalkScanner >> compiler: aSmalltalkCompiler [
 	compiler := aSmalltalkCompiler.
 	compiler sourceCode ifNotNil: [:s | self sourceCode: s]
 ]
 
-{ #category : #scanning }
+{ #category : 'scanning' }
 SSmalltalkScanner >> end [
 	^self buildToken: compiler endToken at: stream position + 1
 ]
 
-{ #category : #errors }
+{ #category : 'errors' }
 SSmalltalkScanner >> error: aString [
 	^self error: aString at: stream position
 ]
 
-{ #category : #errors }
+{ #category : 'errors' }
 SSmalltalkScanner >> error: aString at: anInteger [
 	^compiler error: aString at: anInteger
 ]
 
-{ #category : #scanning }
+{ #category : 'scanning' }
 SSmalltalkScanner >> isBinary: aCharacter [
 	| code |
 	aCharacter isNil ifTrue: [^false].
@@ -78,12 +79,12 @@ SSmalltalkScanner >> isBinary: aCharacter [
 	^code > 255
 ]
 
-{ #category : #scanning }
+{ #category : 'scanning' }
 SSmalltalkScanner >> next [
 	^self nextToken
 ]
 
-{ #category : #scanning }
+{ #category : 'scanning' }
 SSmalltalkScanner >> nextArrayPrefix [
 	| string |
 	string := stream copyFrom: stream position - 1 to: stream position.
@@ -93,12 +94,12 @@ SSmalltalkScanner >> nextArrayPrefix [
 		with: string
 ]
 
-{ #category : #scanning }
+{ #category : 'scanning' }
 SSmalltalkScanner >> nextAssignment [
 	^self buildToken: compiler delimiterToken at: stream position with: #':='
 ]
 
-{ #category : #scanning }
+{ #category : 'scanning' }
 SSmalltalkScanner >> nextBinarySelector [
 	stream back.
 	^self
@@ -107,7 +108,7 @@ SSmalltalkScanner >> nextBinarySelector [
 		with: self scanBinarySymbol
 ]
 
-{ #category : #scanning }
+{ #category : 'scanning' }
 SSmalltalkScanner >> nextBinarySymbol [
 	^self
 		buildToken: compiler literalNode
@@ -115,7 +116,7 @@ SSmalltalkScanner >> nextBinarySymbol [
 		with: self scanBinarySymbol
 ]
 
-{ #category : #scanning }
+{ #category : 'scanning' }
 SSmalltalkScanner >> nextColon [
 	| start char |
 	start := stream position.
@@ -132,7 +133,7 @@ SSmalltalkScanner >> nextColon [
 
 ]
 
-{ #category : #scanning }
+{ #category : 'scanning' }
 SSmalltalkScanner >> nextComment [
 	| start comment |
 	start := stream position.
@@ -144,7 +145,7 @@ SSmalltalkScanner >> nextComment [
 
 ]
 
-{ #category : #scanning }
+{ #category : 'scanning' }
 SSmalltalkScanner >> nextIdentifierOrKeyword [
 	| start |
 	start := stream position.
@@ -153,7 +154,7 @@ SSmalltalkScanner >> nextIdentifierOrKeyword [
 	^self buildToken: compiler stringToken at: start
 ]
 
-{ #category : #scanning }
+{ #category : 'scanning' }
 SSmalltalkScanner >> nextKeyword [
 	| start string |
 	start := stream position + 1.
@@ -162,7 +163,7 @@ SSmalltalkScanner >> nextKeyword [
 	^self buildToken: compiler literalNode at: start - 1 with: string asSymbol
 ]
 
-{ #category : #scanning }
+{ #category : 'scanning' }
 SSmalltalkScanner >> nextLiteralCharacter [
 	stream atEnd ifTrue: [^self error: 'character expected'].
 	^self
@@ -171,7 +172,7 @@ SSmalltalkScanner >> nextLiteralCharacter [
 		with: stream next
 ]
 
-{ #category : #scanning }
+{ #category : 'scanning' }
 SSmalltalkScanner >> nextLiteralString [
 	^self
 		buildToken: compiler literalNode
@@ -179,7 +180,7 @@ SSmalltalkScanner >> nextLiteralString [
 		with: self scanString reduced
 ]
 
-{ #category : #scanning }
+{ #category : 'scanning' }
 SSmalltalkScanner >> nextNumber [
 	| parser assoc |
 	stream skip: -1.
@@ -192,21 +193,21 @@ SSmalltalkScanner >> nextNumber [
 		with: assoc key
 ]
 
-{ #category : #scanning }
+{ #category : 'scanning' }
 SSmalltalkScanner >> nextQuotedSymbol [
 	| node |
 	node := self nextLiteralString.
 	^node beSymbol; position: node position - 1
 ]
 
-{ #category : #scanning }
+{ #category : 'scanning' }
 SSmalltalkScanner >> nextSpecialCharacter [
 	| token |
 	token := self buildToken: compiler delimiterToken.
 	^token beCharacter
 ]
 
-{ #category : #scanning }
+{ #category : 'scanning' }
 SSmalltalkScanner >> nextSymbolOrArrayPrefix [
 	| char |
 	stream atEnd ifTrue: [self error: 'character expected'].
@@ -219,7 +220,7 @@ SSmalltalkScanner >> nextSymbolOrArrayPrefix [
 	self error: 'character expected'
 ]
 
-{ #category : #scanning }
+{ #category : 'scanning' }
 SSmalltalkScanner >> nextToken [
 	| first |
 	first := self scanChar.
@@ -237,13 +238,13 @@ SSmalltalkScanner >> nextToken [
 	^self nextSpecialCharacter
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSmalltalkScanner >> on: aString [
 	stream := aString readStream.
 	compiler notNil ifTrue: [compiler sourceCode: aString]
 ]
 
-{ #category : #scanning }
+{ #category : 'scanning' }
 SSmalltalkScanner >> scanBinarySymbol [
 	| start symbol |
 	start := stream position.
@@ -252,13 +253,13 @@ SSmalltalkScanner >> scanBinarySymbol [
 	^symbol asSymbol
 ]
 
-{ #category : #scanning }
+{ #category : 'scanning' }
 SSmalltalkScanner >> scanChar [
 	^(stream skipSeparators; atEnd) ifFalse: [stream next]
 
 ]
 
-{ #category : #scanning }
+{ #category : 'scanning' }
 SSmalltalkScanner >> scanString [
 	| current start |
 	start := current := stream position.
@@ -274,12 +275,12 @@ SSmalltalkScanner >> scanString [
 				current := stream position]]
 ]
 
-{ #category : #scanning }
+{ #category : 'scanning' }
 SSmalltalkScanner >> skipBinary [
 	[self isBinary: stream peek] whileTrue: [stream next]
 ]
 
-{ #category : #scanning }
+{ #category : 'scanning' }
 SSmalltalkScanner >> skipIdentifier [
 	| frontend |
 	frontend := compiler frontend.
@@ -287,7 +288,7 @@ SSmalltalkScanner >> skipIdentifier [
 		whileFalse: [(frontend peekForIdentifier: stream) ifFalse: [^self]]
 ]
 
-{ #category : #scanning }
+{ #category : 'scanning' }
 SSmalltalkScanner >> skipKeyword [
 	| frontend continue pos |
 	frontend := compiler frontend.
@@ -302,7 +303,7 @@ SSmalltalkScanner >> skipKeyword [
 	pos isNil ifFalse: [stream position: pos]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSmalltalkScanner >> sourceCode: aString [
 	stream := aString readStream
 ]

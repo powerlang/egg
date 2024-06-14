@@ -50,7 +50,7 @@ SExpressionInterpreter >> arguments: aCollection [
 { #category : 'visiting' }
 SExpressionInterpreter >> captureClosure: anSBlock [
 	| closure s i type env arg |
-	closure := anSBlock compiledCode newClosure home: self.
+	closure := self newClosureFor: anSBlock compiledCode.
 	s := anSBlock capturedVariables readStream.
 	i := 1.
 	[ s atEnd ]
@@ -190,6 +190,13 @@ SExpressionInterpreter >> mirageOnObject: anObject [
 ]
 
 { #category : 'visiting' }
+SExpressionInterpreter >> newClosureFor: anSCompiledBlock [
+	| closure |
+	closure := SClosure new: anSCompiledBlock environmentCount.
+	^ closure block: anSCompiledBlock; home: self
+]
+
+{ #category : 'visiting' }
 SExpressionInterpreter >> parent [
 	^parent
 ]
@@ -296,7 +303,7 @@ SExpressionInterpreter >> visitAssignment: anSAssignment [
 SExpressionInterpreter >> visitBlock: anSBlock [
 	| closure handle |
 	closure := anSBlock isInlined
-				   ifTrue: [ SCompiledBlock new newClosure home: self ]
+				   ifTrue: [ self newClosureFor: SCompiledBlock new ]
 				   ifFalse: [ self captureClosure: anSBlock ].
 	blockTreecodes at: closure block put: anSBlock.
 	self halt.

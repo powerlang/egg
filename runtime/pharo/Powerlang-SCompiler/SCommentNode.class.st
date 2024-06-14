@@ -1,23 +1,24 @@
 Class {
-	#name : #SCommentNode,
-	#superclass : #SParseNode,
+	#name : 'SCommentNode',
+	#superclass : 'SParseNode',
 	#instVars : [
 		'value'
 	],
-	#category : #'Powerlang-SCompiler-Parser'
+	#category : 'Powerlang-SCompiler-Parser',
+	#package : 'Powerlang-SCompiler-Parser'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 SCommentNode >> isComment [
 	^true
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCommentNode >> value [
 	^value
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCommentNode >> value: aString [
 	value := aString
 ]

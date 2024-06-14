@@ -1,75 +1,76 @@
 Class {
-	#name : #LocalBinding,
-	#superclass : #Binding,
+	#name : 'LocalBinding',
+	#superclass : 'Binding',
 	#instVars : [
 		'index',
 		'environment',
 		'declaration'
 	],
-	#category : #'Powerlang-SCompiler-Bindings'
+	#category : 'Powerlang-SCompiler-Bindings',
+	#package : 'Powerlang-SCompiler-Bindings'
 }
 
-{ #category : #actions }
+{ #category : 'actions' }
 LocalBinding >> beInArray [
 	environment := ArrayEnvironment new
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LocalBinding >> declaration [
 	^declaration
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LocalBinding >> declaration: anIdentifierNode [
 	declaration := anIdentifierNode
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LocalBinding >> environment [
 	^environment index
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LocalBinding >> environmentIndex [
 	^environment index
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LocalBinding >> environmentIndex: anInteger [
 	environment index: anInteger
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LocalBinding >> environmentObject [
 	^environment
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LocalBinding >> environmentType [
 	^environment environmentType
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LocalBinding >> index [
 	^index
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LocalBinding >> index: aNumber [
 	index := aNumber
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 LocalBinding >> isInArray [
 	^self isInStack not
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 LocalBinding >> isInStack [
 	^environment isStack
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 LocalBinding >> isLocal [
 	^true
 ]

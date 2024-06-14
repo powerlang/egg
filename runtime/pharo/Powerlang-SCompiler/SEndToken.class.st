@@ -1,25 +1,26 @@
 Class {
-	#name : #SEndToken,
-	#superclass : #SToken,
-	#category : #'Powerlang-SCompiler-Parser'
+	#name : 'SEndToken',
+	#superclass : 'SToken',
+	#category : 'Powerlang-SCompiler-Parser',
+	#package : 'Powerlang-SCompiler-Parser'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 SEndToken >> isEnd [
 	^true
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SEndToken >> position: aNumber [
 	super position: aNumber - 1
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SEndToken >> prevPosition [
 	^stretch start
 ]
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 SEndToken >> value: aString [
 	''
 ]

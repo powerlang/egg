@@ -1,10 +1,11 @@
 Class {
-	#name : #InlinedArgEnvironment,
-	#superclass : #StackEnvironment,
-	#category : #'Powerlang-SCompiler-Bindings'
+	#name : 'InlinedArgEnvironment',
+	#superclass : 'StackEnvironment',
+	#category : 'Powerlang-SCompiler-Bindings',
+	#package : 'Powerlang-SCompiler-Bindings'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 InlinedArgEnvironment >> isInlinedArgument [
 	^true
 ]

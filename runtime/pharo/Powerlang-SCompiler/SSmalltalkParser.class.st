@@ -1,16 +1,17 @@
 Class {
-	#name : #SSmalltalkParser,
-	#superclass : #Object,
+	#name : 'SSmalltalkParser',
+	#superclass : 'Object',
 	#instVars : [
 		'compiler',
 		'scanner',
 		'token',
 		'next'
 	],
-	#category : #'Powerlang-SCompiler-Parser'
+	#category : 'Powerlang-SCompiler-Parser',
+	#package : 'Powerlang-SCompiler-Parser'
 }
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 SSmalltalkParser >> addBodyTo: aMethodNode [
 	self
 		addTemporariesTo: aMethodNode;
@@ -18,7 +19,7 @@ SSmalltalkParser >> addBodyTo: aMethodNode [
 		addStatementsTo: aMethodNode
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> addByteTo: aCollection [
 	| byte |
 	byte := token isLiteral ifTrue: [token value] ifFalse: [token literalValue].
@@ -27,12 +28,12 @@ SSmalltalkParser >> addByteTo: aCollection [
 	aCollection add: byte
 ]
 
-{ #category : #'api support' }
+{ #category : 'api support' }
 SSmalltalkParser >> addPragmaTo: aMethodNode [
 	(self attachPragmaTo: aMethodNode) ifTrue: [self step]
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 SSmalltalkParser >> addStatementsTo: aMethodNode [
 	aMethodNode
 		position: token position;
@@ -43,12 +44,12 @@ SSmalltalkParser >> addStatementsTo: aMethodNode [
 		ifFalse: [^self unexpectedStatementError: aMethodNode statements]
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 SSmalltalkParser >> addTemporariesTo: aMethodNode [
 	aMethodNode temporaries: self temporaries
 ]
 
-{ #category : #arrays }
+{ #category : 'arrays' }
 SSmalltalkParser >> arrayBody [
 	| literals position |
 	literals := OrderedCollection new.
@@ -63,7 +64,7 @@ SSmalltalkParser >> arrayBody [
 	^self buildNode: compiler literalNode at: position with: literals asArray
 ]
 
-{ #category : #arrays }
+{ #category : 'arrays' }
 SSmalltalkParser >> arrayElement [
 	token isLiteral ifTrue: [^token value].
 	token isNameToken ifTrue: [^self pseudoLiteralValue].
@@ -76,7 +77,7 @@ SSmalltalkParser >> arrayElement [
 	self invalidArrayToken
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> assignment [
 	| position variable delimiter expression assignment |
 	position := token position.
@@ -90,7 +91,7 @@ SSmalltalkParser >> assignment [
 	^assignment assign: variable with: expression operator: delimiter
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> attachPragmaTo: aMethodNode [
 	| start pragma |
 	(aMethodNode isHeadless orNot: [token is: #'<']) ifTrue: [^false].
@@ -105,7 +106,7 @@ SSmalltalkParser >> attachPragmaTo: aMethodNode [
 	^true
 ]
 
-{ #category : #binary }
+{ #category : 'binary' }
 SSmalltalkParser >> binaryMessage: aMessageNode [
 	| selector primary argument |
 	selector := self step.
@@ -123,7 +124,7 @@ SSmalltalkParser >> binaryMessage: aMessageNode [
 		arguments: {argument}
 ]
 
-{ #category : #binary }
+{ #category : 'binary' }
 SSmalltalkParser >> binarySequence: aParseNode [
 	| node rcvr |
 	node := aParseNode.
@@ -136,7 +137,7 @@ SSmalltalkParser >> binarySequence: aParseNode [
 	^node
 ]
 
-{ #category : #binary }
+{ #category : 'binary' }
 SSmalltalkParser >> binarySignature [
 	| selector arguments |
 	((token isStringToken and: [token hasSymbol])
@@ -152,7 +153,7 @@ SSmalltalkParser >> binarySignature [
 	^self buildMethodNode: selector arguments: arguments
 ]
 
-{ #category : #blocks }
+{ #category : 'blocks' }
 SSmalltalkParser >> block [
 	| block |
 	block := self buildNode: compiler blockNode at: token position.
@@ -171,7 +172,7 @@ SSmalltalkParser >> block [
 	^block
 ]
 
-{ #category : #blocks }
+{ #category : 'blocks' }
 SSmalltalkParser >> blockArguments [
 	| arguments |
 	(token is: $:) ifFalse: [^#()].
@@ -189,7 +190,7 @@ SSmalltalkParser >> blockArguments [
 	^arguments
 ]
 
-{ #category : #arrays }
+{ #category : 'arrays' }
 SSmalltalkParser >> braceBody [
 	| elements position |
 	elements := OrderedCollection new.
@@ -204,7 +205,7 @@ SSmalltalkParser >> braceBody [
 	^self buildBraceNode: elements at: position
 ]
 
-{ #category : #arrays }
+{ #category : 'arrays' }
 SSmalltalkParser >> bracedArray [
 	| array |
 	array := self braceBody.
@@ -212,28 +213,28 @@ SSmalltalkParser >> bracedArray [
 	^array
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> buildBraceNode: elements at: position [
 	| node |
 	node := self buildNode: compiler braceNode at: position.
 	^node elements: elements
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> buildCascadeMessageNode: receiver [
 	| node |
 	node := self buildNode: compiler cascadeMessageNode at: receiver position.
 	^node receiver: receiver
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> buildMessageNode: receiver [
 	| node |
 	node := self buildNode: compiler messageNode at: receiver position.
 	^node receiver: receiver
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> buildMethodNode: selector arguments: arguments [
 	| node |
 	node := self buildNode: compiler methodNode at: selector position.
@@ -241,19 +242,19 @@ SSmalltalkParser >> buildMethodNode: selector arguments: arguments [
 	^node selector: selector; arguments: arguments
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> buildNode: aParserNode at: anInteger [
 	^aParserNode position: anInteger; end: token position
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> buildNode: aParseNode at: anInteger with: anObject [
 	| node |
 	node := scanner buildToken: aParseNode at: anInteger with: anObject.
 	^node end: token position
 ]
 
-{ #category : #arrays }
+{ #category : 'arrays' }
 SSmalltalkParser >> byteArrayBody [
 	| bytes save start array node |
 	bytes := OrderedCollection new.
@@ -273,7 +274,7 @@ SSmalltalkParser >> byteArrayBody [
 	^node moveCommentsFrom: save
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> cascadeMessage: aMessageNode [
 	| msg |
 	self hasUnarySelector ifTrue: [^self unaryMessage: aMessageNode].
@@ -285,7 +286,7 @@ SSmalltalkParser >> cascadeMessage: aMessageNode [
 	self error: msg
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 SSmalltalkParser >> cascadeSequence: aMessageNode [
 	| cascade receiver messages msg node |
 	(token is: $;) ifFalse: [^aMessageNode].
@@ -307,28 +308,28 @@ SSmalltalkParser >> cascadeSequence: aMessageNode [
 	^cascade messages: messages asArray; end: msg end
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSmalltalkParser >> compiler [
 	^compiler
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSmalltalkParser >> compiler: aSmalltalkCompiler [
 	compiler := aSmalltalkCompiler.
 	scanner := compiler scanner
 ]
 
-{ #category : #errors }
+{ #category : 'errors' }
 SSmalltalkParser >> error: aString [
 	self error: aString at: token position
 ]
 
-{ #category : #errors }
+{ #category : 'errors' }
 SSmalltalkParser >> error: aString at: position [
 	^compiler error: aString at: position
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 SSmalltalkParser >> expression [
 	| primary expression |
 	(token isNameToken and: [self peek isAssignment]) ifTrue: [^self assignment].
@@ -342,7 +343,7 @@ SSmalltalkParser >> expression [
 	^expression
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> ffiArguments [
 	| args type |
 	args := OrderedCollection new.
@@ -361,7 +362,7 @@ SSmalltalkParser >> ffiArguments [
 	^ args
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> ffiCall: aBoolean method: aMethodNode [
 	| cc return name args descriptor |
 	cc := token value.
@@ -378,7 +379,7 @@ SSmalltalkParser >> ffiCall: aBoolean method: aMethodNode [
 	^ compiler pragmaNode ffi: cc name: name with: descriptor
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> ffiOrPrimitive: aMethodNode [
 	| tag |
 	tag := token value asLowercase.
@@ -391,7 +392,7 @@ SSmalltalkParser >> ffiOrPrimitive: aMethodNode [
 	self invalidPragma
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> ffiType [
 	| type |
 	self step.
@@ -403,24 +404,24 @@ SSmalltalkParser >> ffiType [
 	^token value
 ]
 
-{ #category : #binary }
+{ #category : 'binary' }
 SSmalltalkParser >> hasBinarySelector [
 	^(token isStringToken and: [token hasSymbol])
 		or: [token is: $^]
 		or: [token is: $:]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> hasKeywordSelector [
 	^token isKeyword
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> hasUnarySelector [
 	^token isNameToken
 ]
 
-{ #category : #productions }
+{ #category : 'productions' }
 SSmalltalkParser >> headlessMethod [
 	| method |
 	self step.
@@ -430,17 +431,17 @@ SSmalltalkParser >> headlessMethod [
 	^method
 ]
 
-{ #category : #errors }
+{ #category : 'errors' }
 SSmalltalkParser >> invalidArrayToken [
 	self error: 'invalid literal entry'
 ]
 
-{ #category : #errors }
+{ #category : 'errors' }
 SSmalltalkParser >> invalidByteValue [
 	self error: 'value not between 0 and 255'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> invalidPragma [
 	| position stretch |
 	position := token position.
@@ -448,7 +449,7 @@ SSmalltalkParser >> invalidPragma [
 	^SInvalidPragmaError new stretch: stretch; signal
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> keywordArgument [
 	| arg |
 	arg := self primary ifNil: [self missingArgument].
@@ -456,7 +457,7 @@ SSmalltalkParser >> keywordArgument [
 	^self binarySequence: arg
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> keywordMessage: aMessageNode [
 	| selector arguments node |
 	node := self buildNode: compiler selectorNode at: token position.
@@ -473,7 +474,7 @@ SSmalltalkParser >> keywordMessage: aMessageNode [
 		selector: node
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> keywordSequence: aParseNode [
 	| expression |
 	self hasKeywordSelector ifFalse: [^aParseNode].
@@ -482,7 +483,7 @@ SSmalltalkParser >> keywordSequence: aParseNode [
 	^expression
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 SSmalltalkParser >> keywordSignature [
 	| selector arguments node |
 	selector := '' writeStream.
@@ -503,7 +504,7 @@ SSmalltalkParser >> keywordSignature [
 	^self buildMethodNode: node arguments: arguments
 ]
 
-{ #category : #arrays }
+{ #category : 'arrays' }
 SSmalltalkParser >> literalArray [
 	| array |
 	array := self arrayBody.
@@ -511,7 +512,7 @@ SSmalltalkParser >> literalArray [
 	^array
 ]
 
-{ #category : #arrays }
+{ #category : 'arrays' }
 SSmalltalkParser >> literalByteArray [
 	| node |
 	node := self byteArrayBody.
@@ -519,14 +520,14 @@ SSmalltalkParser >> literalByteArray [
 	^node
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> literalKeyword [
 	| keyword |
 	keyword := token value , scanner nextKeyword value.
 	^keyword reduced asSymbol
 ]
 
-{ #category : #productions }
+{ #category : 'productions' }
 SSmalltalkParser >> method [
 	| method |
 	self step.
@@ -536,7 +537,7 @@ SSmalltalkParser >> method [
 	^method
 ]
 
-{ #category : #productions }
+{ #category : 'productions' }
 SSmalltalkParser >> methodFragment [
 	| method |
 	self step.
@@ -546,7 +547,7 @@ SSmalltalkParser >> methodFragment [
 	^method
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 SSmalltalkParser >> methodPragma [
 	self step.
 	^[| method |
@@ -557,13 +558,13 @@ SSmalltalkParser >> methodPragma [
 		do: [:ex | ex return: compiler pragmaNode]
 ]
 
-{ #category : #productions }
+{ #category : 'productions' }
 SSmalltalkParser >> methodSelector [
 	self step.
 	^self methodSignature ifNotNil: [:m | m selectorNode]
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 SSmalltalkParser >> methodSignature [
 	self keywordSignature ifNotNil: [:m | ^m].
 	self binarySignature ifNotNil: [:m | ^m].
@@ -571,27 +572,27 @@ SSmalltalkParser >> methodSignature [
 	self error: 'method signature expected'
 ]
 
-{ #category : #errors }
+{ #category : 'errors' }
 SSmalltalkParser >> missingArgument [
 	self error: 'argument missing'
 ]
 
-{ #category : #errors }
+{ #category : 'errors' }
 SSmalltalkParser >> missingExpression [
 	self error: 'missing expression'
 ]
 
-{ #category : #errors }
+{ #category : 'errors' }
 SSmalltalkParser >> missingLiteral [
 	self error: 'missing literal or named literal'
 ]
 
-{ #category : #errors }
+{ #category : 'errors' }
 SSmalltalkParser >> missingToken: aString [
 	self error: 'missing ' , aString
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> namedPrimitive [
 	| name pragma |
 	token isNameToken
@@ -601,42 +602,42 @@ SSmalltalkParser >> namedPrimitive [
 	^ pragma primitive: 0 name: name asSymbol
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> negativeNumber [
 	token := nil.
 	^self negativeNumberOrBinary; step
 ]
 
-{ #category : #arrays }
+{ #category : 'arrays' }
 SSmalltalkParser >> negativeNumberOrBinary [
 	self peek isNumberNode
 		ifTrue: [token := self next negate position: token position - 1].
 	^token value
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSmalltalkParser >> next [
 	token := next.
 	next := nil.
 	^token ifNil: [token := scanner next]
 ]
 
-{ #category : #errors }
+{ #category : 'errors' }
 SSmalltalkParser >> nonIntegerToken [
 	self error: 'non-integer token'
 ]
 
-{ #category : #errors }
+{ #category : 'errors' }
 SSmalltalkParser >> notify: aString [
 	compiler notify: aString at: token position
 ]
 
-{ #category : #errors }
+{ #category : 'errors' }
 SSmalltalkParser >> notify: aString at: position [
 	compiler notify: aString at: position
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> numberedPrimitive [
 	| number pragma |
 	number := token value.
@@ -645,12 +646,12 @@ SSmalltalkParser >> numberedPrimitive [
 	^pragma primitive: number name: nil
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSmalltalkParser >> on: aString [
 	scanner on: aString
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 SSmalltalkParser >> parenthesizedExpression [
 	| start open expression |
 	start := token position.
@@ -664,17 +665,17 @@ SSmalltalkParser >> parenthesizedExpression [
 	^expression
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 SSmalltalkParser >> parse: aString [
 	^self on: aString; method
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 SSmalltalkParser >> parseExpression: aString [
 	^self on: aString; headlessMethod
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 SSmalltalkParser >> parseFragment: aString [
 	| method |
 	self on: aString; step.
@@ -686,13 +687,13 @@ SSmalltalkParser >> parseFragment: aString [
 	^method
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 SSmalltalkParser >> parseTemporaries: aString [
 	self on: aString; step.
 	^self methodSignature notNil ifTrue: [self temporaries]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSmalltalkParser >> peek [
 	| comments |
 	next ifNotNil: [^next].
@@ -706,7 +707,7 @@ SSmalltalkParser >> peek [
 	^next comments: comments
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 SSmalltalkParser >> primary [
 	token isNameToken ifTrue: [^self step asIdentifierNode].
 	token isLiteral ifTrue: [^self step].
@@ -720,7 +721,7 @@ SSmalltalkParser >> primary [
 	^nil
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> primitive [
 	| primitive |
 	self step.
@@ -731,7 +732,7 @@ SSmalltalkParser >> primitive [
 	^primitive
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> pseudoLiteralValue [
 	| value |
 	token isPoolLiteral ifTrue: [^token literalValue].
@@ -742,7 +743,7 @@ SSmalltalkParser >> pseudoLiteralValue [
 	^token isPoolLiteral ifTrue: [token literalValue] ifFalse: [value asSymbol]
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 SSmalltalkParser >> return [
 	| return expression end node |
 	return := self step.
@@ -758,12 +759,12 @@ SSmalltalkParser >> return [
 		moveCommentsFrom: return
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> skipDots [
 	[token is: $.] whileTrue: [self step]
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 SSmalltalkParser >> statement [
 	| expression |
 	((token is: $^) or: [token is: $↑]) ifTrue: [^self return].
@@ -772,7 +773,7 @@ SSmalltalkParser >> statement [
 	^expression
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 SSmalltalkParser >> statements [
 	| statements |
 	statements := OrderedCollection new.
@@ -784,7 +785,7 @@ SSmalltalkParser >> statements [
 	^statements
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 SSmalltalkParser >> step [
 	| save comments |
 	save := token.
@@ -797,7 +798,7 @@ SSmalltalkParser >> step [
 	^save
 ]
 
-{ #category : #'ffi support' }
+{ #category : 'ffi support' }
 SSmalltalkParser >> symbolicPragma [
 	| position symbol pragma |
 	position := token position.
@@ -806,7 +807,7 @@ SSmalltalkParser >> symbolicPragma [
 	^pragma symbol: symbol
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 SSmalltalkParser >> temporaries [
 	| temporaries |
 	(token is: #'||') ifTrue: [
@@ -825,12 +826,12 @@ SSmalltalkParser >> temporaries [
 	^temporaries
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSmalltalkParser >> token [
 	^token
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 SSmalltalkParser >> unaryMessage: aMessageNode [
 	| selector |
 	selector := self unarySelector.
@@ -841,7 +842,7 @@ SSmalltalkParser >> unaryMessage: aMessageNode [
 		moveCommentsFrom: selector
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 SSmalltalkParser >> unarySelector [
 	| selector start end node |
 	selector := token value.
@@ -855,7 +856,7 @@ SSmalltalkParser >> unarySelector [
 		moveCommentsFrom: token
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 SSmalltalkParser >> unarySequence: aParseNode [
 	| node receiver |
 	node := aParseNode.
@@ -869,25 +870,25 @@ SSmalltalkParser >> unarySequence: aParseNode [
 	^node moveCommentsFrom: token
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 SSmalltalkParser >> unarySignature [
 	self hasUnarySelector ifFalse: [^nil].
 	^self buildMethodNode: self unarySelector arguments: #()
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SSmalltalkParser >> validateLocalName: aSmalltalkToken [
 	aSmalltalkToken isDelimitedIdentifier ifTrue: [^self].
 	(aSmalltalkToken value includes: $.)
 		ifTrue: [self error: 'invalid embedded dot']
 ]
 
-{ #category : #errors }
+{ #category : 'errors' }
 SSmalltalkParser >> warning: aString [
 	compiler warning: aString at: token position
 ]
 
-{ #category : #errors }
+{ #category : 'errors' }
 SSmalltalkParser >> warning: aString at: position [
 	compiler warning: aString at: position
 ]

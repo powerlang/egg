@@ -1,30 +1,31 @@
 Class {
-	#name : #SelfBinding,
-	#superclass : #Binding,
-	#category : #'Powerlang-SCompiler-Bindings'
+	#name : 'SelfBinding',
+	#superclass : 'Binding',
+	#category : 'Powerlang-SCompiler-Bindings',
+	#package : 'Powerlang-SCompiler-Bindings'
 }
 
-{ #category : #actions }
+{ #category : 'actions' }
 SelfBinding >> beReferencedFrom: aScriptNode [
 	aScriptNode useSelf
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SelfBinding >> canBeAssigned [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SelfBinding >> encodeUsing: aTreecodeEmitter [
 	aTreecodeEmitter encodeSelf
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SelfBinding >> isSelf [
 	^true
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SelfBinding >> name [
 	^'self'
 ]

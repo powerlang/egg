@@ -1,7 +1,7 @@
 Class {
-	#name : #SCompiledBlock,
-	#superclass : #Object,
-	#type : #variable,
+	#name : 'SCompiledBlock',
+	#superclass : 'Object',
+	#type : 'variable',
 	#instVars : [
 		'format',
 		'optimizedCode',
@@ -10,10 +10,12 @@ Class {
 	#pools : [
 		'SCompiledBlockFlags'
 	],
-	#category : #'Powerlang-SCompiler-Backend'
+	#category : 'Powerlang-SCompiler-Backend',
+	#package : 'Powerlang-SCompiler',
+	#tag : 'Backend'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 SCompiledBlock class >> new [
 	"return an initialized instance"
 
@@ -21,104 +23,97 @@ SCompiledBlock class >> new [
 
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledBlock >> argumentCount [
 	^format bitsAt: BlockArgCount
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledBlock >> argumentCount: anInteger [
 	format := format bitsAt: BlockArgCount put: anInteger
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledBlock >> capturesHome [
 	^ format anyMask: BlockCapturesHome
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledBlock >> capturesHome: aBoolean [
 	format := aBoolean
 				  ifTrue: [ format bitOr: BlockCapturesHome ]
 				  ifFalse: [ format bitClear: BlockCapturesHome ]
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledBlock >> capturesSelf [
 	^format anyMask: BlockCapturesSelf
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledBlock >> capturesSelf: aBoolean [
 	format := aBoolean
 		ifTrue: [ format bitOr: BlockCapturesSelf ]
 		ifFalse: [ format bitClear: BlockCapturesSelf ]
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledBlock >> environmentCount [
 	^ format bitsAt: BlockEnvCount
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledBlock >> environmentCount: anInteger [
 	format := format bitsAt: BlockEnvCount put: anInteger
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledBlock >> format [
 	^ format
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledBlock >> id [
 	^format bitsAt: BlockId
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledBlock >> id: anInteger [
 	format := format bitsAt: BlockId put: anInteger
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledBlock >> initialize [
 	super initialize.
 	format := 0
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledBlock >> isBlock [
 	^true
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledBlock >> method [
 	^method
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCompiledBlock >> method: aCompiledMethod [
 	method := aCompiledMethod
 ]
 
-{ #category : #constants }
-SCompiledBlock >> newClosure [
-	| closure |
-	closure := SClosure new: self environmentCount.
-	^ closure block: self
-]
-
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledBlock >> optimizedCode [
 	^optimizedCode
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledBlock >> optimizedCode: anObject [
 	optimizedCode := anObject
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledBlock >> printOn: aStream [
 	aStream
 		print: method classBinding;
@@ -130,17 +125,17 @@ SCompiledBlock >> printOn: aStream [
 
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledBlock >> tempCount [
 	^format bitsAt: BlockTempCount
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledBlock >> tempCount: anInteger [
 	format := format bitsAt: BlockTempCount put: anInteger
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledBlock >> value [
 self halt
 "	<primitive: BlockValue>

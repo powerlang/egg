@@ -1,6 +1,6 @@
 Class {
-	#name : #SScriptNode,
-	#superclass : #SParseNode,
+	#name : 'SScriptNode',
+	#superclass : 'SParseNode',
 	#instVars : [
 		'statements',
 		'arguments',
@@ -8,53 +8,54 @@ Class {
 		'children',
 		'scope'
 	],
-	#category : #'Powerlang-SCompiler-Parser'
+	#category : 'Powerlang-SCompiler-Parser',
+	#package : 'Powerlang-SCompiler-Parser'
 }
 
-{ #category : #'add/remove' }
+{ #category : 'add/remove' }
 SScriptNode >> addChild: aBlockNode [
 	children add: aBlockNode
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SScriptNode >> addStatements: anOrderedCollection [
 	statements addAll: anOrderedCollection
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SScriptNode >> arguments [
 	^arguments
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SScriptNode >> arguments: aCollection [
 	arguments := aCollection
 ]
 
-{ #category : #binding }
+{ #category : 'binding' }
 SScriptNode >> bindLocals [
 	arguments do: [:arg | arg defineArgumentIn: scope].
 	temporaries do: [:temp | temp checkLowercase; defineTemporaryIn: scope].
 	children do: [:block | block bindLocals]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SScriptNode >> children [
 	^children
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SScriptNode >> environmentSize [
 	^scope environmentSize
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SScriptNode >> hasAssign [
 	statements do: [:s | s hasAssign ifTrue: [^true]].
 	^false
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SScriptNode >> identifiers [
 	| result |
 	result := OrderedCollection new.
@@ -62,7 +63,7 @@ SScriptNode >> identifiers [
 	^result removeDuplicates
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SScriptNode >> initialize [
 	super initialize.
 	statements := OrderedCollection new.
@@ -71,7 +72,7 @@ SScriptNode >> initialize [
 	children := OrderedCollection new
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 SScriptNode >> nodesDo: aBlock includingDeclarations: aBoolean [
 	super nodesDo: aBlock includingDeclarations: aBoolean.
 	aBoolean ifTrue: [
@@ -80,43 +81,43 @@ SScriptNode >> nodesDo: aBlock includingDeclarations: aBoolean [
 	statements do: [:s | s nodesDo: aBlock includingDeclarations: aBoolean]
 ]
 
-{ #category : #binding }
+{ #category : 'binding' }
 SScriptNode >> positionLocals [
 	scope positionLocals.
 	children do: [:b | b positionLocals]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SScriptNode >> realScript [
 	self subclassResponsibility
 ]
 
-{ #category : #binding }
+{ #category : 'binding' }
 SScriptNode >> reference: aBinding [
 	aBinding beReferencedFrom: self
 ]
 
-{ #category : #binding }
+{ #category : 'binding' }
 SScriptNode >> scope [
 	^scope
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SScriptNode >> statements [
 	^statements
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SScriptNode >> temporaries [
 	^temporaries
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SScriptNode >> temporaries: aCollection [
 	temporaries := aCollection
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SScriptNode >> useSelf [
 	scope captureSelf
 ]

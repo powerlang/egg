@@ -1,24 +1,25 @@
 Class {
-	#name : #SCascadeMessageNode,
-	#superclass : #SMessageNode,
+	#name : 'SCascadeMessageNode',
+	#superclass : 'SMessageNode',
 	#instVars : [
 		'cascade'
 	],
-	#category : #'Powerlang-SCompiler-Parser'
+	#category : 'Powerlang-SCompiler-Parser',
+	#package : 'Powerlang-SCompiler-Parser'
 }
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SCascadeMessageNode >> acceptVisitor: visitor [
 	^visitor visitCascadeMessage: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCascadeMessageNode >> cascade: aCascadeNode [
 	cascade := aCascadeNode.
 	receiver := cascade receiver
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SCascadeMessageNode >> from: aMessageNode [
 	arguments := aMessageNode arguments.
 	receiver := aMessageNode receiver.
@@ -28,12 +29,12 @@ SCascadeMessageNode >> from: aMessageNode [
 	comments := aMessageNode comments
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SCascadeMessageNode >> isCascadeMessage [
 	^true
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 SCascadeMessageNode >> nodesDo: aBlock includingDeclarations: aBoolean [
 	aBlock value: self.
 	arguments do: [:arg | arg nodesDo: aBlock includingDeclarations: aBoolean]

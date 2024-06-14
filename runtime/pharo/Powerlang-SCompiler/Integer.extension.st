@@ -1,6 +1,6 @@
-Extension { #name : #Integer }
+Extension { #name : 'Integer' }
 
-{ #category : #'*Powerlang-SCompiler' }
+{ #category : '*Powerlang-SCompiler' }
 Integer >> thru: anInteger [
 	^Stretch from: self thru: anInteger
 ]

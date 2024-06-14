@@ -1,26 +1,27 @@
 Class {
-	#name : #SBlockNode,
-	#superclass : #SScriptNode,
+	#name : 'SBlockNode',
+	#superclass : 'SScriptNode',
 	#instVars : [
 		'inlined',
 		'index',
 		'parent'
 	],
-	#category : #'Powerlang-SCompiler-Parser'
+	#category : 'Powerlang-SCompiler-Parser',
+	#package : 'Powerlang-SCompiler-Parser'
 }
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SBlockNode >> acceptVisitor: visitor [
 	^visitor visitBlock: self
 ]
 
-{ #category : #'emitting - inlined' }
+{ #category : 'emitting - inlined' }
 SBlockNode >> beInlined [
 	inlined := true.
 	arguments do: [:arg | arg binding beInlined]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SBlockNode >> buildBlock [
 	| block |
 	self isInlined ifTrue: [ ^ nil ].
@@ -34,74 +35,74 @@ SBlockNode >> buildBlock [
 			capturesHome: scope capturesHome
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SBlockNode >> captureHome [
 	scope captureEnvironment: self ast
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SBlockNode >> environmentIndexOf: aParseNode [
 	^scope environmentIndexOf: aParseNode
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SBlockNode >> index [
 	^index
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SBlockNode >> index: aNumber [
 	index := aNumber
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SBlockNode >> initialize [
 	super initialize.
 	inlined := false.
 	scope := BlockScope on: self
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SBlockNode >> isBlockNode [
 	^true
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SBlockNode >> isEvaluable [
 	^self isNullary
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SBlockNode >> isInlined [
 	^inlined
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SBlockNode >> isNullary [
 	^arguments isEmpty
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SBlockNode >> parent [
 	^parent
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SBlockNode >> parent: aScriptNode [
 	parent := aScriptNode addChild: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SBlockNode >> realParent [
 	^parent realScript
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SBlockNode >> realScript [
 	^inlined ifTrue: [parent realScript] ifFalse: [self]
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SBlockNode >> usesHome [
 	^inlined
 		ifTrue: [children anySatisfy: [:block | block usesHome]]

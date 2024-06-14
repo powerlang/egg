@@ -1,19 +1,20 @@
 Class {
-	#name : #SMethodNode,
-	#superclass : #SScriptNode,
+	#name : 'SMethodNode',
+	#superclass : 'SScriptNode',
 	#instVars : [
 		'selector',
 		'pragma'
 	],
-	#category : #'Powerlang-SCompiler-Parser'
+	#category : 'Powerlang-SCompiler-Parser',
+	#package : 'Powerlang-SCompiler-Parser'
 }
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SMethodNode >> acceptVisitor: visitor [
 	^visitor visitMethod: self
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 SMethodNode >> buildMethod [
 	| cm encoder treecodes |
 	cm := self methodClass withAll: self literals.
@@ -35,24 +36,24 @@ SMethodNode >> buildMethod [
 	^ cm treecodes: treecodes
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 SMethodNode >> captureHome [
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SMethodNode >> compiler: aSmalltalkCompiler [
 	super compiler: aSmalltalkCompiler.
 	scope := MethodScope new script: self.
 	pragma := aSmalltalkCompiler pragmaNode
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SMethodNode >> environmentIndexOf: aParseNode [
 	^nil
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 SMethodNode >> header [
 	"
 	(Object >> #printOn:) ast header
@@ -64,17 +65,17 @@ SMethodNode >> header [
 	^compiler sourceCode copyFrom: interval start to: interval end
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SMethodNode >> isHeadless [
 	^selector isNil
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SMethodNode >> isMethod [
 	^true
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 SMethodNode >> literals [
 	| literals v l literalsWithClasses |
 	literals := OrderedCollection new.
@@ -108,7 +109,7 @@ SMethodNode >> literals [
 	^ literalsWithClasses collect: [ :n | n key ].
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 SMethodNode >> methodClass [
 	| type |
 	type := pragma type.
@@ -119,13 +120,13 @@ SMethodNode >> methodClass [
 	^ SCompiledMethod
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SMethodNode >> needsEnvironment [
 	^scope environmentSize > 0
 		or: [children anySatisfy: [:block | block usesHome]]
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SMethodNode >> needsFrame [
 	scope stackSize > 0 ifTrue: [ ^ true ].
 	arguments size > 16 ifTrue: [ ^ true ].
@@ -134,38 +135,38 @@ SMethodNode >> needsFrame [
 	^ false
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 SMethodNode >> nodesDo: aBlock includingDeclarations: aBoolean [
 	super nodesDo: aBlock includingDeclarations: aBoolean.
 	(aBoolean and: [selector notNil]) ifTrue: [aBlock value: selector]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SMethodNode >> pragma [
 	^pragma
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SMethodNode >> pragma: anObject [
 	pragma := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SMethodNode >> realScript [
 	^self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SMethodNode >> selector [
 	^selector value
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SMethodNode >> selector: aSelectorNode [
 	selector := aSelectorNode
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SMethodNode >> selectorNode [
 	^selector
 ]
