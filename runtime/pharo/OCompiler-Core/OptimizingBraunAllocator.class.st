@@ -3,8 +3,8 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OptimizingBraunAllocator,
-	#superclass : #Object,
+	#name : 'OptimizingBraunAllocator',
+	#superclass : 'Object',
 	#instVars : [
 		'firstBlock',
 		'currentBlock',
@@ -23,30 +23,31 @@ Class {
 		'blocksDone',
 		'deferredCouplings'
 	],
-	#category : #'OCompiler-Core-Main'
+	#category : 'OCompiler-Core-Main',
+	#package : 'OCompiler-Core-Main'
 }
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> activationRecord [
 	^firstBlock firstInstruction
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> allocationEntry [
 	^allocationEntry
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> amountOfRegisters [
 	^amountOfRegisters
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> amountOfRegisters: amount [
 	amountOfRegisters := amount
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> areEqual: last and: distances [
 	last size = distances size ifFalse: [^false].
 	last keysAndValuesDo: [:key :value | | other |
@@ -55,20 +56,20 @@ OptimizingBraunAllocator >> areEqual: last and: distances [
 	^true
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> clobbersOneRegister: inst [
 	^((inst isJump or: [inst isUnaryOperation and: [inst name == #push]])
 		or: [inst isTernaryOperation and: [inst name = #_basicAt:put:]]) not
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> computeEntryRegistersOf: block [
 	(self isLoopHead: block)
 		ifTrue: [self initLoopHeader: block]
 		ifFalse: [self initUsual: block]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> computeLiveness [
 	liveness := OptimizingLivenessAnalysis new
 		firstBlock: firstBlock;
@@ -76,12 +77,12 @@ OptimizingBraunAllocator >> computeLiveness [
 		analyzeLiveness
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> computeLoops [
 	loops := firstBlock allLoops
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> computeTemporaryIndexes [
 	| index |
 	index := 1.
@@ -91,13 +92,13 @@ OptimizingBraunAllocator >> computeTemporaryIndexes [
 	self activationRecord temporaries: index - 1
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> computeUseDistanceOf: instruction number: index using: distances [
 	instruction operandsDo: [:operand | distances at: operand put: index].
 	distances removeKey: instruction ifAbsent: []
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> computeUseDistances [
 	| distancesEntry changed |
 	distancesEntry := IdentityDictionary new.
@@ -111,7 +112,7 @@ OptimizingBraunAllocator >> computeUseDistances [
 				or: changed]]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> computeUseDistancesOf: block using: distancesEntry [
 	| distances index length |
 	distances := IdentityDictionary new.
@@ -137,7 +138,7 @@ OptimizingBraunAllocator >> computeUseDistancesOf: block using: distancesEntry [
 	^true
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> couple: block withPredecessor: predecessor [
 	| predecessors wentry oldSentry predWexit predSexit newSentry difference |
 	predecessors := block predecessors intersection: blocksDone.
@@ -158,7 +159,7 @@ OptimizingBraunAllocator >> couple: block withPredecessor: predecessor [
 		(difference rejectAll: sexit) do: [:value | self scheduleSpillFor: value]]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> coupleWithPredecessors: block [
 	| predecessors |
 	predecessors := block predecessors intersection: blocksDone.
@@ -174,12 +175,12 @@ OptimizingBraunAllocator >> coupleWithPredecessors: block [
 			do: [:value | self scheduleSpillFor: value]]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> deferCouplingOf: block [
 	deferredCouplings add: block
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> doAllocation [
 	| redefinitions |
 	self computeLoops; computeLiveness; computeUseDistances.
@@ -197,17 +198,17 @@ OptimizingBraunAllocator >> doAllocation [
 	self reconstructSSA: redefinitions
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> firstBlock [
 	^firstBlock
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> firstBlock: aBlock [
 	firstBlock := aBlock
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> initLoopHeader: block [
 	| loop available candidates liveThrough pressure freeLoop extra |
 	loop := loops at: block.
@@ -228,7 +229,7 @@ OptimizingBraunAllocator >> initLoopHeader: block [
 	allocationEntry at: block put: currentlyAvailable copy
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> initUsual: block [
 	| frequencies take max chosen candidates |
 	frequencies := Dictionary new.
@@ -264,7 +265,7 @@ OptimizingBraunAllocator >> initUsual: block [
 	allocationEntry at: block put: currentlyAvailable copy
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> initialize [
 	currentlyAvailable := OrderedCollection new.
 	currentlySpilled := OrderedCollection new.
@@ -280,7 +281,7 @@ OptimizingBraunAllocator >> initialize [
 	deferredCouplings := Set new
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> insertReloadOf: value before: user [
 	| stack index reload |
 	stack := self activationRecord.
@@ -292,7 +293,7 @@ OptimizingBraunAllocator >> insertReloadOf: value before: user [
 	^reload
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> insertSpillOf: value [
 	| stack index store |
 	stack := self activationRecord.
@@ -302,7 +303,7 @@ OptimizingBraunAllocator >> insertSpillOf: value [
 	liveness kill: store at: store
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> insertSpillsAndReloads [
 	| redefinitions |
 	scheduledSpills do: [:value | self insertSpillOf: value].
@@ -316,17 +317,17 @@ OptimizingBraunAllocator >> insertSpillsAndReloads [
 	^redefinitions
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> is: value liveAt: instruction [
 	^(self useDistanceFrom: instruction to: value) != Number infinity
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> isLoopHead: block [
 	^loops includesKey: block
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> limitAt: inst to: limit [
 	| stack |
 	self sortByUseDistance: currentlyAvailable in: inst.
@@ -341,22 +342,22 @@ OptimizingBraunAllocator >> limitAt: inst to: limit [
 	currentlyAvailable := currentlyAvailable truncateTo: limit
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> liveInOf: block [
 	^liveness liveInOf: block
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingBraunAllocator >> liveness [
 	^liveness
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> maxPressureIn: loop [
 	^liveness maxPressureIn: loop
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> reconstructSSA: reloads [
 	| reconstructor |
 	reconstructor := OptimizingSSAReconstructor new firstBlock: firstBlock.
@@ -366,23 +367,23 @@ OptimizingBraunAllocator >> reconstructSSA: reloads [
 			reconstructSSA]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> scheduleReload: value before: user [
 	self haltWhen: value printString = '[send #classField to {#_basicAt:}]'.
 	scheduledReloads add: value -> user
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> scheduleSpillFor: value [
 	scheduledSpills addIfAbsent: value
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> selectAliveIn: collection at: instruction [
 	^collection select: [:value | self is: value liveAt: instruction]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> sortByUseDistance: candidates in: inst [
 	| stack |
 	candidates
@@ -393,7 +394,7 @@ OptimizingBraunAllocator >> sortByUseDistance: candidates in: inst [
 		ifTrue: [candidates remove: stack; addFirst: stack]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> spillAsBeladyIn: block [
 	| k |
 	k := self amountOfRegisters.
@@ -413,7 +414,7 @@ OptimizingBraunAllocator >> spillAsBeladyIn: block [
 	spillExit at: block put: currentlySpilled copy
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> subsetOf: available usedIn: loop [
 	"
 	todo
@@ -421,12 +422,12 @@ OptimizingBraunAllocator >> subsetOf: available usedIn: loop [
 	^available
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> temporaryIndexOf: value [
 	^-1 - (temporaries at: value)
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingBraunAllocator >> useDistanceFrom: inst to: anotherInst [
 	| near distances |
 	near := inst useDistanceTo: anotherInst.

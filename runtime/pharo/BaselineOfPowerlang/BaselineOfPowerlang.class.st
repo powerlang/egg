@@ -1,10 +1,11 @@
 Class {
-	#name : #BaselineOfPowerlang,
-	#superclass : #BaselineOf,
-	#category : #BaselineOfPowerlang
+	#name : 'BaselineOfPowerlang',
+	#superclass : 'BaselineOf',
+	#category : 'BaselineOfPowerlang',
+	#package : 'BaselineOfPowerlang'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BaselineOfPowerlang >> baseline: spec [
 	<baseline>
 	spec for: #common do: [
@@ -53,23 +54,23 @@ BaselineOfPowerlang >> baseline: spec [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BaselineOfPowerlang >> ocompiler: spec [
-		spec package: 'OCompiler-Pharo'.
-		spec package: 'OCompiler-Core' with: [
-			spec requires: 'OCompiler-Pharo'
+		spec package: 'OCompiler-Core'.
+		spec package: 'OCompiler-Pharo' with: [
+			spec requires: 'OCompiler-Core'
 		].
 	
 		spec package: 'OCompiler-Tests'.
 
-		spec group: 'ocompiler' with: #('OCompiler-Pharo'
-		                           'OCompiler-Core'
+		spec group: 'ocompiler' with: #('OCompiler-Core'
+		                           'OCompiler-Pharo'
 		                           'OCompiler-Tests').
 
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BaselineOfPowerlang >> powerlangjs: spec [
 	spec package: 'PowerlangJS-Core' with: [
 		spec requires: 'OCompiler-Core'.
@@ -87,12 +88,12 @@ BaselineOfPowerlang >> powerlangjs: spec [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BaselineOfPowerlang >> repository [
 	^ self packageRepositoryURL
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BaselineOfPowerlang >> setUpWebsideDependency: spec [
 
 	spec

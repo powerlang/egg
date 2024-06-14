@@ -3,8 +3,8 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OptimizingValueNumbering,
-	#superclass : #Object,
+	#name : 'OptimizingValueNumbering',
+	#superclass : 'Object',
 	#instVars : [
 		'firstBlock',
 		'currentBlock',
@@ -12,10 +12,11 @@ Class {
 		'hashes',
 		'hashesOut'
 	],
-	#category : #'OCompiler-Core-Main'
+	#category : 'OCompiler-Core-Main',
+	#package : 'OCompiler-Core-Main'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingValueNumbering >> coalesce: instruction as: hash [
 	hashes
 		at: hash
@@ -23,22 +24,22 @@ OptimizingValueNumbering >> coalesce: instruction as: hash [
 	hashes at: hash put: instruction
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 OptimizingValueNumbering >> isCommutative: name [
 	^name = #'+' or: [name = #'*']
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 OptimizingValueNumbering >> isStillAlive: block [
 	^block == firstBlock or: [block isReachableFrom: firstBlock]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingValueNumbering >> nameOf: instruction [
 	^names at: instruction ifAbsentPut: 'v' , names size printString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingValueNumbering >> resultOfBinaryWithConstants: aBinaryInstruction [
 	| operation left right |
 	operation := aBinaryInstruction name.
@@ -53,7 +54,7 @@ OptimizingValueNumbering >> resultOfBinaryWithConstants: aBinaryInstruction [
 	self halt
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingValueNumbering >> tryMoving: variable justBeforeBranch: branch [
 	| node inserted |
 	node := branch prev.
@@ -68,7 +69,7 @@ OptimizingValueNumbering >> tryMoving: variable justBeforeBranch: branch [
 	branch beforeInsert: inserted
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingValueNumbering >> unifyPredecessorHashes [
 	| incoming any |
 	hashes := Dictionary new.
@@ -85,7 +86,7 @@ OptimizingValueNumbering >> unifyPredecessorHashes [
 		unanimous ifTrue: [hashes at: hash put: value]]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingValueNumbering >> updateMemory: store as: storeHash andLoads: loadHash [
 	"
 	easy: hashes at: storeHash ifPresent: [:mapping | (mapping value livesInSameBlockThan: store)  ifTrue: [mapping value dissolve]]
@@ -94,7 +95,7 @@ OptimizingValueNumbering >> updateMemory: store as: storeHash andLoads: loadHash
 	hashes at: loadHash put: store
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingValueNumbering >> valueBranchTo: aBasicBlock [
 	| source last comparison hash name |
 	aBasicBlock predecessors size != 1 ifTrue: [^self].
@@ -109,7 +110,7 @@ OptimizingValueNumbering >> valueBranchTo: aBasicBlock [
 		ifFalse: [hashes at: hash put: last isJumpFalse]
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingValueNumbering >> visitBinaryWithConstant: instruction [
 	| left right hash temp value replacement |
 	instruction isUseless ifTrue: [^instruction dissolveDeep].
@@ -134,7 +135,7 @@ OptimizingValueNumbering >> visitBinaryWithConstant: instruction [
 		ifFalse: [self coalesce: instruction as: hash]
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingValueNumbering >> visitBinaryWithVariable: instruction [
 	| left right hash temp replacement |
 	instruction isUseless ifTrue: [^instruction dissolveDeep].
@@ -156,7 +157,7 @@ OptimizingValueNumbering >> visitBinaryWithVariable: instruction [
 	self coalesce: instruction as: hash
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingValueNumbering >> visitBranch: branch [
 	| variable hash receiver |
 	variable := branch variable.
@@ -168,22 +169,22 @@ OptimizingValueNumbering >> visitBranch: branch [
 			ifTrue: [branch replaceWithUnconditional: outcome in: currentBlock]]
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingValueNumbering >> visitJump: aJumpInstruction [
 	
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingValueNumbering >> visitJumpFalse: branch [
 	self visitBranch: branch
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingValueNumbering >> visitJumpTrue: branch [
 	self visitBranch: branch
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingValueNumbering >> visitLoad: load [
 	| base index indexHash hash |
 	base := self nameOf: load base.
@@ -195,7 +196,7 @@ OptimizingValueNumbering >> visitLoad: load [
 	self coalesce: load as: hash
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingValueNumbering >> visitLoadConstant: instruction [
 	"
 	we don't coalesce constants, we prefer reloading them than risking spilling
@@ -203,33 +204,33 @@ OptimizingValueNumbering >> visitLoadConstant: instruction [
 	instruction isUsed ifFalse: [^instruction dissolve]
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingValueNumbering >> visitLoadImplicit: instruction [
 	
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingValueNumbering >> visitMessageSend: instruction [
 	hashes
 		removeAllSuchThat: [:value | value isInstruction and: [value isLoad]]
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingValueNumbering >> visitNullary: instruction [
 	
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingValueNumbering >> visitPhi: instruction [
 	instruction dissolveIfUseless
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingValueNumbering >> visitReturn: instruction [
 	
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingValueNumbering >> visitStore: store [
 	| receiver index indexHash value valueHash hash load selector |
 	receiver := self nameOf: store base.
@@ -245,7 +246,7 @@ OptimizingValueNumbering >> visitStore: store [
 	self updateMemory: value as: hash andLoads: load
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingValueNumbering >> visitUnary: instruction [
 	"
 	We cannot coalesce _asNative for now. It would extend its live range and may cause
@@ -259,7 +260,7 @@ OptimizingValueNumbering >> visitUnary: instruction [
 	self coalesce: instruction as: hash
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingValueNumbering >> workFrom: aBasicBlock [
 	| count |
 	hashes := Dictionary new.
@@ -274,7 +275,7 @@ OptimizingValueNumbering >> workFrom: aBasicBlock [
 		reverseDo: [:block | self workOn: block]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingValueNumbering >> workOn: aBlock [
 	(self isStillAlive: aBlock) ifFalse: [^self].
 	currentBlock := aBlock.

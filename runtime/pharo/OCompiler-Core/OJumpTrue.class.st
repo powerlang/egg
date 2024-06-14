@@ -3,17 +3,18 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OJumpTrue,
-	#superclass : #OJumpConditional,
-	#category : #'OCompiler-Core-IR'
+	#name : 'OJumpTrue',
+	#superclass : 'OJumpConditional',
+	#category : 'OCompiler-Core-IR',
+	#package : 'OCompiler-Core-IR'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OJumpTrue >> basicAcceptVisitor: aVisitor [
 	^aVisitor visitJumpTrue: self
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OJumpTrue >> basicPrintString [
 	^'[jump true ' , variable primitivePrintString , ' to ' , target name
 		, ' or fall to '
@@ -21,22 +22,22 @@ OJumpTrue >> basicPrintString [
 		, ']'
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OJumpTrue >> isJumpFalse [
 	^false
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OJumpTrue >> isJumpTrue [
 	^true
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OJumpTrue >> primitivePrintString [
 	^'{jump true}'
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 OJumpTrue >> printStringUsing: names [
 	^'jump true ' , (names at: variable ifAbsent: ['?']) , ' to '
 		, (names at: target ifAbsent: ['?'])

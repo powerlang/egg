@@ -3,48 +3,49 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OOperand,
-	#superclass : #Object,
+	#name : 'OOperand',
+	#superclass : 'Object',
 	#instVars : [
 		'instruction',
 		'name',
 		'nextUse'
 	],
-	#category : #'OCompiler-Core-IR'
+	#category : 'OCompiler-Core-IR',
+	#package : 'OCompiler-Core-IR'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OOperand class >> at: anInstruction named: operandName [
 	^self new instruction: anInstruction; name: operandName
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OOperand class >> valued: anInstruction [
 	^self new value: anInstruction
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OOperand class >> valued: anInstruction in: containingInstruction [
 	^self new value: anInstruction; instruction: containingInstruction
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OOperand >> addUse: anOperand [
 	self DENY: self == anOperand.
 	nextUse ifNil: [nextUse := anOperand] ifNotNil: [nextUse addUse: anOperand]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OOperand >> asOperand [
 	self halt
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OOperand >> definition [
 	^instruction atOperand: name
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OOperand >> duplicateWith: map [
 	| copy |
 	map at: self ifPresent: [:i | ^i].
@@ -56,44 +57,44 @@ OOperand >> duplicateWith: map [
 	^copy
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OOperand >> instruction [
 	^instruction
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OOperand >> instruction: anInstruction [
 	instruction := anInstruction
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OOperand >> name [
 	^name
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OOperand >> name: operandName [
 	name := operandName
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OOperand >> nextUse [
 	^nextUse
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OOperand >> nextUse: anOOperand [
 	nextUse := anOOperand
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OOperand >> printOn: aStream [
 	aStream
 		nextPutAll: '[op #' , name printString , '@' , instruction printString
 			, ']'
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OOperand >> removeUse: anOperand [
 	nextUse instruction == anOperand
 		ifTrue: [
@@ -102,21 +103,21 @@ OOperand >> removeUse: anOperand [
 		ifFalse: [nextUse removeUse: anOperand]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OOperand >> removeUse: anInstruction at: aName [
 	(nextUse instruction == anInstruction and: [nextUse name = aName])
 		ifTrue: [nextUse := nextUse nextUse]
 		ifFalse: [nextUse removeUse: anInstruction at: aName]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OOperand >> removeUseBy: anInstruction [
 	nextUse instruction == anInstruction
 		ifTrue: [nextUse := nextUse nextUse]
 		ifFalse: [nextUse removeUseBy: anInstruction]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OOperand >> replaceAllUsesWith: otherInstruction [
 	| following |
 	following := nextUse.
@@ -124,7 +125,7 @@ OOperand >> replaceAllUsesWith: otherInstruction [
 	following ifNotNil: [following replaceAllUsesWith: otherInstruction]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OOperand >> replaceUsesBy: user with: otherInstruction [
 	| following |
 	following := nextUse.
@@ -132,7 +133,7 @@ OOperand >> replaceUsesBy: user with: otherInstruction [
 	following ifNotNil: [following replaceUsesBy: user with: otherInstruction]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OOperand >> transferUseTo: otherInstruction [
 	self DENY: otherInstruction class == OOperand.
 	self definition removeUse: self.
@@ -140,18 +141,18 @@ OOperand >> transferUseTo: otherInstruction [
 	otherInstruction addUse: self
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OOperand >> user [
 	^instruction
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OOperand >> usesDo: aBlock [
 	aBlock value: self.
 	nextUse ifNotNil: [nextUse usesDo: aBlock]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OOperand >> validate [
 	| set op |
 	set := IdentitySet new.

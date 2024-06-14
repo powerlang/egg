@@ -3,30 +3,31 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OptimizingPhiSimplification,
-	#superclass : #Object,
+	#name : 'OptimizingPhiSimplification',
+	#superclass : 'Object',
 	#instVars : [
 		'marks'
 	],
-	#category : #'OCompiler-Core-Main'
+	#category : 'OCompiler-Core-Main',
+	#package : 'OCompiler-Core-Main'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingPhiSimplification >> initialize [
 	marks := Set new
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingPhiSimplification >> isMarked: instruction [
 	^marks includes: instruction
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingPhiSimplification >> mark: instruction [
 	^marks add: instruction
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingPhiSimplification >> process: aBasicBlock [
 	| instruction |
 	instruction := aBasicBlock firstInstruction.
@@ -39,7 +40,7 @@ OptimizingPhiSimplification >> process: aBasicBlock [
 		instruction := next]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingPhiSimplification >> processFrom: firstBlock [
 	firstBlock instructionsWithSuccessorsDo: [:inst | self mark: inst].
 	firstBlock reversePostOrderDo: [:block | self process: block]

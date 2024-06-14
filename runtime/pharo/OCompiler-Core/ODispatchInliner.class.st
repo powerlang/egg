@@ -3,8 +3,8 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #ODispatchInliner,
-	#superclass : #Object,
+	#name : 'ODispatchInliner',
+	#superclass : 'Object',
 	#instVars : [
 		'methodInliner',
 		'types',
@@ -15,15 +15,16 @@ Class {
 		'currentBlock',
 		'end'
 	],
-	#category : #'OCompiler-Core-Main'
+	#category : 'OCompiler-Core-Main',
+	#package : 'OCompiler-Core-Main'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ODispatchInliner >> canBeInlined [
 	^types notEmpty
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ODispatchInliner >> checkedInline: aCompiledMethod for: aBehavior on: receiverBehavior [
 	| compare inlined next left |
 	left := receiverBehavior ifNil: [receiver].
@@ -36,12 +37,12 @@ ODispatchInliner >> checkedInline: aCompiledMethod for: aBehavior on: receiverBe
 	currentBlock := next
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ODispatchInliner >> initialize [
 	types := #()
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ODispatchInliner >> inline: aMessageSend in: block [
 	| remaining recBehavior current |
 	send := aMessageSend.
@@ -62,7 +63,7 @@ ODispatchInliner >> inline: aMessageSend in: block [
 	^phi -> end
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ODispatchInliner >> inlineMethod: aCompiledMethod [
 	| nativizer initial last return source |
 	nativizer := OptimizingNativizer new.
@@ -84,14 +85,14 @@ ODispatchInliner >> inlineMethod: aCompiledMethod [
 	^initial
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ODispatchInliner >> lastInline: aCompiledMethod [
 	| inlined |
 	inlined := self inlineMethod: aCompiledMethod.
 	currentBlock endWithJumpTo: inlined
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ODispatchInliner >> loadReceiverBehavior [
 	| constant heap header test merge join |
 	constant := OLoadConstant valued: SmallInteger instanceBehavior.
@@ -110,17 +111,17 @@ ODispatchInliner >> loadReceiverBehavior [
 	^join
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ODispatchInliner >> methodInliner: anOptimizingMethodInliner [
 	methodInliner := anOptimizingMethodInliner
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ODispatchInliner >> needsBehavior [
 	^types anySatisfy: [:assoc | assoc key class == Behavior]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ODispatchInliner >> types: aSequenceableCollection [
 	types := aSequenceableCollection
 ]

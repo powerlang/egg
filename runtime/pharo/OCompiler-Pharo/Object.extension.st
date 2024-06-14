@@ -1,6 +1,6 @@
-Extension { #name : #Object }
+Extension { #name : 'Object' }
 
-{ #category : #'*OCompiler-Pharo' }
+{ #category : '*OCompiler-Pharo' }
 Object >> _ASSERT: aBoolean [
 	self assert: aBoolean
 ]

@@ -3,21 +3,22 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OptimizingCSSATransformer,
-	#superclass : #Object,
+	#name : 'OptimizingCSSATransformer',
+	#superclass : 'Object',
 	#instVars : [
 		'firstBlock',
 		'liveness'
 	],
-	#category : #'OCompiler-Core-Main'
+	#category : 'OCompiler-Core-Main',
+	#package : 'OCompiler-Core-Main'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingCSSATransformer >> applyTransformation [
 	self splitPhis; coalescePhis
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingCSSATransformer >> coalescePhis [
 	"
 	to do
@@ -25,12 +26,12 @@ OptimizingCSSATransformer >> coalescePhis [
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingCSSATransformer >> firstBlock: block [
 	firstBlock := block
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingCSSATransformer >> insertionPointFor: anOBasicBlock [
 	| instruction prev |
 	instruction := anOBasicBlock lastInstruction.
@@ -39,7 +40,7 @@ OptimizingCSSATransformer >> insertionPointFor: anOBasicBlock [
 	^prev == instruction variable ifTrue: [prev] ifFalse: [instruction]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingCSSATransformer >> liftPhi: phi [
 	phi variablesWithBlocksDo: [:var :pred | | copy insertion |
 		insertion := self insertionPointFor: pred.
@@ -49,7 +50,7 @@ OptimizingCSSATransformer >> liftPhi: phi [
 		copy addUse: phi at: pred]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingCSSATransformer >> liftPhisIn: block [
 	block
 		phisDo: [:phi | phi isUsed
@@ -57,7 +58,7 @@ OptimizingCSSATransformer >> liftPhisIn: block [
 			ifFalse: [phi dissolve]]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingCSSATransformer >> splitPhis [
 	firstBlock withSuccessorsPostOrder do: [:block | self liftPhisIn: block]
 ]

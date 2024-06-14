@@ -3,8 +3,8 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OptimizingBraunAssigner,
-	#superclass : #Object,
+	#name : 'OptimizingBraunAssigner',
+	#superclass : 'Object',
 	#instVars : [
 		'firstBlock',
 		'liveness',
@@ -16,10 +16,11 @@ Class {
 		'clusters',
 		'processed'
 	],
-	#category : #'OCompiler-Core-Main'
+	#category : 'OCompiler-Core-Main',
+	#package : 'OCompiler-Core-Main'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> allRegistersByPreference [
 	^self wordSize = 4
 		ifTrue: [
@@ -48,7 +49,7 @@ OptimizingBraunAssigner >> allRegistersByPreference [
 				yourself]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> assignRegisterTo: instruction [
 	| register |
 	self enforceConstraints: instruction.
@@ -64,7 +65,7 @@ OptimizingBraunAssigner >> assignRegisterTo: instruction [
 			occupied removeKey: register]]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> assignRegisters [
 	self
 		computeLiveness;
@@ -76,13 +77,13 @@ OptimizingBraunAssigner >> assignRegisters [
 	^assignments
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> clobbersOneRegister: inst [
 	^((inst isJump or: [inst isUnaryOperation and: [inst name == #push]])
 		or: [inst isTernaryOperation and: [inst name = #_basicAt:put:]]) not
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> colorBlock: block [
 	"
 	Determine initial register occupation and color φ-nodes
@@ -103,7 +104,7 @@ OptimizingBraunAssigner >> colorBlock: block [
 			ifTrue: [self insertParallelCopiesFrom: block to: block successors first]]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> computeClusters [
 	firstBlock withSuccessorsPostOrder do: [:block | 
 		block phisDo: [:phi | | cluster |
@@ -113,12 +114,12 @@ OptimizingBraunAssigner >> computeClusters [
 				clusters at: value put: cluster]]]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> computeLiveness [
 	liveness analyzeLiveness
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> computePreferences: block [
 	| argument |
 	argument := firstBlock firstInstruction next next.
@@ -130,30 +131,30 @@ OptimizingBraunAssigner >> computePreferences: block [
 		pref at: index put: (pref at: index) + 1]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> doAssignRegisters [
 	self preallocateImplicitVariables.
 	firstBlock withSuccessorsPostOrder
 		reverseDo: [:block | self colorBlock: block]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> does: operand dieAt: instruction [
 	^liveness does: operand dieAt: instruction
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> enforceConstraints: instruction [
 	
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> from: allocator [
 	firstBlock := allocator firstBlock.
 	allocationEntry := allocator allocationEntry
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> getRegisterFor: var [
 	| prefs candidates cluster reg |
 	assignments at: var ifPresent: [:preset | reg := preset].
@@ -174,7 +175,7 @@ OptimizingBraunAssigner >> getRegisterFor: var [
 	^reg
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> getRegisterForSend: send [
 	| receiver copy |
 	receiver := send receiver.
@@ -185,7 +186,7 @@ OptimizingBraunAssigner >> getRegisterForSend: send [
 	^eax
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> indexOf: register [
 	| regs |
 	regs := self wordSize = 4
@@ -194,7 +195,7 @@ OptimizingBraunAssigner >> indexOf: register [
 	^regs indexOf: register name
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> initialize [
 	processed := OrderedCollection new.
 	preferences := Dictionary new.
@@ -202,7 +203,7 @@ OptimizingBraunAssigner >> initialize [
 	clusters := Dictionary new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> insertCopyTo: dest for: phi at: pred [
 	| value copy |
 	value := phi atOperand: pred.
@@ -212,7 +213,7 @@ OptimizingBraunAssigner >> insertCopyTo: dest for: phi at: pred [
 	phi atOperand: pred put: copy
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> insertParallelCopiesFrom: pred to: block [
 	| phis sources destinations saved |
 	phis := block phis.
@@ -243,7 +244,7 @@ OptimizingBraunAssigner >> insertParallelCopiesFrom: pred to: block [
 		self insertPopOf: var at: pred]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> insertPopOf: var at: pred [
 	| pop reg |
 	pop := OUnaryOperation receiver: nil name: #pop.
@@ -252,28 +253,28 @@ OptimizingBraunAssigner >> insertPopOf: var at: pred [
 	assignments at: pop put: reg
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> insertPushOf: var at: pred [
 	var insertPushBefore: pred lastInstruction
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> integrateABIPreferences [
 	firstBlock withSuccessorsPostOrder
 		do: [:block | self computePreferences: block]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> liveInOf: block [
 	^liveness liveInOf: block
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> liveness: aLivenessAnalysis [
 	liveness := aLivenessAnalysis
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> preallocateImplicitVariables [
 	| in |
 	in := OrderedCollection new.
@@ -286,14 +287,14 @@ OptimizingBraunAssigner >> preallocateImplicitVariables [
 	(liveness liveInOf: firstBlock) addAll: in
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> preinitializePreferences [
 	firstBlock instructionsWithSuccessorsDo: [:instruction | | array |
 		array := #[0 0 0 0 0 0 0 0].
 		preferences at: instruction put: array copy]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> purgeAllocationEntry [
 	firstBlock withSuccessorsPostOrder do: [:block | | alive available |
 		alive := self liveInOf: block.
@@ -303,7 +304,7 @@ OptimizingBraunAssigner >> purgeAllocationEntry [
 				or: [(alive includes: var) not]]]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> registersByPreference: prefs [
 	| all indexes |
 	all := self allRegistersByPreference.
@@ -312,7 +313,7 @@ OptimizingBraunAssigner >> registersByPreference: prefs [
 	^indexes collect: [:index | all at: index]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBraunAssigner >> scheduleCopyingOf: phis from: pred [
 	| destinations changed sources |
 	sources := phis collect: [:phi | | value |

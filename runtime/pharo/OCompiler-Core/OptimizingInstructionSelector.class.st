@@ -3,41 +3,42 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OptimizingInstructionSelector,
-	#superclass : #Object,
+	#name : 'OptimizingInstructionSelector',
+	#superclass : 'Object',
 	#instVars : [
 		'firstBlock',
 		'tiles',
 		'roots',
 		'messages'
 	],
-	#category : #'OCompiler-Core-Main'
+	#category : 'OCompiler-Core-Main',
+	#package : 'OCompiler-Core-Main'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> doSelection [
 	self numberArguments.
 	firstBlock reversePostOrderDo: [:block | self generateTilingFor: block].
 	self removeUnused
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> firstBlock: aBasicBlock [
 	firstBlock := aBasicBlock
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> generateTilingFor: block [
 	block firstInstruction acceptVisitor: self
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> initialize [
 	tiles := IdentityDictionary new.
 	self initializeMessages
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> initializeMessages [
 	messages := Dictionary new
 		at: #'+' put: #CommutativeBinary:;
@@ -66,14 +67,14 @@ OptimizingInstructionSelector >> initializeMessages [
 		yourself
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> insertCopyResultAfter: anInstruction [
 	| copy |
 	copy := OUnaryOperation receiver: anInstruction name: #copyResult.
 	anInstruction afterInsert: copy; replaceAllUsesWith: copy
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> insertPush: anInstruction before: instruction [
 	| push tile |
 	push := anInstruction insertPushBefore: instruction.
@@ -82,12 +83,12 @@ OptimizingInstructionSelector >> insertPush: anInstruction before: instruction [
 	^push
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> newTile: instruction [
 	^OTiling for: instruction
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> numberArguments [
 	| count instruction i |
 	count := 0.
@@ -102,7 +103,7 @@ OptimizingInstructionSelector >> numberArguments [
 		i := i + 1]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> removeUnused [
 	firstBlock instructionsWithSuccessorsDo: [:instruction | | tile |
 		tile := self tileOf: instruction.
@@ -110,12 +111,12 @@ OptimizingInstructionSelector >> removeUnused [
 			ifFalse: [instruction replaceAllUsesWith: tile instruction; dissolve]]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> selectorFor: name [
 	^(#send , (messages at: name ifAbsent: [#GenericMessage:])) asSymbol
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> send: instruction left: left commutativeRight: right [
 	right isConstant
 		ifTrue: [^self tile: instruction using: left toConstant: right value].
@@ -124,7 +125,7 @@ OptimizingInstructionSelector >> send: instruction left: left commutativeRight: 
 	self tile: instruction using: left to: right
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> send: instruction left: left comparedTo: right [
 	right isConstant
 		ifTrue: [^self tile: instruction using: left toConstant: right value].
@@ -133,7 +134,7 @@ OptimizingInstructionSelector >> send: instruction left: left comparedTo: right 
 	self tile: instruction using: left to: right
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> send: instruction left: left minusRight: right [
 	right isConstant
 		ifTrue: [^self tile: instruction using: left toConstant: right value].
@@ -146,7 +147,7 @@ OptimizingInstructionSelector >> send: instruction left: left minusRight: right 
 	self tile: instruction using: left to: right
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> send: instruction left: left right: right [
 	right isConstant
 		ifTrue: [^self tile: instruction using: left toConstant: right value].
@@ -155,13 +156,13 @@ OptimizingInstructionSelector >> send: instruction left: left right: right [
 	self tile: instruction using: left to: right
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> send: instruction receiver: receiver [
 	receiver isConstant ifTrue: [^self tile: instruction toConstant: receiver].
 	self tile: instruction receiver: receiver
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> send: instruction
 receiver: receiver
 left: left
@@ -179,7 +180,7 @@ right: right [
 		right: right
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> sendBinary: instruction [
 	self
 		send: instruction
@@ -187,7 +188,7 @@ OptimizingInstructionSelector >> sendBinary: instruction [
 		right: instruction arguments first
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> sendCommutativeBinary: instruction [
 	self
 		send: instruction
@@ -195,7 +196,7 @@ OptimizingInstructionSelector >> sendCommutativeBinary: instruction [
 		commutativeRight: instruction arguments first
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> sendCompare: instruction [
 	self
 		send: instruction
@@ -203,7 +204,7 @@ OptimizingInstructionSelector >> sendCompare: instruction [
 		comparedTo: instruction arguments first
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> sendGenericMessage: instruction [
 	| arguments values tile new |
 	arguments := instruction arguments.
@@ -219,7 +220,7 @@ OptimizingInstructionSelector >> sendGenericMessage: instruction [
 		insertCopyResultAfter: instruction
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> sendMinus: instruction [
 	self
 		send: instruction
@@ -227,7 +228,7 @@ OptimizingInstructionSelector >> sendMinus: instruction [
 		minusRight: instruction arguments first
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> sendNot: instruction [
 	| negated tile |
 	negated := (self tileOf: instruction receiver) beUsed.
@@ -237,7 +238,7 @@ OptimizingInstructionSelector >> sendNot: instruction [
 	^instruction
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> sendTernary: instruction [
 	self
 		send: instruction
@@ -246,17 +247,17 @@ OptimizingInstructionSelector >> sendTernary: instruction [
 		right: instruction arguments second
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> sendUnary: instruction [
 	self send: instruction receiver: instruction receiver
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> tile: instruction as: tile [
 	tiles at: instruction put: tile
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> tile: instruction receiver: receiver [
 	| receivertile new tile |
 	receivertile := (self tileOf: receiver) beUsed.
@@ -269,7 +270,7 @@ OptimizingInstructionSelector >> tile: instruction receiver: receiver [
 	^new
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> tile: instruction
 using: receiver
 left: left
@@ -291,7 +292,7 @@ right: right [
 	^new
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> tile: instruction using: left to: right [
 	| lefttile righttile tile new |
 	lefttile := (self tileOf: left) beUsed.
@@ -308,7 +309,7 @@ OptimizingInstructionSelector >> tile: instruction using: left to: right [
 	^new
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> tile: instruction using: left toConstant: value [
 	| lefttile new tile |
 	lefttile := (self tileOf: left) beUsed.
@@ -324,19 +325,19 @@ OptimizingInstructionSelector >> tile: instruction using: left toConstant: value
 	^new
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> tileOf: instruction [
 	^tiles at: instruction
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> visitJump: instruction [
 	| new |
 	new := self newTile: instruction.
 	self tile: instruction as: new beUsed
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> visitJumpFalse: instruction [
 	| tile new |
 	tile := self tileOf: instruction variable.
@@ -345,7 +346,7 @@ OptimizingInstructionSelector >> visitJumpFalse: instruction [
 	self tile: instruction as: new beUsed
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> visitJumpTrue: instruction [
 	| tile new |
 	tile := self tileOf: instruction variable.
@@ -354,14 +355,14 @@ OptimizingInstructionSelector >> visitJumpTrue: instruction [
 	self tile: instruction as: new beUsed
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> visitLoadConstant: instruction [
 	| tile |
 	tile := self newTile: instruction.
 	self tile: instruction as: tile
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> visitLoadImplicit: instruction [
 	| tile sourcetile new |
 	instruction name isSmallInteger
@@ -379,14 +380,14 @@ OptimizingInstructionSelector >> visitLoadImplicit: instruction [
 			instruction name == #activationRecord ifTrue: [tile beUsed]]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> visitMessageSend: instruction [
 	| selector |
 	selector := self selectorFor: instruction selector.
 	self perform: selector with: instruction
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> visitPhi: instruction [
 	| tile |
 	instruction variables
@@ -396,7 +397,7 @@ OptimizingInstructionSelector >> visitPhi: instruction [
 	self tile: instruction as: tile
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> visitReturn: instruction [
 	| tile new |
 	tile := self tileOf: instruction source.
@@ -405,7 +406,7 @@ OptimizingInstructionSelector >> visitReturn: instruction [
 	self tile: instruction as: new beUsed
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingInstructionSelector >> visitUnary: instruction [
 	| tile new |
 	tile := self tileOf: instruction receiver.

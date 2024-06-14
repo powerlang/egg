@@ -3,16 +3,17 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OPhi,
-	#superclass : #OInstruction,
+	#name : 'OPhi',
+	#superclass : 'OInstruction',
 	#instVars : [
 		'variables',
 		'blocks'
 	],
-	#category : #'OCompiler-Core-IR'
+	#category : 'OCompiler-Core-IR',
+	#package : 'OCompiler-Core-IR'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OPhi class >> with: operation1
 from: block1
 with: operation2
@@ -22,7 +23,7 @@ from: block2 [
 		addVariable: operation2 from: block2
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OPhi >> addVariable: value from: block [
 	self DENY: (blocks includes: block).
 	variables add: value.
@@ -30,26 +31,26 @@ OPhi >> addVariable: value from: block [
 	value addUse: self at: block
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OPhi >> atOperand: name [
 	| index |
 	index := blocks indexOf: name.
 	^variables at: index
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OPhi >> atOperand: name put: instruction [
 	| index |
 	index := blocks indexOf: name.
 	variables at: index put: instruction
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OPhi >> basicAcceptVisitor: aVisitor [
 	^aVisitor visitPhi: self
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OPhi >> basicPrintString [
 	| sources |
 	sources := variables size > 0
@@ -62,29 +63,29 @@ OPhi >> basicPrintString [
 	^'[phi(' , (sources allButLast: 2) , ')]'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OPhi >> basicVariables: aCollection blocks: anotherCollection [
 	blocks := anotherCollection.
 	variables := aCollection
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 OPhi >> blocks [
 	^blocks
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 OPhi >> canHaveSideEffects [
 	^false
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OPhi >> clearVariables [
 	variables := OrderedCollection new.
 	blocks := OrderedCollection new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OPhi >> copyTo: copy with: map [
 	| b v |
 	super copyTo: copy with: map.
@@ -93,33 +94,33 @@ OPhi >> copyTo: copy with: map [
 	copy variables: v blocks: b
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OPhi >> initialize [
 	variables := OrderedCollection new.
 	blocks := OrderedCollection new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OPhi >> isBoolean [
 	^variables conform: [:v | v isBoolean]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OPhi >> isPhi [
 	^true
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OPhi >> operandsDo: aBlock [
 	variables do: aBlock
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OPhi >> primitivePrintString [
 	^'{#phi}'
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 OPhi >> printStringUsing: names [
 	| sources |
 	sources := variables size = 0 ifTrue: ['  '] ifFalse: [
@@ -133,12 +134,12 @@ OPhi >> printStringUsing: names [
 	^'phi(' , (sources allButLast: 2) , ')'
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 OPhi >> realReverseDo: aBlock [
 	
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OPhi >> removeBlock: removed [
 	| index variable |
 	index := blocks indexOf: removed.
@@ -149,13 +150,13 @@ OPhi >> removeBlock: removed [
 	self removeIfPossible
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OPhi >> removeIfPossible [
 	variables size = 1
 		ifTrue: [self replaceAllUsesWith: variables first; dissolve]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OPhi >> removeVariable: removed at: index [
 	| block |
 	block := blocks at: index.
@@ -166,7 +167,7 @@ OPhi >> removeVariable: removed at: index [
 		ifTrue: [self replaceAllUsesWith: variables first; dissolve]
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 OPhi >> replaceBlock: original with: new [
 	blocks withIndexDo: [:block :i | | source |
 		block == original ifTrue: [
@@ -175,7 +176,7 @@ OPhi >> replaceBlock: original with: new [
 			blocks at: i put: new]]
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 OPhi >> shortPrintString [
 	| sources |
 	sources := variables size > 0
@@ -184,7 +185,7 @@ OPhi >> shortPrintString [
 	^'[phi(' , (sources allButLast: 2) , ')]'
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OPhi >> sortAfter: predecessors [
 	| indices |
 	indices := predecessors collect: [:pred | blocks indexOf: pred].
@@ -192,24 +193,24 @@ OPhi >> sortAfter: predecessors [
 	blocks := predecessors copy
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OPhi >> usesResultOf: anInstruction [
 	^variables includes: anInstruction
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OPhi >> variables [
 	^variables
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OPhi >> variables: aCollection blocks: anotherCollection [
 	blocks := anotherCollection.
 	variables := aCollection.
 	variables with: blocks do: [:var :block | var addUse: self at: block]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OPhi >> variablesWithBlocksDo: aBlock [
 	variables with: blocks do: aBlock
 ]

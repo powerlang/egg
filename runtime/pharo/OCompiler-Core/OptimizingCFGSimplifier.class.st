@@ -3,15 +3,16 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OptimizingCFGSimplifier,
-	#superclass : #Object,
+	#name : 'OptimizingCFGSimplifier',
+	#superclass : 'Object',
 	#instVars : [
 		'firstBlock'
 	],
-	#category : #'OCompiler-Core-Main'
+	#category : 'OCompiler-Core-Main',
+	#package : 'OCompiler-Core-Main'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingCFGSimplifier >> addPredecessor: predecessor like: middle to: final [
 	final phisDo: [:phi | | source |
 		source := phi atOperand: middle.
@@ -19,7 +20,7 @@ OptimizingCFGSimplifier >> addPredecessor: predecessor like: middle to: final [
 	^final
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingCFGSimplifier >> cleanFrom: aBlock [
 	| all |
 	firstBlock := aBlock.
@@ -27,7 +28,7 @@ OptimizingCFGSimplifier >> cleanFrom: aBlock [
 	[self simplify] whileTrue: [all do: [:block | block dissolveIfUnreachable]]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingCFGSimplifier >> hoistBranchIn: succ to: pred [
 	| jump branch condition new target1 target2 |
 	jump := pred lastInstruction.
@@ -49,7 +50,7 @@ OptimizingCFGSimplifier >> hoistBranchIn: succ to: pred [
 	jump replaceAllUsesWith: new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingCFGSimplifier >> simplify [
 	| changed |
 	changed := false.
@@ -61,7 +62,7 @@ OptimizingCFGSimplifier >> simplify [
 	^changed
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingCFGSimplifier >> tryCombining: block [
 	| last following |
 	last := block lastInstruction.
@@ -74,7 +75,7 @@ OptimizingCFGSimplifier >> tryCombining: block [
 	^true
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingCFGSimplifier >> tryFoldingRedundantBranch: block [
 	| last |
 	last := block lastInstruction.
@@ -89,7 +90,7 @@ OptimizingCFGSimplifier >> tryFoldingRedundantBranch: block [
 	^false
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingCFGSimplifier >> tryHoistingBranch: block [
 	| last following |
 	last := block lastInstruction.
@@ -102,7 +103,7 @@ OptimizingCFGSimplifier >> tryHoistingBranch: block [
 	^false
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingCFGSimplifier >> tryRemovingEmptyBlock: block [
 	| following |
 	block isEmptyJump ifTrue: [

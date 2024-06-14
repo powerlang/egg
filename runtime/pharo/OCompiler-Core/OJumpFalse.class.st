@@ -3,17 +3,18 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OJumpFalse,
-	#superclass : #OJumpConditional,
-	#category : #'OCompiler-Core-IR'
+	#name : 'OJumpFalse',
+	#superclass : 'OJumpConditional',
+	#category : 'OCompiler-Core-IR',
+	#package : 'OCompiler-Core-IR'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OJumpFalse >> basicAcceptVisitor: aVisitor [
 	^aVisitor visitJumpFalse: self
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OJumpFalse >> basicPrintString [
 	^'[jump false ' , variable primitivePrintString , ' to ' , target name
 		, ' or fall to '
@@ -21,22 +22,22 @@ OJumpFalse >> basicPrintString [
 		, ']'
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OJumpFalse >> isJumpFalse [
 	^true
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OJumpFalse >> isJumpTrue [
 	^false
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OJumpFalse >> primitivePrintString [
 	^'{jump false}'
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 OJumpFalse >> printStringUsing: names [
 	^'jump false ' , (names at: variable ifAbsent: ['?']) , ' to '
 		, (names at: target ifAbsent: ['?'])

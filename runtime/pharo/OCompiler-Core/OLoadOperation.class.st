@@ -3,12 +3,13 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OLoadOperation,
-	#superclass : #OMemoryOperation,
-	#category : #'OCompiler-Core-IR'
+	#name : 'OLoadOperation',
+	#superclass : 'OMemoryOperation',
+	#category : 'OCompiler-Core-IR',
+	#package : 'OCompiler-Core-IR'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 OLoadOperation class >> base: anInstruction byteAt: anInteger [
 	^self new
 		name: #_byteAt:;
@@ -16,7 +17,7 @@ OLoadOperation class >> base: anInstruction byteAt: anInteger [
 		index: anInteger
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 OLoadOperation class >> base: anInstruction byteAtImm: anInteger [
 	^self new
 		name: #_byteAt:;
@@ -24,7 +25,7 @@ OLoadOperation class >> base: anInstruction byteAtImm: anInteger [
 		indexImm: anInteger
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 OLoadOperation class >> base: anInstruction longSlotAt: anInteger [
 	^self new
 		name: #_longSlotAt:;
@@ -32,7 +33,7 @@ OLoadOperation class >> base: anInstruction longSlotAt: anInteger [
 		index: anInteger
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 OLoadOperation class >> base: anInstruction longSlotAtImm: anInteger [
 	^self new
 		name: #_longSlotAt:;
@@ -40,7 +41,7 @@ OLoadOperation class >> base: anInstruction longSlotAtImm: anInteger [
 		indexImm: anInteger
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 OLoadOperation class >> base: anInstruction slotAt: anInteger [
 	^self new
 		name: #_basicAt:;
@@ -48,7 +49,7 @@ OLoadOperation class >> base: anInstruction slotAt: anInteger [
 		index: anInteger
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 OLoadOperation class >> base: anInstruction slotAtImm: anInteger [
 	^self new
 		name: #_basicAt:;
@@ -56,7 +57,7 @@ OLoadOperation class >> base: anInstruction slotAtImm: anInteger [
 		indexImm: anInteger
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 OLoadOperation class >> base: anInstruction uLongAtImm: anInteger [
 	^self new
 		name: #_uLongAt:;
@@ -64,35 +65,35 @@ OLoadOperation class >> base: anInstruction uLongAtImm: anInteger [
 		indexImm: anInteger
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OLoadOperation >> basicAcceptVisitor: aVisitor [
 	^aVisitor visitLoad: self
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OLoadOperation >> basicPrintString [
 	^'[' , base primitivePrintString , ' ' , name , ' '
 		, index primitivePrintString
 		, ']'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OLoadOperation >> canHaveSideEffects [
 	^false
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OLoadOperation >> isLoad [
 	^true
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OLoadOperation >> operandsDo: aBlock [
 	aBlock value: base.
 	index isInstruction ifTrue: [aBlock value: index]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OLoadOperation >> printStringUsing: names [
 	| b i |
 	b := names at: base ifAbsent: ['?'].

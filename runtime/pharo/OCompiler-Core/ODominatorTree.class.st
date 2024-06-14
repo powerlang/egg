@@ -3,17 +3,18 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #ODominatorTree,
-	#superclass : #Object,
+	#name : 'ODominatorTree',
+	#superclass : 'Object',
 	#instVars : [
 		'block',
 		'dominators',
 		'dominated'
 	],
-	#category : #'OCompiler-Core-IR'
+	#category : 'OCompiler-Core-IR',
+	#package : 'OCompiler-Core-IR'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 ODominatorTree class >> from: root with: aBlocksCollection dominators: dominators [
 	| trees |
 	trees := Array
@@ -26,12 +27,12 @@ ODominatorTree class >> from: root with: aBlocksCollection dominators: dominator
 	^trees first
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 ODominatorTree >> addDominated: aTree [
 	dominated add: aTree
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 ODominatorTree >> allImmediateDominators [
 	| result remaining |
 	result := Dictionary new.
@@ -43,49 +44,49 @@ ODominatorTree >> allImmediateDominators [
 	^result
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 ODominatorTree >> block [
 	^block
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 ODominatorTree >> block: aBasicBlock [
 	block := aBasicBlock
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 ODominatorTree >> dominated [
 	^dominated
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 ODominatorTree >> dominators [
 	^dominators
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 ODominatorTree >> dominators: aTreeCollection [
 	dominators := aTreeCollection
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 ODominatorTree >> initialize [
 	dominated := OrderedCollection new
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 ODominatorTree >> isImmediateDominatorOf: aBasicBlock [
 	^block == self or: [block successors includes: aBasicBlock]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 ODominatorTree >> noticeDominators [
 	dominators
 		select: [:tree | tree isImmediateDominatorOf: self]
 		thenDo: [:dominator | dominator addDominated: self]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 ODominatorTree >> printAtLevel: level on: aStream [
 	level > 8 ifTrue: [self halt].
 	level timesRepeat: [aStream nextPutAll: '--'].
@@ -95,7 +96,7 @@ ODominatorTree >> printAtLevel: level on: aStream [
 		thenDo: [:tree | tree printAtLevel: level + 1 on: aStream]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 ODominatorTree >> printOn: aStream [
 	self printAtLevel: 1 on: aStream
 ]

@@ -3,17 +3,18 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OTernaryOperation,
-	#superclass : #OPrimitiveOperation,
+	#name : 'OTernaryOperation',
+	#superclass : 'OPrimitiveOperation',
 	#instVars : [
 		'receiver',
 		'left',
 		'right'
 	],
-	#category : #'OCompiler-Core-IR'
+	#category : 'OCompiler-Core-IR',
+	#package : 'OCompiler-Core-IR'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OTernaryOperation class >> receiver: receiver
 left: left
 right: right
@@ -25,14 +26,14 @@ name: selector [
 		name: selector
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OTernaryOperation >> atOperand: named [
 	^named == #receiver
 		ifTrue: [receiver]
 		ifFalse: [named == #left ifTrue: [left] ifFalse: [right]]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OTernaryOperation >> atOperand: operandName put: instruction [
 	operandName = #receiver ifTrue: [receiver := instruction] ifFalse: [
 		operandName = #left
@@ -40,12 +41,12 @@ OTernaryOperation >> atOperand: operandName put: instruction [
 			ifFalse: [right := instruction]]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OTernaryOperation >> basicAcceptVisitor: aVisitor [
 	^aVisitor visitTernary: self
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OTernaryOperation >> basicPrintString [
 	^'['
 		, (receiver isInstruction
@@ -57,30 +58,30 @@ OTernaryOperation >> basicPrintString [
 		, ']'
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OTernaryOperation >> isTernaryOperation [
 	^true
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OTernaryOperation >> left [
 	^left
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OTernaryOperation >> left: value [
 	left := value.
 	left isInstruction ifTrue: [left addUse: self at: #left]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OTernaryOperation >> operandsDo: aBlock [
 	aBlock value: receiver.
 	left isInstruction ifTrue: [aBlock value: left].
 	aBlock value: right
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OTernaryOperation >> printStringUsing: names [
 	^(receiver isInstruction
 		ifTrue: [names at: receiver]
@@ -92,29 +93,29 @@ OTernaryOperation >> printStringUsing: names [
 			ifFalse: [right printString])
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OTernaryOperation >> receiver [
 	^receiver
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OTernaryOperation >> receiver: value [
 	receiver := value.
 	receiver addUse: self at: #receiver
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OTernaryOperation >> right [
 	^right
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OTernaryOperation >> right: value [
 	right := value.
 	right addUse: self at: #right
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OTernaryOperation >> usesResultOf: anInstruction [
 	^receiver == anInstruction
 		or: [left == anInstruction or: [right == anInstruction]]

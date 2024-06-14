@@ -3,32 +3,33 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OBeginInstruction,
-	#superclass : #OControlInstruction,
-	#category : #'OCompiler-Core-IR'
+	#name : 'OBeginInstruction',
+	#superclass : 'OControlInstruction',
+	#category : 'OCompiler-Core-IR',
+	#package : 'OCompiler-Core-IR'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBeginInstruction >> basicAcceptVisitor: aVisitor [
 	
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBeginInstruction >> detect: aBlock ifNone: absentBlock [
 	^next detect: aBlock ifNone: absentBlock
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBeginInstruction >> do: aBlock [
 	next do: aBlock
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBeginInstruction >> printBackwardOn: aStream [
 	
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 OBeginInstruction >> printStringUsing: names [
 	| stream |
 	stream := '' writeStream.
@@ -36,12 +37,12 @@ OBeginInstruction >> printStringUsing: names [
 	^stream contents
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 OBeginInstruction >> realReverseDo: aBlock [
 	
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 OBeginInstruction >> reverseDo: aBlock [
 	
 ]
