@@ -57,7 +57,7 @@ ModuleSpec >> addClassFromDefinition: aClassDefinition [
 	class
 		module: self;
 		metaclass: metaclass;
-		name: name;
+		name: aClassDefinition className;
 		supername: aClassDefinition superclassName;
 		ivars: aClassDefinition instVarNames asOrderedCollection;
 		cvars: aClassDefinition classVariables.
