@@ -140,11 +140,6 @@ ClassSpec >> isVariable: aBoolean [
 ]
 
 { #category : 'inquiries' }
-ClassSpec >> localPools [
-	^classVarNames select: [:c | c isKindOf: PoolDictionary]
-]
-
-{ #category : 'inquiries' }
 ClassSpec >> metaMethods [
 	^metaclass methods
 ]

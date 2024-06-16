@@ -8,26 +8,14 @@ Class {
 	#instVars : [
 		'methods',
 		'module',
-		'format',
 		'instSize',
 		'allIvars',
 		'instVarNames'
-	],
-	#classVars : [
-		'Format'
 	],
 	#category : 'Powerlang-Core-CodeSpecs',
 	#package : 'Powerlang-Core',
 	#tag : 'CodeSpecs'
 }
-
-{ #category : 'initialization' }
-SpeciesSpec class >> initializeFormatMasks [
-	Format := PoolDictionary newConstantPool.
-	Format
-		at: 'IsArrayed' put: 1;
-		at: 'IsBytes' put: 2
-]
 
 { #category : 'instance creation' }
 SpeciesSpec class >> new [
@@ -100,8 +88,8 @@ SpeciesSpec >> hasMethods [
 SpeciesSpec >> initialize [
 	super initialize.
 	methods := OrderedCollection new.
-	instVarNames := #().
-	format := 0
+	instVarNames := #()
+
 ]
 
 { #category : 'accessing' }
