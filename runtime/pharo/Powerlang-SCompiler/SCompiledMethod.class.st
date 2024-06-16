@@ -14,7 +14,8 @@ Class {
 		'SCompiledMethodFlags'
 	],
 	#category : 'Powerlang-SCompiler-Backend',
-	#package : 'Powerlang-SCompiler-Backend'
+	#package : 'Powerlang-SCompiler',
+	#tag : 'Backend'
 }
 
 { #category : 'instance creation' }
@@ -248,15 +249,6 @@ SCompiledMethod >> selector [
 { #category : 'constants' }
 SCompiledMethod >> selector: aSymbol [
 	selector := aSymbol
-]
-
-{ #category : 'constants' }
-SCompiledMethod >> sexpressions [
-	| decoder |
-	decoder := TreecodeDecoder new
-		stream: treecodes readStream;
-		method: self.
-	^decoder decodeMethod
 ]
 
 { #category : 'constants' }
