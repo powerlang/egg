@@ -16,12 +16,15 @@ else
 ICEBERG_URL=file://$(GIT_PATH)
 endif
 
-PHARO_VERSION ?= 120
+PHARO_VERSION ?= 110
 
 all: pharo-ui egg.image
 
-pharo pharo-ui Pharo.image:
-	curl https://get.pharo.org/64/$(PHARO_VERSION)+vm | bash || curl https://get.pharo.org/64/$(PHARO_VERSION)+vm | bash
+Pharo.image:
+	curl https://get.pharo.org/64/$(PHARO_VERSION) | bash -x || curl https://get.pharo.org/64/$(PHARO_VERSION) | bash -x
+
+pharo pharo-ui:
+	curl https://get.pharo.org/64/vm$(PHARO_VERSION) | bash -x || curl https://get.pharo.org/64/vm$(PHARO_VERSION) | bash -x
 
 # if there's an existing local git repo, then use it, else create it and add the remote to the root git repo
 egg.image: pharo Pharo.image
