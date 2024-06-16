@@ -12,7 +12,8 @@ Class {
 		'ClosureElementTypes'
 	],
 	#category : 'Powerlang-SCompiler-Backend',
-	#package : 'Powerlang-SCompiler-Backend'
+	#package : 'Powerlang-SCompiler',
+	#tag : 'Backend'
 }
 
 { #category : 'instance creation' }
@@ -69,11 +70,6 @@ TreecodeEncoder >> encodeDynamicVar: name [
 { #category : 'visiting' }
 TreecodeEncoder >> encodeFalse [
 	stream nextPut: FalseId
-]
-
-{ #category : 'visiting' }
-TreecodeEncoder >> encodeLoadRvisitingReceiver [
-	stream nextPut: LoadRvisitingReceiverId
 ]
 
 { #category : 'visiting' }
