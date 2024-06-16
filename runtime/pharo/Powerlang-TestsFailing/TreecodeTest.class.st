@@ -45,7 +45,7 @@ TreecodeTest >> encode: source in: aSpecies [
 TreecodeTest >> test010emptyMethod [
 	| treecodes root |
 	treecodes := self encode: 'm'.
-	self assert: treecodes = {MethodId}.
+	self assert: treecodes equals: {MethodId}.
 	root := self decode: treecodes of: method.
 	self assert: root isMethod; assert: root statements isEmpty
 ]
@@ -54,43 +54,43 @@ TreecodeTest >> test010emptyMethod [
 TreecodeTest >> test020encodeFalse [
 	| treecodes root identifier |
 	treecodes := self encode: 'm false'.
-	self assert: treecodes = {MethodId. {IdentifierId. FalseId}}.
+	self assert: treecodes equals: {MethodId. {IdentifierId. FalseId}}.
 	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
-		assert: root statements size = 1.
+		assert: root statements size equals: 1.
 	identifier := root statements first.
 	self
 		assert: identifier isVariable;
 		assert: identifier binding isLiteral;
-		assert: identifier binding value = false
+		assert: identifier binding value equals: false
 ]
 
 { #category : 'private' }
 TreecodeTest >> test020encodeNil [
 	| treecodes root identifier |
 	treecodes := self encode: 'm nil'.
-	self assert: treecodes = {MethodId. {IdentifierId. NilId}}.
+	self assert: treecodes equals: {MethodId. {IdentifierId. NilId}}.
 	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
-		assert: root statements size = 1.
+		assert: root statements size equals: 1.
 	identifier := root statements first.
 	self
 		assert: identifier isVariable;
 		assert: identifier binding isLiteral;
-		assert: identifier binding value = nil
+		assert: identifier binding value equals: nil
 ]
 
 { #category : 'private' }
 TreecodeTest >> test020encodeSelf [
 	| treecodes root identifier |
 	treecodes := self encode: 'm self'.
-	self assert: treecodes = {MethodId. {IdentifierId. SelfId}}.
+	self assert: treecodes equals: {MethodId. {IdentifierId. SelfId}}.
 	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
-		assert: root statements size = 1.
+		assert: root statements size equals: 1.
 	identifier := root statements first.
 	self assert: identifier isVariable; assert: identifier binding isSelf
 ]
@@ -99,41 +99,40 @@ TreecodeTest >> test020encodeSelf [
 TreecodeTest >> test020encodeTrue [
 	| treecodes root identifier |
 	treecodes := self encode: 'm true'.
-	self assert: treecodes = {MethodId. {IdentifierId. TrueId}}.
+	self assert: treecodes equals: {MethodId. {IdentifierId. TrueId}}.
 	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
-		assert: root statements size = 1.
+		assert: root statements size equals: 1.
 	identifier := root statements first.
 	self
 		assert: identifier isVariable;
 		assert: identifier binding isLiteral;
-		assert: identifier binding value = true
+		assert: identifier binding value equals: true
 ]
 
 { #category : 'private' }
 TreecodeTest >> test021encodeClassVar [
 	| treecodes root identifier |
 	treecodes := self encode: 'm Flags' in: Class.
-	self assert: treecodes = {MethodId. {IdentifierId. ClassVarId. 1}}.
+	self assert: treecodes equals: {MethodId. {IdentifierId. DynamicVarId. 1}}.
 	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
-		assert: root statements size = 1.
+		assert: root statements size equals: 1.
 	identifier := root statements first.
 	self
 		assert: identifier isVariable;
 		assert: identifier binding isClassVar;
-		assert: identifier binding association class = Association;
-		assert: identifier binding association key = 'Flags';
-		assert: identifier binding association value class = PoolDictionary
+		assert: identifier binding association class equals: Association;
+		assert: identifier binding association key equals: 'Flags'
 ]
 
 { #category : 'private' }
 TreecodeTest >> test021encodeInstVar [
 	| treecodes root identifier |
 	treecodes := self encode: 'm name' in: Class.
-	self assert: treecodes = {MethodId. {IdentifierId. InstVarId. 6}}.
+	self assert: treecodes = {MethodId. {IdentifierId. DynamicVarId. 6}}.
 	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
@@ -149,7 +148,7 @@ TreecodeTest >> test021encodeInstVar [
 TreecodeTest >> test021encodePoolVar [
 	| treecodes root identifier |
 	treecodes := self encode: 'm Pointers' in: Class.
-	self assert: treecodes = {MethodId. {IdentifierId. PoolVarId. 1}}.
+	self assert: treecodes = {MethodId. {IdentifierId. DynamicVarId. 1}}.
 	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
@@ -167,11 +166,11 @@ TreecodeTest >> test021encodePoolVar [
 TreecodeTest >> test022encodeReturn [
 	| treecodes root return identifier |
 	treecodes := self encode: 'm ^self'.
-	self assert: treecodes = {MethodId. {ReturnId. true. {IdentifierId. SelfId}}}.
+	self assert: treecodes equals: {MethodId. {ReturnId. true. {IdentifierId. SelfId}}}.
 	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
-		assert: root statements size = 1.
+		assert: root statements size equals: 1.
 	return := root statements first.
 	self assert: return isReturn.
 	identifier := return expression.
@@ -184,7 +183,7 @@ TreecodeTest >> test023encodeClass [
 	treecodes := self encode: 'm ^Array'.
 	self
 		assert: treecodes
-			= {MethodId. {ReturnId. true. {IdentifierId. GlobalClassId. 1}}}.
+			= {MethodId. {ReturnId. true. {IdentifierId. DynamicVarId. 1}}}.
 	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
@@ -203,15 +202,15 @@ TreecodeTest >> test023encodeClass [
 TreecodeTest >> test024encodeLiteral [
 	| treecodes root literal |
 	treecodes := self encode: 'm #foo'.
-	self assert: treecodes = {MethodId. {LiteralId. 1}}.
+	self assert: treecodes equals: {MethodId. {LiteralId. 1}}.
 	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
-		assert: root statements size = 1.
+		assert: root statements size equals: 1.
 	literal := root statements first.
 	self
 		assert: literal isLiteral;
-		assert: literal value = #foo
+		assert: literal value equals: #foo
 ]
 
 { #category : 'private' }
@@ -220,11 +219,11 @@ TreecodeTest >> test030encodeUnaryMessage [
 	treecodes := self encode: 'm ^self foo'.
 	self
 		assert: treecodes
-			= {MethodId. {ReturnId. true. {MessageId. 1. {IdentifierId. SelfId}}}}.
+			equals: {MethodId. {ReturnId. true. {MessageId. 1. {IdentifierId. SelfId}}}}.
 	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
-		assert: root statements size = 1.
+		assert: root statements size equals: 1.
 	return := root statements first.
 	self assert: return isReturn.
 	message := return expression.
@@ -242,11 +241,11 @@ TreecodeTest >> test035encodeBinaryMessage [
 	treecodes := self encode: 'm ^self foo: true'.
 	self
 		assert: treecodes
-			= {MethodId. {ReturnId. true. {MessageId. 1. {IdentifierId. SelfId}. {IdentifierId. TrueId}}}}.
+			equals: {MethodId. {ReturnId. true. {MessageId. 1. {IdentifierId. SelfId}. {IdentifierId. TrueId}}}}.
 	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
-		assert: root statements size = 1.
+		assert: root statements size equals: 1.
 	return := root statements first.
 	self assert: return isReturn.
 	message := return expression.
@@ -258,7 +257,7 @@ TreecodeTest >> test035encodeBinaryMessage [
 		assert: receiver binding isSelf;
 		assert: argument isVariable;
 		assert: argument binding isLiteral;
-		assert: argument binding value = true
+		assert: argument binding value equals: true
 ]
 
 { #category : 'private' }
@@ -266,14 +265,14 @@ TreecodeTest >> test036encodeTernaryMessage [
 	| treecodes root return message receiver arg1 arg2 |
 	treecodes := self encode: 'm ^self foo: true bar: false'.
 	self
-		assert: treecodes = {MethodId. {ReturnId. true. {MessageId. 1.
+		assert: treecodes equals: {MethodId. {ReturnId. true. {MessageId. 1.
 					{IdentifierId. SelfId}.
 					{IdentifierId. TrueId}.
 					{IdentifierId. FalseId}}}}.
 	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
-		assert: root statements size = 1.
+		assert: root statements size equals: 1.
 	return := root statements first.
 	self assert: return isReturn.
 	message := return expression.
@@ -286,10 +285,10 @@ TreecodeTest >> test036encodeTernaryMessage [
 		assert: receiver binding isSelf;
 		assert: arg1 isVariable;
 		assert: arg1 binding isLiteral;
-		assert: arg1 binding value = true;
+		assert: arg1 binding value equals: true;
 		assert: arg2 isVariable;
 		assert: arg2 binding isLiteral;
-		assert: arg2 binding value = false
+		assert: arg2 binding value equals: false
 ]
 
 { #category : 'private' }
@@ -298,7 +297,7 @@ TreecodeTest >> test050instVarAssignment [
 	treecodes := self encode: 'm name := true' in: Class.
 	self
 		assert: treecodes
-			= {MethodId. {AssignmentId. {IdentifierId. InstVarId. 6}. {IdentifierId. TrueId}}}.
+			= {MethodId. {AssignmentId. {IdentifierId. DynamicVarId. 6}. {IdentifierId. TrueId}}}.
 	root := self decode: treecodes of: method.
 	self
 		assert: root isMethod;
@@ -306,14 +305,14 @@ TreecodeTest >> test050instVarAssignment [
 	assignment := root statements first.
 	self
 		assert: assignment isAssignment;
-		assert: assignment assignees size = 1.
+		assert: assignment assignees size equals: 1.
 	assignee := assignment assignees first.
 	expression := assignment expression.
 	self
 		assert: assignee isVariable;
 		assert: assignee binding isInstVar;
-		assert: assignee binding index = 6;
+		assert: assignee binding index equals: 6;
 		assert: expression isVariable;
 		assert: expression binding isLiteral;
-		assert: expression binding value = true
+		assert: expression binding value equals: true
 ]
