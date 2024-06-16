@@ -34,9 +34,9 @@ TreecodeTest >> encode: source [
 
 { #category : 'private' }
 TreecodeTest >> encode: source in: aSpecies [
-	| ring compiler |
-	ring := VirtualImage kernelSpec bindingOf: aSpecies name.
-	compiler := SCompiler forClass: ring value.
+	| spec compiler |
+	spec := EggBootstrapImage kernelSpec at: aSpecies name.
+	compiler := SCompiler forClass: spec.
 	method := compiler compile: source.
 	^ method treecodes
 ]
