@@ -1,35 +1,36 @@
 Class {
-	#name : #SBraceNode,
-	#superclass : #SParseNode,
+	#name : 'SBraceNode',
+	#superclass : 'SParseNode',
 	#instVars : [
 		'elements',
 		'message'
 	],
-	#category : #'Powerlang-SCompiler-Parser'
+	#category : 'Powerlang-SCompiler-Parser',
+	#package : 'Powerlang-SCompiler-Parser'
 }
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SBraceNode >> acceptVisitor: visitor [
 	^visitor visitBraceNode: self
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SBraceNode >> asMessageNode [
 	message notNil ifTrue: [^message].
 	^message := self expanded
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SBraceNode >> elements [
 	^elements
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SBraceNode >> elements: aCollection [
 	elements := aCollection asArray
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SBraceNode >> expanded [
 	| receiver n new argument array messages i you yourself cascade |
 	receiver := compiler identifierNode name: 'Array'.
@@ -58,12 +59,12 @@ SBraceNode >> expanded [
 	^cascade messages: messages
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SBraceNode >> isBraceNode [
 	^true
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 SBraceNode >> nodesDo: aBlock includingDeclarations: aBoolean [
 	super nodesDo: aBlock includingDeclarations: aBoolean.
 	elements do: [:n | n nodesDo: aBlock includingDeclarations: aBoolean]

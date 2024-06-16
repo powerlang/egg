@@ -3,17 +3,18 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OEndInstruction,
-	#superclass : #OControlInstruction,
-	#category : #'OCompiler-Core-IR'
+	#name : 'OEndInstruction',
+	#superclass : 'OControlInstruction',
+	#category : 'OCompiler-Core-IR',
+	#package : 'OCompiler-Core-IR'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OEndInstruction >> acceptVisitor: aVisitor [
 	
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OEndInstruction >> addLast: anInstruction [
 	prev next: anInstruction.
 	anInstruction prev: prev.
@@ -21,42 +22,42 @@ OEndInstruction >> addLast: anInstruction [
 	prev := anInstruction
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OEndInstruction >> detect: aBlock ifNone: absentBlock [
 	^absentBlock value
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OEndInstruction >> do: aBlock [
 	
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OEndInstruction >> hasNext [
 	^false
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OEndInstruction >> isEnd [
 	^true
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OEndInstruction >> last [
 	^prev
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OEndInstruction >> printForwardOn: aStream [
 	
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OEndInstruction >> printForwardOn: aStream using: names [
 	
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OEndInstruction >> printOn: aStream [
 	"
 	prev printBackwardOn: aStream
@@ -64,12 +65,12 @@ OEndInstruction >> printOn: aStream [
 	
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OEndInstruction >> replace: one with: other [
 	
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 OEndInstruction >> reverseDo: aBlock [
 	prev reverseDo: aBlock
 ]

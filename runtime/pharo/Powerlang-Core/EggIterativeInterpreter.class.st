@@ -1,48 +1,46 @@
 Class {
-	#name : 'EggIterativeInterpreter',
-	#superclass : 'EggEvaluator',
+	#name : #EggIterativeInterpreter,
+	#superclass : #EggEvaluator,
 	#instVars : [
 		'regR'
 	],
-	#category : 'Powerlang-Core-Execution',
-	#package : 'Powerlang-Core',
-	#tag : 'Execution'
+	#category : 'Powerlang-Core-Execution'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggIterativeInterpreter >> evaluate [
 	^self subclassResponsibility
 
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggIterativeInterpreter >> hasFinished [
 	^ context hasFinished
 ]
 
-{ #category : 'initializing' }
+{ #category : #initializing }
 EggIterativeInterpreter >> initializeUndermessages [
 	super initializeUndermessages.
 	undermessages 		at: #_restart put: self underprimitiveRestart
 	
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggIterativeInterpreter >> prepareDispatch: dispatch [
 	self subclassResponsibility
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggIterativeInterpreter >> prepareForBlock: sblock [
 	^self subclassResponsibility	
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggIterativeInterpreter >> regR: anObject [ 
 	regR := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggIterativeInterpreter >> unboundAssignment: aBinding with: assignees [
 			assignees size > 1 ifTrue: [ 
 				self error:
@@ -50,29 +48,29 @@ EggIterativeInterpreter >> unboundAssignment: aBinding with: assignees [
 			self doesNotKnow: aBinding name assigned: regR
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggIterativeInterpreter >> underprimitiveRestart [
 	^ self subclassResponsibility 
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggIterativeInterpreter >> visitBlock: anSBlock [
 	regR := context captureClosure: anSBlock
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggIterativeInterpreter >> visitIdentifier: anSIdentifier [
 	| binding |
 	binding := anSIdentifier binding.
 	regR := binding valueWithin: context ifUnbound: [ ^self doesNotKnow: binding name ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggIterativeInterpreter >> visitLiteral: anSLiteral [
 	regR := runtime literalFor: anSLiteral value
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggIterativeInterpreter >> visitOpAssign: anSOpAssign [
 
 	| assignees binding |
@@ -85,37 +83,37 @@ EggIterativeInterpreter >> visitOpAssign: anSOpAssign [
 			ifUnbound: [ self unboundAssignment: binding with: assignees ] ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggIterativeInterpreter >> visitOpDropToS: anSOpDropToS [
 	context dropOperands: anSOpDropToS count
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggIterativeInterpreter >> visitOpLoadRfromFrame: anSOpLoadRfromFrame [
 	regR := context stackTemporaryAt: anSOpLoadRfromFrame index
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggIterativeInterpreter >> visitOpLoadRfromStack: anSOpLoadRfromStack [
 	regR := context operandAt: anSOpLoadRfromStack index
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggIterativeInterpreter >> visitOpLoadRwithNil: anSOpLoadRwithNil [
 	regR := nilObj
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggIterativeInterpreter >> visitOpLoadRwithSelf: anSOpLoadRwithSelf [
 	regR := context self
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggIterativeInterpreter >> visitOpPushR: anSOpPushR [
 	context pushOperand: regR
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggIterativeInterpreter >> visitOpStoreRintoFrame: anSOpStoreRintoFrame [
 	context stackTemporaryAt: anSOpStoreRintoFrame index put: regR
 ]

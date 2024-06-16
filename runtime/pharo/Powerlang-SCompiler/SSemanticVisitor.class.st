@@ -1,13 +1,14 @@
 Class {
-	#name : #SSemanticVisitor,
-	#superclass : #SParseTreeVisitor,
+	#name : 'SSemanticVisitor',
+	#superclass : 'SParseTreeVisitor',
 	#instVars : [
 		'inliner'
 	],
-	#category : #'Powerlang-SCompiler-Frontend'
+	#category : 'Powerlang-SCompiler-Frontend',
+	#package : 'Powerlang-SCompiler-Frontend'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 SSemanticVisitor class >> new [
 	"return an initialized instance"
 
@@ -15,25 +16,25 @@ SSemanticVisitor class >> new [
 
 ]
 
-{ #category : #analizing }
+{ #category : 'analizing' }
 SSemanticVisitor >> analyzeAssignment: anAssignmentNode [
 	anAssignmentNode assignees
 		do: [:v | self analyzeIdentifier: v assignee: true]
 ]
 
-{ #category : #analizing }
+{ #category : 'analizing' }
 SSemanticVisitor >> analyzeBlock: aBlockNode while: aBlock [
 	aBlockNode isInlined
 		ifFalse: [aBlockNode index: aBlockNode compiler blockIndex].
 	self analyzeScript: aBlockNode while: aBlock
 ]
 
-{ #category : #analizing }
+{ #category : 'analizing' }
 SSemanticVisitor >> analyzeIdentifier: anIdentifierNode [
 	self analyzeIdentifier: anIdentifierNode assignee: false
 ]
 
-{ #category : #analizing }
+{ #category : 'analizing' }
 SSemanticVisitor >> analyzeIdentifier: anIdentifierNode assignee: aBoolean [
 	| script binding |
 	anIdentifierNode resolveAssigning: aBoolean.
@@ -45,34 +46,34 @@ SSemanticVisitor >> analyzeIdentifier: anIdentifierNode assignee: aBoolean [
 	anIdentifierNode binding: binding
 ]
 
-{ #category : #analizing }
+{ #category : 'analizing' }
 SSemanticVisitor >> analyzeMessage: aMessageNode [
 	inliner inline: aMessageNode.
 	aMessageNode isInlined ifFalse: [aMessageNode compiler noticeSend]
 ]
 
-{ #category : #analizing }
+{ #category : 'analizing' }
 SSemanticVisitor >> analyzeMethod: aMethodNode while: aBlock [
 	self analyzeScript: aMethodNode while: aBlock
 ]
 
-{ #category : #analizing }
+{ #category : 'analizing' }
 SSemanticVisitor >> analyzeReturn: aReturnNode [
 	aReturnNode compiler activeScript realScript captureHome
 ]
 
-{ #category : #analizing }
+{ #category : 'analizing' }
 SSemanticVisitor >> analyzeScript: aScriptNode while: aBlock [
 	aScriptNode compiler activate: aScriptNode while: aBlock
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SSemanticVisitor >> initialize [
 	super initialize.
 	inliner := MessageInliner new
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SSemanticVisitor >> visitAssignment: anAssignmentNode [
 	| c |
 	self analyzeAssignment: anAssignmentNode.
@@ -81,26 +82,26 @@ SSemanticVisitor >> visitAssignment: anAssignmentNode [
 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SSemanticVisitor >> visitBlock: aBlockNode [
 	self
 		analyzeBlock: aBlockNode
 		while: [aBlockNode statements do: [:node | node acceptVisitor: self]]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SSemanticVisitor >> visitBraceNode: aBraceNode [
 	aBraceNode isLiteral
 		ifFalse: [aBraceNode asMessageNode acceptVisitor: self]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SSemanticVisitor >> visitCascade: aCascadeNode [
 	aCascadeNode receiver acceptVisitor: self.
 	aCascadeNode messages do: [:msg | msg acceptVisitor: self]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SSemanticVisitor >> visitCascadeMessage: aCascadeMessageNode [
 	"we do not inline cascade messages for now"
 	aCascadeMessageNode compiler noticeSend.
@@ -108,19 +109,19 @@ SSemanticVisitor >> visitCascadeMessage: aCascadeMessageNode [
 	aCascadeMessageNode arguments do: [:arg | arg acceptVisitor: self]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SSemanticVisitor >> visitIdentifier: anIdentifierNode [
 	self analyzeIdentifier: anIdentifierNode
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SSemanticVisitor >> visitMessage: aMessageNode [
 	self analyzeMessage: aMessageNode.
 	aMessageNode receiver acceptVisitor: self.
 	aMessageNode arguments do: [:arg | arg acceptVisitor: self]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SSemanticVisitor >> visitMethod: aMethodNode [
 	self analyzeMethod: aMethodNode while: [
 		aMethodNode bindLocals.
@@ -128,7 +129,7 @@ SSemanticVisitor >> visitMethod: aMethodNode [
 		aMethodNode positionLocals]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SSemanticVisitor >> visitParseNode: aParseNode [
 	"
 	do nothing
@@ -136,7 +137,7 @@ SSemanticVisitor >> visitParseNode: aParseNode [
 	
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SSemanticVisitor >> visitReturn: aReturnNode [
 	aReturnNode expression acceptVisitor: self.
 	self analyzeReturn: aReturnNode

@@ -1,35 +1,36 @@
 Class {
-	#name : #SDelimiterToken,
-	#superclass : #SSymbolicToken,
-	#category : #'Powerlang-SCompiler-Parser'
+	#name : 'SDelimiterToken',
+	#superclass : 'SSymbolicToken',
+	#category : 'Powerlang-SCompiler-Parser',
+	#package : 'Powerlang-SCompiler-Parser'
 }
 
-{ #category : #converting }
+{ #category : 'converting' }
 SDelimiterToken >> asSelectorNode [
 	^compiler selectorNode symbol: value asString; stretch: stretch
 ]
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 SDelimiterToken >> beCharacter [
 	value := value isCharacter ifTrue: [value] ifFalse: [value first]
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SDelimiterToken >> endsExpression [
 	^value = $. or: [value = $]] or: [value = $)] or: [value = $}]
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SDelimiterToken >> isAssignment [
 	^self is: #':='
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SDelimiterToken >> isDelimiter [
 	^true
 ]
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 SDelimiterToken >> value: aString [
 	super value: aString asSymbol
 ]

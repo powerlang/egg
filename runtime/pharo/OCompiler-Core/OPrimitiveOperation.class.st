@@ -3,46 +3,47 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OPrimitiveOperation,
-	#superclass : #OInstruction,
+	#name : 'OPrimitiveOperation',
+	#superclass : 'OInstruction',
 	#instVars : [
 		'name'
 	],
-	#category : #'OCompiler-Core-IR'
+	#category : 'OCompiler-Core-IR',
+	#package : 'OCompiler-Core-IR'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OPrimitiveOperation >> basicPrintString [
 	^self primitivePrintString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OPrimitiveOperation >> copyTo: copy with: map [
 	super copyTo: copy with: map.
 	copy name: name
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 OPrimitiveOperation >> isPrimitiveOperation [
 	^true
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OPrimitiveOperation >> name [
 	^name
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OPrimitiveOperation >> name: selector [
 	name := selector
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OPrimitiveOperation >> primitivePrintString [
 	^'{#' , name , '}'
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OPrimitiveOperation >> printStringUsing: names [
 	^self primitivePrintString
 ]

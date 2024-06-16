@@ -1,6 +1,6 @@
 Class {
-	#name : #AstBindingTypes,
-	#superclass : #PSharedPool,
+	#name : 'AstBindingTypes',
+	#superclass : 'PSharedPool',
 	#classVars : [
 		'ArgumentId',
 		'DynamicVarId',
@@ -14,10 +14,11 @@ Class {
 		'TemporaryId',
 		'TrueId'
 	],
-	#category : #'Powerlang-SCompiler-Backend'
+	#category : 'Powerlang-SCompiler-Backend',
+	#package : 'Powerlang-SCompiler-Backend'
 }
 
-{ #category : #'class initialization' }
+{ #category : 'class initialization' }
 AstBindingTypes class >> initialize [
 	NilId := 1.
 	TrueId := 2.

@@ -1,23 +1,24 @@
 Class {
-	#name : #SSymbolicToken,
-	#superclass : #SToken,
+	#name : 'SSymbolicToken',
+	#superclass : 'SToken',
 	#instVars : [
 		'value'
 	],
-	#category : #'Powerlang-SCompiler-Parser'
+	#category : 'Powerlang-SCompiler-Parser',
+	#package : 'Powerlang-SCompiler-Parser'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 SSymbolicToken >> is: anObject [
 	^value == anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSymbolicToken >> value [
 	^value
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSymbolicToken >> value: anObject [
 	value := anObject
 ]

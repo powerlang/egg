@@ -1,27 +1,25 @@
 Class {
-	#name : 'SSelfBinding',
-	#superclass : 'SBinding',
-	#category : 'Powerlang-Core-SExpressions',
-	#package : 'Powerlang-Core',
-	#tag : 'SExpressions'
+	#name : #SSelfBinding,
+	#superclass : #SBinding,
+	#category : 'Powerlang-Core-SExpressions'
 }
 
-{ #category : 'unclassified' }
+{ #category : #unclassified }
 SSelfBinding class >> decodeUsing: aTreecodeDecoder [
 	^self new
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 SSelfBinding >> isSelf [
 	^true
 ]
 
-{ #category : 'printing' }
+{ #category : #printing }
 SSelfBinding >> printOn: aStream [
 	aStream nextPutAll: 'SelfId'
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 SSelfBinding >> valueWithin: anEvaluationContext [
 	^ anEvaluationContext receiver
 ]

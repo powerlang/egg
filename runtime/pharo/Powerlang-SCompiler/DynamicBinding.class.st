@@ -1,18 +1,19 @@
 Class {
-	#name : #DynamicBinding,
-	#superclass : #Binding,
+	#name : 'DynamicBinding',
+	#superclass : 'Binding',
 	#classVars : [
 		'Default'
 	],
-	#category : #'Powerlang-SCompiler-Bindings'
+	#category : 'Powerlang-SCompiler-Bindings',
+	#package : 'Powerlang-SCompiler-Bindings'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 DynamicBinding class >> default [
 	^Default ifNil: [Default := self new name: '<unresolved>']
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 DynamicBinding class >> named: aString [
 	| index first second |
 	index := aString indexOf: $..
@@ -22,23 +23,23 @@ DynamicBinding class >> named: aString [
 	^NestedDynamicBinding new name: { first. second }
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 DynamicBinding >> beReferencedFrom: aScriptNode [
 	"a dynamic binding could refer to an ivar, so we have to be conservative"
 	aScriptNode useSelf
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 DynamicBinding >> encodeUsing: aTreecodeEmitter [
 	aTreecodeEmitter encodeDynamicVar: name
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 DynamicBinding >> isDynamic [
 	^true
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 DynamicBinding >> literal [
 	^name asSymbol
 ]

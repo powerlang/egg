@@ -1,20 +1,21 @@
 Class {
-	#name : #FalseBinding,
-	#superclass : #LiteralBinding,
-	#category : #'Powerlang-SCompiler-Bindings'
+	#name : 'FalseBinding',
+	#superclass : 'LiteralBinding',
+	#category : 'Powerlang-SCompiler-Bindings',
+	#package : 'Powerlang-SCompiler-Bindings'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 FalseBinding >> encodeUsing: aTreecodeEmitter [
 	aTreecodeEmitter encodeFalse
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 FalseBinding >> name [
 	^'false'
 ]
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 FalseBinding >> value [
 	^false
 ]

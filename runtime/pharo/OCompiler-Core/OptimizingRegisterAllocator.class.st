@@ -3,8 +3,8 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OptimizingRegisterAllocator,
-	#superclass : #Object,
+	#name : 'OptimizingRegisterAllocator',
+	#superclass : 'Object',
 	#instVars : [
 		'abi',
 		'liveRanges',
@@ -18,10 +18,11 @@ Class {
 		'currentBlock',
 		'firstBlock'
 	],
-	#category : #'OCompiler-Core-Main'
+	#category : 'OCompiler-Core-Main',
+	#package : 'OCompiler-Core-Main'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> abi: anAbi [
 	abi := anAbi.
 	free := OrderedCollection new.
@@ -33,12 +34,12 @@ OptimizingRegisterAllocator >> abi: anAbi [
 		add: abi regFP
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> activationRecord [
 	^firstBlock activationRecord
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> addLiveRangesOf: block [
 	block
 		instructionsDo: [:instruction | self
@@ -46,7 +47,7 @@ OptimizingRegisterAllocator >> addLiveRangesOf: block [
 			in: block]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingRegisterAllocator >> allocateFor: inst [
 	| range register starts ends |
 	(self rangesEndingAt: inst) reverseDo: [:ending | self free: ending].
@@ -60,7 +61,7 @@ OptimizingRegisterAllocator >> allocateFor: inst [
 	inst isMessageSend ifTrue: [self repairToRespectABI: inst with: range]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingRegisterAllocator >> allocateLiveRanges [
 	self preallocateImplicitVariables.
 	firstBlock reversePostOrderDo: [:block | 
@@ -70,12 +71,12 @@ OptimizingRegisterAllocator >> allocateLiveRanges [
 		usedOut at: block put: used copy]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> allocation [
 	^allocation
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> assign: register to: aRange [
 	((free includes: register) not and: [(used at: register) != aRange])
 		ifTrue: [self error: 'register ' , register printString , ' is not free'].
@@ -84,7 +85,7 @@ OptimizingRegisterAllocator >> assign: register to: aRange [
 	used at: register put: aRange
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> assignRegisterTo: instruction in: aRange [
 	| register |
 	register := allocation at: aRange ifAbsent: [
@@ -95,12 +96,12 @@ OptimizingRegisterAllocator >> assignRegisterTo: instruction in: aRange [
 	self assign: register to: aRange
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> assureLiveRangeStartingAt: anInstruction [
 	^self assureLiveRangeStartingAt: anInstruction in: currentBlock
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> assureLiveRangeStartingAt: anInstruction in: block [
 	| range |
 	range := OSimpleLiveRange new definedAt: anInstruction in: block.
@@ -108,21 +109,21 @@ OptimizingRegisterAllocator >> assureLiveRangeStartingAt: anInstruction in: bloc
 	^range
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> computeExpirationOf: instruction [
 	| range |
 	range := self unifiedLiveRangeOf: instruction.
 	range expirationPoints do: [:operation | self kill: range at: operation]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> computeExpirations [
 	firstBlock
 		instructionsWithSuccessorsDo: [:instruction | self
 			computeExpirationOf: instruction]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> computeLiveRanges [
 	firstBlock
 		reversePostOrderDo: [:block | self addLiveRangesOf: block];
@@ -132,17 +133,17 @@ OptimizingRegisterAllocator >> computeLiveRanges [
 	self computeExpirations
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> computeLiveRangesOf: block [
 	block firstInstruction acceptVisitor: self
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> currentBlock: aBasicBlock [
 	currentBlock := aBasicBlock
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> doAllocation [
 	| record |
 	"	record := self activationRecord.
@@ -151,13 +152,13 @@ OptimizingRegisterAllocator >> doAllocation [
 	^allocation
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> firstBlock: aBasicBlock [
 	firstBlock := aBasicBlock.
 	locals := 2 + firstBlock activationRecord temporaries
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> free: range [
 	| register |
 	register := allocation at: range ifAbsent: [^self].
@@ -169,7 +170,7 @@ OptimizingRegisterAllocator >> free: range [
 	^register
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> initialize [
 	allocation := IdentityDictionary new.
 	liveRanges := IdentityDictionary new.
@@ -179,7 +180,7 @@ OptimizingRegisterAllocator >> initialize [
 	usedOut := Dictionary new
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> insertCopyToR: anInstruction before: inst [
 	| copy range |
 	copy := anInstruction newCopy.
@@ -189,7 +190,7 @@ OptimizingRegisterAllocator >> insertCopyToR: anInstruction before: inst [
 	allocation at: copy put: abi regR
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> insertLoadBeforeUse: operand [
 	| stack load use range definition predecessor |
 	stack := used at: abi regFP.
@@ -212,7 +213,7 @@ OptimizingRegisterAllocator >> insertLoadBeforeUse: operand [
 		ifPresent: [:register | allocation at: load put: register]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> insertPop: anInstruction to: register after: messageSend [
 	| pop range |
 	pop := OUnaryOperation receiver: OInstruction new name: #pop.
@@ -222,7 +223,7 @@ OptimizingRegisterAllocator >> insertPop: anInstruction to: register after: mess
 	allocation at: pop put: register
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> insertStoreAfter: definition with: aLiveRange at: block [
 	| stack store range reg |
 	unifiedLiveRanges removeKey: definition ifAbsent: [].
@@ -244,17 +245,17 @@ OptimizingRegisterAllocator >> insertStoreAfter: definition with: aLiveRange at:
 		reg ifNotNil: [map removeKey: reg]]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> isFree: register [
 	^free includes: register
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> isSpilled: register [
 	^false
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> kill: range at: instruction [
 	| expiring |
 	(range class = OSimpleLiveRange or: [range class == OComposedLiveRange])
@@ -265,12 +266,12 @@ OptimizingRegisterAllocator >> kill: range at: instruction [
 	expiring add: range
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> liveRangeOf: value [
 	^liveRanges at: value
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingRegisterAllocator >> preallocateImplicitVariables [
 	firstBlock instructionsDo: [:inst | | range |
 		inst isLoadImplicit ifFalse: [^self].
@@ -278,12 +279,12 @@ OptimizingRegisterAllocator >> preallocateImplicitVariables [
 		inst register ifNotNil: [:register | allocation at: range put: register]]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> rangesEndingAt: instruction [
 	^expirations at: instruction ifAbsent: [OrderedCollection new]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingRegisterAllocator >> recalculateRegisterUsage [
 	| incoming recalculated |
 	currentBlock predecessors isEmpty ifTrue: [^self].
@@ -302,7 +303,7 @@ OptimizingRegisterAllocator >> recalculateRegisterUsage [
 		removeAll: used keys
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingRegisterAllocator >> repairToRespectABI: messageSend with: range [
 	| result clobbered receiver spillPoint |
 	result := allocation at: messageSend ifAbsent: nil.
@@ -322,12 +323,12 @@ OptimizingRegisterAllocator >> repairToRespectABI: messageSend with: range [
 		ifFalse: [self insertCopyToR: messageSend receiver before: messageSend]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> reserveSpaceForLocals [
 	self activationRecord temporaries: locals - 2
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> spillALiveRangeInUseAfter: instruction [
 	| freed register |
 	freed := self usedRangeReadLastAfter: instruction.
@@ -337,7 +338,7 @@ OptimizingRegisterAllocator >> spillALiveRangeInUseAfter: instruction [
 	^register
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> splitRange: aLiveRange [
 	| real |
 	real := self unifiedLiveRangeOfRange: aLiveRange.
@@ -346,19 +347,19 @@ OptimizingRegisterAllocator >> splitRange: aLiveRange [
 		self insertStoreAfter: definition with: aLiveRange at: block]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> unifiedLiveRangeOf: anInstruction [
 	^unifiedLiveRanges
 		at: anInstruction
 		ifAbsent: [liveRanges at: anInstruction]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> unifiedLiveRangeOfRange: aLiveRange [
 	^unifiedLiveRanges at: aLiveRange ifAbsent: [aLiveRange]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> unify: anInstruction liveRangeTo: unified [
 	| range |
 	range := self unifiedLiveRangeOf: anInstruction.
@@ -368,19 +369,19 @@ OptimizingRegisterAllocator >> unify: anInstruction liveRangeTo: unified [
 		do: [:instruction | unifiedLiveRanges at: instruction put: unified]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> use: operand from: anInstruction [
 	self use: operand from: anInstruction in: currentBlock
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> use: operand from: anInstruction in: block [
 	| range |
 	range := self liveRangeOf: operand.
 	range addUseFrom: anInstruction at: block
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> usedRangeLessAccessed [
 	| ranges |
 	ranges := (used copy removeKey: abi regFP) values asOrderedCollection.
@@ -388,7 +389,7 @@ OptimizingRegisterAllocator >> usedRangeLessAccessed [
 		min: [:range | (range allDefinitions , range allUses reject: #isPhi) size]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> usedRangeReadLast [
 	| ranges |
 	ranges := (used copy removeKey: abi regFP) values asOrderedCollection.
@@ -403,7 +404,7 @@ OptimizingRegisterAllocator >> usedRangeReadLast [
 	self error: 'no range found'
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> usedRangeReadLastAfter: first [
 	| ranges |
 	ranges := (used copy removeKey: abi regFP) values asOrderedCollection.
@@ -417,34 +418,34 @@ OptimizingRegisterAllocator >> usedRangeReadLastAfter: first [
 	^ranges first
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> visitBinaryWithConstant: instruction [
 	self use: instruction left from: instruction
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> visitBinaryWithVariable: instruction [
 	self
 		use: instruction left from: instruction;
 		use: instruction right from: instruction
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> visitJump: instruction [
 	
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> visitJumpFalse: instruction [
 	self use: instruction variable from: instruction
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> visitJumpTrue: instruction [
 	self use: instruction variable from: instruction
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> visitLoad: load [
 	| index |
 	self use: load base from: load.
@@ -453,17 +454,17 @@ OptimizingRegisterAllocator >> visitLoad: load [
 		ifTrue: [self use: index from: load]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> visitLoadConstant: instruction [
 	
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> visitLoadImplicit: instruction [
 	
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> visitMessageSend: instruction [
 	self
 		use: instruction receiver
@@ -472,12 +473,12 @@ OptimizingRegisterAllocator >> visitMessageSend: instruction [
 		do: [:operation | self use: operation from: instruction]"
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> visitNullary: instruction [
 	
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> visitPhi: instruction [
 	| unified |
 	unified := OComposedLiveRange new.
@@ -488,21 +489,21 @@ OptimizingRegisterAllocator >> visitPhi: instruction [
 	self unify: instruction liveRangeTo: unified
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> visitReturn: instruction [
 	self
 		use: instruction source from: instruction;
 		use: self activationRecord from: instruction
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> visitStore: store [
 	self use: store base from: store.
 	store index isInteger ifFalse: [self use: store index from: store].
 	self use: store value from: store
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingRegisterAllocator >> visitUnary: instruction [
 	self use: instruction receiver from: instruction
 ]

@@ -1,10 +1,11 @@
 Class {
-	#name : #LiteralBinding,
-	#superclass : #Binding,
-	#category : #'Powerlang-SCompiler-Bindings'
+	#name : 'LiteralBinding',
+	#superclass : 'Binding',
+	#category : 'Powerlang-SCompiler-Bindings',
+	#package : 'Powerlang-SCompiler-Bindings'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 LiteralBinding >> isLiteral [
 	^true
 ]

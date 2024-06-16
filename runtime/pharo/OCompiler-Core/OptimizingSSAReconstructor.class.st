@@ -3,8 +3,8 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OptimizingSSAReconstructor,
-	#superclass : #Object,
+	#name : 'OptimizingSSAReconstructor',
+	#superclass : 'Object',
 	#instVars : [
 		'firstBlock',
 		'variable',
@@ -14,10 +14,11 @@ Class {
 		'insertedPhis',
 		'blocks'
 	],
-	#category : #'OCompiler-Core-Main'
+	#category : 'OCompiler-Core-Main',
+	#package : 'OCompiler-Core-Main'
 }
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingSSAReconstructor >> definitionInBlockFrom: instruction [
 	instruction
 		reverseDo: [:current | (variable == current
@@ -26,13 +27,13 @@ OptimizingSSAReconstructor >> definitionInBlockFrom: instruction [
 	^nil
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingSSAReconstructor >> firstBlock: block [
 	firstBlock := block.
 	idoms := firstBlock dominatorTree allImmediateDominators
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingSSAReconstructor >> insertPhiAt: block [
 	^insertedPhis at: block ifAbsentPut: [| arguments phi predecessors |
 		predecessors := block predecessors.
@@ -44,7 +45,7 @@ OptimizingSSAReconstructor >> insertPhiAt: block [
 		phi]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingSSAReconstructor >> reachingDefinitionFrom: instruction at: block [
 	| current search |
 	current := block.
@@ -57,7 +58,7 @@ OptimizingSSAReconstructor >> reachingDefinitionFrom: instruction at: block [
 		search := current lastInstruction] repeat
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingSSAReconstructor >> reconstructSSA [
 	| frontiers reloadBlocks uses |
 	frontiers := firstBlock dominanceFrontiersUsing: idoms.
@@ -79,7 +80,7 @@ OptimizingSSAReconstructor >> reconstructSSA [
 		use transferUseTo: def]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingSSAReconstructor >> setupFor: anInstruction with: redefinitions [
 	| users |
 	insertedPhis := Dictionary new.

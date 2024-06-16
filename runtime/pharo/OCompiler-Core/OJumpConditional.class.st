@@ -3,16 +3,17 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OJumpConditional,
-	#superclass : #OJump,
+	#name : 'OJumpConditional',
+	#superclass : 'OJump',
 	#instVars : [
 		'variable',
 		'implicitTarget'
 	],
-	#category : #'OCompiler-Core-IR'
+	#category : 'OCompiler-Core-IR',
+	#package : 'OCompiler-Core-IR'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OJumpConditional class >> variable: operation target: explicitTarget implicitTarget: implicitTarget [
 	^self new
 		variable: operation;
@@ -20,17 +21,17 @@ OJumpConditional class >> variable: operation target: explicitTarget implicitTar
 		implicitTarget: implicitTarget
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OJumpConditional >> atOperand: name [
 	^variable
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OJumpConditional >> atOperand: name put: instruction [
 	variable := instruction
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OJumpConditional >> copyTo: copy with: map [
 	super copyTo: copy with: map.
 	copy
@@ -39,27 +40,27 @@ OJumpConditional >> copyTo: copy with: map [
 		variable: (variable duplicateWith: map)
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OJumpConditional >> implicitTarget [
 	^implicitTarget
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OJumpConditional >> implicitTarget: aBasicBlock [
 	implicitTarget := aBasicBlock
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OJumpConditional >> isConditionalJump [
 	^true
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OJumpConditional >> operandsDo: aBlock [
 	aBlock value: variable
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OJumpConditional >> replaceWithUnconditional: condition in: basicBlock [
 	| fixed removed jump |
 	self isJumpTrue == condition
@@ -74,34 +75,34 @@ OJumpConditional >> replaceWithUnconditional: condition in: basicBlock [
 	removed fullyRemovePredecessor: basicBlock
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OJumpConditional >> retargetFrom: aBasicBlock to: otherBasicBlock [
 	target == aBasicBlock ifTrue: [target := otherBasicBlock].
 	implicitTarget == aBasicBlock ifTrue: [implicitTarget := otherBasicBlock]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OJumpConditional >> successorsDo: aBlock [
 	aBlock value: target.
 	aBlock value: implicitTarget
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OJumpConditional >> targets [
 	^super targets add: implicitTarget; yourself
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OJumpConditional >> usesResultOf: anInstruction [
 	^variable == anInstruction
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OJumpConditional >> variable [
 	^variable
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OJumpConditional >> variable: operand [
 	variable := operand.
 	variable addUse: self at: #variable

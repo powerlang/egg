@@ -1,13 +1,15 @@
 Class {
-	#name : #MessageInliner,
-	#superclass : #Object,
+	#name : 'MessageInliner',
+	#superclass : 'Object',
 	#instVars : [
 		'message'
 	],
-	#category : #'Powerlang-SCompiler'
+	#category : 'Powerlang-SCompiler-Frontend',
+	#package : 'Powerlang-SCompiler',
+	#tag : 'Frontend'
 }
 
-{ #category : #transforming }
+{ #category : 'transforming' }
 MessageInliner >> inline: aMessageNode [
 	| s keywords |
 	message := aMessageNode.
@@ -71,7 +73,7 @@ MessageInliner >> inline: aMessageNode [
 		ifTrue: [ self inlineConditional ]
 ]
 
-{ #category : #inlining }
+{ #category : 'inlining' }
 MessageInliner >> inlineConditional [
 	| arguments |
 	arguments := message arguments.
@@ -81,7 +83,7 @@ MessageInliner >> inlineConditional [
 	arguments select: #isBlockNode thenDo: #beInlined
 ]
 
-{ #category : #inlining }
+{ #category : 'inlining' }
 MessageInliner >> inlineIfNilIfNotNil [
 	| arguments arg |
 	arguments := message arguments.
@@ -95,7 +97,7 @@ MessageInliner >> inlineIfNilIfNotNil [
 	
 ]
 
-{ #category : #inlining }
+{ #category : 'inlining' }
 MessageInliner >> inlineIfNotNil [
 	| arguments arg |
 	arguments := message arguments.
@@ -107,7 +109,7 @@ MessageInliner >> inlineIfNotNil [
 	arg isBlockNode ifTrue: [arg beInlined]
 ]
 
-{ #category : #inlining }
+{ #category : 'inlining' }
 MessageInliner >> inlineIfNotNilIfNil [
 	| arguments arg |
 	arguments := message arguments.
@@ -120,7 +122,7 @@ MessageInliner >> inlineIfNotNilIfNil [
 	arguments select: #isBlockNode thenDo: #beInlined
 ]
 
-{ #category : #transforming }
+{ #category : 'transforming' }
 MessageInliner >> inlineRepeat [
 	| receiver arguments |
 	receiver := message receiver.
@@ -135,7 +137,7 @@ MessageInliner >> inlineRepeat [
 	receiver beInlined
 ]
 
-{ #category : #inlining }
+{ #category : 'inlining' }
 MessageInliner >> inlineToByDo [
 	| arguments arg step |
 	arguments := message arguments.
@@ -149,7 +151,7 @@ MessageInliner >> inlineToByDo [
 	arg beInlined
 ]
 
-{ #category : #inlining }
+{ #category : 'inlining' }
 MessageInliner >> inlineToDo [
 	| arguments last |
 	arguments := message arguments.
@@ -161,7 +163,7 @@ MessageInliner >> inlineToDo [
 	last beInlined
 ]
 
-{ #category : #transforming }
+{ #category : 'transforming' }
 MessageInliner >> inlineUnitaryWhile [
 	| receiver arguments |
 	receiver := message receiver.
@@ -174,7 +176,7 @@ MessageInliner >> inlineUnitaryWhile [
 		receiver beInlined]
 ]
 
-{ #category : #inlining }
+{ #category : 'inlining' }
 MessageInliner >> inlineWhile [
 	| receiver arguments |
 	receiver := message receiver.

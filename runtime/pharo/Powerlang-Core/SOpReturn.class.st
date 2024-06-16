@@ -1,12 +1,10 @@
 Class {
-	#name : 'SOpReturn',
-	#superclass : 'SOperation',
-	#category : 'Powerlang-Core-SExpressions',
-	#package : 'Powerlang-Core',
-	#tag : 'SExpressions'
+	#name : #SOpReturn,
+	#superclass : #SOperation,
+	#category : 'Powerlang-Core-SExpressions'
 }
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SOpReturn >> acceptVisitor: visitor [
 	^ visitor visitOpReturn: self
 ]

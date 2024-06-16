@@ -1,1 +1,1 @@
-Package { #name : #'OCompiler-Core' }
+Package { #name : 'OCompiler-Core' }

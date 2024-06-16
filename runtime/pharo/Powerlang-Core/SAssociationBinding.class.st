@@ -1,51 +1,49 @@
 Class {
-	#name : 'SAssociationBinding',
-	#superclass : 'SBinding',
+	#name : #SAssociationBinding,
+	#superclass : #SBinding,
 	#instVars : [
 		'index',
 		'association'
 	],
-	#category : 'Powerlang-Core-SExpressions',
-	#package : 'Powerlang-Core',
-	#tag : 'SExpressions'
+	#category : 'Powerlang-Core-SExpressions'
 }
 
-{ #category : 'testing' }
+{ #category : #testing }
 SAssociationBinding >> assign: value within: anEvaluationContext [
 	anEvaluationContext storeAssociation: association value: value
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 SAssociationBinding >> association [
 	^association
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 SAssociationBinding >> association: anAssociation [
 	association := anAssociation
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 SAssociationBinding >> index [ 
 	^ index
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 SAssociationBinding >> index: anInteger [
 	 index := anInteger 
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 SAssociationBinding >> isAssociation [
 	^true
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 SAssociationBinding >> isConstant [
 	^ false
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 SAssociationBinding >> valueWithin: anEvaluationContext [
 	^ anEvaluationContext loadAssociationValue: association
 ]

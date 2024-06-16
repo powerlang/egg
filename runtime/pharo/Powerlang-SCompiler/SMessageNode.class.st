@@ -1,42 +1,43 @@
 Class {
-	#name : #SMessageNode,
-	#superclass : #SParseNode,
+	#name : 'SMessageNode',
+	#superclass : 'SParseNode',
 	#instVars : [
 		'selector',
 		'receiver',
 		'arguments',
 		'inlined'
 	],
-	#category : #'Powerlang-SCompiler-Parser'
+	#category : 'Powerlang-SCompiler-Parser',
+	#package : 'Powerlang-SCompiler-Parser'
 }
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SMessageNode >> acceptVisitor: visitor [
 	^visitor visitMessage: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SMessageNode >> arguments [
 	^arguments
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SMessageNode >> arguments: aCollection [
 	arguments := aCollection
 ]
 
-{ #category : #'emitting - inlined' }
+{ #category : 'emitting - inlined' }
 SMessageNode >> beInlined [
 	inlined := true
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SMessageNode >> hasAssign [
 	receiver hasAssign ifTrue: [^true].
 	^arguments anySatisfy: [:arg | arg hasAssign]
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SMessageNode >> hasVolatileArguments [
 	^arguments anySatisfy: [:arg | 
 		arg isIdentifier
@@ -44,35 +45,35 @@ SMessageNode >> hasVolatileArguments [
 			ifFalse: [arg isBlockNode not andNot: [arg isLiteral]]]
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SMessageNode >> hasVolatileReceiver [
 	^ compiler hasBlocks
 		  or: [ receiver isMethodTemporary not ]
 		  or: [ arguments anySatisfy: [ :arg | arg hasAssign ] ]
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SMessageNode >> initialize [
 	super initialize.
 	inlined := false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SMessageNode >> isCascadeMessage [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SMessageNode >> isInlined [
 	^inlined
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SMessageNode >> isMessageNode [
 	^true
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SMessageNode >> needsStrictEvaluationOrder [
 	arguments size = 0 ifTrue: [^false].
 	receiver isBlockNode ifTrue: [^false].
@@ -89,7 +90,7 @@ SMessageNode >> needsStrictEvaluationOrder [
 	^self hasVolatileArguments
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 SMessageNode >> nodesDo: aBlock includingDeclarations: aBoolean [
 	super nodesDo: aBlock includingDeclarations: aBoolean.
 	receiver nodesDo: aBlock includingDeclarations: aBoolean.
@@ -97,27 +98,27 @@ SMessageNode >> nodesDo: aBlock includingDeclarations: aBoolean [
 	selector nodesDo: aBlock includingDeclarations: aBoolean
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SMessageNode >> receiver [
 	^receiver
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SMessageNode >> receiver: node [
 	receiver := node
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SMessageNode >> selector [
 	^selector
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SMessageNode >> selector: node [
 	selector := node
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SMessageNode >> symbol [
 	^selector symbol
 ]

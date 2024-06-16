@@ -3,8 +3,8 @@ Copyright (c) 2024 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : 'ModuleSpec',
-	#superclass : 'Object',
+	#name : #ModuleSpec,
+	#superclass : #Object,
 	#instVars : [
 		'name',
 		'description',
@@ -18,27 +18,25 @@ Class {
 		'ClassInstVarNames',
 		'MetaclassInstVarNames'
 	],
-	#category : 'Powerlang-Core-CodeSpecs',
-	#package : 'Powerlang-Core',
-	#tag : 'CodeSpecs'
+	#category : #'Powerlang-Core-CodeSpecs'
 }
 
-{ #category : 'instance creation' }
+{ #category : #'instance creation' }
 ModuleSpec class >> new [
 	^super new initialize
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 ModuleSpec >> addClass: aClassSpec [
 	classes add: aClassSpec
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 ModuleSpec >> addClassExtension: aClassSpec [
 	^extendedClasses add: aClassSpec
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 ModuleSpec >> addClassExtensionNamed: classname [
 
 	| class metaclass |
@@ -48,12 +46,32 @@ ModuleSpec >> addClassExtensionNamed: classname [
 	^ self addClassExtension: class
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
+ModuleSpec >> addClassFromDefinition: aClassDefinition [
+	| class metaclass |
+	class := ClassSpec new.
+	metaclass := MetaclassSpec new
+		             instanceClass: class;
+		             module: self;
+		             ivars: aClassDefinition classInstVarNames.
+	class
+		module: self;
+		metaclass: metaclass;
+		name: aClassDefinition className;
+		supername: aClassDefinition superclassName;
+		ivars: aClassDefinition instVarNames asOrderedCollection;
+		cvars: aClassDefinition classVariables.
+	aClassDefinition instancesAreArrayed ifTrue: [ class beArrayed ].
+	aClassDefinition instancesHavePointers ifFalse: [ class beBytes ].
+	^ self addClass: class
+]
+
+{ #category : #'adding / removing' }
 ModuleSpec >> addClasses: aCollection [
 	aCollection do: [:c | self addClass: c]
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 ModuleSpec >> addDependencies: aCollection [
 	aCollection keysAndValuesDo: [:dep :objects | 
 		dependencies
@@ -62,34 +80,34 @@ ModuleSpec >> addDependencies: aCollection [
 			ifPresent: [:current | (current addAll: objects) withoutDuplicates]]
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 ModuleSpec >> addImport: anAssociation [
 	imports add: anAssociation
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 ModuleSpec >> addImports: aCollection [
 	aCollection do: [:token | self addImport: token asSymbol -> nil]
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 ModuleSpec >> addSubclassifiedClass: aClassSpec [
 
 	subclassifiedClasses addIfNotPresent: aClassSpec
 ]
 
-{ #category : 'inquiries' }
+{ #category : #inquiries }
 ModuleSpec >> allClasses [
 	^classes , extendedClasses
 ]
 
-{ #category : 'enumerating' }
+{ #category : #enumerating }
 ModuleSpec >> allClassesDo: aBlock [
 	classes do: aBlock.
 	extendedClasses do: aBlock
 ]
 
-{ #category : 'enumerating' }
+{ #category : #enumerating }
 ModuleSpec >> allMethods [
 	| methods |
 	methods := OrderedCollection new.
@@ -97,24 +115,24 @@ ModuleSpec >> allMethods [
 	^methods
 ]
 
-{ #category : 'enumerating' }
+{ #category : #enumerating }
 ModuleSpec >> allMethodsDo: aBlock [
 	self allClassesDo: [:c | 
 		c metaclass methods do: aBlock.
 		c methods do: aBlock]
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 ModuleSpec >> associationAt: aSymbol ifAbsent: aBlock [
 	^imports associationAt: aSymbol ifAbsent: aBlock
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ModuleSpec >> at: aSymbol [
 	^self at: aSymbol ifAbsent: nil
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ModuleSpec >> at: aSymbol ifAbsent: aBlock [
 
 	| string |
@@ -131,7 +149,7 @@ ModuleSpec >> at: aSymbol ifAbsent: aBlock [
 	^ imports at: aSymbol ifAbsent: aBlock
 ]
 
-{ #category : 'resolving' }
+{ #category : #resolving }
 ModuleSpec >> basicResolveClass: aString [
 	classes do: [:c | c name asString = aString ifTrue: [^c]].
 	extendedClasses do: [:c | c name asString = aString ifTrue: [^c]].
@@ -139,24 +157,24 @@ ModuleSpec >> basicResolveClass: aString [
 	^nil
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 ModuleSpec >> classInstVarNames [
 
 	^ ClassInstVarNames
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 ModuleSpec >> classInstVarNames: anArray [
 
 	ClassInstVarNames := anArray
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ModuleSpec >> classes [
 	^classes
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 ModuleSpec >> cleanDependencies [
 	| needed |
 	needed := OrderedCollection new.
@@ -169,37 +187,37 @@ ModuleSpec >> cleanDependencies [
 			ifFalse: [dependencies removeKey: module]]
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 ModuleSpec >> definesClassNamed: aString [
 	^classes anySatisfy: [:c | c name = aString]
 ]
 
-{ #category : 'resolving' }
+{ #category : #resolving }
 ModuleSpec >> definesGlobal: aString [
 	^classes anySatisfy: [:c | c name = aString]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ModuleSpec >> dependencies [
 	^dependencies
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ModuleSpec >> dependencies: aDictionary [
 	dependencies := aDictionary
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ModuleSpec >> description [
 	^description
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ModuleSpec >> description: aString [
 	description := aString
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 ModuleSpec >> ensureClassNamed: classname [
 
 	| class |
@@ -207,17 +225,17 @@ ModuleSpec >> ensureClassNamed: classname [
 	^ class ifNil: [ self addClassExtensionNamed: classname ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ModuleSpec >> extendedClasses [
 	^extendedClasses
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 ModuleSpec >> extendsClassNamed: aString [
 	^extendedClasses anySatisfy: [:c | c name = aString]
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 ModuleSpec >> hierarchyReferences [
 	| references |
 	references := Dictionary new.
@@ -228,12 +246,12 @@ ModuleSpec >> hierarchyReferences [
 	^references
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 ModuleSpec >> includesClass: aClassSpec [
 	^(self resolveClass: aClassSpec) notNil
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 ModuleSpec >> initialize [
 	classes := OrderedCollection new.
 	extendedClasses := OrderedCollection new.
@@ -242,7 +260,7 @@ ModuleSpec >> initialize [
 	dependencies := Dictionary new
 ]
 
-{ #category : 'enumerating' }
+{ #category : #enumerating }
 ModuleSpec >> initializeConstants [
 
 	| ivars |
@@ -253,7 +271,7 @@ ModuleSpec >> initializeConstants [
 
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ModuleSpec >> metaclassAt: aSymbol ifAbsent: aBlock [
 
 	| class |
@@ -261,19 +279,19 @@ ModuleSpec >> metaclassAt: aSymbol ifAbsent: aBlock [
 	^class metaclass
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 ModuleSpec >> metaclassInstVarNames [
 
 	^ MetaclassInstVarNames
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 ModuleSpec >> metaclassInstVarNames: anArray [
 
 	MetaclassInstVarNames := anArray
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 ModuleSpec >> methodReferences [
 	| references |
 	references := Dictionary new.
@@ -284,17 +302,17 @@ ModuleSpec >> methodReferences [
 	^references
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ModuleSpec >> name [
 	^name
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ModuleSpec >> name: aString [
 	name := aString
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 ModuleSpec >> printOn: aStream [
 	aStream
 		nextPut: $<;
@@ -302,7 +320,7 @@ ModuleSpec >> printOn: aStream [
 		nextPutAll: '> module'
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ModuleSpec >> referencedGlobals [
 	| referenced |
 	referenced := Dictionary new.
@@ -318,55 +336,55 @@ ModuleSpec >> referencedGlobals [
 	^referenced
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 ModuleSpec >> removeCategory: aSymbol inClass: aClassSpec [
 	| class |
 	class := self resolveClass: aClassSpec.
 	class removeCategory: aSymbol
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 ModuleSpec >> removeClass: aClassSpec [
 	| class |
 	class := self resolveClass: aClassSpec.
 	classes remove: class ifAbsent: nil
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 ModuleSpec >> removeEmptyExtensions [
 	extendedClasses copy
 		reject: #hasMethods
 		thenDo: [:c | extendedClasses remove: c]
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 ModuleSpec >> removeExtendedClass: aClassSpec [
 	| class |
 	class := self resolveClass: aClassSpec.
 	extendedClasses remove: class ifAbsent: nil
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 ModuleSpec >> removeMethod: aMethodSpec [
 	self ASSERT: (self includesClass: aMethodSpec classBinding).
 	aMethodSpec classBinding removeMethod: aMethodSpec
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 ModuleSpec >> removeSelectors: aCollection [
 	self allClassesDo: [:c | 
 		c removeSelectors: aCollection.
 		c metaclass removeSelectors: aCollection]
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 ModuleSpec >> removeSelectors: aCollection inClass: aClassSpec [
 	| class |
 	class := self resolveClass: aClassSpec.
 	class removeSelectors: aCollection
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 ModuleSpec >> removeSelectors: aCollection inScope: aClassSpec [
 	| class all |
 	class := self resolveClass: aClassSpec.
@@ -374,21 +392,21 @@ ModuleSpec >> removeSelectors: aCollection inScope: aClassSpec [
 	all do: [:c | c removeSelectors: aCollection]
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 ModuleSpec >> removeSubclassesOf: aClassSpec [
 	| class |
 	class := self resolveClass: aClassSpec.
 	class allSubclasses do: [:c | self removeClass: c; removeExtendedClass: c]
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 ModuleSpec >> removeSubclassifiedClass: aClassSpec [
 	| class |
 	class := self resolveClass: aClassSpec.
 	subclassifiedClasses remove: class ifAbsent: nil
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ModuleSpec >> requiredImports [
 	| required |
 	required := Dictionary new.
@@ -398,7 +416,7 @@ ModuleSpec >> requiredImports [
 	^required
 ]
 
-{ #category : 'resolving' }
+{ #category : #resolving }
 ModuleSpec >> resolveClass: class [
 	| moniker metaclass found |
 	moniker := class isString ifTrue: [class] ifFalse: [class name].
@@ -408,7 +426,7 @@ ModuleSpec >> resolveClass: class [
 	^found ifNotNil: [metaclass ifTrue: [found metaclass] ifFalse: [found]]
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 ModuleSpec >> sortedClasses [
 	| remaining sorted |
 	remaining := classes copy.
@@ -423,12 +441,12 @@ ModuleSpec >> sortedClasses [
 	^sorted
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 ModuleSpec >> subclassifiesClassNamed: aString [
 	^subclassifiedClasses anySatisfy: [:c | c name = aString]
 ]
 
-{ #category : 'services' }
+{ #category : #services }
 ModuleSpec >> withAllSubclasses: aClassSpec [
 	| all |
 	all := self allClasses.

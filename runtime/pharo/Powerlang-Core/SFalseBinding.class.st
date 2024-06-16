@@ -1,22 +1,20 @@
 Class {
-	#name : 'SFalseBinding',
-	#superclass : 'SLiteralBinding',
-	#category : 'Powerlang-Core-SExpressions',
-	#package : 'Powerlang-Core',
-	#tag : 'SExpressions'
+	#name : #SFalseBinding,
+	#superclass : #SLiteralBinding,
+	#category : 'Powerlang-Core-SExpressions'
 }
 
-{ #category : 'printing' }
+{ #category : #printing }
 SFalseBinding >> printOn: aStream [
 	aStream nextPutAll: 'FalseId'
 ]
 
-{ #category : 'printing' }
+{ #category : #printing }
 SFalseBinding >> value [
 	^false
 ]
 
-{ #category : 'printing' }
+{ #category : #printing }
 SFalseBinding >> valueWithin: anEvaluationContext [
 	^ anEvaluationContext false
 ]

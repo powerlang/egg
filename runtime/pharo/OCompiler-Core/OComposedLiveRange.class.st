@@ -3,50 +3,51 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OComposedLiveRange,
-	#superclass : #OLiveRange,
+	#name : 'OComposedLiveRange',
+	#superclass : 'OLiveRange',
 	#instVars : [
 		'ranges'
 	],
-	#category : #'OCompiler-Core-IR'
+	#category : 'OCompiler-Core-IR',
+	#package : 'OCompiler-Core-IR'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OComposedLiveRange >> add: range [
 	ranges add: range
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OComposedLiveRange >> addAll: range [
 	ranges addAll: range
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OComposedLiveRange >> allDefinitions [
 	^ranges gather: #allDefinitions
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OComposedLiveRange >> allUses [
 	^ranges gather: #allUses
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OComposedLiveRange >> anyDefinition [
 	^ranges last anyDefinition
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OComposedLiveRange >> definitionsWithBlocksDo: aBlock [
 	^ranges do: [:range | range definitionsWithBlocksDo: aBlock]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OComposedLiveRange >> endsAt: operation [
 	^false
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OComposedLiveRange >> expirationPoints [
 	| definitions uses |
 	definitions := self allDefinitions.
@@ -57,40 +58,40 @@ OComposedLiveRange >> expirationPoints [
 		thenCollect: #key
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OComposedLiveRange >> initialize [
 	ranges := OrderedCollection new
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OComposedLiveRange >> isLiveAt: aBlock [
 	^self allDefinitions
 		anySatisfy: [:def | def livesAfter: aBlock orOutOf: aBlock]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OComposedLiveRange >> isSpilled [
 	^ranges anySatisfy: #isSpilled
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OComposedLiveRange >> printOn: aStream [
 	| rangesStrings |
 	rangesStrings := (ranges collect: #printString) gather: [:x | x , String cr].
 	aStream nextPutAll: 'CLR: ' , String cr , rangesStrings
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OComposedLiveRange >> simpleRanges [
 	^ranges
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OComposedLiveRange >> startsAt: operation [
 	^ranges anySatisfy: [:range | range startsAt: operation]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OComposedLiveRange >> usesWithBlocksDo: aBlock [
 	^ranges do: [:range | range usesWithBlocksDo: aBlock]
 ]

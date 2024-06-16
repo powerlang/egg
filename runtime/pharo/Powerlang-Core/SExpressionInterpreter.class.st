@@ -1,6 +1,6 @@
 Class {
-	#name : 'SExpressionInterpreter',
-	#superclass : 'Object',
+	#name : #SExpressionInterpreter,
+	#superclass : #Object,
 	#instVars : [
 		'receiver',
 		'arguments',
@@ -16,17 +16,15 @@ Class {
 	#pools : [
 		'ClosureElementTypes'
 	],
-	#category : 'Powerlang-Core-Metaphysics',
-	#package : 'Powerlang-Core',
-	#tag : 'Metaphysics'
+	#category : 'Powerlang-Core-Metaphysics'
 }
 
-{ #category : 'instance creation' }
+{ #category : #'instance creation' }
 SExpressionInterpreter class >> new [
 	^self basicNew initialize
 ]
 
-{ #category : 'instance creation' }
+{ #category : #'instance creation' }
 SExpressionInterpreter class >> on: receiverMirror with: arguments for: method [
 	^self new
 		receiver: receiverMirror;
@@ -34,7 +32,7 @@ SExpressionInterpreter class >> on: receiverMirror with: arguments for: method [
 		method: method
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> argumentAt: index in: anInteger [
 	| env |
 	anInteger ifNil: [ ^arguments at: index ].
@@ -42,15 +40,15 @@ SExpressionInterpreter >> argumentAt: index in: anInteger [
 	^env at: index.
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> arguments: aCollection [
 	arguments := aCollection
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> captureClosure: anSBlock [
 	| closure s i type env arg |
-	closure := anSBlock compiledCode newClosure home: self.
+	closure := self newClosureFor: anSBlock compiledCode.
 	s := anSBlock capturedVariables readStream.
 	i := 1.
 	[ s atEnd ]
@@ -69,17 +67,17 @@ SExpressionInterpreter >> captureClosure: anSBlock [
 	^ closure
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> dispatch: message to: msgReceiver [
 	^ self subclassResponsibility
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> dispatchSpecial: message [
 		^self subclassResponsibility 
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> environmentFor: anInteger [
 	"
 	-1: inlined argument.
@@ -93,28 +91,28 @@ SExpressionInterpreter >> environmentFor: anInteger [
 	^ environment at: anInteger
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> evaluate: anSCompiledMethod [
 	method := anSCompiledMethod.
 	^ self visitMethod: anSCompiledMethod sexpressions
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> evaluateClosure: aPClosure [
 	^self evaluateClosure: aPClosure withArgs: {}
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> evaluateClosure: aPClosure with: anObject [
 	 ^self evaluateClosure: aPClosure withArgs: { anObject }
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> evaluateClosure: aPClosure with: anObject with: anotherObject [
 	^ self evaluateClosure: aPClosure withArgs: {anObject. anotherObject}
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 SExpressionInterpreter >> evaluateClosure: aPClosure withArgs: anArray [
 	| oldArgs oldTemps oldEnv block sblock result |
 	block := aPClosure block.
@@ -135,39 +133,39 @@ SExpressionInterpreter >> evaluateClosure: aPClosure withArgs: anArray [
 	^ result
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> initialize [
 	returned := false.
 	blockTreecodes := IdentityDictionary new
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> instVarAt: anInteger [
 	^receiver _gate slotAt: anInteger
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> instVarAt: index put: aValue [
 	^ receiver _gate handle slotAt: index put: aValue _gate handle oid
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> isSpecial: aSelectorMirror [
 	^ self subclassResponsibility 
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> method [
 	^method
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 SExpressionInterpreter >> method: aCompiledMethod [
 	method := aCompiledMethod.
 	temporaries := Array new: aCompiledMethod tempCount.
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> mirageOnBoolean: aBoolean [
 	| runtime handle |
 	runtime := receiver _gate handle runtime.
@@ -175,7 +173,7 @@ SExpressionInterpreter >> mirageOnBoolean: aBoolean [
 	^ handle mirage
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> mirageOnInteger: anInteger [
 	| runtime handle |
 	runtime := receiver _gate handle runtime.
@@ -183,23 +181,30 @@ SExpressionInterpreter >> mirageOnInteger: anInteger [
 	^ handle mirage
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> mirageOnObject: anObject [
 	anObject isSmallInteger ifTrue: [ ^ self mirageOnInteger: anObject ].
 	self ASSERT: false
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
+SExpressionInterpreter >> newClosureFor: anSCompiledBlock [
+	| closure |
+	closure := SClosure new: anSCompiledBlock environmentCount.
+	^ closure block: anSCompiledBlock; home: self
+]
+
+{ #category : #visiting }
 SExpressionInterpreter >> parent [
 	^parent
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> parent: anInterpreter [
 	parent := anInterpreter
 ]
 
-{ #category : 'printing' }
+{ #category : #printing }
 SExpressionInterpreter >> printOn: aStream [
 	aStream
 		nextPutAll: self class name withArticle;
@@ -223,23 +228,23 @@ SExpressionInterpreter >> printOn: aStream [
 	aStream nextPutAll: method source
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> receiver [
 	^receiver
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> receiver: anObject [
 	receiver := anObject.
 	returnValue := anObject
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> subjectOn: anObjectHandle [
 	^ anObjectHandle maneuverer
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> subjectOnBoolean: aBoolean in: aRuntime [
 	| t f |
 	^ aBoolean
@@ -247,22 +252,22 @@ SExpressionInterpreter >> subjectOnBoolean: aBoolean in: aRuntime [
 		ifFalse: [ f := aRuntime false. f oid = false ifTrue: [ f mirage ] ifFalse: [ f maneuverer]] 
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> subjectOnInteger: anInteger in: aRuntime [
 	^ (aRuntime integerHandle: anInteger) maneuverer
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> subjectOnObject: anObjectHandle [
 	^ anObjectHandle maneuverer
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> subjectOnObjectOk: anObjectHandle [
 	^ self maneuvererOn: anObjectHandle
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> temporaryAt: index in: anInteger [
 	| env |
 	anInteger ifNil: [ ^ temporaries at: index ].
@@ -270,7 +275,7 @@ SExpressionInterpreter >> temporaryAt: index in: anInteger [
 	^ env at: index
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> temporaryAt: index in: anInteger put: aValue [
 	| env |
 	anInteger ifNil: [ ^ temporaries	at:index put: aValue ].
@@ -278,12 +283,12 @@ SExpressionInterpreter >> temporaryAt: index in: anInteger put: aValue [
 	^ env at: index put: aValue
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> visitArgument: anSIdentifier [
 	^arguments at: anSIdentifier binding index
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> visitAssignment: anSAssignment [
 	| result |
 	result := anSAssignment expression acceptVisitor: self.
@@ -292,11 +297,11 @@ SExpressionInterpreter >> visitAssignment: anSAssignment [
 	^result
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> visitBlock: anSBlock [
 	| closure handle |
 	closure := anSBlock isInlined
-				   ifTrue: [ SCompiledBlock new newClosure home: self ]
+				   ifTrue: [ self newClosureFor: SCompiledBlock new ]
 				   ifFalse: [ self captureClosure: anSBlock ].
 	blockTreecodes at: closure block put: anSBlock.
 	self halt.
@@ -304,13 +309,13 @@ SExpressionInterpreter >> visitBlock: anSBlock [
 	^ handle mirage
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> visitIdentifier: anSIdentifier [
 	^anSIdentifier binding valueWithin: self.
 
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> visitMessage: anSMessage [
 	| msgReceiver msgArguments selector message |
 	msgReceiver := anSMessage receiver acceptVisitor: self.
@@ -327,7 +332,7 @@ SExpressionInterpreter >> visitMessage: anSMessage [
 	^self dispatch: message to: msgReceiver
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> visitMethod: anSMethod [
 	| primitive value |
 	primitive := anSMethod primitive.
@@ -337,14 +342,14 @@ SExpressionInterpreter >> visitMethod: anSMethod [
 	^returned ifTrue: [ value ] ifFalse: [ receiver ]
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> visitReturn: anSReturn [
 	returnValue := anSReturn expression acceptVisitor: self.
 	returned := true.
 	^returnValue
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> visitScript: anSScript [
 	| result |
 	anSScript statements do: [:node | 
@@ -354,7 +359,7 @@ SExpressionInterpreter >> visitScript: anSScript [
 	^result
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SExpressionInterpreter >> visitTemporary: anSIdentifier [
 	^temporaries at: anSIdentifier binding index
 ]

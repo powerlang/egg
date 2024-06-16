@@ -3,38 +3,39 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OReturn,
-	#superclass : #OInstruction,
+	#name : 'OReturn',
+	#superclass : 'OInstruction',
 	#instVars : [
 		'source',
 		'frame'
 	],
-	#category : #'OCompiler-Core-IR'
+	#category : 'OCompiler-Core-IR',
+	#package : 'OCompiler-Core-IR'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OReturn >> atOperand: name [
 	^name == #source ifTrue: [source] ifFalse: [frame]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OReturn >> atOperand: name put: instruction [
 	^name == #source
 		ifTrue: [source := instruction]
 		ifFalse: [frame := instruction]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OReturn >> basicAcceptVisitor: aVisitor [
 	^aVisitor visitReturn: self
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OReturn >> basicPrintString [
 	^'[ret ' , source primitivePrintString , ']'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OReturn >> copyTo: copy with: map [
 	super copyTo: copy with: map.
 	copy
@@ -42,45 +43,45 @@ OReturn >> copyTo: copy with: map [
 		frame: (frame duplicateWith: map)
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OReturn >> frame: anInstruction [
 	frame := anInstruction.
 	frame addUse: self at: #frame
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OReturn >> isReturn [
 	^true
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OReturn >> operandsDo: aBlock [
 	aBlock value: source.
 	aBlock value: frame
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OReturn >> primitivePrintString [
 	^'{ret}'
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 OReturn >> printStringUsing: names [
 	^'ret ' , (names at: source ifAbsent: '?') , ''
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OReturn >> source [
 	^source
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OReturn >> source: anInstruction [
 	source := anInstruction.
 	source addUse: self at: #source
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OReturn >> usesResultOf: anInstruction [
 	^source == anInstruction or: [frame == anInstruction]
 ]

@@ -3,20 +3,21 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OBlockClosure,
-	#superclass : #OInstruction,
+	#name : 'OBlockClosure',
+	#superclass : 'OInstruction',
 	#instVars : [
 		'firstBlock'
 	],
-	#category : #'OCompiler-Core-IR'
+	#category : 'OCompiler-Core-IR',
+	#package : 'OCompiler-Core-IR'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBlockClosure class >> containing: initialBlock [
 	^self new firstBlock: initialBlock
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OBlockClosure >> copyTo: copy with: map [
 	| first |
 	super copyTo: copy with: map.
@@ -24,43 +25,43 @@ OBlockClosure >> copyTo: copy with: map [
 	copy firstBlock: first
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBlockClosure >> dissolveDeep [
 	firstBlock withSuccessorsDo: [:block | block dissolveAllInstructions].
 	super dissolveDeep
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBlockClosure >> firstBlock [
 	^firstBlock
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBlockClosure >> firstBlock: basicBlock [
 	firstBlock := basicBlock
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBlockClosure >> isBlockClosure [
 	^true
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBlockClosure >> isUseless [
 	^firstUse isNil
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBlockClosure >> lastBlock [
 	^firstBlock lastBlock
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBlockClosure >> lastValue [
 	^firstBlock lastBlock lastValue
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OBlockClosure >> operandsDo: aBlock [
 	
 ]

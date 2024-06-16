@@ -3,23 +3,24 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OptimizingMethodInliner,
-	#superclass : #Object,
+	#name : 'OptimizingMethodInliner',
+	#superclass : 'Object',
 	#instVars : [
 		'firstBlock',
 		'methods',
 		'environment',
 		'changed'
 	],
-	#category : #'OCompiler-Core-Main'
+	#category : 'OCompiler-Core-Main',
+	#package : 'OCompiler-Core-Main'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingMethodInliner class >> on: basicBlock [
 	^self new firstBlock: basicBlock
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingMethodInliner >> bindArgumentsOf: firstBlockInlined with: aMessageSend [
 	| inlined args |
 	inlined := firstBlockInlined activationRecord.
@@ -31,7 +32,7 @@ OptimizingMethodInliner >> bindArgumentsOf: firstBlockInlined with: aMessageSend
 	inlined receiver replaceAllUsesWith: aMessageSend receiver; dissolve
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingMethodInliner >> bindTemporariesOf: inlinedFrame [
 	| inlinerFrame current added |
 	inlinerFrame := firstBlock activationRecord.
@@ -51,7 +52,7 @@ OptimizingMethodInliner >> bindTemporariesOf: inlinedFrame [
 		dissolve
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingMethodInliner >> bindTemporariesOf: inlinedFrame into: inlinerFrame [
 	| current added |
 	current := inlinerFrame temporaries.
@@ -71,12 +72,12 @@ OptimizingMethodInliner >> bindTemporariesOf: inlinedFrame into: inlinerFrame [
 		dissolve
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingMethodInliner >> blockInliner [
 	^OptimizingBlockInliner new inlinerActivation: firstBlock activationRecord
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingMethodInliner >> booleanInliner: selector [
 	| dispatcher types |
 	dispatcher := self newDispatcher.
@@ -86,33 +87,33 @@ OptimizingMethodInliner >> booleanInliner: selector [
 	^dispatcher types: types
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingMethodInliner >> dynamicDispatch [
 	^self newDispatcher
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingMethodInliner >> environment [
 	^environment
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingMethodInliner >> environment: aNativizationEnvironment [
 	environment := aNativizationEnvironment.
 	self methods: environment inlinedMethods
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingMethodInliner >> firstBlock: aBasicBlock [
 	firstBlock := aBasicBlock
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingMethodInliner >> initialize [
 	methods := Dictionary new
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingMethodInliner >> inlineAllMessages [
 	[
 		changed := false.
@@ -124,13 +125,13 @@ OptimizingMethodInliner >> inlineAllMessages [
 		changed] whileTrue
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingMethodInliner >> isBooleanMessage: selector [
 	^#(#ifTrue: #ifFalse: #ifTrue:ifFalse: #ifFalse:ifTrue: #and: #or:)
 		includes: selector
 ]
 
-{ #category : #json }
+{ #category : 'json' }
 OptimizingMethodInliner >> lookup: aMessageSend [
 	| receiver selector |
 	receiver := aMessageSend receiver.
@@ -143,7 +144,7 @@ OptimizingMethodInliner >> lookup: aMessageSend [
 	^self dynamicDispatch
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingMethodInliner >> lookup: selector for: constant [
 	| behavior method |
 	behavior := constant behavior.
@@ -153,27 +154,27 @@ OptimizingMethodInliner >> lookup: selector for: constant [
 	^self newDispatcher types: {behavior -> method}
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingMethodInliner >> methodForSelector: selector [
 	^methods at: selector ifAbsent: nil
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingMethodInliner >> methods: inlinedMethods [
 	inlinedMethods do: [:m | methods at: m selector put: m]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingMethodInliner >> newDispatcher [
 	^ODispatchInliner new methodInliner: self
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingMethodInliner >> staticInliner: method [
 	^self newDispatcher types: {nil -> method}
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingMethodInliner >> tryOptimizingSend: aMessageSend in: aBasicBlock [
 	| inliner |
 	inliner := self lookup: aMessageSend.

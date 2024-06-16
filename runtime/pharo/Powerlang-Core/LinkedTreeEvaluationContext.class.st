@@ -1,12 +1,10 @@
 Class {
-	#name : 'LinkedTreeEvaluationContext',
-	#superclass : 'IterativeLinkedEvaluationContext',
-	#category : 'Powerlang-Core-Execution',
-	#package : 'Powerlang-Core',
-	#tag : 'Execution'
+	#name : #LinkedTreeEvaluationContext,
+	#superclass : #IterativeLinkedEvaluationContext,
+	#category : 'Powerlang-Core-Execution'
 }
 
-{ #category : 'instance creation' }
+{ #category : #'instance creation' }
 LinkedTreeEvaluationContext class >> new [
 	"return an initialized instance"
 
@@ -14,35 +12,35 @@ LinkedTreeEvaluationContext class >> new [
 
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedTreeEvaluationContext >> beBlock [
 	super beBlock.
 	work := OrderedCollection new: 5.
 
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedTreeEvaluationContext >> hasWork [
 	^work notEmpty
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedTreeEvaluationContext >> initialize [
 	super initialize.
 	work := OrderedCollection new: 5
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedTreeEvaluationContext >> popOperation [
 	^ work removeLast
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedTreeEvaluationContext >> pushOperation: anSExpression [
 	work add: anSExpression
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedTreeEvaluationContext >> restart [
 	super restart.
 		work reset.

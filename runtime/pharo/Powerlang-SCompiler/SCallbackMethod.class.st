@@ -1,15 +1,16 @@
 Class {
-	#name : #SCallbackMethod,
-	#superclass : #SCompiledMethod,
-	#type : #variable,
+	#name : 'SCallbackMethod',
+	#superclass : 'SCompiledMethod',
+	#type : 'variable',
 	#instVars : [
 		'receiver',
 		'descriptor'
 	],
-	#category : #'Powerlang-SCompiler-Backend'
+	#category : 'Powerlang-SCompiler-Backend',
+	#package : 'Powerlang-SCompiler-Backend'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 SCallbackMethod class >> behaviorNativeCodeSlot [
 	"callback methods have a special machine code. Its bytes are of
 	class ByteArray, but the behavior of this ByteArray is special:
@@ -18,22 +19,22 @@ SCallbackMethod class >> behaviorNativeCodeSlot [
 	^4
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCallbackMethod >> descriptor [
 	^descriptor
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCallbackMethod >> descriptor: anFFIDescriptor [
 	descriptor := anFFIDescriptor 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCallbackMethod >> isCallback [
 	^true
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCallbackMethod >> pragma: anSPragmaNode [
 	descriptor := anSPragmaNode info
 ]

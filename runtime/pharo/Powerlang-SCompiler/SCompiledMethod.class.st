@@ -1,7 +1,7 @@
 Class {
-	#name : #SCompiledMethod,
-	#superclass : #Array,
-	#type : #variable,
+	#name : 'SCompiledMethod',
+	#superclass : 'Array',
+	#type : 'variable',
 	#instVars : [
 		'format',
 		'optimizedCode',
@@ -13,10 +13,12 @@ Class {
 	#pools : [
 		'SCompiledMethodFlags'
 	],
-	#category : #'Powerlang-SCompiler-Backend'
+	#category : 'Powerlang-SCompiler-Backend',
+	#package : 'Powerlang-SCompiler',
+	#tag : 'Backend'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 SCompiledMethod class >> new [
 	"return an initialized instance"
 
@@ -24,75 +26,65 @@ SCompiledMethod class >> new [
 
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 SCompiledMethod class >> new: anInteger [
 	^ (self basicNew: anInteger) initialize
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> argumentCount [
 	^format bitsAt: ArgCount
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> argumentCount: anInteger [
 	format := format bitsAt: ArgCount put: anInteger
 ]
 
-{ #category : #constants }
-SCompiledMethod >> treecodes [
-	^treecodes
-]
-
-{ #category : #constants }
-SCompiledMethod >> treecodes: aCollection [
-	treecodes := aCollection
-]
-
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> beDebugabble [
 	format := format bitOr: Debuggable
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> blockCount [
 	^format bitsAt: BlockCount
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> blockCount: anInteger [
 	format := format bitsAt: BlockCount put: anInteger
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> blocks [
 	self hasBlocks ifFalse: [^#()].
 	^self select: [:literal | literal isBlock]
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> capturesSelf [ 
 	^ format anyMask: CapturesSelf
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> capturesSelf: aBoolean [
 	format := aBoolean
 				  ifTrue: [ format bitOr: CapturesSelf ]
 				  ifFalse: [ format bitClear: CapturesSelf ]
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> classBinding [
 	^class
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> classBinding: aClass [
 	class := aClass
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> copyWithLiterals: aCollection [
 	| result |
 	result := self species withAll: aCollection.
@@ -106,32 +98,32 @@ SCompiledMethod >> copyWithLiterals: aCollection [
 		yourself
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> dynamicVariableNamed: aSymbol [
 	^class dynamicVariableNamed: aSymbol
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> environmentCount [
 	^format bitsAt: EnvCount
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> environmentCount: anInteger [
 	format := format bitsAt: EnvCount put: anInteger
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCompiledMethod >> format [
 	^format
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCompiledMethod >> format: anInteger [
 	format := anInteger
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SCompiledMethod >> gtDisplayOn: stream [
 stream
 		nextPutAll: self classBinding name;
@@ -139,73 +131,73 @@ stream
 		print: selector
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> hasBlocks [
 	^self blockCount > 0
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> hasEnvironment [
 	^ format anyMask: HasEnvironment
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> hasEnvironment: aBoolean [
 	format := aBoolean
 				  ifTrue: [ format bitOr: HasEnvironment ]
 				  ifFalse: [ format bitClear: HasEnvironment ]
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> hasFrame [
 	^ format anyMask: HasFrame
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> hasFrame: aBoolean [
 	format := aBoolean
 				  ifTrue: [ format bitOr: HasFrame ]
 				  ifFalse: [ format bitClear: HasFrame ]
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> initialize [
 	super initialize.
 	format := 0
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> isCallback [
 	^false
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> isCalloutMethod [
 	^ false
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> isDebuggable [
 	^ format anyMask: Debuggable
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> isExtension [
 
 	^ format anyMask: IsExtension
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> isFrameless [
 	^ self hasFrame not
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> literals [
 	^Array withAll: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCompiledMethod >> module [
 	| association |
 	self isExtension ifFalse: [^class module].
@@ -215,28 +207,28 @@ SCompiledMethod >> module [
 	^association value
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCompiledMethod >> optimizedCode [
 	^optimizedCode
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCompiledMethod >> optimizedCode: anObject [
 	optimizedCode := anObject
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> pragma: aPragmaNode [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCompiledMethod >> prepareForExecution [
 	optimizedCode ifNil: [ optimizedCode := self sexpressions ].
 	^ optimizedCode
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SCompiledMethod >> printOn: aStream [
 	aStream
 		print: self classBinding;
@@ -249,46 +241,47 @@ SCompiledMethod >> printOn: aStream [
 				nextPutAll: source ]
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> selector [
 	^selector
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> selector: aSymbol [
 	selector := aSymbol
 ]
 
-{ #category : #constants }
-SCompiledMethod >> sexpressions [
-	| decoder |
-	decoder := TreecodeDecoder new
-		stream: treecodes readStream;
-		method: self.
-	^decoder decodeMethod
-]
-
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> signature [
 	^class-> selector
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> source [
 	^source
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> source: aString [
 	source := aString
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> tempCount [
 	^format bitsAt: TempCount
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 SCompiledMethod >> tempCount: anInteger [
 	format := format bitsAt: TempCount put: anInteger
+]
+
+{ #category : 'constants' }
+SCompiledMethod >> treecodes [
+	^treecodes
+]
+
+{ #category : 'constants' }
+SCompiledMethod >> treecodes: aCollection [
+	treecodes := aCollection
 ]

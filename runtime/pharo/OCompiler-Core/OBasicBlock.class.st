@@ -3,46 +3,47 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OBasicBlock,
-	#superclass : #OBeginInstruction,
+	#name : 'OBasicBlock',
+	#superclass : 'OBeginInstruction',
 	#instVars : [
 		'end',
 		'predecessors'
 	],
-	#category : #'OCompiler-Core-IR'
+	#category : 'OCompiler-Core-IR',
+	#package : 'OCompiler-Core-IR'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 OBasicBlock class >> decorator [
 	^Smalltalk at: #CollectionDecorator
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> activationRecord [
 	^next
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> add: instruction [
 	^end beforeInsert: instruction
 ]
 
-{ #category : #'adding / removing' }
+{ #category : 'adding / removing' }
 OBasicBlock >> addFrom: first to: last [
 	end prev afterInsert: first to: last
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> addFront: instruction [
 	^self afterInsert: instruction
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> addPredecessor: aBasicBlock [
 	predecessors add: aBasicBlock
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> allDominators [
 	| result all changed |
 	result := Dictionary new.
@@ -64,7 +65,7 @@ OBasicBlock >> allDominators [
 	^result
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> allLoopHeads [
 	| loops doms |
 	loops := Dictionary new.
@@ -76,7 +77,7 @@ OBasicBlock >> allLoopHeads [
 	^loops
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> allLoops [
 	| result |
 	result := Dictionary new.
@@ -87,7 +88,7 @@ OBasicBlock >> allLoops [
 	^result
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OBasicBlock >> allReturnsWithBlocks [
 	"
 	last block ends in a return, but other blocks are the result of inlining,
@@ -106,17 +107,17 @@ OBasicBlock >> allReturnsWithBlocks [
 	^result
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> asArray [
 	^self asReversePostOrderInstructionsCollection asArray
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OBasicBlock >> asOrderedCollection [
 	^OrderedCollection withAll: self
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> asReversePostOrderInstructionsCollection [
 	| collection |
 	collection := OrderedCollection new.
@@ -126,12 +127,12 @@ OBasicBlock >> asReversePostOrderInstructionsCollection [
 	^collection
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> cleanPredecessors [
 	predecessors := OrderedCollection new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OBasicBlock >> collect: aBlock in: aCollection [
 	self do: [:inst | | collected |
 		collected := aBlock value: inst.
@@ -139,7 +140,7 @@ OBasicBlock >> collect: aBlock in: aCollection [
 	^aCollection
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> computeLiveOutInto: liveOut andLiveInInto: liveIn [
 	| blocks changed |
 	blocks := self withSuccessorsPostOrder.
@@ -164,7 +165,7 @@ OBasicBlock >> computeLiveOutInto: liveOut andLiveInInto: liveIn [
 				liveIn at: block put: live]]]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OBasicBlock >> copyTo: copy with: map [
 	| copyend |
 	copy afterConnect: (next duplicateWith: map).
@@ -173,7 +174,7 @@ OBasicBlock >> copyTo: copy with: map [
 	copy predecessors: (predecessors collect: [:pred | pred duplicateWith: map])
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OBasicBlock >> dissolveAllInstructions [
 	| value |
 	[
@@ -182,19 +183,19 @@ OBasicBlock >> dissolveAllInstructions [
 		whileTrue: [value dissolveDeep]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OBasicBlock >> dissolveIfUnreachable [
 	predecessors isEmpty ifTrue: [self dissolveAllInstructions]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> dominanceFrontiers [
 	| idoms |
 	idoms := self dominatorTree allImmediateDominators.
 	^self dominanceFrontiersUsing: idoms
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> dominanceFrontiersUsing: idoms [
 	| blocks result |
 	blocks := self withSuccessorsPostOrder.
@@ -212,7 +213,7 @@ OBasicBlock >> dominanceFrontiersUsing: idoms [
 	^result
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> dominatorTree [
 	| all root idoms indices intersect changed |
 	all := self withSuccessorsPostOrder reversed.
@@ -249,12 +250,12 @@ OBasicBlock >> dominatorTree [
 	^ODominatorTree from: root with: all dominators: idoms
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OBasicBlock >> duplicate [
 	^self duplicateWith: IdentityDictionary new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OBasicBlock >> duplicateWith: map [
 	| copy |
 	map at: self ifPresent: [:c | ^c].
@@ -268,7 +269,7 @@ OBasicBlock >> duplicateWith: map [
 	^copy
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OBasicBlock >> endWith: jumpType
 to: target
 skipping: skipped
@@ -281,12 +282,12 @@ if: compare [
 	^jump
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> endWithJumpFalseTo: target skipping: skipped if: condition [
 	self endWith: OJumpFalse to: target skipping: skipped if: condition
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OBasicBlock >> endWithJumpTo: target [
 	| jump |
 	jump := OJump to: target.
@@ -294,22 +295,22 @@ OBasicBlock >> endWithJumpTo: target [
 	target addPredecessor: self
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> endWithJumpTrueTo: target skipping: skipped if: condition [
 	self endWith: OJumpTrue to: target skipping: skipped if: condition
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> firstInstruction [
 	^next
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> firstNonPhi [
 	^next firstNonPhi
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> fullyRemovePredecessor: predecessor [
 	self
 		removePredecessor: predecessor;
@@ -318,22 +319,22 @@ OBasicBlock >> fullyRemovePredecessor: predecessor [
 		ifTrue: [self successors do: [:succ | succ fullyRemovePredecessor: self]]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> hasMultiplePredecessors [
 	^predecessors size > 1
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> hasMultipleSuccessors [
 	^self lastInstruction isConditionalJump
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> hasSuccessors [
 	^self lastInstruction isJump
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> incorporatePhisFrom: predecessor [
 	| index |
 	predecessors size = 1 ifTrue: [^predecessor movePhisTo: self].
@@ -350,7 +351,7 @@ OBasicBlock >> incorporatePhisFrom: predecessor [
 		phi removeVariable: source at: index]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> indexOf: anInstruction [
 	| current |
 	current := 1.
@@ -360,14 +361,14 @@ OBasicBlock >> indexOf: anInstruction [
 	self error: 'instruction not found'
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> initialize [
 	next := OEndInstruction new prev: self.
 	end := next.
 	predecessors := OrderedCollection new
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> insertPhiOf: block1 and: block2 replacing: operation [
 	| value1 value2 |
 	value1 := block1 lastValue.
@@ -381,7 +382,7 @@ OBasicBlock >> insertPhiOf: block1 and: block2 replacing: operation [
 		replacing: operation
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> insertPhiOf: value1
 at: block1
 and: value2
@@ -393,7 +394,7 @@ replacing: operation [
 	operation replaceAllUsesWith: phi; dissolve
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> insertPhiOf: value1
 at: block1
 and: block2
@@ -409,7 +410,7 @@ replacing: operation [
 		replacing: operation
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> instructionsAfter: first withReversePostOrderSuccessorsDo: aBlock [
 	first do: aBlock.
 	self withSuccessorsPostOrder
@@ -417,7 +418,7 @@ OBasicBlock >> instructionsAfter: first withReversePostOrderSuccessorsDo: aBlock
 		reverseDo: [:block | block instructionsDo: aBlock]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> instructionsAsCollection [
 	| collection |
 	collection := OrderedCollection new.
@@ -425,42 +426,42 @@ OBasicBlock >> instructionsAsCollection [
 	^collection
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> instructionsDo: aBlock [
 	^next do: aBlock
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> instructionsReverseDo: aBlock [
 	^end reverseDo: aBlock
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> instructionsWithPostOrderSuccessorsDo: aBlock [
 	self postOrderDo: [:block | block instructionsDo: aBlock]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> instructionsWithReversePostOrderSuccessorsDo: aBlock [
 	self reversePostOrderDo: [:block | block instructionsDo: aBlock]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> instructionsWithSuccessorsDo: aBlock [
 	self withSuccessorsDo: [:block | block instructionsDo: aBlock]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> isEmptyBranch [
 	self instructionsDo: [:instruction | ^instruction isConditionalJump]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> isEmptyJump [
 	self instructionsDo: [:instruction | ^instruction isUnconditionalJump]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> isEmptyPhiBranch [
 	self instructionsDo: [:instruction | | empty |
 		empty := instruction isPhi and: [| next |
@@ -470,7 +471,7 @@ OBasicBlock >> isEmptyPhiBranch [
 		^empty]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> isOnlyPhiBranch [
 	| last |
 	last := self lastInstruction.
@@ -480,13 +481,13 @@ OBasicBlock >> isOnlyPhiBranch [
 		instruction isPhi ifFalse: [^false]]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> isPhiArgument: instruction [
 	self phisDo: [:phi | (phi variables includes: instruction) ifTrue: [^true]].
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 OBasicBlock >> isReachableFrom: aBasicBlock [
 	| seen work |
 	seen := Set withAll: predecessors.
@@ -501,7 +502,7 @@ OBasicBlock >> isReachableFrom: aBasicBlock [
 	^false
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> iteratedDominanceFrontiersOf: blocks using: frontiers [
 	| result changed |
 	result := (blocks gather: [:block | frontiers at: block]) asSet.
@@ -514,17 +515,17 @@ OBasicBlock >> iteratedDominanceFrontiersOf: blocks using: frontiers [
 	^result
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> lastBlock [
 	^self postOrderDo: [:block | ^block]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> lastInstruction [
 	^end prev
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> lastValue [
 	| last |
 	last := end lastValue.
@@ -533,7 +534,7 @@ OBasicBlock >> lastValue [
 		ifFalse: [last]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> length [
 	| current |
 	current := 0.
@@ -541,12 +542,12 @@ OBasicBlock >> length [
 	^current
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> moveAllTo: block [
 	self moveAllTo: block after: block lastInstruction
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> moveAllTo: block after: instruction [
 	block replace: self asPredecessorIn: self successors.
 	next == end ifTrue: [^self].
@@ -555,7 +556,7 @@ OBasicBlock >> moveAllTo: block after: instruction [
 	self afterConnect: end
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> movePhisTo: otherBlock [
 	| inst dest |
 	inst := next.
@@ -567,12 +568,12 @@ OBasicBlock >> movePhisTo: otherBlock [
 		inst := next]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> name [
 	^'#' , self hash printString
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> nilUnitializedTemporaries [
 	| stack uninitialized nilval |
 	stack := self activationRecord.
@@ -587,7 +588,7 @@ OBasicBlock >> nilUnitializedTemporaries [
 	^nilval
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OBasicBlock >> nodesSelect: aBlock [
 	| seen work result visit |
 	seen := IdentitySet with: self.
@@ -608,23 +609,23 @@ OBasicBlock >> nodesSelect: aBlock [
 	^result
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> operandsDo: aBlock [
 	
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> phiValuesComingFrom: block [
 	^self phis collect: [:phi | phi atOperand: block]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> phiWithArgument: instruction [
 	self phisDo: [:phi | (phi variables includes: instruction) ifTrue: [^phi]].
 	self error: 'not found'
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> phis [
 	| result |
 	result := OrderedCollection new.
@@ -634,7 +635,7 @@ OBasicBlock >> phis [
 			ifFalse: [^result]]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> phisDo: aBlock [
 	self
 		instructionsDo: [:instr | instr isPhi
@@ -642,7 +643,7 @@ OBasicBlock >> phisDo: aBlock [
 			ifFalse: [^self]]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OBasicBlock >> postOrder: result seen: seen [
 	seen add: self.
 	self
@@ -651,29 +652,29 @@ OBasicBlock >> postOrder: result seen: seen [
 	result add: self
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> postOrderDo: aBlock [
 	self withSuccessorsPostOrder do: [:block | aBlock value: block]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> predecessors [
 	^predecessors
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OBasicBlock >> predecessors: aCollection [
 	predecessors := aCollection
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OBasicBlock >> primitivePrintOn: aStream [
 	aStream nextPutAll: '<=== '; print: self name; cr.
 	next printForwardOn: aStream.
 	aStream nextPutAll: '===>'
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 OBasicBlock >> printAll [
 	| stream |
 	stream := '' writeStream.
@@ -683,12 +684,12 @@ OBasicBlock >> printAll [
 	^stream contents
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 OBasicBlock >> printAllNamed [
 	^String streamContents: [:s | self printAllNamedOn: s]
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 OBasicBlock >> printAllNamedOn: aStream [
 	| names vars blocks |
 
@@ -709,14 +710,14 @@ OBasicBlock >> printAllNamedOn: aStream [
 			aStream cr ]
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 OBasicBlock >> printOn: aStream [
 	predecessors isEmpty
 		ifTrue: [self printAllNamedOn: aStream]
 		ifFalse: [self primitivePrintOn: aStream]
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 OBasicBlock >> printOn: aStream using: names [
 	| string |
 	string := names at: self ifAbsent: [^self primitivePrintOn: aStream].
@@ -738,7 +739,7 @@ OBasicBlock >> printOn: aStream using: names [
 	aStream nextPutAll: '===>'
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> realInstructionsDo: aBlock [
 	| current |
 	current := next.
@@ -746,28 +747,28 @@ OBasicBlock >> realInstructionsDo: aBlock [
 	current do: aBlock
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> removePredecessor: aBasicBlock [
 	predecessors remove: aBasicBlock
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> replace: old asPredecessorIn: successors [
 	successors do: [:succ | succ replacePredecessor: old with: self]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> replacePredecessor: old with: new [
 	self phisDo: [:phi | phi replaceBlock: old with: new].
 	predecessors replace: old with: new
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> reversePostOrderDo: aBlock [
 	self withSuccessorsPostOrder reverseDo: [:block | aBlock value: block]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OBasicBlock >> size [
 	| result |
 	result := 0.
@@ -775,17 +776,17 @@ OBasicBlock >> size [
 	^result
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> sortPhiVariables [
 	self phisDo: [:phi | phi sortAfter: predecessors]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> split [
 	^self class new
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> splitAfter: anInstruction [
 	| block start last |
 	block := self class new.
@@ -799,18 +800,18 @@ OBasicBlock >> splitAfter: anInstruction [
 	^block
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> splitAllCriticalEdges [
 	self withSuccessorsPostOrder
 		do: [:block | block splitIncomingCriticalEdges]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> splitBefore: anInstruction [
 	^self splitAfter: anInstruction prev
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> splitEdgeTo: block [
 	| middle jump branch |
 	middle := self class new.
@@ -825,26 +826,26 @@ OBasicBlock >> splitEdgeTo: block [
 	^middle
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> splitIncomingCriticalEdges [
 	predecessors size > 1 ifFalse: [^self].
 	predecessors
 		do: [:pred | pred hasMultipleSuccessors ifTrue: [pred splitEdgeTo: self]]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> successors [
 	^end prev targets
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> successorsDo: aBlock [
 	| last |
 	last := self lastInstruction.
 	last !== self ifTrue: [ last successorsDo: aBlock]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> successorsPostOrder [
 	| seen result |
 	seen := Set new.
@@ -855,7 +856,7 @@ OBasicBlock >> successorsPostOrder [
 	^result
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> unifyReturns [
 	| returns last ret prev end jump phi |
 	returns := self allReturnsWithBlocks.
@@ -886,7 +887,7 @@ OBasicBlock >> unifyReturns [
 		tail dissolve]
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 OBasicBlock >> usesResultOf: anInstruction [
 	next
 		detect: [:instruction | instruction usesResultOf: anInstruction]
@@ -894,7 +895,7 @@ OBasicBlock >> usesResultOf: anInstruction [
 	^true
 ]
 
-{ #category : #validation }
+{ #category : 'validation' }
 OBasicBlock >> validateAllInstructions [
 	| all blocks |
 	self withSuccessorsDo: [:block | | forward current backwards |
@@ -924,7 +925,7 @@ OBasicBlock >> validateAllInstructions [
 			usesDo: [:operand | self _ASSERT: (all includes: operand instruction)]]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> validateCFG [
 	self withSuccessorsDo: [:block | 
 		block successors
@@ -933,7 +934,7 @@ OBasicBlock >> validateCFG [
 			do: [:predecessor | self _ASSERT: (predecessor successors includes: block)]]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> withPredecessorsUntil: block [
 	| result incoming |
 	result := OrderedCollection new.
@@ -947,7 +948,7 @@ OBasicBlock >> withPredecessorsUntil: block [
 	^result
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> withSuccessorsDo: aBlock [
 	| done remaining |
 	done := Set new.
@@ -963,7 +964,7 @@ OBasicBlock >> withSuccessorsDo: aBlock [
 		remaining addAll: more]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OBasicBlock >> withSuccessorsPostOrder [
 	| seen result |
 	seen := Set new.

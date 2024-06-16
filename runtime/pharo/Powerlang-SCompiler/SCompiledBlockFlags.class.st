@@ -1,6 +1,6 @@
 Class {
-	#name : #SCompiledBlockFlags,
-	#superclass : #PSharedPool,
+	#name : 'SCompiledBlockFlags',
+	#superclass : 'PSharedPool',
 	#classVars : [
 		'BlockArgCount',
 		'BlockCapturesHome',
@@ -9,10 +9,11 @@ Class {
 		'BlockId',
 		'BlockTempCount'
 	],
-	#category : #'Powerlang-SCompiler-Backend'
+	#category : 'Powerlang-SCompiler-Backend',
+	#package : 'Powerlang-SCompiler-Backend'
 }
 
-{ #category : #'class initialization' }
+{ #category : 'class initialization' }
 SCompiledBlockFlags class >> initialize [
 	BlockArgCount := 1 thru: 6.
 	BlockTempCount := 7 thru: 14.

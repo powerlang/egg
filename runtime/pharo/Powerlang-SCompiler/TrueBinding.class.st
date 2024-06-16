@@ -1,20 +1,21 @@
 Class {
-	#name : #TrueBinding,
-	#superclass : #LiteralBinding,
-	#category : #'Powerlang-SCompiler-Bindings'
+	#name : 'TrueBinding',
+	#superclass : 'LiteralBinding',
+	#category : 'Powerlang-SCompiler-Bindings',
+	#package : 'Powerlang-SCompiler-Bindings'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 TrueBinding >> encodeUsing: aTreecodeEmitter [
 	aTreecodeEmitter encodeTrue
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 TrueBinding >> name [
 	^'true'
 ]
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 TrueBinding >> value [
 	^true
 ]

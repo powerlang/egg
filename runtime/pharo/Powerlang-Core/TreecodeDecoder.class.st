@@ -1,6 +1,6 @@
 Class {
-	#name : 'TreecodeDecoder',
-	#superclass : 'Object',
+	#name : #TreecodeDecoder,
+	#superclass : #Object,
 	#instVars : [
 		'method',
 		'stream',
@@ -14,12 +14,10 @@ Class {
 		'AstBindingTypes',
 		'AstNodeTypes'
 	],
-	#category : 'Powerlang-Core-SExpressions',
-	#package : 'Powerlang-Core',
-	#tag : 'SExpressions'
+	#category : 'Powerlang-Core-SExpressions'
 }
 
-{ #category : 'class initialization' }
+{ #category : #'class initialization' }
 TreecodeDecoder class >> initialize [
 	NodeTypes := Dictionary new.
 	BindingTypes := Dictionary new.
@@ -43,7 +41,7 @@ TreecodeDecoder class >> initialize [
 		at: NestedDynamicVarId put: SNestedDynamicBinding
 ]
 
-{ #category : 'instance creation' }
+{ #category : #'instance creation' }
 TreecodeDecoder class >> new [
 	"return an initialized instance"
 
@@ -51,24 +49,24 @@ TreecodeDecoder class >> new [
 
 ]
 
-{ #category : 'public' }
+{ #category : #public }
 TreecodeDecoder >> bindingTypeOf: id [
 	^ BindingTypes at: id
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 TreecodeDecoder >> builder: aRuntime [ 
 	builder := aRuntime
 ]
 
-{ #category : 'public' }
+{ #category : #public }
 TreecodeDecoder >> decodeArgument [
 	^ SArgumentBinding new
 		index: self nextInteger;
 		environment: self nextEnvironment
 ]
 
-{ #category : 'public' }
+{ #category : #public }
 TreecodeDecoder >> decodeAssignment [
 	| assignment assignees |
 	assignment := SAssignment new.
@@ -79,7 +77,7 @@ TreecodeDecoder >> decodeAssignment [
 	^ assignment
 ]
 
-{ #category : 'public' }
+{ #category : #public }
 TreecodeDecoder >> decodeBlock [
 
 	| expression inlined block index code |
@@ -101,7 +99,7 @@ TreecodeDecoder >> decodeBlock [
 	^ expression
 ]
 
-{ #category : 'public' }
+{ #category : #public }
 TreecodeDecoder >> decodeCascade [
 	| cascade receiver messages message count |
 	cascade := SCascade new.
@@ -116,7 +114,7 @@ TreecodeDecoder >> decodeCascade [
 		messages: messages
 ]
 
-{ #category : 'public' }
+{ #category : #public }
 TreecodeDecoder >> decodeCascadeMessage [
 	| selector arguments |
 	selector := self nextSymbol.
@@ -126,12 +124,12 @@ TreecodeDecoder >> decodeCascadeMessage [
 		arguments: arguments
 ]
 
-{ #category : 'public' }
+{ #category : #public }
 TreecodeDecoder >> decodeDynamicVar [
 	^ SDynamicBinding new name: self nextSymbol
 ]
 
-{ #category : 'public' }
+{ #category : #public }
 TreecodeDecoder >> decodeIdentifier [
 	| type binding |
 	type := self bindingTypeOf: self nextInteger.
@@ -139,7 +137,7 @@ TreecodeDecoder >> decodeIdentifier [
 	^ SIdentifier new binding: binding
 ]
 
-{ #category : 'public' }
+{ #category : #public }
 TreecodeDecoder >> decodeLiteral [
 	| index value |
 	index := self nextInteger.
@@ -151,7 +149,7 @@ TreecodeDecoder >> decodeLiteral [
 		value: value
 ]
 
-{ #category : 'public' }
+{ #category : #public }
 TreecodeDecoder >> decodeMessage [
 	| inlined selector receiver arguments |
 	inlined := self nextBoolean.
@@ -165,7 +163,7 @@ TreecodeDecoder >> decodeMessage [
 		inlined: inlined
 ]
 
-{ #category : 'public' }
+{ #category : #public }
 TreecodeDecoder >> decodeMethod [
 	| type node next pragma |
 	type := stream next.
@@ -183,7 +181,7 @@ TreecodeDecoder >> decodeMethod [
 	^ node
 ]
 
-{ #category : 'public' }
+{ #category : #public }
 TreecodeDecoder >> decodeNestedDynamicVar [
 	^ SNestedDynamicBinding new
 		name:
@@ -191,7 +189,7 @@ TreecodeDecoder >> decodeNestedDynamicVar [
 
 ]
 
-{ #category : 'public' }
+{ #category : #public }
 TreecodeDecoder >> decodeReturn [
 	| expression local |
 	local := self nextBoolean.
@@ -201,36 +199,36 @@ TreecodeDecoder >> decodeReturn [
 		expression: expression
 ]
 
-{ #category : 'public' }
+{ #category : #public }
 TreecodeDecoder >> decodeTemporary [
 	^ STemporaryBinding new
 		index: self nextInteger;
 		environment: self nextEnvironment
 ]
 
-{ #category : 'unclassified' }
+{ #category : #unclassified }
 TreecodeDecoder >> literalAt: anInteger [
 	^ builder ifNil: [method at: anInteger] ifNotNil: [builder method: method literalAt: anInteger]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 TreecodeDecoder >> method: aMethod [
 	method := aMethod
 ]
 
-{ #category : 'public' }
+{ #category : #public }
 TreecodeDecoder >> nextArray [
 	| count |
 	count := self nextInteger.
 	^ stream next: count
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 TreecodeDecoder >> nextBoolean [
 	^ stream next = 1
 ]
 
-{ #category : 'public' }
+{ #category : #public }
 TreecodeDecoder >> nextEnvironment [
 	| value |
 	value := self nextInteger.
@@ -238,7 +236,7 @@ TreecodeDecoder >> nextEnvironment [
 		ifTrue: [ value ]
 ]
 
-{ #category : 'public' }
+{ #category : #public }
 TreecodeDecoder >> nextExpression [
 	| type |
 	type := self nodeTypeOf: stream next.
@@ -246,14 +244,14 @@ TreecodeDecoder >> nextExpression [
 
 ]
 
-{ #category : 'public' }
+{ #category : #public }
 TreecodeDecoder >> nextExpressionArray [
 	| count |
 	count := self nextInteger.
 	^(1 to: count) collect: [ :arg | self nextExpression ]
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 TreecodeDecoder >> nextInteger [
 	| value |
 	value := stream next.
@@ -264,7 +262,7 @@ TreecodeDecoder >> nextInteger [
 		ifFalse: [ value - 16r100 ]
 ]
 
-{ #category : 'unclassified' }
+{ #category : #unclassified }
 TreecodeDecoder >> nextLiteralInteger [
 	| value |
 	value := self nextInteger.
@@ -273,21 +271,21 @@ TreecodeDecoder >> nextLiteralInteger [
 		ifNotNil: [ builder newInteger: value ]
 ]
 
-{ #category : 'public' }
+{ #category : #public }
 TreecodeDecoder >> nextSymbol [
 	| index |
 	index := self nextInteger.
 	^ self literalAt: index
 ]
 
-{ #category : 'public' }
+{ #category : #public }
 TreecodeDecoder >> nextSymbolOrNil [
 	| index |
 	index := self nextInteger.
 	^index != 0 ifTrue: [ self literalAt: index]
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 TreecodeDecoder >> nextUnsignedInteger [
 	| value |
 	value := self nextByte.
@@ -296,12 +294,12 @@ TreecodeDecoder >> nextUnsignedInteger [
 		ifFalse: [value - 128 + (self nextUnsignedInteger bitShift: 7)]
 ]
 
-{ #category : 'public' }
+{ #category : #public }
 TreecodeDecoder >> nodeTypeOf: id [
 	^NodeTypes at: id
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 TreecodeDecoder >> stream: aStream [
 	stream := aStream
 ]

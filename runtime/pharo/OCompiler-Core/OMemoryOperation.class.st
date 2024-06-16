@@ -3,39 +3,40 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OMemoryOperation,
-	#superclass : #OPrimitiveOperation,
+	#name : 'OMemoryOperation',
+	#superclass : 'OPrimitiveOperation',
 	#instVars : [
 		'base',
 		'index'
 	],
-	#category : #'OCompiler-Core-IR'
+	#category : 'OCompiler-Core-IR',
+	#package : 'OCompiler-Core-IR'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OMemoryOperation >> atOperand: operandName [
 	^operandName == #base ifTrue: [base] ifFalse: [index]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OMemoryOperation >> atOperand: operandName put: instruction [
 	operandName == #base
 		ifTrue: [base := instruction]
 		ifFalse: [index := instruction]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OMemoryOperation >> base [
 	^base
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OMemoryOperation >> base: anInstruction [
 	base := anInstruction.
 	anInstruction addUse: self at: #base
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OMemoryOperation >> copyTo: copy with: map [
 	| i |
 	super copyTo: copy with: map.
@@ -47,28 +48,28 @@ OMemoryOperation >> copyTo: copy with: map [
 		ifFalse: [copy indexImm: index]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OMemoryOperation >> index [
 	^index
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OMemoryOperation >> index: anInstruction [
 	index := anInstruction.
 	anInstruction addUse: self at: #index
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OMemoryOperation >> indexImm: anInteger [
 	index := anInteger
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OMemoryOperation >> isMemoryOperation [
 	^true
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 OMemoryOperation >> usesResultOf: anInstruction [
 	^base == anInstruction or: [index == anInstruction]
 ]

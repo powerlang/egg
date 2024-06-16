@@ -3,8 +3,8 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OptimizingRBVisitor,
-	#superclass : #RBProgramNodeVisitor,
+	#name : 'OptimizingRBVisitor',
+	#superclass : 'RBProgramNodeVisitor',
 	#instVars : [
 		'method',
 		'firstBlock',
@@ -14,46 +14,47 @@ Class {
 		'sendInliner',
 		'activation'
 	],
-	#category : #'OCompiler-Pharo'
+	#category : 'OCompiler-Pharo',
+	#package : 'OCompiler-Pharo'
 }
 
-{ #category : #'emitting - load' }
+{ #category : 'emitting - load' }
 OptimizingRBVisitor >> activation [
 	^activation
 ]
 
-{ #category : #'emitting - load' }
+{ #category : 'emitting - load' }
 OptimizingRBVisitor >> allActivations [
 	^firstBlock nodesSelect: [:node | node class == OActivationContext]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingRBVisitor >> defineActivationRecord [
 	activation := OActivationContext named: #activationRecord.
 	activation temporaries: method tempNames size.
 	currentBlock add: activation
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingRBVisitor >> defineSelf [
 	| definition |
 	definition := OLoadImplicit named: #self.
 	currentBlock add: definition
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingRBVisitor >> environment: aNativizationEnvironment [
 	abi := aNativizationEnvironment abi
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingRBVisitor >> initialize [
 	firstBlock := OBasicBlock new.
 	currentBlock := firstBlock.
 	locals := OrderedCollection new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingRBVisitor >> insertReturnSelf [
 	| instruction |
 	instruction := OReturn new source: activation receiver; frame: activation.
@@ -61,7 +62,7 @@ OptimizingRBVisitor >> insertReturnSelf [
 	^instruction
 ]
 
-{ #category : #'emitting - load' }
+{ #category : 'emitting - load' }
 OptimizingRBVisitor >> loadArgument: name [
 	| load |
 	load := OLoadOperation base: self activation slotAtImm: name.
@@ -69,7 +70,7 @@ OptimizingRBVisitor >> loadArgument: name [
 	^load
 ]
 
-{ #category : #'emitting - load' }
+{ #category : 'emitting - load' }
 OptimizingRBVisitor >> loadAssociation: anAssociation [
 	| global read name |
 	name := anAssociation key asString asSymbol.
@@ -81,7 +82,7 @@ OptimizingRBVisitor >> loadAssociation: anAssociation [
 	^read
 ]
 
-{ #category : #'emitting - load' }
+{ #category : 'emitting - load' }
 OptimizingRBVisitor >> loadEnvironment: envIndex [
 	| result |
 	result := self activation environment.
@@ -91,7 +92,7 @@ OptimizingRBVisitor >> loadEnvironment: envIndex [
 	^result
 ]
 
-{ #category : #'emitting - load' }
+{ #category : 'emitting - load' }
 OptimizingRBVisitor >> loadEnvironmentTemporary: tempIndex environment: envIndex [
 	| load environment |
 	self error: 'non-inlined closure arguments not yet supported'.
@@ -101,12 +102,12 @@ OptimizingRBVisitor >> loadEnvironmentTemporary: tempIndex environment: envIndex
 	^load
 ]
 
-{ #category : #'emitting - load' }
+{ #category : 'emitting - load' }
 OptimizingRBVisitor >> loadFalse [
 	^self loadLiteral: false
 ]
 
-{ #category : #'emitting - load' }
+{ #category : 'emitting - load' }
 OptimizingRBVisitor >> loadInstance: index [
 	| receiver load |
 	receiver := self activation receiver.
@@ -115,7 +116,7 @@ OptimizingRBVisitor >> loadInstance: index [
 	^load
 ]
 
-{ #category : #'emitting - load' }
+{ #category : 'emitting - load' }
 OptimizingRBVisitor >> loadLiteral: value [
 	| constant |
 	constant := OLoadConstant valued: value.
@@ -123,17 +124,17 @@ OptimizingRBVisitor >> loadLiteral: value [
 	^constant
 ]
 
-{ #category : #'emitting - load' }
+{ #category : 'emitting - load' }
 OptimizingRBVisitor >> loadNil [
 	^self loadLiteral: nil
 ]
 
-{ #category : #'emitting - load' }
+{ #category : 'emitting - load' }
 OptimizingRBVisitor >> loadSelf [
 	^self activation receiver
 ]
 
-{ #category : #'emitting - load' }
+{ #category : 'emitting - load' }
 OptimizingRBVisitor >> loadTemporary: name [
 	| load |
 	load := OLoadOperation base: self activation slotAtImm: name.
@@ -141,12 +142,12 @@ OptimizingRBVisitor >> loadTemporary: name [
 	^ load
 ]
 
-{ #category : #'emitting - load' }
+{ #category : 'emitting - load' }
 OptimizingRBVisitor >> loadTrue [
 	^self loadLiteral: true
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingRBVisitor >> lowerSpecialABI: aMethodNode [
 	| literals i actual next load names |
 	literals := method literals.
@@ -183,12 +184,12 @@ OptimizingRBVisitor >> lowerSpecialABI: aMethodNode [
 		whileFalse: [actual := next]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingRBVisitor >> method: aCompiledMethod [
 	method := aCompiledMethod
 ]
 
-{ #category : #'emitting - load' }
+{ #category : 'emitting - load' }
 OptimizingRBVisitor >> pushInstVar: index [
 	| name |
 	name := method classBinding value allInstVarNames at: index. 
@@ -197,12 +198,12 @@ OptimizingRBVisitor >> pushInstVar: index [
 	
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 OptimizingRBVisitor >> registerNamed: regname [
 	^abi perform: regname
 ]
 
-{ #category : #'emitting - store' }
+{ #category : 'emitting - store' }
 OptimizingRBVisitor >> storeAssociation: association with: value [
 	| global write |
 	global := OLoadConstant valued: association.
@@ -210,7 +211,7 @@ OptimizingRBVisitor >> storeAssociation: association with: value [
 	currentBlock add: global; add: write
 ]
 
-{ #category : #'emitting - store' }
+{ #category : 'emitting - store' }
 OptimizingRBVisitor >> storeEnvironmentTemporary: tempIndex environment: envIndex with: value [
 	| environment store |
 	self error: 'non-inlined closure arguments not yet supported'.
@@ -219,7 +220,7 @@ OptimizingRBVisitor >> storeEnvironmentTemporary: tempIndex environment: envInde
 	currentBlock add: store
 ]
 
-{ #category : #'emitting - store' }
+{ #category : 'emitting - store' }
 OptimizingRBVisitor >> storeInstance: index with: value [
 	| write |
 	write := OStoreOperation
@@ -229,7 +230,7 @@ OptimizingRBVisitor >> storeInstance: index with: value [
 	currentBlock add: write
 ]
 
-{ #category : #'emitting - store' }
+{ #category : 'emitting - store' }
 OptimizingRBVisitor >> storeTemporary: anInteger with: value [
 	| store index |
 	index := -1 - anInteger.
@@ -237,24 +238,24 @@ OptimizingRBVisitor >> storeTemporary: anInteger with: value [
 	currentBlock add: store
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 OptimizingRBVisitor >> visit [
 	self visitMethodNode: method parseTree doSemanticAnalysis.
 	^ firstBlock
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 OptimizingRBVisitor >> visit: aParseNode [
 	super visit: aParseNode.
 	^firstBlock
 ]
 
-{ #category : #'emitting - load' }
+{ #category : 'emitting - load' }
 OptimizingRBVisitor >> visitArgumentNode: anArgumentNode [
 	^ self loadArgument: anArgumentNode name
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 OptimizingRBVisitor >> visitAssignmentNode: anAssignmentNode [
 	| result |
 	result := anAssignmentNode expression acceptVisitor: self.
@@ -262,7 +263,7 @@ OptimizingRBVisitor >> visitAssignmentNode: anAssignmentNode [
 		do: [:node | node binding store: result using: self]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 OptimizingRBVisitor >> visitBlockNode: anRBBlockNode [
 	| previous cfg |
 	previous := currentBlock.
@@ -273,7 +274,7 @@ OptimizingRBVisitor >> visitBlockNode: anRBBlockNode [
 	^OBlockClosure containing: cfg
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 OptimizingRBVisitor >> visitCascadeNode: aCascadeNode [
 	| receiver arguments send block |
 	block := currentBlock.
@@ -288,17 +289,17 @@ OptimizingRBVisitor >> visitCascadeNode: aCascadeNode [
 	^send
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 OptimizingRBVisitor >> visitIdentifier: anIdentifierNode [
 	^anIdentifierNode binding loadUsing: self
 ]
 
-{ #category : #'emitting - load' }
+{ #category : 'emitting - load' }
 OptimizingRBVisitor >> visitInstanceVariableNode: aVariableNode [
 ^ self loadInstance: aVariableNode name
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 OptimizingRBVisitor >> visitLiteralValueNode: aLiteralNode [
 	| load |
 	load := OLoadConstant valued: aLiteralNode value.
@@ -306,7 +307,7 @@ OptimizingRBVisitor >> visitLiteralValueNode: aLiteralNode [
 	^ load
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 OptimizingRBVisitor >> visitMessageNode: aMessageNode [
 	| receiver arguments selector send |
 	receiver := aMessageNode receiver acceptVisitor: self.
@@ -321,7 +322,7 @@ OptimizingRBVisitor >> visitMessageNode: aMessageNode [
 	^send
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 OptimizingRBVisitor >> visitMethodNode: anRBMethodNode [
 	| last |
 	self visitScript: anRBMethodNode.
@@ -330,7 +331,7 @@ OptimizingRBVisitor >> visitMethodNode: anRBMethodNode [
 	self lowerSpecialABI: anRBMethodNode
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 OptimizingRBVisitor >> visitReturnNode: aReturnNode [
 	| source instruction |
 	source := aReturnNode value acceptVisitor: self.
@@ -341,7 +342,7 @@ OptimizingRBVisitor >> visitReturnNode: aReturnNode [
 	^ instruction
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 OptimizingRBVisitor >> visitScript: aScriptNode [
 	| previous |
 	previous := activation.
@@ -350,22 +351,22 @@ OptimizingRBVisitor >> visitScript: aScriptNode [
 	previous ifNotNil: [activation := previous]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 OptimizingRBVisitor >> visitSelector: aSelectorNode [
 	
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 OptimizingRBVisitor >> visitSelfNode: aVariableNode [
 	^ self loadSelf
 ]
 
-{ #category : #'emitting - load' }
+{ #category : 'emitting - load' }
 OptimizingRBVisitor >> visitTemporaryNode: aTemporaryNode [
 	^ self loadTemporary: aTemporaryNode name
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 OptimizingRBVisitor >> visitVariableNode: aVariableNode [
 	^ aVariableNode binding emitValue: self
 ]

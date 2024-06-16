@@ -1,20 +1,21 @@
 Class {
-	#name : #NilBinding,
-	#superclass : #LiteralBinding,
-	#category : #'Powerlang-SCompiler-Bindings'
+	#name : 'NilBinding',
+	#superclass : 'LiteralBinding',
+	#category : 'Powerlang-SCompiler-Bindings',
+	#package : 'Powerlang-SCompiler-Bindings'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 NilBinding >> encodeUsing: aTreecodeEmitter [
 	aTreecodeEmitter encodeNil
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 NilBinding >> name [
 	^'nil'
 ]
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 NilBinding >> value [
 	^nil
 ]

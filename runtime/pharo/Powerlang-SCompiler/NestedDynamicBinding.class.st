@@ -1,23 +1,24 @@
 Class {
-	#name : #NestedDynamicBinding,
-	#superclass : #DynamicBinding,
+	#name : 'NestedDynamicBinding',
+	#superclass : 'DynamicBinding',
 	#instVars : [
 		'parent'
 	],
-	#category : #'Powerlang-SCompiler-Bindings'
+	#category : 'Powerlang-SCompiler-Bindings',
+	#package : 'Powerlang-SCompiler-Bindings'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 NestedDynamicBinding >> encodeUsing: aTreecodeEmitter [
 	aTreecodeEmitter encodeNestedDynamicVar: name
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 NestedDynamicBinding >> literal [
 	^name collect: [ :n | n asSymbol]
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 NestedDynamicBinding >> printNameOn: aStream [
 	name do: [ :n | aStream nextPutAll: n ] separatedBy: [ aStream nextPut: $. ]
 ]

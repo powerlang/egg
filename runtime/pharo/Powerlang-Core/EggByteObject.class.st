@@ -1,26 +1,24 @@
 Class {
-	#name : 'EggByteObject',
-	#superclass : 'EggHeapObject',
+	#name : #EggByteObject,
+	#superclass : #EggHeapObject,
 	#instVars : [
 		'bytes'
 	],
-	#category : 'Powerlang-Core-Execution-Metacircular',
-	#package : 'Powerlang-Core',
-	#tag : 'Execution-Metacircular'
+	#category : 'Powerlang-Core-Execution-Metacircular'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggByteObject >> asLocalString [
 	^ bytes allButLast asString
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggByteObject >> at: index [
 
 	^bytes at: index
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggByteObject >> at: index put: anLMRObject [
 	| value |
 	value := anLMRObject value.
@@ -28,25 +26,25 @@ EggByteObject >> at: index put: anLMRObject [
 	^ anLMRObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggByteObject >> bytes [
 	^bytes
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggByteObject >> bytes: aByteArray [
 	self ASSERT: aByteArray size = header size.
 	self ASSERT: aByteArray class == ByteArray.
 	bytes := aByteArray
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggByteObject >> header: anLMRObjectHeader [
 	super header: anLMRObjectHeader.
 	bytes := ByteArray new: header size
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggByteObject >> isBytes [
 	^true
 ]

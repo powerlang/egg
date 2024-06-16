@@ -1,20 +1,21 @@
 Class {
-	#name : #SFFIDescriptor,
-	#superclass : #ByteArray,
-	#type : #bytes,
+	#name : 'SFFIDescriptor',
+	#superclass : 'ByteArray',
+	#type : 'bytes',
 	#classVars : [
 		'FFICallingConventions',
 		'FFITypes'
 	],
-	#category : #'Powerlang-SCompiler-Parser'
+	#category : 'Powerlang-SCompiler-Parser',
+	#package : 'Powerlang-SCompiler-Parser'
 }
 
-{ #category : #'class initialization' }
+{ #category : 'class initialization' }
 SFFIDescriptor class >> initialize [
 	self initializeFFITypes; initializeCallingConventions
 ]
 
-{ #category : #'class initialization' }
+{ #category : 'class initialization' }
 SFFIDescriptor class >> initializeCallingConventions [
 	FFICallingConventions := Dictionary new.
 	FFICallingConventions
@@ -23,7 +24,7 @@ SFFIDescriptor class >> initializeCallingConventions [
 		at: 'callback' put: 22
 ]
 
-{ #category : #'class initialization' }
+{ #category : 'class initialization' }
 SFFIDescriptor class >> initializeFFITypes [
 	FFITypes := Dictionary new.
 	FFITypes
@@ -43,7 +44,7 @@ SFFIDescriptor class >> initializeFFITypes [
 		at: 'double' put: 14
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 SFFIDescriptor class >> ret: aString args: aCollection cc: ccName [
 	| args return cc result |
 	args := aCollection
@@ -64,17 +65,17 @@ SFFIDescriptor class >> ret: aString args: aCollection cc: ccName [
 		arguments: args
 ]
 
-{ #category : #calls }
+{ #category : 'calls' }
 SFFIDescriptor >> arguments: aCollection [
 	self replaceFrom: 3 to: 3 + aCollection size -1 with: aCollection
 ]
 
-{ #category : #calls }
+{ #category : 'calls' }
 SFFIDescriptor >> callingConvention: anInteger [
 	self at: 1 put: anInteger
 ]
 
-{ #category : #calls }
+{ #category : 'calls' }
 SFFIDescriptor >> return: anInteger [
 	self at: 2 put: anInteger
 ]

@@ -1,66 +1,67 @@
 Class {
-	#name : #SSelectorNode,
-	#superclass : #SParseNode,
+	#name : 'SSelectorNode',
+	#superclass : 'SParseNode',
 	#instVars : [
 		'symbol',
 		'keywords'
 	],
-	#category : #'Powerlang-SCompiler-Parser'
+	#category : 'Powerlang-SCompiler-Parser',
+	#package : 'Powerlang-SCompiler-Parser'
 }
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SSelectorNode >> acceptVisitor: visitor [
 	^visitor visitSelector: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSelectorNode >> addKeyword: aSelectorNode [
 	keywords isNil ifTrue: [keywords := OrderedCollection new: 1].
 	keywords add: aSelectorNode
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSelectorNode >> end [
 	stretch end ifNotNil: [:e | ^e].
 	^keywords notNil ifTrue: [keywords last end]
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SSelectorNode >> hasSymbol [
 	^symbol isSymbol
 ]
 
-{ #category : #queries }
+{ #category : 'queries' }
 SSelectorNode >> isBinary [
 	^symbol isBinary
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SSelectorNode >> isSelector [
 	^true
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSelectorNode >> keywords [
 	^keywords isNil ifTrue: [{self}] ifFalse: [keywords]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SSelectorNode >> positions [
 	^self keywords collect: [:node | node position]
 ]
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 SSelectorNode >> symbol [
 	^symbol
 ]
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 SSelectorNode >> symbol: aString [
 	symbol := aString asSymbol
 ]
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 SSelectorNode >> value [
 	^symbol
 ]

@@ -1,14 +1,15 @@
 Class {
-	#name : #BlockScope,
-	#superclass : #ScriptScope,
+	#name : 'BlockScope',
+	#superclass : 'ScriptScope',
 	#instVars : [
 		'environments',
 		'captured'
 	],
-	#category : #'Powerlang-SCompiler-Parser'
+	#category : 'Powerlang-SCompiler-Parser',
+	#package : 'Powerlang-SCompiler-Parser'
 }
 
-{ #category : #binding }
+{ #category : 'binding' }
 BlockScope >> captureArgument: anArgumentBinding [
 	| name |
 	name := anArgumentBinding name.
@@ -20,7 +21,7 @@ BlockScope >> captureArgument: anArgumentBinding [
 		copy declaration: transferred declaration]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 BlockScope >> captureEnvironment: aScriptNode [
 	script == aScriptNode ifTrue: [^self].
 	(environments identityIncludes: aScriptNode) ifTrue: [^self].
@@ -30,7 +31,7 @@ BlockScope >> captureEnvironment: aScriptNode [
 		ifFalse: [environments addLast: aScriptNode]
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 BlockScope >> captureLocal: aLocalBinding [
 	(self defines: aLocalBinding name) ifTrue: [^aLocalBinding].
 	^aLocalBinding isTemporary
@@ -38,14 +39,14 @@ BlockScope >> captureLocal: aLocalBinding [
 		ifFalse: [self captureArgument: aLocalBinding]
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 BlockScope >> captureSelf [
 	captureSelf ifTrue: [^self].
 	captureSelf := true.
 	self parent captureSelf
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 BlockScope >> captureTemporary: aTemporaryBinding [
 	| name |
 	name := aTemporaryBinding name.
@@ -60,12 +61,12 @@ BlockScope >> captureTemporary: aTemporaryBinding [
 		copy declaration: transferred declaration]
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 BlockScope >> capturedArguments [
 	^captured select: [:b | b isArgument]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 BlockScope >> capturedEnvironmentIndexOf: aScriptNode [
 	| index |
 	aScriptNode realScript == script realScript
@@ -75,22 +76,22 @@ BlockScope >> capturedEnvironmentIndexOf: aScriptNode [
 	^self capturesSelf ifTrue: [ index + 1 ] ifFalse: [ index ]
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 BlockScope >> capturedEnvironments [
 	^environments
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 BlockScope >> capturesHome [
 	^self home notNil
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 BlockScope >> copyLocal: binding [
 	^script isInlined ifTrue: [binding] ifFalse: [binding copy beInArray]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 BlockScope >> environmentIndexOf: aScriptNode [
 	"
 	temporal compatibility
@@ -100,19 +101,19 @@ BlockScope >> environmentIndexOf: aScriptNode [
 	^self capturedEnvironmentIndexOf: aScriptNode
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 BlockScope >> environmentSizeUpToCapturedArguments [
 	^self environmentSizeUpToEnvironments + self capturedArguments size
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 BlockScope >> environmentSizeUpToEnvironments [
 	| receiver |
 	receiver := self capturesSelf ifTrue: [ 1 ] ifFalse: [ 0 ].
 	^receiver + environments size
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 BlockScope >> environments [
 	"
 	compatibility, removes the home environment
@@ -123,7 +124,7 @@ BlockScope >> environments [
 	^first isMethod ifTrue: [environments allButFirst] ifFalse: [environments]
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 BlockScope >> home [
 	| first |
 	environments isEmpty ifTrue: [^nil].
@@ -131,29 +132,29 @@ BlockScope >> home [
 	^first isMethod ifTrue: [first]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 BlockScope >> initialize [
 	super initialize.
 	captured := StaticBinder new.
 	environments := OrderedCollection new
 ]
 
-{ #category : #binding }
+{ #category : 'binding' }
 BlockScope >> localBindings [
 	^super localBindings , captured values
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 BlockScope >> parent [
 	^script parent scope
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 BlockScope >> positionCapturedArgument: anArgumentBinding [
 	anArgumentBinding index: self growEnvironment
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 BlockScope >> positionCapturedLocals [
 	script isInlined ifTrue: [^self].
 	envSize := self environmentSizeUpToEnvironments.
@@ -163,7 +164,7 @@ BlockScope >> positionCapturedLocals [
 			ifFalse: [self positionCapturedTemporary: binding]]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 BlockScope >> positionCapturedTemporary: aTemporaryBinding [
 	| outest index declaration |
 	outest := self scriptDefining: aTemporaryBinding name.
@@ -174,7 +175,7 @@ BlockScope >> positionCapturedTemporary: aTemporaryBinding [
 	aTemporaryBinding index: declaration index
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 BlockScope >> positionDefinedArgumentsIn: aScriptScope [
 	arguments do: [:binding | | index |
 		index := binding isInArray
@@ -183,7 +184,7 @@ BlockScope >> positionDefinedArgumentsIn: aScriptScope [
 		binding index: index]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 BlockScope >> positionDefinedLocals [
 	| real |
 	script isInlined
@@ -195,36 +196,36 @@ BlockScope >> positionDefinedLocals [
 		ifFalse: [super positionDefinedLocals]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 BlockScope >> positionLocals [
 	self positionCapturedLocals.
 	super positionLocals
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 BlockScope >> realParent [
 	^script realParent scope
 ]
 
-{ #category : #binding }
+{ #category : 'binding' }
 BlockScope >> resolve: aString [
 	(self resolveLocal: aString) ifNotNil: [:binding | ^binding].
 	^self parent resolve: aString
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 BlockScope >> resolveLocal: aString [
 	(super resolveLocal: aString) ifNotNil: [:binding | ^binding].
 	^captured at: aString
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 BlockScope >> scriptDefining: aString [
 	(self defines: aString) ifTrue: [^script].
 	^self parent scriptDefining: aString
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 BlockScope >> transferLocal: name [
 	| binding copy |
 	(self resolveLocal: name) ifNotNil: [:b | ^b].

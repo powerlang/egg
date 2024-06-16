@@ -3,22 +3,24 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OptimizingNativizer,
-	#superclass : #Object,
+	#name : 'OptimizingNativizer',
+	#superclass : 'Object',
 	#instVars : [
 		'environment',
 		'method',
 		'firstBlock'
 	],
-	#category : #'OCompiler-Core-Main'
+	#category : 'OCompiler-Core-Main',
+	#package : 'OCompiler-Core',
+	#tag : 'Main'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingNativizer class >> on: aCompiledMethod [
 	^self new method: aCompiledMethod
 ]
 
-{ #category : #allocation }
+{ #category : 'allocation' }
 OptimizingNativizer >> allocate [
 	| allocator |
 	allocator := OptimizingRegisterAllocator new
@@ -27,7 +29,7 @@ OptimizingNativizer >> allocate [
 	^allocator doAllocation
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingNativizer >> assembleUsing: allocation [
 	^OptimizingCodeEmitter new
 		method: method;
@@ -38,7 +40,7 @@ OptimizingNativizer >> assembleUsing: allocation [
 		nativeCode
 ]
 
-{ #category : #actions }
+{ #category : 'actions' }
 OptimizingNativizer >> decompose [
 	self
 		validateAllInstructions;
@@ -51,12 +53,12 @@ OptimizingNativizer >> decompose [
 		simplifyCFG
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingNativizer >> eliminateDeadPhis [
 	OptimizingPhiSimplification new processFrom: firstBlock
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingNativizer >> enforceTwoAddressCodeUsing: allocation [
 	| enforcer |
 	enforcer := OptimizingTwoAddressEnforcer new
@@ -65,24 +67,24 @@ OptimizingNativizer >> enforceTwoAddressCodeUsing: allocation [
 	^enforcer doEnforce
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingNativizer >> environment: aNativizationEnvironment [
 	environment := aNativizationEnvironment
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingNativizer >> firstBlock [
 	^firstBlock
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingNativizer >> fragmentInstructions [
 	| binder |
 	binder := OptimizingInstructionFragmenter new firstBlock: firstBlock.
 	binder doFragment
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingNativizer >> inlineMethods [
 	OptimizingMethodInliner new
 		firstBlock: firstBlock;
@@ -90,20 +92,20 @@ OptimizingNativizer >> inlineMethods [
 		inlineAllMessages
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingNativizer >> method: aCompiledMethod [
 	| visitor |
 	method := aCompiledMethod.
-	visitor := OptimizingRBVisitor new environment: environment; method: method.
+	visitor := self visitorClass new environment: environment; method: method.
 	firstBlock := visitor visit: aCompiledMethod parseTree
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingNativizer >> nativeCode [
 	^self nativize
 ]
 
-{ #category : #nativizing }
+{ #category : 'nativizing' }
 OptimizingNativizer >> nativize [
 	| allocation |
 	allocation := self
@@ -121,46 +123,46 @@ OptimizingNativizer >> nativize [
 		assembleUsing: allocation
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingNativizer >> removeRedundantCode [
 	OptimizingValueNumbering new workFrom: firstBlock
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingNativizer >> selectInstructions [
 	| allocator |
 	allocator := OptimizingInstructionSelector new firstBlock: firstBlock.
 	^allocator doSelection
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingNativizer >> simplifyCFG [
 	OptimizingCFGSimplifier new cleanFrom: firstBlock
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingNativizer >> splitCriticalEdges [
 	firstBlock splitAllCriticalEdges
 ]
 
-{ #category : #allocation }
+{ #category : 'allocation' }
 OptimizingNativizer >> transformToCSSA [
 	| transformer |
 	transformer := OptimizingCSSATransformer new firstBlock: firstBlock.
 	transformer applyTransformation
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingNativizer >> unifyReturns [
 	firstBlock unifyReturns
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingNativizer >> validateAllInstructions [
 	firstBlock validateAllInstructions
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingNativizer >> verifyPredecessors [
 	firstBlock validateCFG
 ]

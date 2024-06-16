@@ -3,8 +3,8 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OSimpleLiveRange,
-	#superclass : #OLiveRange,
+	#name : 'OSimpleLiveRange',
+	#superclass : 'OLiveRange',
 	#instVars : [
 		'definition',
 		'uses',
@@ -12,66 +12,67 @@ Class {
 		'usesBlocks',
 		'isSpilled'
 	],
-	#category : #'OCompiler-Core-IR'
+	#category : 'OCompiler-Core-IR',
+	#package : 'OCompiler-Core-IR'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OSimpleLiveRange >> addUseFrom: operation at: block [
 	uses add: operation -> block
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OSimpleLiveRange >> allDefinitions [
 	^OrderedCollection with: definition
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OSimpleLiveRange >> allUses [
 	^uses collect: #key
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OSimpleLiveRange >> anyDefinition [
 	^definition
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OSimpleLiveRange >> beSpilled [
 	isSpilled := true
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OSimpleLiveRange >> clearUses [
 	uses := OrderedCollection new
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OSimpleLiveRange >> definedAt: operation in: block [
 	definition := operation.
 	definitionBlock := block
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OSimpleLiveRange >> definition: operation [
 	definition := operation
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OSimpleLiveRange >> definitionAndUses [
 	^OrderedCollection with: definition -> definitionBlock withAll: uses
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OSimpleLiveRange >> definitionsWithBlocksDo: aBlock [
 	aBlock value: definition value: definitionBlock
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OSimpleLiveRange >> endsAt: operation [
 	^uses isEmpty
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OSimpleLiveRange >> expirationPoints [
 	| associations |
 	associations := uses
@@ -81,53 +82,53 @@ OSimpleLiveRange >> expirationPoints [
 	^associations collect: #key
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OSimpleLiveRange >> initialize [
 	uses := OrderedCollection new.
 	isSpilled := false
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OSimpleLiveRange >> isLiveAt: aBlock [
 	^definition livesAfter: aBlock orOutOf: aBlock
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OSimpleLiveRange >> isSpilled [
 	^isSpilled
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OSimpleLiveRange >> isUnused [
 	^uses isEmpty
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OSimpleLiveRange >> printOn: aStream [
 	aStream nextPutAll: 'LR of: ' , definition printString
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OSimpleLiveRange >> simpleRanges [
 	^OrderedCollection with: self
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OSimpleLiveRange >> startsAt: operation [
 	^definition == operation
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OSimpleLiveRange >> uses [
 	^uses
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OSimpleLiveRange >> usesWithBlocks [
 	^uses
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OSimpleLiveRange >> usesWithBlocksDo: aBlock [
 	uses
 		do: [:association | aBlock value: association key value: association value]

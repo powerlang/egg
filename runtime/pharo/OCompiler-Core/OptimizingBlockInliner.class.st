@@ -3,20 +3,21 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OptimizingBlockInliner,
-	#superclass : #Object,
+	#name : 'OptimizingBlockInliner',
+	#superclass : 'Object',
 	#instVars : [
 		'inlinerActivation'
 	],
-	#category : #'OCompiler-Core-Main'
+	#category : 'OCompiler-Core-Main',
+	#package : 'OCompiler-Core-Main'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingBlockInliner >> canBeInlined [
 	^true
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingBlockInliner >> closureArgumentsIn: aBasicBlock count: anInteger [
 	| result remaining |
 	result := OrderedCollection new.
@@ -28,7 +29,7 @@ OptimizingBlockInliner >> closureArgumentsIn: aBasicBlock count: anInteger [
 	^result
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingBlockInliner >> duplicateClosure: anOCompiledBlock [
 	| closure activation implicits |
 	closure := anOCompiledBlock firstBlock duplicate.
@@ -41,7 +42,7 @@ OptimizingBlockInliner >> duplicateClosure: anOCompiledBlock [
 	^closure
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingBlockInliner >> inline: anOMessageSend in: block [
 	| selector inliner |
 	selector := anOMessageSend selector asString copy replace: $: with: $_.
@@ -49,7 +50,7 @@ OptimizingBlockInliner >> inline: anOMessageSend in: block [
 	^self perform: inliner asSymbol with: anOMessageSend with: block
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingBlockInliner >> inlineValue: message in: block [
 	| closure entry exit after result |
 	closure := message receiver.
@@ -65,7 +66,7 @@ OptimizingBlockInliner >> inlineValue: message in: block [
 	^result -> after
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingBlockInliner >> inlineValue_: message in: block [
 	| closure args arg1 entry exit after closureArgs result |
 	closure := message receiver.
@@ -85,7 +86,7 @@ OptimizingBlockInliner >> inlineValue_: message in: block [
 	^result -> after
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingBlockInliner >> inlineWhileTrue_: message in: block [
 	| antecedent consequent firstAntecedent firstConsequent lastAntecedent lastConsequent join |
 	antecedent := message receiver.
@@ -105,12 +106,12 @@ OptimizingBlockInliner >> inlineWhileTrue_: message in: block [
 	^antecedent -> join
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingBlockInliner >> inlinerActivation: anOActivationRecord [
 	inlinerActivation := anOActivationRecord
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingBlockInliner >> inliners [
 	^#(#value #value: #whileTrue:)
 ]

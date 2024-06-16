@@ -1,33 +1,34 @@
 Class {
-	#name : #IdentifierBinder,
-	#superclass : #Object,
+	#name : 'IdentifierBinder',
+	#superclass : 'Object',
 	#instVars : [
 		'contents'
 	],
-	#category : #'Powerlang-SCompiler-Parser'
+	#category : 'Powerlang-SCompiler-Parser',
+	#package : 'Powerlang-SCompiler-Parser'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 IdentifierBinder class >> new [
 	^super new initialize
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 IdentifierBinder >> contents [
 	^contents
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 IdentifierBinder >> keyFor: aString [
 	^self subclassResponsibility
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 IdentifierBinder >> printOn: aStream [
 	self printOn: aStream indent: 0
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 IdentifierBinder >> printOn: aStream indent: anInteger [
 	self subclassResponsibility
 ]

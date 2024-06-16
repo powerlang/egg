@@ -1,41 +1,39 @@
 Class {
-	#name : 'ProtoeggBootstrapDictionary',
-	#superclass : 'ProtoeggObject',
+	#name : #ProtoeggBootstrapDictionary,
+	#superclass : #ProtoeggObject,
 	#instVars : [
 		'image',
 		'assocs',
 		'realSpec',
 		'constant'
 	],
-	#category : 'Powerlang-Core-Execution-Bootstrap',
-	#package : 'Powerlang-Core',
-	#tag : 'Execution-Bootstrap'
+	#category : 'Powerlang-Core-Execution-Bootstrap'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggBootstrapDictionary >> associationAt: aSymbol ifAbsent: aBlock [
 	^ assocs at: aSymbol ifAbsent: aBlock
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggBootstrapDictionary >> associationAt: aSymbol ifPresent: aBlock [
 	assocs at: aSymbol ifPresent: [:assoc |  ^ aBlock value: assoc ].
 	^ nil
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggBootstrapDictionary >> associations [
 	^ assocs values
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggBootstrapDictionary >> at: aSymbol [
 	^self
 		at: aSymbol
 		ifAbsent: [ self error: aSymbol , ' was not found in dictionary' ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggBootstrapDictionary >> at: aSymbol ifAbsent: aBlock [
 	| assoc |
 	assoc := assocs
@@ -44,14 +42,14 @@ ProtoeggBootstrapDictionary >> at: aSymbol ifAbsent: aBlock [
 	^ assoc value
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggBootstrapDictionary >> at: aSymbol ifPresent: aBlock [
 	| value |
 	value := self at: aSymbol ifAbsent: [ ^ nil ].
 	^ aBlock value: value
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggBootstrapDictionary >> at: aSymbol put: anObject [
 	| s assoc value |
 	assoc := assocs
@@ -63,55 +61,55 @@ ProtoeggBootstrapDictionary >> at: aSymbol put: anObject [
 	^ value
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggBootstrapDictionary >> beConstant [
 	constant := true
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggBootstrapDictionary >> image: aPowertalkRingImage [
 	image := aPowertalkRingImage
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggBootstrapDictionary >> includesKey: aSymbol [
 	^assocs includesKey: aSymbol
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggBootstrapDictionary >> initialize [
 	assocs := Dictionary new.
 	constant := false
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggBootstrapDictionary >> initializeAs: anRGBehavior [
 	spec := anRGBehavior
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggBootstrapDictionary >> isConstant [
 	^ constant
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggBootstrapDictionary >> isDictionaryMap [ 
 	^ true
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggBootstrapDictionary >> keys [
 	| keys |
 	keys := assocs values collect: #key.
 	^image newArray: keys
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggBootstrapDictionary >> realSpec [
 	^realSpec
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggBootstrapDictionary >> realSpec: anRGBehavior [
 	realSpec := anRGBehavior 
 ]

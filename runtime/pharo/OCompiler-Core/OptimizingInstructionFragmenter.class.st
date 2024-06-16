@@ -3,32 +3,33 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OptimizingInstructionFragmenter,
-	#superclass : #Object,
+	#name : 'OptimizingInstructionFragmenter',
+	#superclass : 'Object',
 	#instVars : [
 		'messages',
 		'firstBlock'
 	],
-	#category : #'OCompiler-Core-Main'
+	#category : 'OCompiler-Core-Main',
+	#package : 'OCompiler-Core-Main'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingInstructionFragmenter >> activationRecord [
 	^firstBlock activationRecord
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> doFragment [
 	firstBlock
 		reversePostOrderDo: [:block | self fragmentInstructionsOf: block]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingInstructionFragmenter >> firstBlock: aBasicBlock [
 	firstBlock := aBasicBlock
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> fragmentBinaryCommutative: instruction [
 	| left right |
 	left := instruction receiver.
@@ -40,7 +41,7 @@ OptimizingInstructionFragmenter >> fragmentBinaryCommutative: instruction [
 	self replace: instruction withVariable: left with: right
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> fragmentBinaryCompare: instruction [
 	| left right new |
 	left := instruction receiver.
@@ -53,7 +54,7 @@ OptimizingInstructionFragmenter >> fragmentBinaryCompare: instruction [
 	self replace: instruction withVariable: left with: right
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> fragmentBinaryNonCommutative: instruction [
 	| left right |
 	left := instruction receiver.
@@ -63,7 +64,7 @@ OptimizingInstructionFragmenter >> fragmentBinaryNonCommutative: instruction [
 	self replace: instruction withVariable: left with: right
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> fragmentBitsAt: instruction [
 	| receiver constant stretch and shift |
 	receiver := instruction receiver.
@@ -81,14 +82,14 @@ OptimizingInstructionFragmenter >> fragmentBitsAt: instruction [
 	instruction beforeInsert: and; dissolveReplacingWith: shift
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> fragmentCallSite: instruction [
 	| callsite |
 	callsite := OLoadOperation base: self activationRecord slotAtImm: 2.
 	instruction dissolveReplacingWith: callsite
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> fragmentGenericMessage: instruction [
 	| arguments new |
 	arguments := instruction arguments.
@@ -100,19 +101,19 @@ OptimizingInstructionFragmenter >> fragmentGenericMessage: instruction [
 	firstBlock activationRecord haveFrame
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> fragmentInstructionsFrom: aBasicBlock [
 	self firstBlock: aBasicBlock.
 	aBasicBlock
 		reversePostOrderDo: [:block | self fragmentInstructionsOf: block]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> fragmentInstructionsOf: block [
 	block firstInstruction acceptVisitor: self
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> fragmentLoadByte: instruction [
 	| base index new |
 	base := instruction receiver.
@@ -123,7 +124,7 @@ OptimizingInstructionFragmenter >> fragmentLoadByte: instruction [
 	instruction dissolveReplacingWith: new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> fragmentLoadFlags: instruction [
 	| base new |
 	base := instruction receiver.
@@ -131,7 +132,7 @@ OptimizingInstructionFragmenter >> fragmentLoadFlags: instruction [
 	instruction dissolveReplacingWith: new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> fragmentLoadLargeSize: instruction [
 	| base new |
 	base := instruction receiver.
@@ -139,7 +140,7 @@ OptimizingInstructionFragmenter >> fragmentLoadLargeSize: instruction [
 	instruction dissolveReplacingWith: new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> fragmentLoadLongSlot: instruction [
 	| base index new |
 	base := instruction receiver.
@@ -150,7 +151,7 @@ OptimizingInstructionFragmenter >> fragmentLoadLongSlot: instruction [
 	instruction dissolveReplacingWith: new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> fragmentLoadSlot: instruction [
 	| base index new |
 	base := instruction receiver.
@@ -161,7 +162,7 @@ OptimizingInstructionFragmenter >> fragmentLoadSlot: instruction [
 	instruction dissolveReplacingWith: new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> fragmentLoadSmallSize: instruction [
 	| base new |
 	base := instruction receiver.
@@ -169,7 +170,7 @@ OptimizingInstructionFragmenter >> fragmentLoadSmallSize: instruction [
 	instruction dissolveReplacingWith: new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> fragmentLoadULong: instruction [
 	| base index new |
 	base := instruction receiver.
@@ -180,7 +181,7 @@ OptimizingInstructionFragmenter >> fragmentLoadULong: instruction [
 	instruction dissolveReplacingWith: new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> fragmentPatchIndirectCallSiteTo: instruction [
 	| nativeCode callsite patch |
 	nativeCode := instruction arguments first.
@@ -190,7 +191,7 @@ OptimizingInstructionFragmenter >> fragmentPatchIndirectCallSiteTo: instruction 
 	patch beforeInsert: callsite
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> fragmentStoreByte: instruction [
 	| base index new value |
 	base := instruction receiver.
@@ -202,7 +203,7 @@ OptimizingInstructionFragmenter >> fragmentStoreByte: instruction [
 	instruction replaceAllUsesWith: value; dissolveReplacingWith: new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> fragmentStoreFlags: instruction [
 	| base value new |
 	base := instruction receiver.
@@ -211,7 +212,7 @@ OptimizingInstructionFragmenter >> fragmentStoreFlags: instruction [
 	instruction replaceAllUsesWith: value; dissolveReplacingWith: new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> fragmentStoreLargeSize: instruction [
 	| base value new |
 	base := instruction receiver.
@@ -220,7 +221,7 @@ OptimizingInstructionFragmenter >> fragmentStoreLargeSize: instruction [
 	instruction replaceAllUsesWith: value; dissolveReplacingWith: new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> fragmentStoreLongSlot: instruction [
 	| base index new value |
 	base := instruction receiver.
@@ -232,7 +233,7 @@ OptimizingInstructionFragmenter >> fragmentStoreLongSlot: instruction [
 	instruction replaceAllUsesWith: value; dissolveReplacingWith: new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> fragmentStoreSlot: instruction [
 	| base index new value |
 	base := instruction receiver.
@@ -244,7 +245,7 @@ OptimizingInstructionFragmenter >> fragmentStoreSlot: instruction [
 	instruction replaceAllUsesWith: value; dissolveReplacingWith: new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> fragmentStoreSmallSize: instruction [
 	| base value new |
 	base := instruction receiver.
@@ -253,7 +254,7 @@ OptimizingInstructionFragmenter >> fragmentStoreSmallSize: instruction [
 	instruction replaceAllUsesWith: value; dissolveReplacingWith: new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> fragmentStoreULong: instruction [
 	| base index new value |
 	base := instruction receiver.
@@ -265,7 +266,7 @@ OptimizingInstructionFragmenter >> fragmentStoreULong: instruction [
 	instruction replaceAllUsesWith: value; dissolveReplacingWith: new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> fragmentTransferControlTo: instruction [
 	| receiver machine |
 	receiver := instruction receiver.
@@ -273,7 +274,7 @@ OptimizingInstructionFragmenter >> fragmentTransferControlTo: instruction [
 	self replace: instruction withVariable: receiver with: machine
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> fragmentUnary: instruction [
 	| receiver new |
 	receiver := instruction receiver.
@@ -282,12 +283,12 @@ OptimizingInstructionFragmenter >> fragmentUnary: instruction [
 	instruction dissolveReplacingWith: new
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingInstructionFragmenter >> initialize [
 	self initializeMessages
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingInstructionFragmenter >> initializeMessages [
 	messages := Dictionary new
 		at: #'+' put: #BinaryCommutative:;
@@ -333,14 +334,14 @@ OptimizingInstructionFragmenter >> initializeMessages [
 		yourself
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> insertCopyResultAfter: anInstruction [
 	| copy |
 	copy := OUnaryOperation receiver: anInstruction name: #copyResult.
 	anInstruction afterInsert: copy; replaceAllUsesWith: copy
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> replace: instruction withBinary: left withConstant: right [
 	| constant new |
 	constant := right value.
@@ -352,7 +353,7 @@ OptimizingInstructionFragmenter >> replace: instruction withBinary: left withCon
 	^new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingInstructionFragmenter >> replace: instruction withVariable: left with: right [
 	| new |
 	new := OBinaryVariableOperation
@@ -363,74 +364,74 @@ OptimizingInstructionFragmenter >> replace: instruction withVariable: left with:
 	^new
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingInstructionFragmenter >> selectorFor: name [
 	^(#fragment , (messages at: name ifAbsent: [#GenericMessage:])) asSymbol
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingInstructionFragmenter >> visitBinaryWithConstant: instruction [
 	
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingInstructionFragmenter >> visitBinaryWithVariable: instruction [
 	
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingInstructionFragmenter >> visitJump: instruction [
 	
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingInstructionFragmenter >> visitJumpFalse: instruction [
 	
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingInstructionFragmenter >> visitJumpTrue: instruction [
 	
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingInstructionFragmenter >> visitLoad: instruction [
 	
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingInstructionFragmenter >> visitLoadConstant: instruction [
 	
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingInstructionFragmenter >> visitLoadImplicit: instruction [
 	
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingInstructionFragmenter >> visitMessageSend: instruction [
 	| selector |
 	selector := self selectorFor: instruction selector.
 	self perform: selector with: instruction
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingInstructionFragmenter >> visitPhi: instruction [
 	
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingInstructionFragmenter >> visitReturn: instruction [
 	
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingInstructionFragmenter >> visitStore: instruction [
 	
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingInstructionFragmenter >> visitUnary: instruction [
 	
 ]

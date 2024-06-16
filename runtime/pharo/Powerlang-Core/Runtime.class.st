@@ -1,6 +1,6 @@
 Class {
-	#name : 'Runtime',
-	#superclass : 'Object',
+	#name : #Runtime,
+	#superclass : #Object,
 	#instVars : [
 		'lookup',
 		'storage',
@@ -10,12 +10,10 @@ Class {
 		'shapeMap',
 		'objectModel'
 	],
-	#category : 'Powerlang-Core-Metaphysics',
-	#package : 'Powerlang-Core',
-	#tag : 'Metaphysics'
+	#category : 'Powerlang-Core-Metaphysics'
 }
 
-{ #category : 'private' }
+{ #category : #private }
 Runtime class >> forBootstrappingPst: aSmalltalkBootstrapper spec: anRGEnvironment [
 	^ self new
 		bridge: (BootstrappedPstBridge new bootstrapper: aSmalltalkBootstrapper);
@@ -24,7 +22,7 @@ Runtime class >> forBootstrappingPst: aSmalltalkBootstrapper spec: anRGEnvironme
 		useEmulationLookup: anRGEnvironment
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 Runtime class >> forEmulatingPst: aSmalltalkBootstrapper [
 	^ self new
 		bridge: (BootstrappedPstBridge new bootstrapper: aSmalltalkBootstrapper);
@@ -33,7 +31,7 @@ Runtime class >> forEmulatingPst: aSmalltalkBootstrapper [
 		loadBridge
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 Runtime class >> forLocalPharo [
 	^ self new
 		bridge: PharoBridge new;
@@ -43,7 +41,7 @@ Runtime class >> forLocalPharo [
 		loadShapesFromImage
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 Runtime class >> forSimulating: aModuleSpec memory: aByteArray [
 	| adapter |
 	adapter := ByteArrayAdapter on: aByteArray.
@@ -55,88 +53,88 @@ Runtime class >> forSimulating: aModuleSpec memory: aByteArray [
 		loadBridge
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 Runtime class >> new [
 	^self basicNew initialize
 ]
 
-{ #category : 'storage' }
+{ #category : #storage }
 Runtime >> arrayedSlotOf: object at: index [
 	^ objectFormat arrayedSlotOf: object at: index
 ]
 
-{ #category : 'storage' }
+{ #category : #storage }
 Runtime >> arrayedSlotOf: object at: index put: value [
 	^ storage arrayedSlotOf: object at: index put: value
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 Runtime >> bridge [
 	^bridge
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 Runtime >> bridge: aBridge [
 	bridge := aBridge.
 	bridge runtime: self
 ]
 
-{ #category : 'storage' }
+{ #category : #storage }
 Runtime >> bytesOf: oid [
 	^objectFormat bytesOf: oid
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 Runtime >> false [
 	^ bridge false
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 Runtime >> handleOn: oid [
 	^ ObjectHandle on: oid within: self
 ]
 
-{ #category : 'shapes' }
+{ #category : #shapes }
 Runtime >> indexOf: varname inStructureOf: type [
 	^shapeMap indexOf: varname at: type
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 Runtime >> initialize [
 	shapeMap := ShapeMap new.
 	self useMirrorLookup
 ]
 
-{ #category : 'object format' }
+{ #category : #'object format' }
 Runtime >> integerHandle: anInteger [
 	| oid |
 	oid := objectFormat newInteger: anInteger.
 	^ self handleOn: oid
 ]
 
-{ #category : 'object format' }
+{ #category : #'object format' }
 Runtime >> integerOf: oid [
 	^objectFormat integerOf: oid
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 Runtime >> isLocal [
 	^objectModel == Smalltalk.
 
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 Runtime >> loadBridge [
 	bridge findRootObjects
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 Runtime >> loadShapesFrom: anRGEnvironment [
 	objectModel := anRGEnvironment.
 	anRGEnvironment allClasses do: [ :class | shapeMap load: class ]
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 Runtime >> loadShapesFromImage [
 	| classes |
 	objectModel := Smalltalk.
@@ -144,36 +142,36 @@ Runtime >> loadShapesFromImage [
 	classes do: [ :class | shapeMap load: class ]
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 Runtime >> lookup [
 	^ lookup
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 Runtime >> lookup: aSymbol on: aSubject [
 	^lookup lookup: aSymbol on: aSubject
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 Runtime >> lookupSuper: aSymbol on: aSubject from: classname [
 	^ lookup lookupSuper: aSymbol on: aSubject from: classname
 ]
 
-{ #category : 'object format' }
+{ #category : #'object format' }
 Runtime >> new: oid [
 	| instance |
 	instance := storage new: oid.
 	^ self handleOn: instance
 ]
 
-{ #category : 'object format' }
+{ #category : #'object format' }
 Runtime >> new: oid sized: anInteger [
 	| instance |
 	instance := storage new: oid sized: anInteger.
 	^ self handleOn: instance
 ]
 
-{ #category : 'object format' }
+{ #category : #'object format' }
 Runtime >> newClosure: anObjectHandle [
 	| oid |
 	oid := storage newClosure: anObjectHandle.
@@ -182,7 +180,7 @@ Runtime >> newClosure: anObjectHandle [
 	^ self handleOn: oid
 ]
 
-{ #category : 'object format' }
+{ #category : #'object format' }
 Runtime >> newClosureHandle: aPCompiledBlock [
 	| oid |
 	oid := storage newClosure: aPCompiledBlock.
@@ -191,88 +189,88 @@ Runtime >> newClosureHandle: aPCompiledBlock [
 	^ self handleOn: oid
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 Runtime >> nil [
 	^bridge nil
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 Runtime >> objectFormat [
 	^objectFormat
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 Runtime >> objectFormat: anObjectFormat [
 	objectFormat := anObjectFormat.
 	anObjectFormat runtime: self
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 Runtime >> objectModel [
 	^objectModel
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 Runtime >> objectModel: aModuleSpec [
 	^objectModel := aModuleSpec
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 Runtime >> objectNamed: name [
 	^ bridge objectNamed: name
 ]
 
-{ #category : 'storage' }
+{ #category : #storage }
 Runtime >> slotOf: object at: index [
 	^objectFormat slotOf: object at: index
 ]
 
-{ #category : 'storage' }
+{ #category : #storage }
 Runtime >> slotOf: object at: index put: value [
 	^ storage slotOf: object at: index put: value
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 Runtime >> storage [
 	^storage
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 Runtime >> storage: anObject [
 	storage := anObject
 ]
 
-{ #category : 'storage' }
+{ #category : #storage }
 Runtime >> stringOf: oid [
 	^objectFormat stringOf: oid
 ]
 
-{ #category : 'shapes' }
+{ #category : #shapes }
 Runtime >> structureOf: type [
 	^shapeMap at: type
 ]
 
-{ #category : 'storage' }
+{ #category : #storage }
 Runtime >> symbolOf: oid [
 	^objectFormat symbolOf: oid
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 Runtime >> true [
 	^ bridge true
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 Runtime >> useEmulationLookup: anRGEnvironment [ 
 	lookup := EmulationLookup new spec: anRGEnvironment
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 Runtime >> useMirrorLookup [
 	lookup := MirrorLookup new
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 Runtime >> usePharoLookup [
 	lookup := PharoLookup new
 ]

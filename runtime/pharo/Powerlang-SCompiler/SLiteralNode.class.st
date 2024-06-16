@@ -1,48 +1,49 @@
 Class {
-	#name : #SLiteralNode,
-	#superclass : #SParseNode,
+	#name : 'SLiteralNode',
+	#superclass : 'SParseNode',
 	#instVars : [
 		'value'
 	],
-	#category : #'Powerlang-SCompiler-Parser'
+	#category : 'Powerlang-SCompiler-Parser',
+	#package : 'Powerlang-SCompiler-Parser'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 SLiteralNode >> acceptVisitor: visitor [
 	^visitor visitLiteral: self
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SLiteralNode >> beSymbol [
 	value := value asSymbol
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SLiteralNode >> hasSymbol [
 	^value isSymbol
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SLiteralNode >> isEvaluable [
 	^true
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SLiteralNode >> isImmediate [
 	^true
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SLiteralNode >> isLiteral [
 	^true
 ]
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 SLiteralNode >> value [
 	^value
 ]
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 SLiteralNode >> value: anObject [
 	value := anObject
 ]

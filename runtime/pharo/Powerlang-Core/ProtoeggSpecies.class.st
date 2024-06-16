@@ -1,30 +1,28 @@
 Class {
-	#name : 'ProtoeggSpecies',
-	#superclass : 'ProtoeggSlotObject',
+	#name : #ProtoeggSpecies,
+	#superclass : #ProtoeggSlotObject,
 	#instVars : [
 		'instanceSpec'
 	],
-	#category : 'Powerlang-Core-Execution-Bootstrap',
-	#package : 'Powerlang-Core',
-	#tag : 'Execution-Bootstrap'
+	#category : 'Powerlang-Core-Execution-Bootstrap'
 }
 
-{ #category : 'instance creation' }
+{ #category : #'instance creation' }
 ProtoeggSpecies class >> classFor: anRGBehavior [
 	^self
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggSpecies >> instanceSpec [
 	^instanceSpec
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggSpecies >> instanceSpec: anRGBehavior [
 	instanceSpec := anRGBehavior
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggSpecies >> storeCvar: aSymbol with: anObject [
 	| species namespaces |
 	species := self. 
@@ -40,7 +38,7 @@ ProtoeggSpecies >> storeCvar: aSymbol with: anObject [
 
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggSpecies >> storeNamed: aSymbol with: anObjectMap [
 	(self storeCvar: aSymbol with: anObjectMap) ifNotNil: [ :value | ^ value ].
 	^ self module namespace
@@ -48,12 +46,12 @@ ProtoeggSpecies >> storeNamed: aSymbol with: anObjectMap [
 		put: anObjectMap
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggSpecies >> superclass [
 	^ self slotNamed: #superclass
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggSpecies >> superclass: aSpeciesMap [
 	^ self slotNamed: #superclass put: aSpeciesMap
 ]

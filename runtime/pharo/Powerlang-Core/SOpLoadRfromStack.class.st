@@ -1,25 +1,23 @@
 Class {
-	#name : 'SOpLoadRfromStack',
-	#superclass : 'SOperation',
+	#name : #SOpLoadRfromStack,
+	#superclass : #SOperation,
 	#instVars : [
 		'index'
 	],
-	#category : 'Powerlang-Core-SExpressions',
-	#package : 'Powerlang-Core',
-	#tag : 'SExpressions'
+	#category : 'Powerlang-Core-SExpressions'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 SOpLoadRfromStack >> acceptVisitor: visitor [
 	^ visitor visitOpLoadRfromStack: self
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 SOpLoadRfromStack >> index [
 	^index
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 SOpLoadRfromStack >> index: anInteger [
 	index := anInteger
 ]

@@ -3,8 +3,8 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OptimizingVariableBinder,
-	#superclass : #Object,
+	#name : 'OptimizingVariableBinder',
+	#superclass : 'Object',
 	#instVars : [
 		'definitions',
 		'currentBlock',
@@ -15,32 +15,33 @@ Class {
 		'pendingPhis',
 		'abi'
 	],
-	#category : #'OCompiler-Core-Main'
+	#category : 'OCompiler-Core-Main',
+	#package : 'OCompiler-Core-Main'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingVariableBinder >> abi: anAbi [
 	abi := anAbi
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingVariableBinder >> define: value as: name [
 	self define: value as: name in: currentBlock
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingVariableBinder >> define: value as: name in: block [
 	| here |
 	here := definitions at: block ifAbsentPut: [Dictionary new].
 	here at: name put: value
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingVariableBinder >> definitionOf: name [
 	^self definitionOf: name from: currentBlock
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingVariableBinder >> definitionOf: name before: block [
 	| instruction current |
 	instruction := block firstInstruction.
@@ -59,7 +60,7 @@ OptimizingVariableBinder >> definitionOf: name before: block [
 				ifPresent: [:here | here at: name ifPresent: [:value | ^value]]]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingVariableBinder >> definitionOf: name from: block [
 	| current |
 	current := block.
@@ -75,7 +76,7 @@ OptimizingVariableBinder >> definitionOf: name from: block [
 				self error: 'undefined variable <' , name , '>'"]]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingVariableBinder >> definitionOf: name in: block [
 	definitions
 		at: block
@@ -83,7 +84,7 @@ OptimizingVariableBinder >> definitionOf: name in: block [
 	^nil
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingVariableBinder >> doBindingFrom: firstBlock [
 	dominatorTree := firstBlock dominatorTree.
 	immediateDominators := dominatorTree allImmediateDominators.
@@ -95,14 +96,14 @@ OptimizingVariableBinder >> doBindingFrom: firstBlock [
 	self resolvePendingReads; rewritePhis
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingVariableBinder >> initialize [
 	definitions := Dictionary new.
 	pendingReads := OrderedCollection new.
 	pendingPhis := OrderedCollection new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingVariableBinder >> insertPhiOf: name at: block [
 	| size variables phi |
 	(self definitionOf: name in: block) ifNotNil: [^self].
@@ -116,7 +117,7 @@ OptimizingVariableBinder >> insertPhiOf: name at: block [
 	self define: phi as: name in: block
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingVariableBinder >> instructionsForWriting: aWriteVariable toTemporary: binding [
 	self define: aWriteVariable source as: binding name asSymbol.
 	aWriteVariable dissolve.
@@ -124,7 +125,7 @@ OptimizingVariableBinder >> instructionsForWriting: aWriteVariable toTemporary: 
 		do: [:block | self insertPhiOf: binding name asSymbol at: block]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingVariableBinder >> resolve: aReadVariable asTemporary: binding [
 	| source |
 	source := self definitionOf: binding name asSymbol in: currentBlock.
@@ -133,7 +134,7 @@ OptimizingVariableBinder >> resolve: aReadVariable asTemporary: binding [
 		ifNotNil: [aReadVariable replaceAllUsesWith: source; dissolve]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingVariableBinder >> resolvePendingReads [
 	pendingReads do: [:association | | read block source |
 		read := association key.
@@ -142,7 +143,7 @@ OptimizingVariableBinder >> resolvePendingReads [
 		read replaceWithCopyOf: source]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingVariableBinder >> rewritePhis [
 	pendingPhis do: [:association | | phi block |
 		phi := association key.
@@ -157,62 +158,62 @@ OptimizingVariableBinder >> rewritePhis [
 			ifFalse: [phi clearVariables; dissolve]]
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingVariableBinder >> visitBinaryWithConstant: instruction [
 	
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingVariableBinder >> visitBinaryWithVariable: instruction [
 	
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingVariableBinder >> visitJump: aJumpInstruction [
 	
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingVariableBinder >> visitJumpFalse: aJumpInstruction [
 	
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingVariableBinder >> visitJumpTrue: aJumpInstruction [
 	
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingVariableBinder >> visitLoad: instruction [
 	
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingVariableBinder >> visitLoadConstant: aLoadImplicit [
 	
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingVariableBinder >> visitMessageSend: aMessageSend [
 	
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingVariableBinder >> visitPhi: aPhi [
 	
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingVariableBinder >> visitReturn: aReturnInstruction [
 	
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingVariableBinder >> visitStore: instruction [
 	
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingVariableBinder >> visitUnary: instruction [
 	
 ]

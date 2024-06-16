@@ -3,21 +3,22 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OptimizingTwoAddressEnforcer,
-	#superclass : #Object,
+	#name : 'OptimizingTwoAddressEnforcer',
+	#superclass : 'Object',
 	#instVars : [
 		'allocation',
 		'firstBlock'
 	],
-	#category : #'OCompiler-Core-Main'
+	#category : 'OCompiler-Core-Main',
+	#package : 'OCompiler-Core-Main'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingTwoAddressEnforcer >> allocation: aDictionary [
 	allocation := aDictionary
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingTwoAddressEnforcer >> convert: instruction copyingLeftInto: dest [
 	| load |
 	load := instruction left newCopy.
@@ -25,7 +26,7 @@ OptimizingTwoAddressEnforcer >> convert: instruction copyingLeftInto: dest [
 	allocation at: load put: dest
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingTwoAddressEnforcer >> convert: instruction copyingReceiverInto: dest [
 	| load |
 	load := instruction receiver newCopy.
@@ -34,18 +35,18 @@ OptimizingTwoAddressEnforcer >> convert: instruction copyingReceiverInto: dest [
 	allocation at: load put: dest
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingTwoAddressEnforcer >> doEnforce [
 	firstBlock
 		withSuccessorsDo: [:block | block firstInstruction acceptVisitor: self]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingTwoAddressEnforcer >> firstBlock: block [
 	firstBlock := block
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingTwoAddressEnforcer >> invertMinus: minus with: left with: right [
 	| negate |
 	negate := OUnaryOperation receiver: minus right name: #negate.
@@ -55,7 +56,7 @@ OptimizingTwoAddressEnforcer >> invertMinus: minus with: left with: right [
 	minus right: negate; name: #'+'; swapOperands
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingTwoAddressEnforcer >> visitBinaryWithConstant: instruction [
 	| left dest |
 	left := allocation at: instruction left.
@@ -64,7 +65,7 @@ OptimizingTwoAddressEnforcer >> visitBinaryWithConstant: instruction [
 	self convert: instruction copyingLeftInto: dest
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingTwoAddressEnforcer >> visitBinaryWithVariable: instruction [
 	| left right dest temp |
 	left := allocation at: instruction left.
@@ -85,62 +86,62 @@ OptimizingTwoAddressEnforcer >> visitBinaryWithVariable: instruction [
 	self convert: instruction copyingLeftInto: dest
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingTwoAddressEnforcer >> visitJump: instruction [
 	
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingTwoAddressEnforcer >> visitJumpFalse: instruction [
 	
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingTwoAddressEnforcer >> visitJumpTrue: instruction [
 	
 ]
 
-{ #category : #'visitor protocol' }
+{ #category : 'visitor protocol' }
 OptimizingTwoAddressEnforcer >> visitLoad: load [
 	
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingTwoAddressEnforcer >> visitLoadConstant: instruction [
 	
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingTwoAddressEnforcer >> visitLoadImplicit: instruction [
 	
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingTwoAddressEnforcer >> visitMessageSend: instruction [
 	
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingTwoAddressEnforcer >> visitNullary: instruction [
 	
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingTwoAddressEnforcer >> visitPhi: instruction [
 	
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingTwoAddressEnforcer >> visitReturn: instruction [
 	
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingTwoAddressEnforcer >> visitStore: store [
 	
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OptimizingTwoAddressEnforcer >> visitUnary: instruction [
 	| receiver dest |
 	(#(_asNative _asObject _asPointer _asSmallInteger)

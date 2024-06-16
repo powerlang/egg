@@ -1,6 +1,6 @@
 Class {
-	#name : 'SExpressionTypes',
-	#superclass : 'PSharedPool',
+	#name : #SExpressionTypes,
+	#superclass : #PSharedPool,
 	#classVars : [
 		'AssignmentId',
 		'BlockId',
@@ -12,12 +12,10 @@ Class {
 		'MethodId',
 		'ReturnId'
 	],
-	#category : 'Powerlang-Core-SExpressions',
-	#package : 'Powerlang-Core',
-	#tag : 'SExpressions'
+	#category : 'Powerlang-Core-SExpressions'
 }
 
-{ #category : 'class initialization' }
+{ #category : #'class initialization' }
 SExpressionTypes class >> initialize [
 	MethodId := 1.
 	BlockId := 2.

@@ -3,15 +3,16 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OStoreOperation,
-	#superclass : #OMemoryOperation,
+	#name : 'OStoreOperation',
+	#superclass : 'OMemoryOperation',
 	#instVars : [
 		'value'
 	],
-	#category : #'OCompiler-Core-IR'
+	#category : 'OCompiler-Core-IR',
+	#package : 'OCompiler-Core-IR'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 OStoreOperation class >> base: anInstruction byteAt: indexInstruction put: anotherInstruction [
 	^self new
 		name: #_byteAt:put:;
@@ -20,7 +21,7 @@ OStoreOperation class >> base: anInstruction byteAt: indexInstruction put: anoth
 		value: anotherInstruction
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 OStoreOperation class >> base: anInstruction byteAtImm: anInteger put: anotherInstruction [
 	^self new
 		name: #_byteAt:put:;
@@ -29,7 +30,7 @@ OStoreOperation class >> base: anInstruction byteAtImm: anInteger put: anotherIn
 		value: anotherInstruction
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 OStoreOperation class >> base: anInstruction longSlotAt: indexInstruction put: anotherInstruction [
 	^self new
 		name: #_longSlotAt:put:;
@@ -38,7 +39,7 @@ OStoreOperation class >> base: anInstruction longSlotAt: indexInstruction put: a
 		value: anotherInstruction
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 OStoreOperation class >> base: anInstruction longSlotAtImm: indexInstruction put: anotherInstruction [
 	^self new
 		name: #_longSlotAt:put:;
@@ -47,7 +48,7 @@ OStoreOperation class >> base: anInstruction longSlotAtImm: indexInstruction put
 		value: anotherInstruction
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 OStoreOperation class >> base: anInstruction slotAt: anInteger put: anotherInstruction [
 	^self new
 		name: #_basicAt:put:;
@@ -56,7 +57,7 @@ OStoreOperation class >> base: anInstruction slotAt: anInteger put: anotherInstr
 		value: anotherInstruction
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 OStoreOperation class >> base: anInstruction slotAtImm: anInteger put: anotherInstruction [
 	^self new
 		name: #_basicAt:put:;
@@ -65,7 +66,7 @@ OStoreOperation class >> base: anInstruction slotAtImm: anInteger put: anotherIn
 		value: anotherInstruction
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 OStoreOperation class >> base: anInstruction uLongAt: anInteger put: anotherInstruction [
 	^self new
 		name: #_uLongAt:put:;
@@ -74,7 +75,7 @@ OStoreOperation class >> base: anInstruction uLongAt: anInteger put: anotherInst
 		value: anotherInstruction
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 OStoreOperation class >> base: anInstruction uLongAtImm: indexInstruction put: anotherInstruction [
 	^self new
 		name: #_uLongAt:put:;
@@ -83,25 +84,25 @@ OStoreOperation class >> base: anInstruction uLongAtImm: indexInstruction put: a
 		value: anotherInstruction
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OStoreOperation >> atOperand: operandName [
 	operandName = #value ifTrue: [^value].
 	^super atOperand: operandName
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OStoreOperation >> atOperand: operandName put: instruction [
 	operandName = #value
 		ifTrue: [value := instruction]
 		ifFalse: [super atOperand: operandName put: instruction]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OStoreOperation >> basicAcceptVisitor: aVisitor [
 	^aVisitor visitStore: self
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OStoreOperation >> basicPrintString [
 	| b |
 	b := base isInstruction
@@ -112,7 +113,7 @@ OStoreOperation >> basicPrintString [
 		, ']'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OStoreOperation >> copyTo: copy with: map [
 	| v |
 	super copyTo: copy with: map.
@@ -122,19 +123,19 @@ OStoreOperation >> copyTo: copy with: map [
 	copy value: v
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 OStoreOperation >> isStore [
 	^true
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OStoreOperation >> operandsDo: aBlock [
 	aBlock value: base.
 	index isInstruction ifTrue: [aBlock value: index].
 	aBlock value: value
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OStoreOperation >> printStringUsing: names [
 	| b i v |
 	b := names at: base ifAbsent: '?'.
@@ -147,23 +148,23 @@ OStoreOperation >> printStringUsing: names [
 	^'{#' , b , ' ' , name , ', ' , i , ',' , v , '}'
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 OStoreOperation >> usesResultOf: anInstruction [
 	^value == anInstruction or: [super usesResultOf: anInstruction]
 ]
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 OStoreOperation >> value [
 	^value
 ]
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 OStoreOperation >> value: anInstruction [
 	value := anInstruction.
 	anInstruction addUse: self at: #value
 ]
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 OStoreOperation >> valueImm: anObject [
 	value := anObject
 ]

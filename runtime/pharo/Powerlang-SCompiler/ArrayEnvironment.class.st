@@ -1,38 +1,39 @@
 Class {
-	#name : #ArrayEnvironment,
-	#superclass : #LocalEnvironment,
+	#name : 'ArrayEnvironment',
+	#superclass : 'LocalEnvironment',
 	#instVars : [
 		'index'
 	],
-	#category : #'Powerlang-SCompiler-Bindings'
+	#category : 'Powerlang-SCompiler-Bindings',
+	#package : 'Powerlang-SCompiler-Bindings'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 ArrayEnvironment >> environmentType [
 	^EnvironmentValue
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ArrayEnvironment >> index [
 	^index
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ArrayEnvironment >> index: anInteger [
 	index := anInteger
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ArrayEnvironment >> isCurrent [
 	^index isNil
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ArrayEnvironment >> isIndirect [
 	^self isCurrent not
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ArrayEnvironment >> isStack [
 	^false
 ]

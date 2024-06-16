@@ -1,25 +1,23 @@
 Class {
-	#name : 'MirageGate',
-	#superclass : 'Gate',
+	#name : #MirageGate,
+	#superclass : #Gate,
 	#instVars : [
 		'class'
 	],
-	#category : 'Powerlang-Core-Metaphysics',
-	#package : 'Powerlang-Core',
-	#tag : 'Metaphysics'
+	#category : 'Powerlang-Core-Metaphysics'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 MirageGate >> classBinding [
 	^class
 ]
 
-{ #category : 'notifications' }
+{ #category : #notifications }
 MirageGate >> dispatch: aMessage [
 	^self dispatch: aMessage from: nil
 ]
 
-{ #category : 'notifications' }
+{ #category : #notifications }
 MirageGate >> dispatch: aMessage from: parentInterpreter [
 	| receiver |
 	receiver := aMessage receiver.
@@ -28,7 +26,7 @@ MirageGate >> dispatch: aMessage from: parentInterpreter [
 		ifFalse: [ self dispatchRemote: aMessage from: parentInterpreter ]
 ]
 
-{ #category : 'notifications' }
+{ #category : #notifications }
 MirageGate >> dispatchLocal: aMessage from: parentInterpreter [
 	| args receiver result hresult |
 	"args := aMessage arguments
@@ -45,7 +43,7 @@ MirageGate >> dispatchLocal: aMessage from: parentInterpreter [
 	^ hresult mirage
 ]
 
-{ #category : 'notifications' }
+{ #category : #notifications }
 MirageGate >> dispatchRemote: aMessage from: parentInterpreter [
 	| method interpreter |
 	method := self lookup: aMessage selector.
@@ -59,7 +57,7 @@ MirageGate >> dispatchRemote: aMessage from: parentInterpreter [
 		evaluate: method
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 MirageGate >> getInstVarNamed: name [
 	| index |
 	index := class indexOfSlot: name.
@@ -67,7 +65,7 @@ MirageGate >> getInstVarNamed: name [
 	^self slotAt: index
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 MirageGate >> handle: anObjectHandle [
 	super handle: anObjectHandle.
 	class := handle isLocal
@@ -75,17 +73,17 @@ MirageGate >> handle: anObjectHandle [
 		ifFalse: [ handle mirror reflectedClass localEquivalent ]
 ]
 
-{ #category : 'nativizing' }
+{ #category : #nativizing }
 MirageGate >> lookup: selector [
 	^class methodNamed: selector
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 MirageGate >> printOn: aStream [
 	aStream nextPutAll: 'mirage gate on: ' , handle printString
 ]
 
-{ #category : 'services' }
+{ #category : #services }
 MirageGate >> slotAt: index [
 	| slot |
 	slot := handle slotAt: index.

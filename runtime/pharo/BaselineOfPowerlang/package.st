@@ -1,1 +1,1 @@
-Package { #name : #BaselineOfPowerlang }
+Package { #name : 'BaselineOfPowerlang' }

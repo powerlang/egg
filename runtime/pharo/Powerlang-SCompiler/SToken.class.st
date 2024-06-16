@@ -1,15 +1,16 @@
 Class {
-	#name : #SToken,
-	#superclass : #Object,
+	#name : 'SToken',
+	#superclass : 'Object',
 	#instVars : [
 		'compiler',
 		'stretch',
 		'comments'
 	],
-	#category : #'Powerlang-SCompiler-Parser'
+	#category : 'Powerlang-SCompiler-Parser',
+	#package : 'Powerlang-SCompiler-Parser'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 SToken class >> new [
 	"return an initialized instance"
 
@@ -17,17 +18,17 @@ SToken class >> new [
 
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SToken >> comment [
 	^comments notNil ifTrue: [comments anyOne]
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SToken >> comments [
 	^comments
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SToken >> comments: aCollection [
 	aCollection isNil ifTrue: [^self].
 	comments isNil
@@ -35,154 +36,154 @@ SToken >> comments: aCollection [
 		ifFalse: [comments addAll: aCollection]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SToken >> compileWarning: aString [
 	compiler notify: aString at: self stretch
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SToken >> compiler [
 	^compiler
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SToken >> compiler: aSmalltalkCompiler [
 	compiler := aSmalltalkCompiler
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SToken >> end [
 	^stretch end
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SToken >> end: aNumber [
 	stretch end: aNumber
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SToken >> endsExpression [
 	^self isEnd
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SToken >> hasSymbol [
 	^false
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SToken >> initialize [
 	super initialize.
 	stretch := 1 thru: 0
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SToken >> is: anObject [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SToken >> isAssignment [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SToken >> isBar [
 	^(self is: #'|') or: [self is: #'/']
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SToken >> isBlockNode [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SToken >> isComment [
 	^false
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SToken >> isDelimitedIdentifier [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SToken >> isDelimiter [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SToken >> isEnd [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SToken >> isIdentifier [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SToken >> isKeyword [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SToken >> isLiteral [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SToken >> isNameToken [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SToken >> isNumberNode [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SToken >> isPoolLiteral [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SToken >> isStringToken [
 	^false
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SToken >> moveCommentsTo: aParseNode [
 	aParseNode comments: comments.
 	comments := nil
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SToken >> position [
 	^stretch start
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SToken >> position: aNumber [
 	stretch start: aNumber
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SToken >> prevPosition [
 	^stretch start - 1
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SToken >> source [
 	^compiler sourceCode copyFrom: stretch start to: stretch end
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SToken >> stretch [
 	^stretch
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SToken >> stretch: aStretch [
 	stretch := aStretch
 ]

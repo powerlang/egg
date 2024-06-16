@@ -1,6 +1,6 @@
 Class {
-	#name : #TreecodeEncoder,
-	#superclass : #SParseTreeVisitor,
+	#name : 'TreecodeEncoder',
+	#superclass : 'SParseTreeVisitor',
 	#instVars : [
 		'method',
 		'stream',
@@ -11,10 +11,12 @@ Class {
 		'AstNodeTypes',
 		'ClosureElementTypes'
 	],
-	#category : #'Powerlang-SCompiler-Backend'
+	#category : 'Powerlang-SCompiler-Backend',
+	#package : 'Powerlang-SCompiler',
+	#tag : 'Backend'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 TreecodeEncoder class >> new [
 	"return an initialized instance"
 
@@ -22,7 +24,7 @@ TreecodeEncoder class >> new [
 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> compiledBlockIndexOf: aBlockNode [
 	| index |
 	index := method
@@ -31,7 +33,7 @@ TreecodeEncoder >> compiledBlockIndexOf: aBlockNode [
 	^index
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> encodeArgument: anInteger env: environment [
 	| encoded |
 	encoded := self encodedEnvironment: environment.
@@ -41,7 +43,7 @@ TreecodeEncoder >> encodeArgument: anInteger env: environment [
 		nextIntegerPut: encoded
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> encodeClosureElements: aBlockNode [
 	| scope parent |
 	scope := aBlockNode scope.
@@ -59,54 +61,49 @@ TreecodeEncoder >> encodeClosureElements: aBlockNode [
 	
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> encodeDynamicVar: name [
 	stream nextPut: DynamicVarId.
 	self nextSymbolPut: name
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> encodeFalse [
 	stream nextPut: FalseId
 ]
 
-{ #category : #visiting }
-TreecodeEncoder >> encodeLoadRvisitingReceiver [
-	stream nextPut: LoadRvisitingReceiverId
-]
-
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> encodeNestedDynamicVar: name [
 	stream nextPut: NestedDynamicVarId.
 	self nextLiteralPut: name 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> encodeNil [
 	stream nextPut: NilId
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> encodePopR [
 	stream nextPut: PopRid 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> encodePushR [
 	stream nextPut: PushRid 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> encodeSelf [
 	stream nextPut: SelfId
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> encodeSuper [
 	stream nextPut: SuperId
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> encodeTemporary: anInteger env: environment [
 	| encoded |
 	encoded := self encodedEnvironment: environment.
@@ -116,12 +113,12 @@ TreecodeEncoder >> encodeTemporary: anInteger env: environment [
 		nextIntegerPut: encoded
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> encodeTrue [
 	stream nextPut: TrueId
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> encodedEnvironment: aLocalEnvironment [
 	aLocalEnvironment isStack
 		ifTrue: [ ^ aLocalEnvironment isInlinedArgument
@@ -132,7 +129,7 @@ TreecodeEncoder >> encodedEnvironment: aLocalEnvironment [
 	^ aLocalEnvironment index
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 TreecodeEncoder >> findLiteralIndex: anObject ifAbsent: aBlock [
 	^ method
 		detectIndex: [ :v |
@@ -140,30 +137,30 @@ TreecodeEncoder >> findLiteralIndex: anObject ifAbsent: aBlock [
 		ifNone: aBlock
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 TreecodeEncoder >> initialize [
 	stream := #[] writeStream
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 TreecodeEncoder >> method: aCompiledMethod [
 	method := aCompiledMethod
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> nextBigIntegerPut: anInteger [
 	stream
 		nextPut: 16r80;
 		int64: anInteger
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> nextBooleanPut: aBoolean [
 	stream nextPut: aBoolean asBit
 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> nextIntegerPut: anInteger [
 	| value |
 	(anInteger > 127 or: [ anInteger < -127 ])
@@ -174,7 +171,7 @@ TreecodeEncoder >> nextIntegerPut: anInteger [
 	stream nextPut: value
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> nextLiteralPut: anObject [
 	| index |
 	index := self
@@ -183,17 +180,17 @@ TreecodeEncoder >> nextLiteralPut: anObject [
 	self nextIntegerPut: index
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> nextPut: anInteger [
 	stream nextPut: anInteger
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> nextPutAll: aCollection [
 	stream nextPut: aCollection size; nextPutAll: aCollection
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> nextSymbolPut: aSymbol [
 	| index |
 	index := self
@@ -202,12 +199,12 @@ TreecodeEncoder >> nextSymbolPut: aSymbol [
 	self nextIntegerPut: index
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> nextTypePut: anInteger [
 	stream nextPut: anInteger
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> visitAssignment: anAssignmentNode [
 	| assignees |
 	self nextTypePut: AssignmentId.
@@ -217,7 +214,7 @@ TreecodeEncoder >> visitAssignment: anAssignmentNode [
 	anAssignmentNode expression acceptVisitor: self
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> visitBlock: aBlockNode [
 	| args inlined |
 	self nextTypePut: BlockId.
@@ -234,14 +231,14 @@ TreecodeEncoder >> visitBlock: aBlockNode [
 	self visitScript: aBlockNode
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> visitBraceNode: aBraceNode [
 	aBraceNode isLiteral
 		ifTrue: [self visitLiteral: aBraceNode asLiteralNode]
 		ifFalse: [self visitCascade: aBraceNode asMessageNode]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> visitCascade: aCascadeNode [
 	| messages |
 	self nextTypePut: CascadeId.
@@ -251,7 +248,7 @@ TreecodeEncoder >> visitCascade: aCascadeNode [
 	messages do: [ :node | self visitCascadeMessage: node ]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> visitCascadeMessage: aCascadeMessageNode [
 	| arguments |
 	self nextSymbolPut: aCascadeMessageNode selector symbol.
@@ -260,13 +257,13 @@ TreecodeEncoder >> visitCascadeMessage: aCascadeMessageNode [
 	arguments do: [ :arg | arg acceptVisitor: self ]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> visitIdentifier: anIdentifierNode [
 	self nextTypePut: IdentifierId.
 	anIdentifierNode binding encodeUsing: self
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> visitLiteral: aLiteralNode [
 	| index |
 	index := self
@@ -279,7 +276,7 @@ TreecodeEncoder >> visitLiteral: aLiteralNode [
 		ifTrue: [ self nextIntegerPut: aLiteralNode value ]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> visitMessage: aMessageNode [
 	| arguments |
 	self
@@ -292,7 +289,7 @@ TreecodeEncoder >> visitMessage: aMessageNode [
 	arguments do: [ :arg | arg acceptVisitor: self ]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> visitMethod: aMethodNode [
 	| pragma |
 	self nextTypePut: MethodId.
@@ -306,12 +303,12 @@ TreecodeEncoder >> visitMethod: aMethodNode [
 	^ stream contents 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> visitParseNode: aParseNode [
 	^self ASSERT: false
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> visitReturn: aReturnNode [
 	self
 		nextTypePut: ReturnId;
@@ -320,7 +317,7 @@ TreecodeEncoder >> visitReturn: aReturnNode [
 		aReturnNode expression acceptVisitor: self
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 TreecodeEncoder >> visitScript: aScriptNode [
 	| prev statements |
 	prev := script.

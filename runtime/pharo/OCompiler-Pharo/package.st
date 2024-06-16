@@ -1,1 +1,1 @@
-Package { #name : #'OCompiler-Pharo' }
+Package { #name : 'OCompiler-Pharo' }

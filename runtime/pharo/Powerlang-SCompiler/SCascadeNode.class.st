@@ -1,54 +1,55 @@
 Class {
-	#name : #SCascadeNode,
-	#superclass : #SParseNode,
+	#name : 'SCascadeNode',
+	#superclass : 'SParseNode',
 	#instVars : [
 		'receiver',
 		'messages',
 		'optimized'
 	],
-	#category : #'Powerlang-SCompiler-Parser'
+	#category : 'Powerlang-SCompiler-Parser',
+	#package : 'Powerlang-SCompiler-Parser'
 }
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SCascadeNode >> acceptVisitor: visitor [
 	^visitor visitCascade: self
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SCascadeNode >> hasAssign [
 	receiver hasAssign ifTrue: [^true].
 	messages detect: [:msg | msg hasAssign] ifNone: [^false].
 	^true
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 SCascadeNode >> isCascade [
 	^true
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCascadeNode >> messages [
 	^messages
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCascadeNode >> messages: aCollection [
 	messages := aCollection
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 SCascadeNode >> nodesDo: aBlock includingDeclarations: aBoolean [
 	super nodesDo: aBlock includingDeclarations: aBoolean.
 	receiver nodesDo: aBlock includingDeclarations: aBoolean.
 	messages do: [:msg | msg nodesDo: aBlock includingDeclarations: aBoolean]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCascadeNode >> receiver [
 	^receiver
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCascadeNode >> receiver: rcvr [
 	receiver := rcvr
 ]

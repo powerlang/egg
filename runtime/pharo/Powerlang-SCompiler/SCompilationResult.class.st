@@ -1,51 +1,52 @@
 Class {
-	#name : #SCompilationResult,
-	#superclass : #Object,
+	#name : 'SCompilationResult',
+	#superclass : 'Object',
 	#instVars : [
 		'compiler',
 		'error',
 		'ast',
 		'method'
 	],
-	#category : #'Powerlang-SCompiler-Frontend'
+	#category : 'Powerlang-SCompiler-Frontend',
+	#package : 'Powerlang-SCompiler-Frontend'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCompilationResult >> ast [
 	^ast
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCompilationResult >> ast: aParseNode [
 	ast := aParseNode
 ]
 
-{ #category : #errors }
+{ #category : 'errors' }
 SCompilationResult >> beSuccessful [
 	error := nil
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCompilationResult >> compiler: aSmalltalkCompiler [
 	compiler := aSmalltalkCompiler
 ]
 
-{ #category : #errors }
+{ #category : 'errors' }
 SCompilationResult >> error [
 	^error
 ]
 
-{ #category : #errors }
+{ #category : 'errors' }
 SCompilationResult >> error: aCompilationError [
 	error := aCompilationError
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCompilationResult >> method [
 	^method
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCompilationResult >> method: aCompiledMethod [
 	method := aCompiledMethod
 ]

@@ -1,5 +1,6 @@
 Class {
-	#name : #SInvalidPragmaError,
-	#superclass : #SCompilationError,
-	#category : #'Powerlang-SCompiler-Frontend'
+	#name : 'SInvalidPragmaError',
+	#superclass : 'SCompilationError',
+	#category : 'Powerlang-SCompiler-Frontend',
+	#package : 'Powerlang-SCompiler-Frontend'
 }

@@ -1,6 +1,6 @@
 Class {
-	#name : 'FrameOffsets',
-	#superclass : 'PSharedPool',
+	#name : #FrameOffsets,
+	#superclass : #PSharedPool,
 	#classVars : [
 		'CallerIndex',
 		'LastArgumentIndex',
@@ -8,7 +8,5 @@ Class {
 		'ReceiverIndex',
 		'ReturnAddressIndex'
 	],
-	#category : 'Powerlang-Core-Mirrors',
-	#package : 'Powerlang-Core',
-	#tag : 'Mirrors'
+	#category : 'Powerlang-Core-Mirrors'
 }

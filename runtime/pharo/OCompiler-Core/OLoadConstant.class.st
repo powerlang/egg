@@ -3,83 +3,84 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OLoadConstant,
-	#superclass : #OInstruction,
+	#name : 'OLoadConstant',
+	#superclass : 'OInstruction',
 	#instVars : [
 		'constant'
 	],
-	#category : #'OCompiler-Core-IR'
+	#category : 'OCompiler-Core-IR',
+	#package : 'OCompiler-Core-IR'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OLoadConstant class >> valued: value [
 	^self new value: value
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OLoadConstant >> basicAcceptVisitor: aVisitor [
 	^aVisitor visitLoadConstant: self
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OLoadConstant >> basicPrintString [
 	^'[load cst ' , constant printString , ']'
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OLoadConstant >> canHaveSideEffects [
 	^false
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OLoadConstant >> copyTo: copy with: map [
 	super copyTo: copy with: map.
 	copy value: constant
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OLoadConstant >> isBoolean [
 	^constant isBoolean
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OLoadConstant >> isConstant [
 	^true
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OLoadConstant >> newCopy [
 	^self class valued: constant
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OLoadConstant >> operandsDo: aBlock [
 	constant isInstruction ifTrue: [
 		self halt.
 		aBlock value: constant]
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OLoadConstant >> primitivePrintString [
 	^'{' , constant printString , '}'
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OLoadConstant >> printStringUsing: names [
 	^'load cst ' , constant printString
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OLoadConstant >> usesResultOf: anInstruction [
 	^false
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OLoadConstant >> value [
 	^constant
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 OLoadConstant >> value: value [
 	constant := value
 ]

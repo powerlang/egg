@@ -1,49 +1,50 @@
 Class {
-	#name : #SCompiler,
-	#superclass : #Object,
+	#name : 'SCompiler',
+	#superclass : 'Object',
 	#instVars : [
 		'errorHandler',
 		'result',
 		'class'
 	],
-	#category : #'Powerlang-SCompiler-Frontend'
+	#category : 'Powerlang-SCompiler-Frontend',
+	#package : 'Powerlang-SCompiler-Frontend'
 }
 
-{ #category : #services }
+{ #category : 'services' }
 SCompiler class >> compile: aString in: aClass [
 	| compiler |
 	compiler := self forClass: aClass.
 	^compiler compile: aString
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 SCompiler class >> forClass: aClass [
 	^self new forClass: aClass
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 SCompiler class >> parse: aString in: aClass [
 	| compiler |
 	compiler := self forClass: aClass.
 	^compiler parse: aString
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SCompiler >> canBeInIdentifier: aCharacter [
 	^aCharacter isLetter or: [aCharacter isDigit] or: [aCharacter = $_]
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SCompiler >> canStartIdentifier: aCharacter [
 	^aCharacter isLetter or: [aCharacter = $_]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SCompiler >> classBinding [
 	 ^class
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SCompiler >> classBinding: aSpecies [
 	| instance |
 	class := aSpecies.
@@ -52,31 +53,31 @@ SCompiler >> classBinding: aSpecies [
 		ifTrue: [instance configureCompiler: self]
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 SCompiler >> compile: aString [
 	result := self smalltalkCompiler compileMethod: aString.
 	^result method
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SCompiler >> forClass: aClass [
 	| c |
 	c := aClass ifNil: [UndefinedObject].
 	self classBinding: c
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SCompiler >> initialize: aDictionary [
 	class := aDictionary at: #UndefinedObject ifAbsent: nil
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 SCompiler >> parse: aString [
 	result := self smalltalkCompiler parseMethod: aString.
 	^result ast
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SCompiler >> peekForIdentifier: aStream [
 	| char next |
 	char := aStream peek.
@@ -94,22 +95,22 @@ SCompiler >> peekForIdentifier: aStream [
 	^next isLetter ifFalse: [aStream skip: -1]; yourself
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SCompiler >> protect: aBlock [
 	^aBlock value
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 SCompiler >> smalltalkCompiler [
 	^ SSmalltalkCompiler new frontend: self
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 SCompiler >> smalltalkParser [
 	^ self smalltalkCompiler parser
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 SCompiler >> smalltalkScanner [
 	^ self smalltalkCompiler scanner
 ]

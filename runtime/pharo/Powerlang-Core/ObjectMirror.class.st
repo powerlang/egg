@@ -1,118 +1,116 @@
 Class {
-	#name : 'ObjectMirror',
-	#superclass : 'Mirror',
-	#category : 'Powerlang-Core-Mirrors',
-	#package : 'Powerlang-Core',
-	#tag : 'Mirrors'
+	#name : #ObjectMirror,
+	#superclass : #Mirror,
+	#category : 'Powerlang-Core-Mirrors'
 }
 
-{ #category : 'comparing' }
+{ #category : #comparing }
 ObjectMirror >> = anObject [
 	^self class = anObject class and: [handle = anObject handle]
 ]
 
-{ #category : 'nativizing' }
+{ #category : #nativizing }
 ObjectMirror >> _gate [
 	^self
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 ObjectMirror >> asAssociationMirror [
 	^self associationMirrorOn: handle
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 ObjectMirror >> asBehaviorMirror [
 	^self behaviorMirrorOn: handle
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 ObjectMirror >> asBlockMirror [
 	^ self compiledBlockMirrorOn: handle
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 ObjectMirror >> asByteArray [
 	^self bytes
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 ObjectMirror >> asClassMirror [
 	^self classMirrorOn: handle
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 ObjectMirror >> asClosureMirror [
 	^ self closureMirrorOn: handle
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 ObjectMirror >> asDictionaryMirror [
 	^self dictionaryMirrorOn: handle
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 ObjectMirror >> asLocalArray [
 	| size |
 	size := self size.
 	^(1 to: size) collect: [:i | self slotAt: i]
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 ObjectMirror >> asLocalInteger [
 	^handle asLocalInteger
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 ObjectMirror >> asLocalString [
 	^handle asLocalString
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 ObjectMirror >> asMethodMirror [
 	^self compiledMethodMirrorOn: handle
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 ObjectMirror >> asSpeciesMirror [
 	^(self speciesMirrorOn: handle) reflectsMetaclass
 		ifTrue: [self metaclassMirrorOn: handle]
 		ifFalse: [self classMirrorOn: handle]
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 ObjectMirror >> asStringMirror [
 	^self
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 ObjectMirror >> asSubject [
 	^handle mirage
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 ObjectMirror >> at: index [
 	| slot |
 	slot := self reflectedClass instSize + index.
 	^self slotAt: slot
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 ObjectMirror >> basicFlags [
 	^handle basicFlags
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 ObjectMirror >> bytes [
 	^handle asLocalBytes
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 ObjectMirror >> contains: anAddress [
 	^anAddress >= handle oid and: [anAddress < (handle oid + self size)]
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 ObjectMirror >> dispatch: aMessage from: parentInterpreter [
 	| method interpreter |
 	method := self lookup: aMessage selector.
@@ -126,25 +124,25 @@ ObjectMirror >> dispatch: aMessage from: parentInterpreter [
 		evaluate: method
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 ObjectMirror >> do: aBlock [
 	1 to: self size do: [:index | | slot |
 		slot := self slotAt: index.
 		aBlock value: slot]
 ]
 
-{ #category : 'nativizing' }
+{ #category : #nativizing }
 ObjectMirror >> equals: anotherObject [
 	^ (anotherObject isKindOf: self class)
 		and: [ handle = anotherObject handle ]
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 ObjectMirror >> getInstVarAt: index [
 	^self slotAt: index
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 ObjectMirror >> getInstVarNamed: name [
 	| index |
 	index := handle indexOf: name for: self.
@@ -152,29 +150,29 @@ ObjectMirror >> getInstVarNamed: name [
 	^self slotAt: index
 ]
 
-{ #category : 'comparing' }
+{ #category : #comparing }
 ObjectMirror >> hash [
 	^ handle hash
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 ObjectMirror >> invoke: method with: arguments [
 	| interpreter |
 	interpreter := SmalltalkInterpreter on: self with: arguments for: method.
 	^ interpreter evaluate: method
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 ObjectMirror >> largeSize [
 	^handle largeSize
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 ObjectMirror >> localClassname [
 	^self reflectedClass localName
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 ObjectMirror >> localDeepCopy [
 	self reflectsInteger
 		ifTrue: [ ^ self asLocalInteger ].
@@ -184,7 +182,7 @@ ObjectMirror >> localDeepCopy [
 			slot localDeepCopy ]
 ]
 
-{ #category : 'printing' }
+{ #category : #printing }
 ObjectMirror >> localDescription [
 	| class name |
 	self reflectsInteger
@@ -198,17 +196,17 @@ ObjectMirror >> localDescription [
 		do: [ self printString , '(could not be read)' ]
 ]
 
-{ #category : 'nativizing' }
+{ #category : #nativizing }
 ObjectMirror >> lookup: aSelector [
 	^self reflectedBehavior compiledMethodFor: aSelector
 ]
 
-{ #category : 'converting' }
+{ #category : #converting }
 ObjectMirror >> mirage [
 	^handle mirage
 ]
 
-{ #category : 'printing' }
+{ #category : #printing }
 ObjectMirror >> printOn: aStream [
 	| description |
 	self reflectsInteger
@@ -225,84 +223,84 @@ ObjectMirror >> printOn: aStream [
 				, description , ')'
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 ObjectMirror >> reflectedBehavior [
 	| behavior |
 	behavior := handle getBehavior.
 	^self behaviorMirrorOn: behavior
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 ObjectMirror >> reflectedClass [
 	^handle getClass
 ]
 
-{ #category : 'nativizing' }
+{ #category : #nativizing }
 ObjectMirror >> reflectsBytesObject [
 	^handle isBytes
 ]
 
-{ #category : 'nativizing' }
+{ #category : #nativizing }
 ObjectMirror >> reflectsInteger [
 	^handle isInteger
 ]
 
-{ #category : 'nativizing' }
+{ #category : #nativizing }
 ObjectMirror >> reflectsLargeObject [
 	^handle isLarge
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 ObjectMirror >> reflectsMethodDictionary [
 	^false
 ]
 
-{ #category : 'nativizing' }
+{ #category : #nativizing }
 ObjectMirror >> reflectsNil [
 	^handle = handle nilObject
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 ObjectMirror >> setInstVarAt: index with: value [
 	^ self slotAt: index put: value
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 ObjectMirror >> size [
 	^handle size - self reflectedClass instSize
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 ObjectMirror >> slotAt: index [
 	| slot |
 	slot := handle slotAt: index.
 	^self objectMirrorOn: slot
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 ObjectMirror >> slotAt: index put: value [
 	handle slotAt: index put: value _gate handle oid.
 	^ value
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 ObjectMirror >> slotOf: species named: name [
 	| index |
 	index := handle indexOf: name inStructureOf: species name asSymbol.
 	^self slotAt: index
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 ObjectMirror >> slotSize [
 	^ handle size
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 ObjectMirror >> structure [
 	^handle structureOf: self structureType
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 ObjectMirror >> structureType [
 	^self subclassResponsibility
 ]

@@ -1,10 +1,11 @@
 Class {
-	#name : #SStringToken,
-	#superclass : #SSymbolicToken,
-	#category : #'Powerlang-SCompiler-Parser'
+	#name : 'SStringToken',
+	#superclass : 'SSymbolicToken',
+	#category : 'Powerlang-SCompiler-Parser',
+	#package : 'Powerlang-SCompiler-Parser'
 }
 
-{ #category : #converting }
+{ #category : 'converting' }
 SStringToken >> asIdentifierNode [
 	^compiler identifierNode
 		name: value;
@@ -12,37 +13,37 @@ SStringToken >> asIdentifierNode [
 		comments: comments
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 SStringToken >> asSelectorNode [
 	^compiler selectorNode symbol: value; stretch: stretch
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SStringToken >> hasSymbol [
 	^value isSymbol
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SStringToken >> isBinary [
 	^value isSymbol
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SStringToken >> isDelimitedIdentifier [
 	^value first = ${
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SStringToken >> isKeyword [
 	^value last = $:
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SStringToken >> isNameToken [
 	^(self isKeyword or: [self isBinary]) not
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 SStringToken >> isStringToken [
 	^true
 ]

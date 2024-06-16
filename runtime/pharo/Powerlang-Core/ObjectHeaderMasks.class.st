@@ -1,18 +1,16 @@
 Class {
-	#name : 'ObjectHeaderMasks',
-	#superclass : 'PSharedPool',
+	#name : #ObjectHeaderMasks,
+	#superclass : #PSharedPool,
 	#classVars : [
 		'IsArrayed',
 		'IsBytes',
 		'IsNamed',
 		'IsSmall'
 	],
-	#category : 'Powerlang-Core-Metaphysics',
-	#package : 'Powerlang-Core',
-	#tag : 'Metaphysics'
+	#category : 'Powerlang-Core-Metaphysics'
 }
 
-{ #category : 'class initialization' }
+{ #category : #'class initialization' }
 ObjectHeaderMasks class >> initialize [
 		IsBytes := 16r1.
 		IsArrayed := 16r2.

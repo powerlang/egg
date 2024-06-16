@@ -1,80 +1,81 @@
 Class {
-	#name : #SCompilationError,
-	#superclass : #Error,
+	#name : 'SCompilationError',
+	#superclass : 'Error',
 	#instVars : [
 		'compiler',
 		'resumable',
 		'retryable',
 		'stretch'
 	],
-	#category : #'Powerlang-SCompiler-Frontend'
+	#category : 'Powerlang-SCompiler-Frontend',
+	#package : 'Powerlang-SCompiler-Frontend'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCompilationError >> beFatal [
 	resumable := retryable := false
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCompilationError >> beResumable [
 	resumable := true
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCompilationError >> beWarning [
 	resumable := true
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCompilationError >> compiler [
 	^compiler
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCompilationError >> compiler: aCompiler [
 	compiler := aCompiler.
 	compiler result error: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCompilationError >> description: aString [
 	messageText := aString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCompilationError >> isResumable [
 	^resumable
 
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SCompilationError >> isUndeclaredAccess [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SCompilationError >> isUndeclaredAssignment [
 	^ false
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCompilationError >> proceed [
 	retryable := false.
 	compiler result beSuccessful.
 	self isResumable ifTrue: [ self resume ] ifFalse: [ self return ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCompilationError >> source [
 	^compiler sourceCode copyFrom: stretch start to: stretch end
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCompilationError >> stretch [
 	^stretch
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCompilationError >> stretch: aStretch [
 	stretch := aStretch
 ]

@@ -1,6 +1,6 @@
 Class {
-	#name : #ScriptScope,
-	#superclass : #Object,
+	#name : 'ScriptScope',
+	#superclass : 'Object',
 	#instVars : [
 		'script',
 		'arguments',
@@ -9,25 +9,26 @@ Class {
 		'envSize',
 		'captureSelf'
 	],
-	#category : #'Powerlang-SCompiler-Parser'
+	#category : 'Powerlang-SCompiler-Parser',
+	#package : 'Powerlang-SCompiler-Parser'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ScriptScope class >> new [
 	^super new initialize
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ScriptScope class >> on: aScriptNode [
 	^self new script: aScriptNode
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 ScriptScope >> capturesSelf [
 	^ captureSelf
 ]
 
-{ #category : #binding }
+{ #category : 'binding' }
 ScriptScope >> defineArgument: identifier [
 	| binding |
 	(self resolves: identifier) ifTrue: [self redefinitionError: identifier].
@@ -36,7 +37,7 @@ ScriptScope >> defineArgument: identifier [
 	^binding
 ]
 
-{ #category : #binding }
+{ #category : 'binding' }
 ScriptScope >> defineTemporary: identifier [
 	| binding |
 	(temporaries defines: identifier)
@@ -46,12 +47,12 @@ ScriptScope >> defineTemporary: identifier [
 	^binding
 ]
 
-{ #category : #binding }
+{ #category : 'binding' }
 ScriptScope >> defines: aString [
 	^(temporaries defines: aString) or: [arguments defines: aString]
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 ScriptScope >> describe: identifier [
 	| binding type |
 	binding := self resolve: identifier.
@@ -59,22 +60,22 @@ ScriptScope >> describe: identifier [
 	^binding description , ' of ' , type
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 ScriptScope >> environmentSize [
 	^envSize
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ScriptScope >> growEnvironment [
 	^envSize := envSize + 1
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ScriptScope >> growStack [
 	^stackSize := stackSize + 1
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ScriptScope >> initialize [
 	super initialize.
 	arguments := StaticBinder new.
@@ -83,22 +84,22 @@ ScriptScope >> initialize [
 		captureSelf := false.
 ]
 
-{ #category : #binding }
+{ #category : 'binding' }
 ScriptScope >> localBindings [
 	^arguments values , temporaries values
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ScriptScope >> positionDefinedArguments [
 	arguments withIndexDo: [:binding :index | binding index: index]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ScriptScope >> positionDefinedLocals [
 	self positionDefinedTemporariesIn: self; positionDefinedArguments
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ScriptScope >> positionDefinedTemporariesIn: aScriptScope [
 	temporaries do: [:binding | | position |
 		position := binding isInStack
@@ -107,17 +108,17 @@ ScriptScope >> positionDefinedTemporariesIn: aScriptScope [
 		binding index: position]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ScriptScope >> positionLocals [
 	self positionDefinedLocals
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ScriptScope >> realScope [
 	^script realScript scope
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ScriptScope >> redefinitionError: name [
 	| scope description |
 	scope := self scopeOf: name.
@@ -127,30 +128,30 @@ ScriptScope >> redefinitionError: name [
 		at: script stretch
 ]
 
-{ #category : #binding }
+{ #category : 'binding' }
 ScriptScope >> resolveLocal: aString [
 	(temporaries at: aString) ifNotNil: [:binding | ^binding].
 	^arguments at: aString
 ]
 
-{ #category : #binding }
+{ #category : 'binding' }
 ScriptScope >> resolves: aString [
 	^(self resolve: aString) isDynamic not
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 ScriptScope >> scopeOf: aString [
 	| s |
 	s := self scriptDefining: aString.
 	^s notNil ifTrue: [s scope]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScriptScope >> script: aScriptNode [
 	script := aScriptNode
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 ScriptScope >> stackSize [
 	^stackSize
 ]

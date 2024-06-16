@@ -3,8 +3,8 @@ Copyright (c) 2020-2023 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #OptimizingLivenessAnalysis,
-	#superclass : #Object,
+	#name : 'OptimizingLivenessAnalysis',
+	#superclass : 'Object',
 	#instVars : [
 		'firstBlock',
 		'liveIn',
@@ -13,10 +13,11 @@ Class {
 		'pressures',
 		'expirations'
 	],
-	#category : #'OCompiler-Core-Main'
+	#category : 'OCompiler-Core-Main',
+	#package : 'OCompiler-Core-Main'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingLivenessAnalysis >> analyzeLiveness [
 	| changed all |
 	liveIn := Dictionary new.
@@ -30,7 +31,7 @@ OptimizingLivenessAnalysis >> analyzeLiveness [
 	all do: [:block | self computeExpirationsAt: block]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingLivenessAnalysis >> analyzeLivenessOf: block [
 	| alive last changed pressure |
 	alive := self gatherAliveAfter: block.
@@ -49,7 +50,7 @@ OptimizingLivenessAnalysis >> analyzeLivenessOf: block [
 	^changed
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingLivenessAnalysis >> computeExpirationsAt: block [
 	| alive last |
 	alive := self gatherAliveAfter: block.
@@ -62,7 +63,7 @@ OptimizingLivenessAnalysis >> computeExpirationsAt: block [
 	last realReverseDo: [:instr | self computeExpirationsAt: instr with: alive]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingLivenessAnalysis >> computeExpirationsAt: instruction with: alive [
 	instruction operandsDo: [:value | 
 		(alive includes: value) ifFalse: [self kill: value at: instruction].
@@ -72,19 +73,19 @@ OptimizingLivenessAnalysis >> computeExpirationsAt: instruction with: alive [
 		ifFalse: [self kill: instruction at: instruction]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingLivenessAnalysis >> does: operand dieAt: instruction [
 	| dying |
 	dying := expirations at: instruction ifAbsent: [^false].
 	^dying includes: operand
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingLivenessAnalysis >> firstBlock: aBlock [
 	firstBlock := aBlock
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingLivenessAnalysis >> gatherAliveAfter: block [
 	| incoming extra |
 	incoming := block successors
@@ -93,12 +94,12 @@ OptimizingLivenessAnalysis >> gatherAliveAfter: block [
 	^(incoming , extra) withoutDuplicates
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingLivenessAnalysis >> initialize [
 	
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingLivenessAnalysis >> kill: value at: instruction [
 	| collection |
 	collection := expirations
@@ -107,17 +108,17 @@ OptimizingLivenessAnalysis >> kill: value at: instruction [
 	collection addIfAbsent: value
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingLivenessAnalysis >> liveInOf: block [
 	^liveIn at: block
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OptimizingLivenessAnalysis >> loops: aDictionary [
 	loops := aDictionary
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OptimizingLivenessAnalysis >> maxPressureIn: loopBlocks [
 	| all |
 	all := loopBlocks collect: [:block | pressures at: block].

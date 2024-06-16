@@ -1,10 +1,11 @@
 Class {
-	#name : #ArgumentEnvironment,
-	#superclass : #StackEnvironment,
-	#category : #'Powerlang-SCompiler-Bindings'
+	#name : 'ArgumentEnvironment',
+	#superclass : 'StackEnvironment',
+	#category : 'Powerlang-SCompiler-Bindings',
+	#package : 'Powerlang-SCompiler-Bindings'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 ArgumentEnvironment >> environmentType [
 	^LocalArgument
 ]
