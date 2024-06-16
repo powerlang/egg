@@ -1,27 +1,25 @@
 Class {
-	#name : 'Storage',
-	#superclass : 'Object',
-	#category : 'Powerlang-Core-Metaphysics',
-	#package : 'Powerlang-Core',
-	#tag : 'Metaphysics'
+	#name : #Storage,
+	#superclass : #Object,
+	#category : 'Powerlang-Core-Metaphysics'
 }
 
-{ #category : 'storage' }
+{ #category : #storage }
 Storage >> arrayedSlotOf: base at: index put: value [
 	^ self subclassResponsibility
 ]
 
-{ #category : 'storage' }
+{ #category : #storage }
 Storage >> new: oid [
 	^self subclassResponsibility
 ]
 
-{ #category : 'storage' }
+{ #category : #storage }
 Storage >> slotOf: base at: index [
 	^ self subclassResponsibility
 ]
 
-{ #category : 'storage' }
+{ #category : #storage }
 Storage >> slotOf: base at: index put: value [
 	^self subclassResponsibility
 ]

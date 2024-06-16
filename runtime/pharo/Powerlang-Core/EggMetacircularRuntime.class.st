@@ -1,6 +1,6 @@
 Class {
-	#name : 'EggMetacircularRuntime',
-	#superclass : 'EggRuntime',
+	#name : #EggMetacircularRuntime,
+	#superclass : #EggRuntime,
 	#instVars : [
 		'kernel',
 		'wordSize',
@@ -49,24 +49,22 @@ Class {
 		'SCompiledBlockFlags',
 		'SCompiledMethodFlags'
 	],
-	#category : 'Powerlang-Core-Execution-Metacircular',
-	#package : 'Powerlang-Core',
-	#tag : 'Execution-Metacircular'
+	#category : 'Powerlang-Core-Execution-Metacircular'
 }
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> addSymbol: aSymbol [
 	| string |
 	string := self newString: aSymbol asString.
 	^ self sendLocal: #asSymbol to: string
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> arrayClass: anLMRObject [
 	arrayClass := anLMRObject 
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> arrayedSizeOf: anLMRObject [
 	| species ivars |
 	anLMRObject isImmediate ifTrue: [ ^0 ].
@@ -75,179 +73,179 @@ EggMetacircularRuntime >> arrayedSizeOf: anLMRObject [
 	^anLMRObject size - ivars
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> associationValue: association [
 
 	^association slotAt: 2
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> behaviorClass: anLMRObject [
 	^ anLMRObject slotAt: behaviorClassIndex
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> behaviorClassIndex: anInteger [
 	behaviorClassIndex := anInteger
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> behaviorClass_: anLMRObject [
 	behaviorClass := anLMRObject
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> behaviorMethodDictionary: anLMRObject [
 	^ anLMRObject slotAt: behaviorMethodDictionaryIndex
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> behaviorMethodDictionaryIndex: anInteger [
 	behaviorMethodDictionaryIndex := anInteger
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> behaviorNext: anLMRObject [
 	^ anLMRObject slotAt: behaviorNextIndex
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> behaviorNextIndex: anInteger [
 	behaviorNextIndex := anInteger
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> behaviorOf: anLMRObject [
 	^anLMRObject isImmediate ifTrue: [ self smallIntegerBehavior ] ifFalse: [anLMRObject behavior]
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> blockArgumentCount: anLMRObject [
 	| flags |
 	flags := anLMRObject slotAt: methodFlagsIndex.
 	^ flags value bitsAt: BlockArgCount
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> blockCapturesHome: block [
 	| flags |
 	flags := block slotAt: methodFlagsIndex.
 	^ flags value anyMask: BlockCapturesHome
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> blockCapturesSelf: block [
 	| flags |
 	flags := block slotAt: methodFlagsIndex.
 	^ flags value anyMask: BlockCapturesSelf
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> blockClass: anLMRObject [
 	blockClass := anLMRObject
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> blockEnvironmentCount: anLMRObject [
 	| flags |
 	flags := anLMRObject slotAt: methodFlagsIndex.
 	^ flags value bitsAt: BlockEnvCount
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> blockExecutableCode: anLMRObject [
 
 	^ self methodExecutableCode: anLMRObject
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> blockExecutableCode: anLMRObject put: anObject [
 	^ self methodExecutableCode: anLMRObject put: anObject
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> blockExecutionTree: anLMRObject [
 	^ anLMRObject slotAt: compiledCodeExecutableCodeIndex
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> blockMethod: anLMRObject [
 	^ anLMRObject slotAt: blockMethodIndex
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> blockMethodIndex: anInteger [
 	blockMethodIndex := anInteger
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> blockTempCount: anLMRObject [
 	| flags |
 	flags := anLMRObject slotAt: methodFlagsIndex.
 	^ flags value bitsAt: BlockTempCount
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> bootstrapper [
 	^bootstrapper
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> bootstrapper: aBootstrapper [
 	bootstrapper := aBootstrapper
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> byteArrayClass: anLMRObject [
 	byteArrayClass := anLMRObject
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> classIvars: anLMRObject [
 	^ anLMRObject slotAt: speciesIvarsIndex
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> classModule: class [
 	^ class slotAt: classModuleIndex
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> classModuleIndex: anInteger [
 	classModuleIndex := anInteger
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> className: anLMRObject [
 	^ anLMRObject slotAt: classNameIndex
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> classNameIndex: anInteger [
 	classNameIndex := anInteger
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> classNamespacesIndex: anInteger [
 	classNamespacesIndex := anInteger
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> closureBlock: closure [ 
 	^closure slotAt: closureBlockIndex
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> closureBlockIndex: anInteger [
 	closureBlockIndex := anInteger
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> closureClass: anLMRObject [
 	closureClass := anLMRObject
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> closureHome: closure [
 	| block |
 	block := self closureBlock: closure.
@@ -258,17 +256,17 @@ EggMetacircularRuntime >> closureHome: closure [
 		ifFalse: [ closure at: 1 ]
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> dictionaryTable: anLMRObject [
 	^anLMRObject slotAt: dictionaryTableIndex
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> dictionaryTableIndex: anInteger [
 	dictionaryTableIndex := anInteger
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> doLookup: aSymbol startingAt: aBehavior [
 	| behavior m |
 	behavior := aBehavior.
@@ -279,25 +277,25 @@ EggMetacircularRuntime >> doLookup: aSymbol startingAt: aBehavior [
 	^ nil
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> doesNotUnderstandMethod: anEggObject [
 	doesNotUnderstandMethod := anEggObject
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> executableCodeWork: anEggExecutableCode [
 	self ASSERT: anEggExecutableCode !== nilObj.
 	^anEggExecutableCode code
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> extensionMethodModule: anLMRObject [
 	| association |
 	association := anLMRObject slotAt: anLMRObject size.
 	^ self associationValue: association
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> fixOverrides [
 	| selector md |
 	overrides
@@ -312,13 +310,13 @@ EggMetacircularRuntime >> fixOverrides [
 					method} ]
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> floatClass: anLMRObject [
 
 	floatClass := anLMRObject
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> hashFor: anLMRObject [
 	| shifted hash current |
 	anLMRObject isImmediate
@@ -334,13 +332,13 @@ EggMetacircularRuntime >> hashFor: anLMRObject [
 	^ lastHash := hash
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> initialize [
 	lastHash := 1.
 	super initialize
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> integerFrom: anLMRObject [
 	| behavior class |
 	anLMRObject isImmediate
@@ -352,65 +350,65 @@ EggMetacircularRuntime >> integerFrom: anLMRObject [
 		ifFalse: [ anLMRObject bytes asLittleEndianNegativeInteger ]
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> isBlock: compiledCode [
 	^ (self behaviorClass: compiledCode behavior) ==
 	blockClass 
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> isExecutableCode: code [
 	^code class == EggExecutableCode
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> isMetaclass: anLMRObject [
 	^ (self speciesFor: anLMRObject) == metaclassClass
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> kernel [
 	^kernel
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> kernel: anLMRObject [ 
 	kernel := anLMRObject
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> knownSymbols: associations [
 	knownSymbols := Dictionary withAll: associations
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> largeNegativeIntegerClass: anLMRObject [
 	largeNegativeIntegerClass := anLMRObject
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> largePositiveIntegerClass: anLMRObject [
 	largePositiveIntegerClass := anLMRObject
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> loadAssociationValue: association [
 	^ association slotAt: 2.
 
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> loadModule: symbol [
 	^ bootstrapper loadModule: symbol asLocalString
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> localMethodTreecodes: method [
 
 	^ (self methodTreecodes: method) bytes
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> lookupAssociationFor: aSymbol in: dictionary [
 	|  table assoc key |
 	table := self dictionaryTable: dictionary.
@@ -422,79 +420,79 @@ EggMetacircularRuntime >> lookupAssociationFor: aSymbol in: dictionary [
 	
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> metaclassClass: anLMRObject [
 	metaclassClass := anLMRObject
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> metaclassInstanceClass: anLMRObject [
 	^ anLMRObject slotAt: metaclassInstanceClassIndex
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> metaclassInstanceClassIndex: anInteger [
 	metaclassInstanceClassIndex := anInteger
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> method: method literalAt: index [
 	^ method slotAt: methodInstSize + index
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> methodArgumentCount: anLMRObject [
 	| flags |
 	flags := anLMRObject slotAt: methodFlagsIndex.
 	^ flags value bitsAt: ArgCount
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> methodClass: anLMRObject [
 	methodClass := anLMRObject
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> methodClassBinding: anLMRObject [
 	^ anLMRObject slotAt: methodClassBindingIndex
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> methodClassBindingIndex: anInteger [
 	methodClassBindingIndex := anInteger
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> methodEnvironmentSize: anLMRObject [
 	| flags |
 	flags := anLMRObject slotAt: methodFlagsIndex.
 	^ flags value bitsAt: EnvCount
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> methodExecutableCode: anLMRObject [
 
 ^anLMRObject slotAt: compiledCodeExecutableCodeIndex.
 	
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> methodExecutableCode: anLMRObject put: anObject [
 
 	^ anLMRObject slotAt: compiledCodeExecutableCodeIndex put: anObject 
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> methodExecutableCodeIndex: anInteger [
 	compiledCodeExecutableCodeIndex := anInteger
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> methodFlagsIndex: anInteger [
 	methodFlagsIndex := anInteger
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> methodFor: aSymbol in: behavior [
 	| md table  |
 	overrides at: behavior -> aSymbol ifPresent: [ :m | ^ m ].
@@ -506,12 +504,12 @@ EggMetacircularRuntime >> methodFor: aSymbol in: behavior [
 	^ nil
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> methodInstSize: anInteger [
 	methodInstSize := anInteger
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> methodIsExtension: anLMRObject [
 
 	| flags |
@@ -519,48 +517,48 @@ EggMetacircularRuntime >> methodIsExtension: anLMRObject [
 	^ flags value anyMask: IsExtension
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> methodSelector: anLMRObject [
 
 	^ anLMRObject slotAt: methodSelectorIndex
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> methodSelectorIndex: anInteger [
 
 	methodSelectorIndex := anInteger
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> methodTempCount: anLMRObject [
 	| flags |
 	flags := anLMRObject slotAt: methodFlagsIndex.
 	^ flags value bitsAt: TempCount
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> methodTreecodes: anLMRObject [
 	^ anLMRObject slotAt: methodTreecodesIndex
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> methodTreecodesIndex: anInteger [
 	methodTreecodesIndex := anInteger
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> moduleNamespace: anLMRObject [
 	^anLMRObject slotAt: moduleNamespaceIndex
 
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> moduleNamespaceIndex: anInteger [
 
 	moduleNamespaceIndex := anInteger
 ]
 
-{ #category : 'validating' }
+{ #category : #validating }
 EggMetacircularRuntime >> nativizeForLMR [
 	| script |
 	script := 'nativizeForLMR
@@ -571,7 +569,7 @@ EggMetacircularRuntime >> nativizeForLMR [
 		sendLocal: #nativizeForLMR to: nilObj
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> newArray: anArray [
 | result |
 result := 	self newArraySized: anArray size.
@@ -579,7 +577,7 @@ result := 	self newArraySized: anArray size.
 	^result
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> newArraySized: anInteger [
 	| behavior header |
 	behavior := self speciesInstanceBehavior: arrayClass.
@@ -591,7 +589,7 @@ EggMetacircularRuntime >> newArraySized: anInteger [
 	^ EggSlotObject new header: header
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> newByteArray: aByteArray [
 
 	| behavior header |
@@ -606,7 +604,7 @@ EggMetacircularRuntime >> newByteArray: aByteArray [
 		  bytes: aByteArray
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> newBytes: species size: anInteger [
 	| behavior header |
 	behavior := self speciesInstanceBehavior: species.
@@ -620,12 +618,12 @@ EggMetacircularRuntime >> newBytes: species size: anInteger [
 		bytes: (ByteArray new: anInteger)
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> newBytesOf: species sized: size [
 	^ self newBytes: species size: size
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> newCharacter: aCharacter [
 	| value |
 	value := self newInteger: aCharacter asInteger.
@@ -633,7 +631,7 @@ EggMetacircularRuntime >> newCharacter: aCharacter [
 
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> newClosureFor: compiledBlock [
 	| size closure |
 	size := self blockEnvironmentCount: compiledBlock.
@@ -642,7 +640,7 @@ EggMetacircularRuntime >> newClosureFor: compiledBlock [
 	^ closure
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> newCompiledMethod [
 	| behavior header method |
 	behavior := self speciesInstanceBehavior: methodClass.
@@ -656,12 +654,12 @@ EggMetacircularRuntime >> newCompiledMethod [
 	^method
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> newEnvironmentSized: anInteger [
 	^ self newArraySized: anInteger
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> newExecutableCodeFor: anObject [
 		| behavior header |
 	behavior := self speciesInstanceBehavior: arrayClass.
@@ -675,7 +673,7 @@ EggMetacircularRuntime >> newExecutableCodeFor: anObject [
 
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> newFloat: aFloat [
 
 	| behavior header |
@@ -690,7 +688,7 @@ EggMetacircularRuntime >> newFloat: aFloat [
 		  bytes: aFloat pointerDouble
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> newInteger: anInteger [
 	anInteger > maxSMI
 		ifTrue: [ ^ self newLargePositiveInteger: anInteger ].
@@ -699,7 +697,7 @@ EggMetacircularRuntime >> newInteger: anInteger [
 	^ EggSmallInteger new value: anInteger
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> newLargeNegativeInteger: anInteger [
 	| size bytes byte result complement |
 	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
@@ -714,7 +712,7 @@ EggMetacircularRuntime >> newLargeNegativeInteger: anInteger [
 
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> newLargePositiveInteger: anInteger [
 	| size bytes result |
 	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
@@ -723,19 +721,19 @@ EggMetacircularRuntime >> newLargePositiveInteger: anInteger [
 	^ result bytes: bytes reversed
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> newOf: aSpecies sized: anInteger [
 	^(self speciesIsBytes: aSpecies)
 		ifTrue: [ self newBytes: aSpecies size: anInteger ]
 		ifFalse: [ self newSlots: aSpecies size: anInteger ]
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> newSlots: class [
 	^self newSlots: class size: 0
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> newSlots: class size: anInteger [
 	| ivars behavior header result |
 	ivars := self speciesInstanceSize: class.
@@ -753,17 +751,17 @@ EggMetacircularRuntime >> newSlots: class size: anInteger [
 		nilSlots: nilObj
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> newSlotsOf: class [
 	^ self newSlots: class size: 0
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> newSmallInteger: anInteger [
 	^ EggSmallInteger new value: anInteger
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> newString: aString [
 	| behavior header bytes |
 	behavior := self speciesInstanceBehavior: stringClass.
@@ -778,19 +776,19 @@ EggMetacircularRuntime >> newString: aString [
 		bytes: bytes
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> nil: n true: t false: f [
 	nilObj := n.
 	trueObj := t.
 	falseObj := f
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> override: assoc with: method [
 	overrides at: assoc put: method
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> print: anLMRObject on: aStream [
 	| species name selector |
 	species := self behaviorClass: anLMRObject behavior.
@@ -815,7 +813,7 @@ EggMetacircularRuntime >> print: anLMRObject on: aStream [
 		nextPut: $>
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> printBehavior: anLMRBehavior on: aStream [
 	| species name |
 	species := self behaviorClass: anLMRBehavior.
@@ -824,18 +822,18 @@ EggMetacircularRuntime >> printBehavior: anLMRBehavior on: aStream [
 		nextPutAll: '<' , name , ' instanceBehavior>'
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> processStackSP: anLMRObject [
 
 	^ anLMRObject slotAt: processStackSPIndex
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> processStackSPIndex: anInteger [
  processStackSPIndex := anInteger
 ]
 
-{ #category : 'validating' }
+{ #category : #validating }
 EggMetacircularRuntime >> readKernel [
 	| script |
 	script := 'readKernel
@@ -848,7 +846,7 @@ EggMetacircularRuntime >> readKernel [
 		sendLocal: #readKernel to: nilObj
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> removeOverride: assoc [
 	| species selector |
 	species := assoc key.
@@ -860,17 +858,17 @@ EggMetacircularRuntime >> removeOverride: assoc [
 		ifPresent: [ :messages | messages do: #flushCache ]
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> smallIntegerBehavior [
 	^self speciesInstanceBehavior: smallIntegerClass
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> smallIntegerClass: anLMRObject [
 	smallIntegerClass := anLMRObject
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> speciesFor: anLMRObject [
 	| behavior |
 	behavior := self behaviorOf: anLMRObject.
@@ -879,22 +877,22 @@ EggMetacircularRuntime >> speciesFor: anLMRObject [
 
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> speciesFormatIndex: anInteger [
 	speciesFormatIndex := anInteger
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> speciesInstanceBehavior: anLMRObject [
 	^anLMRObject slotAt: speciesInstanceBehaviorIndex
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> speciesInstanceBehaviorIndex: anInteger [
 	speciesInstanceBehaviorIndex := anInteger 
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> speciesInstanceClass: anLMRObject [
 	| metaclass |
 	metaclass := self isMetaclass: anLMRObject.
@@ -903,22 +901,22 @@ EggMetacircularRuntime >> speciesInstanceClass: anLMRObject [
 		ifFalse: [ anLMRObject ]
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> speciesInstanceSize: anLMRObject [
 	^ (anLMRObject slotAt: speciesFormatIndex) value bitAnd: 16r7F.
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> speciesIsBytes: anLMRObject [
 	^ (anLMRObject slotAt: speciesFormatIndex) value noMask: 16r4000
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> speciesIvarsIndex: anInteger [
 	speciesIvarsIndex := anInteger
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> speciesLocalName: species [
 	| name class |
 	(self isMetaclass: species) ifFalse: [
@@ -930,7 +928,7 @@ EggMetacircularRuntime >> speciesLocalName: species [
 	^ name asLocalString, ' class'
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> speciesModule: species [
 	| class |
 	(self isMetaclass: species)
@@ -939,24 +937,24 @@ EggMetacircularRuntime >> speciesModule: species [
 	^ self classModule: class
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> speciesNamespaces: anLMRObject [
 	| class |
 	class := self speciesInstanceClass: anLMRObject.
 	^class slotAt: classNamespacesIndex
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> speciesSuperclass: anLMRObject [
 	^ anLMRObject slotAt: speciesSuperclassIndex
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> speciesSuperclassIndex: anInteger [
 	speciesSuperclassIndex := anInteger
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> staticBindingForIvar: aSymbol in: receiver [
 	| class all slots bytes |
 	
@@ -972,24 +970,24 @@ EggMetacircularRuntime >> staticBindingForIvar: aSymbol in: receiver [
 	^0
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> storeAssociation: association value: anObject [
 	association slotAt: 2 put: anObject
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> stringClass: anLMRObject [
 	stringClass := anLMRObject
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> superBehaviorOf: class [
 	| superclass |
 	superclass := self speciesSuperclass: class.
 	^ self speciesInstanceBehavior: superclass
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> symbolFromLocal: aSymbol [
 
 	| bytes table symbol |
@@ -1003,24 +1001,24 @@ EggMetacircularRuntime >> symbolFromLocal: aSymbol [
 	self error: 'symbol not found'
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> symbolTable: anLMRObject [
 	symbolTable:= anLMRObject
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> wordSize [
 	^wordSize
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggMetacircularRuntime >> wordSize: anInteger [
 	wordSize := anInteger.
 	maxSMI := (1 bitShift: wordSize * 8 - 2) - 1.
 	minSMI := maxSMI negated - 1
 ]
 
-{ #category : 'validating' }
+{ #category : #validating }
 EggMetacircularRuntime >> writeKernelAt: anInteger [
 	| script |
 	script := 'writeKernel

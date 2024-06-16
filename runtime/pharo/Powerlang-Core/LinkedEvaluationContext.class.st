@@ -1,6 +1,6 @@
 Class {
-	#name : 'LinkedEvaluationContext',
-	#superclass : 'EvaluationContext',
+	#name : #LinkedEvaluationContext,
+	#superclass : #EvaluationContext,
 	#instVars : [
 		'parent',
 		'method',
@@ -10,12 +10,10 @@ Class {
 		'isBlock',
 		'_self'
 	],
-	#category : 'Powerlang-Core-Execution',
-	#package : 'Powerlang-Core',
-	#tag : 'Execution'
+	#category : 'Powerlang-Core-Execution'
 }
 
-{ #category : 'instance creation' }
+{ #category : #'instance creation' }
 LinkedEvaluationContext class >> new [
 	"return an initialized instance"
 
@@ -23,12 +21,12 @@ LinkedEvaluationContext class >> new [
 
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedEvaluationContext >> argumentAt: anInteger [
 	^arguments at: anInteger
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedEvaluationContext >> argumentAt: index in: environmentIndex [
 	| env | 
 	environmentIndex ifNil: [ ^ arguments at: index ].
@@ -36,17 +34,17 @@ LinkedEvaluationContext >> argumentAt: index in: environmentIndex [
 	^ env at: index
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedEvaluationContext >> arguments [
 	^arguments
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedEvaluationContext >> arguments: aCollection [
 	arguments := aCollection
 ]
 
-{ #category : 'services' }
+{ #category : #services }
 LinkedEvaluationContext >> backtrace [
 	| bt next |
 	bt := OrderedCollection new.
@@ -60,22 +58,22 @@ LinkedEvaluationContext >> backtrace [
 	^ bt
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedEvaluationContext >> beBlock [
 	isBlock := true
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 LinkedEvaluationContext >> environment [
 	^ environment
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedEvaluationContext >> environment: anObject [
 	environment := anObject
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedEvaluationContext >> environmentFor: anInteger [
 	"
 	-1: inlined argument.
@@ -89,17 +87,17 @@ LinkedEvaluationContext >> environmentFor: anInteger [
 	^ environment at: anInteger
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 LinkedEvaluationContext >> firstArgument [
 	^arguments at: 1
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 LinkedEvaluationContext >> fourthArgument [
 	^ arguments at: 4
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 LinkedEvaluationContext >> framesCount [
 	| current result |
 	current := self.
@@ -110,7 +108,7 @@ LinkedEvaluationContext >> framesCount [
 	^ result
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedEvaluationContext >> homeContext [
 	| frame searched |
 	isBlock
@@ -124,12 +122,12 @@ LinkedEvaluationContext >> homeContext [
 	self error: 'home context not found'
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedEvaluationContext >> initialize [
 	isBlock := false
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedEvaluationContext >> initializeForBlock: sblock args: anArray closure: closure [
 	"When the block is not inlined, closure becomes the environment of the new context.
 	But when it is inlined, the environment is the one of the builder, which is already
@@ -145,23 +143,23 @@ LinkedEvaluationContext >> initializeForBlock: sblock args: anArray closure: clo
 			environment := closure. ]
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedEvaluationContext >> isBlock [
 	^isBlock
 	
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedEvaluationContext >> isHomeOf: env [
 	^ environment == env andNot: [ isBlock ]
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedEvaluationContext >> method [
 	^method
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 LinkedEvaluationContext >> method: aMethod [
 	| count |
 	method := aMethod.
@@ -169,55 +167,55 @@ LinkedEvaluationContext >> method: aMethod [
 	temporaries := Array new: count
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedEvaluationContext >> methodArguments [
 	^ arguments
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedEvaluationContext >> parent [
 	^parent
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedEvaluationContext >> parent: anEvaluationContext [
 	parent := anEvaluationContext.
 	(isBlock not and: [self framesCount > 1000])
 		ifTrue: [ self halt ].
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedEvaluationContext >> receiver [
 	^_self
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 LinkedEvaluationContext >> secondArgument [
 	^ arguments at: 2
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedEvaluationContext >> self [
 	^ _self
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedEvaluationContext >> self: anObject [
 	_self := anObject
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedEvaluationContext >> stackTemporaryAt: index [
 	^ temporaries at: index
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedEvaluationContext >> stackTemporaryAt: index put: value [
 	^temporaries at: index put: value
 	
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedEvaluationContext >> temporaryAt: index in: environmentIndex [
 	| env |
 	environmentIndex ifNil: [ ^ self stackTemporaryAt: index ].
@@ -225,7 +223,7 @@ LinkedEvaluationContext >> temporaryAt: index in: environmentIndex [
 	^ env at: index
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 LinkedEvaluationContext >> temporaryAt: index in: environmentIndex put: value [
 	| env |
 	environmentIndex ifNil: [ ^ self stackTemporaryAt: index put: value ].
@@ -233,7 +231,7 @@ LinkedEvaluationContext >> temporaryAt: index in: environmentIndex put: value [
 	^ env at: index put: value
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 LinkedEvaluationContext >> thirdArgument [
 	^ arguments at: 3
 ]

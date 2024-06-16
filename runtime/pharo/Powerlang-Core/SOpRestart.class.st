@@ -1,12 +1,10 @@
 Class {
-	#name : 'SOpRestart',
-	#superclass : 'SOperation',
-	#category : 'Powerlang-Core-SExpressions',
-	#package : 'Powerlang-Core',
-	#tag : 'SExpressions'
+	#name : #SOpRestart,
+	#superclass : #SOperation,
+	#category : 'Powerlang-Core-SExpressions'
 }
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SOpRestart >> acceptVisitor: visitor [
 	^ visitor visitOpRestart: self
 ]

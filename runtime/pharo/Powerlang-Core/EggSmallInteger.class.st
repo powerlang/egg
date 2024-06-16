@@ -1,32 +1,30 @@
 Class {
-	#name : 'EggSmallInteger',
-	#superclass : 'EggObject',
+	#name : #EggSmallInteger,
+	#superclass : #EggObject,
 	#instVars : [
 		'value'
 	],
-	#category : 'Powerlang-Core-Execution-Metacircular',
-	#package : 'Powerlang-Core',
-	#tag : 'Execution-Metacircular'
+	#category : 'Powerlang-Core-Execution-Metacircular'
 }
 
-{ #category : 'comparing' }
+{ #category : #comparing }
 EggSmallInteger >> = anObject [
 	anObject class == self class
 		ifFalse: [ ^ false ].
 	^ value = anObject value
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggSmallInteger >> hash [
 	^value hash
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggSmallInteger >> isImmediate [
 	^true
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggSmallInteger >> printOn: aStream [
 	aStream
 		nextPut: $<;
@@ -34,12 +32,12 @@ EggSmallInteger >> printOn: aStream [
 		nextPut: $>
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggSmallInteger >> value [
 	^value
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggSmallInteger >> value: anInteger [
 	value := anInteger
 ]

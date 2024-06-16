@@ -1,17 +1,15 @@
 Class {
-	#name : 'EggLinkedTreeInterpreter',
-	#superclass : 'EggIterativeLinkedInterpreter',
-	#category : 'Powerlang-Core-Execution',
-	#package : 'Powerlang-Core',
-	#tag : 'Execution'
+	#name : #EggLinkedTreeInterpreter,
+	#superclass : #EggIterativeLinkedInterpreter,
+	#category : 'Powerlang-Core-Execution'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggLinkedTreeInterpreter >> dropToS [
 	context pushOperation: SOpDropToS new
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggLinkedTreeInterpreter >> evaluate [
 	| operation |
 	[ context hasWork ]
@@ -21,41 +19,41 @@ EggLinkedTreeInterpreter >> evaluate [
 	^ regR
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggLinkedTreeInterpreter >> evaluationContextClass [
 	^ LinkedTreeEvaluationContext
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggLinkedTreeInterpreter >> initializeExecutableCodeOf: method [
 
 	^self initializeRecursiveExecutableCodeOf: method
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggLinkedTreeInterpreter >> linearizer [
 
 	self shouldNotImplement
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggLinkedTreeInterpreter >> loadRfromStack: anInteger [
 	| load |
 	load := SOpLoadRfromStack new index: anInteger.
 		context pushOperation: load
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggLinkedTreeInterpreter >> loadRwithSelf [
 		context pushOperation:SOpLoadRwithSelf new
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggLinkedTreeInterpreter >> prepareDispatch: dispatch [
 	context pushOperation: dispatch
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggLinkedTreeInterpreter >> prepareForBlock: sblock [
 	| statements |
 	statements := sblock statements.
@@ -65,7 +63,7 @@ EggLinkedTreeInterpreter >> prepareForBlock: sblock [
 	^ nilObj
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggLinkedTreeInterpreter >> prepareForExecuting: method [
 
 	| work |
@@ -73,24 +71,24 @@ EggLinkedTreeInterpreter >> prepareForExecuting: method [
 	self push: work
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggLinkedTreeInterpreter >> push: anSExpression [
 		context pushOperation: anSExpression
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggLinkedTreeInterpreter >> pushOpAssign: aCollection [
 	| op |
 	op := SOpAssign new assignees: aCollection.
 		context pushOperation: op
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggLinkedTreeInterpreter >> pushOpReturn [
 		context pushOperation: SOpReturn new
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggLinkedTreeInterpreter >> pushOpReturn: aBoolean [
 	| class |
 	class := (aBoolean andNot: [ context isBlock ])
@@ -99,12 +97,12 @@ EggLinkedTreeInterpreter >> pushOpReturn: aBoolean [
 	context pushOperation: class new
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggLinkedTreeInterpreter >> pushR [
 		context pushOperation: SOpPushR new
 ]
 
-{ #category : 'initializing' }
+{ #category : #initializing }
 EggLinkedTreeInterpreter >> underprimitiveRestart [
 
 	^ [ :receiver :arguments | 
@@ -116,14 +114,14 @@ EggLinkedTreeInterpreter >> underprimitiveRestart [
 		   ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggLinkedTreeInterpreter >> visitAssignment: anSAssignment [
 	self
 		pushOpAssign: anSAssignment assignees;		push: anSAssignment expression
 
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggLinkedTreeInterpreter >> visitCascade: anSCascade [
 	| dispatch args argsize |
 	self dropToS.
@@ -144,7 +142,7 @@ EggLinkedTreeInterpreter >> visitCascade: anSCascade [
 		push: anSCascade receiver
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggLinkedTreeInterpreter >> visitMessage: anSMessage [
 	| dispatch args argsize |
 	messageCount := messageCount + 1.
@@ -164,7 +162,7 @@ EggLinkedTreeInterpreter >> visitMessage: anSMessage [
 	self push: anSMessage receiver
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggLinkedTreeInterpreter >> visitMethod: anSMethod [
 	| primitive statements |
 	primitive := anSMethod pragma.
@@ -182,13 +180,13 @@ EggLinkedTreeInterpreter >> visitMethod: anSMethod [
 	statements reverseDo: [ :node | self push: node ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggLinkedTreeInterpreter >> visitOpRestart: anSOpRestart [
 
  self prepareForExecuting: context method
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggLinkedTreeInterpreter >> visitReturn: anSReturn [
 	self
 		pushOpReturn: anSReturn local;

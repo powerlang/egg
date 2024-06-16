@@ -7,37 +7,35 @@ particular stack frame in a frozen process of that runtime.
 I could be seen as a lower-level mirror
 "
 Class {
-	#name : 'Handle',
-	#superclass : 'Object',
+	#name : #Handle,
+	#superclass : #Object,
 	#instVars : [
 		'runtime'
 	],
-	#category : 'Powerlang-Core-Metaphysics',
-	#package : 'Powerlang-Core',
-	#tag : 'Metaphysics'
+	#category : 'Powerlang-Core-Metaphysics'
 }
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 Handle >> handleOn: objectId [
 	^self class on: objectId within: runtime
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 Handle >> isLocal [
 	^runtime isLocal
 ]
 
-{ #category : 'meta accessing' }
+{ #category : #'meta accessing' }
 Handle >> objectHandleOn: objectId [
 	^ ObjectHandle on: objectId within: runtime
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 Handle >> runtime [
 	^runtime
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 Handle >> runtime: aRuntime [
 	runtime := aRuntime
 ]

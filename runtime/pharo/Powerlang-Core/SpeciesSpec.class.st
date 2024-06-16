@@ -3,8 +3,8 @@ Copyright (c) 2024 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : 'SpeciesSpec',
-	#superclass : 'Object',
+	#name : #SpeciesSpec,
+	#superclass : #Object,
 	#instVars : [
 		'methods',
 		'module',
@@ -12,27 +12,25 @@ Class {
 		'allIvars',
 		'instVarNames'
 	],
-	#category : 'Powerlang-Core-CodeSpecs',
-	#package : 'Powerlang-Core',
-	#tag : 'CodeSpecs'
+	#category : 'Powerlang-Core-CodeSpecs'
 }
 
-{ #category : 'instance creation' }
+{ #category : #'instance creation' }
 SpeciesSpec class >> new [
 	^super new initialize
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 SpeciesSpec >> addMethod: aMethodSpec [
 	^methods add: aMethodSpec
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 SpeciesSpec >> addMethods: aCollection [
 	aCollection do: [:m | self addMethod: m]
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 SpeciesSpec >> addReplacingMethod: aMethodSpec [
 	| s index |
 	s := aMethodSpec selector.
@@ -40,7 +38,7 @@ SpeciesSpec >> addReplacingMethod: aMethodSpec [
 	methods at: index put: aMethodSpec
 ]
 
-{ #category : 'inquiries' }
+{ #category : #inquiries }
 SpeciesSpec >> allInstVarNames [
 
 	allIvars ifNotNil: [^allIvars]. 
@@ -48,7 +46,7 @@ SpeciesSpec >> allInstVarNames [
 			               c instVarNames ]) asArray 
 ]
 
-{ #category : 'inquiries' }
+{ #category : #inquiries }
 SpeciesSpec >> allSharedPools [
 	| pools |
 	pools := Set new.
@@ -56,7 +54,7 @@ SpeciesSpec >> allSharedPools [
 	^pools
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 SpeciesSpec >> allSubclasses [
 	| all |
 	all := OrderedCollection new.
@@ -64,14 +62,14 @@ SpeciesSpec >> allSubclasses [
 	^all
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 SpeciesSpec >> allSubclassesDo: aBlock [
 	self subclasses do: [:class | 
 		aBlock value: class.
 		class allSubclassesDo: aBlock]
 ]
 
-{ #category : 'inquiries' }
+{ #category : #inquiries }
 SpeciesSpec >> allSuperclasses [
 	| superclasses |
 	superclasses := OrderedCollection new.
@@ -79,12 +77,12 @@ SpeciesSpec >> allSuperclasses [
 	^superclasses
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 SpeciesSpec >> hasMethods [
 	^methods notEmpty
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 SpeciesSpec >> initialize [
 	super initialize.
 	methods := OrderedCollection new.
@@ -92,127 +90,127 @@ SpeciesSpec >> initialize [
 
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 SpeciesSpec >> instSize [
 
 	^ instSize ifNil: [ 
 		  instSize := self allInstVarNames size]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 SpeciesSpec >> instVarNames [
 
 	^ instVarNames asArray
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 SpeciesSpec >> instVarNames: aCollection [
 
 	instVarNames := aCollection asOrderedCollection
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 SpeciesSpec >> instanceClass [
 	^self subclassResponsibility
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 SpeciesSpec >> instanceSide [
 
 	^ self instanceClass
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 SpeciesSpec >> isBytes [
 
 	^ false
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 SpeciesSpec >> isExtension [
 	^module extendedClasses includes: self instanceClass
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 SpeciesSpec >> isMetaclass [
 	^false
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 SpeciesSpec >> isPointers [
 
 	^ true
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 SpeciesSpec >> isVariable [
 
 	^ false
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 SpeciesSpec >> ivars: aCollection [
 	self haltIf: (aCollection anySatisfy: [:each | each isString not]).
 	instVarNames := aCollection asOrderedCollection
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 SpeciesSpec >> methodNamed: aSymbol [
 
 	^methods detect: [ :m | m selector = aSymbol ] ifNone: nil
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 SpeciesSpec >> methods [
 	^methods
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 SpeciesSpec >> module: aModuleSpec [
 	module := aModuleSpec
 ]
 
-{ #category : 'printing' }
+{ #category : #printing }
 SpeciesSpec >> printOn: aStream [
 	aStream nextPutAll: '<' , self name , '>'
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 SpeciesSpec >> removeCategory: aSymbol [
 	methods removeAllSuchThat: [:m | m category == aSymbol]
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 SpeciesSpec >> removeMethod: aMethodSpec [
 	methods remove: aMethodSpec ifAbsent: nil
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 SpeciesSpec >> removeSelector: aSymbol [
 	methods removeAllSuchThat: [:m | m selector == aSymbol]
 ]
 
-{ #category : 'adding / removing' }
+{ #category : #'adding / removing' }
 SpeciesSpec >> removeSelectors: aCollection [
 	methods removeAllSuchThat: [:m | aCollection includes: m selector]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 SpeciesSpec >> selectors [
 	^methods collect: #selector
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 SpeciesSpec >> subclasses [
 	^module allClasses select: [:c | c supername = self name]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 SpeciesSpec >> withAllSubclasses [
 	^OrderedCollection with: self withAll: self allSubclasses
 ]
 
-{ #category : 'inquiries' }
+{ #category : #inquiries }
 SpeciesSpec >> withAllSuperclasses [
 	^OrderedCollection with: self withAll: self allSuperclasses
 ]

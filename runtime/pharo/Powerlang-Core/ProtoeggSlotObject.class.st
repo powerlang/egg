@@ -1,16 +1,14 @@
 Class {
-	#name : 'ProtoeggSlotObject',
-	#superclass : 'ProtoeggObject',
+	#name : #ProtoeggSlotObject,
+	#superclass : #ProtoeggObject,
 	#instVars : [
 		'slots',
 		'hash'
 	],
-	#category : 'Powerlang-Core-Execution-Bootstrap',
-	#package : 'Powerlang-Core',
-	#tag : 'Execution-Bootstrap'
+	#category : #'Powerlang-Core-Execution-Bootstrap'
 }
 
-{ #category : 'instance creation' }
+{ #category : #'instance creation' }
 ProtoeggSlotObject class >> new [
 	"return an initialized instance"
 
@@ -18,27 +16,27 @@ ProtoeggSlotObject class >> new [
 
 ]
 
-{ #category : 'instance creation' }
-ProtoeggSlotObject class >> new: anRGBehavior size: size [
+{ #category : #'instance creation' }
+ProtoeggSlotObject class >> new: aSpeciesSpec size: size [
 
-	^ self new initializeAs: anRGBehavior sized: size
+	^ self new initializeAs: aSpeciesSpec sized: size
 ]
 
-{ #category : 'instance creation' }
-ProtoeggSlotObject class >> new: anRGBehavior size: size withAll: value [
+{ #category : #'instance creation' }
+ProtoeggSlotObject class >> new: aSpeciesSpec size: size withAll: value [
 	| obj |
-	obj := self new: anRGBehavior size: size.
+	obj := self new: aSpeciesSpec size: size.
 	^obj atAllPut: value; yourself
 	
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggSlotObject >> allSlotNames [
 
 	^ spec allInstVarNames
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggSlotObject >> arrayedSize [
 	"
 	 Return the size of the arrayed part of this object, that this,
@@ -48,13 +46,13 @@ ProtoeggSlotObject >> arrayedSize [
 	^ self size - self instSize
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggSlotObject >> asBoolean [
 	spec name = #True ifTrue: [ ^true ].	spec name = #False ifTrue: [ ^false ].
 		self ASSERT: false
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggSlotObject >> at: index [
 	"Return indexed value at given index, starting with 1. This CANNOT be 
 	 used for accessing named slots (aka, instance variables), to access 
@@ -64,7 +62,7 @@ ProtoeggSlotObject >> at: index [
 	^slots at: self instSize + index
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggSlotObject >> at: index put: value [
 	"Set indexed value at given `index` to `value`. This CANNOT be used for 
 	 setting named slots (aka, instance variables), to access them use 
@@ -75,12 +73,12 @@ ProtoeggSlotObject >> at: index put: value [
 	^slots at: self instSize + index put: value
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 ProtoeggSlotObject >> atAllPut: value [
 	slots atAllPut: value
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggSlotObject >> basicAt: index [
 	"Return indexed value at given raw index, starting with 1"
 
@@ -88,13 +86,13 @@ ProtoeggSlotObject >> basicAt: index [
 	^ slots at: index
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggSlotObject >> bodySizeInBytes [	
 	^ self sizeInBytes
 
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggSlotObject >> doesNotUnderstand: aMessage [
 	| sel ivars |
 	sel := aMessage selector.
@@ -109,7 +107,7 @@ ProtoeggSlotObject >> doesNotUnderstand: aMessage [
 	^ super doesNotUnderstand: aMessage
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 ProtoeggSlotObject >> headerFlags [
 	| variable named small |
 	variable := spec isVariable ifTrue: [2] ifFalse: [0].
@@ -118,41 +116,41 @@ ProtoeggSlotObject >> headerFlags [
 	^ variable | named | small
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 ProtoeggSlotObject >> headerHash [
 	^hash
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 ProtoeggSlotObject >> headerHash: anInteger [
 	hash := anInteger
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 ProtoeggSlotObject >> initialize [
 	hash := 0
 ]
 
-{ #category : 'initialization' }
-ProtoeggSlotObject >> initializeAs: anRGBehavior sized: size [
-	self assert: anRGBehavior notNil.
-	self assert: anRGBehavior isPointers.
-	self assert: (anRGBehavior isVariable or: [ size == 0 ]).
-	spec := anRGBehavior.
+{ #category : #initialization }
+ProtoeggSlotObject >> initializeAs: aSpeciesSpec sized: size [
+	self assert: aSpeciesSpec notNil.
+	self assert: aSpeciesSpec isPointers.
+	self assert: (aSpeciesSpec isVariable or: [ size == 0 ]).
+	spec := aSpeciesSpec.
 	slots := Array new: self instSize + size
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggSlotObject >> instSize [
 	^ spec instSize
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggSlotObject >> isPointers [
 	^true
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggSlotObject >> loadIvar: aSymbol [
 	| ivar |
 	ivar := self allSlotNames indexOf: aSymbol.
@@ -160,7 +158,7 @@ ProtoeggSlotObject >> loadIvar: aSymbol [
 		ifTrue: [ self slotAt: ivar ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggSlotObject >> printOn: aStream [
 	aStream
 		nextPutAll: '<<';
@@ -168,7 +166,7 @@ ProtoeggSlotObject >> printOn: aStream [
 		nextPutAll: '>>'
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggSlotObject >> size [
 	"Return the size if this object, that this, the value of
 	 size field in object header. 
@@ -179,13 +177,13 @@ ProtoeggSlotObject >> size [
 	^ slots size
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggSlotObject >> sizeInBytes [	
 	^ self size * self wordSize
 
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggSlotObject >> slotAt: index [
 	"Get named slot at given `index`, starting with 1. This CANNOT be used 
 	 for accessing indexed slots  (i.e., variable part of array-like objects), 
@@ -195,7 +193,7 @@ ProtoeggSlotObject >> slotAt: index [
 	^slots at: index
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggSlotObject >> slotAt: index put: value [
 	"Set named slot at given `index` to `value`. This CANNOT be used 
 	 for setting indexed slots  (i.e., variable part of array-like objects), 
@@ -206,17 +204,17 @@ ProtoeggSlotObject >> slotAt: index put: value [
 	^slots at: index put: value
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggSlotObject >> slots [
 	^slots
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggSlotObject >> slotsDo: aBlock [
 	slots do: aBlock
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggSlotObject >> storeIvar: aSymbol with: anObject [
 	| ivar |
 	ivar := self allSlotNames indexOf: aSymbol.
@@ -224,13 +222,13 @@ ProtoeggSlotObject >> storeIvar: aSymbol with: anObject [
 		ifTrue: [ self slotAt: ivar put: anObject ]
 ]
 
-{ #category : 'validation' }
+{ #category : #validation }
 ProtoeggSlotObject >> validate [
 	super validate.
 	slots withIndexDo:[:value :index | self assert: value notNil ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ProtoeggSlotObject >> value [
 	| message |
 	(self allSlotNames includes: #value)

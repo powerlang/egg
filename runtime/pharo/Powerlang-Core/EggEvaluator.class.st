@@ -1,6 +1,6 @@
 Class {
-	#name : 'EggEvaluator',
-	#superclass : 'Object',
+	#name : #EggEvaluator,
+	#superclass : #Object,
 	#instVars : [
 		'runtime',
 		'falseObj',
@@ -15,24 +15,22 @@ Class {
 	#pools : [
 		'ClosureElementTypes'
 	],
-	#category : 'Powerlang-Core-Execution',
-	#package : 'Powerlang-Core',
-	#tag : 'Execution'
+	#category : 'Powerlang-Core-Execution'
 }
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 EggEvaluator class >> undermessages [
 	^#(_basicAt: #_basicAt:put: _bitShiftLeft: _byteAt: #_byteAt:put: _smallSize _largeSize _isSmallInteger _basicHash _basicHash: _smallIntegerByteAt: _uShortAtOffset: #_uShortAtOffset:put:)
 ]
 
-{ #category : 'services' }
+{ #category : #services }
 EggEvaluator >> booleanFor: aBoolean [
 	^ aBoolean
 		ifTrue: [ trueObj ]
 		ifFalse: [ falseObj ]
 ]
 
-{ #category : 'services' }
+{ #category : #services }
 EggEvaluator >> booleanFrom: anObject [
 	anObject == falseObj
 		ifTrue: [ ^ false ].
@@ -41,23 +39,23 @@ EggEvaluator >> booleanFrom: anObject [
 	self error: 'not a boolean'
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> context [
 	^ context 
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> context: anEvaluationContext [ 
 	context := anEvaluationContext
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> contextSwitchTo: vmStack [
 
 ^self subclassResponsibility 
 ]
 
-{ #category : 'initializing' }
+{ #category : #initializing }
 EggEvaluator >> convertPrimitives [
 	| original |
 	original := primitives.
@@ -67,7 +65,7 @@ EggEvaluator >> convertPrimitives [
 			[ :symbol :block | primitives at: (runtime symbolFromLocal: symbol) put: block ]
 ]
 
-{ #category : 'initializing' }
+{ #category : #initializing }
 EggEvaluator >> convertUndermessages [
 	| original |
 	original := undermessages.
@@ -76,27 +74,27 @@ EggEvaluator >> convertUndermessages [
 
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> evaluateClosure: receiver [
 	^ self evaluateClosure: receiver withArgs: #()
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 EggEvaluator >> evaluateClosure: aPClosure with: anObject [
 	 ^self evaluateClosure: aPClosure withArgs: { anObject }
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 EggEvaluator >> evaluateClosure: aPClosure with: anObject with: anotherObject [
 	^ self evaluateClosure: aPClosure withArgs: {anObject. anotherObject}
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 EggEvaluator >> evaluateClosure: receiver withArgs: arguments [
 	^self subclassResponsibility
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> evaluatePerform: aSymbol in: receiver withArgs: arguments [
 	| behavior method |
 	behavior := runtime behaviorOf: receiver.
@@ -105,7 +103,7 @@ EggEvaluator >> evaluatePerform: aSymbol in: receiver withArgs: arguments [
 	^self invoke: method with: receiver
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> evaluatePrimitiveHash: receiver [
 	| hash |
 	hash := receiver headerHash.
@@ -115,25 +113,25 @@ EggEvaluator >> evaluatePrimitiveHash: receiver [
 	^ runtime newInteger: hash
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggEvaluator >> false [
 	^ falseObj
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggEvaluator >> initialize [
 
 	messageCount := 0.
 	stacks := IdentityDictionary new
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> initializeExecutableCodeOf: method [
 
 	^self subclassResponsibility
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> initializeLinearExecutableCodeOf: method [
 
 	| sexpressions executable |
@@ -144,7 +142,7 @@ EggEvaluator >> initializeLinearExecutableCodeOf: method [
 	^runtime methodExecutableCode: method put: executable
 ]
 
-{ #category : 'initializing' }
+{ #category : #initializing }
 EggEvaluator >> initializePrimitives [
 
 	primitives := IdentityDictionary new.
@@ -212,7 +210,7 @@ EggEvaluator >> initializePrimitives [
 		put: self primitiveProcessVMStackContextSwitchTo
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> initializeRecursiveExecutableCodeOf: method [
 
 	| sexpressions executable |
@@ -221,7 +219,7 @@ EggEvaluator >> initializeRecursiveExecutableCodeOf: method [
 	^runtime methodExecutableCode: method put: executable
 ]
 
-{ #category : 'initializing' }
+{ #category : #initializing }
 EggEvaluator >> initializeUndermessages [
 	undermessages := IdentityDictionary new.
 	undermessages
@@ -267,12 +265,12 @@ EggEvaluator >> initializeUndermessages [
 		at: #_halt put: self underprimitiveHalt
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> invoke: method with: receiver [
 	^self subclassResponsibility
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> isIdentical: anObject to: anotherObject [
 	^ anObject == anotherObject
 		or: [ anObject isImmediate
@@ -280,12 +278,12 @@ EggEvaluator >> isIdentical: anObject to: anotherObject [
 						and: [ anObject value = anotherObject value ] ] ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> linearizer [
 	^self subclassResponsibility
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> lookup: aSymbol startingAt: aBehavior sendSite: anSMessage [
 	| method symbol |
 	method := anSMessage methodFor: aBehavior.
@@ -304,13 +302,13 @@ EggEvaluator >> lookup: aSymbol startingAt: aBehavior sendSite: anSMessage [
 	^ method
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggEvaluator >> nil [
 	^nilObj
 	
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> prepareExecutableCode: method [
 
 	| code |
@@ -319,7 +317,7 @@ EggEvaluator >> prepareExecutableCode: method [
 	^ self initializeExecutableCodeOf: method
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 EggEvaluator >> prepareForExecuting: method [
 
 	| code |
@@ -327,7 +325,7 @@ EggEvaluator >> prepareForExecuting: method [
 	^ runtime executableCodeWork: code
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveAt [
 	| receiver index value |
 	^ [ receiver := context self.
@@ -338,14 +336,14 @@ EggEvaluator >> primitiveAt [
 		ifFalse: [ value ] ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveAtPut [
 	| index |
 	^ [ index := context firstArgument value.
 	context self at: index put: context secondArgument ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveBehavior [
 	| receiver |
 	^ [ receiver := context self.
@@ -354,149 +352,149 @@ EggEvaluator >> primitiveBehavior [
 		ifFalse: [ receiver behavior ] ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveBootstrapDictAt [
 	| string |
 	^ [ string := context firstArgument asString.
 	context self at: string ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveBootstrapDictAtPut [
 	| string |
 	^ [ string := context firstArgument asString.
 	context self at: string put: context secondArgument ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveBootstrapDictBeConstant [
 	^ [ context self beConstant ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveBootstrapDictKeys [
 	^ [ context self keys ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveBootstrapDictNew [
 	^ [ runtime newBootstrapDictionaryOf: context self ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveClass [
 	^ [ runtime speciesFor: context self ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveClosureArgumentCount [
 	^ [ runtime newInteger: context self block argumentCount ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveClosureValue [
 	^ [ self evaluateClosure: context self ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveClosureValueWithArgs [
 	^ [ self
 		evaluateClosure: context self
 		withArgs: context methodArguments ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveEqual [
 	^ [ runtime booleanFor: context self = context firstArgument ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveFloatNew [
 	^ [ runtime newBytesOf: context self sized: 8 ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveFlushDispatchCaches [
 	^ [ runtime
 		flushDispatchCache: context self
 		in: context firstArgument ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveFlushFromCaches [
 
 	^ [ runtime flushDispatchCache: (runtime methodSelector: context self)]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> primitiveFor: aSymbol [
 	^primitives at: aSymbol
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveHash [
 	^ [ runtime newInteger: (runtime hashFor: context self) ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveHostFixOverrides [
 	^ [ runtime fixOverrides ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveHostLoadModule [
 	^ [ runtime loadModule: context firstArgument]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveHostSuspendedBecause [
 
 	^ [ context signalSuspension]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveNew [
 	^ [ runtime newSlotsOf: context self ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveNewBytes [
 	| size |
 	^ [ size := context firstArgument value.
 	runtime newBytesOf: context self sized: size ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveNewObjectHeap [
 	^ [ runtime newObjectHeap ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveNewSized [
 	| size |
 	^ [ size := context firstArgument value.
 	runtime newOf: context self sized: size ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitivePerformWithArguments [
 	^ [ self
 		evaluatePerform: context firstArgument in: context self
 		withArgs: context secondArgument ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitivePrepareForExecution [
 
 	^ [ self prepareForExecuting: context self ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitivePrimeFor [
 	^ [ self primitivePrimeFor: context firstArgument value ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> primitivePrimeFor: anInteger [
 	| result |
 
@@ -505,7 +503,7 @@ EggEvaluator >> primitivePrimeFor: anInteger [
 	^ runtime newInteger: result
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveProcessVMStackAt [
 
 	^ [ 
@@ -514,19 +512,19 @@ EggEvaluator >> primitiveProcessVMStackAt [
 		 ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveProcessVMStackAtPut [
 
 	^ [ (stacks at: context receiver) stack at: context firstArgument value put: context secondArgument ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveProcessVMStackBP [
 
 	^ [ runtime newSmallInteger: context regBP ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveProcessVMStackBpAtPut [
 
 	^ [ 
@@ -535,20 +533,20 @@ EggEvaluator >> primitiveProcessVMStackBpAtPut [
 		  put: context secondArgument value ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveProcessVMStackBufferSize [
 
 	^ [ runtime newInteger: (stacks at: context receiver) stackSize ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveProcessVMStackContextSwitchTo [
 
 	^ [ 
 	  self contextSwitchTo: context firstArgument ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveProcessVMStackInitialize [
 
 	^ [ 
@@ -559,7 +557,7 @@ EggEvaluator >> primitiveProcessVMStackInitialize [
 	  stacks at: context self put: new ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveProcessVMStackPcAtPut [
 
 	^ [ 
@@ -568,7 +566,7 @@ EggEvaluator >> primitiveProcessVMStackPcAtPut [
 		  put: context secondArgument value ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveSMIBitAnd [
 	^ [ runtime
 		newInteger:
@@ -576,7 +574,7 @@ EggEvaluator >> primitiveSMIBitAnd [
 				bitAnd: (runtime integerFrom: context firstArgument)) ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveSMIBitOr [
 	^ [ runtime
 		newInteger:
@@ -584,7 +582,7 @@ EggEvaluator >> primitiveSMIBitOr [
 				bitOr: (runtime integerFrom: context firstArgument)) ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveSMIBitShift [
 	^ [ runtime
 		newInteger:
@@ -592,7 +590,7 @@ EggEvaluator >> primitiveSMIBitShift [
 				bitShift: (runtime integerFrom: context firstArgument)) ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveSMIBitXor [
 	^ [ runtime
 		newInteger:
@@ -600,7 +598,7 @@ EggEvaluator >> primitiveSMIBitXor [
 				bitXor: (runtime integerFrom: context firstArgument)) ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveSMIEqual [
 	^ [ runtime
 		booleanFor: (
@@ -608,7 +606,7 @@ EggEvaluator >> primitiveSMIEqual [
 				context firstArgument value) ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveSMIGreaterEqualThan [
 	^ [ runtime
 		booleanFor:
@@ -616,18 +614,18 @@ EggEvaluator >> primitiveSMIGreaterEqualThan [
 				>= (runtime integerFrom: context firstArgument) ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveSMIGreaterThan [
 	^ [ runtime
 		booleanFor: context self value > (runtime integerFrom: context firstArgument) ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveSMIHighBit [
 	^ [ runtime newInteger: context self value highBit ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveSMIIntDiv [
 	^ [ runtime
 		newInteger:
@@ -635,7 +633,7 @@ EggEvaluator >> primitiveSMIIntDiv [
 				// (runtime integerFrom: context firstArgument ) ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveSMIIntQuot [
 	^ [ runtime
 		newInteger:
@@ -643,7 +641,7 @@ EggEvaluator >> primitiveSMIIntQuot [
 				\\ (runtime integerFrom: context firstArgument) ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveSMIMinus [
 	^ [ runtime
 		newInteger:
@@ -651,7 +649,7 @@ EggEvaluator >> primitiveSMIMinus [
 				- (runtime integerFrom: context firstArgument) ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveSMINotEqual [
 	^ [ runtime
 		booleanFor:
@@ -659,7 +657,7 @@ EggEvaluator >> primitiveSMINotEqual [
 				!= (runtime integerFrom: context firstArgument) ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveSMIPlus [
 	^ [ runtime
 		newInteger:
@@ -667,12 +665,12 @@ EggEvaluator >> primitiveSMIPlus [
 				+ (runtime integerFrom: context firstArgument) ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveSMISize [
 	^ [ runtime newInteger: context self value bytesCount ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveSMITimes [
 	^ [ runtime
 		newInteger:
@@ -680,7 +678,7 @@ EggEvaluator >> primitiveSMITimes [
 				* (runtime integerFrom: context firstArgument) ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveSetBehavior [
 	| receiver |
 	^ [ receiver := context self.
@@ -688,12 +686,12 @@ EggEvaluator >> primitiveSetBehavior [
 	receiver ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveSize [
 	^ [ runtime newInteger: (runtime arrayedSizeOf: context self) ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveStringReplaceFromToWithStartingAt [
 	| receiver |
 	^ [ receiver := context self.
@@ -705,33 +703,33 @@ EggEvaluator >> primitiveStringReplaceFromToWithStartingAt [
 	receiver ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveUnderHash [
 	^ [ runtime newInteger: context self headerHash ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveUnderIsBytes [
 	^ [ runtime booleanFor: context self isBytes ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveUnderPointersSize [
 	^ [ runtime newInteger: context self pointersSize ]
 ]
 
-{ #category : 'primitives' }
+{ #category : #primitives }
 EggEvaluator >> primitiveUnderSize [
 	^ [ runtime newInteger: context self size ]
 ]
 
-{ #category : 'initializing' }
+{ #category : #initializing }
 EggEvaluator >> runtime [
 	^runtime
 
 ]
 
-{ #category : 'initializing' }
+{ #category : #initializing }
 EggEvaluator >> runtime: anEggRuntime [
 	runtime := anEggRuntime.
 	nilObj := runtime nil.
@@ -742,27 +740,27 @@ EggEvaluator >> runtime: anEggRuntime [
 		initializePrimitives; convertUndermessages ; convertPrimitives 
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> sendLocal: aSymbol to: receiver [
 	^ self sendLocal: aSymbol to: receiver with: {}
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> stackSize [
 	^context framesCount
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 EggEvaluator >> true [
 	^ trueObj
 ]
 
-{ #category : 'underprimitives' }
+{ #category : #underprimitives }
 EggEvaluator >> underprimitiveBasicAt [
 	^ [ :receiver :arguments | receiver slots at: arguments first value ]
 ]
 
-{ #category : 'underprimitives' }
+{ #category : #underprimitives }
 EggEvaluator >> underprimitiveBasicAtPut [
 
 	^ [ :receiver :arguments | 
@@ -772,22 +770,22 @@ EggEvaluator >> underprimitiveBasicAtPut [
 	  arguments second ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveBasicFlags [
 	^ [ :receiver :arguments | runtime newInteger: receiver headerFlags ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveBasicHash [
 	^ [ :receiver :arguments | runtime newInteger: receiver headerHash ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveBasicHashPut [
 	^ [ :receiver :arguments | receiver headerHash: arguments first value ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveBitShiftLeft [
 	| result |
 	^ [ :receiver :arguments | 
@@ -795,7 +793,7 @@ EggEvaluator >> underprimitiveBitShiftLeft [
 	runtime newInteger: result ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveByteAt [
 	| result |
 	^ [ :receiver :arguments | 
@@ -803,7 +801,7 @@ EggEvaluator >> underprimitiveByteAt [
 	runtime newInteger: result ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveByteAtPut [
 
 	^ [ :receiver :arguments | 
@@ -813,27 +811,27 @@ EggEvaluator >> underprimitiveByteAtPut [
 	arguments second ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveHalt [
 	^ [ :receiver :arguments | receiver halt ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveIdentityEquals [
 	^ [ :receiver :arguments | runtime booleanFor: (self isIdentical: receiver to: arguments first)]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveIsLarge [
 	^ [ :receiver :arguments | runtime booleanFor: receiver isSmall not ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveIsSmallInteger [
 	^ [ :receiver :arguments | runtime booleanFor: receiver isImmediate ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveLargeSize [
 	^ [ :receiver :arguments | 
 	receiver isSmall
@@ -841,7 +839,7 @@ EggEvaluator >> underprimitiveLargeSize [
 	runtime newInteger: receiver size ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveLeadingZeroBitCount [
 	^ [ :receiver :arguments | 
 	runtime
@@ -849,86 +847,86 @@ EggEvaluator >> underprimitiveLeadingZeroBitCount [
 		underprimitiveLeadingZeroBitCount: receiver value) ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveLeadingZeroBitCount: anInteger [
 	^ anInteger < 0
 		ifTrue: [ 0 ]
 		ifFalse: [ runtime wordSize * 8 - anInteger highBit ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveSMIBitAnd [
 	^ [ :receiver :arguments | runtime newInteger: (receiver value bitAnd: arguments first value) ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveSMIBitOr [
 	^ [ :receiver :arguments | runtime newInteger: (receiver value bitOr: arguments first value) ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveSMIBitShiftLeft [
 	^ [ :receiver :arguments | runtime newInteger: receiver value << arguments first value ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveSMIBitShiftRight [
 	^ [ :receiver :arguments | 
 	runtime
 		newInteger: (receiver value >> arguments first value) ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveSMIEquals [
 	^ [ :receiver :arguments | runtime booleanFor: receiver value = arguments first value ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveSMIGreaterEqualThan [
 	^ [ :receiver :arguments | runtime booleanFor: receiver value >= arguments first value ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveSMIGreaterThan [
 	^ [ :receiver :arguments | runtime booleanFor: receiver value > arguments first value ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveSMILowerEqualThan [
 	^ [ :receiver :arguments | runtime booleanFor: receiver value <= arguments first value ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveSMILowerThan [
 	^ [ :receiver :arguments | runtime booleanFor: receiver value < arguments first value ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveSMIMinus [
 	^ [ :receiver :arguments | runtime newInteger: receiver value - arguments first value ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveSMIPlus [
 	^ [ :receiver :arguments | runtime newInteger: receiver value + arguments first value ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveSMIQuotientTowardZero [
 	^ [ :receiver :arguments | runtime newInteger: (receiver value quo: arguments first value) ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveSMIRemainderTowardZero [
 	^ [ :receiver :arguments | runtime newInteger: (receiver value \\ arguments first value) ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveSMITimes [
 	^ [ :receiver :arguments | runtime newInteger: receiver value * arguments first value ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveSmallIntegerByteAt [
 	| result |
 	^ [ :receiver :arguments | 
@@ -936,7 +934,7 @@ EggEvaluator >> underprimitiveSmallIntegerByteAt [
 	runtime newInteger: result ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveSmallSize [
 	^ [ :receiver :arguments | 
 	receiver isSmall
@@ -944,7 +942,7 @@ EggEvaluator >> underprimitiveSmallSize [
 	runtime newInteger: receiver size ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveULongAtOffset [
 	| result |
 	^ [ :receiver :arguments | 
@@ -952,7 +950,7 @@ EggEvaluator >> underprimitiveULongAtOffset [
 	runtime newInteger: result ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveULongAtOffsetPut [
 	| value |
 	^ [ :receiver :arguments | 
@@ -963,7 +961,7 @@ EggEvaluator >> underprimitiveULongAtOffsetPut [
 	value ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveUShortAtOffset [
 	| result |
 	^ [ :receiver :arguments | 
@@ -972,7 +970,7 @@ EggEvaluator >> underprimitiveUShortAtOffset [
 	runtime newInteger: result ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 EggEvaluator >> underprimitiveUShortAtOffsetPut [
 	| value |
 	^ [ :receiver :arguments | 

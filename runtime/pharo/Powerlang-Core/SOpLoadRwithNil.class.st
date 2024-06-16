@@ -1,12 +1,10 @@
 Class {
-	#name : 'SOpLoadRwithNil',
-	#superclass : 'SOperation',
-	#category : 'Powerlang-Core-SExpressions',
-	#package : 'Powerlang-Core',
-	#tag : 'SExpressions'
+	#name : #SOpLoadRwithNil,
+	#superclass : #SOperation,
+	#category : 'Powerlang-Core-SExpressions'
 }
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SOpLoadRwithNil >> acceptVisitor: visitor [
 	^ visitor visitOpLoadRwithNil: self
 ]

@@ -1,12 +1,10 @@
 Class {
-	#name : 'SOpJumpTrue',
-	#superclass : 'SOpJump',
-	#category : 'Powerlang-Core-SExpressions',
-	#package : 'Powerlang-Core',
-	#tag : 'SExpressions'
+	#name : #SOpJumpTrue,
+	#superclass : #SOpJump,
+	#category : 'Powerlang-Core-SExpressions'
 }
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 SOpJumpTrue >> acceptVisitor: visitor [
 	^ visitor visitOpJumpTrue: self
 ]

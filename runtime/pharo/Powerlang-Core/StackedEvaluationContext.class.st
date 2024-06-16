@@ -1,6 +1,6 @@
 Class {
-	#name : 'StackedEvaluationContext',
-	#superclass : 'EvaluationContext',
+	#name : #StackedEvaluationContext,
+	#superclass : #EvaluationContext,
 	#instVars : [
 		'stack',
 		'regSP',
@@ -10,18 +10,16 @@ Class {
 		'regE',
 		'pc'
 	],
-	#category : 'Powerlang-Core-Execution',
-	#package : 'Powerlang-Core',
-	#tag : 'Execution'
+	#category : 'Powerlang-Core-Execution'
 }
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> argumentAt: anInteger [
 
 	^self argumentAt: anInteger frameIndex: 1 
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> argumentAt: anInteger frameIndex: anotherInteger [
 
 	| bp code count |
@@ -31,21 +29,21 @@ StackedEvaluationContext >> argumentAt: anInteger frameIndex: anotherInteger [
 	^ stack at: bp + 1 + (count - anInteger + 1)
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> argumentAt: index in: environmentIndex [
 	environmentIndex ifNil: [ ^ self argumentAt: index ].
 	^self environment: environmentIndex at: index.
 
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> arguments [
 	| count |
 	count := runtime argumentCountOf: regM.
 	^ (count to: 1 by: -1) collect: [ :i | self argumentAt: i ]
 ]
 
-{ #category : 'services' }
+{ #category : #services }
 StackedEvaluationContext >> backtrace [
 	| result bp code receiver |
 	result := OrderedCollection new.
@@ -58,7 +56,7 @@ StackedEvaluationContext >> backtrace [
 	^ result
 ]
 
-{ #category : 'services' }
+{ #category : #services }
 StackedEvaluationContext >> bpForFrameAt: anInteger [
 
 	| bp  |
@@ -69,14 +67,14 @@ StackedEvaluationContext >> bpForFrameAt: anInteger [
 	^ bp
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> buildClosureFrameFor: receiver code: code environment: environment [
 	| temps |
 	temps := runtime blockTempCount: code.
 	self buildFrameFor: receiver code: code environment: environment temps: temps
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> buildFrameFor: receiver code: code environment: environment temps: temps [
 	regS := receiver.
 	regM := code.
@@ -95,7 +93,7 @@ StackedEvaluationContext >> buildFrameFor: receiver code: code environment: envi
 	temps timesRepeat: [ self push: self nil ]
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> buildLaunchFrame [
 	| launcher code executable |
 	launcher := runtime newCompiledMethod.
@@ -108,7 +106,7 @@ StackedEvaluationContext >> buildLaunchFrame [
 		environment: runtime nil
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> buildMethodFrameFor: receiver code: code environment: environment [
 	| temps |
 	temps := runtime methodTempCount: code.
@@ -119,7 +117,7 @@ StackedEvaluationContext >> buildMethodFrameFor: receiver code: code environment
 		temps: temps
 ]
 
-{ #category : 'services' }
+{ #category : #services }
 StackedEvaluationContext >> contextSwitchTo: anotherStack sp: anotherSP environment: env [
 	"Only a stack switch is needed (and restoring E), other registers
 	are restored upon return from the currently executing method (prev BP, S, M and PC)"
@@ -129,23 +127,23 @@ StackedEvaluationContext >> contextSwitchTo: anotherStack sp: anotherSP environm
 
 ]
 
-{ #category : 'services' }
+{ #category : #services }
 StackedEvaluationContext >> dropOperands: anInteger [
 	regSP := regSP + anInteger
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> environment [
 	^regE
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> environment: array [
 
 	regE := array
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> environment: environmentIndex at: index [
 	"
 	-1: inlined argument.
@@ -161,7 +159,7 @@ StackedEvaluationContext >> environment: environmentIndex at: index [
 	^ env at: index
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> environment: environmentIndex at: index put: value [
 	"
 	-1: inlined argument.
@@ -177,27 +175,27 @@ StackedEvaluationContext >> environment: environmentIndex at: index put: value [
 	^ env at: index put: value
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> firstArgument [
 	^ self argumentAt: 1
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> fourthArgument [
 	^ self argumentAt: 4
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> hasFinished [
 	^ regBP = 0 and: [ regSP = (stack size + 1) ]
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> incRegPC [
 	^pc := pc + 1
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> initialize [
 	super initialize.
 	stack := Array new: 64 * 1024.
@@ -206,37 +204,37 @@ StackedEvaluationContext >> initialize [
 	pc := 0
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> isBlock [
 	^ runtime isBlock: regM
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> method [
 	^ self isBlock
 		ifTrue: [ runtime blockMethod: regM ]
 		ifFalse: [ regM ]
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> method: aMethod [
 	regM := aMethod
 
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> methodArguments [
 	| count |
 	count := runtime methodArgumentCount: regM.
 	^ (count to: 1 by: -1) collect: [ :i | self argumentAt: i ]
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> operandAt: anInteger [
 	^ stack at: regSP + anInteger
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> pop [
 	| result |
 	result := stack at: regSP.
@@ -245,7 +243,7 @@ StackedEvaluationContext >> pop [
 
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> popFrame [
 
 	regSP := regBP.
@@ -257,7 +255,7 @@ StackedEvaluationContext >> popFrame [
 	regS := stack at: regBP - 1
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> popLaunchFrame [
 	regSP := regBP.
 	regE := stack at: regBP - 3.
@@ -270,12 +268,12 @@ StackedEvaluationContext >> popLaunchFrame [
 
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> popOperand [
 	^self pop
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> popOperands: anInteger [
 	| result |
 	anInteger = 0
@@ -285,7 +283,7 @@ StackedEvaluationContext >> popOperands: anInteger [
 	^ result
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> printOn: aStream [
 	| slot |
 	regSP to: regBP + 3 do: [ :i | slot := stack at: i. aStream nextPutAll: i hex; nextPutAll: ' -> '; print: slot;cr ].
@@ -294,7 +292,7 @@ StackedEvaluationContext >> printOn: aStream [
 super printOn: aStream
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> printStack [
 	^String
 		streamContents: [ :stream | 
@@ -308,75 +306,75 @@ StackedEvaluationContext >> printStack [
 					cr ] ]
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> push: anObject [
 	anObject ifNil: [ self halt ].
 	regSP := regSP - 1.
 	stack at: regSP put: anObject
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> pushOperand: anObject [
 	anObject ifNil: [ self halt ].
 	regSP := regSP - 1.
 	stack at: regSP put: anObject
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> receiver [
 	^ regS
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> receiver: object [
 
 	regS := object
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> regBP [
 	^ regBP
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> regBP: integer [
 
 	regBP := integer
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 StackedEvaluationContext >> regM [
 	^ regM
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 StackedEvaluationContext >> regPC [
 	^pc
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 StackedEvaluationContext >> regPC: anInteger [ 
 	pc := anInteger
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 StackedEvaluationContext >> regSP [
 
 	^regSP
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 StackedEvaluationContext >> regSP: integer [
 
 	regSP := integer
 ]
 
-{ #category : 'services' }
+{ #category : #services }
 StackedEvaluationContext >> reserveStackSlots: anInteger [
 	regSP := regSP - anInteger
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> restart [
 	| nilObj |
 	nilObj := runtime nil.
@@ -384,23 +382,23 @@ StackedEvaluationContext >> restart [
 	pc := 1
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> runtime: anEggRuntime [
 	super runtime: anEggRuntime.
 	regE := regS := runtime nil
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> secondArgument [
 	^ self argumentAt: 2
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> self [
 	^ regS
 ]
 
-{ #category : 'services' }
+{ #category : #services }
 StackedEvaluationContext >> signalSuspension [
 
 	EggProcessSuspended new
@@ -409,73 +407,73 @@ StackedEvaluationContext >> signalSuspension [
 		signal
 ]
 
-{ #category : 'services' }
+{ #category : #services }
 StackedEvaluationContext >> stack [
 
 	^stack
 ]
 
-{ #category : 'services' }
+{ #category : #services }
 StackedEvaluationContext >> stack: array [
 	stack := array
 ]
 
-{ #category : 'services' }
+{ #category : #services }
 StackedEvaluationContext >> stackSize [
 
 	^stack size
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> stackTemporaryAt: anInteger [
 
 	^ self stackTemporaryAt: anInteger frameIndex: 1 
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> stackTemporaryAt: anInteger frameIndex: anotherInteger [
 	| bp |
 	bp := self bpForFrameAt: anotherInteger.
 	^ stack at: bp - self tempOffset - anInteger
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> stackTemporaryAt: anInteger frameIndex: anotherInteger put: anObject [
 	| bp |
 	bp := self bpForFrameAt: anotherInteger.
 	^ stack at: bp - self tempOffset - anInteger put: anObject
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> stackTemporaryAt: anInteger put: anObject [
 
 	^ self stackTemporaryAt: anInteger frameIndex: 1 put: anObject 
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> tempOffset [ 
 "should be 2 or 4 if we had methods without environment"
 	^4
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> temporaryAt: index in: environmentIndex [
 	environmentIndex ifNil: [ ^ self stackTemporaryAt: index].
 	^ self environment: environmentIndex at: index
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> temporaryAt: index in: environmentIndex put: value [
 	environmentIndex ifNil: [ ^ self stackTemporaryAt: index put: value ].
 	^ self environment: environmentIndex at: index put: value
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> thirdArgument [
 	^ self argumentAt: 3
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 StackedEvaluationContext >> unwind [
 	| home bp environment |
 	home := runtime closureHome: self environment.

@@ -1,6 +1,6 @@
-Extension { #name : 'SCompiledMethod' }
+Extension { #name : #SCompiledMethod }
 
-{ #category : '*Powerlang-Core' }
+{ #category : #'*Powerlang-Core' }
 SCompiledMethod >> sexpressions [
 	| decoder |
 	decoder := TreecodeDecoder new

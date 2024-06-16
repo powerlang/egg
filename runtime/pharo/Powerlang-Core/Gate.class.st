@@ -8,82 +8,80 @@ My subclasses implement those different semantics:
    of the behavior of the remote object.
 "
 Class {
-	#name : 'Gate',
-	#superclass : 'Object',
+	#name : #Gate,
+	#superclass : #Object,
 	#instVars : [
 		'handle'
 	],
-	#category : 'Powerlang-Core-Metaphysics',
-	#package : 'Powerlang-Core',
-	#tag : 'Metaphysics'
+	#category : 'Powerlang-Core-Metaphysics'
 }
 
-{ #category : 'instance creation' }
+{ #category : #'instance creation' }
 Gate class >> on: handle [
 	^self new handle: handle
 ]
 
-{ #category : 'instance creation' }
+{ #category : #'instance creation' }
 Gate class >> subjectOn: handle [
 	^(self on: handle) subject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 Gate >> asLocalCollection [
 	^handle asLocalCollection
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 Gate >> asLocalString [
 	^handle asLocalString
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 Gate >> dispatch: aMessage [
 	^self dispatch: aMessage from: nil
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 Gate >> dispatch: aMessage from: parentInterpreter [
 	^self subclassResponsibility
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 Gate >> handle [
 	^handle
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 Gate >> handle: anObjectHandle [
 	handle := anObjectHandle
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 Gate >> handleOn: objectHandle [
 	^handle handleOn: objectHandle
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 Gate >> isLocal [
 	^handle isLocal
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 Gate >> maneuvererOn: objectHandle [
 	^DirectGate subjectOn: objectHandle
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 Gate >> mirageOn: objectHandle [
 	^MirageGate subjectOn: objectHandle
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 Gate >> mirror [
 	^handle mirror
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 Gate >> subject [
 	^Subject new _gate: self
 ]

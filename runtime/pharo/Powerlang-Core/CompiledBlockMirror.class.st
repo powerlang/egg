@@ -1,18 +1,16 @@
 Class {
-	#name : 'CompiledBlockMirror',
-	#superclass : 'ObjectMirror',
+	#name : #CompiledBlockMirror,
+	#superclass : #ObjectMirror,
 	#classVars : [
 		'Flags'
 	],
 	#pools : [
 		'CompiledBlockFormatMasks'
 	],
-	#category : 'Powerlang-Core-Mirrors',
-	#package : 'Powerlang-Core',
-	#tag : 'Mirrors'
+	#category : 'Powerlang-Core-Mirrors'
 }
 
-{ #category : 'private' }
+{ #category : #private }
 CompiledBlockMirror >> structureType [
 	^ #CompiledBlock
 ]

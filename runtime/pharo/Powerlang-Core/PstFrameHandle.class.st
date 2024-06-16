@@ -1,47 +1,45 @@
 Class {
-	#name : 'PstFrameHandle',
-	#superclass : 'Handle',
+	#name : #PstFrameHandle,
+	#superclass : #Handle,
 	#instVars : [
 		'frame'
 	],
-	#category : 'Powerlang-Core-Metaphysics',
-	#package : 'Powerlang-Core',
-	#tag : 'Metaphysics'
+	#category : 'Powerlang-Core-Metaphysics'
 }
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 PstFrameHandle class >> on: frame within: runtime [
 	^self new frame: frame; runtime: runtime
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 PstFrameHandle >> currentIp [
 	^frame currentIp
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 PstFrameHandle >> frame: aFrame [
 	frame := aFrame
 ]
 
-{ #category : 'services' }
+{ #category : #services }
 PstFrameHandle >> objectAtSlot: index [
 	| slot |
 	slot := frame slotAt: index.
 	^self objectHandleOn: slot
 ]
 
-{ #category : 'printing' }
+{ #category : #printing }
 PstFrameHandle >> printOn: aStream [
 	aStream nextPutAll: 'FH with: ' , String cr , frame printString
 ]
 
-{ #category : 'services' }
+{ #category : #services }
 PstFrameHandle >> slotAt: index [
 	^self objectAtSlot: index
 ]
 
-{ #category : 'services' }
+{ #category : #services }
 PstFrameHandle >> slotAtTop [
 	^frame slotAtTop
 ]
