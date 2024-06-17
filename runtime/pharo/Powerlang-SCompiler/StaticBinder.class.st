@@ -2,7 +2,8 @@ Class {
 	#name : 'StaticBinder',
 	#superclass : 'IdentifierBinder',
 	#category : 'Powerlang-SCompiler-Parser',
-	#package : 'Powerlang-SCompiler-Parser'
+	#package : 'Powerlang-SCompiler',
+	#tag : 'Parser'
 }
 
 { #category : 'instance creation' }

@@ -5,7 +5,8 @@ Class {
 		'value'
 	],
 	#category : 'Powerlang-SCompiler-Parser',
-	#package : 'Powerlang-SCompiler-Parser'
+	#package : 'Powerlang-SCompiler',
+	#tag : 'Parser'
 }
 
 { #category : 'testing' }

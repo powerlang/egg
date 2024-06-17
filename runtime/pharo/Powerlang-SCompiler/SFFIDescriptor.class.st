@@ -7,7 +7,8 @@ Class {
 		'FFITypes'
 	],
 	#category : 'Powerlang-SCompiler-Parser',
-	#package : 'Powerlang-SCompiler-Parser'
+	#package : 'Powerlang-SCompiler',
+	#tag : 'Parser'
 }
 
 { #category : 'class initialization' }

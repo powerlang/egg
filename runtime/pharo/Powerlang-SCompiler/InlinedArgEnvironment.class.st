@@ -2,7 +2,8 @@ Class {
 	#name : 'InlinedArgEnvironment',
 	#superclass : 'StackEnvironment',
 	#category : 'Powerlang-SCompiler-Bindings',
-	#package : 'Powerlang-SCompiler-Bindings'
+	#package : 'Powerlang-SCompiler',
+	#tag : 'Bindings'
 }
 
 { #category : 'accessing' }

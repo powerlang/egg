@@ -2,7 +2,8 @@ Class {
 	#name : 'SParseTreeVisitor',
 	#superclass : 'Object',
 	#category : 'Powerlang-SCompiler-Parser',
-	#package : 'Powerlang-SCompiler-Parser'
+	#package : 'Powerlang-SCompiler',
+	#tag : 'Parser'
 }
 
 { #category : 'instance creation' }

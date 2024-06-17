@@ -7,7 +7,8 @@ Class {
 		'declaration'
 	],
 	#category : 'Powerlang-SCompiler-Bindings',
-	#package : 'Powerlang-SCompiler-Bindings'
+	#package : 'Powerlang-SCompiler',
+	#tag : 'Bindings'
 }
 
 { #category : 'actions' }

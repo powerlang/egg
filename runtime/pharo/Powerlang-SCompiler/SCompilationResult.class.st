@@ -8,7 +8,8 @@ Class {
 		'method'
 	],
 	#category : 'Powerlang-SCompiler-Frontend',
-	#package : 'Powerlang-SCompiler-Frontend'
+	#package : 'Powerlang-SCompiler',
+	#tag : 'Frontend'
 }
 
 { #category : 'accessing' }
