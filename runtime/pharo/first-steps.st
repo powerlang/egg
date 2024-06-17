@@ -2,9 +2,10 @@
     Browsing kernel code (load kernel smalltalk from files and browse it).
 "
 
-EggRingImage resetSpecs.
-EggRingImage kernelSpec browse.
+EggBootstrapImage resetSpecs.
+EggBootstrapImage kernelSpec browse.
 
+"JS - for this you must have powerlangjs packages installed (make js in root dir)"
 JSTranspiler transpileEggInterpreter.
 
 JSTranspiler generateKernelSegment.
@@ -16,7 +17,7 @@ JSTranspiler generateMainSegments.
     Executing Smalltalk code in a virtual image:
 "
 
-image := EggRingImage fromSpec wordSize: 8; genesis.
+image := EggBootstrapImage fromSpec wordSize: 8; genesis.
 runtime := image runtime.
 three := image newInteger: 3.
 four := image newInteger: 4.
