@@ -4,7 +4,9 @@ Class {
 	#instVars : [
 		'value'
 	],
-	#category : 'Powerlang-Core-Execution-Metacircular'
+	#category : 'Powerlang-Core-Execution-Metacircular',
+	#package : 'Powerlang-Core',
+	#tag : 'Execution-Metacircular'
 }
 
 { #category : #comparing }

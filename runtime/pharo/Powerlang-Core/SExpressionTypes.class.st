@@ -12,7 +12,9 @@ Class {
 		'MethodId',
 		'ReturnId'
 	],
-	#category : 'Powerlang-Core-SExpressions'
+	#category : 'Powerlang-Core-SExpressions',
+	#package : 'Powerlang-Core',
+	#tag : 'SExpressions'
 }
 
 { #category : #'class initialization' }

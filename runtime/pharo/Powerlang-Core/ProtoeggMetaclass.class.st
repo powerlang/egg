@@ -1,7 +1,9 @@
 Class {
 	#name : #ProtoeggMetaclass,
 	#superclass : #ProtoeggSpecies,
-	#category : 'Powerlang-Core-Execution-Bootstrap'
+	#category : 'Powerlang-Core-Execution-Bootstrap',
+	#package : 'Powerlang-Core',
+	#tag : 'Execution-Bootstrap'
 }
 
 { #category : #'accessing - parallel hierarchy' }

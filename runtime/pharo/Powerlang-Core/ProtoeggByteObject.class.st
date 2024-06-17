@@ -5,7 +5,9 @@ Class {
 		'bytes',
 		'hash'
 	],
-	#category : 'Powerlang-Core-Execution-Bootstrap'
+	#category : 'Powerlang-Core-Execution-Bootstrap',
+	#package : 'Powerlang-Core',
+	#tag : 'Execution-Bootstrap'
 }
 
 { #category : #'instance creation' }

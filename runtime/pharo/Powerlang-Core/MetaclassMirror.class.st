@@ -1,7 +1,9 @@
 Class {
 	#name : #MetaclassMirror,
 	#superclass : #SpeciesMirror,
-	#category : 'Powerlang-Core-Mirrors'
+	#category : 'Powerlang-Core-Mirrors',
+	#package : 'Powerlang-Core',
+	#tag : 'Mirrors'
 }
 
 { #category : #accessing }

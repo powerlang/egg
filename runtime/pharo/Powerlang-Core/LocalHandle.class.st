@@ -1,7 +1,9 @@
 Class {
 	#name : #LocalHandle,
 	#superclass : #ObjectHandle,
-	#category : 'Powerlang-Core-Metaphysics'
+	#category : 'Powerlang-Core-Metaphysics',
+	#package : 'Powerlang-Core',
+	#tag : 'Metaphysics'
 }
 
 { #category : #'as yet unclassified' }

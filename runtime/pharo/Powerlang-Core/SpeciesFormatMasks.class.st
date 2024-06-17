@@ -5,5 +5,7 @@ Class {
 		'InstSize',
 		'IsPointers'
 	],
-	#category : 'Powerlang-Core-Mirrors'
+	#category : 'Powerlang-Core-Mirrors',
+	#package : 'Powerlang-Core',
+	#tag : 'Mirrors'
 }

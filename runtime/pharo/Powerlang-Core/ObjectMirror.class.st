@@ -1,7 +1,9 @@
 Class {
 	#name : #ObjectMirror,
 	#superclass : #Mirror,
-	#category : 'Powerlang-Core-Mirrors'
+	#category : 'Powerlang-Core-Mirrors',
+	#package : 'Powerlang-Core',
+	#tag : 'Mirrors'
 }
 
 { #category : #comparing }

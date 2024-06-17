@@ -4,7 +4,9 @@ Class {
 	#instVars : [
 		'nonLocalReturn'
 	],
-	#category : 'Powerlang-Core-Execution'
+	#category : 'Powerlang-Core-Execution',
+	#package : 'Powerlang-Core',
+	#tag : 'Execution'
 }
 
 { #category : #'as yet unclassified' }

@@ -1,7 +1,9 @@
 Class {
 	#name : #EggIterativeLinkedInterpreter,
 	#superclass : #EggIterativeInterpreter,
-	#category : 'Powerlang-Core-Execution'
+	#category : 'Powerlang-Core-Execution',
+	#package : 'Powerlang-Core',
+	#tag : 'Execution'
 }
 
 { #category : #private }

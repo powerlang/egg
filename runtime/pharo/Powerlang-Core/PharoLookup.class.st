@@ -1,7 +1,9 @@
 Class {
 	#name : #PharoLookup,
 	#superclass : #MethodLookup,
-	#category : 'Powerlang-Core-Metaphysics'
+	#category : 'Powerlang-Core-Metaphysics',
+	#package : 'Powerlang-Core',
+	#tag : 'Metaphysics'
 }
 
 { #category : #'meta accessing' }

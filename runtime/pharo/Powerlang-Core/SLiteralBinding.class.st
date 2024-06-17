@@ -1,7 +1,9 @@
 Class {
 	#name : #SLiteralBinding,
 	#superclass : #SBinding,
-	#category : 'Powerlang-Core-SExpressions'
+	#category : 'Powerlang-Core-SExpressions',
+	#package : 'Powerlang-Core',
+	#tag : 'SExpressions'
 }
 
 { #category : #unclassified }
