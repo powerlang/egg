@@ -1,1 +1,1 @@
-Package { #name : 'Powerlang-Tests' }
+Package { #name : #'Powerlang-Tests' }

@@ -1,18 +1,16 @@
 Class {
-	#name : 'MessageCollector',
-	#superclass : 'Object',
+	#name : #MessageCollector,
+	#superclass : #Object,
 	#instVars : [
 		'subject'
 	],
 	#classVars : [
 		'Messages'
 	],
-	#category : 'Powerlang-Tests-Collector',
-	#package : 'Powerlang-Tests',
-	#tag : 'Collector'
+	#category : 'Powerlang-Tests-Collector'
 }
 
-{ #category : 'instance creation' }
+{ #category : #'instance creation' }
 MessageCollector class >> for: anObject [
 	^ self new 
 		subject: anObject;
@@ -20,7 +18,7 @@ MessageCollector class >> for: anObject [
 
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 MessageCollector class >> initialize [
 	"Invoked at system start or when the class is dynamically loaded."
 
@@ -30,13 +28,13 @@ MessageCollector class >> initialize [
 
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 MessageCollector class >> messages [
 	^ Messages
 
 ]
 
-{ #category : 'hooks' }
+{ #category : #hooks }
 MessageCollector >> doesNotUnderstand: aMessage [
 	(aMessage arguments allSatisfy: [:e | e isInteger ]) ifTrue: [ 
 		(Messages contains: [:e | e selector = aMessage selector and:[e arguments = aMessage arguments]]) ifFalse: [ 
@@ -47,12 +45,12 @@ MessageCollector >> doesNotUnderstand: aMessage [
 
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 MessageCollector >> subject [
 	^ subject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 MessageCollector >> subject:anObject [
 	subject := anObject.
 

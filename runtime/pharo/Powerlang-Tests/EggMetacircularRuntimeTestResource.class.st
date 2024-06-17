@@ -1,27 +1,25 @@
 Class {
-	#name : 'EggMetacircularRuntimeTestResource',
-	#superclass : 'TestResource',
+	#name : #EggMetacircularRuntimeTestResource,
+	#superclass : #TestResource,
 	#instVars : [
 		'image',
 		'bootstrapper'
 	],
-	#category : 'Powerlang-Tests-Bootstrap',
-	#package : 'Powerlang-Tests',
-	#tag : 'Bootstrap'
+	#category : 'Powerlang-Tests-Bootstrap'
 }
 
-{ #category : 'running' }
+{ #category : #running }
 EggMetacircularRuntimeTestResource >> bootstrapper [
 	^bootstrapper ifNil: [ bootstrapper := image generateMetacircularImage ]
 
 ]
 
-{ #category : 'running' }
+{ #category : #running }
 EggMetacircularRuntimeTestResource >> runtime [
 	^ self bootstrapper result
 ]
 
-{ #category : 'running' }
+{ #category : #running }
 EggMetacircularRuntimeTestResource >> setUp [
 	super setUp.
 	image := EggBootstrapImage fromSpec
