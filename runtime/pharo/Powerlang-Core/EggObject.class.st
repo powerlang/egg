@@ -1,7 +1,9 @@
 Class {
 	#name : #EggObject,
 	#superclass : #Object,
-	#category : 'Powerlang-Core-Execution-Metacircular'
+	#category : 'Powerlang-Core-Execution-Metacircular',
+	#package : 'Powerlang-Core',
+	#tag : 'Execution-Metacircular'
 }
 
 { #category : #accessing }

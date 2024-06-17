@@ -10,7 +10,9 @@ Class {
 		'shapeMap',
 		'objectModel'
 	],
-	#category : 'Powerlang-Core-Metaphysics'
+	#category : 'Powerlang-Core-Metaphysics',
+	#package : 'Powerlang-Core',
+	#tag : 'Metaphysics'
 }
 
 { #category : #private }

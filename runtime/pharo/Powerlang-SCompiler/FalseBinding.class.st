@@ -2,7 +2,8 @@ Class {
 	#name : 'FalseBinding',
 	#superclass : 'LiteralBinding',
 	#category : 'Powerlang-SCompiler-Bindings',
-	#package : 'Powerlang-SCompiler-Bindings'
+	#package : 'Powerlang-SCompiler',
+	#tag : 'Bindings'
 }
 
 { #category : 'accessing' }

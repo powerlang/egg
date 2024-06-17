@@ -7,7 +7,8 @@ Class {
 		'descriptor'
 	],
 	#category : 'Powerlang-SCompiler-Backend',
-	#package : 'Powerlang-SCompiler-Backend'
+	#package : 'Powerlang-SCompiler',
+	#tag : 'Backend'
 }
 
 { #category : 'as yet unclassified' }

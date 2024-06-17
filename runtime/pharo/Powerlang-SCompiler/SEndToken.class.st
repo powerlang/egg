@@ -2,7 +2,8 @@ Class {
 	#name : 'SEndToken',
 	#superclass : 'SToken',
 	#category : 'Powerlang-SCompiler-Parser',
-	#package : 'Powerlang-SCompiler-Parser'
+	#package : 'Powerlang-SCompiler',
+	#tag : 'Parser'
 }
 
 { #category : 'testing' }

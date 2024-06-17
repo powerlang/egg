@@ -1,7 +1,9 @@
 Class {
 	#name : #AssociationMirror,
 	#superclass : #ObjectMirror,
-	#category : 'Powerlang-Core-Mirrors'
+	#category : 'Powerlang-Core-Mirrors',
+	#package : 'Powerlang-Core',
+	#tag : 'Mirrors'
 }
 
 { #category : #'as yet unclassified' }

@@ -8,7 +8,8 @@ Class {
 		'Self'
 	],
 	#category : 'Powerlang-SCompiler-Backend',
-	#package : 'Powerlang-SCompiler-Backend'
+	#package : 'Powerlang-SCompiler',
+	#tag : 'Backend'
 }
 
 { #category : 'class initialization' }

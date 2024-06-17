@@ -2,7 +2,8 @@ Class {
 	#name : 'SStringToken',
 	#superclass : 'SSymbolicToken',
 	#category : 'Powerlang-SCompiler-Parser',
-	#package : 'Powerlang-SCompiler-Parser'
+	#package : 'Powerlang-SCompiler',
+	#tag : 'Parser'
 }
 
 { #category : 'converting' }

@@ -14,7 +14,9 @@ Class {
 		'pointers',
 		'classVarNames'
 	],
-	#category : 'Powerlang-Core-CodeSpecs'
+	#category : 'Powerlang-Core-CodeSpecs',
+	#package : 'Powerlang-Core',
+	#tag : 'CodeSpecs'
 }
 
 { #category : #'adding / removing' }

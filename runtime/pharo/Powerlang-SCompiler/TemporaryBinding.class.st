@@ -2,7 +2,8 @@ Class {
 	#name : 'TemporaryBinding',
 	#superclass : 'LocalBinding',
 	#category : 'Powerlang-SCompiler-Bindings',
-	#package : 'Powerlang-SCompiler-Bindings'
+	#package : 'Powerlang-SCompiler',
+	#tag : 'Bindings'
 }
 
 { #category : 'instance creation' }

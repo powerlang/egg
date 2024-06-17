@@ -10,7 +10,9 @@ Class {
 		'isBlock',
 		'_self'
 	],
-	#category : 'Powerlang-Core-Execution'
+	#category : 'Powerlang-Core-Execution',
+	#package : 'Powerlang-Core',
+	#tag : 'Execution'
 }
 
 { #category : #'instance creation' }

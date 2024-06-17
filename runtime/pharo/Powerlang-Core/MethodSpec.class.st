@@ -13,7 +13,9 @@ Class {
 		'module',
 		'ast'
 	],
-	#category : 'Powerlang-Core-CodeSpecs'
+	#category : 'Powerlang-Core-CodeSpecs',
+	#package : 'Powerlang-Core',
+	#tag : 'CodeSpecs'
 }
 
 { #category : #comparing }

@@ -8,7 +8,9 @@ Class {
 		'LargeSizeOffset',
 		'SizeOffset'
 	],
-	#category : 'Powerlang-Core-Metaphysics'
+	#category : 'Powerlang-Core-Metaphysics',
+	#package : 'Powerlang-Core',
+	#tag : 'Metaphysics'
 }
 
 { #category : #'class initialization' }

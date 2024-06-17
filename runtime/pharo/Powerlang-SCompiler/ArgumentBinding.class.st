@@ -2,7 +2,9 @@ Class {
 	#name : 'ArgumentBinding',
 	#superclass : 'LocalBinding',
 	#category : 'Powerlang-SCompiler-Bindings',
-	#package : 'Powerlang-SCompiler-Bindings'
+	#package : 'Powerlang-SCompiler',
+	#tag : 'Bindings',
+	#tag : 'Bindings'
 }
 
 { #category : 'instance creation' }

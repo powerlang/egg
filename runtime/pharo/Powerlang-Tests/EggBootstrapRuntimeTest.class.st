@@ -1,6 +1,6 @@
 Class {
-	#name : 'EggRingRuntimeTest',
-	#superclass : 'TestCase',
+	#name : #EggBootstrapRuntimeTest,
+	#superclass : #TestCase,
 	#instVars : [
 		'image',
 		'runtime'
@@ -10,18 +10,18 @@ Class {
 	#tag : 'Bootstrap'
 }
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> ==> anObject [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> ==> anObject [
 	^image transferLiteralDeep: anObject
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> assertNoLeftoverFrames [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> assertNoLeftoverFrames [
 	self assert: runtime interpreter hasFinished
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> compile: aString in: classname during: aBlock [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> compile: aString in: classname during: aBlock [
 	| class selector method |
 	class := image => classname.
 	method := SCompiler compile: aString in: class.
@@ -30,54 +30,54 @@ EggRingRuntimeTest >> compile: aString in: classname during: aBlock [
 	aBlock 		ensure: [ class removeMethod: method ]
 ]
 
-{ #category : 'running' }
-EggRingRuntimeTest >> setUp [
+{ #category : #running }
+EggBootstrapRuntimeTest >> setUp [
 	image := EggBootstrapImage fromSpec
 		wordSize: 8;
 		genesis.
 	runtime := image runtime
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test100yourself [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test100yourself [
 	| result |
 	result := runtime sendLocal: #yourself to: image nil.
 	self assert: result equals: image nil
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test110compute1plus1 [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test110compute1plus1 [
 	| one result |
 	one := self ==> 1.
 	result := runtime sendLocal: #+ to: one with: {one}.
 	self assert: result equals: self ==> 2; assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test111compute1minus1 [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test111compute1minus1 [
 	| one result |
 	one := self ==> 1.
 	result := runtime sendLocal: #- to: one with: {one}.
 	self assert: result equals: self ==> 0
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test112compute3times4 [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test112compute3times4 [
 	| result |
 	result := runtime sendLocal: #* to: self ==> 3 with: {self ==> 4}.
 	self assert: result equals: self ==> 12
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test113compute20quotient5 [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test113compute20quotient5 [
 	|  result |
 
 	result := runtime sendLocal: #// to: self ==>20 with: {self ==>5}.
 	self assert: result equals: self ==>4
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test120sendSizeMinusOne [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test120sendSizeMinusOne [
 	| result |
 	self
 		compile: 'foo ^#abc _size - 1'
@@ -86,8 +86,8 @@ EggRingRuntimeTest >> test120sendSizeMinusOne [
 			self assert: result equals: self ==> 3 ]
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test121sendCascade [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test121sendCascade [
 	| result |
 	self
 		compile: 'foo ^#abc yourself; size'
@@ -96,8 +96,8 @@ EggRingRuntimeTest >> test121sendCascade [
 			self assert: result equals: self ==> 3 ]
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test130sendIfTrueToFalse [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test130sendIfTrueToFalse [
 	| result |
 	self
 		compile: 'foo ^false ifTrue: [#failed]'
@@ -108,8 +108,8 @@ EggRingRuntimeTest >> test130sendIfTrueToFalse [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test131sendIfFalseToTrue [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test131sendIfFalseToTrue [
 	| result |
 	self
 		compile: 'foo ^true ifFalse: [#failed]'
@@ -119,8 +119,8 @@ EggRingRuntimeTest >> test131sendIfFalseToTrue [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test132sendIfTrueToTrue [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test132sendIfTrueToTrue [
 	| result |
 	self
 		compile: 'foo ^true ifTrue: [5]'
@@ -130,8 +130,8 @@ EggRingRuntimeTest >> test132sendIfTrueToTrue [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test133sendIfTrueToTrueAndTrue [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test133sendIfTrueToTrueAndTrue [
 	| result |
 	self
 		compile: 'foo ^(true and: [true]) ifTrue: [5]'
@@ -141,8 +141,8 @@ EggRingRuntimeTest >> test133sendIfTrueToTrueAndTrue [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test134sendIfTrueToTrueAndFalse [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test134sendIfTrueToTrueAndFalse [
 	| result |
 	self
 		compile: 'foo ^(true and: [false]) ifTrue: [5]'
@@ -152,8 +152,8 @@ EggRingRuntimeTest >> test134sendIfTrueToTrueAndFalse [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test135sendIfTrueToFalseAndTrue [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test135sendIfTrueToFalseAndTrue [
 	| result |
 	self
 		compile: 'foo ^(false and: [true]) ifTrue: [5]'
@@ -163,8 +163,8 @@ EggRingRuntimeTest >> test135sendIfTrueToFalseAndTrue [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test136sendIfTrueToFalseOrTrue [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test136sendIfTrueToFalseOrTrue [
 	| result |
 	self
 		compile: 'foo ^(false or: [true]) ifTrue: [5]'
@@ -174,8 +174,8 @@ EggRingRuntimeTest >> test136sendIfTrueToFalseOrTrue [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test137sendIfTrueToFalseOrFalse [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test137sendIfTrueToFalseOrFalse [
 	| result |
 	self
 		compile: 'foo ^(false or: [false]) ifTrue: [5]'
@@ -185,8 +185,8 @@ EggRingRuntimeTest >> test137sendIfTrueToFalseOrFalse [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test138sendIfTrueToTrueOrFalse [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test138sendIfTrueToTrueOrFalse [
 	| result |
 	self
 		compile: 'foo ^(true or: [false]) ifTrue: [5]'
@@ -196,8 +196,8 @@ EggRingRuntimeTest >> test138sendIfTrueToTrueOrFalse [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test139sendIfNilIfNotNilToNil [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test139sendIfNilIfNotNilToNil [
 	| result |
 	self
 		compile: 'foo ^nil ifNil: [3] ifNotNil: [4]'
@@ -207,8 +207,8 @@ EggRingRuntimeTest >> test139sendIfNilIfNotNilToNil [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test139sendIfNilIfNotNilToNotNil [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test139sendIfNilIfNotNilToNotNil [
 	| result |
 	self
 		compile: 'foo ^#abc ifNil: [3] ifNotNil: [4]'
@@ -218,8 +218,8 @@ EggRingRuntimeTest >> test139sendIfNilIfNotNilToNotNil [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test139sendIfNilIfNotNilWithArg [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test139sendIfNilIfNotNilWithArg [
 	| result |
 	self
 		compile: 'foo ^5 ifNil: [3] ifNotNil: [:a | a]'
@@ -229,8 +229,8 @@ EggRingRuntimeTest >> test139sendIfNilIfNotNilWithArg [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test139sendIfNilIfNotNilWithArgToNil [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test139sendIfNilIfNotNilWithArgToNil [
 	| result |
 	self
 		compile: 'foo ^nil ifNil: [3] ifNotNil: [:a | a]'
@@ -240,8 +240,8 @@ EggRingRuntimeTest >> test139sendIfNilIfNotNilWithArgToNil [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test139sendIfNilToNil [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test139sendIfNilToNil [
 	| result |
 	self
 		compile: 'foo ^nil ifNil: [self]'
@@ -251,8 +251,8 @@ EggRingRuntimeTest >> test139sendIfNilToNil [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test139sendIfNilToNotNil [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test139sendIfNilToNotNil [
 	| result |
 	self
 		compile: 'foo ^false ifNil: [self]'
@@ -262,8 +262,8 @@ EggRingRuntimeTest >> test139sendIfNilToNotNil [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test139sendIfNotNilWithArg [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test139sendIfNotNilWithArg [
 	| result |
 	self
 		compile: 'foo ^5 ifNotNil: [:a | a]'
@@ -273,8 +273,8 @@ EggRingRuntimeTest >> test139sendIfNotNilWithArg [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test140evaluateClosure [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test140evaluateClosure [
 	| result |
 	self
 		compile: 'foo ^[5] value'
@@ -284,8 +284,8 @@ EggRingRuntimeTest >> test140evaluateClosure [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test141evaluateClosureFrames [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test141evaluateClosureFrames [
 	| result |
 	self
 		compile: 'foo [5] value'
@@ -295,8 +295,8 @@ EggRingRuntimeTest >> test141evaluateClosureFrames [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test142evaluateClosureReceiver [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test142evaluateClosureReceiver [
 	| result |
 	self
 		compile: 'foo [self] value'
@@ -306,8 +306,8 @@ EggRingRuntimeTest >> test142evaluateClosureReceiver [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test150sendWhileTrue [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test150sendWhileTrue [
 	| result |
 	self
 		compile: 'foo
@@ -321,8 +321,8 @@ EggRingRuntimeTest >> test150sendWhileTrue [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test151sendToDo [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test151sendToDo [
 	| result |
 	self
 		compile:
@@ -337,8 +337,8 @@ EggRingRuntimeTest >> test151sendToDo [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test152compute20dividedBy5 [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test152compute20dividedBy5 [
 	| result |
 	result := runtime sendLocal: #/ to: self ==> 20 with: {(self ==> 5)}.
 	self 
@@ -346,8 +346,8 @@ EggRingRuntimeTest >> test152compute20dividedBy5 [
 		assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test152sendToDoWithInterval [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test152sendToDoWithInterval [
 	| result |
 	self
 		compile:
@@ -362,8 +362,8 @@ EggRingRuntimeTest >> test152sendToDoWithInterval [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test161evaluateClosureWithArgs [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test161evaluateClosureWithArgs [
 	| result |
 	self
 		compile: 'foo ^[:a :b | a + b] value: 3 value: 4'
@@ -372,8 +372,8 @@ EggRingRuntimeTest >> test161evaluateClosureWithArgs [
 			self assert: result equals: self ==> 7 ]
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test162evaluateClosureWithArgsAndTemps [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test162evaluateClosureWithArgsAndTemps [
 	| result |
 	self
 		compile: 'foo ^[:a :b | | t | t := a + b. t] value: 3 value: 4'
@@ -382,8 +382,8 @@ EggRingRuntimeTest >> test162evaluateClosureWithArgsAndTemps [
 			self assert: result equals: self ==> 7 ]
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test163evaluateClosureWithArgsAndMethodTemps [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test163evaluateClosureWithArgsAndMethodTemps [
 	| result |
 	self
 		compile: 'foo | t | ^[:a :b | t := a + b. t] value: 3 value: 4'
@@ -392,8 +392,8 @@ EggRingRuntimeTest >> test163evaluateClosureWithArgsAndMethodTemps [
 			self assert: result equals: self ==> 7 ]
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test164evaluateClosureWithArgsAndMultipleTemps [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test164evaluateClosureWithArgsAndMultipleTemps [
 	| result |
 	self
 		compile:
@@ -409,8 +409,8 @@ EggRingRuntimeTest >> test164evaluateClosureWithArgsAndMultipleTemps [
 			self assert: result equals: self ==> 7 ]
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test165evaluateClosureNonLocalReturn [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test165evaluateClosureNonLocalReturn [
 	| result |
 	self
 		compile:
@@ -424,8 +424,8 @@ EggRingRuntimeTest >> test165evaluateClosureNonLocalReturn [
 			self assert: result equals: self ==> 3 ]
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test166evaluateNestedClosure [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test166evaluateNestedClosure [
 	| result |
 	self
 		compile: 'foo ^[ [ 7 ] value ] value'
@@ -434,8 +434,8 @@ EggRingRuntimeTest >> test166evaluateNestedClosure [
 			self assert: result equals: self ==> 7 ]
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test167evaluateNestedClosureWithArgs [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test167evaluateNestedClosureWithArgs [
 	| result |
 	self
 		compile: 'foo ^[:a | [:b | a + b ] value: 4 ] value: 3'
@@ -444,8 +444,8 @@ EggRingRuntimeTest >> test167evaluateNestedClosureWithArgs [
 			self assert: result equals: self ==> 7 ]
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test168evaluateNestedClosureNonLocalReturn [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test168evaluateNestedClosureNonLocalReturn [
 	| result |
 	self
 		compile: 'foo [ [ ^7 ] value ] value'
@@ -454,8 +454,8 @@ EggRingRuntimeTest >> test168evaluateNestedClosureNonLocalReturn [
 			self assert: result equals: self ==> 7 ]
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test168evaluateNestedClosureWithTemps [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test168evaluateNestedClosureWithTemps [
 	| result |
 	self
 		compile:
@@ -472,8 +472,8 @@ EggRingRuntimeTest >> test168evaluateNestedClosureWithTemps [
 			self assert: result equals: self ==> 9 ]
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test169evaluateInlinedClosureInClosureWithMethodTemps [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test169evaluateInlinedClosureInClosureWithMethodTemps [
 	| result |
 	self
 		compile:
@@ -487,8 +487,8 @@ EggRingRuntimeTest >> test169evaluateInlinedClosureInClosureWithMethodTemps [
 			self assert: result equals: self ==> 7 ]
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test170evaluateNonInlinedClosureIfTrue [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test170evaluateNonInlinedClosureIfTrue [
 	| result |
 	self
 		compile:
@@ -503,8 +503,8 @@ EggRingRuntimeTest >> test170evaluateNonInlinedClosureIfTrue [
 			self assert: result equals: self ==> 7;  assertNoLeftoverFrames ]
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test180evaluateToDo [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test180evaluateToDo [
 	| result |
 	self
 		compile:
@@ -517,8 +517,8 @@ EggRingRuntimeTest >> test180evaluateToDo [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test181evaluateIntervalSize [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test181evaluateIntervalSize [
 	| result |
 	self
 		compile:
@@ -531,8 +531,8 @@ EggRingRuntimeTest >> test181evaluateIntervalSize [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test185evaluateArrayDo [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test185evaluateArrayDo [
 	| result |
 	self
 		compile:
@@ -550,8 +550,8 @@ EggRingRuntimeTest >> test185evaluateArrayDo [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test186evaluateOrderedCollectionDo [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test186evaluateOrderedCollectionDo [
 	| result |
 	self
 		compile:
@@ -569,8 +569,8 @@ EggRingRuntimeTest >> test186evaluateOrderedCollectionDo [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test187evaluateArrayToDo [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test187evaluateArrayToDo [
 	| result |
 	self
 		compile:
@@ -586,8 +586,8 @@ EggRingRuntimeTest >> test187evaluateArrayToDo [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test188evaluateReplaceFromToWith [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test188evaluateReplaceFromToWith [
 	| result |
 	self
 		compile: 'foo ^#(1 2) replaceFrom: 1 to: 2 with: #(3 4) startingAt: 1'
@@ -600,8 +600,8 @@ EggRingRuntimeTest >> test188evaluateReplaceFromToWith [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test189evaluateArrayConcatenation [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test189evaluateArrayConcatenation [
 	| result |
 	self
 		compile: 'foo ^#(3), #(4)'
@@ -611,8 +611,8 @@ EggRingRuntimeTest >> test189evaluateArrayConcatenation [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test190evaluateStringConcatenation [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test190evaluateStringConcatenation [
 	| result |
 	self
 		compile: 'foo ^''ABC'', ''DE'''
@@ -622,8 +622,8 @@ EggRingRuntimeTest >> test190evaluateStringConcatenation [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test191evaluateIntervalCollect [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test191evaluateIntervalCollect [
 	| result |
 	self
 		compile:
@@ -638,16 +638,16 @@ EggRingRuntimeTest >> test191evaluateIntervalCollect [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test200createDictionary [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test200createDictionary [
 	| class d |
 	class := image classNamed: #Dictionary.
 	d := runtime sendLocal: #new to: class with: {}.
 	self assert: d spec name equals: 'Dictionary'; assertNoLeftoverFrames
 ]
 
-{ #category : 'tests' }
-EggRingRuntimeTest >> test210addAssociationToDictionary [
+{ #category : #tests }
+EggBootstrapRuntimeTest >> test210addAssociationToDictionary [
 	| class d assoc |
 	class := image classNamed: #Dictionary.
 	assoc := image newAssociation: #foo -> nil.

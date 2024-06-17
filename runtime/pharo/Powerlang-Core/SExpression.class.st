@@ -4,7 +4,9 @@ I am a Smalltalk expression, the minimal unit of Smalltalk semantics, expressed 
 Class {
 	#name : #SExpression,
 	#superclass : #Object,
-	#category : 'Powerlang-Core-SExpressions'
+	#category : 'Powerlang-Core-SExpressions',
+	#package : 'Powerlang-Core',
+	#tag : 'SExpressions'
 }
 
 { #category : #visiting }

@@ -12,7 +12,8 @@ Class {
 		'activeScript'
 	],
 	#category : 'Powerlang-SCompiler-Frontend',
-	#package : 'Powerlang-SCompiler-Frontend'
+	#package : 'Powerlang-SCompiler',
+	#tag : 'Frontend'
 }
 
 { #category : 'instance creation' }

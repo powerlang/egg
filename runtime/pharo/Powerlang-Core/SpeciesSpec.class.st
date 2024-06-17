@@ -12,7 +12,9 @@ Class {
 		'allIvars',
 		'instVarNames'
 	],
-	#category : 'Powerlang-Core-CodeSpecs'
+	#category : 'Powerlang-Core-CodeSpecs',
+	#package : 'Powerlang-Core',
+	#tag : 'CodeSpecs'
 }
 
 { #category : #'instance creation' }
