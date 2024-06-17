@@ -4,8 +4,9 @@ Class {
 	#instVars : [
 		'runtime'
 	],
-	#category : 'Powerlang-Tests-Bootstrap'
-}
+	#category : 'Powerlang-Tests-Bootstrap',
+	#package : 'Powerlang-Tests',
+	#tag : 'Bootstrap'}
 
 { #category : #accessing }
 EggMetacircularRuntimeTest class >> defaultTimeLimit [

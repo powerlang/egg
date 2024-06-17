@@ -5,8 +5,9 @@ Class {
 		'runtime',
 		'bootstrapper'
 	],
-	#category : 'Powerlang-Tests-Bootstrap'
-}
+	#category : 'Powerlang-Tests-Bootstrap',
+	#package : 'Powerlang-Tests',
+	#tag : 'Bootstrap'}
 
 { #category : #accessing }
 EggModuleTest class >> defaultTimeLimit [

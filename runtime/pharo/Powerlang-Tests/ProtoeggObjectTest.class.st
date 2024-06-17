@@ -4,8 +4,9 @@ Class {
 	#instVars : [
 		'kernel'
 	],
-	#category : 'Powerlang-Tests-Bootstrap'
-}
+	#category : 'Powerlang-Tests-Bootstrap',
+	#package : 'Powerlang-Tests',
+	#tag : 'Bootstrap'}
 
 { #category : #running }
 ProtoeggObjectTest >> setUp [
