@@ -6,7 +6,8 @@ Class {
 	#name : 'OJumpTrue',
 	#superclass : 'OJumpConditional',
 	#category : 'OCompiler-Core-IR',
-	#package : 'OCompiler-Core-IR'
+	#package : 'OCompiler-Core',
+	#tag : 'IR'
 }
 
 { #category : 'unclassified' }

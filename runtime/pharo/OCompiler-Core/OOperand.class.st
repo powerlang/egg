@@ -11,7 +11,8 @@ Class {
 		'nextUse'
 	],
 	#category : 'OCompiler-Core-IR',
-	#package : 'OCompiler-Core-IR'
+	#package : 'OCompiler-Core',
+	#tag : 'IR'
 }
 
 { #category : 'unclassified' }
