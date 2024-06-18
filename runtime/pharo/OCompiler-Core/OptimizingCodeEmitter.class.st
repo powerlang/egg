@@ -18,7 +18,8 @@ Class {
 		'messageLinker'
 	],
 	#category : 'OCompiler-Core-Main',
-	#package : 'OCompiler-Core-Main'
+	#package : 'OCompiler-Core',
+	#tag : 'Main'
 }
 
 { #category : 'accessing' }

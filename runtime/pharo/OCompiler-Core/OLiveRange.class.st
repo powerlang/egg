@@ -6,7 +6,8 @@ Class {
 	#name : 'OLiveRange',
 	#superclass : 'Object',
 	#category : 'OCompiler-Core-IR',
-	#package : 'OCompiler-Core-IR'
+	#package : 'OCompiler-Core',
+	#tag : 'IR'
 }
 
 { #category : 'testing' }

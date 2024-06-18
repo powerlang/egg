@@ -5,7 +5,8 @@ Class {
 	#name : 'ManifestOCompiler',
 	#superclass : 'PackageManifest',
 	#category : 'OCompiler-Core-Manifest',
-	#package : 'OCompiler-Core-Manifest'
+	#package : 'OCompiler-Core',
+	#tag : 'Manifest'
 }
 
 { #category : 'code-critics' }
