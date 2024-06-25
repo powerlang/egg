@@ -203,11 +203,6 @@ Object >> ensurePropertyTable [
 	^Smalltalk ensurePropertyTableFor: self
 ]
 
-{ #category : #unclassified }
-Object >> error: message resumable: resumable [
-	^self error: message title: 'Error' resumable: resumable
-]
-
 { #category : #evaluating }
 Object >> evaluate [
 	^self

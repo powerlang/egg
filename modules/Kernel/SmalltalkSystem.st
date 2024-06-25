@@ -287,12 +287,6 @@ SmalltalkSystem >> nativizer: anObject [
 	nativizer := anObject
 ]
 
-{ #category : #accessing }
-SmalltalkSystem >> poolDictionaries [
-	^globals associations
-		select: [:assoc | assoc value class == PoolDictionary]
-]
-
 { #category : #services }
 SmalltalkSystem >> primitiveNamed: aString [
 	^NamedPrimitives at: aString ifAbsent: nil

@@ -296,6 +296,11 @@ ProtoObject >> _strongPointersSize [
 	^(self _isBytes or: [self _isSpecial]) ifTrue: [0] ifFalse: [0 + self _size]
 ]
 
+{ #category : #system }
+ProtoObject >> allReferences [
+	^Memory current collectAndCompactOldSpace; referencesTo: self
+]
+
 { #category : #'*system' }
 ProtoObject >> basicHash [
 	| hash shifted |
@@ -316,6 +321,11 @@ ProtoObject >> basicHash [
 { #category : #'*system' }
 ProtoObject >> basicHash: anInteger [
 	self _basicHash: anInteger
+]
+
+{ #category : #services }
+ProtoObject >> become: anotherObject [
+	Memory current make: self become: anotherObject
 ]
 
 { #category : #'*meta accessing' }
@@ -341,6 +351,17 @@ ProtoObject >> doesNotUnderstandSelector: selector [
 		argumentsWithArity: selector arity.
 	message := Message receiver: self selector: selector arguments: arguments.
 	^self doesNotUnderstand: message
+]
+
+{ #category : #private }
+ProtoObject >> holdRefererIfNeeded: referent [
+	| memory |
+	#savePreviousSelf.
+	self _isSmallInteger ifTrue: [^self].
+	referent _isRemembered ifTrue: [^self].
+	memory := Memory current.
+	(memory isYoungSafe: referent)
+		ifFalse: [(memory isYoungSafe: self) ifTrue: [memory remember: referent]]
 ]
 
 { #category : #'header access' }
@@ -373,15 +394,6 @@ ProtoObject >> perform: aSymbol withArguments: anArray [
 	^self lookupAndInvoke: aSymbol
 ]
 
-{ #category : #'*system' }
-ProtoObject >> primitiveSize [
-	| size |
-	self _isSmallInteger ifTrue: [^0].
-	self _isArrayed ifFalse: [^0].
-	size := self _size.
-	^self _hasNamedSlots ifTrue: [size - self class instSize] ifFalse: [size]
-]
-
 { #category : #'*accessing' }
 ProtoObject >> primitiveAt: i [
 	self _isSmallInteger ifTrue: [^self shouldNotImplement].
@@ -396,6 +408,15 @@ ProtoObject >> primitiveAt: i put: anObject [
 	^self _isBytes
 		ifTrue: [self basicByteAt: i put: anObject]
 		ifFalse: [self basicObjectAt: i put: anObject]
+]
+
+{ #category : #'*system' }
+ProtoObject >> primitiveSize [
+	| size |
+	self _isSmallInteger ifTrue: [^0].
+	self _isArrayed ifFalse: [^0].
+	size := self _size.
+	^self _hasNamedSlots ifTrue: [size - self class instSize] ifFalse: [size]
 ]
 
 { #category : #private }

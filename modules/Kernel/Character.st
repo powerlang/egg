@@ -495,7 +495,7 @@ Character >> highByte [
 { #category : #testing }
 Character >> isAlphanumeric [
 	value < 256 ifTrue: [^self isLetter or: [self isDigit]].
-	^UserLibrary IsCharAlphaNumericW: value
+	^ActiveLocale IsCharAlphaNumeric: value
 ]
 
 { #category : #testing }
