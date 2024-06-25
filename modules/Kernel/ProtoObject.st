@@ -6,20 +6,15 @@
 Class {
 	#name : #ProtoObject,
 	#superclass : nil,
-	#classVars : [
-		'ObjectBitsMasks',
-		'ObjectFieldsOffset'
-	],
 	#category : #Kernel
 }
-
 
 { #category : #initialization }
 ProtoObject class >> initializeBitMasks [
 	"
 	self initializeBitMasks
 	"
-	ObjectBitsMasks := self addNamespace.
+	self addNamespaceAs: #ObjectBitsMasks.
 	ObjectBitsMasks
 		at: #IsBytes put: 16r1;
 		at: #IsArrayed put: 16r2;
@@ -41,7 +36,7 @@ ProtoObject class >> initializeConstants [
 	"
 	ProtoObject initializeConstants
 	"
-	ObjectFieldsOffset := self addNamespace.
+	self addNamespaceAs: #ObjectFieldsOffset.
 	ObjectFieldsOffset
 		at: #_Behavior put: 0;
 		at: #_Reserved put: -2;
@@ -51,33 +46,9 @@ ProtoObject class >> initializeConstants [
 		at: #_Hash put: -8
 ]
 
-{ #category : #testing }
-ProtoObject class >> isUndermethod: aSelector [
-	^self undermethodSelectors includes: aSelector
-]
-
 { #category : #'instance creation' }
 ProtoObject class >> new [
 	^self basicNew initialize
-]
-
-{ #category : #private }
-ProtoObject class >> staticSelectors [
-	"
-	(NativizationEnvironment primitiveObjectMethods collect: #selector) sort
-	"
-	^#(
-_beArrayed _beBytes _beLarge _beNamed _beNotRemembered _beRemembered _beSecondGeneration _beSeen _beSmall _beSpecial _beNotSpecial _beUnseen _copyBasicHeaderFrom: _copyHeaderSized:from: _flagsMask: _flagsSet: _hasBeenSeen _headerSizeInBytes _isArrayed _isBit1Set _isBytes _isEphemeron _isFixed _isLarge _hasNamedSlots _isProxy _isRemembered _isSecondGeneration _isSmall _isSpecial _largeSize: _maskBit1 _nextBasePointer _objectFromBasePointer _pointersSize _setBit1 _size _sizeInBytes _strongPointersSize )
-]
-
-{ #category : #private }
-ProtoObject class >> undermethods [
-	^self undermethodSelectors collect: [:selector | self >> selector]
-]
-
-{ #category : #private }
-ProtoObject class >> undermethodSelectors [
-	^self organization selectorsFor: 'header access'
 ]
 
 { #category : #comparing }
@@ -149,7 +120,7 @@ ProtoObject >> == anObject [
 
 { #category : #system }
 ProtoObject >> allReferences [
-	^Memory current collectAndCompactOldSpace; referencesTo: self
+	^self errorVMSpecific
 ]
 
 { #category : #accessing }
@@ -243,7 +214,7 @@ ProtoObject >> basicSize [
 
 { #category : #services }
 ProtoObject >> become: anotherObject [
-	Memory current make: self become: anotherObject
+	^self errorVMSpecific
 ]
 
 { #category : #'meta accessing' }
@@ -272,20 +243,8 @@ ProtoObject >> error: aString [
 ]
 
 { #category : #errors }
-ProtoObject >> error: message title: title resumable: resumable [
-	| type result text caption |
-	type := 16r10 + (resumable ifTrue: [16r5] ifFalse: [0]).
-	text := message externalCopy.
-	caption := title externalCopy.
-	result := UserLibrary
-		MessageBoxExW: 0
-		lpText: text asParameter
-		lpCaption: caption asParameter
-		uType: type asParameter
-		wLanguageId: 0.
-	text free.
-	caption free.
-	^resumable and: [result = 4]
+ProtoObject >> errorVMSpecific [
+	^self error: 'this method should have been overriden by the current VM'
 ]
 
 { #category : #finalization }
@@ -311,22 +270,6 @@ ProtoObject >> hash [
 { #category : #testing }
 ProtoObject >> hasIndexedSlots [
 	^self class _instancesAreArrayed
-]
-
-{ #category : #private }
-ProtoObject >> _holdRefererIfNeeded: referent [
-
-]
-
-{ #category : #private }
-ProtoObject >> holdRefererIfNeeded: referent [
-	| memory |
-	#savePreviousSelf.
-	self _isSmallInteger ifTrue: [^self].
-	referent _isRemembered ifTrue: [^self].
-	memory := Memory current.
-	(memory isYoungSafe: referent)
-		ifFalse: [(memory isYoungSafe: self) ifTrue: [memory remember: referent]]
 ]
 
 { #category : #comparing }

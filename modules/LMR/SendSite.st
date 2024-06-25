@@ -111,6 +111,11 @@ SendSite class >> invoking: aCompiledMethod using: instructions [
 	^self new beInvoke: aCompiledMethod using: instructions
 ]
 
+{ #category : #testing }
+SendSite class >> isUndermethod: aSelector [
+	^self undermethodSelectors includes: aSelector
+]
+
 { #category : #accessing }
 SendSite class >> lookupCount [
 	^LookupCount
@@ -134,6 +139,25 @@ SendSite class >> newPICUsing: aNativeCode [
 	^new
 ]
 
+{ #category : #private }
+SendSite class >> optimizedStaticSelectors [
+	^#(#basicByteAt: #basicByteAt:put: #byteAtValid: #byteAtValid:put:
+		#basicObjectAt: #basicObjectAt:put: #behavior #class #allocate:size:
+		 #memory #instanceBehavior
+		#_instancesAreArrayed #_instancesHavePointers #nil:slotsOf:
+		#initializeExtended:contentSize: #primitiveNew
+		#primitiveNewBytes: #primitiveNewPointers: #_return: #_returnTo: #zero:bytesOf:)
+]
+
+{ #category : #private }
+SendSite class >> objectStaticSelectors [
+	"
+	self undermethodSelectors asArray sort
+	"
+	^#(
+_beArrayed _beBytes _beLarge _beNamed _beNotRemembered _beRemembered _beSecondGeneration _beSeen _beSmall _beSpecial _beNotSpecial _beUnseen _copyBasicHeaderFrom: _copyHeaderSized:from: _flagsMask: _flagsSet: _hasBeenSeen _headerSizeInBytes _isArrayed _isBytes _isEphemeron _isFixed _isLarge _hasNamedSlots _isProxy _isRemembered _isSecondGeneration _isSmall _isSpecial _largeSize: _nextBasePointer _objectFromBasePointer _pointersSize _size _sizeInBytes _strongPointersSize )
+]
+
 { #category : #initialization }
 SendSite class >> polymorphicCache: instructions [
 	PolymorphicStub := instructions
@@ -147,6 +171,16 @@ SendSite class >> sending: aSelector with: instructions [
 { #category : #initialization }
 SendSite class >> startUp [
 	Instances := nil
+]
+
+{ #category : #private }
+SendSite class >> undermethods [
+	^self undermethodSelectors collect: [:selector | self >> selector]
+]
+
+{ #category : #private }
+SendSite class >> undermethodSelectors [
+	^self organization selectorsFor: 'header access'
 ]
 
 { #category : #'meta accessing' }
@@ -321,15 +355,8 @@ SendSite >> isPolymorphic [
 
 { #category : #testing }
 SendSite >> isStaticSelector [
-	(#(#basicByteAt: #basicByteAt:put: #byteAtValid: #byteAtValid:put:
-		#basicObjectAt: #basicObjectAt:put: #behavior #class #allocate:size:
-		 #memory #instanceBehavior
-		#_instancesAreArrayed #_instancesHavePointers #nil:slotsOf:
-		#initializeExtended:contentSize: #primitiveNew
-		#primitiveNewBytes: #primitiveNewPointers: #_return: #_returnTo: #zero:bytesOf:)
-		includes: selector)
-		ifTrue: [^true].
-	^ProtoObject staticSelectors includes: selector
+	(self class optimizedStaticSelectors includes: selector) ifTrue: [^true].
+	^self class objectStaticSelectors includes: selector
 ]
 
 { #category : #testing }
