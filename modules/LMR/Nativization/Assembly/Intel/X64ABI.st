@@ -16,6 +16,11 @@ X64ABI >> bits [
 	^64
 ]
 
+{ #category : #accessing }
+X64ABI >> newAssembler [
+	^AMD64TemplateAssembler new
+]
+
 { #category : #'registers - IR' }
 X64ABI >> regA [
 	^rdx

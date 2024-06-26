@@ -33,9 +33,9 @@ LookupLinker >> emitSendSuper: aSymbol from: aClass using: anAssembler [
 ]
 
 { #category : #accessing }
-LookupLinker >> initializeFrom: aNativizationEnvironment [
-	lookup := aNativizationEnvironment lookupStub.
-	lookupSuper := aNativizationEnvironment lookupSuperStub.
+LookupLinker >> initializeFrom: anLMRModule [
+	lookup := anLMRModule lookupStub.
+	lookupSuper := anLMRModule lookupSuperStub.
 
 ]
 

@@ -7,7 +7,6 @@ Class {
 		'invokedMethods',
 		'inlinedMethods',
 		'messageLinker',
-		'globals',
 		'writeBarrier',
 		'safepointCheck',
 		'cachedNativizer',
@@ -15,71 +14,6 @@ Class {
 	],
 	#category : #Nativization
 }
-
-{ #category : #accessing }
-NativizationEnvironment class >> globalNames [
-	^#(Lookup LookupSuper WriteBarrier Safepoint SmallIntegerBehavior Invoke DebuggableLookup DebuggableLookupSuper)
-]
-
-{ #category : #accessing }
-NativizationEnvironment class >> indexOfGlobal: aSymbol [
-	^self globalNames
-		indexOf: aSymbol
-		ifAbsent: [self error: 'global not found']
-]
-
-{ #category : #accessing }
-NativizationEnvironment class >> inlinedMethods [
-	| map |
-	map := {
-		(ProtoObject -> #(#objectAtValid: #objectAtValid:put: #behavior #class #primitiveAt: #_cachedLookup: #_cachedLookup:in:)).
-		(Object -> #(#byteAtValid: #byteAtValid:put: #basicObjectIndexOf: #at:put:)).
-		(Species -> #(#instSize #_instancesAreArrayed #_instancesHavePointers #memory #instanceBehavior #primitiveNew #primitiveNew:)).
-		(CompiledMethod -> #(#prepareForExecution #isNativized #nativeCode #blockCount #literalIndexFrom:)).
-		(CompiledBlock -> #(#argumentCount #blockNumber #blockCode #method)).
-		(NativeCode -> #(#code)).
-		(GCSpace -> #(#commitedLimit #nextFree #nextFree:)).
-		(CharacterArray -> #(#characterAtValid:))}.
-	^self undermethods , (self methodSubset: map)
-]
-
-{ #category : #accessing }
-NativizationEnvironment class >> invokedMethods [
-	| map |
-	map := {
-		(ProtoObject -> #(behavior class primitiveAt: #initializeExtended:contentSize:)).
-		(Object -> #(#_replaceFrom:to:with:)).
-		(Species -> #(#allocate:size: instanceBehavior _instancesAreArrayed _instancesHavePointers #nil:slotsOf: memory primitiveNewBytes: primitiveNewPointers: #zero:bytesOf:))}.
-	^self undermethods , (self methodSubset: map)
-]
-
-{ #category : #accessing }
-NativizationEnvironment class >> methodSubset: aDictionary [
-	| result |
-	result := OrderedCollection new.
-	aDictionary keysAndValuesDo: [ :species :selectors | 
-		selectors collect: [:sel | | m | species >> sel ifNil: [self ASSERT: false] ] into: result].
-	^result
-]
-
-{ #category : #accessing }
-NativizationEnvironment class >> optimizedMethods [
-	| map |
-	map := {
-		(ProtoObject -> #(behavior class primitiveAt: #primitiveAt:put: #initializeExtended:contentSize:)).
-		(Object -> #(at: #at:put: basicByteAt: #basicByteAt:put: byteAtValid: #byteAtValid:put:
-					 basicObjectAt: #basicObjectAt:put: #replaceBytesForwardFrom:to:with:startingAt:)).
-		(SendSite -> #(_dispatchOn: #_dispatchOn:startingAt: _dispatchDebuggableOn: #_dispatchDebuggableOn:startingAt:)).
-		(Species -> #(#allocate:size: primitiveNew primitiveNew: instSize primitiveNewBytes: primitiveNewPointers:)).
-		('Float class' -> #(new)).
-		(CompiledBlock -> #(argumentCount arity blockCode method)).
-		(Closure -> #(value value: #value:value:)).
-		(CompiledMethod -> #(blockCount isNativized)).
-		(String -> #(at: #at:put: byteAt: #byteAt:put:)).
-		(GCSpace -> #(lockedAllocateIfPossible: lockedAllocateUnsafe: shallowCopy:)).
-		(Memory -> #(shallowCopy:))}.
-	^self undermethods , (self methodSubset: map)
-]
 
 { #category : #accessing }
 NativizationEnvironment >> abi [
@@ -93,31 +27,7 @@ NativizationEnvironment >> addLinker: aLinker [
 
 { #category : #initialization }
 NativizationEnvironment >> completeInitialization [
-	cachedNativizer := self newExpressionNativizer 
-]
-
-{ #category : #accessing }
-NativizationEnvironment >> globalNamed: aSymbol [
-	| index |
-	index := self class indexOfGlobal: aSymbol.
-	^globals at: index
-]
-
-{ #category : #accessing }
-NativizationEnvironment >> globalNamed: aSymbol put: anObject [
-	| index |
-	index := self class indexOfGlobal: aSymbol.
-	globals at: index put: anObject
-]
-
-{ #category : #accessing }
-NativizationEnvironment >> globals [
-	^globals
-]
-
-{ #category : #accessing }
-NativizationEnvironment >> globals: anArray [
-	globals := anArray
+	cachedNativizer := self newTemplateJIT 
 ]
 
 { #category : #initialization }
@@ -128,12 +38,17 @@ NativizationEnvironment >> initialize [
 	inlinedMethods := OrderedCollection new.
 	messageLinker := CompositeMessageLinker new.
 	messageLinker add: InlineMessageLinker new.
-	globals := Array new: self class globalNames size.
+]
+
+{ #category : #initialization }
+NativizationEnvironment >> initializeLinkersFor: anLMRModule [
+	| invoker dispatcher |
+	invoker := InvokeLinker new invoker: anLMRModule invokeStub; addMethods: invokedMethods.
+	dispatcher := LookupLinker new initializeFrom: anLMRModule.
 	self
-		initializeGlobals;
-		inlinedMethods: self class inlinedMethods;
-		invokedMethods: self class invokedMethods;
-		optimizedMethods: self class optimizedMethods
+		addLinker: invoker;
+		addLinker: dispatcher;
+		completeInitialization
 ]
 
 { #category : #accessing }
@@ -146,12 +61,6 @@ NativizationEnvironment >> inlinedMethods: aCollection [
 	inlinedMethods := aCollection
 ]
 
-{ #category : #accessing }
-NativizationEnvironment >> invokeStub [
-	| index |
-	index := self class indexOfGlobal: #Invoke.
-	^(globals at: index) code
-]
 
 { #category : #accessing }
 NativizationEnvironment >> invokedMethods [
@@ -163,47 +72,6 @@ NativizationEnvironment >> invokedMethods: aCollection [
 	invokedMethods := aCollection asOrderedCollection 
 ]
 
-{ #category : #accessing }
-NativizationEnvironment >> lookup [
-	| index |
-	index := self class indexOfGlobal: #Lookup.
-	^globals at: index
-]
-
-{ #category : #accessing }
-NativizationEnvironment >> lookupDebuggableStub [
-	| index |
-	index := self class indexOfGlobal: #DebuggableLookup.
-	^(globals at: index) code
-]
-
-{ #category : #accessing }
-NativizationEnvironment >> lookupStub [
-	| index |
-	index := self class indexOfGlobal: #Lookup.
-	^(globals at: index) code
-]
-
-{ #category : #accessing }
-NativizationEnvironment >> lookupSuper [
-	| index |
-	index := self class indexOfGlobal: #LookupSuper.
-	^globals at: index
-]
-
-{ #category : #accessing }
-NativizationEnvironment >> lookupSuperDebuggableStub [
-	| index |
-	index := self class indexOfGlobal: #DebuggableLookupSuper.
-	^(globals at: index) code
-]
-
-{ #category : #accessing }
-NativizationEnvironment >> lookupSuperStub [
-	| index |
-	index := self class indexOfGlobal: #LookupSuper.
-	^(globals at: index) code
-]
 
 { #category : #accessing }
 NativizationEnvironment >> messageLinker [
@@ -221,29 +89,6 @@ NativizationEnvironment >> methodNativizer [
 ]
 
 { #category : #services }
-NativizationEnvironment >> monomorphicCache [
-	| asm lookup next |
-	asm := platform newAssembler.
-	lookup := asm newLabel.
-	asm
-		loadTwithAindex: 3;
-		loadSwithGlobal: #SmallIntegerBehavior.
-	next := asm labeledNonIntegerBitTestOfR.
-	asm
-		loadLongSwithRindex: 0;
-		@ next;
-		compareSwithTindex: 1;
-		shortJumpIfNotEqualTo: lookup;
-		loadMwithTindex: 2;
-		jumpToMindex: 1;
-		@ lookup;
-		loadMwithGlobal: #Lookup;
-		jumpToMindex: 1;
-		applyFixups.
-	^asm nativeCode code
-]
-
-{ #category : #services }
 NativizationEnvironment >> nativize: aCompiledMethod [
 	^(self shouldOptimize: aCompiledMethod)
 		  ifTrue: [ self nativizeOptimizing: aCompiledMethod ]
@@ -258,14 +103,6 @@ NativizationEnvironment >> nativizeOptimizing: aCompiledMethod [
 ]
 
 { #category : #services }
-NativizationEnvironment >> nativizeWithoutOptimizing: aCompiledMethod [
-	| method |
-	method := self
-		nativizerDuring: [ :nativizer | nativizer nativize: aCompiledMethod ].
-	^method
-]
-
-{ #category : #services }
 NativizationEnvironment >> nativizerDuring: aBlock [
 	^busy
 		  ifFalse: [ 
@@ -275,12 +112,25 @@ NativizationEnvironment >> nativizerDuring: aBlock [
 			  | old |
 			  old := cachedNativizer. 
 			  [ 
-			  cachedNativizer := self newExpressionNativizer.
+			  cachedNativizer := self newTemplateJIT.
 			  aBlock value: cachedNativizer ] ensure: [ cachedNativizer := old ] ]
 ]
 
 { #category : #services }
-NativizationEnvironment >> newExpressionNativizer [
+NativizationEnvironment >> nativizeWithoutOptimizing: aCompiledMethod [
+	| method |
+	method := self
+		nativizerDuring: [ :jit | jit nativize: aCompiledMethod ].
+	^method
+]
+
+{ #category : #services }
+NativizationEnvironment >> newAssembler [
+	^platform newAssembler
+]
+
+{ #category : #services }
+NativizationEnvironment >> newTemplateJIT [
 	^TemplateJIT new environment: self
 ]
 
@@ -309,66 +159,6 @@ NativizationEnvironment >> platform: aNativizationPlatform [
 	platform := aNativizationPlatform
 ]
 
-{ #category : #services }
-NativizationEnvironment >> polymorphicCache [
-	| asm smi case2 case3 case4 case5 case6 case7 lookup |
-	asm := platform newAssembler.
-	smi := asm newLabel.
-	case2 := asm newLabel.
-	case3 := asm newLabel.
-	case4 := asm newLabel.
-	case5 := asm newLabel.
-	case6 := asm newLabel.
-	case7 := asm newLabel.
-	lookup := asm newLabel.
-	asm loadTwithAindex: 3.
-	smi := asm labeledNonIntegerBitTestOfR.
-	asm
-		loadLongSwithRindex: 0;
-		compareSwithTindex: 1;
-		shortJumpIfNotEqualTo: case2;
-		loadMwithTindex: 2;
-		jumpToMindex: 1;
-		@ case2;
-		compareSwithTindex: 3;
-		shortJumpIfNotEqualTo: case3;
-		loadMwithTindex: 4;
-		jumpToMindex: 1;
-		@ case3;
-		compareSwithTindex: 5;
-		shortJumpIfNotEqualTo: case4;
-		loadMwithTindex: 6;
-		jumpToMindex: 1;
-		@ case4;
-		compareSwithTindex: 7;
-		shortJumpIfNotEqualTo: case5;
-		loadMwithTindex: 8;
-		jumpToMindex: 1;
-		@ case5;
-		compareSwithTindex: 9;
-		shortJumpIfNotEqualTo: case6;
-		loadMwithTindex: 10;
-		jumpToMindex: 1;
-		@ case6;
-		compareSwithTindex: 11;
-		shortJumpIfNotEqualTo: case7;
-		loadMwithTindex: 12;
-		jumpToMindex: 1;
-		@ case7;
-		compareSwithTindex: 13;
-		shortJumpIfNotEqualTo: lookup;
-		loadMwithTindex: 14;
-		jumpToMindex: 1;
-		@ lookup;
-		loadMwithGlobal: #Lookup;
-		jumpToMindex: 1;
-		@ smi;
-		loadMwithTindex: 15;
-		jumpToMindex: 1;
-		applyFixups.
-	^asm nativeCode code
-]
-
 { #category : #'printing & storing' }
 NativizationEnvironment >> printOn:aStream [
 	"append a printed representation of the receiver to the argument, aStream"
@@ -380,26 +170,8 @@ NativizationEnvironment >> printOn:aStream [
 ]
 
 { #category : #accessing }
-NativizationEnvironment >> safepoint [
-	| index |
-	index := self class indexOfGlobal: #Safepoint.
-	^(globals at: index) code
-]
-
-{ #category : #accessing }
 NativizationEnvironment >> safepointCheck: anObject [
 	safepointCheck := anObject 
-]
-
-{ #category : #initialization }
-NativizationEnvironment >> setupMessageLinkers [
-	| invoker dispatcher |
-	invoker := InvokeLinker new invoker: self invokeStub; addMethods: invokedMethods.
-	dispatcher := LookupLinker new initializeFrom: self.
-	self
-		addLinker: invoker;
-		addLinker: dispatcher;
-		completeInitialization
 ]
 
 { #category : #services }

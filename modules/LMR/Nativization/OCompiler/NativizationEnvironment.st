@@ -6,7 +6,7 @@
 Extension { #name : #NativizationEnvironment }
 
 { #category : '*OCompiler' }
-NativizationEnvironment >> bareMetalNativizer [
+NativizationEnvironment >> optimizingNativizer [
 	^OptimizingNativizer
 ]
 
@@ -15,7 +15,7 @@ NativizationEnvironment >> shouldOptimize: method [
 	method isDebuggable ifTrue: [^false].
 	method isCallback ifTrue: [^false].
 	(method classBinding == Object
-		and: [self class isUndermethod: method selector])
+		and: [SendSite isUndermethod: method selector])
 		ifTrue: [^true].
 	(method classBinding == ProtoObject
 		and: [#(behavior class primitiveAt:) includes: method selector])
