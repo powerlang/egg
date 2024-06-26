@@ -1,6 +1,6 @@
 "
-    Copyright (c) 2020 Aucerna. 
-    See (MIT) license in root directory.
+	Copyright (c) 2020-2022 Quorum Software.
+	See (MIT) license in root directory.
 "
 
 Class {
@@ -16,71 +16,53 @@ Class {
 		'MICs',
 		'MonomorphicStub',
 		'NextMIC',
+		'NextMICs',
 		'NextPIC',
+		'NextPICs',
 		'PICs',
 		'PolymorphicStub'
 	],
 	#category : #Kernel
 }
 
-{ #category : #initialization }
-SendSite class >> allocateCaches: amount lookup: aNativeCode [
-	| mics pics array |
-	mics := amount.
-	pics := amount // 4.
-	array := Array new: mics.
-	1 to: mics do: [:i | array basicAt: i put: (Array new: 2)].
-	MICs := array.
-	NextMIC := 1.
-	array := Array new: pics.
-	1 to: pics do: [:i | array basicAt: i put: (self newPICUsing: aNativeCode)].
-	PICs := array.
-	NextPIC := 1
+{ #category : #'writing image' }
+SendSite class >> ensureEnoughFreeCaches: anInteger [
+	MICs _size - NextMIC < anInteger ifTrue: [self useNextMICs].
+	PICs _size - NextPIC < (anInteger // 8) ifTrue: [self useNextPICs]
 ]
 
-{ #category : #initialization }
-SendSite class >> allocateInitialCachesUsing: aNativeCode [
-	self allocateCaches: 3000 lookup: aNativeCode
-]
-
-{ #category : #initialization }
-SendSite class >> allocateMoreCaches [
-	self beeAllocateCaches: 140000 lookup: (Smalltalk at: #Lookup)
-]
-
-{ #category : #initialization }
-SendSite class >> beeAllocateCaches: amount lookup: aNativeCode [
-	| mics pics array mic pic memory |
-	mics := amount.
-	pics := amount // 5.
-	array := Array new: mics.
-	mic := Array new: 2.
-	pic := (Array new: 15)
-		at: 15 put: aNativeCode;
-		yourself.
-	memory := Memory current.
-	1 to: mics do: [:i | array basicAt: i put: (memory pinnedCopy: mic)].
-	MICs := array.
-	NextMIC := 1.
-	array := Array new: pics.
-	1 to: pics do: [:i | array basicAt: i put: (memory pinnedCopy: pic)].
-	PICs := array.
-	NextPIC := 1
+{ #category : #services }
+SendSite class >> flush: selector [
+	| sends count copy |
+	sends := self instances at: selector ifAbsent: [^self].
+	count := 0.
+	sends do: [:send | 
+		send ifNotNil: [
+			count := count + 1.
+			send flush: selector]].
+	count * 3 < sends size ifFalse: [^self].
+	count = 0 ifTrue: [^sends removeKey: selector].
+	copy := WeakArray new: (count * 1.5) asInteger.
+	count := 0.
+	sends do: [:send | 
+		send ifNotNil: [
+			count := count + 1.
+			copy at: count put: send]].
+	self instances at: selector put: copy
 ]
 
 { #category : #private }
-SendSite class >> flush [
+SendSite class >> flushForRelease [
+	self instances do: [:sites | sites do: [:s | s flush]].
+	self flushInstances; useNextMICs; useNextPICs
+]
+
+{ #category : #private }
+SendSite class >> flushInstances [
 	Instances := nil
 ]
 
 { #category : #initialization }
-SendSite class >> flush: selector [
-	| sends |
-	sends := self instances at: selector ifAbsent: [^self].
-	sends do: [:send | send flush: selector]
-]
-
-{ #category : #private }
 SendSite class >> initializeFormatFlags [
 	"
 	SendSite initializeFormatFlags
@@ -94,26 +76,29 @@ SendSite class >> initializeFormatFlags [
 ]
 
 { #category : #initialization }
+SendSite class >> initializeFrom: aNativizationEnvironment [
+	self
+		reserveMoreMICs;
+		reserveMorePICsWith: aNativizationEnvironment lookup;
+		useNextMICs;
+		useNextPICsWith: aNativizationEnvironment lookup;
+		initializeMICStubFor: aNativizationEnvironment abi;
+		initializePICStubFor: aNativizationEnvironment abi.
+	Invoke := aNativizationEnvironment invokeStub
+]
+
+{ #category : #accessing }
 SendSite class >> instances [
 	Instances ifNil: [
 		Instances := IdentityDictionary new.
-		self allExistingInstances do: [:send | send register]].
+		self allInstances do: [:send | send register]].
 	^Instances
 ]
 
-{ #category : #initialization }
-SendSite class >> initializeInvoke: aNativeCode [
-	Invoke := aNativeCode code
-]
-
-{ #category : #private }
+{ #category : #'instance creation' }
 SendSite class >> invoking: aCompiledMethod using: instructions [
-	^self new beInvoke: aCompiledMethod using: instructions
-]
-
-{ #category : #testing }
-SendSite class >> isUndermethod: aSelector [
-	^self undermethodSelectors includes: aSelector
+	^self new beStaticSend; beInvoke: aCompiledMethod
+	using: instructions
 ]
 
 { #category : #accessing }
@@ -121,66 +106,70 @@ SendSite class >> lookupCount [
 	^LookupCount
 ]
 
-{ #category : #initialization }
+{ #category : #accessing }
 SendSite class >> mics [
 	^MICs
 ]
 
-{ #category : #initialization }
-SendSite class >> monomorphicCache: instructions [
-	MonomorphicStub := instructions
-]
-
-{ #category : #initialization }
-SendSite class >> newPICUsing: aNativeCode [
-	| new |
-	new := Array new: 15.
-	new at: 15 put: aNativeCode.
-	^new
+{ #category : #'instance creation' }
+SendSite class >> new [
+	^self basicNew initialize
 ]
 
 { #category : #private }
-SendSite class >> optimizedStaticSelectors [
-	^#(#basicByteAt: #basicByteAt:put: #byteAtValid: #byteAtValid:put:
-		#basicObjectAt: #basicObjectAt:put: #behavior #class #allocate:size:
-		 #memory #instanceBehavior
-		#_instancesAreArrayed #_instancesHavePointers #nil:slotsOf:
-		#initializeExtended:contentSize: #primitiveNew
-		#primitiveNewBytes: #primitiveNewPointers: #_return: #_returnTo: #zero:bytesOf:)
-]
-
-{ #category : #private }
-SendSite class >> objectStaticSelectors [
+SendSite class >> reserveMoreMICs [
 	"
-	self undermethodSelectors asArray sort
+	The amount needs to be enough to execute all the code until either:
+	a. initializing the memory spaces;
+	b. reading the image.
+	If not, when exhausting the caches we will try to create a new GCSpace
+	but will raise errors because memory hasn't been initialized yet
 	"
-	^#(
-_beArrayed _beBytes _beLarge _beNamed _beNotRemembered _beRemembered _beSecondGeneration _beSeen _beSmall _beSpecial _beNotSpecial _beUnseen _copyBasicHeaderFrom: _copyHeaderSized:from: _flagsMask: _flagsSet: _hasBeenSeen _headerSizeInBytes _isArrayed _isBytes _isEphemeron _isFixed _isLarge _hasNamedSlots _isProxy _isRemembered _isSecondGeneration _isSmall _isSpecial _largeSize: _nextBasePointer _objectFromBasePointer _pointersSize _size _sizeInBytes _strongPointersSize )
-]
-
-{ #category : #initialization }
-SendSite class >> polymorphicCache: instructions [
-	PolymorphicStub := instructions
+	| memory amount array mic |
+	memory := Smalltalk memory.
+	amount := 2000.
+	array := memory newLargeArray: amount.
+	mic := Array new: 2.
+	1 to: amount do: [:i | array basicAt: i put: (memory pinnedCopy: mic)].
+	NextMICs := array
 ]
 
 { #category : #private }
+SendSite class >> reserveMorePICsWith: aNativeCode [
+	| memory amount array lookup pic |
+	memory := Smalltalk memory.
+	amount := 1000.
+	array := memory newLargeArray: amount.
+	lookup := aNativeCode ifNil: [Smalltalk at: #Lookup].
+	pic := (Array new: 15)
+		at: 15 put: lookup;
+		yourself.
+	1 to: amount do: [:i | array basicAt: i put: (memory pinnedCopy: pic)].
+	NextPICs := array
+]
+
+{ #category : #'instance creation' }
 SendSite class >> sending: aSelector with: instructions [
 	^self new selector: aSelector; instructions: instructions
 ]
 
-{ #category : #initialization }
-SendSite class >> startUp [
-	Instances := nil
+{ #category : #private }
+SendSite class >> useNextMICs [
+	MICs := NextMICs.
+	NextMIC := 1.
+	self reserveMoreMICs
 ]
 
 { #category : #private }
-SendSite class >> undermethods [
-	^self undermethodSelectors collect: [:selector | self >> selector]
+SendSite class >> useNextPICs [
+	self useNextPICsWith: nil
 ]
 
 { #category : #private }
-SendSite class >> undermethodSelectors [
-	^self organization selectorsFor: 'header access'
+SendSite class >> useNextPICsWith: aNativeCode [
+	PICs := NextPICs.
+	NextPIC := 1.
+	self reserveMorePICsWith: aNativeCode
 ]
 
 { #category : #'meta accessing' }
@@ -293,18 +282,20 @@ SendSite >> cache [
 
 { #category : #private }
 SendSite >> flush [
+	self isStaticSend ifTrue: [^self].
 	instructions := self isSuperSend
 		ifTrue: [Smalltalk at: #LookupSuperCode]
 		ifFalse: [Smalltalk at: #LookupCode].
-	cache := nil
+	cache := nil.
+	tally := 0
 ]
 
-{ #category : #private }
+{ #category : #services }
 SendSite >> flush: aSelector [
 	aSelector == selector ifTrue: [self flush]
 ]
 
-{ #category : #private }
+{ #category : #testing }
 SendSite >> hasBeenReset [
 	^format isOnBit: HasBeenReset
 ]
@@ -325,12 +316,12 @@ SendSite >> instructions: aByteArray [
 	instructions := aByteArray
 ]
 
-{ #category : #printing }
+{ #category : #testing }
 SendSite >> isFakeMegamorphic [
 	^self isFakeMegamorphic: 3
 ]
 
-{ #category : #printing }
+{ #category : #testing }
 SendSite >> isFakeMegamorphic: maxImplementations [
 	| d |
 	self isMegamorphic ifFalse: [^false].
@@ -343,20 +334,27 @@ SendSite >> isFakeMegamorphic: maxImplementations [
 	^d size <= maxImplementations
 ]
 
-{ #category : #private }
+{ #category : #testing }
 SendSite >> isMegamorphic [
 	^self isPolymorphic and: [self hasBeenReset]
 ]
 
-{ #category : #private }
+{ #category : #testing }
 SendSite >> isPolymorphic [
 	^format isOnBit: IsPolymorphic
 ]
 
 { #category : #testing }
 SendSite >> isStaticSelector [
-	(self class optimizedStaticSelectors includes: selector) ifTrue: [^true].
-	^self class objectStaticSelectors includes: selector
+	(#(#basicByteAt: #basicByteAt:put: #basicInstVarAt: #basicInstVarAt:put:
+		#behavior #class #allocate:size:
+		 #memory #instanceBehavior
+		#_instancesAreArrayed #_instancesHavePointers #nil:slotsOf:
+		#initializeExtended:contentSize: #primitiveNew
+		#primitiveNewBytes: #primitiveNewPointers: #_return: #_returnTo: #zero:bytesOf:)
+		includes: selector)
+		ifTrue: [^true].
+	^ProtoObject staticSelectors includes: selector
 ]
 
 { #category : #testing }
@@ -376,17 +374,24 @@ SendSite >> maxSize [
 
 { #category : #private }
 SendSite >> monomorphicMap: aBehavior to: code [
-	instructions := MonomorphicStub.
-	cache := self takeNextFreeMIC.
-	cache objectAtValid: 1 put: aBehavior.
-	cache objectAtValid: 2 put: code
+	cache := self takeNextFreeMIC ifNil: [^self].
+	instructions := self monomorphicStub.
+	cache
+		objectAtValid: 1 put: aBehavior;
+		objectAtValid: 2 put: code
+]
+
+{ #category : #private }
+SendSite >> monomorphicStub [
+	^MonomorphicStub code
 ]
 
 { #category : #private }
 SendSite >> polymorphicMap: aBehavior to: code [
 	cache _size == 2 ifTrue: [
-		instructions := PolymorphicStub.
-		cache := self takeNextFreePIC.
+		cache := self takeNextFreePIC ifNil: [^self].
+		tally := 0.
+		instructions := self polymorphicStub.
 		self bePolymorphic].
 	aBehavior == SmallInteger instanceBehavior
 		ifTrue: [cache objectAtValid: self maxSize + 1 put: code]
@@ -396,6 +401,11 @@ SendSite >> polymorphicMap: aBehavior to: code [
 				objectAtValid: tally + 1 put: aBehavior;
 				objectAtValid: tally + 2 put: code.
 			tally := tally + 2]
+]
+
+{ #category : #private }
+SendSite >> polymorphicStub [
+	^PolymorphicStub code
 ]
 
 { #category : #printing }
@@ -442,9 +452,9 @@ SendSite >> printPolymorphicTypeOn: aStream [
 { #category : #printing }
 SendSite >> printTypeOn: aStream [
 	cache isCompiledMethod ifTrue: [^self printInvokeTypeOn: aStream].
-	instructions == MonomorphicStub
+	instructions == MonomorphicStub code
 		ifTrue: [^self printMonomorphicTypeOn: aStream].
-	instructions == PolymorphicStub
+	instructions == PolymorphicStub code
 		ifTrue: [^self printPolymorphicTypeOn: aStream].
 	instructions == (Smalltalk at: #Lookup ifAbsent: [''])
 		ifTrue: [^aStream nextPutAll: 'lookup'].
@@ -462,7 +472,7 @@ SendSite >> register [
 	sends add: self
 ]
 
-{ #category : #private }
+{ #category : #services }
 SendSite >> reset [
 	tally := 0.
 	format := format bitOr: HasBeenReset
@@ -487,19 +497,22 @@ SendSite >> sentSelector [
 
 { #category : #private }
 SendSite >> takeNextFreeMIC [
-	| position |
-	position := NextMIC.
-	NextMIC := NextMIC + 1.
-	position + 50 = MICs _size ifTrue: [self class allocateMoreCaches].
-	^MICs _basicAt: position]
+	| result |
+	result := MICs _basicAt: NextMIC.
+	NextMIC = MICs _size
+		ifTrue: [self class useNextMICs]
+		ifFalse: [NextMIC := NextMIC + 1].
+	^result
+]
 
 { #category : #private }
 SendSite >> takeNextFreePIC [
-	| position |
-	position := NextPIC.
-	NextPIC := NextPIC + 1.
-	NextPIC + 50 = PICs _size ifTrue: [self class allocateMoreCaches].
-	^PICs _basicAt: position
+	| result |
+	result := PICs _basicAt: NextPIC.
+	NextPIC = PICs _size
+		ifTrue: [self class useNextPICs]
+		ifFalse: [NextPIC := NextPIC + 1].
+	^result
 ]
 
 { #category : #private }

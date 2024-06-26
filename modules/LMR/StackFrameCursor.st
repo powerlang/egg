@@ -24,17 +24,17 @@ StackFrameCursor class >> caller [
 ]
 
 { #category : #'instance creation' }
-StackFrameCursor class >> classFor: aStackWrapper [
-	^aStackWrapper isNative
+StackFrameCursor class >> classFor: aProcessStack [
+	^aProcessStack isNative
 		ifTrue: [StackFrameCursor]
 		ifFalse: [ReifiedStackFrameCursor]
 ]
 
 { #category : #'instance creation' }
-StackFrameCursor class >> on: aStackWrapper [
+StackFrameCursor class >> on: aProcessStack [
 	| class |
-	class := self classFor: aStackWrapper.
-	^class new current: aStackWrapper lastFrame previous: aStackWrapper top
+	class := self classFor: aProcessStack.
+	^class new current: aProcessStack lastFrame previous: aProcessStack top
 ]
 
 { #category : #'instance creation' }

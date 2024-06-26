@@ -26,6 +26,11 @@ ProcessorScheduler >> activeProcess: anActiveProcess [
 ]
 
 { #category : #accessing }
+ProcessorScheduler >> areInterruptsEnabled [
+	^interruptsEnabled
+]
+
+{ #category : #accessing }
 ProcessorScheduler >> dropHandler: aClosure [
 	dropHandler := aClosure
 ]
