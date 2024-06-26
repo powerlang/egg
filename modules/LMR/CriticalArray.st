@@ -1,6 +1,6 @@
 "
-    Copyright (c) 2020 Aucerna. 
-    See (MIT) license in root directory.
+	Copyright (c) 2020-2022 Quorum Software.
+	See (MIT) license in root directory.
 "
 
 Class {
@@ -9,34 +9,27 @@ Class {
 	#instVars : [
 		'size',
 		'contents',
-		'space',
+		'allocator',
 		'writeBarrier'
 	],
 	#category : #Kernel
 }
-
-{ #category : #'instance creation' }
-CriticalArray class >> emptyReserving: anInteger [
-	^self on: Memory current reserving: anInteger
-]
-
-{ #category : #'instance creation' }
-CriticalArray class >> on: anArray [
-	^self new contents: anArray; yourself
-]
-
-{ #category : #'instance creation' }
-CriticalArray class >> on: space reserving: anInteger [
-	| array |
-	array := space shallowCopy: #() growingTo: anInteger.
-	^self new space: space; contents: array; yourself
-]
 
 { #category : #actions }
 CriticalArray >> add: object [
 	size = contents _size ifTrue: [self grow].
 	size := size + 1.
 	self at: size put: object
+]
+
+{ #category : #accessing }
+CriticalArray >> allocator [
+	^allocator
+]
+
+{ #category : #accessing }
+CriticalArray >> allocator: anAllocator [
+	allocator := anAllocator
 ]
 
 { #category : #accessing }
@@ -70,25 +63,19 @@ CriticalArray >> do: aBlock [
 
 { #category : #enumerating }
 CriticalArray >> grow [
-	self growToHold: contents _size * 2
+	self growTo: contents _size * 2
 ]
 
 { #category : #private }
-CriticalArray >> growToHold: n [
-	"
-	Change the contents to the expanded version 
-	before remembering, as remembering may trigger
-	an insertion in this very same array.
-	"
-	| expanded original |
-	contents _size < n ifTrue: [
-		expanded := space shallowCopy: contents growingTo: n.
-		original := contents.
-		contents := expanded.
-		original _isRemembered ifTrue: [Memory current remember: expanded]]
+CriticalArray >> growTo: n [
+	| expanded |
+	contents _size >= n ifTrue: [^self].
+	expanded := allocator shallowCopy: contents growingTo: n.
+	expanded ifNil: [self _error: 'Could not copy critical array contents'].
+	contents := expanded
 ]
 
-{ #category : #accessing }
+{ #category : #actions }
 CriticalArray >> ignoreWriteBarrier [
 	writeBarrier := false
 ]
@@ -105,12 +92,13 @@ CriticalArray >> includesIdentical: anObject [
 	^false
 ]
 
-{ #category : #testing }
+{ #category : #initialization }
 CriticalArray >> initialize [
 	super initialize.
 	size := 0.
 	writeBarrier := true.
-	space := Memory current
+	contents := #().
+	allocator := Allocator new memory: Memory current
 ]
 
 { #category : #testing }
@@ -118,7 +106,7 @@ CriticalArray >> isEmpty [
 	^size = 0
 ]
 
-{ #category : #accessing }
+{ #category : #actions }
 CriticalArray >> pop [
 	| answer |
 	answer := self at: size.
@@ -138,6 +126,26 @@ CriticalArray >> push: object [
 	^self add: object
 ]
 
+{ #category : #removing }
+CriticalArray >> remove: anObject ifAbsent: aBlock [
+	1 to: size do: [:i | 
+		anObject == (contents at: i) ifTrue: [
+			self removeIndex: i.
+			^anObject]].
+	^aBlock value
+]
+
+{ #category : #removing }
+CriticalArray >> removeIndex: anInteger [
+	contents
+		replaceFrom: anInteger
+		to: size - 1
+		with: contents
+		startingAt: anInteger + 1;
+		at: size put: nil.
+	size := size - 1
+]
+
 { #category : #actions }
 CriticalArray >> reset [
 	1 to: self size do: [:i | contents _basicAt: i put: nil].
@@ -154,12 +162,7 @@ CriticalArray >> size: anInteger [
 	size := anInteger
 ]
 
-{ #category : #accessing }
-CriticalArray >> space: aSpace [
-	space := aSpace
-]
-
-{ #category : #'adding / removing' }
+{ #category : #adding }
 CriticalArray >> unsafeAdd: anObject [
 	size = contents _size ifTrue: [self grow].
 	size := size + 1.
@@ -169,5 +172,10 @@ CriticalArray >> unsafeAdd: anObject [
 { #category : #accessing }
 CriticalArray >> unsafeAt: index put: anObject [
 	^contents _basicAt: index put: anObject
+]
+
+{ #category : #actions }
+CriticalArray >> usePinnedAllocation [
+	allocator := PinnedAllocator new
 ]
 

@@ -1,6 +1,6 @@
 "
-    Copyright (c) 2020 Aucerna. 
-    See (MIT) license in root directory.
+	Copyright (c) 2020-2022 Quorum Software.
+	See (MIT) license in root directory.
 "
 
 Class {
@@ -13,7 +13,8 @@ Class {
 		'commitedLimit',
 		'reservedLimit',
 		'prevBase',
-		'mutex'
+		'memory',
+		'name'
 	],
 	#category : #Kernel
 }
@@ -21,32 +22,6 @@ Class {
 { #category : #'instance creation' }
 GCSpace class >> copyFrom: aGCSpace [
 	^self new copyFrom: aGCSpace
-]
-
-{ #category : #'instance creation' }
-GCSpace class >> from: anImageSegment [
-	^self new
-]
-
-{ #category : #'instance creation' }
-GCSpace class >> newAt: base limit: limit [
-	^self new base: base; commitedLimit: limit
-]
-
-{ #category : #'instance creation' }
-GCSpace class >> newAtAddress: address size: size [
-	| p |
-	p := address // 2.
-	^self newAt: p limit: p + (size // 2)
-]
-
-{ #category : #'instance creation' }
-GCSpace class >> reservedAt: address sized: size [
-	| space |
-	space := self new.
-	^space
-		base: address // 2;
-		reservedLimit: space base + (size // 2)
 ]
 
 { #category : #enumeration }
@@ -81,36 +56,48 @@ GCSpace >> addMarkedInstancesOf: aSpecies into: result [
 ]
 
 { #category : #enumeration }
-GCSpace >> addReferencesTo: anObject into: aCollection [
-	"
-	remember not to create ANY objects here
-	"
+GCSpace >> addMarkedReferencesTo: anObject into: aCollection [
 	| next object end |
 	next := base.
 	end := nextFree.
-	[next < end] whileTrue: [
+	[next < end] whileTrue: [| index limit |
 		object := next _objectFromBasePointer.
-		1 to: object _strongPointersSize do: [:index | | ivar |
-			ivar := object _basicAt: index.
-			ivar == anObject ifTrue: [aCollection add: object]].
+		index := 1.
+		limit := object _strongPointersSize.
+		object _hasBeenSeen ifTrue: [
+			[index <= limit] whileTrue: [| ivar |
+				ivar := object _basicAt: index.
+				ivar == anObject ifTrue: [
+					aCollection add: object.
+					index := limit].
+				index := index + 1]].
 		next := object _nextBasePointer]
+]
+
+{ #category : #accessing }
+GCSpace >> address: address size: size [
+	| p |
+	p := address // 2.
+	^self
+		base: p;
+		reservedLimit: p + (size // 2)
+]
+
+{ #category : #actions }
+GCSpace >> allocateCommittingIfNeeded: size [
+	| answer |
+	"	mutex _busyWait."
+	answer := self lockedAllocateCommittingIfNeeded: size.
+	"	mutex _release."
+	^answer
 ]
 
 { #category : #actions }
 GCSpace >> allocateIfPossible: size [
 	| answer |
-	mutex _busyWait.
+	"	mutex _busyWait."
 	answer := self lockedAllocateIfPossible: size.
-	mutex _release.
-	^answer
-]
-
-{ #category : #actions }
-GCSpace >> allocateUnsafe: size [
-	| answer |
-	mutex _busyWait.
-	answer := self lockedAllocateUnsafe: size.
-	mutex _release.
+	"	mutex _release."
 	^answer
 ]
 
@@ -119,12 +106,12 @@ GCSpace >> assert: aBoolean [
 	aBoolean ifFalse: [self _halt]
 ]
 
-{ #category : #accessing }
+{ #category : #inquiries }
 GCSpace >> available [
 	^softLimit - nextFree
 ]
 
-{ #category : #accessing }
+{ #category : #inquiries }
 GCSpace >> availableBytes [
 	^self available * 2
 ]
@@ -137,16 +124,20 @@ GCSpace >> base [
 { #category : #accessing }
 GCSpace >> base: baseAddress [
 	base := baseAddress.
-	nextFree isNil ifTrue: [nextFree := baseAddress].
-	commitedLimit isNil ifTrue: [commitedLimit := base]
+	nextFree ifNil: [nextFree := base].
+	softLimit ifNil: [softLimit := base].
+	commitedLimit ifNil: [commitedLimit := base]
 ]
 
 { #category : #actions }
 GCSpace >> commit: bytes [
-	| size result |
-	size := commitedLimit + bytes _asPointer.
-	result := self commitSized: size - base.
-	result == base ifTrue: [commitedLimit := size] ifFalse: [self _halt]
+	| newLimit result |
+	newLimit := commitedLimit + bytes _asPointer.
+	result := self commitSized: newLimit - base.
+	result == base
+		ifFalse: [self _error: 'GC space could not commit as requested'].
+	softLimit := nextFree max: newLimit - 16r4000 _asPointer.
+	commitedLimit := newLimit
 ]
 
 { #category : #actions }
@@ -157,6 +148,11 @@ GCSpace >> commitAtLeast: bytes [
 	self commit: size
 ]
 
+{ #category : #inquiries }
+GCSpace >> commitedBytes [
+	^commitedLimit - base * 2
+]
+
 { #category : #accessing }
 GCSpace >> commitedLimit [
 	^commitedLimit
@@ -165,30 +161,47 @@ GCSpace >> commitedLimit [
 { #category : #accessing }
 GCSpace >> commitedLimit: anInteger [
 	commitedLimit := anInteger.
-	reservedLimit isNil ifTrue: [self reservedLimit: anInteger].
-	softLimit isNil ifTrue: [self leaveDispenseSpace]
+	reservedLimit isNil ifTrue: [reservedLimit := anInteger].
+	softLimit isNil ifTrue: [softLimit := anInteger]
 ]
 
-{ #category : #accessing }
+{ #category : #inquiries }
 GCSpace >> commitedSize [
 	^commitedLimit - base
 ]
 
 { #category : #actions }
-GCSpace >> commitMoreMemory [
-	| newLimit padding |
-	nextFree >= reservedLimit ifTrue: [self _halt].
-	padding := 16r8000 _asPointer.
-	newLimit := nextFree + padding bitAnd: -16r1000 _asPointer.
-	(self commitSized: newLimit - base) == (base bitAnd: -16r1000 _asPointer)
-		ifTrue: [commitedLimit := newLimit]
-		ifFalse: [self _halt]
+GCSpace >> commitMoreMemory: anInteger [
+	"
+	This method may temporarily switch allocation space to old, which
+	is guaranteed to have dispense space. This is needed to assure
+	there is space for the extra objects allocated by the commit ffi call.
+	"
+	| new padded old critical original |
+	new := anInteger + 16r8000 _asPointer.
+	new >= reservedLimit ifTrue: [^self].
+	critical := CRITICAL.
+	CRITICAL := true.
+	padded := new bitAnd: -16r1000 _asPointer.
+	original := memory allocator.
+	original available < 16r1000 _asPointer ifTrue: [
+		old := memory old.
+		self == old ifTrue: [self dispenseReservedSpace].
+		memory allocator: old].
+	(self commitSized: padded - base) == base
+		ifFalse: [self _error: 'GC space could not commit as requested'].
+	softLimit := padded - 16r4000 _asPointer.
+	commitedLimit := padded.
+	memory allocator: original.
+	CRITICAL := critical
 ]
 
 { #category : #actions }
 GCSpace >> commitSized: size [
 	| result |
-	result := Smalltalk os alloc: base * 2 size: size * 2 commit: true protect: #rwx.
+	size = 0 ifTrue: [^base].
+	result := Kernel os commit: size * 2 at: base * 2.
+	result = 0 ifTrue: [Kernel os lastError].
 	^result // 2
 ]
 
@@ -198,10 +211,11 @@ GCSpace >> copyFrom: space [
 	base := space base.
 	commitedLimit := space commitedLimit.
 	reservedLimit := space reservedLimit.
-	nextFree := space nextFree
+	nextFree := space nextFree.
+	memory := space memory
 ]
 
-{ #category : #accessing }
+{ #category : #inquiries }
 GCSpace >> dataBase [
 	^base * 2
 ]
@@ -212,28 +226,29 @@ GCSpace >> dataBase: address size: anInteger [
 	p := address // 2.
 	self
 		base: p;
-		commitedLimit: p + (anInteger // 2).
-	self nextFree: self commitedLimit
+		commitedLimit: p + (anInteger // 2);
+		nextFree: self commitedLimit
 ]
 
-{ #category : #accessing }
+{ #category : #inquiries }
 GCSpace >> dataSize [
 	^reservedLimit - base * 2
 ]
 
 { #category : #actions }
-GCSpace >> deepCopy: object [
-	| copy class ivars |
-	copy := self shallowCopy: object.
-	class := copy class.
-	ivars := class _instancesAreFixed ifTrue: [0] ifFalse: [self basicSize].
-	class _instancesHavePointers ifTrue: [
-		1 to: ivars + class instSize do: [:index | | ivar c |
-			ivar := self basicInstVarAt: index.
-			ivar _isSmallInteger ifFalse: [
-				c := self shallowCopy: ivar.
-				copy basicInstVarAt: index put: c]]].
-	^copy
+GCSpace >> decommitIfPossible: anInteger [
+	| delta dispense limit min newsoft |
+	delta := anInteger bitAnd: -0x1000 _asPointer.
+	dispense := 64 kbytes.
+	limit := commitedLimit - delta.
+	min := base + 2 mbytes _asPointer.
+	commitedLimit <= min ifTrue: [^self].
+	limit := limit max: min.
+	newsoft := limit - dispense.
+	newsoft < nextFree ifTrue: [^self].
+	Kernel os decommit: limit * 2 size: delta * 2.
+	softLimit := newsoft.
+	commitedLimit := limit
 ]
 
 { #category : #actions }
@@ -241,22 +256,27 @@ GCSpace >> dispenseReservedSpace [
 	softLimit := commitedLimit
 ]
 
-{ #category : #accessing }
+{ #category : #finalization }
 GCSpace >> finalize [
-	Smalltalk os free: base.
+	Kernel os release: base
 ]
 
-{ #category : #accessing }
+{ #category : #enumeration }
+GCSpace >> firstObject [
+	^base _objectFromBasePointer
+]
+
+{ #category : #inquiries }
 GCSpace >> histogram [
 	| sizes |
 	sizes := Dictionary new.
 	^self histogramInto: sizes
 ]
 
-{ #category : #accessing }
+{ #category : #inquiries }
 GCSpace >> histogramInto: sizes [
 	self objectsDo: [:object | | size association |
-		size := object _sizeInBytes.
+		size := object _bodySizeInBytes.
 		association := sizes associationAt: object class ifAbsent: nil.
 		association
 			ifNil: [sizes at: object class put: size]
@@ -270,14 +290,18 @@ GCSpace >> includes: anObject [
 		and: [anObject _asPointer between: base and: commitedLimit]
 ]
 
-{ #category : #initialization }
-GCSpace >> initialize [
-	self initializeMutex
+{ #category : #testing }
+GCSpace >> includesAddress: anInteger [
+	^anInteger between: base and: commitedLimit
 ]
 
-{ #category : #initialization }
-GCSpace >> initializeMutex [
-	mutex := #[16rFF 16rFF 16rFF 16rFF] shallowCopy
+{ #category : #actions }
+GCSpace >> increaseSoftLimit: anInteger [
+	| available |
+	available := commitedLimit - softLimit.
+	available <= 0x8000 _asPointer ifTrue: [^false].
+	softLimit := softLimit + (anInteger min: available - 0x4000 _asPointer).
+	^true
 ]
 
 { #category : #testing }
@@ -292,18 +316,32 @@ GCSpace >> isReferredBy: object [
 ]
 
 { #category : #actions }
-GCSpace >> leaveDispenseSpace [
-	self leaveDispenseSpace: 4096
-]
-
-{ #category : #actions }
 GCSpace >> leaveDispenseSpace: anInteger [
-	self softLimit: self commitedLimit - anInteger
+	softLimit := commitedLimit - anInteger.
+	softLimit >= nextFree
+		ifFalse: [self _error: 'GC space was asked for too much dispensed space']
 ]
 
 { #category : #actions }
-GCSpace >> lock [
-	mutex _busyWait
+GCSpace >> lockedAllocateCommittingIfNeeded: size [
+	"
+	take into account that committing more memory could cause
+	 allocation, so after doing it we recalculate our answer
+	"
+	| answer next |
+	answer := nextFree.
+	next := answer + size _asPointer.
+	next <= softLimit ifTrue: [
+		nextFree := next.
+		^answer].
+	self commitMoreMemory: next.
+	answer := nextFree.
+	next := answer + size _asPointer.
+	^next <= softLimit
+		ifTrue: [
+			nextFree := next.
+			answer]
+		ifFalse: [nil]
 ]
 
 { #category : #actions }
@@ -317,15 +355,6 @@ GCSpace >> lockedAllocateIfPossible: size [
 ]
 
 { #category : #actions }
-GCSpace >> lockedAllocateUnsafe: size [
-	| answer |
-	answer := nextFree.
-	nextFree := nextFree + size _asPointer.
-	nextFree >= commitedLimit ifTrue: [self commitMoreMemory].
-	^answer
-]
-
-{ #category : #enumeration }
 GCSpace >> make: anObject become: anotherObject [
 	"
 	should use objectsDo:, but using blocks creates
@@ -349,9 +378,24 @@ GCSpace >> markedDo: aBlock [
 		objectsDo: [:object | object _hasBeenSeen ifTrue: [aBlock value: object]]
 ]
 
-{ #category : #actions }
-GCSpace >> newExtendedArray: size [
-	^self shallowCopy: #() growingTo: size
+{ #category : #accessing }
+GCSpace >> memory [
+	^memory
+]
+
+{ #category : #accessing }
+GCSpace >> memory: aMemory [
+	memory := aMemory
+]
+
+{ #category : #accessing }
+GCSpace >> name [
+	^name
+]
+
+{ #category : #accessing }
+GCSpace >> name: aString [
+	name := aString
 ]
 
 { #category : #accessing }
@@ -375,12 +419,12 @@ GCSpace >> objectsDo: aBlock [
 		aBlock value: object]
 ]
 
-{ #category : #accessing }
+{ #category : #inquiries }
 GCSpace >> percentageOfCommitedUsed [
 	^self used * 100 // self commitedSize
 ]
 
-{ #category : #accessing }
+{ #category : #inquiries }
 GCSpace >> percentageOfReservedUsed [
 	^self used * 100 // self reservedSize
 ]
@@ -391,22 +435,59 @@ GCSpace >> prevBase [
 ]
 
 { #category : #accessing }
-GCSpace >> prevBase: anInteger [
-	prevBase := anInteger
+GCSpace >> prevBase: address [
+	prevBase := address
 ]
 
-{ #category : #actions }
+{ #category : #inquiries }
+GCSpace >> prevOffset [
+	^base - prevBase
+]
+
+{ #category : #printing }
 GCSpace >> printOn: stream [
 	| commited reserved used |
 	commited := (self commitedSize * 2 // 1024) printString , ' kb'.
 	reserved := (self reservedSize * 2 // 1024) printString , ' kb reserved'.
 	used := self percentageOfReservedUsed printString , '% used'.
-	stream nextPutAll: '[ ' , commited , ' (' , reserved , ') ' , used , ' ]'
+	name printOn: stream.
+	stream nextPutAll: ' [ ' , commited , ' (' , reserved , ') ' , used , ' ]'
 ]
 
 { #category : #actions }
-GCSpace >> release [
-	mutex _release
+GCSpace >> relocate: offset [
+	prevBase := base.
+	base := base + offset.
+	commitedLimit := commitedLimit + offset.
+	nextFree := nextFree + offset.
+	reservedLimit := reservedLimit + offset.
+	softLimit := softLimit + offset
+]
+
+{ #category : #actions }
+GCSpace >> relocatingSetUp [
+	| reserved committed address offset limit |
+	reserved := reservedLimit - base * 2.
+	committed := commitedLimit - base * 2.
+	prevBase := base.
+	address := Kernel os reserve: reserved at: base * 2.
+	address = 0 ifTrue: [
+		limit := prevBase < 4 gbytes ifTrue: [4 gbytes] ifFalse: [1 << 64].
+		address := Kernel os reserve: reserved near: prevBase limit: limit.
+		address = 0 ifTrue: [Kernel os lastError]].
+	base := address // 2.
+	offset := base - prevBase.
+	commitedLimit := commitedLimit + offset.
+	nextFree := nextFree + offset.
+	reservedLimit := reservedLimit + offset.
+	softLimit := softLimit + offset.
+	address := Kernel os commit: committed at: base * 2.
+	address = 0 ifTrue: [Kernel os lastError]
+]
+
+{ #category : #inquiries }
+GCSpace >> reservedBytes [
+	^reservedLimit - base * 2
 ]
 
 { #category : #accessing }
@@ -419,7 +500,7 @@ GCSpace >> reservedLimit: anInteger [
 	reservedLimit := anInteger
 ]
 
-{ #category : #accessing }
+{ #category : #inquiries }
 GCSpace >> reservedSize [
 	^reservedLimit - base
 ]
@@ -430,9 +511,14 @@ GCSpace >> reset [
 ]
 
 { #category : #actions }
+GCSpace >> resetSoftLimit: anInteger [
+	softLimit := nextFree + anInteger min: commitedLimit
+]
+
+{ #category : #actions }
 GCSpace >> shallowCopy: object [
 	| size extra allocation oop copy |
-	size := object _sizeInBytes.
+	size := object _bodySizeInBytes.
 	extra := object _headerSizeInBytes.
 	allocation := self allocateIfPossible: extra + size.
 	allocation _isSmallInteger ifFalse: [^0].
@@ -446,27 +532,27 @@ GCSpace >> shallowCopy: object [
 ]
 
 { #category : #actions }
-GCSpace >> shallowCopy: array growingTo: newSize [
-	| headerSize total buffer copy |
-	headerSize := 16.
-	total := headerSize + (newSize * WordSize).
-	buffer := self allocateUnsafe: total.
-	copy := (buffer + headerSize _asPointer) _asObject.
-	copy _copyBasicHeaderFrom: array; _makeExtendedSize: newSize.
-	1
-		to: array _size
-		do: [:index | copy _basicAt: index put: (array _basicAt: index)].
-	array _size + 1 to: newSize do: [:i | copy _basicAt: i put: nil].
-	copy _beNotRemembered; _beUnseen.
+GCSpace >> shallowCopyCommiting: object [
+	| size extra allocation oop copy |
+	size := object _bodySizeInBytes.
+	extra := object _headerSizeInBytes.
+	allocation := self allocateCommittingIfNeeded: extra + size.
+	allocation _isSmallInteger ifFalse: [^nil].
+	oop := allocation + extra _asPointer.
+	copy := oop _asObject.
+	copy
+		_copyHeaderSized: extra from: object;
+		_replaceFrom: 1 to: (size bitShift: 0 - WordSizeShift) with: object;
+		_beNotRemembered.
 	^copy
 ]
 
-{ #category : #accessing }
+{ #category : #inquiries }
 GCSpace >> size [
 	^reservedLimit - base
 ]
 
-{ #category : #accessing }
+{ #category : #inquiries }
 GCSpace >> softAvailable [
 	^softLimit - nextFree
 ]
@@ -492,7 +578,7 @@ GCSpace >> unmarkedDo: aBlock [
 		objectsDo: [:object | object _hasBeenSeen ifFalse: [aBlock value: object]]
 ]
 
-{ #category : #accessing }
+{ #category : #inquiries }
 GCSpace >> used [
 	^nextFree - base
 ]
