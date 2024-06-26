@@ -16,7 +16,7 @@ NativizationPlatform class >> host [
 
 	| host |
 
-	host := Smalltalk host.
+	host := Kernel host.
 	host = 'x86_64-linux-gnu' ifTrue:[ ^ self x86_64_linux_gnu ].
 	host = 'x86_64-darwin' ifTrue:[ ^ self x86_64_darwin ].
 	host = 'x86_64-win32' ifTrue:[ ^self x86_64_win32 ].
@@ -106,7 +106,7 @@ NativizationPlatform >> newCodeGenerator [
 
 { #category : #'instance creation' }
 NativizationPlatform >> newAssembler [
-	^ Assembler new platform: self
+	^ abi newAssembler
 ]
 
 { #category : #'printing & storing' }

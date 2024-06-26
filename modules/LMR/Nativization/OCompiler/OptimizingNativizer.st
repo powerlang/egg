@@ -171,7 +171,7 @@ OptimizingNativizer >> inlineMethods [
 OptimizingNativizer >> irFor: aCompiledMethod [
 	| visitor ir cm |
 	visitor := OptimizingVisitor new.
-	cm := (BeeNativizationEnvironment isUndermethod: aCompiledMethod selector)
+	cm := (SendSite isUndermethod: aCompiledMethod selector)
 		ifTrue: [ProtoObject >> aCompiledMethod selector]
 		ifFalse: [aCompiledMethod].
 	ir := visitor visit: cm parseTree.

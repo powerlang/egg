@@ -255,7 +255,7 @@ TemplateJIT >> emitWriteBarrier [
 { #category : #accessing }
 TemplateJIT >> environment: aNativizationEnvironment [
 	environment := aNativizationEnvironment.
-	assembler := environment platform newAssembler
+	assembler := environment newAssembler
 ]
 
 { #category : #services }

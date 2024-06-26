@@ -2,26 +2,16 @@ Class {
 	#name : #LookupNativizer,
 	#superclass : #Object,
 	#instVars : [
-		'bootstrapper',
+		'nativizer',
 		'methods'
 	],
 	#category : #'Powerlang-Core-Building'
 }
 
 { #category : #'as yet unclassified' }
-LookupNativizer >> >> aSymbol [
-	^bootstrapper spec at: aSymbol
-]
-
-{ #category : #accessing }
-LookupNativizer >> bootstrapper: aSmalltalkBootstrapper [
-	bootstrapper := aSmalltalkBootstrapper
-]
-
-{ #category : #'as yet unclassified' }
 LookupNativizer >> closureMethods [
 	^ self selectorLookupMethods , self globalLookupMethods
-		, self otherLookupMethods , bootstrapper undermethods
+		, self otherLookupMethods , nativizer class undermethods
 		, self sendSiteMethods
 ]
 
@@ -30,12 +20,12 @@ LookupNativizer >> globalLookupMethods [
 	| result out global |
 	result := OrderedCollection new.
 	result
-		add: (self >> #ProtoObject) >> #_cachedLookup:;
-		add: (self >> #ProtoObject) >> #_cachedLookup:in:;
-		add: (self >> #Thread) metaclass >> #currentGlobalLookup;
-		add: (self >> #GlobalDispatchCache) metaclass >> #current.
+		add: ProtoObject >> #_cachedLookup:;
+		add: ProtoObject >> #_cachedLookup:in:;
+		add: Thread metaclass >> #currentGlobalLookup;
+		add: GlobalDispatchCache metaclass >> #current.
 	out := #(initialize flushAll: #flush:forSpecies: #flush:for: #flush:for:startingAt:).
-	global := (self >> #GlobalDispatchCache) methods
+	global := (GlobalDispatchCache methods
 		reject: [ :m | out includes: m selector ].
 	^ result
 		addAll: global;
@@ -56,18 +46,23 @@ LookupNativizer >> methods [
 { #category : #accessing }
 LookupNativizer >> nativizeMethods [
 	| environment | 
-	methods := self closureMethods collect: [:m | bootstrapper compile: m ].
+	methods := self closureMethods collect: [:m | nativizer compile: m ].
 	environment := self newNativizationEnvironment.
 	methods do: [:m | environment nativize: m]
+]
+
+{ #category : #accessing }
+LookupNativizer >> nativizer: aNativizationEnvironment [
+	nativizer := aNativizationEnvironment
 ]
 
 { #category : #'instance creation' }
 LookupNativizer >> newNativizationEnvironment [
 	| environment ignored lookup invoke |
 	environment := NativizationEnvironment new 
-		platform: bootstrapper platform;
-		globals: bootstrapper nativizer globals;
-		optimizedMethods: bootstrapper nativizer optimizedMethods.
+		platform: nativizer platform;
+		globals: nativizer globals;
+		optimizedMethods: nativizer optimizedMethods.
 	ignored := HaltingSend new
 		filter: #(< <= = > + - * // bitAnd: bitOr: bitXor:).
 	lookup := LookupLinker new initializeFrom: environment.
@@ -87,33 +82,32 @@ LookupNativizer >> newNativizationEnvironment [
 { #category : #'as yet unclassified' }
 LookupNativizer >> otherLookupMethods [
 	^ OrderedCollection new
-		add: self >> #ProtoObject >> #objectAtValid:put:;
-		add: self >> #ProtoObject >> #behavior;
-		add: self >> #CompiledMethod >> #prepareForExecution;
-		add: self >> #CompiledMethod >> #isNativized;
-		add: self >> #CompiledMethod >> #validNativeCodeAddress;
-		add: self >> #CompiledMethod >> #nativeCode;
-		add: self >> #CompiledMethod >> #selector;
-		add: self >> #NativeCode >> #code;
-		add: self >> #NativeCode >> #compiledCode;
-		add: self >> #Species >> #instanceBehavior;
-		add: self >> #Process >> #wantsToStepInto;
+		add: ProtoObject >> #objectAtValid:put:;
+		add: ProtoObject >> #behavior;
+		add: CompiledMethod >> #prepareForExecution;
+		add: CompiledMethod >> #isNativized;
+		add: CompiledMethod >> #validNativeCodeAddress;
+		add: CompiledMethod >> #nativeCode;
+		add: CompiledMethod >> #selector;
+		add: NativeCode >> #code;
+		add: NativeCode >> #compiledCode;
+		add: Species >> #instanceBehavior;
+		add: Process >> #wantsToStepInto;
 		yourself
 ]
 
 { #category : #'as yet unclassified' }
 LookupNativizer >> selectorLookupMethods [
 	^ OrderedCollection new
-		add: (self >> #ProtoObject) >> #_lookup:;
-		add: (self >> #ProtoObject) >> #_lookup:in:;
-		add: (self >> #ProtoObject) >> #_lookup:inDictionary:;
+		add: SendSite >> #_lookup:;
+		add: SendSite >> #_lookup:in:;
+		add: SendSite >> #_lookup:inDictionary:;
 		yourself
 ]
 
 { #category : #'as yet unclassified' }
 LookupNativizer >> sendSiteMethods [
 	| sendsite |
-	sendsite := self >> #SendSite.
 	^ #(_dispatchOn: _dispatchOn:startingAt: _dispatchDebuggableOn: _dispatchDebuggableOn:startingAt: sentSelector when:use: beInvoke:using: bePolymorphic isStaticSend monomorphicMap:to: polymorphicMap:to: maxSize reset takeNextFreeMIC takeNextFreePIC)
-		collect: [ :s | sendsite >> s ]
+		collect: [ :s | SendSite >> s ]
 ]

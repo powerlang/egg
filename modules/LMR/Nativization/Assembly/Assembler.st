@@ -901,13 +901,6 @@ Assembler >> loadSwithGindex: index [
 ]
 
 { #category : #loading }
-Assembler >> loadSwithGlobal: aSymbol [
-	| index |
-	index := NativizationEnvironment indexOfGlobal: aSymbol.
-	self loadSwithGindex: index
-]
-
-{ #category : #loading }
 Assembler >> loadSwithNil [
 	self subclassResponsibility
 ]
