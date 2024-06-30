@@ -26,8 +26,9 @@ and intentions are:
 ## Contents of this repo
 
 This repository includes the Smalltalk sources of Egg (in `modules` directory) as
-well as the different runtime implementations (`runtimes` directory) and the
-mechanisms to generate images from scratch (`bootstrap` directory).
+well as the different runtime implementations (`runtimes` directory). Some runtimes
+allow to generate Egg images from files, i.e. to bootstrap images (currently only possible
+from `runtime/pharo`).
 
 ## Using
 
