@@ -11,16 +11,13 @@ Class {
 		'methods', 
 		'module', 
 		'format'
-	], 
-	#classVars : [
-		'Format'
-	], 
+	],
 	#category : #CodeSpecs
 }
 
 {#category : #initialization}
 SpeciesSpec class >> initializeFormatMasks [
-	Format := PoolDictionary newConstantPool.
+	self addNamespaceAs: #Format.
 	Format
 		at: 'IsArrayed' put: 0x1;
 		at: 'IsBytes' put: 0x2
