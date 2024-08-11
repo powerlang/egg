@@ -18,7 +18,7 @@ InvokeLinker >> addMethod: aCompiledMethod for: aSymbol [
 	| instructions send |
 	filter add: aSymbol.
 	instructions := invoker ifNil: [ aCompiledMethod nativeCode code ].
-	send := SendSite new invoke: aCompiledMethod using: instructions.
+	send := SendSite invoking: aCompiledMethod using: instructions.
 	sends at: aSymbol put: send
 ]
 

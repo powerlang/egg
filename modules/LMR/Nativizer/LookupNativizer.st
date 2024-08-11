@@ -24,8 +24,8 @@ LookupNativizer >> globalLookupMethods [
 		add: ProtoObject >> #_cachedLookup:in:;
 		add: Thread metaclass >> #currentGlobalLookup;
 		add: GlobalDispatchCache metaclass >> #current.
-	out := #(initialize flushAll: #flush:forSpecies: #flush:for: #flush:for:startingAt:).
-	global := (GlobalDispatchCache methods
+	out := #(initialize flushAll: flush:forSpecies: flush:for: flush:for:startingAt:).
+	global := GlobalDispatchCache methods
 		reject: [ :m | out includes: m selector ].
 	^ result
 		addAll: global;

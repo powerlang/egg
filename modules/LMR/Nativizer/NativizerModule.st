@@ -7,14 +7,14 @@ Class {
 	#name : #NativizerModule,
 	#superclass : #Module,
 	#instVars : [
-		'environment',
+		'environment'
 	],
 	#category : #Nativization
 }
 
 
 { #category : #bootstrapping }
-NativizerModule >> bootstrap: anLMRModule for: aPlatform [
+NativizerModule >> bootstrap: anLMRModule with: aPlatform [
 	environment := self newNativizationEnvironmentFor: aPlatform.
 
 	self
@@ -29,42 +29,60 @@ NativizerModule >> bootstrap: anLMRModule for: aPlatform [
 { #category : #spec }
 NativizerModule >> imports [
 	^{
-		#Kernel -> #(Behavior CharacterArray Closure CompiledBlock CompiledMethod Float OrderedCollection Species String).
-		#LMR -> #(CriticalArray GCSpace GlobalDispatchCache Memory NativeCode SendSite Thread)
+		#Kernel -> #(Behavior CharacterArray Closure CompiledBlock CompiledMethod Float OrderedCollection ProtoObject Species String).
+		#Kernel.LMR -> #(LMRProtoObject LMRFloat LMRSpecies).
+		#LMR -> #(CriticalArray GCSpace GlobalDispatchCache Memory NativeCode SendSite Thread).
 	}
-] 
+]
+
+{ #category : #bootstrapping }
+NativizerModule >> initializeFor: anLMRModule with: aPlatform [
+	environment := self newNativizationEnvironmentFor: aPlatform.
+	environment initializeLinkersFor: anLMRModule; completeInitialization
+]
+
 
 { #category : #accessing }
 NativizerModule >> inlinedMethods [
 	| map |
 	map := {
-		(ProtoObject -> #(#objectAtValid: #objectAtValid:put: #behavior #class #primitiveAt: #_cachedLookup: #_cachedLookup:in:)).
-		(Object -> #(#byteAtValid: #byteAtValid:put: #basicObjectIndexOf: #at:put:)).
-		(Species -> #(#instSize #_instancesAreArrayed #_instancesHavePointers #memory #instanceBehavior #primitiveNew #primitiveNew:)).
-		(CompiledMethod -> #(#prepareForExecution #isNativized #nativeCode #blockCount #literalIndexFrom:)).
+		(ProtoObject -> #(#basicObjectIndexOf: #class #objectAtValid: #objectAtValid:put:)).
+		(LMRProtoObject -> #(#behavior #primitiveAt: #_cachedLookup: #_cachedLookup:in:)).
+		(Object -> #(#byteAtValid: #byteAtValid:put: #at:put:)).
+		(Species -> #(#instSize #_instancesAreArrayed #_instancesHavePointers #instanceBehavior)).
+		(LMRSpecies -> #(#memory #primitiveNew #primitiveNew:)).
+		(CompiledMethod -> #(#prepareForExecution #isNativized #executableCode #blockCount #literalIndexFrom:)).
 		(CompiledBlock -> #(#argumentCount #blockNumber #blockCode #method)).
 		(NativeCode -> #(#code)).
 		(GCSpace -> #(#commitedLimit #nextFree #nextFree:)).
 		(CharacterArray -> #(#characterAtValid:))}.
-	^SendSite undermethods , (self methodSubset: map)
+	^self undermethods , (self methodSubset: map)
 ]
 
 { #category : #accessing }
 NativizerModule >> invokedMethods [
 	| map |
 	map := {
-		(ProtoObject -> #(behavior class primitiveAt: #initializeExtended:contentSize:)).
-		(Object -> #(#_replaceFrom:to:with:)).
-		(Species -> #(#allocate:size: instanceBehavior _instancesAreArrayed _instancesHavePointers #nil:slotsOf: memory primitiveNewBytes: primitiveNewPointers: #zero:bytesOf:))}.
-	^SendSite undermethods , (self methodSubset: map)
+		(ProtoObject -> #(class)).
+		(LMRProtoObject -> #(behavior #initializeExtended:contentSize: primitiveAt:)).
+		(Object -> #(_replaceFrom:to:with:)).
+		(Species -> #(instanceBehavior _instancesAreArrayed _instancesHavePointers)).
+		(LMRSpecies -> #(allocate:size: nil:slotsOf: memory primitiveNewBytes: primitiveNewPointers: zero:bytesOf:))}.
+	^self undermethods , (self methodSubset: map)
 ]
 
 { #category : #accessing }
-NativizerModule >> methodSubset: aDictionary [
-	| result |
+NativizerModule >> justLoaded [
+	InlineMessageLinker initializeInlineMessageLinkerFlags
+]
+
+{ #category : #accessing }
+NativizerModule >> methodSubset: associations [
+	| result dict |
 	result := OrderedCollection new.
-	aDictionary keysAndValuesDo: [ :species :selectors | 
-		selectors collect: [:sel | | m | species >> sel ifNil: [self ASSERT: false] ] into: result].
+	dict := Dictionary withAll: associations.
+	dict keysAndValuesDo: [ :species :selectors | 
+		selectors collect: [:sel | | m | species >> sel ifNil: [self ASSERT: false] ] in: result].
 	^result
 ]
 
@@ -72,19 +90,20 @@ NativizerModule >> methodSubset: aDictionary [
 NativizerModule >> optimizedMethods [
 	| map |
 	map := {
-		(ProtoObject -> #(behavior class primitiveAt: #primitiveAt:put: #initializeExtended:contentSize:)).
-		(Object -> #(at: #at:put: basicByteAt: #basicByteAt:put: byteAtValid: #byteAtValid:put:
-					 basicObjectAt: #basicObjectAt:put: #replaceBytesForwardFrom:to:with:startingAt:)).
+		(ProtoObject -> #(basicByteAt: #basicByteAt:put: basicObjectAt: #basicObjectAt:put: class)).
+		(LMRProtoObject -> #(behavior primitiveAt: #primitiveAt:put: #initializeExtended:contentSize:)). 
+		(Object -> #(at: #at:put: byteAtValid: #byteAtValid:put: #replaceBytesForwardFrom:to:with:startingAt:)).
 		(SendSite -> #(_dispatchOn: #_dispatchOn:startingAt: _dispatchDebuggableOn: #_dispatchDebuggableOn:startingAt:)).
-		(Species -> #(#allocate:size: primitiveNew primitiveNew: instSize primitiveNewBytes: primitiveNewPointers:)).
-		(Float class -> #(new)).
+		(Species -> #(instSize)).
+		(LMRSpecies -> #(allocate:size: primitiveNew primitiveNew: primitiveNewBytes: primitiveNewPointers:)).
+		(LMRFloat class -> #(new)).
 		(CompiledBlock -> #(argumentCount arity blockCode method)).
 		(Closure -> #(value value: #value:value:)).
 		(CompiledMethod -> #(blockCount isNativized)).
 		(String -> #(at: #at:put: byteAt: #byteAt:put:)).
-		(GCSpace -> #(lockedAllocateIfPossible: lockedAllocateUnsafe: shallowCopy:)).
+		(GCSpace -> #(lockedAllocateIfPossible: shallowCopy:)).
 		(Memory -> #(shallowCopy:))}.
-	^SendSite undermethods , (self methodSubset: map)
+	^self undermethods , (self methodSubset: map)
 ]
 
 { #category : #bootstrapping }
@@ -104,8 +123,8 @@ NativizerModule >> nativizeLookupFor: anLMRModule [
 	lookup := nativizer methodFor: #_dispatchOn:.
 	lookupSuper := nativizer methodFor: #_dispatchOn:startingAt:.
 	anLMRModule
-		mapGlobal: #Lookup to: lookup nativeCode;
-		mapGlobal: #LookupSuper to: lookupSuper nativeCode
+		mapGlobal: #Lookup to: lookup executableCode;
+		mapGlobal: #LookupSuper to: lookupSuper executableCode
 ]
 
 { #category : #bootstrapping }
@@ -220,7 +239,7 @@ NativizerModule >> nativizeWriteBarrierFor: anLMRModule [
 		messageLinker: dispatcher;
 		completeInitialization;
 		nativizeOptimizing: barrier.
-	anLMRModule mapGlobal: #WriteBarrier to: barrier nativeCode
+	anLMRModule mapGlobal: #WriteBarrier to: barrier executableCode
 ]
 
 { #category : #services }
@@ -230,4 +249,9 @@ NativizerModule >> newNativizationEnvironmentFor: aPlatform [
 		inlinedMethods: self inlinedMethods;
 		invokedMethods: self invokedMethods;
 		optimizedMethods: self optimizedMethods
+]
+
+{ #category : #services }
+NativizerModule >> undermethods [
+	^SendSite undermethods
 ]
