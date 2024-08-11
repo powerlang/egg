@@ -3,10 +3,14 @@
 	See (MIT) license in root directory.
 "
 
-Extension { #name : #Symbol }
+Class {
+	#name : #LMRSymbol,
+	#superclass : #Symbol,
+	#category : #Kernel
+}
 
 { #category : #private }
-Symbol >> flushCacheFor: species [
+LMRSymbol >> flushCacheFor: species [
 	GlobalDispatchCache current flush: self forSpecies: species.
 	SendSite flush: self
 ]
