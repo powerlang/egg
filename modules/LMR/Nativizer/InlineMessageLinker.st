@@ -5,12 +5,20 @@ Class {
 		'assembler',
 		'map'
 	],
-	#pools : [
-		'InlineMessageLinkerFlags',
-		'Registers'
-	],
 	#category : #Nativization
 }
+
+{ #category : #private }
+InlineMessageLinker class >> initializeInlineMessageLinkerFlags [
+	self addNamespaceAs: #InlineMessageLinkerFlags.
+	InlineMessageLinkerFlags
+		at: #_Flags put: -5;
+		at: #_SmallSize put: -6;
+		at: #_Hash put: -8;
+		at: #_Reserved put: -2;
+		at: #_ExtendedSize put: -3.
+
+]
 
 { #category : #private }
 InlineMessageLinker class >> supported [
