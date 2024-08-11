@@ -5,11 +5,15 @@
 
 Class {
 	#name : #SendSite,
-	#superclass : #DispatchSite,
-	#instVars : [
+	#superclass : #Object,
+	#instVars: [
+		'instructions',
+		'cache',
+		'format',
+		'token',
+		'tally'
 	],
 	#classVars : [
-		'FormatFlags',
 		'Instances',
 		'Invoke',
 		'LookupCount',
@@ -64,15 +68,12 @@ SendSite class >> flushInstances [
 
 { #category : #initialization }
 SendSite class >> initializeFormatFlags [
-	"
-	SendSite initializeFormatFlags
-	"
-	FormatFlags := self addNamespace
-		at: #IsStaticSend put: 16r1;
-		at: #IsSuperSend put: 16r2;
-		at: #IsPolymorphic put: 16r4;
-		at: #HasBeenReset put: 16r8;
-		yourself
+	self addNamespaceAs: #FormatFlags.
+	FormatFlags
+		at: #IsStaticSend put: 0x1;
+		at: #IsSuperSend put: 0x2;
+		at: #IsPolymorphic put: 0x4;
+		at: #HasBeenReset put: 0x8
 ]
 
 { #category : #initialization }
@@ -97,8 +98,12 @@ SendSite class >> instances [
 
 { #category : #'instance creation' }
 SendSite class >> invoking: aCompiledMethod using: instructions [
-	^self new beStaticSend; beInvoke: aCompiledMethod
-	using: instructions
+	^self new beStaticSend; beInvoke: aCompiledMethod using: instructions
+]
+
+{ #category : #testing }
+SendSite class >> isUndermethod: aSelector [
+	^self undermethodSelectors includes: aSelector
 ]
 
 { #category : #accessing }
@@ -111,9 +116,23 @@ SendSite class >> mics [
 	^MICs
 ]
 
-{ #category : #'instance creation' }
-SendSite class >> new [
-	^self basicNew initialize
+{ #category : #private }
+SendSite class >> objectStaticSelectors [
+	"
+		self undermethodSelectors asArray sort
+	"
+		^#(
+_beArrayed _beBytes _beLarge _beNamed _beNotRemembered _beRemembered _beSecondGeneration _beSeen _beSmall _beSpecial _beNotSpecial _beUnseen _copyBasicHeaderFrom: _copyHeaderSized:from: _flagsMask: _flagsSet: _hasBeenSeen _headerSizeInBytes _isArrayed _isBytes _isEphemeron _isFixed _isLarge _hasNamedSlots _isProxy _isRemembered _isSecondGeneration _isSmall _isSpecial _largeSize: _nextBasePointer _objectFromBasePointer _pointersSize _size _sizeInBytes _strongPointersSize )
+]
+
+{ #category : #private }
+SendSite class >> optimizedStaticSelectors [
+	^#(#basicByteAt: #basicByteAt:put: #byteAtValid: #byteAtValid:put:
+		#basicObjectAt: #basicObjectAt:put: #behavior #class #allocate:size:
+		 #memory #instanceBehavior
+		#_instancesAreArrayed #_instancesHavePointers #nil:slotsOf:
+		#initializeExtended:contentSize: #primitiveNew
+		#primitiveNewBytes: #primitiveNewPointers: #_return: #_returnTo: #zero:bytesOf:)
 ]
 
 { #category : #private }
@@ -149,8 +168,19 @@ SendSite class >> reserveMorePICsWith: aNativeCode [
 ]
 
 { #category : #'instance creation' }
-SendSite class >> sending: aSelector with: instructions [
-	^self new selector: aSelector; instructions: instructions
+SendSite class >> sending: selector with: instructions [
+	^self new selector: selector; instructions: instructions
+]
+
+{ #category : #private }
+SendSite class >> undermethods [
+	^LMRProtoObject methodDictionary values asArray select: [:m | m selector beginsWith: '_']
+]
+
+{ #category : #private }
+SendSite class >> undermethodSelectors [
+	"^self organization selectorsFor: 'header access'"
+	^self undermethods collect: [:method | method selector]
 ]
 
 { #category : #private }
@@ -180,8 +210,8 @@ SendSite >> _dispatchDebuggableOn: anObject [
 	#self -> #regA.
 	#specialABIEnd.
 	LookupCount := LookupCount + 1.
-	cm := anObject _cachedLookup: selector.
-	cm == nil ifTrue: [^anObject doesNotUnderstandSelector: selector].
+	cm := anObject _cachedLookup: token.
+	cm == nil ifTrue: [^anObject doesNotUnderstandSelector: token].
 	invoked := Processor activeProcess wantsToStepInto
 		ifTrue: [cm debuggableCopy]
 		ifFalse: [cm].
@@ -200,8 +230,8 @@ SendSite >> _dispatchDebuggableOn: anObject startingAt: aBehavior [
 	#aBehavior -> #regT.
 	#specialABIEnd.
 	LookupCount := LookupCount + 1.
-	cm := anObject _cachedLookup: selector in: aBehavior.
-	cm == nil ifTrue: [^anObject doesNotUnderstandSelector: selector].
+	cm := anObject _cachedLookup: token in: aBehavior.
+	cm == nil ifTrue: [^anObject doesNotUnderstandSelector: token].
 	invoked := Processor activeProcess wantsToStepInto
 		ifTrue: [cm debuggableCopy]
 		ifFalse: [cm].
@@ -219,8 +249,8 @@ SendSite >> _dispatchOn: anObject [
 	#self -> #regA.
 	#specialABIEnd.
 	LookupCount := LookupCount + 1.
-	cm := anObject _cachedLookup: selector.
-	cm == nil ifTrue: [^anObject doesNotUnderstandSelector: selector].
+	cm := anObject _cachedLookup: token.
+	cm == nil ifTrue: [^anObject doesNotUnderstandSelector: token].
 	cm prepareForExecution.
 	nativeCode := cm nativeCode.
 	self when: anObject behavior use: nativeCode.
@@ -236,8 +266,8 @@ SendSite >> _dispatchOn: anObject startingAt: aBehavior [
 	#aBehavior -> #regT.
 	#specialABIEnd.
 	LookupCount := LookupCount + 1.
-	cm := anObject _cachedLookup: selector in: aBehavior.
-	cm == nil ifTrue: [^anObject doesNotUnderstandSelector: selector].
+	cm := anObject _cachedLookup: token in: aBehavior.
+	cm == nil ifTrue: [^anObject doesNotUnderstandSelector: token].
 	cm prepareForExecution.
 	nativeCode := cm nativeCode.
 	self beInvoke: cm using: Invoke.
@@ -291,8 +321,8 @@ SendSite >> flush [
 ]
 
 { #category : #services }
-SendSite >> flush: aSelector [
-	aSelector == selector ifTrue: [self flush]
+SendSite >> flush: aSymbol [
+	aSymbol == token ifTrue: [self flush]
 ]
 
 { #category : #testing }
@@ -352,9 +382,9 @@ SendSite >> isStaticSelector [
 		#_instancesAreArrayed #_instancesHavePointers #nil:slotsOf:
 		#initializeExtended:contentSize: #primitiveNew
 		#primitiveNewBytes: #primitiveNewPointers: #_return: #_returnTo: #zero:bytesOf:)
-		includes: selector)
+		includes: token)
 		ifTrue: [^true].
-	^ProtoObject staticSelectors includes: selector
+	^ProtoObject staticSelectors includes: token
 ]
 
 { #category : #testing }
@@ -425,7 +455,7 @@ SendSite >> printMonomorphicTypeOn: aStream [
 SendSite >> printOn: aStream [
 	aStream
 		nextPutAll: 'SendSite (';
-		nextPutAll: selector;
+		nextPutAll: token;
 		nextPutAll: ') ['.
 	self printTypeOn: aStream.
 	aStream nextPut: $]
@@ -480,19 +510,19 @@ SendSite >> reset [
 
 { #category : #private }
 SendSite >> selector [
-	^selector
+	^token
 ]
 
 { #category : #private }
-SendSite >> selector: aSelector [
-	selector := aSelector.
+SendSite >> selector: aSymbol [
+	token := aSymbol.
 	self isStaticSelector ifTrue: [self beStaticSend].
-	self register
+	Smalltalk isDMR ifTrue: [self register]
 ]
 
 { #category : #private }
 SendSite >> sentSelector [
-	^selector
+	^token
 ]
 
 { #category : #private }

@@ -10,7 +10,7 @@ Class {
 		'contents'
 	],
 	#classVars : [
-		'Shared',
+		'Current',
 		'GlobalLookupCount'
 	],
 	#category : #Kernel
@@ -18,15 +18,12 @@ Class {
 
 { #category : #accessing }
 GlobalDispatchCache class >> current [
-	| current |
-	current := Thread currentGlobalLookup.
-	^current == nil ifTrue: [Shared]
+	^Thread currentGlobalLookup ifNil: [Current]
 ]
 
-{ #category : #initializing }
-GlobalDispatchCache class >> initialize [
-	GlobalLookupCount := 0.
-	Shared := self new
+{ #category : #accessing }
+GlobalDispatchCache class >> current: aCache [
+	Current := aCache
 ]
 
 { #category : #accessing }
