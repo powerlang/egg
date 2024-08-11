@@ -3,10 +3,14 @@
 	See (MIT) license in root directory.
 "
 
-Extension { #name : #Float }
+Class {
+	#name : #LMRFloat,
+	#superclass : #Float,
+	#category : #Kernel
+}
 
 { #category : #'*instance creation' }
-Float class >> new [
+LMRFloat class >> new [
 	^self memory newArrayedBytes: instanceBehavior size: 8.
 ]
 
