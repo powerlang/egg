@@ -11,21 +11,12 @@ Class {
 		'family',
 		'flags'
 	],
-	#pools : [
-		'OperandTypeFlags',
-		'Registers'
-	],
 	#category : #'Powerlang-Core-Assembler-Intel'
 }
 
 { #category : #private }
 Register class >> addRegister: aRegister [
-	Registers at: aRegister name put: aRegister
-]
-
-{ #category : #initialization }
-Register class >> initialize [
-	self initializeRegisters; initializeFamilies
+	Registers at: aRegister name asSymbol put: aRegister
 ]
 
 { #category : #initialization }
@@ -117,12 +108,8 @@ Register class >> initializeRIPRegister [
 { #category : #initialization }
 Register class >> initializeRegisters [
 	
-	"Make sure OperandTypeFlags are initialized since
-	 it is required and order of initialization is not 
-	 defined in Pharo and Smallltalk/X."
-	OperandTypeFlags initialize.
-
 	self
+		addNamespaceAs: #Registers;
 		initialize8BitRegisters;
 		initialize8BitRexRegisters;
 		initialize16BitRegisters;
@@ -169,6 +156,11 @@ Register class >> named: aString [
 	Register named: 'rax'
 	"
 	^Registers at: aString asLowercase ifAbsent: nil
+]
+
+{ #category : #accessing }
+Register class >> registers [
+	^Registers
 ]
 
 { #category : #accessing }

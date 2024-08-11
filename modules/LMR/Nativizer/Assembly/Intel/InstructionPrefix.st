@@ -8,9 +8,6 @@ Class {
 	#instVars : [
 		'name'
 	],
-	#pools : [
-		'Prefixes'
-	],
 	#category : #'Powerlang-Core-Assembler-Intel'
 }
 
@@ -39,10 +36,14 @@ InstructionPrefix class >> fromString: aString [
 
 { #category : #initialization }
 InstructionPrefix class >> initializePrefixes [
-	self == InstructionPrefix
-		ifTrue: [ self allSubclasses do: #initializePrefixes ].
-	self compileAll.
-	self class compileAll
+	self addNamespaceAs: #Prefixes.
+	LegacyPrefix initializePrefixes.
+	REXPrefix initializePrefixes
+]
+
+{ #category : #'instance creation' }
+InstructionPrefix class >> named: aString [
+	^self new name: aString
 ]
 
 { #category : #services }

@@ -11,9 +11,6 @@ Class {
 	#classVars : [
 		'Signatures'
 	],
-	#pools : [
-		'CharacterConstants'
-	],
 	#category : #'Powerlang-Core-Assembler-Intel'
 }
 
@@ -24,7 +21,7 @@ VEXPrefix class >> b [
 
 { #category : #'instance creation' }
 VEXPrefix class >> fromStream: aStream [
-	^self withSignature: (aStream upTo: Space)
+	^self withSignature: (aStream upTo: Character space)
 ]
 
 { #category : #initialization }
@@ -119,14 +116,6 @@ VEXPrefix class >> initializeSignatures [
 { #category : #accessing }
 VEXPrefix class >> l [
 	^2r100
-]
-
-{ #category : #'instance creation' }
-VEXPrefix class >> new [
-	"return an initialized instance"
-
-	^ self basicNew initialize.
-
 ]
 
 { #category : #private }

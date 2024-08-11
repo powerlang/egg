@@ -35,15 +35,7 @@ REXPrefix class >> initializePrefixes [
 			| rex |
 			rex := self new name: s.
 			Prefixes at: s put: rex ].
-	super initializePrefixes.
-	self	compileAll.
-	self class compileAll.
 
-]
-
-{ #category : #'instance creation' }
-REXPrefix class >> new [
-	^super new initialize
 ]
 
 { #category : #services }

@@ -14,10 +14,6 @@ Class {
 	#classVars : [
 		'Types'
 	],
-	#pools : [
-		'OperandTypeFlags',
-		'Registers'
-	],
 	#category : #'Powerlang-Core-Assembler-Intel'
 }
 
@@ -41,13 +37,21 @@ ISAOperandType class >> immediateTypes [
 	^Types select: [:t | t isImmediate]
 ]
 
+
 { #category : #initialization }
-ISAOperandType class >> initialize [
-	OperandTypeFlags initialize.
-	self initializeTypes
-
+ISAOperandType class >> initializeOperandTypeFlags [
+	self addNamespaceAs: #OperandTypeFlags.
+	OperandTypeFlags
+		at: #MemoryType put: 4;
+		at: #RegisterGroupMask put: 3840;
+		at: #ConstantType put: 2;
+		at: #RegisterSIMD put: 256;
+		at: #ImmediateType put: 1;
+		at: #RegisterGP put: 0;
+		at: #RegisterType put: 8;
+		at: #RegisterSegment put: 512;
+		at: #RegisterSpecific put: 768.
 ]
-
 { #category : #initialization }
 ISAOperandType class >> initializeTypes [
 	| dictionary |
@@ -67,6 +71,11 @@ ISAOperandType class >> memoryTypes [
 { #category : #'instance creation' }
 ISAOperandType class >> named: aString [
 	^Types at: aString
+]
+
+{ #category : #initialization }
+ISAOperandType class >> operandTypeFlags [
+	^OperandTypeFlags
 ]
 
 { #category : #services }
@@ -291,7 +300,7 @@ ISAOperandType >> hasImmediateFlag [
 
 { #category : #initialization }
 ISAOperandType >> initializeConstantFlag [
-	type anyOne isDigit ifTrue: [self addFlag: ConstantType]
+	type anyone isDigit ifTrue: [self addFlag: ConstantType]
 
 ]
 
