@@ -42,7 +42,7 @@ SmallInteger >> - aNumber [
 
 { #category : #comparing }
 SmallInteger >> != aNumber [
-	^self == aNumber ifTrue: [false] ifFalse: [true]
+	^self errorVMSpecific
 ]
 
 { #category : #arithmetic }
@@ -57,41 +57,17 @@ SmallInteger >> & anInteger [
 
 { #category : #arithmetic }
 SmallInteger >> * aNumber [
-	aNumber _isSmallInteger ifFalse: [^aNumber * self].
-	^(self _smiTimes: aNumber) ifNil: [self asLargeInteger * aNumber]
+	^self errorVMSpecific
 ]
 
 { #category : #arithmetic }
 SmallInteger >> // aNumber [
-	| result quotient answer |
-	aNumber == 0 ifTrue: [^self zeroDivisorOn: #'//'].
-	aNumber _isSmallInteger
-		ifTrue: [
-			result := self _quotientTowardZero: aNumber.
-			^(self >= 0 = (aNumber >= 0) or: [result * aNumber = self])
-				ifTrue: [result]
-				ifFalse: [result - 1]]
-		ifFalse: [
-			aNumber isInteger
-				ifTrue: [^self = 0 | (self positive = aNumber positive)
-					ifTrue: [0]
-					ifFalse: [-1]].
-			quotient := self / aNumber.
-			answer := quotient truncated.
-			^(quotient < 0 and: [quotient ~= answer])
-				ifTrue: [answer - 1]
-				ifFalse: [answer]]
+	self errorVMSpecific
 ]
 
 { #category : #arithmetic }
 SmallInteger >> \\ aNumber [
-	aNumber == 0 ifTrue: [^self zeroDivisorOn: #'\\'].
-	aNumber _isSmallInteger
-		ifTrue: [^self _remainderTowardZero: aNumber]
-		ifFalse: [
-			aNumber isLargeInteger
-				ifTrue: [aNumber positive == self positive ifTrue: [^self]].
-			^super \\ aNumber]
+	self errorVMSpecific
 ]
 
 { #category : #underprimitives }
@@ -111,8 +87,7 @@ SmallInteger >> ~= aNumber [
 
 { #category : #arithmetic }
 SmallInteger >> + aNumber [
-	aNumber _isSmallInteger ifFalse: [^aNumber + self].
-	^(self _smiPlus: aNumber) ifNil: [self asLargeInteger + aNumber].
+	self errorVMSpecific
 ]
 
 { #category : #arithmetic }
@@ -131,23 +106,17 @@ SmallInteger >> <= aNumber [
 
 { #category : #comparing }
 SmallInteger >> = aNumber [
-	^aNumber _isSmallInteger
-		ifTrue: [self _smiEquals: aNumber] 
-		ifFalse: [aNumber = self]
+	^self errorVMSpecific
 ]
 
 { #category : #comparing }
 SmallInteger >> > aNumber [
-	^aNumber _isSmallInteger
-		ifTrue: [self _smiGreaterThan: aNumber] 
-		ifFalse: [aNumber < self]
+	^self errorVMSpecific
 ]
 
 { #category : #comparing }
 SmallInteger >> >= aNumber [
-	^aNumber _isSmallInteger
-		ifTrue: [self _smiGreaterEqualThan: aNumber] 
-		ifFalse: [aNumber <= self]
+	^self errorVMSpecific
 ]
 
 { #category : #arithmetic }

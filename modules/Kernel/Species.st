@@ -91,20 +91,6 @@ Species >> allInstVarNames [
 	^(self withAllSuperclasses reversed gather: [:class | class instVarNames]) asArray
 ]
 
-{ #category : #'instance creation' }
-Species >> allocate: byteSize size: size [
-	| headerSize totalSize buffer object extended |
-	extended := size > 255.
-	headerSize := extended ifTrue: [16] ifFalse: [8].
-	totalSize := headerSize + byteSize.
-	buffer := self memory allocate: totalSize.
-	object := (buffer + headerSize _asPointer) _asObject.
-	object
-		_basicULongAt: _Behavior put: self instanceBehavior;
-		initializeExtended: extended contentSize: size.
-	^object
-]
-
 { #category : #queries }
 Species >> allSubclasses [
 	| all |
@@ -165,14 +151,12 @@ Species >> allSuperclassesDo: aBlock [
 
 { #category : #'instance creation' }
 Species >> basicNew [
-	^self _instancesAreArrayed
-		ifTrue: [self primitiveNew: 0]
-		ifFalse: [self primitiveNew]
+	^self errorVMSpecific
 ]
 
 { #category : #'instance creation' }
 Species >> basicNew: anInteger [
-	^self primitiveNew: anInteger
+	^self errorVMSpecific
 ]
 
 { #category : #flags }
@@ -399,11 +383,6 @@ Species >> kindOfSubclass [
 	self error: 'invalid type of subclass'
 ]
 
-{ #category : #private }
-Species >> memory [
-	^Memory current
-]
-
 { #category : #accessing }
 Species >> methodDictionary [
 	^instanceBehavior methods
@@ -460,19 +439,12 @@ Species >> methodsWritingInstVar: aString [
 
 { #category : #'instance creation' }
 Species >> new [
-	^self _instancesAreArrayed
-		ifTrue: [self primitiveNew: 0]
-		ifFalse: [self primitiveNew]
+	^self errorVMSpecific
 ]
 
 { #category : #'instance creation' }
 Species >> new: anInteger [
-	^self primitiveNew: anInteger
-]
-
-{ #category : #'instance creation' }
-Species >> nil: size slotsOf: object [
-	object _nilSlots: size
+	^self errorVMSpecific
 ]
 
 { #category : #organization }
@@ -486,31 +458,9 @@ Species >> organization: aClassOrganizer [
 	organization := aClassOrganizer
 ]
 
-{ #category : #unclassified }
-Species >> primitiveNew [
-	^self memory newPointers: instanceBehavior size: self instSize
-]
-
-{ #category : #unclassified }
-Species >> primitiveNew: size [
-	size _isSmallInteger ifFalse: [self error: 'invalid size'].
-	self _instancesAreArrayed ifFalse: [self errorNotIndexable].
-	^self _instancesHavePointers
-		ifTrue: [self primitiveNewPointers: size + self instSize]
-		ifFalse: [self primitiveNewBytes: size]
-]
-
-{ #category : #unclassified }
+{ #category : 'Primitives' }
 Species >> primitiveNewBytes: size [
-	^self memory newArrayedBytes: instanceBehavior size: size
-]
-
-{ #category : #unclassified }
-Species >> primitiveNewPointers: size [
-	^self memory
-		newArrayedPointers: instanceBehavior
-		size: size
-		named: self instSize > 0
+	^self errorVMSpecific
 ]
 
 { #category : #printing }
@@ -605,9 +555,3 @@ Species >> withAllSuperclassesDo: aBlock [
 	aBlock evaluateWith: self.
 	self allSuperclassesDo: aBlock
 ]
-
-{ #category : #'instance creation' }
-Species >> zero: size bytesOf: object [
-	object _zeroSlots: (size bitShift: 0 - WordSizeShift)
-]
-

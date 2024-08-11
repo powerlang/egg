@@ -6,13 +6,13 @@
 Extension { #name : #SmallInteger }
 
 { #category : '*Primitives' }
-SmallInteger >> + aNumber [
-	<primitive: SMIPlus>
+SmallInteger >> - aNumber [
+	<primitive: SMIMinus>
 ]
 
 { #category : '*Primitives' }
-SmallInteger >> - aNumber [
-	<primitive: SMIMinus>
+SmallInteger >> != aNumber [
+	<primitive: SMINotEqual>
 ]
 
 { #category : '*Primitives' }
@@ -28,6 +28,26 @@ SmallInteger >> // aNumber [
 { #category : '*Primitives' }
 SmallInteger >> \\ aNumber [
 	<primitive: SMIIntQuot>
+]
+
+{ #category : '*Primitives' }
+SmallInteger >> + aNumber [
+	<primitive: SMIPlus>
+]
+
+{ #category : '*Primitives' }
+SmallInteger >> = aNumber [
+	<primitive: SMIEqual>
+]
+
+{ #category : '*Primitives' }
+SmallInteger >> > aNumber [
+	<primitive: SMIGreaterThan>
+]
+
+{ #category : '*Primitives' }
+SmallInteger >> >= aNumber [
+	<primitive: SMIGreaterEqualThan>
 ]
 
 { #category : '*Primitives' }
@@ -53,21 +73,6 @@ SmallInteger >> bitShift: anInteger [
 { #category : '*Primitives' }
 SmallInteger >> highBit [
 	<primitive: SMIHighBit>
-]
-
-{ #category : '*Primitives' }
-SmallInteger >> > aNumber [
-	<primitive: SMIGreaterThan>
-]
-
-{ #category : '*Primitives' }
-SmallInteger >> >= aNumber [
-	<primitive: SMIGreaterEqualThan>
-]
-
-{ #category : '*Primitives' }
-SmallInteger >> = aNumber [
-	<primitive: SMIEqual>
 ]
 
 { #category : '*Primitives' }
