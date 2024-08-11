@@ -73,7 +73,6 @@ LegacyPrefix class >> initializePrefixes [
 		initializeGroup2;
 		initializeGroup3;
 		initializeGroup4.
-	super initializePrefixes
 ]
 
 { #category : #private }
