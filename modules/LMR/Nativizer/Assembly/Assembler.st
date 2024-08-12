@@ -1114,6 +1114,10 @@ Assembler >> orRwithA [
 	self subclassResponsibility
 ]
 
+{ #category : #initialization }
+Assembler >> platform: aNativizationPlatform [
+]
+
 { #category : #private }
 Assembler >> pop: dstReg [
 	self subclassResponsibility

@@ -106,7 +106,7 @@ NativizationPlatform >> newCodeGenerator [
 
 { #category : #'instance creation' }
 NativizationPlatform >> newAssembler [
-	^ abi newAssembler
+	^ abi newAssembler platform: self
 ]
 
 { #category : #'printing & storing' }

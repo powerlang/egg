@@ -1,0 +1,17 @@
+"
+	Copyright (c) 2024, Javier Pimás.
+	See (MIT) license in root directory.
+"
+Class {
+	#name : #AssemblyModule,
+	#superclass : #Module,
+	#category : #'Powerlang-Core-Assembly'
+}
+
+{ #category : #initialization }
+AssemblyModule >> imports [
+	^{
+		#Kernel -> #(ByteArray)
+	}
+]
+

@@ -460,7 +460,7 @@ TemplateJIT >> nativize: aCompiledMethod [
 	self
 		resetFor: aCompiledMethod;
 		nativize.
-	^ aCompiledMethod nativeCode: mainCode
+	^ aCompiledMethod optimizedCode: mainCode
 ]
 
 { #category : #services }

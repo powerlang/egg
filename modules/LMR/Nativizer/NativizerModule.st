@@ -27,6 +27,11 @@ NativizerModule >> bootstrap: anLMRModule with: aPlatform [
 ]
 
 { #category : #spec }
+NativizerModule >> environment [
+	^environment
+]
+
+{ #category : #spec }
 NativizerModule >> imports [
 	^{
 		#Kernel -> #(Behavior CharacterArray Closure CompiledBlock CompiledMethod Float OrderedCollection ProtoObject Species String).
