@@ -49,7 +49,7 @@ AMD64TemplateAssembler >> addTtoR [
 { #category : #logic }
 AMD64TemplateAssembler >> andRwithA [
 	self assembleBytes: #[16r48 16r21 16rD0].
-	
+
 ]
 
 { #category : #logic }
@@ -68,13 +68,10 @@ AMD64TemplateAssembler >> andRwithImmediate: imm [
 		assembleBytes: #[16r4C 16r21 16rD8]
 ]
 
-
-{ #category : #basic }
-AMD64CodeGenerator >> assembleBytes: value count: count [
-
-
+{ #category : #relocation }
+AMD64TemplateAssembler >> applyFixups [
+	buffer applyFixupsWith: self
 ]
-
 
 { #category : #arithmetic }
 AMD64TemplateAssembler >> assembleByte: anInteger [
@@ -812,6 +809,11 @@ AMD64TemplateAssembler >> multiplyRbyAwideningToA [
 	
 ]
 
+{ #category : #accessing }
+AMD64TemplateAssembler >> nativeCode [
+	^ NativeCode new code: buffer bytes
+]
+
 { #category : #logic }
 AMD64TemplateAssembler >> orRwithA [
 	self assembleBytes: #[16r48 16r9 16rD0].
@@ -952,6 +954,12 @@ AMD64TemplateAssembler >> restoreCallerSelf [
 	self assembleBytes: #[16r48 16r8B 16r75 16rF8].
 	
 ]
+
+{ #category : #calls }
+AMD64TemplateAssembler >> return [
+	self assembleBytes: #[16rC3]
+]
+
 
 { #category : #loading }
 AMD64TemplateAssembler >> roundDoubleX0intoX1 [
@@ -1245,6 +1253,8 @@ AMD64TemplateAssembler >> subTslotsToSP [
 AMD64TemplateAssembler >> platform: aNativizationPlatform [
 	super platform: aNativizationPlatform.
 	wordSize := aNativizationPlatform wordSize.
+	buffer := RelocatableBuffer new.
+
 ]
 
 { #category : #integers }

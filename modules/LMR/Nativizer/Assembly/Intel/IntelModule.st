@@ -10,11 +10,16 @@ Class {
 
 { #category : #initialization }
 IntelModule >> imports [
-	^{#'LMR.Nativizer.Assembly' -> #(ABI Assembler CodeGenerator)}
+	^{
+		#Kernel -> #(ByteArray).
+		#LMR -> #(NativeCode).
+		#'LMR.Nativizer.Assembly' -> #(ABI Assembler CodeGenerator RelocatableBuffer)
+	}
 ]
 
 { #category : #initialization }
 IntelModule >> justLoaded [
+	super justLoaded.
 	ISAOperandType 	initializeOperandTypeFlags; initializeTypes.
 	InstructionPrefix initializePrefixes.
 	Register addNamespace: ISAOperandType operandTypeFlags; initializeRegisters; initializeFamilies.

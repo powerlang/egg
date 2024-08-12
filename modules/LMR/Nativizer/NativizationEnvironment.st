@@ -160,13 +160,13 @@ NativizationEnvironment >> platform: aNativizationPlatform [
 ]
 
 { #category : #'printing & storing' }
-NativizationEnvironment >> printOn:aStream [
+NativizationEnvironment >> printOn: aStream [
 	"append a printed representation of the receiver to the argument, aStream"
 
-	super printOn:aStream.
-	aStream nextPutAll:'(platform: '.
-	platform name printOn:aStream.
-	aStream nextPut:$)
+	super printOn: aStream.
+	aStream nextPutAll: '(platform: '.
+	platform name printOn: aStream.
+	aStream nextPut: $)
 ]
 
 { #category : #accessing }

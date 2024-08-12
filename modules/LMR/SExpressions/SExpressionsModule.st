@@ -17,5 +17,6 @@ SExpressionsModule >> imports [
 
 { #category : #bootstrapping }
 SExpressionsModule >> justLoaded [
+	super justLoaded.
 	TreecodeDecoder initializePools; initializeBindingTypes; initializeNodeTypes
 ]

@@ -30,7 +30,7 @@ TreecodeDecoder class >> initializePools [
 		at: #DynamicVarId put: 14;
 		at: #NestedDynamicVarId put: 15;
 		at: #PushRid put: 50;
-		at: #PopRid put: 51
+		at: #PopRid put: 51.
 
 	self addNamespaceAs: #TreecodeIds.
 	TreecodeIds

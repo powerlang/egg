@@ -20,12 +20,6 @@ Class {
 	#category : #'Powerlang-Core-Assembler-Intel'
 }
 
-{ #category : #'instance creation' }
-AMD64CodeGenerator class >> new [
-	^ self basicNew initialize.
-
-]
-
 { #category : #'operations - arithmetic' }
 AMD64CodeGenerator >> add: src2 to: src1AndDst [
 	self assemble: 'add' with: src1AndDst with: src2
@@ -38,7 +32,6 @@ AMD64CodeGenerator >> addDouble: source1 to: source2andDest [
 		assemble: 'addsd'
 		with: source2andDest
 		with: source1
-
 ]
 
 { #category : #'operations - arithmetic' }

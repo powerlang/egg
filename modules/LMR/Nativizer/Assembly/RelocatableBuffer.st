@@ -58,7 +58,7 @@ RelocatableBuffer >> initialize [
 	super initialize.
 	fixups := OrderedCollection new.
 	address := 0.
-	stream := ByteArray writeStream
+	stream := #[] writeStream
 ]
 
 { #category : #writing }
