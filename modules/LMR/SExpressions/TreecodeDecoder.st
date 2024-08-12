@@ -10,27 +10,46 @@ Class {
 		'BindingTypes',
 		'NodeTypes'
 	],
-	#pools : [
-		'AstBindingTypes',
-		'AstNodeTypes'
-	],
 	#category : 'Powerlang-Core-SExpressions',
 	#package : 'Powerlang-Core',
 	#tag : 'SExpressions'
 }
 
 { #category : #'class initialization' }
-TreecodeDecoder class >> initialize [
-	NodeTypes := Dictionary new.
+TreecodeDecoder class >> initializePools [
+	"TODO: would be best to share this code with encoder. However, both can be loaded (or not) independently"
+	self addNamespaceAs: #BindingIds.
+	BindingIds
+		at: #NilId put: 1;
+		at: #TrueId put: 2;
+		at: #FalseId put: 3;
+		at: #ArgumentId put: 4;
+		at: #TemporaryId put: 5;
+		at: #SelfId put: 6;
+		at: #SuperId put: 7;
+		at: #DynamicVarId put: 14;
+		at: #NestedDynamicVarId put: 15;
+		at: #PushRid put: 50;
+		at: #PopRid put: 51
+
+	self addNamespaceAs: #TreecodeIds.
+	TreecodeIds
+		at: #MethodId put: 101;
+		at: #BlockId put: 102;
+		at: #IdentifierId put: 103;
+		at: #LiteralId put: 104;
+		at: #MessageId put: 105;
+		at: #CascadeId put: 106;
+		at: #BraceId put: 107;
+		at: #AssignmentId put: 108;
+		at: #ReturnId put: 109;
+		at: #PragmaId put: 110
+
+]
+
+{ #category : #'class initialization' }
+TreecodeDecoder class >> initializeBindingTypes [
 	BindingTypes := Dictionary new.
-	NodeTypes
-		at: AssignmentId put: SAssignment;
-		at: BlockId put: SBlock;
-		at: CascadeId put: SCascade;
-		at: LiteralId put: SLiteral;
-		at: IdentifierId put: SIdentifier;
-		at: MessageId put: SMessage;
-		at: ReturnId put: SReturn.
 	BindingTypes
 		at: NilId put: SNilBinding;
 		at: TrueId put: STrueBinding;
@@ -43,12 +62,17 @@ TreecodeDecoder class >> initialize [
 		at: NestedDynamicVarId put: SNestedDynamicBinding
 ]
 
-{ #category : #'instance creation' }
-TreecodeDecoder class >> new [
-	"return an initialized instance"
-
-	^ self basicNew initialize.
-
+{ #category : #'class initialization' }
+TreecodeDecoder class >> initializeNodeTypes [
+	NodeTypes := Dictionary new.
+	NodeTypes
+		at: AssignmentId put: SAssignment;
+		at: BlockId put: SBlock;
+		at: CascadeId put: SCascade;
+		at: LiteralId put: SLiteral;
+		at: IdentifierId put: SIdentifier;
+		at: MessageId put: SMessage;
+		at: ReturnId put: SReturn
 ]
 
 { #category : #public }
