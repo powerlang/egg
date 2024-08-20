@@ -5,8 +5,8 @@ self startServer
 self allInstances
 "
 Class {
-	#name : #EggWebsideAPI,
-	#superclass : #Object,
+	#name : 'EggWebsideAPI',
+	#superclass : 'Object',
 	#instVars : [
 		'request',
 		'server'
@@ -17,15 +17,17 @@ Class {
 		'Objects',
 		'Workspaces'
 	],
-	#category : #'Powerlang-EggWebside-Base'
+	#category : 'Powerlang-EggWebside-Base',
+	#package : 'Powerlang-EggWebside',
+	#tag : 'Base'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 EggWebsideAPI class >> new [
 	^ super new initialize
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggWebsideAPI class >> startServer [
 
 	"
@@ -48,7 +50,7 @@ EggWebsideAPI class >> startServer [
 		  start
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggWebsideAPI class >> stopServer [
 	"
 	self stopServer
@@ -57,7 +59,7 @@ EggWebsideAPI class >> stopServer [
 	WebsideServer allInstances do: #stop
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 EggWebsideAPI >> addChange [
 
 	| change author |
@@ -71,13 +73,13 @@ EggWebsideAPI >> addChange [
 	^ change asWebsideJson
 ]
 
-{ #category : #'private - changes' }
+{ #category : 'private - changes' }
 EggWebsideAPI >> applyAddClassChange: aRBAddClassChange [
 self halt.
 	
 ]
 
-{ #category : #'private - changes' }
+{ #category : 'private - changes' }
 EggWebsideAPI >> applyAddMethodChange: aRBAddMethodChange [
 
 	| class |
@@ -86,7 +88,7 @@ EggWebsideAPI >> applyAddMethodChange: aRBAddMethodChange [
 	class compile: aRBAddMethodChange source
 ]
 
-{ #category : #'private - changes' }
+{ #category : 'private - changes' }
 EggWebsideAPI >> applyChange: change [
 
 	(change isKindOf: RBAddClassChange) ifTrue: [ 
@@ -98,7 +100,7 @@ EggWebsideAPI >> applyChange: change [
 	self error: 'Change not supported'
 ]
 
-{ #category : #'private - changes' }
+{ #category : 'private - changes' }
 EggWebsideAPI >> applyRemoveMethodChange: aRBRemoveMethodChange [
 
 	| class |
@@ -108,13 +110,13 @@ EggWebsideAPI >> applyRemoveMethodChange: aRBRemoveMethodChange [
 	class removeSelector: aRBRemoveMethodChange selector
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> bodyAt: aString [
 
 	^ self bodyAt: aString ifAbsent: nil
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> bodyAt: aString ifAbsent: aBlock [
 
 	| json |
@@ -122,7 +124,7 @@ EggWebsideAPI >> bodyAt: aString ifAbsent: aBlock [
 	^ json at: aString ifAbsent: aBlock
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 EggWebsideAPI >> categories [
 	| class |
 	class := self requestedClass.
@@ -130,7 +132,7 @@ EggWebsideAPI >> categories [
 	^ class categories
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 EggWebsideAPI >> classDefinition [
 
 	| class |
@@ -139,7 +141,7 @@ EggWebsideAPI >> classDefinition [
 	^ class asWebsideJson
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> classNamed: aString [
 
 	| name metaclass root class |
@@ -155,7 +157,7 @@ EggWebsideAPI >> classNamed: aString [
 		  ifFalse: [ class ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> classTreeFrom: aPowerlangSpeciesWrapper depth: anInteger [
 	| json subclasses depth names superclass |
 	names := self queryAt: 'names'.
@@ -180,7 +182,7 @@ EggWebsideAPI >> classTreeFrom: aPowerlangSpeciesWrapper depth: anInteger [
 	^ json
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 EggWebsideAPI >> classVariables [
 	| class |
 	class := self requestedClass.
@@ -196,7 +198,7 @@ EggWebsideAPI >> classVariables [
 						yourself ] ]
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 EggWebsideAPI >> classes [
 
 	| root tree classes names depth json |
@@ -216,7 +218,7 @@ EggWebsideAPI >> classes [
 	^ classes collect: [ :c | c asWebsideJson ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> compilationError: error [
 
 	| entity json suggestions |
@@ -232,7 +234,7 @@ EggWebsideAPI >> compilationError: error [
 	^ (ZnResponse statusCode: 409) entity: entity
 ]
 
-{ #category : #'debugging endpoints' }
+{ #category : 'debugging endpoints' }
 EggWebsideAPI >> createDebugger [
 
 	| id process exception context debugger |
@@ -249,7 +251,7 @@ EggWebsideAPI >> createDebugger [
 		  yourself
 ]
 
-{ #category : #'debugging endpoints' }
+{ #category : 'debugging endpoints' }
 EggWebsideAPI >> debuggerFrame [
 
 	| debugger index frame interval runtime method receiver class |
@@ -281,7 +283,7 @@ EggWebsideAPI >> debuggerFrame [
 		  yourself
 ]
 
-{ #category : #'debugging endpoints' }
+{ #category : 'debugging endpoints' }
 EggWebsideAPI >> debuggerFrames [
 
 	| debugger runtime method receiver |
@@ -301,13 +303,13 @@ EggWebsideAPI >> debuggerFrames [
 			  yourself ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> debuggers [
 
 	^ server debuggers
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> defaultRootClass [
 
 	| runtime root |
@@ -319,7 +321,7 @@ EggWebsideAPI >> defaultRootClass [
 	^ root
 ]
 
-{ #category : #'debugging endpoints' }
+{ #category : 'debugging endpoints' }
 EggWebsideAPI >> deleteDebugger [
 
 	| id debugger |
@@ -332,13 +334,13 @@ EggWebsideAPI >> deleteDebugger [
 	^ id
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 EggWebsideAPI >> dialect [
 
 	^ 'Powerlang'
 ]
 
-{ #category : #'evaluation  endpoints' }
+{ #category : 'evaluation  endpoints' }
 EggWebsideAPI >> evaluateExpression [
 
 	| debug expression sync pin id semaphore object process block json |
@@ -377,7 +379,7 @@ EggWebsideAPI >> evaluateExpression [
 		  yourself
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> evaluateExpression: aString [
 
 	| class  |
@@ -386,7 +388,7 @@ EggWebsideAPI >> evaluateExpression: aString [
 	^class new doIt
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> evaluationError: id [
 
 	| process json entity |
@@ -404,13 +406,13 @@ EggWebsideAPI >> evaluationError: id [
 	^ ZnResponse serverErrorWithEntity: entity
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> evaluations [
 
 	^ server evaluations
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> filterByCategory: aCollection [
 	| category |
 	category := self queriedCategory.
@@ -419,7 +421,7 @@ EggWebsideAPI >> filterByCategory: aCollection [
 		ifFalse: [ aCollection ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> filterByVariable: aCollection [
 	| variable class slot classVar |
 	variable := self queriedAccessing.
@@ -436,7 +438,7 @@ EggWebsideAPI >> filterByVariable: aCollection [
 				or: [ classVar notNil and: [ classVar isReferencedIn: m ] ] ]
 ]
 
-{ #category : #'debugging endpoints' }
+{ #category : 'debugging endpoints' }
 EggWebsideAPI >> frameBindings [
 
 	| debugger frame |
@@ -455,12 +457,12 @@ EggWebsideAPI >> frameBindings [
 			  yourself ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> image [
 	^ self runtime image
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> implementorsOf: aSymbol [
 	| scope root |
 	scope := self queriedScope.
@@ -472,7 +474,7 @@ EggWebsideAPI >> implementorsOf: aSymbol [
 		  thenCollect: [ :class | class >> aSymbol ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> indexedSlotsOf: anObject [
 
 	| from to slot |
@@ -492,7 +494,7 @@ EggWebsideAPI >> indexedSlotsOf: anObject [
 			  yourself ]
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 EggWebsideAPI >> instanceVariables [
 	| class |
 	class := self requestedClass.
@@ -508,7 +510,7 @@ EggWebsideAPI >> instanceVariables [
 						yourself ] ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> instanceVariablesOf: anObject [
 
 	^ anObject objectClass allInstVarNames collect: [ :n | 
@@ -517,7 +519,7 @@ EggWebsideAPI >> instanceVariablesOf: anObject [
 			  yourself ]
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 EggWebsideAPI >> method [
 
 	| class selector symbol |
@@ -529,7 +531,7 @@ EggWebsideAPI >> method [
 	^ (class >> selector) asWebsideJson
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 EggWebsideAPI >> methods [
 
 	| selector methods senders global references class |
@@ -557,7 +559,7 @@ EggWebsideAPI >> methods [
 	^ methods collect: [ :m | m asWebsideJson ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> namedSlotsOf: anObject [
 
 	| slot |
@@ -568,30 +570,30 @@ EggWebsideAPI >> namedSlotsOf: anObject [
 			  yourself ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> newID [
 
 	^ UUID new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> newJsonObject [
 
 	^ NeoJSONObject new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> notFound [
 	^ ZnResponse notFound: 'resource not found'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> objects [
 
 	^ server objects
 ]
 
-{ #category : #'objects endpoints' }
+{ #category : 'objects endpoints' }
 EggWebsideAPI >> pinnedObject [
 
 	| id object |
@@ -604,7 +606,7 @@ EggWebsideAPI >> pinnedObject [
 		  yourself
 ]
 
-{ #category : #'objects endpoints' }
+{ #category : 'objects endpoints' }
 EggWebsideAPI >> pinnedObjectSlots [
 
 	| id object path index last |
@@ -623,72 +625,72 @@ EggWebsideAPI >> pinnedObjectSlots [
 	^ object asWebsideJson
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> queriedAccessing [
 	^ self queryAt: 'accessing' 
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> queriedCategory [
 	| category |
 	category := request at: 'category' ifAbsent: nil.
 	^ category ifNotNil: [ category asSymbol ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> queriedClass [
 	| name |
 	name := request at: 'class' ifAbsent: nil.
 	^ name ifNotNil: [ self classNamed: name ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> queriedReferencingClass [
 	^self queryAt: 'referencingClass' ifPresent: [:n | self classNamed: n ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> queriedReferencingString [
 	^self queryAt: 'referencingString'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> queriedScope [
 	| scope |
 	scope := request at: 'scope' ifAbsent: nil.
 	^ scope ifNotNil: [ self classNamed: scope ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> queriedSelector [
 	| selector |
 	selector := request at: 'selector' ifAbsent: nil.
 	^ selector ifNotNil: [ selector asSymbol ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> queriedSending [
 	| selector |
 	selector := request at: 'sending' ifAbsent: nil.
 	^ selector ifNotNil: [ selector asSymbol ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> queryAt: aString [
 	^ self queryAt: aString ifAbsent: nil
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> queryAt: aString ifAbsent: aBlock [
 	^ self queryAt: aString ifPresent: nil ifAbsent: aBlock
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> queryAt: aString ifPresent: aBlock [
 	^ self queryAt: aString ifPresent: aBlock ifAbsent: nil
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> queryAt: aString ifPresent: aBlock ifAbsent: anotherBlock [
 
 	| value |
@@ -699,14 +701,14 @@ EggWebsideAPI >> queryAt: aString ifPresent: aBlock ifAbsent: anotherBlock [
 		  ifFalse: [ value ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> referencesToClass: aClass [
 	| binding |
 	binding := Smalltalk bindingOf: aClass name asSymbol.
 	^ SystemNavigation default allReferencesTo: binding
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> referencesToString: aString [
 	| scope |
 	scope := self queriedScope ifNil: [ self queriedClass ].
@@ -721,12 +723,12 @@ EggWebsideAPI >> referencesToString: aString [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggWebsideAPI >> request: aTeaRequest [
 	request := aTeaRequest
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> requestedChange [
 
 	| json change |
@@ -736,14 +738,14 @@ EggWebsideAPI >> requestedChange [
 	^ change
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> requestedClass [
 	| name |
 	name := self urlAt: 'name'.
 	^ name ifNotNil: [ self classNamed: name ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> requestedId [
 
 	| id |
@@ -751,7 +753,7 @@ EggWebsideAPI >> requestedId [
 	^ id ifNotNil: [ UUID fromString: id ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> requestedIndex [
 
 	| index |
@@ -759,7 +761,7 @@ EggWebsideAPI >> requestedIndex [
 	^ index ifNotNil: [ index asInteger ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> requestedSelector [
 
 	| selector |
@@ -767,12 +769,12 @@ EggWebsideAPI >> requestedSelector [
 	^ selector ifNotNil: [ selector asSymbol ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> runtime [
 	^ server resourcesAt: #runtime
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> sendersOf: aSymbol [
 
 	| scope |
@@ -783,7 +785,7 @@ EggWebsideAPI >> sendersOf: aSymbol [
 	^ self defaultRootClass withAllSubclasses gather: [ :class | self halt ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> sendersOf: aSymbol among: aCollection [
 	| index |
 	index := Smalltalk specialSelectorIndexOrNil: aSymbol.
@@ -791,12 +793,12 @@ EggWebsideAPI >> sendersOf: aSymbol among: aCollection [
 		select: [ :m | m hasSelector: aSymbol specialSelectorIndex: index ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggWebsideAPI >> server: aWebsideServer [
 	server := aWebsideServer
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> slot: aString of: anObject ifAbsent: aBlock [
 
 	| index |
@@ -821,7 +823,7 @@ EggWebsideAPI >> slot: aString of: anObject ifAbsent: aBlock [
 		  ifFalse: [ aBlock value ]
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 EggWebsideAPI >> subclasses [
 
 	| class |
@@ -830,7 +832,7 @@ EggWebsideAPI >> subclasses [
 	^ class subclasses collect: [ :c | c asWebsideJson ]
 ]
 
-{ #category : #'objects endpoints' }
+{ #category : 'objects endpoints' }
 EggWebsideAPI >> unpinObject [
 
 	self objects
@@ -839,12 +841,12 @@ EggWebsideAPI >> unpinObject [
 	^ nil
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPI >> urlAt: aString [
 	^ request at: aString ifAbsent: nil
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 EggWebsideAPI >> variables [
 	| class |
 	class := self requestedClass.
