@@ -1,4 +1,9 @@
 "
+I implement the Webside API for EggMetacircularRuntime kind of image. That means we deal with a virtual
+metacircular image where each object knows its own class, which is just another object. Implementing the
+webside API for it is more complicate: to ask things to objects we have to send messages to their classes
+in the virtual world.
+
 self startServer
 
 
@@ -21,11 +26,6 @@ Class {
 	#package : 'Powerlang-EggWebside',
 	#tag : 'Base'
 }
-
-{ #category : 'instance creation' }
-EggWebsideAPI class >> new [
-	^ super new initialize
-]
 
 { #category : 'services' }
 EggWebsideAPI class >> startServer [
@@ -832,6 +832,15 @@ EggWebsideAPI >> subclasses [
 	^ class subclasses collect: [ :c | c asWebsideJson ]
 ]
 
+{ #category : 'debugging endpoints' }
+EggWebsideAPI >> superclasses [
+
+	| class |
+	class := self requestedClass.
+	class ifNil: [ ^ self notFound ].
+	^ class allSuperclasses collect: [ :c | c asWebsideJson ]
+]
+
 { #category : 'objects endpoints' }
 EggWebsideAPI >> unpinObject [
 
@@ -844,6 +853,18 @@ EggWebsideAPI >> unpinObject [
 { #category : 'private' }
 EggWebsideAPI >> urlAt: aString [
 	^ request at: aString ifAbsent: nil
+]
+
+{ #category : 'private' }
+EggWebsideAPI >> usedCategories [
+
+	^ #(  )
+]
+
+{ #category : 'private' }
+EggWebsideAPI >> usualCategories [
+
+	^ #(  )
 ]
 
 { #category : 'code endpoints' }
