@@ -27,6 +27,37 @@ Class {
 	#tag : 'Base'
 }
 
+{ #category : 'services' }
+EggBootstrapWebsideAPI class >> startServer [
+	"
+	self startServer
+	"
+
+	| runtime |
+	runtime := (EggBootstrapImage fromSpec
+		            wordSize: 8;
+		            genesis;
+		            bootstrap;
+		            fillClasses;
+		            fillSymbols;
+		            generateMetacircularImage) result.
+	^ WebsideServer new
+		  apiClass: self class;
+		  baseUri: '/powerlang';
+		  port: 9010;
+		  resourcesAt: #runtime put: runtime;
+		  start
+]
+
+{ #category : 'services' }
+EggBootstrapWebsideAPI class >> stopServer [
+	"
+	self stopServer
+	"
+
+	WebsideServer allInstances do: #stop
+]
+
 { #category : 'changes endpoints' }
 EggBootstrapWebsideAPI >> addChange [
 
@@ -477,6 +508,12 @@ EggBootstrapWebsideAPI >> instanceVariablesOf: anObject [
 			  yourself ]
 ]
 
+{ #category : 'private' }
+EggBootstrapWebsideAPI >> kernelSpec [
+
+	^ self runtime image specs
+]
+
 { #category : 'code endpoints' }
 EggBootstrapWebsideAPI >> method [
 
@@ -496,21 +533,21 @@ EggBootstrapWebsideAPI >> methods [
 	selector := self queriedSelector.
 	selector notNil ifTrue: [ methods := self implementorsOf: selector ].
 	selector := self queriedSending.
-	selector notNil ifTrue: [ 
+	selector notNil ifTrue: [
 		senders := self sendersOf: selector.
 		methods := methods
 			           ifNil: [ senders ]
 			           ifNotNil: [ methods intersection: senders ] ].
 	global := self queriedReferencingClass.
-	global notNil ifTrue: [ 
-		references := self referencesTo: global.
+	global notNil ifTrue: [
+		references := self referencesToClass: global.
 		methods := methods
 			           ifNil: [ references ]
 			           ifNotNil: [ methods intersection: references ] ].
 	class := self requestedClass ifNil: [ self queriedClass ].
-	(class notNil and: [ methods notNil ]) ifTrue: [ 
+	(class notNil and: [ methods notNil ]) ifTrue: [
 		methods := methods select: [ :m | m classBinding = class ] ].
-	methods ifNil: [ 
+	methods ifNil: [
 		methods := (class ifNil: [ self defaultRootClass ]) methods ].
 	methods := self filterByCategory: methods.
 	methods := self filterByVariable: methods.
@@ -661,24 +698,21 @@ EggBootstrapWebsideAPI >> queryAt: aString ifPresent: aBlock ifAbsent: anotherBl
 
 { #category : 'private' }
 EggBootstrapWebsideAPI >> referencesToClass: aClass [
-	| binding |
-	binding := Smalltalk bindingOf: aClass name asSymbol.
-	^ SystemNavigation default allReferencesTo: binding
+
+	^self kernelSpec allReferencesTo: aClass name
 ]
 
 { #category : 'private' }
 EggBootstrapWebsideAPI >> referencesToString: aString [
+
 	| scope |
 	scope := self queriedScope ifNil: [ self queriedClass ].
-	
-		^ SystemNavigation default 
-			allMethodsSelect:  [ :m | 
-			m
-				hasLiteralSuchThat: [ :l | 
-					l isString
-						and: [ l isSymbol not
-								and: [ l includesSubstring: aString caseSensitive: false ] ] ] ]
-
+self halt.
+	^ scope methodsDo: [ :m |
+		  m hasLiteralSuchThat: [ :l |
+			  l isString and: [
+				  l isSymbol not and: [
+					  l includesSubstring: aString caseSensitive: false ] ] ] ]
 ]
 
 { #category : 'accessing' }
