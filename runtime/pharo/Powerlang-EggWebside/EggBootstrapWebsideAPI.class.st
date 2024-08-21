@@ -774,7 +774,7 @@ EggBootstrapWebsideAPI >> sendersOf: aSymbol [
 	scope ifNotNil: [ 
 		self halt.
 		^ self sendersOf: aSymbol among: scope methods ].
-	^ self defaultRootClass withAllSubclasses gather: [ :class | self halt ]
+	^ self kernelSpec sendersOf: aSymbol
 ]
 
 { #category : 'private' }
