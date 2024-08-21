@@ -438,6 +438,15 @@ ModuleSpec >> resolveClass: class [
 	^found ifNotNil: [metaclass ifTrue: [found metaclass] ifFalse: [found]]
 ]
 
+{ #category : 'accessing' }
+ModuleSpec >> sendersOf: aSymbol [
+	| result |
+	result := OrderedCollection new.
+	self allMethodsDo: [ :m |
+		(m sendsSelector: aSymbol) ifTrue: [ result add: m ] ].
+	^ result
+]
+
 { #category : 'private' }
 ModuleSpec >> sortedClasses [
 	| remaining sorted |

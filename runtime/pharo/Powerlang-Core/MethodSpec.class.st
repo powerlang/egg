@@ -174,6 +174,12 @@ MethodSpec >> selector: aSymbol [
 	selector := aSymbol
 ]
 
+{ #category : 'converting' }
+MethodSpec >> sendsSelector: aSymbol [
+
+	^ self ast ifNil: [ false ] ifNotNil: [ :node | node sendsSelector: aSymbol ]
+]
+
 { #category : 'accessing' }
 MethodSpec >> source [
 	^source

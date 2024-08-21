@@ -3,7 +3,6 @@ Class {
 	#superclass : 'LocalBinding',
 	#category : 'Powerlang-SCompiler-Bindings',
 	#package : 'Powerlang-SCompiler',
-	#tag : 'Bindings',
 	#tag : 'Bindings'
 }
 
