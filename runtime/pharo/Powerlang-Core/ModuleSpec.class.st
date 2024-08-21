@@ -124,6 +124,16 @@ ModuleSpec >> allMethodsDo: aBlock [
 		c methods do: aBlock]
 ]
 
+{ #category : 'accessing' }
+ModuleSpec >> allReferencesTo: aSymbol [
+
+	| result |
+	result := OrderedCollection new.
+	self allMethodsDo: [ :m |
+		(m referencesIdentifier: aSymbol) ifTrue: [ result add: m ]].
+	^ result
+]
+
 { #category : 'adding / removing' }
 ModuleSpec >> associationAt: aSymbol ifAbsent: aBlock [
 	^imports associationAt: aSymbol ifAbsent: aBlock

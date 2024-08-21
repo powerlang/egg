@@ -13,9 +13,9 @@ Class {
 	#tag : 'CodeSpecs'
 }
 
-{ #category : 'testing' }
+{ #category : 'inquiries' }
 MetaclassSpec >> allInstVarNames [
-
+	"unlike in ProtoObject class, the superclass of the spec of ProtoObject class is nil"
 	allIvars ifNotNil: [ ^ allIvars ].
 	^ allIvars := module classInstVarNames
 	              ,

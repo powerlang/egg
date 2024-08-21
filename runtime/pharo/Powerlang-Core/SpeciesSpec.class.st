@@ -23,6 +23,12 @@ SpeciesSpec class >> new [
 ]
 
 { #category : 'adding / removing' }
+SpeciesSpec >> >> aSymbol [
+
+	^methods detect: [ :m | m selector == aSymbol ] ifNone: nil
+]
+
+{ #category : 'adding / removing' }
 SpeciesSpec >> addMethod: aMethodSpec [
 	^methods add: aMethodSpec
 ]
@@ -77,6 +83,12 @@ SpeciesSpec >> allSuperclasses [
 	^superclasses
 ]
 
+{ #category : 'accessing' }
+SpeciesSpec >> categories [
+
+	^ (self methods collect: [ :m | m category ]) asSet
+]
+
 { #category : 'testing' }
 SpeciesSpec >> hasInstVarNamed: aString [
 
@@ -86,6 +98,12 @@ SpeciesSpec >> hasInstVarNamed: aString [
 { #category : 'testing' }
 SpeciesSpec >> hasMethods [
 	^methods notEmpty
+]
+
+{ #category : 'adding / removing' }
+SpeciesSpec >> includesSelector: aSymbol [
+
+	^methods anySatisfy: [ :m | m selector == aSymbol ]
 ]
 
 { #category : 'initialization' }
