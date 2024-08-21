@@ -36,6 +36,14 @@ MetaclassSpec >> allSuperclassesDo: aBlock [
 	s allSuperclassesDo: aBlock
 ]
 
+{ #category : 'testing' }
+MetaclassSpec >> asWebsideJson [
+
+	^ super asWebsideJson
+		  at: #class put: 'Metaclass';
+		  yourself
+]
+
 { #category : 'inquiries' }
 MetaclassSpec >> classVarNames [
 	^class classVarNames
