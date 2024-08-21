@@ -1,6 +1,6 @@
 Class {
-	#name : #SMessage,
-	#superclass : #SExpression,
+	#name : 'SMessage',
+	#superclass : 'SExpression',
 	#instVars : [
 		'selector',
 		'receiver',
@@ -13,12 +13,12 @@ Class {
 	#tag : 'SExpressions'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 SMessage class >> decodeUsing: aTreecodeDecoder [
 	^aTreecodeDecoder decodeMessage
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 SMessage class >> new [
 	"return an initialized instance"
 
@@ -26,27 +26,27 @@ SMessage class >> new [
 
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SMessage >> acceptVisitor: visitor [
 	^visitor visitMessage: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SMessage >> argumentCount [
 	^arguments size
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SMessage >> arguments [
 	^arguments
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SMessage >> arguments: aCollection [
 	arguments := aCollection
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SMessage >> cache: anSCompiledMethod when: type [
 	cache
 		ifNil: [ ^ cache := Array with: type with:
@@ -57,44 +57,44 @@ SMessage >> cache: anSCompiledMethod when: type [
 			anSCompiledMethod)
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SMessage >> cacheUndermessage: aBlockClosure [
 	cache := aBlockClosure
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SMessage >> cachedUndermessage [
 	^cache isBlock ifTrue: [ cache ]
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SMessage >> flushCache [
 	cache := nil
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SMessage >> initialize [
 	super initialize.
 	arguments := #().
 	inlined := false
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SMessage >> inlined: aBoolean [
 	inlined := aBoolean
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SMessage >> isInlined [
 	^ inlined
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SMessage >> isMessage [
 	^true
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SMessage >> methodFor: requiredType [
 	| type |
 	cache ifNil: [ ^ nil ].
@@ -105,7 +105,7 @@ SMessage >> methodFor: requiredType [
 	^ nil
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SMessage >> printOn: aStream indent: anInteger [
 	aStream tab: anInteger; nextPutAll: '{MessageId. '; print: selector; nextPutAll: '. '; cr.
 	receiver printOn: aStream indent: anInteger + 1.
@@ -116,27 +116,27 @@ SMessage >> printOn: aStream indent: anInteger [
 	aStream nextPutAll: '}'
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SMessage >> receiver [
 	^receiver
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SMessage >> receiver: anSExpression [
 	receiver := anSExpression
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SMessage >> registerCacheWith: runtime [
 	cache ifNil: [ runtime registerCache: self for: selector ]
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SMessage >> selector [
 	^selector
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SMessage >> selector: aSelector [
 	selector := aSelector
 ]

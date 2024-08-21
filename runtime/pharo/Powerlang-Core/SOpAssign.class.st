@@ -1,6 +1,6 @@
 Class {
-	#name : #SOpAssign,
-	#superclass : #SOperation,
+	#name : 'SOpAssign',
+	#superclass : 'SOperation',
 	#instVars : [
 		'assignees'
 	],
@@ -9,17 +9,17 @@ Class {
 	#tag : 'SExpressions'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SOpAssign >> acceptVisitor: visitor [
 	^ visitor visitOpAssign: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SOpAssign >> assignees [
 	^assignees
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SOpAssign >> assignees: aCollection [
 	assignees := aCollection
 ]

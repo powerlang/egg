@@ -1,6 +1,6 @@
 Class {
-	#name : #SCascade,
-	#superclass : #SExpression,
+	#name : 'SCascade',
+	#superclass : 'SExpression',
 	#instVars : [
 		'receiver',
 		'messages'
@@ -10,37 +10,37 @@ Class {
 	#tag : 'SExpressions'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 SCascade class >> decodeUsing: aTreecodeDecoder [
 	^aTreecodeDecoder decodeCascade
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SCascade >> acceptVisitor: visitor [
 	^visitor visitCascade: self
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SCascade >> isCascade [
 	^true
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCascade >> messages [
 	^messages
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCascade >> messages: aCollection [
 	messages := aCollection
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCascade >> receiver [
 	^receiver
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCascade >> receiver: anSExpression [
 	receiver := anSExpression
 ]

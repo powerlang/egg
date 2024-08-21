@@ -1,17 +1,17 @@
 Class {
-	#name : #MethodDictionaryMirror,
-	#superclass : #ObjectMirror,
+	#name : 'MethodDictionaryMirror',
+	#superclass : 'ObjectMirror',
 	#category : 'Powerlang-Core-Mirrors',
 	#package : 'Powerlang-Core',
 	#tag : 'Mirrors'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 MethodDictionaryMirror >> at: i [
 	^self contents at: i
 ]
 
-{ #category : #nativizing }
+{ #category : 'nativizing' }
 MethodDictionaryMirror >> compiledMethodFor: aSymbol [
 	| selector |
 	selector := aSymbol asString.
@@ -19,17 +19,17 @@ MethodDictionaryMirror >> compiledMethodFor: aSymbol [
 	^nil
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 MethodDictionaryMirror >> contents [
 	^self getInstVarNamed: #table
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 MethodDictionaryMirror >> contentsSize [
 	^self contents size
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 MethodDictionaryMirror >> do: aBlock [
 	1 to: self contentsSize by: 2 do: [:i | | current |
 		current := self at: i.
@@ -38,22 +38,22 @@ MethodDictionaryMirror >> do: aBlock [
 			aBlock value: current value: method asMethodMirror]]
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 MethodDictionaryMirror >> printOn: aStream [
 	aStream nextPutAll: 'a MDMirror (' ; nextPutAll: handle printString ; nextPut: $)
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 MethodDictionaryMirror >> reflectsMethodDictionary [
 	^true
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 MethodDictionaryMirror >> structureType [
 	^#MethodDictionary
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 MethodDictionaryMirror >> tally [
 	^self getInstVarNamed: #tally
 ]

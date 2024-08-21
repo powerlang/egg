@@ -1,6 +1,6 @@
 Class {
-	#name : #SOpDropToS,
-	#superclass : #SOperation,
+	#name : 'SOpDropToS',
+	#superclass : 'SOperation',
 	#instVars : [
 		'count'
 	],
@@ -9,17 +9,17 @@ Class {
 	#tag : 'SExpressions'
 }
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SOpDropToS >> acceptVisitor: visitor [
 	^ visitor visitOpDropToS: self
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SOpDropToS >> count [
 	^count
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SOpDropToS >> count: anInteger [
 	count := anInteger 
 ]

@@ -1,6 +1,6 @@
 Class {
-	#name : #SOpStoreRintoFrame,
-	#superclass : #SInlinerOperation,
+	#name : 'SOpStoreRintoFrame',
+	#superclass : 'SInlinerOperation',
 	#instVars : [
 		'index'
 	],
@@ -9,17 +9,17 @@ Class {
 	#tag : 'SExpressions'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SOpStoreRintoFrame >> acceptVisitor: visitor [
 	^ visitor visitOpStoreRintoFrame: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SOpStoreRintoFrame >> index [
 	^ index
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SOpStoreRintoFrame >> index: anInteger [
 	index := anInteger
 ]

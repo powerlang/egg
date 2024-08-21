@@ -1,12 +1,12 @@
 Class {
-	#name : #ClassMirror,
-	#superclass : #SpeciesMirror,
+	#name : 'ClassMirror',
+	#superclass : 'SpeciesMirror',
 	#category : 'Powerlang-Core-Mirrors',
 	#package : 'Powerlang-Core',
 	#tag : 'Mirrors'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ClassMirror >> classVariables [
 	| classVariables |
 	classVariables := self getInstVarNamed: #classVariables.
@@ -14,34 +14,34 @@ ClassMirror >> classVariables [
 	^classVariables
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ClassMirror >> instanceClass [
 	^self
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 ClassMirror >> localEquivalent [
 	^handle runtime objectModel at: self localName asSymbol
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ClassMirror >> localName [
 	^self name asLocalString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ClassMirror >> name [
 	| name |
 	name := self getInstVarNamed: #name.
 	^name asStringMirror
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ClassMirror >> structureType [
 	^#Class
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ClassMirror >> subclasses [
 	| subclasses |
 	subclasses := self getInstVarNamed: #subclasses.

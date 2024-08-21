@@ -7,8 +7,8 @@ as it is runtime specific.
 
 "
 Class {
-	#name : #Bridge,
-	#superclass : #Object,
+	#name : 'Bridge',
+	#superclass : 'Object',
 	#instVars : [
 		'cache',
 		'objects',
@@ -19,43 +19,43 @@ Class {
 	#tag : 'Metaphysics'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 Bridge class >> new [
 	^self basicNew initialize
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Bridge >> findObjectNamed: aSymbol [
 	^self subclassResponsibility
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Bridge >> initialize [
 	cache := IdentityDictionary new.
 	objects := Dictionary new
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Bridge >> mirrorOn: address [
 	^(runtime handleOn: address) mirror
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Bridge >> name: object as: name [
 	^objects at: name put: object
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Bridge >> objectNamed: aSymbol [
 	^ objects at: aSymbol ifAbsentPut: [ self findObjectNamed: aSymbol ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Bridge >> objectNamed: aSymbol ifAbsent: aBlock [
 	^ objects at: aSymbol ifAbsent: aBlock
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Bridge >> runtime: aRuntime [
 	runtime := aRuntime
 ]

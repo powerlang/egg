@@ -1,6 +1,6 @@
 Class {
-	#name : #SAssignment,
-	#superclass : #SExpression,
+	#name : 'SAssignment',
+	#superclass : 'SExpression',
 	#instVars : [
 		'assignees',
 		'expression'
@@ -10,12 +10,12 @@ Class {
 	#tag : 'SExpressions'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 SAssignment class >> decodeUsing: aTreecodeDecoder [
 	^aTreecodeDecoder decodeAssignment
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 SAssignment class >> new [
 	"return an initialized instance"
 
@@ -23,42 +23,42 @@ SAssignment class >> new [
 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SAssignment >> acceptVisitor: visitor [
 	^visitor visitAssignment: self
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SAssignment >> assign: anSIdentifier [
 	assignees add: anSIdentifier
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SAssignment >> assignees [
 	^assignees
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SAssignment >> expression [
 	^expression
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SAssignment >> expression: anSExpression [
 	expression := anSExpression
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SAssignment >> initialize [
 	assignees := OrderedCollection new
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SAssignment >> isAssignment [
 	^true
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SAssignment >> printOn: aStream indent: anInteger [
 	aStream tab: anInteger; nextPutAll: '{AssignmentId.'.
 	assignees

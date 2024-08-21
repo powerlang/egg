@@ -1,6 +1,6 @@
 Class {
-	#name : #SpeciesFormatMasks,
-	#superclass : #PSharedPool,
+	#name : 'SpeciesFormatMasks',
+	#superclass : 'PSharedPool',
 	#classVars : [
 		'InstSize',
 		'IsPointers'
