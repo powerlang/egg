@@ -831,12 +831,10 @@ EggBootstrapWebsideAPI >> sendersOf: aSymbol [
 	^ self kernelSpec sendersOf: aSymbol
 ]
 
-{ #category : 'private' }
+{ #category : 'as yet unclassified' }
 EggBootstrapWebsideAPI >> sendersOf: aSymbol among: aCollection [
-	| index |
-	index := Smalltalk specialSelectorIndexOrNil: aSymbol.
-	^ aCollection
-		select: [ :m | m hasSelector: aSymbol specialSelectorIndex: index ]
+
+	^ aCollection select: [ :m | m sendsSelector: aSymbol ]
 ]
 
 { #category : 'accessing' }

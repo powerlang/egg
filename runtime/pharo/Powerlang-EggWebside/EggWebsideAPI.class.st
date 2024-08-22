@@ -29,13 +29,12 @@ Class {
 
 { #category : 'services' }
 EggWebsideAPI class >> startServer [
-
 	"
 	self startServer
 	"
 
 	| runtime |
-	runtime := (EggRingImage fromSpec
+	runtime := (EggBootstrapImage fromSpec
 		            wordSize: 8;
 		            genesis;
 		            bootstrap;
@@ -43,7 +42,7 @@ EggWebsideAPI class >> startServer [
 		            fillSymbols;
 		            generateMetacircularImage) result.
 	^ WebsideServer new
-		  apiClass: EggWebsideAPI;
+		  apiClass: self class;
 		  baseUri: '/powerlang';
 		  port: 9010;
 		  resourcesAt: #runtime put: runtime;
@@ -337,7 +336,7 @@ EggWebsideAPI >> deleteDebugger [
 { #category : 'code endpoints' }
 EggWebsideAPI >> dialect [
 
-	^ 'Powerlang'
+	^ 'Egg'
 ]
 
 { #category : 'evaluation  endpoints' }
@@ -423,19 +422,11 @@ EggWebsideAPI >> filterByCategory: aCollection [
 
 { #category : 'private' }
 EggWebsideAPI >> filterByVariable: aCollection [
-	| variable class slot classVar |
+
+	| variable |
 	variable := self queriedAccessing.
 	variable ifNil: [ ^ aCollection ].
-	^ aCollection
-		select: [ :m | 
-			class := m methodClass.
-			(class hasSlotNamed: variable)
-				ifTrue: [ slot := class slotNamed: variable ].
-			(class classVarNames includes: variable)
-				ifTrue: [ classVar := class classVarNamed: variable ].
-			(slot notNil
-				and: [ (slot isReadIn: m) or: [ slot isWrittenIn: m ] ])
-				or: [ classVar notNil and: [ classVar isReferencedIn: m ] ] ]
+	^ aCollection select: [ :m | m referencesIdentifier: variable ]
 ]
 
 { #category : 'debugging endpoints' }
@@ -522,7 +513,7 @@ EggWebsideAPI >> instanceVariablesOf: anObject [
 { #category : 'code endpoints' }
 EggWebsideAPI >> method [
 
-	| class selector symbol |
+	| class selector |
 	class := self requestedClass.
 	class ifNil: [ ^ self notFound ].
 	selector := self requestedSelector.
@@ -545,7 +536,7 @@ EggWebsideAPI >> methods [
 			           ifNotNil: [ methods intersection: senders ] ].
 	global := self queriedReferencingClass.
 	global notNil ifTrue: [ 
-		references := self referencesTo: global.
+		references := self referencesToClass: global.
 		methods := methods
 			           ifNil: [ references ]
 			           ifNotNil: [ methods intersection: references ] ].
@@ -703,9 +694,8 @@ EggWebsideAPI >> queryAt: aString ifPresent: aBlock ifAbsent: anotherBlock [
 
 { #category : 'private' }
 EggWebsideAPI >> referencesToClass: aClass [
-	| binding |
-	binding := Smalltalk bindingOf: aClass name asSymbol.
-	^ SystemNavigation default allReferencesTo: binding
+
+	^self referencesToSymbol: aClass name
 ]
 
 { #category : 'private' }
@@ -721,6 +711,26 @@ EggWebsideAPI >> referencesToString: aString [
 						and: [ l isSymbol not
 								and: [ l includesSubstring: aString caseSensitive: false ] ] ] ]
 
+]
+
+{ #category : 'private' }
+EggWebsideAPI >> referencesToSymbol: aSymbol [
+
+	| scope |
+	scope := self queriedScope.
+	scope ifNotNil: [ ^ self referencesToSymbol: aSymbol among: scope methods ].
+	^ self defaultRootClass withAllSubclasses gather: [ :class |
+		  self referencesToSymbol: aSymbol among: class methods ]
+]
+
+{ #category : 'private' }
+EggWebsideAPI >> referencesToSymbol: aSymbol among: aCollection [
+
+	| s slots |
+	s := self runtime addSymbol: aSymbol.
+	^ aCollection select: [ :m |
+		  slots := m wrappee slots.
+		  (7 to: slots size) anySatisfy: [ :i | (slots at: i) == s ] ]
 ]
 
 { #category : 'accessing' }
@@ -777,20 +787,7 @@ EggWebsideAPI >> runtime [
 { #category : 'private' }
 EggWebsideAPI >> sendersOf: aSymbol [
 
-	| scope |
-	scope := self queriedScope.
-	scope ifNotNil: [ 
-		self halt.
-		^ self sendersOf: aSymbol among: scope methods ].
-	^ self defaultRootClass withAllSubclasses gather: [ :class | self halt ]
-]
-
-{ #category : 'private' }
-EggWebsideAPI >> sendersOf: aSymbol among: aCollection [
-	| index |
-	index := Smalltalk specialSelectorIndexOrNil: aSymbol.
-	^ aCollection
-		select: [ :m | m hasSelector: aSymbol specialSelectorIndex: index ]
+	^ self referencesToSymbol: aSymbol
 ]
 
 { #category : 'accessing' }
