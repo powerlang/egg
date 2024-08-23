@@ -2,7 +2,8 @@ Class {
 	#name : 'EggSpeciesWrapper',
 	#superclass : 'EggObjectWrapper',
 	#category : 'Powerlang-EggWebside-Base',
-	#package : 'Powerlang-EggWebside-Base'
+	#package : 'Powerlang-EggWebside',
+	#tag : 'Base'
 }
 
 { #category : 'inquiries' }
@@ -75,37 +76,6 @@ EggSpeciesWrapper >> comment [
 	^ super comment wrappee asLocalString
 ]
 
-{ #category : 'services' }
-EggSpeciesWrapper >> compile: aString [
-
-	| local size kernel name class method treecodes selector format code md |
-	local := SCompiler new compile: aString.
-	size := runtime newInteger: local size.
-	kernel := runtime sendLocal: #namespace to: runtime kernel.
-	name := runtime symbolFromLocal: #CompiledMethod.
-	class := runtime sendLocal: #at: to: kernel with: { name }.
-	method := runtime sendLocal: #new: to: class with: { size }.
-	treecodes := runtime newByteArray: local treecodes.
-	selector := runtime addSymbol: local selector.
-	format := runtime newInteger: local format.
-	code := runtime newString: local source.
-	runtime
-		sendLocal: #treecodes: to: method with: { treecodes };
-		sendLocal: #classBinding: to: method with: { wrappee };
-		sendLocal: #selector: to: method with: { selector };
-		sendLocal: #format: to: method with: { format };
-		sendLocal: #sourceObject: to: method with: { code }.
-	local withIndexDo: [ :literal :i | 
-		| tliteral |
-		tliteral := runtime bootstrapper transferLiteral: literal.
-		method at: i put: tliteral ].
-	md := runtime sendLocal: #methodDictionary to: wrappee.
-	runtime sendLocal: #at:put: to: md with: { 
-			selector.
-			method }.
-	^ method
-]
-
 { #category : 'inquiries' }
 EggSpeciesWrapper >> definition [
 
@@ -158,6 +128,41 @@ EggSpeciesWrapper >> instVarNames [
 		collect: [ :s |  s asLocalString]
 ]
 
+{ #category : 'services' }
+EggSpeciesWrapper >> installMethod: smethod category: categoryName [
+
+	| size kernel name class method treecodes selector format code md organizer category |
+	size := runtime newInteger: smethod size.
+	kernel := runtime sendLocal: #namespace to: runtime kernel.
+	name := runtime symbolFromLocal: #CompiledMethod.
+	class := runtime sendLocal: #at: to: kernel with: { name }.
+	method := runtime sendLocal: #new: to: class with: { size }.
+	treecodes := runtime newByteArray: smethod treecodes.
+	selector := runtime addSymbol: smethod selector.
+	format := runtime newInteger: smethod format.
+	code := runtime newString: smethod source.
+	runtime
+		sendLocal: #treecodes: to: method with: { treecodes };
+		sendLocal: #classBinding: to: method with: { wrappee };
+		sendLocal: #selector: to: method with: { selector };
+		sendLocal: #format: to: method with: { format };
+		sendLocal: #sourceObject: to: method with: { code }.
+	smethod withIndexDo: [ :literal :i |
+		| tliteral |
+		tliteral := runtime bootstrapper transferLiteral: literal.
+		method at: i put: tliteral ].
+	md := runtime sendLocal: #methodDictionary to: wrappee.
+	runtime sendLocal: #at:put: to: md with: {
+			selector.
+			method }.
+	organizer := runtime sendLocal: #organization to: wrappee.
+	category := runtime addSymbol: categoryName.
+	runtime sendLocal: #classify:under: to: organizer with: {
+			selector.
+			category }.
+	^ method
+]
+
 { #category : 'private' }
 EggSpeciesWrapper >> instanceVariablesString [
 	^ String
@@ -189,9 +194,11 @@ EggSpeciesWrapper >> name [
 { #category : 'services' }
 EggSpeciesWrapper >> removeSelector: aSymbol [
 
-	| symbol |
+	| symbol md |
 	symbol := runtime symbolFromLocal: aSymbol.
-	super removeSelector: symbol
+	md := runtime sendLocal: #methodDictionary to: wrappee.
+	runtime sendLocal: #removeKey: to: md with: {	symbol }.
+
 ]
 
 { #category : 'private' }

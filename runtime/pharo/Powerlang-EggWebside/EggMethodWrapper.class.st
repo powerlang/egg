@@ -2,7 +2,8 @@ Class {
 	#name : 'EggMethodWrapper',
 	#superclass : 'EggObjectWrapper',
 	#category : 'Powerlang-EggWebside-Base',
-	#package : 'Powerlang-EggWebside-Base'
+	#package : 'Powerlang-EggWebside',
+	#tag : 'Base'
 }
 
 { #category : 'converting' }
@@ -11,10 +12,10 @@ EggMethodWrapper >> asWebsideJson [
 	^ super asWebsideJson
 		  at: 'selector' put: self selector;
 		  at: 'methodClass' put: self classBinding name;
-		  at: 'category' put: 'self category';
+		  at: 'category' put: self category asString wrappee asLocalString;
 		  at: 'source' put: self sourceCode;
-		  at: 'author' put: 'self author';
-		  at: 'timestamp' put: 'self timeStamp';
+		  at: 'author' put: self author wrappee asLocalString;
+		  at: 'timestamp' put: self timestamp  asString wrappee asLocalString;
 		  at: 'overriding' put: false;
 		  at: 'overriden' put: false;
 		  yourself

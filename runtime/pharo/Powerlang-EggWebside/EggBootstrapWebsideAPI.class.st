@@ -876,7 +876,7 @@ EggBootstrapWebsideAPI >> subclasses [
 	^ class subclasses collect: [ :c | c asWebsideJson ]
 ]
 
-{ #category : 'debugging endpoints' }
+{ #category : 'code endpoints' }
 EggBootstrapWebsideAPI >> superclasses [
 
 	| class |
@@ -899,13 +899,13 @@ EggBootstrapWebsideAPI >> urlAt: aString [
 	^ request at: aString ifAbsent: nil
 ]
 
-{ #category : 'private' }
+{ #category : 'code endpoints' }
 EggBootstrapWebsideAPI >> usedCategories [
 
 	^ #(  )
 ]
 
-{ #category : 'private' }
+{ #category : 'debugging endpoints' }
 EggBootstrapWebsideAPI >> usualCategories [
 
 	^ #(  )
