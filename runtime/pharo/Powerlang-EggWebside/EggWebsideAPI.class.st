@@ -84,7 +84,7 @@ EggWebsideAPI >> applyAddMethodChange: aRBAddMethodChange [
 	| class |
 	class := self classNamed: aRBAddMethodChange changeClassName.
 	class ifNil: [ self error: 'Unexisting class' ].
-	class compile: aRBAddMethodChange source
+	^ self compile: aRBAddMethodChange source category: aRBAddMethodChange protocol in: class
 ]
 
 { #category : 'private - changes' }
@@ -103,7 +103,6 @@ EggWebsideAPI >> applyChange: change [
 EggWebsideAPI >> applyRemoveMethodChange: aRBRemoveMethodChange [
 
 	| class |
-	self halt.
 	class := self classNamed: aRBRemoveMethodChange changeClassName.
 	class ifNil: [ self error: 'Unexisting class' ].
 	class removeSelector: aRBRemoveMethodChange selector
@@ -220,17 +219,24 @@ EggWebsideAPI >> classes [
 { #category : 'private' }
 EggWebsideAPI >> compilationError: error [
 
-	| entity json suggestions |
+	| entity json |
 	json := error asWebsideJson.
-	(error isKindOf: OCUndeclaredVariableWarning) ifTrue: [ 
-		suggestions := self declareVariableSuggestionsFrom: error.
-		suggestions ifNotNil: [ json at: 'suggestions' put: suggestions ] ].
 	entity := ZnStringEntity
 		          with: (NeoJSONWriter toString: json)
 		          type: (ZnMimeType applicationJson
 				           charSet: 'utf-8';
 				           yourself).
 	^ (ZnResponse statusCode: 409) entity: entity
+]
+
+{ #category : 'private - changes' }
+EggWebsideAPI >> compile: source category: category in: anEggSpeciesWrapper [
+
+	| compiler method |
+	compiler := SCompiler new.
+	method := compiler compile: source.
+	method ifNil: [ ^ self compilationError: compiler result error ].
+	^ anEggSpeciesWrapper installMethod: method category: category
 ]
 
 { #category : 'debugging endpoints' }
@@ -829,7 +835,7 @@ EggWebsideAPI >> subclasses [
 	^ class subclasses collect: [ :c | c asWebsideJson ]
 ]
 
-{ #category : 'debugging endpoints' }
+{ #category : 'code endpoints' }
 EggWebsideAPI >> superclasses [
 
 	| class |
@@ -852,13 +858,13 @@ EggWebsideAPI >> urlAt: aString [
 	^ request at: aString ifAbsent: nil
 ]
 
-{ #category : 'private' }
+{ #category : 'code endpoints' }
 EggWebsideAPI >> usedCategories [
 
 	^ #(  )
 ]
 
-{ #category : 'private' }
+{ #category : 'debugging endpoints' }
 EggWebsideAPI >> usualCategories [
 
 	^ #(  )
