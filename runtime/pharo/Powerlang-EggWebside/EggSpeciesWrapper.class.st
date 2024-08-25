@@ -19,20 +19,18 @@ EggSpeciesWrapper >> >> aSymbol [
 { #category : 'inquiries' }
 EggSpeciesWrapper >> allInstVarNames [
 
-	^ super allInstVarNames asArray wrappee slots collect: [ :s | 
-		  s asLocalString ]
+	^ super allInstVarNames collect: [ :s | s asLocalObject ]
 ]
 
 { #category : 'inquiries' }
 EggSpeciesWrapper >> allSubclasses [
-	^ super allSubclasses asArray wrappee slots
-		collect: [ :c | EggSpeciesWrapper on: c runtime: runtime ]
+	^ super allSubclasses collect: [ :c | c asSpeciesWrapper ]
 ]
 
 { #category : 'inquiries' }
 EggSpeciesWrapper >> allSuperclasses [
-	^ super allSuperclasses asArray wrappee slots
-		collect: [ :c | EggSpeciesWrapper on: c runtime: runtime ]
+
+	^ super allSuperclasses collect: [ :c | c asSpeciesWrapper ]
 ]
 
 { #category : 'converting' }
@@ -52,8 +50,8 @@ EggSpeciesWrapper >> asWebsideJson [
 
 { #category : 'inquiries' }
 EggSpeciesWrapper >> categories [
-	^ super categories asArray wrappee slots
-		collect: [ :c | c asLocalString  ]
+
+	^ super categories collect: [ :c | c asLocalObject ]
 ]
 
 { #category : 'inquiries' }
