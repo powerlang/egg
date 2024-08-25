@@ -42,8 +42,8 @@ EggWebsideAPI class >> startServer [
 		            fillSymbols;
 		            generateMetacircularImage) result.
 	^ WebsideServer new
-		  apiClass: self class;
-		  baseUri: '/powerlang';
+		  apiClass: self;
+		  baseUri: '/egg';
 		  port: 9010;
 		  resourcesAt: #runtime put: runtime;
 		  start
@@ -56,6 +56,11 @@ EggWebsideAPI class >> stopServer [
 	"
 
 	WebsideServer allInstances do: #stop
+]
+
+{ #category : 'private' }
+EggWebsideAPI >> ==> anEggObject [
+	^EggObjectWrapper on: anEggObject runtime: self runtime
 ]
 
 { #category : 'changes endpoints' }
@@ -106,6 +111,12 @@ EggWebsideAPI >> applyRemoveMethodChange: aRBRemoveMethodChange [
 	class := self classNamed: aRBRemoveMethodChange changeClassName.
 	class ifNil: [ self error: 'Unexisting class' ].
 	class removeSelector: aRBRemoveMethodChange selector
+]
+
+{ #category : 'private' }
+EggWebsideAPI >> autocompletions [
+
+	^ #(  )
 ]
 
 { #category : 'private' }
@@ -418,6 +429,12 @@ EggWebsideAPI >> evaluations [
 ]
 
 { #category : 'private' }
+EggWebsideAPI >> extensions [
+
+	^ #(  )
+]
+
+{ #category : 'private' }
 EggWebsideAPI >> filterByCategory: aCollection [
 	| category |
 	category := self queriedCategory.
@@ -432,7 +449,7 @@ EggWebsideAPI >> filterByVariable: aCollection [
 	| variable |
 	variable := self queriedAccessing.
 	variable ifNil: [ ^ aCollection ].
-	^ aCollection select: [ :m | m referencesIdentifier: variable ]
+	^ self referencesToSymbol: variable among: aCollection
 ]
 
 { #category : 'debugging endpoints' }
@@ -588,6 +605,28 @@ EggWebsideAPI >> notFound [
 EggWebsideAPI >> objects [
 
 	^ server objects
+]
+
+{ #category : 'code endpoints' }
+EggWebsideAPI >> packages [
+
+	| kernel loaded names tree categories |
+	kernel := self ==> self runtime kernel.
+	loaded := kernel loadedModules keys asArray.
+
+
+	names := self queryAt: 'names'.
+	names = 'true' ifTrue: [
+		^ loaded collect: [ :name | name asLocalString ] ].
+	tree := self queryAt: 'tree'.
+	tree = 'true' ifTrue: [
+		^ loaded collect: [ :name |
+			  categories := #(  ).
+			  self newJsonObject
+				  at: 'name' put: name asLocalString;
+				  at: 'categories' put: categories;
+				  yourself ] ].
+	^ loaded collect: [ :p | p asWebsideJson ]
 ]
 
 { #category : 'objects endpoints' }
