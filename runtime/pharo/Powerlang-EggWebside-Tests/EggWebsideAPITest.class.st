@@ -107,7 +107,7 @@ EggWebsideAPITest >> testAccessors [
 		assert:
 			(accessors allSatisfy: [ :m |
 					 m source includesSubstring: 'numerator' ]).
-	accessors := self get: 'methods?class=Fraction&accessing=numerator'.
+	accessors := self get: 'methods?class=Fraction&assigning=numerator'.
 	self
 		assert: accessors notEmpty;
 		assert: (accessors allSatisfy: [ :m |
@@ -946,60 +946,6 @@ EggWebsideAPITest >> testMethod [
 				or: [ method source includesSubstring: '^ x' ])
 ]
 
-{ #category : 'changes endpoints' }
-EggWebsideAPITest >> testMethodDefinition [
-
-	| change method |
-	change := NeoJSONObject new
-		          at: 'type' put: 'AddMethod';
-		          at: 'class' put: 'Point';
-		          at: 'category' put: self class name;
-		          at: 'sourceCode' put: 'testMethodDefinition
-	^x + 1';
-		          at: 'author' put: self class name;
-		          yourself.
-	[ 
-	self post: '/changes' with: change.
-	method := self get: '/classes/Point/methods/testMethodDefinition'.
-	self
-		assert: method notNil;
-		assert: method selector equals: 'testMethodDefinition';
-		assert: method category equals: self class name;
-		assert: method source equals: 'testMethodDefinition
-	^x + 1' ] ensure: [ 
-		| remotion |
-		remotion := NeoJSONObject new
-			            at: 'type' put: 'RemoveMethod';
-			            at: 'class' put: 'Point';
-			            at: 'selector' put: 'testMethodDefinition';
-			            yourself.
-		self post: '/changes' with: remotion ]
-]
-
-{ #category : 'changes endpoints' }
-EggWebsideAPITest >> testMethodRemove [
-
-	| definition remotion method |
-	definition := NeoJSONObject new
-		              at: 'type' put: 'AddMethod';
-		              at: 'class' put: 'Point';
-		              at: 'category' put: self class name;
-		              at: 'sourceCode' put: 'testMethodRemove
-	^x + 1';
-		              at: 'author' put: self class name;
-		              yourself.
-	remotion := NeoJSONObject new
-		            at: 'type' put: 'RemoveMethod';
-		            at: 'class' put: 'Point';
-		            at: 'selector' put: 'testMethodRemove';
-		            yourself.
-	self
-		post: '/changes' with: definition;
-		post: '/changes' with: remotion.
-	method := self get: '/classes/Point/methods/testMethodRemove'.
-	self assert: method isNil
-]
-
 { #category : 'code endpoints' }
 EggWebsideAPITest >> testMethods [
 	| methods |
@@ -1156,6 +1102,30 @@ EggWebsideAPITest >> testReferencesToString [
 		assert: references notEmpty;
 		assert: (references allSatisfy: [ :m |
 					 m source includesSubstring: 'referencingString' ])
+]
+
+{ #category : 'objects endpoints' }
+EggWebsideAPITest >> testRemoveMethod [
+
+	| definition remotion method |
+	definition := self newJsonObject
+		              at: 'type' put: 'AddMethod';
+		              at: 'className' put: 'Point';
+		              at: 'category' put: self class name;
+		              at: 'sourceCode' put: 'testMethodRemove
+	^x + 1';
+		              at: 'author' put: self class name;
+		              yourself.
+	remotion := self newJsonObject
+		            at: 'type' put: 'RemoveMethod';
+		            at: 'className' put: 'Point';
+		            at: 'selector' put: 'testMethodRemove';
+		            yourself.
+	self
+		post: '/changes' with: definition;
+		post: '/changes' with: remotion.
+	method := self get: '/classes/Point/methods/testMethodRemove'.
+	self assert: method isNil
 ]
 
 { #category : 'changes endpoints' }
