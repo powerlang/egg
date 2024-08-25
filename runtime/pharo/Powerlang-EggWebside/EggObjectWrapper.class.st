@@ -37,6 +37,12 @@ EggObjectWrapper >> asLocalObject [
 ]
 
 { #category : 'converting' }
+EggObjectWrapper >> asSpeciesWrapper [
+
+	^EggSpeciesWrapper on: wrappee runtime: runtime
+]
+
+{ #category : 'converting' }
 EggObjectWrapper >> asWebsideJson [
 
 	| variable printed |
@@ -55,13 +61,21 @@ EggObjectWrapper >> asWebsideJson [
 { #category : 'comparing' }
 EggObjectWrapper >> collect: aBlock [
 
-	^ wrappee slots collect: [ :slot |aBlock value: slot ]
+	^self asArray wrappee slots collect: [ :slot |
+		  aBlock value: (EggObjectWrapper on: slot runtime: runtime) ]
 ]
 
 { #category : 'printing' }
 EggObjectWrapper >> displayString [
 
 	^ self printString
+]
+
+{ #category : 'comparing' }
+EggObjectWrapper >> do: aBlock [
+
+	^ self asArray wrappee slots do: [ :slot |
+		  aBlock value: (EggObjectWrapper on: slot runtime: runtime) ]
 ]
 
 { #category : 'accessing' }
@@ -78,6 +92,13 @@ EggObjectWrapper >> doesNotUnderstand: aMessage [
 		ifTrue: [ EggSpeciesWrapper ]
 		ifFalse: [ EggObjectWrapper ].
 	^ class on: result runtime: runtime
+]
+
+{ #category : 'comparing' }
+EggObjectWrapper >> gather: aBlock [
+
+	^ self asArray wrappee slots gather: [ :slot |
+		  aBlock value: (EggObjectWrapper on: slot runtime: runtime) ]
 ]
 
 { #category : 'comparing' }
@@ -135,6 +156,13 @@ EggObjectWrapper >> respondsTo: aSymbol [
 { #category : 'accessing' }
 EggObjectWrapper >> runtime: aPowerlangLMR [
 	runtime := aPowerlangLMR
+]
+
+{ #category : 'comparing' }
+EggObjectWrapper >> select: aBlock [
+
+	^ self asArray wrappee slots select: [ :slot |
+		  aBlock value: (EggObjectWrapper on: slot runtime: runtime) ]
 ]
 
 { #category : 'testing' }
