@@ -6,7 +6,8 @@ Class {
 		'runtime'
 	],
 	#category : 'Powerlang-EggWebside-Base',
-	#package : 'Powerlang-EggWebside-Base'
+	#package : 'Powerlang-EggWebside',
+	#tag : 'Base'
 }
 
 { #category : 'instance creation' }
@@ -49,6 +50,12 @@ EggObjectWrapper >> asWebsideJson [
 				   ifFalse: [ 0 ]);
 		  at: 'printString' put: printed asLocalString;
 		  yourself
+]
+
+{ #category : 'comparing' }
+EggObjectWrapper >> collect: aBlock [
+
+	^ wrappee slots collect: [ :slot |aBlock value: slot ]
 ]
 
 { #category : 'printing' }
