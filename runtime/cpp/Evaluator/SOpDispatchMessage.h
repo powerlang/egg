@@ -6,10 +6,13 @@
 namespace Egg {
 
 class SOpDispatchMessage : public SExpression {
-    SMessage *_message;
+    SAbstractMessage *_message;
     public:
 
     SOpDispatchMessage(auto message) : _message(message) {}
+	void acceptVisitor_(SExpressionVisitor *visitor) override {
+		visitor->visitOpDispatchMessage(this);
+	}
 
 };
 
