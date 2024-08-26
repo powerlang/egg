@@ -25,6 +25,8 @@ enum Offsets {
     BlockExecutableCode = 1,
     BlockMethod = 2,
 
+    ClosureBlock = 0,
+
     DictionaryTally = 0,
     DictionaryTable = 1,
 
