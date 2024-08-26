@@ -287,6 +287,7 @@ SendSite >> _invokeOn: anObject [
 { #category : #private }
 SendSite >> beInvoke: aCompiledMethod using: invokeInstructions [
 	instructions := invokeInstructions.
+	token := aCompiledMethod selector.
 	cache := aCompiledMethod
 ]
 
