@@ -2,11 +2,16 @@
 #define _SOPLOADRWITHSELF_H_
 
 #include "SOperation.h"
+#include "SExpressionVisitor.h"
 
 namespace Egg {
 
 class SOpLoadRwithSelf : public SOperation {
-    public:
+
+public:
+    void acceptVisitor_(SExpressionVisitor *visitor) override {
+        visitor->visitOpLoadRwithSelf(this);
+    }
 
 };
 
