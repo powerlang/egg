@@ -571,22 +571,24 @@ EggWebsideAPI >> methods [
 	selector := self queriedSelector.
 	selector notNil ifTrue: [ methods := self implementorsOf: selector ].
 	selector := self queriedSending.
-	selector notNil ifTrue: [ 
+	selector notNil ifTrue: [
 		senders := self sendersOf: selector.
 		methods := methods
 			           ifNil: [ senders ]
 			           ifNotNil: [ methods intersection: senders ] ].
 	global := self queriedReferencingClass.
-	global notNil ifTrue: [ 
+	global notNil ifTrue: [
 		references := self referencesToClass: global.
 		methods := methods
 			           ifNil: [ references ]
 			           ifNotNil: [ methods intersection: references ] ].
-	class := self requestedClass ifNil: [ self queriedClass ].
-	(class notNil and: [ methods notNil ]) ifTrue: [ 
+	class := self requestedClass.
+	class notNil ifFalse: [ class := self queriedClass ].
+	(class notNil and: [ methods notNil ]) ifTrue: [
 		methods := methods select: [ :m | m classBinding = class ] ].
-	methods ifNil: [ 
-		methods := (class ifNil: [ self defaultRootClass ]) methods ].
+	methods ifNil: [
+		class notNil ifFalse: [ class := self defaultRootClass ].
+		methods := class methods ].
 	methods := self filterByCategory: methods.
 	methods := self filterByVariable: methods.
 	^ methods collect: [ :m | m asWebsideJson ]
