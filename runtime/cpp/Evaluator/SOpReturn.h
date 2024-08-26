@@ -6,7 +6,11 @@
 namespace Egg {
 
 class SOpReturn : public SOperation {
-    public:
+
+public:
+    void acceptVisitor_(SExpressionVisitor *visitor) override {
+        visitor->visitOpReturn(this);
+    }
 
 };
 
