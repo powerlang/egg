@@ -3,23 +3,22 @@
 
 #include <vector>
 
-#include "SExpression.h"
+#include "SAbstractMessage.h"
 #include "SExpressionVisitor.h"
 
 namespace Egg {
 
-class SMessage : public SExpression {
-    HeapObject *_selector;
+class SMessage : public SAbstractMessage {
     SExpression *_receiver;
-    std::vector<SExpression*> _arguments;
-    std::vector<HeapObject*> _cache;
     bool _inlined;
 
     public:
     SMessage(SExpression *receiver, HeapObject *selector, const std::vector<SExpression*>& arguments, bool inlined) :
-        _selector(selector), _receiver(receiver), _arguments(arguments), _inlined(inlined)
+        SAbstractMessage(selector, arguments), _receiver(receiver), _inlined(inlined)
         { }
 
+    bool isInlined() const { return _inlined; }
+    SExpression* receiver () { return _receiver; }
 };
 
 } // namespace Egg
