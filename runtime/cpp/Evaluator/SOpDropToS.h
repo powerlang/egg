@@ -6,10 +6,17 @@
 namespace Egg {
 
 class SOpDropToS : public SOperation {
+    size_t _count;
     public:
 
-    SOpDropToS(auto assignees) : _assignees(assignees) {}
+    SOpDropToS(auto count) : _count(count) {}
+	void acceptVisitor_(SExpressionVisitor *visitor) override {
+		visitor->visitOpDropToS(this);
+	}
 
+    size_t count() {
+        return _count;
+    }
 };
 
 } // namespace Egg
