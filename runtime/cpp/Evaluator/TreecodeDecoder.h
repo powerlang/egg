@@ -66,6 +66,7 @@ class TreecodeDecoder {
 	HeapObject *_method;
 	std::istringstream _stream;
 	Runtime *_runtime;
+	std::map<HeapObject*, SBlock*> _blocks;
 
 public:
 	SExpression* decodeExpression(auto id)
@@ -121,8 +122,7 @@ public:
 		} else {
 			auto index = this->nextInteger();
 			auto block = this->literalAt_(index)->asHeapObject();
-			auto code = this->_runtime->newExecutableCodeFor_(block, reinterpret_cast<HeapObject*>(expression));
-			this->_runtime->blockExecutableCode_put_(block, (Object*)code);
+			this->_blocks[block] = expression;
 		
 			expression->compiledCode_(block);
 			expression->index_(index);

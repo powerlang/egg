@@ -54,7 +54,7 @@ public:
     HeapObject* newArraySized_(uint32_t);
     HeapObject* newCompiledMethod();
     HeapObject* newEnvironmentSized_(uint32_t);
-    HeapObject* newExecutableCodeFor_(HeapObject *compiledCode, HeapObject *platformCode);
+    HeapObject* newExecutableCodeFor_with_(HeapObject *compiledCode, HeapObject *platformCode);
 
 	int16_t nextHash() {
 			auto shifted = this->_lastHash >> 1;
@@ -150,6 +150,10 @@ public:
 
     void blockExecutableCode_put_(HeapObject* block, Object *anObject) {
         return methodExecutableCode_put_(block, anObject);
+    }
+
+    HeapObject* closureBlock_(HeapObject *closure) {
+        return closure->slot(Offsets::ClosureBlock)->asHeapObject();
     }
 
     HeapObject* compiledCodeExecutableCode_(HeapObject *block) {

@@ -55,6 +55,10 @@ public:
         return true;
     }
 
+    bool isInlined() const {
+   		return _compiledCode == nullptr;
+    }
+
     int offsetOfCurrentEnvironment() const {
         return 2;
     }

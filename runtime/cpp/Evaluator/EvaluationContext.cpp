@@ -41,7 +41,7 @@ void EvaluationContext::buildLaunchFrame()
 {
     auto launcher = _runtime->newCompiledMethod();
     auto platformCode = _runtime->newArraySized_(0);
-    auto executable = _runtime->newExecutableCodeFor_(launcher, platformCode);
+    auto executable = _runtime->newExecutableCodeFor_with_(launcher, platformCode);
     _runtime->methodExecutableCode_put_(launcher, (Object*)executable);
     this->buildMethodFrameFor_code_environment_((Object*)_runtime->_nilObj, launcher, _runtime->_nilObj);
 }

@@ -23,6 +23,8 @@ class EvaluationContext {
 
 public:
     Object* receiver() { return _regS; }
+    Object* self() { return _regS; }
+    
     HeapObject* compiledCode() { return _regM; }
 
     Object* argumentAt_(int anInteger);

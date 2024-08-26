@@ -9,7 +9,7 @@ void Runtime::initializeEvaluator(){
     _evaluator = new Evaluator(this, _falseObj, _trueObj, _nilObj);
 }
 
-HeapObject* Runtime::newExecutableCodeFor_(HeapObject *compiledCode, HeapObject *platformCode)
+HeapObject* Runtime::newExecutableCodeFor_with_(HeapObject *compiledCode, HeapObject *platformCode)
 {
     auto behavior = this->speciesInstanceBehavior_(_arrayClass);
     auto result = allocateSlots(0);
