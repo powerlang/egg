@@ -12,6 +12,7 @@ Class {
 		'format',
 		'token',
 		'tally'
+
 	],
 	#classVars : [
 		'Instances',
@@ -390,12 +391,12 @@ SendSite >> isStaticSelector [
 
 { #category : #testing }
 SendSite >> isStaticSend [
-	^(format bitAnd: 1) == 1
+	^(format bitAnd: IsStaticSend) == IsStaticSend
 ]
 
 { #category : #testing }
 SendSite >> isSuperSend [
-	^(format bitAnd: 2) == 2
+	^(format bitAnd: IsSuperSend) == IsSuperSend
 ]
 
 { #category : #private }
