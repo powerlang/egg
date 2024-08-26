@@ -27,6 +27,11 @@ CompiledMethod class >> aspects [
 	^#(#treecodeString #disassembledText)
 ]
 
+{ #category : #accessing }
+CompiledMethod >> author [
+	^'Unknown'
+]
+
 { #category : #initialization }
 CompiledMethod class >> initializeFormatFlags [
 	Flags := self addNamespace.
@@ -168,6 +173,16 @@ CompiledMethod >> capturesSelf: aBoolean [
 	format := aBoolean
 				ifTrue: [ format bitOr: CapturesSelf ]
 				ifFalse: [ format bitClear: CapturesSelf ]
+]
+
+{ #category : #accessing }
+CompiledMethod >> category [
+	^class categoryFor: selector
+]
+
+{ #category : #accessing }
+CompiledMethod >> category: category [
+	^class organization move: selector to: category
 ]
 
 { #category : #accessing }
@@ -472,9 +487,7 @@ CompiledMethod >> tempCount: anInteger [
 
 { #category : #accessing }
 CompiledMethod >> timestamp [
-	| s |
-	s := self sourceReference.
-	^(s respondsTo: #timestamp) ifTrue: [s timestamp]
+	^nil
 ]
 
 { #category : #accessing }
