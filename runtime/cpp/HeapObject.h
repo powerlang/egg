@@ -106,10 +106,7 @@ struct HeapObject
 
 #pragma pack (pop)
   protected:
-    SmallHeader::Flags flags()
-    {
-        return (SmallHeader::Flags)this->smallHeader()->flags;
-    }
+ 
 
     const SmallHeader* smallHeader() const { return (const SmallHeader*)((uintptr_t)this - sizeof(SmallHeader)); }
     SmallHeader* smallHeader() { return (SmallHeader*)((uintptr_t)this - sizeof(SmallHeader)); }
@@ -128,7 +125,11 @@ struct HeapObject
       void unsetFlags(const uint8_t flag);
 
   public:
-
+      SmallHeader::Flags flags()
+      {
+          return (SmallHeader::Flags)this->smallHeader()->flags;
+      }
+      
       /// ~ header bits getters ~
 
       bool isBytes() const; // `true` means this object is byte-indexed, `false` that its slots contain Object pointers.
