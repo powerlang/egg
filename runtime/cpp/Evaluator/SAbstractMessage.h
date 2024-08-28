@@ -35,8 +35,9 @@ public:
         _cache.push_back(anSCompiledMethod);
     }
 
-    void cacheUndermessage_(HeapObject* aBlockClosure) {
-        _cache.push_back(aBlockClosure);
+    using UndermessagePointer = Object* (Evaluator::*)(Object *, std::vector<Object*> &args);
+    void cacheUndermessage_(UndermessagePointer *anUndermessage) {
+        _cache.push_back(reinterpret_cast<HeapObject*>(anUndermessage));
     }
 
     HeapObject* cachedUndermessage() const {
@@ -63,7 +64,7 @@ public:
 
     void registerCacheWith(Runtime* runtime) {
         if (_cache.empty()) {
-            runtime->registerCache_for_(&_cache, _selector);
+            runtime->registerCache_for_(this, _selector);
         }
     }
 

@@ -52,6 +52,7 @@ struct HeapObject
           AllOn        = 0xFF
       } Flags;
 
+
       static SmallHeader* at(void* buffer) /// just a cast
         { return (SmallHeader*)buffer; }
 
@@ -65,6 +66,9 @@ struct HeapObject
       void unsetFlags(const uint8_t flag);
 
     };
+    
+    static const int MAX_SMALL_SIZE = 0xFF;
+
 
     struct LargeHeader
     {
@@ -179,6 +183,13 @@ struct HeapObject
       void     smallSize(uint8_t size);
       uint32_t largeSize() const; // the size field of the large header part (the object must have a large header)
       void     largeSize(uint32_t size);
+      void     size(uint32_t size)  // sets the small or large size field according to its small flag
+      {
+        if (this->isSmall()) 
+            smallSize(size);
+        else
+            largeSize(size);
+      };
 
       uint32_t size() const; // the small size field if the object is marked as small, the large size field otherwise
       uint32_t bodySizeInBytes() const; // the size in bytes of the buffer used for the body of this object (buffer sizes are aligned to pointer size)
@@ -191,13 +202,27 @@ struct HeapObject
       /// ~ object slots ~
 
       typedef Object* ObjectSlot;
-      ObjectSlot &slot(const uint32_t index); // return a reference to a slot of
+      ObjectSlot &slot(const uint32_t subscript); // return a reference to a slot of
                                               // this object. `index` is 0-based
+
       ObjectSlot& slotAt_(uint32_t index) { return slot(index - 1); }; // 1-based slot for compatibility reasons
 
-      const uint8_t& byte(const uint32_t index) const; /// Return a byte of this object at 0-based `index`
-      const uint8_t& byteAt_(uint32_t index) { return byte(index - 1); }; // 1-based slot for compatibility reasons
+      uint8_t& byte(const uint32_t subscript);       /// Return a byte of this object at 0-based `subscript`
+      uint8_t& byteAt_(uint32_t index) { return byte(index - 1); }; // 1-based index for compatibility reasons
 
+      uint16_t& uint16(const uint32_t subscript);       /// Return a 16-bit uint of this object at 0-based `subscript`
+      uint16_t& unsignedShortAt_(uint32_t index) { return uint16(index - 1); }; // 1-based index for compatibility reasons
+
+      uint32_t& uint32(const uint32_t subscript);       /// Return a 32-bit uint of this object at 0-based `subscript`
+      uint32_t& unsignedLongAt_(uint32_t index) { return uint32(index - 1); }; // 1-based index for compatibility reasons
+
+
+    /// ~ object bytes ~
+      void replaceBytesFrom_to_with_startingAt_(
+          const uintptr_t from,
+          const uintptr_t to,
+          HeapObject *anObject,
+          const uintptr_t startingAt);
 
     /**
      * Returns a pointer to the header of the object immediately after the

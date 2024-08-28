@@ -2,6 +2,7 @@
 #define _EVALUATIONCONTEXT_H_
 
 #include <iostream>
+#include <vector>
 
 #include "../HeapObject.h"
 #include "../KnownObjects.h"
@@ -14,6 +15,7 @@ namespace Egg {
 
 class Runtime;
 class SBinding;
+class SBlock;
 
 class EvaluationContext {
     HeapObject *_regM, *_regE;
@@ -25,7 +27,10 @@ public:
     Object* receiver() { return _regS; }
     Object* self() { return _regS; }
     
+    HeapObject* environment() { return _regE; }
     HeapObject* compiledCode() { return _regM; }
+
+    int tempOffset() { return 4; }
 
     Object* argumentAt_(int anInteger);
 
@@ -40,6 +45,20 @@ public:
     Object* firstArgument(){
 	    return this->argumentAt_(1);
     }
+
+    Object* secondArgument(){
+	    return this->argumentAt_(2);
+    }
+
+    Object* thirdArgument(){
+	    return this->argumentAt_(3);
+    }
+
+    Object* fourthArgument(){
+	    return this->argumentAt_(4);
+    }
+
+    std::vector<Object*> methodArguments();
 
 	void buildFrameFor_code_environment_temps_(Object *receiver, HeapObject *executableCode, HeapObject *environment, uint32_t temps);
     void buildLaunchFrame();
@@ -89,6 +108,28 @@ public:
         this->stackAt_put_(_regSP, anObject);
     }
 
+    void dropOperands_(intptr_t anInteger)
+    {
+    	_regSP = _regSP + anInteger;
+    }
+
+    std::vector<Object*> popOperands_(intptr_t anInteger)
+    {
+        if (anInteger == 0) return std::vector<Object*>();
+    	std::vector<Object*> result;
+        result.resize(anInteger);
+    	for (int i = anInteger; i > 0; i--)
+        {
+            result[i-1] = this->pop();
+        }
+    	return result;
+    }
+
+    Object* operandAt_(intptr_t anInteger)
+    {
+    	return _stack[_regSP + anInteger];
+    }
+
     uintptr_t regPC() { return _regPC; }
     void regPC_(uintptr_t pc) { _regPC = pc; }
 
@@ -99,6 +140,18 @@ public:
 
 	HeapObject* method();
 
+    uintptr_t bpForFrameAt_(int index)
+    {
+        uintptr_t bp = _regBP;
+        for (int i = 0; i < index - 1; ++i) {
+            if (bp == 0) {
+                error("reached the begining of the stack");
+            }
+            bp = (uintptr_t)_stack[bp];
+        }
+        return bp;
+    }
+
     Object* stackAt_(int index) {
         return _stack[index - 1];
     }
@@ -107,8 +160,28 @@ public:
         return _stack[index - 1] = object;
     }
 
-    Object* stackTemporaryAt_(int);
+    Object* stackTemporaryAt_(int index);
+    Object* stackTemporaryAt_frameIndex_(int index, int anotherIndex);
+
     void stackTemporaryAt_put_(int index, Object *value);
+    void stackTemporaryAt_frameIndex_put_(int index, int anotherIndex, Object *value);
+
+    void popFrame()
+    {
+        _regSP = _regBP;
+    	_regBP = (uintptr_t)this->pop();
+        _regPC = (uintptr_t)this->pop();
+        _regE  = _stack[_regBP - 4]->asHeapObject();
+        _regM  = _stack[_regBP - 2]->asHeapObject();
+        _regS  = _stack[_regBP - 1];
+    }
+
+    void reserveStackSlots_(int anInteger)
+    {
+        _regSP = _regSP - anInteger;
+    }
+
+    void unwind();
 
     Object* temporaryAt_in_(int index, int environmentIndex){
         if (environmentIndex == INSTACK_ENVIRONMENT) { 
@@ -127,6 +200,8 @@ public:
     Object* loadAssociationValue_(HeapObject *anObject);
 
 	void storeAssociation_value_(HeapObject *association, Object *anObject);
+
+    HeapObject* captureClosure_(SBlock *anSBlock);
 
     uint16_t ivarIndex_in_(HeapObject *symbol, Object *receiver);
 

@@ -35,14 +35,18 @@ private:
 
     std::vector<SExpression*> *_work;
 
+public:
     using PrimitivePointer = Object* (Evaluator::*)();
-    std::map<HeapObject*, PrimitivePointer> _primitives;
-
     using UndermessagePointer = Object* (Evaluator::*)(Object *, std::vector<Object*> &args);
+
+private:
+   	std::map<HeapObject*, PrimitivePointer> _primitives;
     std::map<HeapObject*, UndermessagePointer> _undermessages;
 
 public:
     Evaluator(Runtime *runtime, HeapObject *falseObj, HeapObject *trueObj, HeapObject *nilObj);
+
+	void _halt(); // trigger a breakpoint that hard-pauses the interpreter (you'd better have a debugger attached to os-process)
 
     static std::vector<std::string> undermessages() {
         return {"_basicAt:", "_basicAt:put:", "_bitShiftLeft:", "_byteAt:", "_byteAt:put:", "_smallSize", "_largeSize", "_isSmallInteger", "_basicHash", "_basicHash:", "_smallIntegerByteAt:", "_uShortAtOffset:", "_uShortAtOffset:put:"};
@@ -88,8 +92,10 @@ public:
 
     }
 
-    void evaluatePerform_in_withArgs_(HeapObject *aSymbol, Object *receiver, std::vector<Object*> &arguments);
+    void evaluatePerform_in_withArgs_(HeapObject *aSymbol, Object *receiver, Object *arguments);
     SmallInteger* evaluatePrimitiveHash_(HeapObject *receiver);
+
+	void evaluateUndermessage_with_(SAbstractMessage *message, UndermessagePointer undermessage);
 
     HeapObject* false_() {
         return this->_falseObj;
@@ -101,16 +107,28 @@ public:
 
     Object* send_to_with_(HeapObject *symbol, Object *receiver, std::vector<Object*> &args);
 
-    void visitAssignment(SAssignment* assignment) override;
-    void visitExpression(SExpression* expression) override;
+	void doesNotKnow(HeapObject *symbol);
     void visitIdentifier(SIdentifier* identifier) override;
-    void visitReturn(SReturn* sReturn) override;
-    void visitPragma(SPragma* sPragma) override;
-    void visitCascade(SCascade* sCascade) override;
-    void visitCascadeMessage(SCascadeMessage* cascadeMessage) override;
-    void visitMethod(SMethod* sMethod) override;
     void visitLiteral(SLiteral* sLiteral) override;
     void visitBlock(SBlock* sBlock) override;
+
+  	virtual void visitOpAssign(SOpAssign *anSOpAssign);
+    virtual void visitOpDispatchMessage(SOpDispatchMessage *anSOpDispatchMessage);
+    virtual void visitOpDropToS(SOpDropToS *anSOpDropToS);
+    virtual void visitOpJump(SOpJump *anSOpJump);
+    virtual void visitOpJumpFalse(SOpJumpFalse *anSOpJumpFalse);
+    virtual void visitOpJumpTrue(SOpJumpTrue *anSOpJumpTrue);
+    virtual void visitOpLoadRfromFrame(SOpLoadRfromFrame *anSOpLoadRfromFrame);
+    virtual void visitOpLoadRfromStack(SOpLoadRfromStack *anSOpLoadRfromStack);
+    virtual void visitOpLoadRwithNil(SOpLoadRwithNil *anSOpLoadRwithNil);
+    virtual void visitOpLoadRwithSelf(SOpLoadRwithSelf *anSOpLoadRwithSelf);
+    virtual void visitOpPrimitive(SOpPrimitive *anSOpPrimitive);
+    virtual void visitOpPopR(SOpPopR *anSOpPopR);
+    virtual void visitOpPushR(SOpPushR *anSOpPushR);
+
+	void popFrameAndPrepare();
+    virtual void visitOpReturn(SOpReturn *anSOpReturn);
+    virtual void visitOpNonLocalReturn(SOpNonLocalReturn *anSOpNonLocalReturn);
 
 private:
     void evaluate();
@@ -191,7 +209,7 @@ private:
 	Object* underprimitiveIsSmallInteger(Object *receiver, std::vector<Object*> &args);
 	Object* underprimitiveLargeSize(Object *receiver, std::vector<Object*> &args);
 	Object* underprimitiveLeadingZeroBitCount(Object *receiver, std::vector<Object*> &args);
-	Object* underprimitiveLeadingZeroBitCount_(auto anInteger);
+	intptr_t underprimitiveLeadingZeroBitCount_(uintptr_t anInteger);
 	Object* underprimitiveSMIBitAnd(Object *receiver, std::vector<Object*> &args);
 	Object* underprimitiveSMIBitOr(Object *receiver, std::vector<Object*> &args);
 	Object* underprimitiveSMIBitShiftLeft(Object *receiver, std::vector<Object*> &args);

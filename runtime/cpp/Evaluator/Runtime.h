@@ -11,15 +11,19 @@
 namespace Egg {
 
 class Evaluator;
-
+class SAbstractMessage;
+class GCSpace;
+class SExpression;
 
 class Runtime {
     ImageSegment *_kernel;
     Evaluator *_evaluator;
+    GCSpace *eden;
+
     std::map<std::string, HeapObject*> _knownSymbols;
 
-    typedef std::vector<HeapObject*> inline_cache;
-    std::map<HeapObject*, std::vector <inline_cache *> * > _inlineCaches;
+    //typedef std::vector<SAbstractMessage*> inline_cache;
+    std::map<HeapObject*, std::vector <SAbstractMessage *> * > _inlineCaches;
 
     typedef std::pair<HeapObject*,HeapObject*> global_cache_key;
     std::map<global_cache_key, HeapObject*> _globalCache;
@@ -47,34 +51,50 @@ public:
 
     HeapObject* lookupAssociationFor_in_(HeapObject *symbol, HeapObject *dictionary);
 
+    void flushDispatchCache_(HeapObject *aSymbol);
+    void flushDispatchCache_in_(HeapObject *aSymbol, HeapObject *klass);
+
     SmallInteger* newInteger_(intptr_t value) {
         return SmallInteger::from(value);
     }
 
+    uintptr_t arrayedSizeOf_(Object *anObject);
+
+    HeapObject* newBytes_size_(HeapObject* species, uint32_t size);
+    HeapObject* newBytesOf_sized_(HeapObject* species, uint32_t size);
+    HeapObject* newSlots_size_(HeapObject *species, uint32_t size);
+    HeapObject* newSlotsOf_(HeapObject* species);
+    HeapObject* newOf_sized_(HeapObject* species, uint32_t size);
+
     HeapObject* newArraySized_(uint32_t);
+    HeapObject* newClosureFor_(HeapObject *block);
     HeapObject* newCompiledMethod();
     HeapObject* newEnvironmentSized_(uint32_t);
     HeapObject* newExecutableCodeFor_with_(HeapObject *compiledCode, HeapObject *platformCode);
 
+    HeapObject* loadModule_(HeapObject *name);
+
+    uintptr_t hashFor_(Object *anObject);
+
 	int16_t nextHash() {
 			auto shifted = this->_lastHash >> 1;
-			this->_lastHash = (this->_lastHash & 1) == 0 ? shifted : shifted ^ 47560;
+			this->_lastHash = (this->_lastHash & 1) == 0 ? shifted : shifted ^ 0xB9C8;
 			return this->_lastHash;
 	}
 
-    void registerCache_for_(inline_cache *cache, HeapObject *symbol) {
+    void registerCache_for_(SAbstractMessage *message, HeapObject *symbol) {
         auto it = _inlineCaches.find(symbol);
-        std::vector <inline_cache*> *messages; 
+        std::vector <SAbstractMessage*> *messages; 
         if (it == _inlineCaches.end())
         {
-            messages = new std::vector<inline_cache*>();
+            messages = new std::vector<SAbstractMessage*>();
             _inlineCaches[symbol] = messages;
         }
         else {
             messages = it->second;
         }
 
-	    messages->push_back(cache);
+	    messages->push_back(message);
     }
 
     HeapObject* booleanFor_(bool aBoolean)
@@ -164,12 +184,26 @@ public:
         return code->slot(Offsets::ExecutableCodePlatformCode)->asHeapObject();
     }
 
+    HeapObject* closureHome_(HeapObject *closure) {
+        auto block = this->closureBlock_(closure);
+        if (!this->blockCapturesHome_(block))
+		    error("closure has no home");
+        
+	    return (this->blockCapturesSelf_(block)) ?
+            closure->slotAt_(2)->asHeapObject() :
+		    closure->slotAt_(1)->asHeapObject();
+    }
+
     void executableCodePlatformCode_put_(HeapObject *code, Object *platformCode) {
         code->slot(Offsets::ExecutableCodePlatformCode) = platformCode;
     }
 
     HeapObject* executableCodeCompiledCode_(HeapObject *code) {
         return code->slot(Offsets::ExecutableCodeCompiledCode)->asHeapObject();
+    }
+
+    std::vector<SExpression*>* executableCodeWork_(HeapObject *code) {
+        return (std::vector<SExpression*> *)(code->slot(Offsets::ExecutableCodePlatformCode));
     }
 
     void executableCodeCompiledCode_put_(HeapObject *code, Object *compiledCode) {
@@ -223,6 +257,10 @@ public:
         method->slot(Offsets::CompiledCodeExecutableCode) = anObject;
     }
 
+    HeapObject* methodSelector_(HeapObject *method) {
+        return method->slot(Offsets::MethodSelector)->asHeapObject();
+    }
+    
     HeapObject* moduleNamespace_(HeapObject *module) {
         return module->slot(Offsets::ModuleNamespace)->asHeapObject();
     }

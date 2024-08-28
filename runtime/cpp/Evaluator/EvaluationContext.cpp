@@ -3,6 +3,7 @@
 #include "Runtime.h"
 #include "SAssociationBinding.h"
 #include "SInstVarBinding.h"
+#include "SBlock.h"
 
 using namespace Egg;
 
@@ -36,6 +37,16 @@ void EvaluationContext::buildFrameFor_code_environment_temps_(Object *receiver, 
         this->push_((Object*)this->_runtime->_nilObj);
 }
 
+
+std::vector<Object*> EvaluationContext::methodArguments() {
+    int count = _runtime->methodArgumentCount_(_regM);
+    std::vector<Object*> arguments;
+    arguments.reserve(count);
+    for (int i = count; i >= 1; --i) {
+        arguments.push_back(this->argumentAt_(i));
+    }
+    return arguments;
+}
 
 void EvaluationContext::buildLaunchFrame()
 {
@@ -81,10 +92,81 @@ void EvaluationContext::storeAssociation_value_(HeapObject *association, Object 
     this->_runtime->associationValue_put_(association, anObject);
 }
 
+HeapObject *EvaluationContext::captureClosure_(SBlock *anSBlock)
+{
+	auto closure = _runtime->newClosureFor_(anSBlock->compiledCode());
+	auto it = anSBlock->capturedVariables().begin();
+	auto i = 1;
+	while(it != anSBlock->capturedVariables().end()) {
+		auto type = *it++;
+	    switch (type)
+        {
+        case BlockCapturedVariables::Self:
+            closure->slotAt_(i) = this->self(); break;
+		case BlockCapturedVariables::Environment:
+            closure->slotAt_(i) = (Object*)this->environment(); break;
+        case BlockCapturedVariables::EnvironmentValue: {
+			auto env = this->environment()->slotAt_(*it++);
+			closure->slotAt_(i) = env;
+            break; }
+		case BlockCapturedVariables::LocalArgument: {
+			auto arg = this->argumentAt_(*it++);
+			closure->slotAt_(i) = arg;
+            break; };
+        }
+		i = i + 1;
+    }
+	return closure;
+}
+
 HeapObject* EvaluationContext::method()
 {
         auto code = this->_runtime->executableCodeCompiledCode_(this->_regM);
 		return this->_runtime->isBlock_(code) ? this->_runtime->blockMethod_(code) : code;
+}
+
+Object *EvaluationContext::stackTemporaryAt_(int anInteger)
+{
+    return this->stackTemporaryAt_frameIndex_(anInteger, 1);
+}
+
+Object *EvaluationContext::stackTemporaryAt_frameIndex_(int index, int anotherIndex)
+{
+    uintptr_t bp = this->bpForFrameAt_(anotherIndex);
+    return _stack[bp - this->tempOffset() - index];
+}
+
+void EvaluationContext::stackTemporaryAt_put_(int index, Object *value)
+{
+    this->stackTemporaryAt_frameIndex_put_(index, 1, value);
+}
+
+void EvaluationContext::stackTemporaryAt_frameIndex_put_(int index, int anotherIndex, Object *value)
+{
+    uintptr_t bp = this->bpForFrameAt_(anotherIndex);
+    _stack[bp - this->tempOffset() - index] = value;
+}
+
+void EvaluationContext::unwind()
+{
+    HeapObject* home = _runtime->closureHome_(this->environment());
+    if (home == _runtime->_nilObj)
+        error("cannot return because closure has no home");
+
+    uintptr_t bp = _regBP;
+    while (bp != 0) {
+        HeapObject* environment = _stack[bp - 4]->asHeapObject();
+        if (environment == home) {
+            _regBP = bp;
+            this->popFrame();
+            return;
+        }
+
+        bp = (uintptr_t)_stack[bp];
+    }
+
+    error("cannot return from this closure");
+
 }
 
 SBinding* EvaluationContext::staticBindingFor_(HeapObject *symbol)

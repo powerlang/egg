@@ -25,9 +25,9 @@ void HeapObject::SmallHeader::unsetFlags(uint8_t flag)
 	this->flags &= flag ^ Flags::AllOn;
 }
 
-bool HeapObject::testFlags (const uint8_t flags) const { this->testFlags(flags); }
+bool HeapObject::testFlags (const uint8_t flags) const { return this->smallHeader()->testFlags(flags); }
 void HeapObject::setFlags  (const uint8_t flags) { this->smallHeader()->setFlags(flags); }
-void HeapObject::unsetFlags(const uint8_t flags) { this->testFlags(flags); }
+void HeapObject::unsetFlags(const uint8_t flags) { this->smallHeader()->unsetFlags(flags); }
 
 
 /// ~ header flags getters ~
@@ -58,11 +58,22 @@ bool HeapObject::isBytes() const
 	return this->testFlags(SmallHeader::Flags::IsBytes);
 }
 
+bool Egg::HeapObject::isPointers() const {
+	return !this->isBytes();
+}
+
+bool Egg::HeapObject::isArrayed() const { 
+	return this->testFlags(SmallHeader::Flags::IsArrayed);
+}
+
 bool HeapObject::isSmall() const
 {
 	return this->testFlags(SmallHeader::Flags::IsSmall);
 }
 
+bool Egg::HeapObject::isLarge() const {
+	return !this->isSmall();
+}
 
 bool HeapObject::isRemembered() const
 {
@@ -87,9 +98,12 @@ void Egg::HeapObject::beNamed()
 	this->smallHeader()->unsetFlags(SmallHeader::Flags::IsNamed);
 }
 
-void HeapObject::beStrong()
-{
+void Egg::HeapObject::beNotSpecial() {
 	this->unsetFlags(SmallHeader::Flags::IsSpecial);
+}
+
+void HeapObject::beStrong() {
+	this->beNotSpecial();
 }
 
 void HeapObject::beSecondGeneration()
@@ -227,15 +241,48 @@ HeapObject::slot(const uint32_t index)
     return ((ObjectSlot*)this)[index];
 }
 
-const uint8_t&
-HeapObject::byte(const uint32_t index) const
+uint8_t&
+HeapObject::byte(const uint32_t subscript)
 {
     ASSERT(this->isBytes());
-    ASSERT(index <= this->size());
+    ASSERT(subscript < this->size());
 
-    return *(((uint8_t*)this) + index);
+    return *(((uint8_t*)this) + subscript);
 }
 
+uint16_t&
+HeapObject::uint16(const uint32_t subscript)
+{
+    ASSERT(this->isBytes());
+    ASSERT(subscript * 2 + 1 < this->size());
+
+    return *(((uint16_t*)this) + subscript);
+}
+
+uint32_t&
+HeapObject::uint32(const uint32_t subscript)
+{
+    ASSERT(this->isBytes());
+    ASSERT(subscript * 4 + 3 < this->size());
+
+    return *(((uint32_t*)this) + subscript);
+}
+
+void HeapObject::replaceBytesFrom_to_with_startingAt_(
+    const uintptr_t from, const uintptr_t to, HeapObject *anObject,
+    const uintptr_t startingAt) {
+		if (from > to)
+			return;
+
+		auto size = to - from + 1;
+		auto startingAtOffset = startingAt - 1;
+		if (size > anObject->size() - startingAtOffset)
+			error("out of bounds");
+		
+		auto dst = (char*)this;
+		auto src = ((char*)anObject) + startingAtOffset;
+		std::copy(src, src + size, dst);
+	}
 
 /// ~ debugging and temp stuff ~
 
@@ -248,6 +295,22 @@ HeapObject::stringVal()
     return str;
 }
 
+std::string HeapObject::asLocalString()
+{
+	return std::string((char*)this, this->size());
+}
+
+bool HeapObject::sameBytesThan(const std::string &string)
+{
+	auto size = this->size();
+	return size == string.size() && std::equal((char*)this, (char*)this + size, string.begin());
+}
+
+bool Egg::HeapObject::sameBytesThan(const HeapObject *object)
+{
+	auto size = this->size();
+	return size == object->size() && std::equal((char*)this, (char*)this+size, (char*)object);
+}
 
 HeapObject* HeapObject::klass() {
     HeapObject *current = this->behavior();

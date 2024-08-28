@@ -1,7 +1,9 @@
 
 #include "Runtime.h"
 #include "Evaluator.h"
-#include "Memory.h"
+#include "GCSpace.h"
+#include "SAbstractMessage.h"
+#include "KnownConstants.h"
 
 using namespace Egg;
 
@@ -9,16 +11,112 @@ void Runtime::initializeEvaluator(){
     _evaluator = new Evaluator(this, _falseObj, _trueObj, _nilObj);
 }
 
-HeapObject* Runtime::newExecutableCodeFor_with_(HeapObject *compiledCode, HeapObject *platformCode)
+uintptr_t Runtime::arrayedSizeOf_(Object *anObject) {
+    if (anObject->isSmallInteger())
+        return 0;
+    
+    auto species = this->speciesOf_(anObject);
+    auto ivars = this->speciesInstanceSize_(species);
+
+    return anObject->asHeapObject()->size() - ivars;
+}
+
+HeapObject* Runtime::newBytes_size_(HeapObject *species, uint32_t size)
 {
-    auto behavior = this->speciesInstanceBehavior_(_arrayClass);
-    auto result = allocateSlots(0);
+	auto behavior = this->speciesInstanceBehavior_(species);
+	auto result = eden->allocateBytes_(size);
+              
     result->behavior(behavior);
-    result->beArrayed();
-    this->executableCodePlatformCode_put_(result, (Object*)platformCode);
-    this->executableCodeCompiledCode_put_(result, (Object*)compiledCode);
     return result;
 }
+
+HeapObject* Runtime::newBytesOf_sized_(HeapObject *species, uint32_t size)
+{
+    return this->newBytes_size_(species, size);
+}
+
+HeapObject *Egg::Runtime::newSlots_size_(HeapObject *species, uint32_t size) {
+	auto ivars = this->speciesInstanceSize_(species);
+    HeapObject *behavior = this->speciesInstanceBehavior_(species);
+    auto slotSize = ivars + size;
+    HeapObject *result = eden->allocateSlots_(slotSize);
+    result->behavior(behavior);
+    return result;
+ }
+
+HeapObject* Runtime::newSlotsOf_(HeapObject *species) {
+    return this->newSlots_size_(species, 0);
+}
+
+HeapObject *Runtime::newOf_sized_(HeapObject *species, uint32_t size) {
+    return (speciesIsBytes_(species)) ?
+        newBytes_size_(species, size) :
+        newSlots_size_(species, size);
+}
+
+HeapObject* Runtime::newArraySized_(uint32_t anInteger) { 
+    HeapObject *behavior = this->speciesInstanceBehavior_(_arrayClass);
+    HeapObject *result = eden->allocateSlots_(anInteger);
+    result->behavior(behavior);
+    result->beArrayed();
+    return result;
+ }
+
+HeapObject *Egg::Runtime::newClosureFor_(HeapObject *block)
+{
+	auto size = this->blockEnvironmentCount_(block);
+	auto closure = this->newSlots_size_(_closureClass, size);
+	closure->slot(Offsets::ClosureBlock) = (Object*)block;
+	return  closure;
+}
+
+ HeapObject *Egg::Runtime::newCompiledMethod() {
+     HeapObject *behavior = this->speciesInstanceBehavior_(_methodClass);
+     HeapObject *result = eden->allocateSlots_(Offsets::MethodInstSize);
+     result->behavior(behavior);
+     result->beNamed();
+     result->beArrayed();
+     result->slot(Offsets::MethodFormat) = (Object *)this->newInteger_(0);
+
+     return result;
+ 
+}
+
+HeapObject *Egg::Runtime::newEnvironmentSized_(uint32_t size)
+{
+    return this->newArraySized_(size);
+ }
+
+HeapObject *Runtime::newExecutableCodeFor_with_(HeapObject *compiledCode,
+                                                HeapObject *platformCode) {
+    auto behavior = this->speciesInstanceBehavior_(_arrayClass);
+    auto result = eden->allocateSlots_(0);
+    result->behavior(behavior);
+    result->beArrayed();
+    this->executableCodePlatformCode_put_(result, (Object *)platformCode);
+    this->executableCodeCompiledCode_put_(result, (Object *)compiledCode);
+    return result;
+}
+
+HeapObject *Egg::Runtime::loadModule_(HeapObject *name)
+{
+    _evaluator->_halt();
+    return _evaluator->context()->self()->asHeapObject();
+}
+
+uintptr_t Egg::Runtime::hashFor_(Object *anObject)
+{
+    if (anObject->isSmallInteger()) 
+        return anObject->asSmallInteger()->asNative();
+
+    uintptr_t current = anObject->asHeapObject()->hash();
+    if (current != 0)
+        return current;
+
+    auto hash = this->nextHash();
+    anObject->asHeapObject()->hash(hash);
+    return hash;
+ }
 
 Object* Runtime::sendLocal_to_with_(const std::string &selector, Object *receiver, std::vector<Object*> &arguments) {
     auto symbol = this->existingSymbolFrom_(selector);
@@ -88,4 +186,42 @@ HeapObject* Runtime::lookupAssociationFor_in_(HeapObject *symbol, HeapObject *di
         }
     }
     return nullptr;
+}
+
+void Runtime::flushDispatchCache_(HeapObject *aSymbol) {
+
+    auto iter = _inlineCaches.find(aSymbol);
+    if (iter != _inlineCaches.end()) {
+        auto messages = _inlineCaches[aSymbol];
+        for (auto& m : *messages) {
+            m->flushCache();
+        }
+    }
+
+    std::vector<global_cache_key> cached;
+    for (const auto& entry : _globalCache) {
+        if (entry.first.first == aSymbol) {
+            cached.push_back(entry.first);
+        }
+    }
+
+    for (const auto& key : cached) {
+        _globalCache.erase(key);
+    }
+}
+
+void Runtime::flushDispatchCache_in_(HeapObject *aSymbol, HeapObject *klass) {
+
+    HeapObject *behavior = this->speciesInstanceBehavior_(klass);
+
+    auto iter = _inlineCaches.find(aSymbol);
+    if (iter != _inlineCaches.end()) {
+    
+        auto messages = _inlineCaches[aSymbol];
+        for (auto& m : *messages) {
+            m->flushCache();
+        }
+    }
+
+    _globalCache.erase(std::make_pair(aSymbol, behavior));
 }
