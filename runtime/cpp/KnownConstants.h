@@ -13,6 +13,13 @@ enum BlockFlags {
     CapturesSelf = 0x1
 };
 
+enum BlockCapturedVariables {
+    Self = 0,
+    LocalArgument = 1,
+    Environment = 2,
+    EnvironmentValue = 3
+};
+
 enum Offsets {
     AssociationKey = 0,
     AssociationValue = 1,
