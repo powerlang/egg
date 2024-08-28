@@ -36,33 +36,33 @@ class SOpNonLocalReturn;
 class SExpressionVisitor {
 public:
     // Pure virtual methods for each SExpression subclass
-    virtual void visitAssignment(SAssignment *assignment) = 0;
+    virtual void visitAssignment(SAssignment *assignment) { ASSERT(false); };
     virtual void visitExpression(SExpression *expression) { ASSERT(false); };
     virtual void visitIdentifier(SIdentifier *identifier) = 0;
-    virtual void visitReturn(SReturn *sReturn) = 0;
-    virtual void visitPragma(SPragma *sPragma) { ASSERT(false); };
-    virtual void visitCascade(SCascade *sCascade) = 0;
+    virtual void visitReturn(SReturn *anSReturn) { ASSERT(false); };
+    virtual void visitPragma(SPragma *anSPragma) { ASSERT(false); };
+    virtual void visitCascade(SCascade *anSCascade) { ASSERT(false); };
     virtual void visitCascadeMessage(SCascadeMessage *cascadeMessage) { ASSERT(false); };
-    virtual void visitMethod(SMethod *sMethod) = 0;
-    virtual void visitLiteral(SLiteral *sLiteral) = 0;
-    virtual void visitBlock(SBlock *sBlock) = 0;
+    virtual void visitMethod(SMethod *anSMethod) { ASSERT(false); };
+    virtual void visitLiteral(SLiteral *anSLiteral) = 0;
+    virtual void visitBlock(SBlock *anSBlock) { ASSERT(false); };
 
     // these types are only needed when inlining and/or linearization are used
-    virtual void visitOpAssign(SOpAssign *sOpAssign) { ASSERT(false); };
-    virtual void visitOpDispatchMessage(SOpDispatchMessage *sOpDispatchMessage) { ASSERT(false); };
-    virtual void visitOpDropToS(SOpDropToS *sOpDropToS) { ASSERT(false); };
-    virtual void visitOpJump(SOpJump *sOpJump) { ASSERT(false); };
-    virtual void visitOpJumpFalse(SOpJumpFalse *sOpJumpFalse) { ASSERT(false); };
-    virtual void visitOpJumpTrue(SOpJumpTrue *sOpJumpFalse) { ASSERT(false); };
-    virtual void visitOpLoadRfromFrame(SOpLoadRfromFrame *sOpLoadRfromFrame) { ASSERT(false); };
-    virtual void visitOpLoadRfromStack(SOpLoadRfromStack *sOpLoadRfromStack) { ASSERT(false); };
-    virtual void visitOpLoadRwithNil(SOpLoadRwithNil *sOpLoadRwithNil) { ASSERT(false); };
-    virtual void visitOpLoadRwithSelf(SOpLoadRwithSelf *sOpLoadRwithSelf) { ASSERT(false); };
-    virtual void visitOpPrimitive(SOpPrimitive *sOpPrimitive) { ASSERT(false); };
-    virtual void visitOpPopR(SOpPopR *sOpPopR) { ASSERT(false); };
-    virtual void visitOpPushR(SOpPushR *sOpPushR) { ASSERT(false); };
-    virtual void visitOpReturn(SOpReturn *sOpReturn) { ASSERT(false); };
-    virtual void visitOpNonLocalReturn(SOpNonLocalReturn *sOpNonLocalReturn) { ASSERT(false); };
+    virtual void visitOpAssign(SOpAssign *anSOpAssign) { ASSERT(false); };
+    virtual void visitOpDispatchMessage(SOpDispatchMessage *anSOpDispatchMessage) { ASSERT(false); };
+    virtual void visitOpDropToS(SOpDropToS *anSOpDropToS) { ASSERT(false); };
+    virtual void visitOpJump(SOpJump *anSOpJump) { ASSERT(false); };
+    virtual void visitOpJumpFalse(SOpJumpFalse *anSOpJumpFalse) { ASSERT(false); };
+    virtual void visitOpJumpTrue(SOpJumpTrue *anSOpJumpTrue) { ASSERT(false); };
+    virtual void visitOpLoadRfromFrame(SOpLoadRfromFrame *anSOpLoadRfromFrame) { ASSERT(false); };
+    virtual void visitOpLoadRfromStack(SOpLoadRfromStack *anSOpLoadRfromStack) { ASSERT(false); };
+    virtual void visitOpLoadRwithNil(SOpLoadRwithNil *anSOpLoadRwithNil) { ASSERT(false); };
+    virtual void visitOpLoadRwithSelf(SOpLoadRwithSelf *anSOpLoadRwithSelf) { ASSERT(false); };
+    virtual void visitOpPrimitive(SOpPrimitive *anSOpPrimitive) { ASSERT(false); };
+    virtual void visitOpPopR(SOpPopR *anSOpPopR) { ASSERT(false); };
+    virtual void visitOpPushR(SOpPushR *anSOpPushR) { ASSERT(false); };
+    virtual void visitOpReturn(SOpReturn *anSOpReturn) { ASSERT(false); };
+    virtual void visitOpNonLocalReturn(SOpNonLocalReturn *anSOpNonLocalReturn) { ASSERT(false); };
 
 };
 

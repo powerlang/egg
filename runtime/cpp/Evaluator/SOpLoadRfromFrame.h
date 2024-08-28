@@ -11,6 +11,9 @@ class SOpLoadRfromFrame : public SOperation {
 
 public:
     SOpLoadRfromFrame(auto index) : _index(index) {}
+
+    int index() { return _index; }
+
     void acceptVisitor_(SExpressionVisitor *visitor) override {
         visitor->visitOpLoadRfromFrame(this);
     }

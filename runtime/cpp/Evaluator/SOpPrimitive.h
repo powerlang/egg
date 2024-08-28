@@ -15,6 +15,7 @@ class SOpPrimitive : public SOperation {
     public:
     SOpPrimitive(PrimitivePointer primitive) : _primitive(primitive) {}
 
+    PrimitivePointer primitive() { return _primitive; }
     void acceptVisitor_(SExpressionVisitor *visitor) {
         visitor->visitOpPrimitive(this);
     }

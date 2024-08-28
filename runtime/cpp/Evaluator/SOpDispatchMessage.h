@@ -10,6 +10,8 @@ class SOpDispatchMessage : public SExpression {
     public:
 
     SOpDispatchMessage(auto message) : _message(message) {}
+
+    SAbstractMessage* message() { return _message; }
 	void acceptVisitor_(SExpressionVisitor *visitor) override {
 		visitor->visitOpDispatchMessage(this);
 	}

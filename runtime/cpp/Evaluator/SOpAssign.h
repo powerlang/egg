@@ -12,6 +12,8 @@ class SOpAssign : public SOperation {
 
     SOpAssign(auto assignees) : _assignees(assignees) {}
 
+    std::vector<SIdentifier*>& assignees() { return _assignees; }
+
 };
 
 } // namespace Egg
