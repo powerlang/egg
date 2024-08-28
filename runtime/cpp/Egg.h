@@ -22,6 +22,8 @@ void error(const char *message);
 void error_(const std::string &message);
 void debug(const char *message);
 
+extern bool GC_CRITICAL;
+
 }
 
 #endif // _EGG_H_

@@ -1,7 +1,6 @@
 #include "GCSpace.h"
-#include "KnownObjects.h"
 
-#include <cstring>
+#include <algorithm>
 
 using namespace Egg;
 
@@ -27,9 +26,10 @@ uintptr_t GCSpace::reservedSize()
     return _reservedLimit - _base;
 }
 
-void GCSpace::commitMemory()
+void GCSpace::commitMemory(uint32_t delta)
 {
-    Egg::CommitMemory(_base, this->reservedSize());
+    auto newLimit = std::min(_committedLimit + delta, _reservedLimit);
+    Egg::CommitMemory(_base, newLimit - _base);
     _softLimit = _committedLimit = _reservedLimit;
 }
 
@@ -42,61 +42,14 @@ uintptr_t GCSpace::allocate(uint32_t size) {
         return result;
     }
 
-    error("out of space");
     return 0;
 }
 
-HeapObject* GCSpace::allocateSlots_(uint32_t size) {
-    bool small = size <= HeapObject::MAX_SMALL_SIZE;
-    auto headerSize = small ? 8 : 16;
-    auto totalSize = headerSize + size * sizeof(uintptr_t);
-    auto buffer = this->allocate(totalSize);
-    std::memset((void*)buffer, 0, headerSize);
-    HeapObject *result;
-
-    if (small)
-    {
-        result = ((HeapObject::SmallHeader*)buffer)->object();
-        result->beSmall();
-        result->smallSize((uint8_t)size);
-    } 
-    else
-    {
-        result = ((HeapObject::LargeHeader*)buffer)->object();
-        result->beLarge(); 
-        result->largeSize(size);
-    }
-    HeapObject *end = ((HeapObject*)result) + size;
-
-    std::fill((HeapObject**)result, (HeapObject**)end, KnownObjects::nil);
-
-    return result;
-}
-
-HeapObject* GCSpace::allocateBytes_(uint32_t size)
-{
-    bool small = size <= HeapObject::MAX_SMALL_SIZE;
-    auto headerSize = small ? 8 : 16;
-    auto totalSize = headerSize + align(size, sizeof(uintptr_t));
-    auto buffer = this->allocate(totalSize);
-    std::memset((void*)buffer, 0, totalSize);
-    HeapObject *result;
-
-    if (small)
-    {
-        result = ((HeapObject::SmallHeader*)buffer)->object();
-        result->beSmall();
-        result->smallSize((uint8_t)size);
-    } 
-    else
-    {
-        result = ((HeapObject::LargeHeader*)buffer)->object();
-        result->beLarge(); 
-        result->largeSize(size);
-    }
-
-    result->beBytes();
-    result->beArrayed();
-
-    return result;
+bool Egg::GCSpace::increaseSoftLimit_(uint32_t delta)
+{ 
+    int32_t available = _committedLimit - _softLimit;
+    if (available < 0) return false;
+    
+	_softLimit = _softLimit + std::min(delta, (uint32_t)available);
+	return true;
 }

@@ -13,10 +13,9 @@ public:
     ~GCSpace();
 
     uintptr_t reservedSize();
-    void commitMemory();
+    void commitMemory(uint32_t delta);
     uintptr_t allocate(uint32_t size);
-    HeapObject* allocateSlots_(uint32_t size);
-    HeapObject* allocateBytes_(uint32_t size);
+    bool increaseSoftLimit_(uint32_t delta);
 
 };
 

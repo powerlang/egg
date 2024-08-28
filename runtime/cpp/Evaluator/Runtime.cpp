@@ -1,7 +1,7 @@
 
 #include "Runtime.h"
 #include "Evaluator.h"
-#include "GCSpace.h"
+#include "GCHeap.h"
 #include "SAbstractMessage.h"
 #include "KnownConstants.h"
 
@@ -24,7 +24,7 @@ uintptr_t Runtime::arrayedSizeOf_(Object *anObject) {
 HeapObject* Runtime::newBytes_size_(HeapObject *species, uint32_t size)
 {
 	auto behavior = this->speciesInstanceBehavior_(species);
-	auto result = eden->allocateBytes_(size);
+	auto result = heap->allocateBytes_(size);
               
     result->behavior(behavior);
     return result;
@@ -39,7 +39,7 @@ HeapObject *Egg::Runtime::newSlots_size_(HeapObject *species, uint32_t size) {
 	auto ivars = this->speciesInstanceSize_(species);
     HeapObject *behavior = this->speciesInstanceBehavior_(species);
     auto slotSize = ivars + size;
-    HeapObject *result = eden->allocateSlots_(slotSize);
+    HeapObject *result = heap->allocateSlots_(slotSize);
     result->behavior(behavior);
     return result;
  }
@@ -56,7 +56,7 @@ HeapObject *Runtime::newOf_sized_(HeapObject *species, uint32_t size) {
 
 HeapObject* Runtime::newArraySized_(uint32_t anInteger) { 
     HeapObject *behavior = this->speciesInstanceBehavior_(_arrayClass);
-    HeapObject *result = eden->allocateSlots_(anInteger);
+    HeapObject *result = heap->allocateSlots_(anInteger);
     result->behavior(behavior);
     result->beArrayed();
     return result;
@@ -72,7 +72,7 @@ HeapObject *Egg::Runtime::newClosureFor_(HeapObject *block)
 
  HeapObject *Egg::Runtime::newCompiledMethod() {
      HeapObject *behavior = this->speciesInstanceBehavior_(_methodClass);
-     HeapObject *result = eden->allocateSlots_(Offsets::MethodInstSize);
+     HeapObject *result = heap->allocateSlots_(Offsets::MethodInstSize);
      result->behavior(behavior);
      result->beNamed();
      result->beArrayed();
@@ -90,7 +90,7 @@ HeapObject *Egg::Runtime::newEnvironmentSized_(uint32_t size)
 HeapObject *Runtime::newExecutableCodeFor_with_(HeapObject *compiledCode,
                                                 HeapObject *platformCode) {
     auto behavior = this->speciesInstanceBehavior_(_arrayClass);
-    auto result = eden->allocateSlots_(0);
+    auto result = heap->allocateSlots_(0);
     result->behavior(behavior);
     result->beArrayed();
     this->executableCodePlatformCode_put_(result, (Object *)platformCode);

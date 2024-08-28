@@ -12,13 +12,13 @@ namespace Egg {
 
 class Evaluator;
 class SAbstractMessage;
-class GCSpace;
+class GCHeap;
 class SExpression;
 
 class Runtime {
     ImageSegment *_kernel;
     Evaluator *_evaluator;
-    GCSpace *eden;
+    GCHeap *heap;
 
     std::map<std::string, HeapObject*> _knownSymbols;
 
