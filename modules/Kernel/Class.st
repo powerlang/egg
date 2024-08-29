@@ -46,7 +46,7 @@ Class >> addNamespace: aNamespace [
 	"
 		first namespace are class variables, remaining ones are local pools of the class
 	"
-	namespaces ifNil: [namespaces := Array with: Namespace new].
+	namespaces isEmpty ifTrue: [namespaces := Array with: Namespace new].
 	namespaces := namespaces copyWith: aNamespace.
 	^aNamespace
 ]
@@ -105,6 +105,11 @@ Class >> classVariables: aNamespace [
 		ifFalse: [namespaces at: 1 put: aNamespace].
 	(aNamespace isEmpty and: [namespaces size = 1])
 		ifTrue: [namespaces := #()]
+]
+
+{ #category : #accessing }
+Class >> classVarNamed: aString [
+	^namespaces first at: aString
 ]
 
 { #category : #accessing }
