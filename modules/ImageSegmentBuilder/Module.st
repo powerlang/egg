@@ -16,12 +16,11 @@ Module >> shouldBeStoredIn: anObjectClosure [
 ]
 
 { #category : #'*snapshotting' }
-Module >> writeImageSegment [
-	| builder writer |
+Module >> writeImageSegmentUsing: aWriter [
+	| builder |
 	builder := Builder new.
 	builder module: self; build.
-	writer := JSONWriter new.
-	^writer
+	^aWriter
 		closure: builder closure;
 		objects: builder objects;
 		mapping: builder mapping;
