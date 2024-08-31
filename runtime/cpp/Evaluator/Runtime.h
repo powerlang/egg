@@ -14,11 +14,16 @@ class Evaluator;
 class SAbstractMessage;
 class GCHeap;
 class SExpression;
+class Runtime;
+class Bootstrapper;
+
+extern Runtime *debugRuntime;
 
 class Runtime {
+    Bootstrapper *_bootstrapper;
     ImageSegment *_kernel;
     Evaluator *_evaluator;
-    GCHeap *heap;
+    GCHeap *_heap;
 
     std::map<std::string, HeapObject*> _knownSymbols;
 
@@ -32,7 +37,10 @@ class Runtime {
 public:
     Runtime(ImageSegment *kernel) : _kernel(kernel), _lastHash(0) {
         this->initializeKernelObjects();
+        debugRuntime = this;
     }
+
+    std::string print_(HeapObject* obj);
 
     void initializeEvaluator();
 

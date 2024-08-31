@@ -7,7 +7,10 @@
 
 using namespace Egg;
 
-void Runtime::initializeEvaluator(){
+Runtime *Egg::debugRuntime = 0;
+
+void Runtime::initializeEvaluator() {
+    _heap = new GCHeap;
     _evaluator = new Evaluator(this, _falseObj, _trueObj, _nilObj);
 }
 
@@ -24,7 +27,7 @@ uintptr_t Runtime::arrayedSizeOf_(Object *anObject) {
 HeapObject* Runtime::newBytes_size_(HeapObject *species, uint32_t size)
 {
 	auto behavior = this->speciesInstanceBehavior_(species);
-	auto result = heap->allocateBytes_(size);
+	auto result = _heap->allocateBytes_(size);
               
     result->behavior(behavior);
     return result;
@@ -39,7 +42,7 @@ HeapObject *Egg::Runtime::newSlots_size_(HeapObject *species, uint32_t size) {
 	auto ivars = this->speciesInstanceSize_(species);
     HeapObject *behavior = this->speciesInstanceBehavior_(species);
     auto slotSize = ivars + size;
-    HeapObject *result = heap->allocateSlots_(slotSize);
+    HeapObject *result = _heap->allocateSlots_(slotSize);
     result->behavior(behavior);
     return result;
  }
@@ -56,7 +59,7 @@ HeapObject *Runtime::newOf_sized_(HeapObject *species, uint32_t size) {
 
 HeapObject* Runtime::newArraySized_(uint32_t anInteger) { 
     HeapObject *behavior = this->speciesInstanceBehavior_(_arrayClass);
-    HeapObject *result = heap->allocateSlots_(anInteger);
+    HeapObject *result = _heap->allocateSlots_(anInteger);
     result->behavior(behavior);
     result->beArrayed();
     return result;
@@ -72,7 +75,7 @@ HeapObject *Egg::Runtime::newClosureFor_(HeapObject *block)
 
  HeapObject *Egg::Runtime::newCompiledMethod() {
      HeapObject *behavior = this->speciesInstanceBehavior_(_methodClass);
-     HeapObject *result = heap->allocateSlots_(Offsets::MethodInstSize);
+     HeapObject *result = _heap->allocateSlots_(Offsets::MethodInstSize);
      result->behavior(behavior);
      result->beNamed();
      result->beArrayed();
@@ -90,7 +93,7 @@ HeapObject *Egg::Runtime::newEnvironmentSized_(uint32_t size)
 HeapObject *Runtime::newExecutableCodeFor_with_(HeapObject *compiledCode,
                                                 HeapObject *platformCode) {
     auto behavior = this->speciesInstanceBehavior_(_arrayClass);
-    auto result = heap->allocateSlots_(0);
+    auto result = _heap->allocateSlots_(2); // fixme: use a proper kind of object for this
     result->behavior(behavior);
     result->beArrayed();
     this->executableCodePlatformCode_put_(result, (Object *)platformCode);
@@ -170,8 +173,8 @@ HeapObject* Runtime::existingSymbolFrom_(const std::string &selector)
         if (symbol != this->_nilObj && symbol->sameBytesThan(selector))
             return  symbol;
     }
-
-    error("symbol not found");
+    std::string str = std::string("symbol #") + selector + " not found in image";
+    error(str.c_str());
     return nullptr;
 }
 
@@ -225,3 +228,21 @@ void Runtime::flushDispatchCache_in_(HeapObject *aSymbol, HeapObject *klass) {
 
     _globalCache.erase(std::make_pair(aSymbol, behavior));
 }
+
+std::string Egg::Runtime::print_(HeapObject *obj) {
+	auto species = this->behaviorClass_(obj->behavior());
+	if (species == _stringClass)
+		return "<'" , obj->asLocalString() + "'>";
+	if (species == _methodClass)
+	{
+        auto selector = (HeapObject*)obj->slot(Offsets::MethodSelector);
+		auto s = (selector == _nilObj) ? "<nil>" : selector->asLocalString();
+		return "<" + (this->methodClassBinding_(obj)->printString()) +
+				">>#" + s + ">";
+    }
+	auto name = this->speciesLocalName_(species);
+	if (name == "Symbol")
+		return "<#" + obj->asLocalString() + ">";
+	
+    return "<a " + name + ">";
+ }

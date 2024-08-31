@@ -5,6 +5,7 @@
 
 #include "HeapObject.h"
 #include "KnownObjects.h"
+#include "Evaluator/Runtime.h"
 
 using namespace Egg;
 
@@ -151,6 +152,7 @@ HeapObject* HeapObject::behavior()
 void HeapObject::behavior(HeapObject *behavior)
 {
     smallHeader()->behavior = (uint32_t)((uintptr_t)behavior);
+	//std::cout << "made " << this << " a " << behavior->slot(0)->printString() << " of size " << this->size() << std::endl;
 }
 
 uint16_t HeapObject::hash () const
@@ -236,7 +238,7 @@ HeapObject::ObjectSlot&
 HeapObject::slot(const uint32_t index)
 {
     ASSERT(this->isPointers());
-    ASSERT(/*index >= 0 &&*/ index <= this->size());
+    ASSERT(/*index >= 0 &&*/ index < this->size());
 
     return ((ObjectSlot*)this)[index];
 }
@@ -297,7 +299,7 @@ HeapObject::stringVal()
 
 std::string HeapObject::asLocalString()
 {
-	return std::string((char*)this, this->size());
+	return std::string((char*)this, this->size() - 1);
 }
 
 bool HeapObject::sameBytesThan(const std::string &string)
@@ -323,4 +325,9 @@ HeapObject* HeapObject::klass() {
     }
 
     return k;
+}
+
+std::string Egg::HeapObject::printString()
+{
+	return debugRuntime->print_(this);
 }

@@ -8,6 +8,8 @@
 
 #include "Util.h"
 
+#include <string>
+
 namespace Egg {
 
 struct HeapObject;
@@ -59,7 +61,8 @@ struct Object
      */
     HeapObject* asHeapObject() {return (HeapObject*)this;}    
 
-
+    // debugging
+    std::string printString();
 };
 
 } // namespace Egg

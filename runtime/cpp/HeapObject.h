@@ -244,6 +244,8 @@ struct HeapObject
     /// temporary stuff for debugging or to be refactored
   	HeapObject* klass();
 
+    std::string printString();
+
     std::string stringVal();
     std::string asLocalString();
     bool sameBytesThan(const std::string &string);

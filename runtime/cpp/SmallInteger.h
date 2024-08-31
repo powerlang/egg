@@ -8,6 +8,8 @@
 
 #include "Util.h"
 
+#include <string>
+
 namespace Egg {
 
 struct Object;
@@ -46,6 +48,9 @@ struct SmallInteger {
 
         return (T)((intptr_t)this & (intptr_t)~1);
     }
+
+    // debugging
+    std::string printString(){ return std::to_string(this->asNative()); }
 };
 
 } // namespace Egg
