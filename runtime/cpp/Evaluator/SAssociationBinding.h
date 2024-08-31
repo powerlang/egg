@@ -42,7 +42,7 @@ public:
 		return false;
 	}
 
-    Object* valueWithin_(EvaluationContext* anEvaluationContext) const override {
+    Object* valueWithin_(EvaluationContext* anEvaluationContext) override {
         return anEvaluationContext->loadAssociationValue_(this->_association);
     }
 };

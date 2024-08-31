@@ -13,7 +13,7 @@ public:
         return true;
     }
 
-    Object* valueWithin_(EvaluationContext* anEvaluationContext) const override {
+    Object* valueWithin_(EvaluationContext* anEvaluationContext) override {
         return anEvaluationContext->receiver();
     }
 };

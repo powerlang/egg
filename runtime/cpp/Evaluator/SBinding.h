@@ -67,7 +67,7 @@ public:
         return nullptr;
     }
 
-    virtual Object* valueWithin_(EvaluationContext* anEvaluationContext) const {
+    virtual Object* valueWithin_(EvaluationContext* anEvaluationContext) {
         subclassResponsibility();
         return nullptr;
     }

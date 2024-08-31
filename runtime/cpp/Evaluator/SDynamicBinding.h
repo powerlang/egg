@@ -34,7 +34,7 @@ public:
         return this;
     }
 
-    Object* valueWithin_(EvaluationContext* anEvaluationContext) {
+    Object* valueWithin_(EvaluationContext* anEvaluationContext) override {
         if (_cache == nullptr) {
             this->lookupWithin_(anEvaluationContext);
         }

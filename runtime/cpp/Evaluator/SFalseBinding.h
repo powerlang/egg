@@ -13,7 +13,7 @@ public:
         return KnownObjects::_false;
     }
 
-    Object* valueWithin_(EvaluationContext* anEvaluationContext) const override {
+    Object* valueWithin_(EvaluationContext* anEvaluationContext) override {
         return (Object*)anEvaluationContext->_false();
     }
 };

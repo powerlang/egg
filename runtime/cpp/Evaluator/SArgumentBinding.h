@@ -24,7 +24,7 @@ public:
         return this->_environment == -1;
     }
 
-    Object* valueWithin_(EvaluationContext* anEvaluationContext) {
+    Object* valueWithin_(EvaluationContext* anEvaluationContext) override {
         return anEvaluationContext->argumentAt_in_(this->_position, this->_environment);
     }
 };

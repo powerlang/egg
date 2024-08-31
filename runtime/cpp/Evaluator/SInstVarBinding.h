@@ -29,7 +29,7 @@ public:
 		return true;
 	}
 
-	Object* valueWithin_(EvaluationContext *anEvaluationContext) {
+	Object* valueWithin_(EvaluationContext *anEvaluationContext) override {
 		return anEvaluationContext->instanceVarAt_(this->_index);
 	}
 
