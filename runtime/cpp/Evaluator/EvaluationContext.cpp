@@ -5,11 +5,21 @@
 #include "SInstVarBinding.h"
 #include "SBlock.h"
 
+#include "SLiteral.h"
+#include "SMessage.h"
+#include "SOpDispatchMessage.h"
+
+
 using namespace Egg;
 
 class Runtime;
 
-Object* EvaluationContext::argumentAt_(int anInteger) {
+HeapObject* EvaluationContext::classBinding()
+{
+    return _runtime->methodClassBinding_(this->method());
+}
+
+Object *EvaluationContext::argumentAt_(int anInteger) {
     auto executableCode = this->_runtime->executableCodeCompiledCode_(this->_regM);
     int args = this->_runtime->isBlock_(executableCode) ?
         this->_runtime->blockArgumentCount_(executableCode) :
@@ -18,9 +28,9 @@ Object* EvaluationContext::argumentAt_(int anInteger) {
     return this->stackAt_((this->_regBP + 1) + (args - anInteger) + 1);
 }
 
-void EvaluationContext::buildFrameFor_code_environment_temps_(Object *receiver, HeapObject *executableCode, HeapObject *environment, uint32_t temps) {
+void EvaluationContext::buildFrameFor_code_environment_temps_(Object *receiver, HeapObject *compiledCode, HeapObject *environment, uint32_t temps) {
     this->_regS = receiver;
-    this->_regM = executableCode;
+    this->_regM = compiledCode;
     this->push_((Object*)this->_regPC);
     this->push_((Object*)this->_regBP);
     this->_regBP = this->_regSP;
@@ -28,7 +38,7 @@ void EvaluationContext::buildFrameFor_code_environment_temps_(Object *receiver, 
         error_("stack overflow");
 
     this->push_(receiver);
-    this->push_((Object*)executableCode);
+    this->push_((Object*)compiledCode);
     this->push_((Object*)this->_regE);
     this->push_((Object*)environment);
     this->_regE = environment;
@@ -48,19 +58,26 @@ std::vector<Object*> EvaluationContext::methodArguments() {
     return arguments;
 }
 
-void EvaluationContext::buildLaunchFrame()
+std::vector<SExpression*>* EvaluationContext::buildLaunchFrame(HeapObject *symbol, int argCount)
 {
     auto launcher = _runtime->newCompiledMethod();
-    auto platformCode = _runtime->newArraySized_(0);
-    auto executable = _runtime->newExecutableCodeFor_with_(launcher, platformCode);
+    auto bytecodes = new std::vector<SExpression*>();
+    auto executable = _runtime->newExecutableCodeFor_with_(launcher, reinterpret_cast<HeapObject*>(bytecodes));
     _runtime->methodExecutableCode_put_(launcher, (Object*)executable);
     this->buildMethodFrameFor_code_environment_((Object*)_runtime->_nilObj, launcher, _runtime->_nilObj);
+
+    auto literal = new SLiteral(0, (Object*)_runtime->_nilObj);
+    std::vector<SExpression*> dummy(argCount, literal);
+    auto message = new SMessage(literal, symbol, dummy, false);
+    auto dispatch = new SOpDispatchMessage(message);
+
+    bytecodes->push_back(dispatch);
+    return bytecodes;
 }
 
-void EvaluationContext::buildMethodFrameFor_code_environment_(Object *receiver, HeapObject *executableCode, HeapObject *environment) { 
-    auto method = this->_runtime->executableCodeCompiledCode_(executableCode);
+void EvaluationContext::buildMethodFrameFor_code_environment_(Object *receiver, HeapObject *method, HeapObject *environment) { 
     auto temps = this->_runtime->methodTempCount_(method);
-    this->buildFrameFor_code_environment_temps_(receiver, executableCode, environment, temps);
+    this->buildFrameFor_code_environment_temps_(receiver, method, environment, temps);
 }
 
 

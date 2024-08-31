@@ -304,8 +304,7 @@ std::string HeapObject::asLocalString()
 
 bool HeapObject::sameBytesThan(const std::string &string)
 {
-	auto size = this->size();
-	return size == string.size() && std::equal((char*)this, (char*)this + size, string.begin());
+	return string.size() == this->size() - 1 && std::equal(string.begin(), string.end(), (char*)this);
 }
 
 bool Egg::HeapObject::sameBytesThan(const HeapObject *object)

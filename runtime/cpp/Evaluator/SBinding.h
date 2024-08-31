@@ -12,6 +12,8 @@ namespace Egg {
 class EvaluationContext;
 
 class SBinding {
+protected:
+    SBinding() = default;
 public:
 
     virtual void assign_within_(Object *value, EvaluationContext* anEvaluationContext) {

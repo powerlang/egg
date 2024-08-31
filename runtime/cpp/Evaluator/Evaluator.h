@@ -89,7 +89,7 @@ public:
 
     auto evaluateClosure_withArgs_(auto receiver, const std::vector<Object*> _arguments)
     {
-
+		error("unimplemented");
     }
 
     void evaluatePerform_in_withArgs_(HeapObject *aSymbol, Object *receiver, Object *arguments);
@@ -101,12 +101,14 @@ public:
         return this->_falseObj;
     }
     
+	HeapObject* lookup_startingAt_sendSite_(HeapObject* symbol, HeapObject *behavior, SAbstractMessage *message);
     Object* invoke_with_(HeapObject* method, Object *receiver);
     HeapObject* prepareForExecution_(HeapObject *method);
 
 
     Object* send_to_with_(HeapObject *symbol, Object *receiver, std::vector<Object*> &args);
 
+	void messageNotUnderstood_(SAbstractMessage *message);
 	void doesNotKnow(HeapObject *symbol);
     void visitIdentifier(SIdentifier* identifier) override;
     void visitLiteral(SLiteral* sLiteral) override;

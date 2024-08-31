@@ -16,6 +16,7 @@ namespace Egg {
 class Runtime;
 class SBinding;
 class SBlock;
+class SExpression;
 
 class EvaluationContext {
     HeapObject *_regM, *_regE;
@@ -24,11 +25,26 @@ class EvaluationContext {
     Runtime *_runtime;
 
 public:
+    const int STACK_SIZE = 64 * 1024;
+    EvaluationContext(Runtime *runtime) : 
+        _runtime(runtime)
+    {
+        _regM = _regE = nullptr;
+        _regSP = STACK_SIZE + 1;
+        _regBP = _regPC = 0;
+        _regS = 0;
+
+        _stack = new Object*[STACK_SIZE];
+    
+    }
+
     Object* receiver() { return _regS; }
     Object* self() { return _regS; }
     
     HeapObject* environment() { return _regE; }
     HeapObject* compiledCode() { return _regM; }
+
+    HeapObject* classBinding();
 
     int tempOffset() { return 4; }
 
@@ -60,9 +76,9 @@ public:
 
     std::vector<Object*> methodArguments();
 
-	void buildFrameFor_code_environment_temps_(Object *receiver, HeapObject *executableCode, HeapObject *environment, uint32_t temps);
-    void buildLaunchFrame();
-    void buildMethodFrameFor_code_environment_(Object *receiver, HeapObject *executableCode, HeapObject *environment);
+	void buildFrameFor_code_environment_temps_(Object *receiver, HeapObject *compiledCode, HeapObject *environment, uint32_t temps);
+    std::vector<SExpression*>* buildLaunchFrame(HeapObject *symbol, int argCount);
+    void buildMethodFrameFor_code_environment_(Object *receiver, HeapObject *compiledCode, HeapObject *environment);
     void popLaunchFrame();
 
     Object*	environment_at_(int environmentIndex, int index) {
@@ -97,7 +113,7 @@ public:
 
 
 	void push_(Object *object) {
-		ASSERT(object != nullptr);
+		//ASSERT(object != nullptr);
 		
         this->_regSP = this->_regSP - 1;
 		this->stackAt_put_(this->_regSP, object);
@@ -127,7 +143,7 @@ public:
 
     Object* operandAt_(intptr_t anInteger)
     {
-    	return _stack[_regSP + anInteger];
+    	return _stack[_regSP - 1 + anInteger];
     }
 
     uintptr_t regPC() { return _regPC; }
@@ -147,7 +163,7 @@ public:
             if (bp == 0) {
                 error("reached the begining of the stack");
             }
-            bp = (uintptr_t)_stack[bp];
+            bp = (uintptr_t)_stack[bp - 1];
         }
         return bp;
     }
@@ -171,9 +187,9 @@ public:
         _regSP = _regBP;
     	_regBP = (uintptr_t)this->pop();
         _regPC = (uintptr_t)this->pop();
-        _regE  = _stack[_regBP - 4]->asHeapObject();
-        _regM  = _stack[_regBP - 2]->asHeapObject();
-        _regS  = _stack[_regBP - 1];
+        _regE  = _stack[_regBP - 4 - 1]->asHeapObject();
+        _regM  = _stack[_regBP - 2 - 1]->asHeapObject();
+        _regS  = _stack[_regBP - 1 - 1];
     }
 
     void reserveStackSlots_(int anInteger)

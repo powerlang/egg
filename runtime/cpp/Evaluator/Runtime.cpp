@@ -168,10 +168,13 @@ HeapObject* Runtime::existingSymbolFrom_(const std::string &selector)
     if (it != this->_knownSymbols.end())
         return it->second;
     HeapObject *table = this->_symbolTable->slotAt_(2)->asHeapObject();
-    for (int i = 2; i < table->size(); i = i + 2){
+    for (int i = 2; i < table->size(); i++){
         auto symbol = table->slotAt_(i)->asHeapObject();
-        if (symbol != this->_nilObj && symbol->sameBytesThan(selector))
-            return  symbol;
+        if (symbol != this->_nilObj){
+            //    std::cout << "symbol" << symbol->printString() << " at: 0x" << i << std::endl;
+            if (symbol->sameBytesThan(selector))
+               return  symbol;
+        }
     }
     std::string str = std::string("symbol #") + selector + " not found in image";
     error(str.c_str());

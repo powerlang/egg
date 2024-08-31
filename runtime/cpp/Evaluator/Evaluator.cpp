@@ -31,6 +31,7 @@ Evaluator::Evaluator(Runtime *runtime, HeapObject *falseObj, HeapObject *trueObj
     {
         _linearizer = new SExpressionLinearizer();
         _linearizer->runtime_(_runtime);
+        _context = new EvaluationContext(runtime);
     }
 
 
@@ -121,14 +122,28 @@ void Evaluator::evaluatePerform_in_withArgs_(HeapObject *aSymbol, Object *receiv
     this->invoke_with_(method, receiver);
 }
 
-Object* Evaluator::invoke_with_(HeapObject* method, Object *receiver) {
-        int size = _runtime->methodEnvironmentSize_(method);
-        HeapObject *environment = _runtime->newEnvironmentSized_(size);
-        HeapObject *executable = this->prepareForExecution_(method);
+HeapObject*
+Evaluator::lookup_startingAt_sendSite_(HeapObject *symbol, HeapObject *behavior, SAbstractMessage *message)
+{
+	auto method = _runtime->lookup_startingAt_(symbol, behavior);
+	if (!method) return nullptr;
 
-        this->_context->buildMethodFrameFor_code_environment_(receiver, executable, environment);
+    message->registerCacheWith_(_runtime);
+    message->cache_when_(method, behavior);
+    
+    return method;
+}
 
-        return _regR;
+Object *Evaluator::invoke_with_(HeapObject *method, Object *receiver) {
+    int size = _runtime->methodEnvironmentSize_(method);
+    HeapObject *environment = _runtime->newEnvironmentSized_(size);
+    HeapObject *executable = this->prepareForExecution_(method);
+    _work = reinterpret_cast<std::vector<SExpression*>*>(_runtime->executableCodePlatformCode_(executable));
+
+    this->_context->buildMethodFrameFor_code_environment_(receiver, method,
+                                                          environment);
+
+    return _regR;
 }
 
 HeapObject* Evaluator::prepareForExecution_(HeapObject *method) {
@@ -168,12 +183,7 @@ void Egg::Evaluator::evaluateUndermessage_with_(SAbstractMessage * message, Unde
 }
 
 Object* Evaluator::send_to_with_(HeapObject *symbol, Object *receiver, std::vector<Object*> &args) {
-    auto literal = new SLiteral(0, (Object*)this->_nilObj);
-    std::vector<SExpression*> dummy(args.size(), literal);
-    auto message = new SMessage(literal, symbol, dummy, false);
-    auto dispatch = new SOpDispatchMessage(message);
-
-    this->_context->buildLaunchFrame();
+    auto bytecodes = this->_context->buildLaunchFrame(symbol, args.size());
     this->_regR = receiver;
     if (!args.empty())
         this->_context->pushOperand_(receiver);
@@ -181,8 +191,6 @@ Object* Evaluator::send_to_with_(HeapObject *symbol, Object *receiver, std::vect
     for (auto arg : args) {
         this->_context->pushOperand_(arg);
     }
-    auto bytecodes = new std::vector<SExpression*>();
-    bytecodes->push_back(dispatch);
     this->_work = bytecodes;
     this->_context->regPC_(0);
     this->evaluate();
@@ -190,10 +198,16 @@ Object* Evaluator::send_to_with_(HeapObject *symbol, Object *receiver, std::vect
     return this->_regR;
 }
 
-void Evaluator::doesNotKnow(HeapObject *symbol)
-{
-    ASSERT(false);
+void Egg::Evaluator::messageNotUnderstood_(SAbstractMessage *message)
+{ 
+    std::cout
+        << "Message not understood!" << std::endl
+        << this->_regR->printString() << " does not understand " << message->selector();
+    
+    error("dnu recovery not implemented yet");
 }
+
+void Evaluator::doesNotKnow(HeapObject *symbol) { ASSERT(false); }
 
 void Evaluator::visitIdentifier(SIdentifier *identifier)
 {
@@ -230,12 +244,42 @@ void Evaluator::visitOpAssign(SOpAssign *anSOpAssign)
 void Evaluator::visitOpDispatchMessage(SOpDispatchMessage *anSOpDispatchMessage)
 {
     SAbstractMessage *message = anSOpDispatchMessage->message();
+
+    //std::cout << "dispatching " << message->selector()->asLocalString() << std::endl;
     
-    UndermessagePointer cachedUndermessage = *(UndermessagePointer*)message->cachedUndermessage();
-    if (cachedUndermessage != nullptr) {
-        return this->evaluateUndermessage_with_(message, cachedUndermessage);
+    UndermessagePointer undermessage = message->cachedUndermessage();
+    if (undermessage != nullptr) {
+        return this->evaluateUndermessage_with_(message, undermessage);
     }
 
+	auto behavior =
+        message->receiver()->isSuper() ? 
+            _runtime->superBehaviorOf_(_context->classBinding()) :
+		    _runtime->behaviorOf_(_regR);
+
+    auto method = message->methodFor_(behavior);
+	if (method)
+    {
+        this->invoke_with_(method, _regR);
+        return;
+    }
+	
+    auto symbol = message->selector();
+    auto it = _undermessages.find(symbol);
+    if (it != _undermessages.end())
+    {
+        UndermessagePointer undermessage = it->second;
+        message->cacheUndermessage_(undermessage);
+        return this->evaluateUndermessage_with_(message, undermessage);
+		return;
+    }
+
+    method = this->lookup_startingAt_sendSite_(symbol, behavior, message);
+
+	if (!method)
+        return messageNotUnderstood_(message);
+
+	this->invoke_with_(method, _regR);
 }
 void Evaluator::visitOpDropToS(SOpDropToS *anSOpDropToS)
 {
@@ -323,7 +367,7 @@ SExpression* Evaluator::nextOperation() {
 	if (pc > _work->size())
         return nullptr;
 
-    return _work->at(pc);
+    return _work->at(pc - 1);
 }
 
 

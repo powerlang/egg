@@ -33,7 +33,7 @@ public:
         return true;
     }
 
-    SExpression* receiver() const {
+    SExpression* receiver() {
         return _cascade ? _cascade->receiver() : nullptr;
     }
 

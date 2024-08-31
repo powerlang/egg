@@ -35,7 +35,11 @@ class Runtime {
     uint16_t _lastHash;
 
 public:
-    Runtime(ImageSegment *kernel) : _kernel(kernel), _lastHash(0) {
+    Runtime(Bootstrapper *bootstrapper, ImageSegment *kernel) :
+        _bootstrapper(bootstrapper),
+        _kernel(kernel),
+        _lastHash(0)
+    {
         this->initializeKernelObjects();
         debugRuntime = this;
     }
@@ -188,10 +192,6 @@ public:
         return block->slot(Offsets::CompiledCodeExecutableCode)->asHeapObject();
     }
 
-    HeapObject* executableCodePlatformCode_(HeapObject *code) {
-        return code->slot(Offsets::ExecutableCodePlatformCode)->asHeapObject();
-    }
-
     HeapObject* closureHome_(HeapObject *closure) {
         auto block = this->closureBlock_(closure);
         if (!this->blockCapturesHome_(block))
@@ -200,6 +200,10 @@ public:
 	    return (this->blockCapturesSelf_(block)) ?
             closure->slotAt_(2)->asHeapObject() :
 		    closure->slotAt_(1)->asHeapObject();
+    }
+
+    Object* executableCodePlatformCode_(HeapObject *code) {
+        return code->slot(Offsets::ExecutableCodePlatformCode);
     }
 
     void executableCodePlatformCode_put_(HeapObject *code, Object *platformCode) {
@@ -340,6 +344,11 @@ public:
 
     SmallInteger* speciesFormat_(HeapObject *species) {
         return species->slot(Offsets::SpeciesFormat)->asSmallInteger();
+    }
+
+    HeapObject* superBehaviorOf_(HeapObject *species) {
+        auto superclass = this->speciesSuperclass_(species);
+	    return this->speciesInstanceBehavior_(superclass);
     }
 
 	void initializeKernelObjects()

@@ -13,6 +13,17 @@ class SAbstractMessage : public SExpression {
     std::vector<SExpression*> _arguments;
     std::vector<HeapObject*> _cache;
 
+ public:
+    using UndermessagePointer = Object* (Evaluator::*)(Object *, std::vector<Object*> &args);
+
+    // this is a hack to make C++ type system stop crying
+    struct UndermessageWrapper {
+    public:
+        UndermessageWrapper(UndermessagePointer ptr) : _undermessage(ptr) {}
+
+        UndermessagePointer _undermessage;
+    };
+
 public:
     SAbstractMessage(HeapObject *selector, const std::vector<SExpression*>& arguments) :
         _selector(selector), _arguments(arguments)
@@ -35,23 +46,25 @@ public:
         _cache.push_back(anSCompiledMethod);
     }
 
-    using UndermessagePointer = Object* (Evaluator::*)(Object *, std::vector<Object*> &args);
-    void cacheUndermessage_(UndermessagePointer *anUndermessage) {
-        _cache.push_back(reinterpret_cast<HeapObject*>(anUndermessage));
+    void cacheUndermessage_(UndermessagePointer anUndermessage) {
+        _cache.push_back(reinterpret_cast<HeapObject*>(new UndermessageWrapper(anUndermessage)));
     }
 
-    HeapObject* cachedUndermessage() const {
-        if (_cache.size() == 1)
-            return _cache[0];
-        else
+    UndermessagePointer cachedUndermessage() const {
+        // cache is usually added pairs of <behavior, method>. If size is 1 (odd), then the cache
+        // has been used to cache an undermessage instead.
+        if (_cache.size() != 1)
             return nullptr;
+
+        UndermessageWrapper *w = (UndermessageWrapper*)_cache[0];
+        return w->_undermessage;
     }
 
     void flushCache() {
         _cache.clear();
     }
 
-    HeapObject* methodFor(HeapObject *behavior) const {
+    HeapObject* methodFor_(HeapObject *behavior) const {
         for (size_t i = 0; i < _cache.size(); i += 2) {
             HeapObject *cached = _cache[i];
             if (cached == behavior) {
@@ -62,7 +75,9 @@ public:
         return nullptr;
     }
 
-    void registerCacheWith(Runtime* runtime) {
+    virtual SExpression* receiver() = 0;
+
+    void registerCacheWith_(Runtime* runtime) {
         if (_cache.empty()) {
             runtime->registerCache_for_(this, _selector);
         }
@@ -72,7 +87,7 @@ public:
         return _selector;
     }
 
-    void selector(HeapObject* aSymbol) {
+    void selector_(HeapObject* aSymbol) {
         _selector = aSymbol;
     }
 
