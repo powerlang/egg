@@ -25,7 +25,7 @@ uintptr_t Egg::ReserveMemory(uintptr_t base, uintptr_t size)
 
 void Egg::CommitMemory(uintptr_t base, uintptr_t size)
 {
-    if (mprotect((void*)base, size, PROT_READ | PROT_WRITE) != 0) {
+    if (mprotect((void*)base, pagealign(size), PROT_READ | PROT_WRITE) != 0) {
         error("Failed to commit memory.");
     }
     std::memset((char*)base, 0, size);

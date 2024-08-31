@@ -29,8 +29,8 @@ uintptr_t GCSpace::reservedSize()
 void GCSpace::commitMemory(uint32_t delta)
 {
     auto newLimit = std::min(_committedLimit + delta, _reservedLimit);
-    Egg::CommitMemory(_base, newLimit - _base);
-    _softLimit = _committedLimit = _reservedLimit;
+    Egg::CommitMemory(_committedLimit, newLimit - _base);
+    _committedLimit = newLimit;
 }
 
 uintptr_t GCSpace::allocate(uint32_t size) {

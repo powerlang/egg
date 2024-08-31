@@ -77,9 +77,9 @@ HeapObject* GCHeap::allocateSlots_(uint32_t size) {
         result->beLarge(); 
         result->largeSize(size);
     }
-    HeapObject *end = ((HeapObject*)result) + size;
+    uintptr_t *end = ((uintptr_t*)result) + size;
 
-    std::fill((HeapObject**)result, (HeapObject**)end, KnownObjects::nil);
+    std::fill((uintptr_t*)result, (uintptr_t*)end, (uintptr_t)KnownObjects::nil);
 
     return result;
 }
