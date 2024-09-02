@@ -24,9 +24,9 @@ Launcher::main(const int argc, const char** argv)
         printf("Usage: %s <module name>\n", argv[0]);
         return 1;
     }
-    std::ifstream kernelFile("kernel.ems", std::ifstream::binary);
+    std::ifstream kernelFile("Kernel.ems", std::ifstream::binary);
     if (!kernelFile) {
-        printf("No such file: %s\n", argv[1]);
+        printf("No Kernel.ems file\n");
         return 1;
     }
 
