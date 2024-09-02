@@ -54,6 +54,8 @@ public:
 	}
 
 	Object* sendLocal_to_with_(const std::string &selector, Object *receiver, std::vector<Object*> &arguments);
+    Object* sendLocal_to_with_(const std::string &selector, Object *receiver, Object *arg1);
+    Object* sendLocal_to_with_with_(const std::string &selector, Object *receiver, Object *arg1, Object* arg2);
     
     HeapObject* lookup_startingAt_(HeapObject *symbol, HeapObject *behavior);
     HeapObject* doLookup_startingAt_(HeapObject *symbol, HeapObject *behavior);
@@ -78,11 +80,15 @@ public:
     HeapObject* newSlotsOf_(HeapObject* species);
     HeapObject* newOf_sized_(HeapObject* species, uint32_t size);
 
+    HeapObject* newArray_(std::vector<Object*> &elems);
+    HeapObject* newArray_(std::vector<HeapObject*> &elems);// needed because HeapObject is not a subclass of Object. Should it be?
     HeapObject* newArraySized_(uint32_t);
     HeapObject* newClosureFor_(HeapObject *block);
     HeapObject* newCompiledMethod();
     HeapObject* newEnvironmentSized_(uint32_t);
     HeapObject* newExecutableCodeFor_with_(HeapObject *compiledCode, HeapObject *platformCode);
+    HeapObject* newString_(const std::string &str);
+    HeapObject* addSymbol_(const std::string &str);
 
     HeapObject* loadModule_(HeapObject *name);
 
@@ -353,21 +359,21 @@ public:
 
 	void initializeKernelObjects()
 	{
-		this->_falseObj =                  _kernel->exports["false"];
-		this->_trueObj =                   _kernel->exports["true"];
-		this->_nilObj =                    _kernel->exports["nil"];
-		this->_arrayClass =                _kernel->exports["Array"];
-		this->_metaclassClass =            _kernel->exports["Metaclass"];
-		this->_methodClass =               _kernel->exports["CompiledMethod"];
-		this->_smallIntegerClass =         _kernel->exports["SmallInteger"];
-		this->_largePositiveIntegerClass = _kernel->exports["LargePositiveInteger"];
-		this->_largeNegativeIntegerClass = _kernel->exports["LargeNegativeInteger"];
-		this->_blockClass =                _kernel->exports["CompiledBlock"];
-		this->_byteArrayClass =            _kernel->exports["ByteArray"];
-		this->_stringClass =               _kernel->exports["String"];
-		this->_closureClass =              _kernel->exports["Closure"];
-		this->_behaviorClass =             _kernel->exports["Behavior"];
-        this->_symbolTable =               _kernel->exports["SymbolTable"];
+		this->_falseObj =                  _kernel->_exports["false"];
+		this->_trueObj =                   _kernel->_exports["true"];
+		this->_nilObj =                    _kernel->_exports["nil"];
+		this->_arrayClass =                _kernel->_exports["Array"];
+		this->_metaclassClass =            _kernel->_exports["Metaclass"];
+		this->_methodClass =               _kernel->_exports["CompiledMethod"];
+		this->_smallIntegerClass =         _kernel->_exports["SmallInteger"];
+		this->_largePositiveIntegerClass = _kernel->_exports["LargePositiveInteger"];
+		this->_largeNegativeIntegerClass = _kernel->_exports["LargeNegativeInteger"];
+		this->_blockClass =                _kernel->_exports["CompiledBlock"];
+		this->_byteArrayClass =            _kernel->_exports["ByteArray"];
+		this->_stringClass =               _kernel->_exports["String"];
+		this->_closureClass =              _kernel->_exports["Closure"];
+		this->_behaviorClass =             _kernel->_exports["Behavior"];
+        this->_symbolTable =               _kernel->_exports["SymbolTable"];
 
         this->_smallIntegerBehavior = this->speciesInstanceBehavior_(_smallIntegerClass);
 	}

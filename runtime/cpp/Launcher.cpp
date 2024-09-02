@@ -4,6 +4,7 @@
  */
 
 #include <iostream>
+#include <vector>
 
 #include "Launcher.h"
 #include "ImageSegment.h"
@@ -14,36 +15,40 @@
 
 using namespace Egg;
 
-void start(ImageSegment *kernel);
+void start(Runtime *runtime, HeapObject *kernel, std::vector<Object*> &args);
 
 int
 Launcher::main(const int argc, const char** argv)
 {
     if (argc != 2) {
-        printf("Usage: %s <KERNEL_SEGMENT>\n", argv[0]);
+        printf("Usage: %s <module name>\n", argv[0]);
         return 1;
     }
-    std::ifstream file(argv[1], std::ifstream::binary);
-    if (!file) {
+    std::ifstream kernelFile("kernel.ems", std::ifstream::binary);
+    if (!kernelFile) {
         printf("No such file: %s\n", argv[1]);
         return 1;
     }
 
-    auto kernel = new ImageSegment(&file);
+    auto kernelSegment = new ImageSegment(&kernelFile);
+    auto bootstrapper = new Bootstrapper(kernelSegment);
+    auto runtime = bootstrapper->_runtime;
+    HeapObject *kernel = bootstrapper->_kernel->_exports["Kernel"];
 
-    start(kernel);
-    return 0;
+
+    std::vector<Object*> args;
+    for (int i = 0; i < argc; i++)
+        args.push_back((Object*)runtime->newString_(argv[i]));
+    
+     return 0;
 }
 
-void start(ImageSegment *kernel)
+void start(Runtime *runtime, HeapObject *kernel, std::vector<Object*> &args)
 {
-    Bootstrapper bootstrapper(kernel);
-
-    auto runtime = bootstrapper._runtime;
-
-    HeapObject *module = bootstrapper._kernel->exports["Kernel"];
-    HeapObject *name = runtime->sendLocal_to_("name", (Egg::Object*)module)->asHeapObject();
-
+    HeapObject *name = runtime->sendLocal_to_("name", (Egg::Object*)kernel)->asHeapObject();
     std::cout << "The name of kernel module is " << name->asLocalString() << std::endl;
 
+    auto module = runtime->sendLocal_to_with_("loadModule:", (Object*)kernel, (Object*)args[1]);
+
+    runtime->sendLocal_to_with_("main:", module, args);
 }

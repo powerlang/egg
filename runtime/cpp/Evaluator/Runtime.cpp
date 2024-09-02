@@ -38,7 +38,7 @@ HeapObject* Runtime::newBytesOf_sized_(HeapObject *species, uint32_t size)
     return this->newBytes_size_(species, size);
 }
 
-HeapObject *Egg::Runtime::newSlots_size_(HeapObject *species, uint32_t size) {
+HeapObject *Runtime::newSlots_size_(HeapObject *species, uint32_t size) {
 	auto ivars = this->speciesInstanceSize_(species);
     HeapObject *behavior = this->speciesInstanceBehavior_(species);
     auto slotSize = ivars + size;
@@ -57,6 +57,22 @@ HeapObject *Runtime::newOf_sized_(HeapObject *species, uint32_t size) {
         newSlots_size_(species, size);
 }
 
+HeapObject* Runtime::newArray_(std::vector<Object*> &anArray)
+{
+    auto result = this->newArraySized_(anArray.size());
+    for (int i = 0; i < anArray.size(); i++)
+        result->slot(i) = anArray[i];
+	return result;
+}
+
+HeapObject* Runtime::newArray_(std::vector<HeapObject*> &anArray)
+{
+    auto result = this->newArraySized_(anArray.size());
+    for (int i = 0; i < anArray.size(); i++)
+        result->slot(i) = (Object*)anArray[i];
+	return result;
+}
+
 HeapObject* Runtime::newArraySized_(uint32_t anInteger) { 
     HeapObject *behavior = this->speciesInstanceBehavior_(_arrayClass);
     HeapObject *result = _heap->allocateSlots_(anInteger);
@@ -65,7 +81,7 @@ HeapObject* Runtime::newArraySized_(uint32_t anInteger) {
     return result;
  }
 
-HeapObject *Egg::Runtime::newClosureFor_(HeapObject *block)
+HeapObject *Runtime::newClosureFor_(HeapObject *block)
 {
 	auto size = this->blockEnvironmentCount_(block);
 	auto closure = this->newSlots_size_(_closureClass, size);
@@ -73,7 +89,7 @@ HeapObject *Egg::Runtime::newClosureFor_(HeapObject *block)
 	return  closure;
 }
 
- HeapObject *Egg::Runtime::newCompiledMethod() {
+ HeapObject *Runtime::newCompiledMethod() {
      HeapObject *behavior = this->speciesInstanceBehavior_(_methodClass);
      HeapObject *result = _heap->allocateSlots_(Offsets::MethodInstSize);
      result->behavior(behavior);
@@ -85,7 +101,7 @@ HeapObject *Egg::Runtime::newClosureFor_(HeapObject *block)
  
 }
 
-HeapObject *Egg::Runtime::newEnvironmentSized_(uint32_t size)
+HeapObject *Runtime::newEnvironmentSized_(uint32_t size)
 {
     return this->newArraySized_(size);
  }
@@ -101,13 +117,27 @@ HeapObject *Runtime::newExecutableCodeFor_with_(HeapObject *compiledCode,
     return result;
 }
 
-HeapObject *Egg::Runtime::loadModule_(HeapObject *name)
+HeapObject *Runtime::newString_(const std::string &str)
 {
+    auto behavior = this->speciesInstanceBehavior_(_stringClass);
+    auto result = _heap->allocateBytes_(str.size() + 1); // fixme: use a proper kind of object for this
+    result->behavior(behavior);
+    result->beBytes();
+    result->beArrayed();
+    str.copy((char*)result, str.size());
+    return result;
+}
+
+HeapObject *Runtime::addSymbol_(const std::string &str){
+    return this->sendLocal_to_("asSymbol", (Object*)this->newString_(str))->asHeapObject();
+}
+
+HeapObject *Runtime::loadModule_(HeapObject *name) {
     _evaluator->_halt();
     return _evaluator->context()->self()->asHeapObject();
 }
 
-uintptr_t Egg::Runtime::hashFor_(Object *anObject)
+uintptr_t Runtime::hashFor_(Object *anObject)
 {
     if (anObject->isSmallInteger()) 
         return anObject->asSmallInteger()->asNative();
@@ -127,6 +157,22 @@ Object* Runtime::sendLocal_to_with_(const std::string &selector, Object *receive
     return this->_evaluator->send_to_with_(symbol, receiver, arguments);
 }
 
+Object* Runtime::sendLocal_to_with_(const std::string &selector, Object *receiver, Object* arg1) {
+    auto symbol = this->existingSymbolFrom_(selector);
+    std::vector<Object*> args;
+    args.push_back(arg1);
+
+    return this->_evaluator->send_to_with_(symbol, receiver, args);
+}
+
+Object* Runtime::sendLocal_to_with_with_(const std::string &selector, Object *receiver, Object *arg1, Object* arg2) {
+    auto symbol = this->existingSymbolFrom_(selector);
+    std::vector<Object*> args;
+    args.push_back(arg1);
+    args.push_back(arg2);
+
+    return this->_evaluator->send_to_with_(symbol, receiver, args);
+}
 HeapObject* Runtime::lookup_startingAt_(HeapObject *symbol, HeapObject *behavior)
 {
     auto iter = _globalCache.find(global_cache_key(symbol,behavior));

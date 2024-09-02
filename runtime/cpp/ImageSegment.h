@@ -11,6 +11,7 @@
 #include <iterator>
 #include <map>
 #include <string>
+#include <vector>
 
 #include "HeapObject.h"
 
@@ -54,15 +55,18 @@ class ImageSegment
 {
   public:
     ImageSegmentHeader header;
-    std::map<std::string, HeapObject*> exports;
   public:
+    std::map<std::string, HeapObject*> _exports;
+    std::vector<std::string> _importStrings;
+    std::vector<std::vector<uint32_t>> _importDescriptors;
     ImageSegment(std::istream* data) { this->load(data); }
 
     /**
      * Allocate a new segment of given `size` at given `base` address.
      * Contents of the segment is zeroed.
+     * Return value is address allocated when passed null as base.
      */
-    void alloc(uintptr_t base, size_t size);
+    uintptr_t alloc(uintptr_t base, size_t size);
 
     /**
      * Load a segment from given stream and return it. The stream should
@@ -70,7 +74,11 @@ class ImageSegment
      */
     void load(std::istream* data);
 
+    std::string& importStringAt_(uint32_t index);
+
 private:
+    void readImportStrings(std::istream *data);
+    void readImportDescriptors(std::istream *data);
     void readExports(std::istream *data);
 };
 
