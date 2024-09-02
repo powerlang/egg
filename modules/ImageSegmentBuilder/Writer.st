@@ -52,11 +52,6 @@ Writer >> initialize [
 	stream := '' writeStream.
 ]
 
-{ #category : #private }
-Writer >> quoted: aSymbol [
-	^'"', aSymbol asString, '"'
-]
-
 { #category : #accessing }
 Writer >> stream: aWriteStream [
 	stream := aWriteStream

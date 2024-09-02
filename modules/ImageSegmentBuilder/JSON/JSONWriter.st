@@ -5,53 +5,17 @@
 
 Class {
 	#name : #JSONWriter,
-	#superclass : #Object,
+	#superclass : #Writer,
 	#instVars : [
-		'stream',
-		'objects',
-		'mapping',
-		'imports',
-		'exports',
-		'indexes',
-		'closure'
+		'indexes'
 	],
 	#category : #'JSONWriter'
 }
 
-{ #category : #accessing }
-JSONWriter >> closure: anObjectClosure [
-	closure := anObjectClosure
-]
-
-{ #category : #accessing }
-JSONWriter >> objects: aCollection [
-	objects := aCollection
-]
-
-{ #category : #accessing }
-JSONWriter >> mapping: aDictionary [
-	mapping := aDictionary
-]
-
-{ #category : #accessing }
-JSONWriter >> imports: anIdentityDictionary [
-	imports := anIdentityDictionary
-]
-
-{ #category : #accessing }
-JSONWriter >> exports: aDictionary [
-	exports := aDictionary
-]
-
-{ #category : #accessing }
-JSONWriter >> image [
-	^stream contents
-]
-
 { #category : #initializing }
 JSONWriter >> initialize [
+	super initialize.
 	indexes := IdentityDictionary new.
-	stream := '' writeStream.
 ]
 
 { #category : #closure }
@@ -76,11 +40,6 @@ JSONWriter >> indexOf: anObject [
 { #category : #private }
 JSONWriter >> quoted: aSymbol [
 	^'"', aSymbol asString, '"'
-]
-
-{ #category : #accessing }
-JSONWriter >> stream: aWriteStream [
-	stream := aWriteStream
 ]
 
 { #category : #services }
@@ -188,14 +147,3 @@ JSONWriter >> writeObjects [
 			stream nextPut: $] ]
 		separatedBy: [stream nextPut: $,; crtab: 2]
 ]
-
-{ #category : #writing }
-JSONWriter >> writeTo: aStream [
-	self stream: aStream; write.
-]
-
-{ #category : #writing }
-JSONWriter >> writeToFile: filename [
-	filename binaryWriteStreamDo: [ :s | self writeTo: byteStream ]
-]
-
