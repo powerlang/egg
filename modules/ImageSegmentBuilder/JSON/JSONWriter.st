@@ -108,28 +108,19 @@ JSONWriter >> writeExports [
 		separatedBy: [stream nextPutAll: ', '; crtab: 2]
 ]
 
-{ #category : #'*snapshotting' }
-JSONWriter >> writeImportLinker: linker [
-	linker ifNil: [^self].
-	stream nextPutAll: ', '; nextPutAll: (self quoted: linker)
-]
-
-{ #category : #'*snapshotting' }
-JSONWriter >> writeImportToken: token [
-	token isString ifTrue: [^stream nextPutAll: (self quoted: token)].
-	stream nextPutAll: '['.
-	token
-		do: [:str | stream nextPutAll: (self quoted: str)]
-		separatedBy: [stream nextPutAll: ', '].
-	stream nextPutAll: ']'
-]
-
 { #category : #writing }
 JSONWriter >> writeImport: aSymbolicReference [
-	stream nextPutAll: '['.
-	self
-		writeImportToken: aSymbolicReference token;
-		writeImportLinker: aSymbolicReference linker.
+	| elements |
+	stream
+		nextPutAll: '[';
+		nextPutAll: (self quoted: aSymbolicReference linker).
+
+	aSymbolicReference token ifNotNil: [:token |
+		elements := token isString ifTrue: [{token}] ifFalse: [token].
+		elements do: [:str |
+			stream
+				nextPutAll: ', ';
+				nextPutAll: (self quoted: str)]].
 	stream nextPutAll: ']'
 ]
 

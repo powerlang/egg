@@ -79,10 +79,15 @@ let Egg = class {
 
 	bindModuleImport(descriptor)
 	{
-		const token = this.transferImportLiteral(descriptor[0]);
-		const linker = descriptor[1] ? this.transferImportLiteral(descriptor[1]) : this.kernel.exports["nil"];
+		const linker = this.transferImportLiteral(descriptor[0]);
+		if (descriptor.length == 1)
+			token =  this.kernel.exports["nil"];
+		else if (descriptor.length == 2) 
+			token = this.transferImportLiteral(descriptor[1]);
+		else
+			token = this.transferImportLiteral(descriptor.slice(1)); // all elems but first (the linker)
 		
-		const ref = this.runtime.sendLocal_to_with_("token:linker:", this.kernel.exports["SymbolicReference"], [token, linker]);
+		const ref = this.runtime.sendLocal_to_with_("linker:token:", this.kernel.exports["SymbolicReference"], [linker, token]);
 		return this.runtime.sendLocal_to_("link", ref);
 	}
 

@@ -7,5 +7,5 @@ Extension { #name : #True }
 
 { #category : #'*snapshotting' }
 True >> asSymbolicReference [
-	^SymbolicReference new token: #true
+	^SymbolicReference new linker: #true
 ]
