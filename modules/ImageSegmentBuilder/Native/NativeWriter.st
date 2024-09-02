@@ -7,6 +7,7 @@ Class {
 	#name : #NativeWriter,
 	#superclass : #Writer,
 	#instVars : [
+		'importStrings',
 		'offsets',
 		'size',
 		'base',
@@ -62,6 +63,23 @@ NativeWriter >> closure: anObjectClosure [
 	super closure: anObjectClosure.
 ]
 
+{ #category : #private }
+NativeWriter >> addImportString: aSymbol [
+	(importStrings includesKey: aSymbol) ifTrue: [^self].
+	importStrings at: aSymbol put: importStrings size.
+]
+
+{ #category : #private }
+NativeWriter >> computeImportStrings [
+	imports do: [:import |
+		self addImportString: import linker.
+		import token ifNotNil: [:token |
+			token isString
+				ifTrue: [self addImportString: token]
+				ifFalse: [token do: [:s | self addImportString: s]]]
+	]
+]
+
 { #category : #accessing }
 NativeWriter >> encodedReferenceTo: anObject [
 	| key offset |
@@ -80,8 +98,9 @@ NativeWriter >> image [
 
 { #category : #accessing }
 NativeWriter >> initialize [
-	base := 0.
+	base := 0x1000000.
 	wordSize := 8.
+	importStrings := Dictionary new.
 	offsets := IdentityDictionary new.
 	stream := #[] writeStream
 ]
@@ -112,18 +131,32 @@ NativeWriter >> objectSizeInBytes: anObject [
 		ifFalse: [total * wordSize]
 ]
 
-{ #category : #accessing }
+{ #category : #private }
+NativeWriter >> layoutImport: anObject at: anInteger [
+	| encoded |
+	encoded := anInteger << 2 | 0x2.
+	offsets at: anObject put: encoded.
+]
+
+{ #category : #private }
+NativeWriter >> layoutObject: obj at: offset [
+	| oop |
+	oop := offset + (self objectHeaderSizeInBytes: obj).
+	offsets at: obj put: oop.
+	^oop + (self objectSizeInBytes: obj).
+]
+
+{ #category : #private }
 NativeWriter >> layoutObjects [
-	| offset oop |
+	| offset subscript |
 	offset := self objectsOffset.
 	objects
 		do: [ :obj |
-			obj _isSmallInteger ifFalse: [
-				oop := offset + (self objectHeaderSizeInBytes: obj).
-				offsets at: obj put: oop.
-				offset := oop + (self objectSizeInBytes: obj) ]].
+			obj _isSmallInteger ifFalse: [ 
+				offset := self layoutObject: obj at: offset]].
 	size := offset.
-	imports keysDo: [:o | offsets at: o put: offset. offset := offset + wordSize].
+	subscript := 0.
+	imports keysDo: [ :obj | self layoutImport: obj at: subscript. subscript := subscript + 1].	
 	mapping keysAndValuesDo: [:obj :surrogate |
 		offsets at: surrogate ifPresent: [:o | offsets at: obj put: o]].
 ]
@@ -146,16 +179,27 @@ NativeWriter >> wordSize: anInteger [
 { #category : #accessing }
 NativeWriter >> write [
 	self
+		computeImportStrings;
 		layoutObjects;
 		writeSignature;
 		writeHeader;
 		writeObjects;
+		writeImportStrings;
 		writeImports;
 		writeExports
 ]
+
 { #category : #'own services' }
 NativeWriter >> writeExports [
-	"To do"
+	"stream nextULargePut: exports size."
+	exports keys
+		do: [ :name | | object encoded |
+			object := exports at: name.
+			encoded := self encodedReferenceTo: object.
+			stream
+				nextULargePut: encoded;
+				nextULargePut: name size;
+				nextPutAll: name]
 ]
 
 { #category : #'own services' }
@@ -165,9 +209,58 @@ NativeWriter >> writeHeader [
 	self writeReferenceTo: closure module
 ]
 
+{ #category : #'*snapshotting' }
+NativeWriter >> writeImportLinker: linker [
+	"
+		linker can be 
+	"
+	linker ifNil: [^stream nextULongPut: 0].
+	stream nextULongPut: 1; nextULongPut: linker size; nextPutAll: linker
+]
+
+{ #category : #'*snapshotting' }
+NativeWriter >> writeImportToken: token [
+	"
+		token can be a string or a collection of strings. In first case, a
+		type 0 is put first, then strings. Else collection size (>0) is put
+		first. Then the strings.
+	"
+	token isString ifTrue: [^stream nextULongPut: 0; nextULongPut: token size; nextPutAll: token].
+	stream nextULongPut: token size.
+	token
+		do: [:str | stream nextULongPut: str size; nextPutAll: str]
+]
+
+{ #category : #writing }
+NativeWriter >> writeImport: aSymbolicReference [
+
+	| descriptor subscript |
+	descriptor := OrderedCollection with: aSymbolicReference linker.
+	aSymbolicReference token ifNotNil: [:token |
+						token isString 
+							ifTrue: [descriptor add: token]
+							ifFalse: [descriptor addAll: token]].
+
+	stream nextULongPut: descriptor size.
+	descriptor do: [:str |
+		subscript := importStrings at: str.
+		stream nextULongPut: subscript].
+]
+
 { #category : #'own services' }
 NativeWriter >> writeImports [
-	"To do"
+	imports do: [ :symref | self writeImport: symref]
+]
+
+{ #category : #'own services' }
+NativeWriter >> writeImportStrings [
+	| sorted |
+	sorted := Array new: importStrings size.
+	importStrings keysAndValuesDo: [:symref :subscript | sorted at: subscript + 1 put: symref].
+
+	stream nextULargePut: importStrings size.
+	sorted do: [ :string |
+		stream nextULongPut: string size; nextPutAll: string ]
 ]
 
 { #category : #accessing }
