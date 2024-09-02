@@ -1,9 +1,9 @@
 # Egg.cpp - An Egg Smalltalk VM that is implemented in C++
 
 In a nutshell, here you get a simple interpreter that is able to load Egg modules and run them.
-It starts by loading an Egg kernel snapshot, then the specified module, and sending it main:
+It starts by loading an Egg kernel snapshot, then the module you specify, and finally sending it `#main:`
 
-*IMPORTANT NOTE* this is heavily w.i.p and there are quite a few things that may not work.
+*IMPORTANT NOTE* this is heavily w.i.p. and there are quite a few things that may not work.
 
 # Getting Started
 
