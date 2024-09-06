@@ -35,7 +35,7 @@ void HeapObject::unsetFlags(const uint8_t flags) { this->smallHeader()->unsetFla
 
 bool HeapObject::isNamed() const
 {
-	return this->testFlags(SmallHeader::Flags::IsSpecial);
+	return this->testFlags(SmallHeader::Flags::IsNamed);
 }
 
 bool HeapObject::isSpecial() const
@@ -91,12 +91,12 @@ void HeapObject::beBytes()
 
 void Egg::HeapObject::beArrayed()
 {
-	this->smallHeader()->unsetFlags(SmallHeader::Flags::IsArrayed);
+	this->smallHeader()->setFlags(SmallHeader::Flags::IsArrayed);
 }
 
 void Egg::HeapObject::beNamed()
 {
-	this->smallHeader()->unsetFlags(SmallHeader::Flags::IsNamed);
+	this->smallHeader()->setFlags(SmallHeader::Flags::IsNamed);
 }
 
 void Egg::HeapObject::beNotSpecial() {
@@ -281,7 +281,7 @@ void HeapObject::replaceBytesFrom_to_with_startingAt_(
 		if (size > anObject->size() - startingAtOffset)
 			error("out of bounds");
 		
-		auto dst = (char*)this;
+		auto dst = ((char*)this) + from - 1;
 		auto src = ((char*)anObject) + startingAtOffset;
 		std::copy(src, src + size, dst);
 	}
