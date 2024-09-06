@@ -85,15 +85,21 @@ public:
 	}
 
 	SBinding* decodeBinding(auto id) {
-
+		int64_t index, env;
 		switch(id) {
 			case AstBindingTypes::NilId:				return new SNilBinding();
 			case AstBindingTypes::TrueId:				return new STrueBinding();
 			case AstBindingTypes::FalseId:				return new SFalseBinding();
 			case AstBindingTypes::SelfId:				return new SSelfBinding();
 			case AstBindingTypes::SuperId:				return new SSuperBinding();
-			case AstBindingTypes::ArgumentId:			return new SArgumentBinding(this->nextInteger(), this->nextEnvironment());
-			case AstBindingTypes::TemporaryId:			return new STemporaryBinding(this->nextInteger(), this->nextEnvironment());
+			case AstBindingTypes::ArgumentId:
+				index = this->nextInteger();
+				env = this->nextEnvironment();
+				return new SArgumentBinding(index, env);
+			case AstBindingTypes::TemporaryId:
+				index = this->nextInteger();
+				env = this->nextEnvironment();
+				return new STemporaryBinding(index, env);
 			case AstBindingTypes::DynamicVarId:			return new SDynamicBinding(this->nextSymbol());
 			case AstBindingTypes::NestedDynamicVarId:	return new SNestedDynamicBinding(this->nextSymbol());
 			default:									ASSERT(false); return nullptr;
@@ -228,7 +234,7 @@ public:
 
 	int64_t nextEnvironment() {
 		auto value = this->nextInteger();
-		return value != -2 ? value: 0;
+		return value != -2 ? value: INSTACK_ENVIRONMENT;
 	}
 
 	SExpression* nextExpression() {
@@ -248,11 +254,20 @@ public:
 	int64_t nextInteger() {
 		uint8_t value = this->nextByte();
 		if (value == 128) {
-			int64_t value64;
-			this->_stream.read(reinterpret_cast<char*>(&value64), sizeof(int64_t));
+			// the value64 is stored big endian, should make it come as little endian
+			uint64_t value64;
+			uint8_t *bytes = (uint8_t*)&value64;
+			bytes[7] = this->nextByte();
+			bytes[6] = this->nextByte();
+			bytes[5] = this->nextByte();
+			bytes[4] = this->nextByte();
+			bytes[3] = this->nextByte();
+			bytes[2] = this->nextByte();
+			bytes[1] = this->nextByte();
+			bytes[0] = this->nextByte();
 			return value64;
 		}
-		return value < 127 ? value : value-256;
+		return value <= 127 ? value : value-256;
 	}
 
 	SmallInteger* nextLiteralInteger() {
