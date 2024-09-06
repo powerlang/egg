@@ -296,17 +296,33 @@ void Runtime::flushDispatchCache_in_(HeapObject *aSymbol, HeapObject *klass) {
 std::string Egg::Runtime::print_(HeapObject *obj) {
 	auto species = this->behaviorClass_(obj->behavior());
 	if (species == _stringClass)
-		return "<'" , obj->asLocalString() + "'>";
+		return "'" + obj->asLocalString() + "'";
 	if (species == _methodClass)
 	{
         auto selector = (HeapObject*)obj->slot(Offsets::MethodSelector);
-		auto s = (selector == _nilObj) ? "<nil>" : selector->asLocalString();
-		return "<" + (this->methodClassBinding_(obj)->printString()) +
-				">>#" + s + ">";
+		auto s = (selector == _nilObj) ? "nil" : selector->asLocalString();
+		return "" + (this->methodClassBinding_(obj)->printString()) +
+				">>#" + s + "";
     }
+
+    if (species == _blockClass) {
+        auto method = this->blockMethod_(obj);
+        auto index = this->blockNumber_(obj);
+        return "block " + std::to_string(index) + " of " + method->printString();
+    }
+
+    if (species == _behaviorClass) {
+        return speciesLocalName_(this->behaviorClass_(obj)) + " behavior";
+    }
+
+    if (speciesIsMetaclass_(species)) // then obj is a class
+    {
+        return "" + speciesLocalName_(obj) + "";
+    }
+
 	auto name = this->speciesLocalName_(species);
 	if (name == "Symbol")
-		return "<#" + obj->asLocalString() + ">";
+		return "#" + obj->asLocalString() + "";
 	
-    return "<a " + name + ">";
+    return "a " + name + "";
  }
