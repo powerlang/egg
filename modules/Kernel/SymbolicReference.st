@@ -64,7 +64,7 @@ SymbolicReference class >> linker: anObject token: anotherObject [
 { #category : #comparing }
 SymbolicReference >> = aSymbolicReference [
 	aSymbolicReference class == self class ifFalse: [^false].
-	^aSymbolicReference token = token
+	^linker = aSymbolicReference linker and: [token = aSymbolicReference token]
 ]
 
 { #category : #linking }
