@@ -10,32 +10,10 @@ namespace Egg {
 
 class Runtime;
 class Evaluator;
-class SExpression;
-class SOpAssign;
-class SOpJump;
-class SOpJumpFalse;
-class SOpJumpTrue;
-class SOpDispatchMessage;
-class SOpDropToS;
-class SOpLoadRfromStack;
-class SOpLoadRwithNil;
-class SOpLoadRwithSelf;
-class SOpPopR;
-class SOpPushR;
-class SAbstractMessage;
-class SAssignment;
-class SBlock;
-class SCascade;
-class SCascadeMessage;
-class SIdentifier;
-class SLiteral;
-class SMessage;
-class SMethod;
-class SReturn;
 
 class SExpressionLinearizer : public SExpressionVisitor {
-	HeapObject *_greaterThan, *_one, *_plus, *_not, *_equalsEquals, *_ifTrue, *_ifFalse, *_ifTrueIfFalse, *_ifFalseIfTrue, *_ifNil, *_ifNotNil, *_ifNilIfNotNil, *_ifNotNilIfNil, *_whileTrue, *_whileFalse, *_whileTrue_, *_whileFalse_, *_toDo, *_toByDo, *_repeat, *_timesRepeat, *_andNot, *_orNot;
-
+	HeapObject *_greaterThan, *_plus, *_not, *_equalsEquals, *_ifTrue, *_ifFalse, *_ifTrueIfFalse, *_ifFalseIfTrue, *_ifNil, *_ifNotNil, *_ifNilIfNotNil, *_ifNotNilIfNil, *_whileTrue, *_whileFalse, *_whileTrue_, *_whileFalse_, *_toDo, *_toByDo, *_repeat, *_timesRepeat, *_andNot, *_orNot;
+	SLiteral *_one;
 	bool _inBlock;
 	bool _dropsArguments;
 	size_t _stackTop;
@@ -54,8 +32,9 @@ public:
 		this->_inBlock = false;
 		this->_dropsArguments = true;
 
-		this->_greaterThan = nullptr;
 		this->_one = nullptr;
+
+		this->_greaterThan = nullptr;
 		this->_plus = nullptr;
 		this->_not = nullptr;
 		this->_equalsEquals = nullptr;
@@ -93,7 +72,23 @@ public:
 	void dropToS();
 	void dropToS_(size_t anInteger);
 	void dropsArguments();
-	void jump();
+
+    void inline_if_(SMessage *anSMessage, bool aBoolean);
+    void inline_ifNil_(SMessage *anSMessage, bool aBoolean);
+    void inline_ifNilIfNotNil_(SMessage *anSMessage, bool aBoolean);
+    void inline_ifTrueIfFalse_(SMessage *anSMessage, bool aBoolean);
+    void inline_unitaryWhile_(SMessage *anSMessage, bool aBoolean);
+    void inline_binaryWhile_(SMessage *anSMessage, bool aBoolean);
+    void inlineRepeat_(SMessage *anSMessage);
+    void inlineToDo_(SMessage *anSMessage);
+    void inlineToByDo_(SMessage *anSMessage);
+    void inlineTimesRepeat_(SMessage *anSMessage);
+    void inlineAndNot_(SMessage *anSMessage);
+    void inlineOrNot_(SMessage *anSMessage);
+    void inlineOr_(SMessage *anSMessage);
+    void inlineAnd_(SMessage *anSMessage);
+
+	SOpJump *jump();
 	void jumpTo_(size_t anInteger);
 	void loadRfromStack_(size_t anInteger);
 	void loadRwithNil();
@@ -107,17 +102,20 @@ public:
 	void return_(bool isLocal);
 	void runtime_(Runtime *aRuntime);
 	void storeRintoFrameAt_(size_t anInteger);
-	void visitAssignment(SAssignment *anSAssignment);
-	void visitBlock(SBlock *anSBlock);
-	void visitCascade(SCascade *anSCascade);
-	void visitIdentifier(SIdentifier *anSIdentifier);
+
+	void visitStatements(std::vector<SExpression *> &statements);
+
+	void visitAssignment(SAssignment *anSAssignment) override;
+	void visitBlock(SBlock *anSBlock) override;
+	void visitCascade(SCascade *anSCascade) override;
+	void visitIdentifier(SIdentifier *anSIdentifier) override;
 	void visitInlinedMessage(SMessage *anSMessage);
-	void visitLiteral(SLiteral *anSLiteral);
-	void visitMessage(SMessage *anSMessage);
-	void visitMethod(SMethod *anSMethod);
-	void visitOpLoadRfromFrame(SOpLoadRfromFrame *anSOpLoadRfromFrame);
-	void visitOpLoadRfromStack(SOpLoadRfromStack *anSOpLoadRfromStack);
-	void visitReturn(SReturn *anSReturn);
+	void visitLiteral(SLiteral *anSLiteral) override;
+	void visitMessage(SMessage *anSMessage) override;
+	void visitMethod(SMethod *anSMethod) override;
+	void visitOpLoadRfromFrame(SOpLoadRfromFrame *anSOpLoadRfromFrame) override;
+	void visitOpLoadRfromStack(SOpLoadRfromStack *anSOpLoadRfromStack) override;
+	void visitReturn(SReturn *anSReturn) override;
 
 };
 
