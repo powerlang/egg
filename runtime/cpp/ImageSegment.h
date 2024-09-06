@@ -56,6 +56,7 @@ class ImageSegment
   public:
     ImageSegmentHeader header;
   public:
+    uint64_t _currentBase;
     std::map<std::string, HeapObject*> _exports;
     std::vector<std::string> _importStrings;
     std::vector<std::vector<uint32_t>> _importDescriptors;
@@ -76,7 +77,9 @@ class ImageSegment
 
     std::string& importStringAt_(uint32_t index);
 
-private:
+    void dumpObjects();
+
+   private:
     void readImportStrings(std::istream *data);
     void readImportDescriptors(std::istream *data);
     void readExports(std::istream *data);
