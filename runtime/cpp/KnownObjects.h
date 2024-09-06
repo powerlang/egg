@@ -5,8 +5,12 @@
 
 namespace Egg {
 
+class Runtime;
+
 class KnownObjects {
 public:
+    static void initializeFrom(Runtime *runtime);
+
     static HeapObject *nil;
     static HeapObject *_true;
     static HeapObject *_false;
