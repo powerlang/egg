@@ -11,6 +11,7 @@
 #include "SOpLoadRfromStack.h"
 #include "SOpLoadRwithNil.h"
 #include "SOpLoadRwithSelf.h"
+#include "SOpStoreRintoFrame.h"
 #include "SOpNonLocalReturn.h"
 #include "SOpPopR.h"
 #include "SOpPrimitive.h"
@@ -32,12 +33,14 @@ Evaluator::Evaluator(Runtime *runtime, HeapObject *falseObj, HeapObject *trueObj
         _linearizer = new SExpressionLinearizer();
         _linearizer->runtime_(_runtime);
         _context = new EvaluationContext(runtime);
+        this->initializeUndermessages();
+        this->initializePrimitives();
     }
 
 
 void Evaluator::_halt()
 {
-	perror("_halt encountered");
+	error("_halt encountered");
 }
 
 void Evaluator::addPrimitive(const std::string &name, Evaluator::PrimitivePointer primitive)
@@ -51,70 +54,114 @@ void Evaluator::addUndermessage(const std::string &name, UndermessagePointer pri
     _undermessages[symbol] = primitive;
 }
 
+void Evaluator::initializeUndermessages() {
+    this->addUndermessage("_isSmallInteger", &Evaluator::underprimitiveIsSmallInteger);
+    this->addUndermessage("_isLarge", &Evaluator::underprimitiveIsLarge);
+    this->addUndermessage("_smallSize", &Evaluator::underprimitiveSmallSize);
+    this->addUndermessage("_largeSize", &Evaluator::underprimitiveLargeSize);
+    this->addUndermessage("_basicFlags", &Evaluator::underprimitiveBasicFlags);
+    this->addUndermessage("_basicAt:", &Evaluator::underprimitiveBasicAt);
+    this->addUndermessage("_basicAt:put:", &Evaluator::underprimitiveBasicAtPut);
+    this->addUndermessage("_byteAt:", &Evaluator::underprimitiveByteAt);
+    this->addUndermessage("_byteAt:put:", &Evaluator::underprimitiveByteAtPut);
+    this->addUndermessage("_basicHash", &Evaluator::underprimitiveBasicHash);
+    this->addUndermessage("_basicHash:", &Evaluator::underprimitiveBasicHashPut);
+    this->addUndermessage("_smallIntegerByteAt:", &Evaluator::underprimitiveSmallIntegerByteAt);
+    this->addUndermessage("_bitShiftLeft:", &Evaluator::underprimitiveBitShiftLeft);
+    this->addUndermessage("_primitiveULongAtOffset:", &Evaluator::underprimitiveULongAtOffset);
+    this->addUndermessage("_primitiveULongAtOffset:put:", &Evaluator::underprimitiveULongAtOffsetPut);
+    this->addUndermessage("_uShortAtOffset:", &Evaluator::underprimitiveUShortAtOffset);
+    this->addUndermessage("_uShortAtOffset:put:", &Evaluator::underprimitiveUShortAtOffsetPut);
+    this->addUndermessage("_smiPlus:", &Evaluator::underprimitiveSMIPlus);
+    this->addUndermessage("_smiMinus:", &Evaluator::underprimitiveSMIMinus);
+    this->addUndermessage("_smiTimes:", &Evaluator::underprimitiveSMITimes);
+    this->addUndermessage("_smiLowerThan:", &Evaluator::underprimitiveSMILowerThan);
+    this->addUndermessage("_smiLowerEqualThan:", &Evaluator::underprimitiveSMILowerEqualThan);
+    this->addUndermessage("_smiGreaterThan:", &Evaluator::underprimitiveSMIGreaterThan);
+    this->addUndermessage("_smiGreaterEqualThan:", &Evaluator::underprimitiveSMIGreaterEqualThan);
+    this->addUndermessage("_smiEquals:", &Evaluator::underprimitiveSMIEquals);
+    this->addUndermessage("_identityEquals:", &Evaluator::underprimitiveIdentityEquals);
+    this->addUndermessage("_leadingZeroBitCount", &Evaluator::underprimitiveLeadingZeroBitCount);
+    this->addUndermessage("_quotientTowardZero:", &Evaluator::underprimitiveSMIQuotientTowardZero);
+    this->addUndermessage("_remainderTowardZero:", &Evaluator::underprimitiveSMIRemainderTowardZero);
+    this->addUndermessage("_bitShiftLeft:", &Evaluator::underprimitiveSMIBitShiftLeft);
+    this->addUndermessage("_bitShiftRight:", &Evaluator::underprimitiveSMIBitShiftRight);
+    this->addUndermessage("_smiBitAnd:", &Evaluator::underprimitiveSMIBitAnd);
+    this->addUndermessage("_smiBitOr:", &Evaluator::underprimitiveSMIBitOr);
+    this->addUndermessage("_halt", &Evaluator::underprimitiveHalt);
+}
+
 
 void Evaluator::initializePrimitives()
 {
-    this->addPrimitive("PrimitiveBehavior", &Evaluator::primitiveBehavior);
-    this->addPrimitive("PrimitiveSetBehavior", &Evaluator::primitiveSetBehavior);
-    this->addPrimitive("PrimitiveClass", &Evaluator::primitiveClass);
-    this->addPrimitive("PrimitiveUnderHash", &Evaluator::primitiveUnderHash);
-    this->addPrimitive("PrimitiveUnderIsBytes", &Evaluator::primitiveUnderIsBytes);
-    this->addPrimitive("PrimitiveUnderPointersSize", &Evaluator::primitiveUnderPointersSize);
-    this->addPrimitive("PrimitiveUnderSize", &Evaluator::primitiveUnderSize);
-    this->addPrimitive("PrimitiveSize", &Evaluator::primitiveSize);
-    this->addPrimitive("PrimitiveHash", &Evaluator::primitiveHash);
-    this->addPrimitive("PrimitiveAt", &Evaluator::primitiveAt);
-    this->addPrimitive("PrimitiveAtPut", &Evaluator::primitiveAtPut);
-    this->addPrimitive("PrimitiveNew", &Evaluator::primitiveNew);
-    this->addPrimitive("PrimitiveNewSized", &Evaluator::primitiveNewSized);
-    this->addPrimitive("PrimitiveNewBytes", &Evaluator::primitiveNewBytes);
-    this->addPrimitive("PrimitiveSMIPlus", &Evaluator::primitiveSMIPlus);
-    this->addPrimitive("PrimitiveSMIMinus", &Evaluator::primitiveSMIMinus);
-    this->addPrimitive("PrimitiveSMITimes", &Evaluator::primitiveSMITimes);
-    this->addPrimitive("PrimitiveSMIIntDiv", &Evaluator::primitiveSMIIntDiv);
-    this->addPrimitive("PrimitiveSMIIntQuot", &Evaluator::primitiveSMIIntQuot);
-    this->addPrimitive("PrimitiveSMIBitAnd", &Evaluator::primitiveSMIBitAnd);
-    this->addPrimitive("PrimitiveSMIBitOr", &Evaluator::primitiveSMIBitOr);
-    this->addPrimitive("PrimitiveSMIBitXor", &Evaluator::primitiveSMIBitXor);
-    this->addPrimitive("PrimitiveSMIBitShift", &Evaluator::primitiveSMIBitShift);
-    this->addPrimitive("PrimitiveSMIHighBit", &Evaluator::primitiveSMIHighBit);
-    this->addPrimitive("PrimitiveSMIGreaterThan", &Evaluator::primitiveSMIGreaterThan);
-    this->addPrimitive("PrimitiveSMIGreaterEqualThan", &Evaluator::primitiveSMIGreaterEqualThan);
-    this->addPrimitive("PrimitiveSMIEqual", &Evaluator::primitiveSMIEqual);
-    this->addPrimitive("PrimitiveSMINotEqual", &Evaluator::primitiveSMINotEqual);
-    this->addPrimitive("PrimitiveSMISize", &Evaluator::primitiveSMISize);
-    this->addPrimitive("PrimitiveClosureValue", &Evaluator::primitiveClosureValue);
-    this->addPrimitive("PrimitiveClosureValueWithArgs", &Evaluator::primitiveClosureValueWithArgs);
-    this->addPrimitive("PrimitiveClosureArgumentCount", &Evaluator::primitiveClosureArgumentCount);
-    this->addPrimitive("PrimitivePerformWithArguments", &Evaluator::primitivePerformWithArguments);
-    this->addPrimitive("PrimitiveStringReplaceFromToWithStartingAt", &Evaluator::primitiveStringReplaceFromToWithStartingAt);
-    this->addPrimitive("PrimitiveFloatNew", &Evaluator::primitiveFloatNew);
-    this->addPrimitive("PrimitiveBootstrapDictNew", &Evaluator::primitiveBootstrapDictNew);
-    this->addPrimitive("PrimitiveFlushDispatchCaches", &Evaluator::primitiveFlushDispatchCaches);
-    this->addPrimitive("PrimitiveBootstrapDictBeConstant", &Evaluator::primitiveBootstrapDictBeConstant);
-    this->addPrimitive("PrimitiveBootstrapDictKeys", &Evaluator::primitiveBootstrapDictKeys);
-    this->addPrimitive("PrimitiveBootstrapDictAt", &Evaluator::primitiveBootstrapDictAt);
-    this->addPrimitive("PrimitiveBootstrapDictAtPut", &Evaluator::primitiveBootstrapDictAtPut);
-    //this->addPrimitive("PrimitiveHostSuspendedBecause", &Evaluator::primitiveHostSuspendedBecause);
-    this->addPrimitive("PrimitiveHostLoadModule", &Evaluator::primitiveHostLoadModule);
-    //this->addPrimitive("PrimitiveHostFixOverrides", &Evaluator::primitiveHostFixOverrides);
-    this->addPrimitive("PrimitivePrimeFor", &Evaluator::primitivePrimeFor);
-    this->addPrimitive("PrimitiveFlushFromCaches", &Evaluator::primitiveFlushFromCaches);
-    /*this->addPrimitive("PrimitivePrepareForExecution", &Evaluator::primitivePrepareForExecution);
-    this->addPrimitive("PrimitiveProcessVMStackInitialize", &Evaluator::primitiveProcessVMStackInitialize);
-    this->addPrimitive("PrimitiveProcessVMStackAt", &Evaluator::primitiveProcessVMStackAt);
-    this->addPrimitive("PrimitiveProcessVMStackAtPut", &Evaluator::primitiveProcessVMStackAtPut);
-    this->addPrimitive("PrimitiveProcessVMStackBpAtPut", &Evaluator::primitiveProcessVMStackBpAtPut);
-    this->addPrimitive("PrimitiveProcessVMStackPcAtPut", &Evaluator::primitiveProcessVMStackPcAtPut);
-    this->addPrimitive("PrimitiveProcessVMStackBP", &Evaluator::primitiveProcessVMStackBP);
-    this->addPrimitive("PrimitiveProcessVMStackBufferSize", &Evaluator::primitiveProcessVMStackBufferSize);
-    this->addPrimitive("PrimitiveProcessVMStackContextSwitchTo", &Evaluator::primitiveProcessVMStackContextSwitchTo);
+    this->addPrimitive("Behavior", &Evaluator::primitiveBehavior);
+    this->addPrimitive("SetBehavior", &Evaluator::primitiveSetBehavior);
+    this->addPrimitive("Class", &Evaluator::primitiveClass);
+    this->addPrimitive("UnderHash", &Evaluator::primitiveUnderHash);
+    this->addPrimitive("UnderIsBytes", &Evaluator::primitiveUnderIsBytes);
+    this->addPrimitive("UnderPointersSize", &Evaluator::primitiveUnderPointersSize);
+    this->addPrimitive("UnderSize", &Evaluator::primitiveUnderSize);
+    this->addPrimitive("Size", &Evaluator::primitiveSize);
+    this->addPrimitive("Hash", &Evaluator::primitiveHash);
+    this->addPrimitive("At", &Evaluator::primitiveAt);
+    this->addPrimitive("AtPut", &Evaluator::primitiveAtPut);
+    this->addPrimitive("New", &Evaluator::primitiveNew);
+    this->addPrimitive("NewSized", &Evaluator::primitiveNewSized);
+    this->addPrimitive("NewBytes", &Evaluator::primitiveNewBytes);
+    this->addPrimitive("Equal", &Evaluator::primitiveEqual);
+    this->addPrimitive("SMIPlus", &Evaluator::primitiveSMIPlus);
+    this->addPrimitive("SMIMinus", &Evaluator::primitiveSMIMinus);
+    this->addPrimitive("SMITimes", &Evaluator::primitiveSMITimes);
+    this->addPrimitive("SMIIntDiv", &Evaluator::primitiveSMIIntDiv);
+    this->addPrimitive("SMIIntQuot", &Evaluator::primitiveSMIIntQuot);
+    this->addPrimitive("SMIBitAnd", &Evaluator::primitiveSMIBitAnd);
+    this->addPrimitive("SMIBitOr", &Evaluator::primitiveSMIBitOr);
+    this->addPrimitive("SMIBitXor", &Evaluator::primitiveSMIBitXor);
+    this->addPrimitive("SMIBitShift", &Evaluator::primitiveSMIBitShift);
+    this->addPrimitive("SMIHighBit", &Evaluator::primitiveSMIHighBit);
+    this->addPrimitive("SMIGreaterThan", &Evaluator::primitiveSMIGreaterThan);
+    this->addPrimitive("SMIGreaterEqualThan", &Evaluator::primitiveSMIGreaterEqualThan);
+    this->addPrimitive("SMIEqual", &Evaluator::primitiveSMIEqual);
+    this->addPrimitive("SMINotEqual", &Evaluator::primitiveSMINotEqual);
+    this->addPrimitive("SMISize", &Evaluator::primitiveSMISize);
+    this->addPrimitive("ClosureValue", &Evaluator::primitiveClosureValue);
+    this->addPrimitive("ClosureValueWithArgs", &Evaluator::primitiveClosureValueWithArgs);
+    this->addPrimitive("ClosureArgumentCount", &Evaluator::primitiveClosureArgumentCount);
+    this->addPrimitive("PerformWithArguments", &Evaluator::primitivePerformWithArguments);
+    this->addPrimitive("StringReplaceFromToWithStartingAt", &Evaluator::primitiveStringReplaceFromToWithStartingAt);
+    this->addPrimitive("FloatNew", &Evaluator::primitiveFloatNew);
+    this->addPrimitive("FlushDispatchCaches", &Evaluator::primitiveFlushDispatchCaches);
+    //this->addPrimitive("BootstrapDictBeConstant", &Evaluator::primitiveBootstrapDictBeConstant);
+    //this->addPrimitive("BootstrapDictKeys", &Evaluator::primitiveBootstrapDictKeys);
+    //this->addPrimitive("BootstrapDictNew", &Evaluator::primitiveBootstrapDictNew);
+    //this->addPrimitive("BootstrapDictAt", &Evaluator::primitiveBootstrapDictAt);
+    //this->addPrimitive("BootstrapDictAtPut", &Evaluator::primitiveBootstrapDictAtPut);
+    //this->addPrimitive("HostSuspendedBecause", &Evaluator::primitiveHostSuspendedBecause);
+    this->addPrimitive("HostLoadModule", &Evaluator::primitiveHostLoadModule);
+    //this->addPrimitive("HostFixOverrides", &Evaluator::primitiveHostFixOverrides);
+    this->addPrimitive("PrimeFor", &Evaluator::primitivePrimeFor);
+    this->addPrimitive("FlushFromCaches", &Evaluator::primitiveFlushFromCaches);
+    /*this->addPrimitive("PrepareForExecution", &Evaluator::primitivePrepareForExecution);
+    this->addPrimitive("ProcessVMStackInitialize", &Evaluator::primitiveProcessVMStackInitialize);
+    this->addPrimitive("ProcessVMStackAt", &Evaluator::primitiveProcessVMStackAt);
+    this->addPrimitive("ProcessVMStackAtPut", &Evaluator::primitiveProcessVMStackAtPut);
+    this->addPrimitive("ProcessVMStackBpAtPut", &Evaluator::primitiveProcessVMStackBpAtPut);
+    this->addPrimitive("ProcessVMStackPcAtPut", &Evaluator::primitiveProcessVMStackPcAtPut);
+    this->addPrimitive("ProcessVMStackBP", &Evaluator::primitiveProcessVMStackBP);
+    this->addPrimitive("ProcessVMStackBufferSize", &Evaluator::primitiveProcessVMStackBufferSize);
+    this->addPrimitive("ProcessVMStackContextSwitchTo", &Evaluator::primitiveProcessVMStackContextSwitchTo);
     */
+    _linearizer->primitives_(_primitives);
 }
 
 void Evaluator::evaluatePerform_in_withArgs_(HeapObject *aSymbol, Object *receiver, Object *arguments) {
     HeapObject *behavior = this->_runtime->behaviorOf_(receiver);
+    if (aSymbol->printString() == "#asBehavior") {
+        int a = 0;
+    }
     HeapObject *method = this->_runtime->lookup_startingAt_(aSymbol, behavior);
+    if (!method)
+        error_(std::string("cannot perform ") + aSymbol->printString() + " on " + receiver->printString());
     auto heapargs = arguments->asHeapObject();
     for (int i = 1; i <= heapargs->size(); i++) {
         this->_context->pushOperand_(heapargs->slotAt_(i));
@@ -202,7 +249,7 @@ void Egg::Evaluator::messageNotUnderstood_(SAbstractMessage *message)
 { 
     std::cout
         << "Message not understood!" << std::endl
-        << this->_regR->printString() << " does not understand " << message->selector();
+        << this->_regR->printString() << " does not understand " << message->selector()->printString();
     
     error("dnu recovery not implemented yet");
 }
@@ -321,6 +368,10 @@ void Evaluator::visitOpLoadRwithSelf(SOpLoadRwithSelf *anSOpLoadRwithSelf)
     _regR = _context->self();
 }
 
+void Evaluator::visitOpStoreRintoFrame(SOpStoreRintoFrame *anSOpStoreRintoFrame) {
+    _context->stackTemporaryAt_put_(anSOpStoreRintoFrame->index(), _regR);
+}
+
 void Evaluator::visitOpPrimitive(SOpPrimitive *anSOpPrimitive)
 {
     PrimitivePointer p = anSOpPrimitive->primitive();
@@ -370,7 +421,6 @@ SExpression* Evaluator::nextOperation() {
     return _work->at(pc - 1);
 }
 
-
 Object* Evaluator::newIntObject(auto anInteger){
     return (Object*)this->_runtime->newInteger_(anInteger);
 }
@@ -393,7 +443,7 @@ Object* Evaluator::primitiveAt() {
     auto index_int = index->asSmallInteger()->asNative();
 
     auto heapreceiver = receiver->asHeapObject();
-    return heapreceiver->isBytes() ? newIntObject(heapreceiver->byteAt_(index_int)) : heapreceiver->slotAt_(index_int);
+    return heapreceiver->isBytes() ? newIntObject(heapreceiver->byteAt_(index_int)) : _runtime->indexedSlotAt_(heapreceiver, index_int);
 }
 
 Object* Evaluator::primitiveAtPut() {
@@ -408,8 +458,16 @@ Object* Evaluator::primitiveAtPut() {
 
     auto index_int = index->asSmallInteger()->asNative();
     auto heapreceiver = receiver->asHeapObject();
-    
-    heapreceiver->slotAt_(index_int) = this->_context->secondArgument();
+
+    Object* value = this->_context->secondArgument();
+    if (heapreceiver->isBytes()) {
+        auto native = value->asSmallInteger()->asNative();
+        ASSERT(native < 256 && native >= -128);
+        heapreceiver->byteAt_(index_int) = native;
+    }
+    else {
+        _runtime->indexedSlotAt_(heapreceiver, index_int) = value;
+    }
     return receiver;
 }
 
@@ -472,12 +530,12 @@ Object* Evaluator::primitiveClosureArgumentCount() {
 }
 
 Object* Evaluator::primitiveClosureValue() {
-    this->evaluateClosure_(this->_context->self());
+    this->evaluateClosure_(this->_context->self()->asHeapObject());
     return this->_context->self();
 }
 
 Object* Evaluator::primitiveClosureValueWithArgs() {
-    this->evaluateClosure_withArgs_(this->_context->self(), this->_context->methodArguments());
+    this->evaluateClosure_withArgs_(this->_context->self()->asHeapObject(), this->_context->methodArguments());
     return this->_context->self();
 }
 
@@ -559,7 +617,7 @@ Object* Evaluator::primitiveSMIBitOr() {
 Object* Evaluator::primitiveSMIBitShift() {
     auto self = this->_context->self()->asSmallInteger()->asNative();
     auto firstArg = this->_context->firstArgument()->asSmallInteger()->asNative();
-    auto shifted = firstArg > 0 ? self << firstArg : self >> firstArg;
+    auto shifted = firstArg > 0 ? self << firstArg : self >> -firstArg;
     return newIntObject(shifted);
 }
 

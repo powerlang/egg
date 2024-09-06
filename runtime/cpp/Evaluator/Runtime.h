@@ -1,6 +1,7 @@
 #ifndef _POWERTALKRUNTIME_H_
 #define _POWERTALKRUNTIME_H_
 
+#include <KnownObjects.h>
 #include <vector>
 #include <map>
 
@@ -20,6 +21,7 @@ class Bootstrapper;
 extern Runtime *debugRuntime;
 
 class Runtime {
+public:
     Bootstrapper *_bootstrapper;
     ImageSegment *_kernel;
     Evaluator *_evaluator;
@@ -42,6 +44,7 @@ public:
     {
         this->initializeKernelObjects();
         debugRuntime = this;
+        KnownObjects::initializeFrom(this);
     }
 
     std::string print_(HeapObject* obj);
@@ -50,10 +53,10 @@ public:
 
 	Object* sendLocal_to_(const std::string &selector, Object *receiver) {
         std::vector<Object*>args;
-		return this->sendLocal_to_with_(selector, receiver, args);
+		return this->sendLocal_to_withArgs_(selector, receiver, args);
 	}
 
-	Object* sendLocal_to_with_(const std::string &selector, Object *receiver, std::vector<Object*> &arguments);
+	Object* sendLocal_to_withArgs_(const std::string &selector, Object *receiver, std::vector<Object*> &arguments);
     Object* sendLocal_to_with_(const std::string &selector, Object *receiver, Object *arg1);
     Object* sendLocal_to_with_with_(const std::string &selector, Object *receiver, Object *arg1, Object* arg2);
     
@@ -62,6 +65,7 @@ public:
     HeapObject* methodFor_in_(HeapObject *symbol, HeapObject *behavior);
 
     HeapObject* existingSymbolFrom_(const std::string &selector);
+    HeapObject* symbolTableAt_(const std::string &selector);
 
     HeapObject* lookupAssociationFor_in_(HeapObject *symbol, HeapObject *dictionary);
 
@@ -89,7 +93,9 @@ public:
     HeapObject* newExecutableCodeFor_with_(HeapObject *compiledCode, HeapObject *platformCode);
     HeapObject* newString_(const std::string &str);
     HeapObject* addSymbol_(const std::string &str);
-
+    void addKnownSymbol_(const std::string &str, HeapObject *symbol) {
+        _knownSymbols[str] = symbol;
+    }
     HeapObject* loadModule_(HeapObject *name);
 
     uintptr_t hashFor_(Object *anObject);
@@ -166,6 +172,14 @@ public:
         return (this->blockFlags(block) & 0x3F);
     }
 
+    int blockTempCount_(HeapObject *block) {
+	    return ((this->blockFlags(block) & 0x3FC0) >> 6);
+	}
+
+    int blockNumber_(HeapObject *block) {
+	    return ((this->blockFlags(block) & 0x3FC000) >> 14);
+	}
+
     intptr_t blockFlags(HeapObject *block) {
         return block->slot(Offsets::MethodFormat)->asSmallInteger()->asNative();
     }
@@ -194,18 +208,33 @@ public:
         return closure->slot(Offsets::ClosureBlock)->asHeapObject();
     }
 
-    HeapObject* compiledCodeExecutableCode_(HeapObject *block) {
-        return block->slot(Offsets::CompiledCodeExecutableCode)->asHeapObject();
-    }
-
     HeapObject* closureHome_(HeapObject *closure) {
         auto block = this->closureBlock_(closure);
         if (!this->blockCapturesHome_(block))
 		    error("closure has no home");
         
 	    return (this->blockCapturesSelf_(block)) ?
-            closure->slotAt_(2)->asHeapObject() :
-		    closure->slotAt_(1)->asHeapObject();
+            closure->slotAt_(_closureInstSize + 2)->asHeapObject() :
+		    closure->slotAt_(_closureInstSize + 1)->asHeapObject();
+    }
+
+    HeapObject::ObjectSlot& closureIndexedSlotAt_(HeapObject *closure, int index) {
+	    return closure->slotAt_(_closureInstSize + index);
+	}
+
+    HeapObject::ObjectSlot& environmentIndexedSlotAt_(HeapObject *closureOrArray, int index) {
+	    return closureOrArray->isNamed() ? this->closureIndexedSlotAt_(closureOrArray, index) : closureOrArray->slotAt_(index);
+	}
+
+    HeapObject::ObjectSlot& indexedSlotAt_(HeapObject *anObject, int index) {
+	    auto slot = anObject->isNamed() ?
+	        index + (int)this->speciesInstanceSize_(this->speciesOf_((Object*)anObject)) :
+	        index;
+	    return anObject->slotAt_(slot);
+	}
+
+    HeapObject* compiledCodeExecutableCode_(HeapObject *block) {
+        return block->slot(Offsets::CompiledCodeExecutableCode)->asHeapObject();
     }
 
     Object* executableCodePlatformCode_(HeapObject *code) {
@@ -236,6 +265,17 @@ public:
         return dictionary->slot(Offsets::DictionaryTable)->asHeapObject();
     }
 
+    int argumentCountOf_(HeapObject *code) {
+	    return this->isBlock_(code) ?
+	        this->blockArgumentCount_(code) :
+	        this->methodArgumentCount_(code);
+	}
+
+    int temporaryCountOf_(HeapObject *code) {
+	    return this->isBlock_(code) ?
+            this->blockTempCount_(code) :
+            this->methodTempCount_(code);
+	}
     bool isBlock_(HeapObject *compiledCode) {
         return this->behaviorClass_(compiledCode->behavior()) == this->_blockClass;
     }
@@ -372,6 +412,7 @@ public:
 		this->_byteArrayClass =            _kernel->_exports["ByteArray"];
 		this->_stringClass =               _kernel->_exports["String"];
 		this->_closureClass =              _kernel->_exports["Closure"];
+		this->_closureInstSize =           this->speciesInstanceSize_(this->_closureClass);
 		this->_behaviorClass =             _kernel->_exports["Behavior"];
         this->_symbolTable =               _kernel->_exports["SymbolTable"];
 
@@ -391,6 +432,7 @@ public:
     HeapObject *_byteArrayClass;
     HeapObject *_stringClass;
     HeapObject *_closureClass;
+    int _closureInstSize;
     HeapObject *_behaviorClass;
     HeapObject *_symbolTable;
 

@@ -1,5 +1,8 @@
 
 #include "Runtime.h"
+
+#include <Bootstrapper.h>
+
 #include "Evaluator.h"
 #include "GCHeap.h"
 #include "SAbstractMessage.h"
@@ -85,6 +88,8 @@ HeapObject *Runtime::newClosureFor_(HeapObject *block)
 {
 	auto size = this->blockEnvironmentCount_(block);
 	auto closure = this->newSlots_size_(_closureClass, size);
+    closure->beNamed();
+    closure->beArrayed();
 	closure->slot(Offsets::ClosureBlock) = (Object*)block;
 	return  closure;
 }
@@ -133,8 +138,7 @@ HeapObject *Runtime::addSymbol_(const std::string &str){
 }
 
 HeapObject *Runtime::loadModule_(HeapObject *name) {
-    _evaluator->_halt();
-    return _evaluator->context()->self()->asHeapObject();
+    return _bootstrapper->loadModule_(name->asLocalString());
 }
 
 uintptr_t Runtime::hashFor_(Object *anObject)
@@ -151,7 +155,7 @@ uintptr_t Runtime::hashFor_(Object *anObject)
     return hash;
  }
 
-Object* Runtime::sendLocal_to_with_(const std::string &selector, Object *receiver, std::vector<Object*> &arguments) {
+Object* Runtime::sendLocal_to_withArgs_(const std::string &selector, Object *receiver, std::vector<Object*> &arguments) {
     auto symbol = this->existingSymbolFrom_(selector);
 
     return this->_evaluator->send_to_with_(symbol, receiver, arguments);
@@ -208,22 +212,33 @@ HeapObject* Runtime::methodFor_in_(HeapObject *symbol, HeapObject *behavior)
 	return nullptr;
 }
 
-HeapObject* Runtime::existingSymbolFrom_(const std::string &selector)
+HeapObject* Runtime::existingSymbolFrom_(const std::string &selector) {
+    auto result = this->symbolTableAt_(selector);
+    if (result == nullptr) {
+        std::string str = std::string("symbol #") + selector + " not found in image";
+        error(str.c_str());
+    }
+    return result;
+}
+HeapObject* Runtime::symbolTableAt_(const std::string &selector)
 {
     auto it = this->_knownSymbols.find(selector);
     if (it != this->_knownSymbols.end())
         return it->second;
+
+    if (selector == "linker:token:") {
+        int a = 0;
+    }
     HeapObject *table = this->_symbolTable->slotAt_(2)->asHeapObject();
     for (int i = 2; i < table->size(); i++){
         auto symbol = table->slotAt_(i)->asHeapObject();
         if (symbol != this->_nilObj){
-            //    std::cout << "symbol" << symbol->printString() << " at: 0x" << i << std::endl;
+            //std::cout << "symbol" << symbol->printString() << " at: 0x" << i << std::endl;
             if (symbol->sameBytesThan(selector))
                return  symbol;
         }
     }
-    std::string str = std::string("symbol #") + selector + " not found in image";
-    error(str.c_str());
+
     return nullptr;
 }
 

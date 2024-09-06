@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 
+#include "Runtime.h"
 #include "../HeapObject.h"
 #include "../KnownObjects.h"
 
@@ -23,6 +24,13 @@ class EvaluationContext {
     uintptr_t  _regSP, _regBP, _regPC;
     Object *_regS, **_stack;
     Runtime *_runtime;
+
+    const int FRAME_TO_RECEIVER_DELTA = 1;
+    const int FRAME_TO_CODE_DELTA = 2;
+    const int FRAME_TO_PREV_ENVIRONMENT_DELTA = 3;
+    const int FRAME_TO_ENVIRONMENT_DELTA = 4;
+    const int FRAME_TO_FIRST_TEMP_DELTA = 5;
+    const int FRAME_TO_FIRST_ARG_DELTA = 2;
 
 public:
     const int STACK_SIZE = 64 * 1024;
@@ -50,8 +58,10 @@ public:
 
     Object* argumentAt_(int anInteger);
 
+    Object* argumentAt_frameIndex_(int anInteger, int anotherInteger);
+
     Object* argumentAt_in_(int index, int environmentIndex) {
-        if (environmentIndex == CURRENT_ENVIRONMENT) {
+        if (environmentIndex == INSTACK_ENVIRONMENT) {
             return this->argumentAt_(index);
         } else {
             return this->environment_at_(environmentIndex, index);
@@ -78,17 +88,19 @@ public:
 
 	void buildFrameFor_code_environment_temps_(Object *receiver, HeapObject *compiledCode, HeapObject *environment, uint32_t temps);
     std::vector<SExpression*>* buildLaunchFrame(HeapObject *symbol, int argCount);
+    void buildClosureFrameFor_code_environment_(Object *receiver, HeapObject *compiledCode, HeapObject *environment);
     void buildMethodFrameFor_code_environment_(Object *receiver, HeapObject *compiledCode, HeapObject *environment);
     void popLaunchFrame();
 
-    Object*	environment_at_(int environmentIndex, int index) {
-		if (environmentIndex == INLINED_ENVIRONMENT)
-			return this->stackTemporaryAt_(index);
+    Object* environment_at_(int environmentIndex, int index) {
+	if (environmentIndex == INLINED_ENVIRONMENT)
+	    return this->stackTemporaryAt_(index);
 		
         HeapObject *env = environmentIndex == CURRENT_ENVIRONMENT ? 
             this->_regE :
-            this->_regE->slot(environmentIndex)->asHeapObject();
-        return env->slot(index);	
+            this->_regE->slotAt_(environmentIndex + _runtime->_closureInstSize)->asHeapObject();
+        auto position = _runtime->speciesOf_((Object*)env) == _runtime->_arrayClass ? index : index + _runtime->_closureInstSize;
+        return env->slotAt_(position);
 	}
     
     /*
@@ -101,8 +113,10 @@ public:
         if (environmentIndex == INLINED_ENVIRONMENT)
 		    return this->stackTemporaryAt_put_(index, object);
 	
-        auto env = environmentIndex == CURRENT_ENVIRONMENT ? _regE : _regE->slotAt_(environmentIndex)->asHeapObject();
-	    env->slotAt_(index) = object;
+        auto env = environmentIndex == CURRENT_ENVIRONMENT ? _regE : _regE->slotAt_(environmentIndex + _runtime->_closureInstSize)->asHeapObject();
+        auto position = _runtime->speciesOf_((Object*)env) == _runtime->_arrayClass ? index : index + _runtime->_closureInstSize;
+
+        env->slotAt_(position) = object;
     }
 
     Object* pop() {
@@ -175,6 +189,8 @@ public:
     Object* stackAt_put_(int index, Object *object) {
         return _stack[index - 1] = object;
     }
+    Object* stackAt_frameIndex_(int index, int anotherIndex);
+    Object* stackAt_frameIndex_put_(int index, int anotherIndex, Object *value);
 
     Object* stackTemporaryAt_(int index);
     Object* stackTemporaryAt_frameIndex_(int index, int anotherIndex);
@@ -224,6 +240,7 @@ public:
     SBinding* staticBindingFor_(HeapObject *aSymbol);
     SBinding* staticBindingFor_inModule_(HeapObject *symbol, HeapObject *module);
     SBinding* staticBindingForCvar_(HeapObject *aSymbol);
+    SBinding* staticBindingForCvar_in_(HeapObject *aSymbol, HeapObject *species);
     SBinding* staticBindingForIvar_(HeapObject *aSymbol);
     SBinding* staticBindingForMvar_(HeapObject *symbol);
     SBinding* staticBindingForNested_(HeapObject *name);
@@ -231,6 +248,15 @@ public:
     HeapObject*  nil()   { return KnownObjects::nil; }
     HeapObject* _true()  { return KnownObjects::_true; }
     HeapObject* _false() { return KnownObjects::_false; }
+
+    HeapObject* codeOfFrameAt_(uintptr_t frame);
+    Object* receiverOfFrameAt_(uintptr_t frame);
+    Object* argumentOfFrameAt_subscript_(uintptr_t frame, uintptr_t subscript);
+    Object* temporaryOfFrameAt_subscript_(uintptr_t frame, uintptr_t subscript);
+    void printFrame_into_(uintptr_t frame, std::ostringstream &s);
+    std::string backtrace();
+    std::string printStackContents();
+
 };
 
 } // namespace Egg

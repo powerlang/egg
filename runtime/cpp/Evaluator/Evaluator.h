@@ -75,21 +75,45 @@ public:
         _context = anEvaluationContext;
     }
 
-    auto evaluateClosure_(auto receiver) {
-        return evaluateClosure_withArgs_(receiver, {});
+    Object* evaluateClosure_(HeapObject *closure) {
+        return evaluateClosure_withArgs_(closure, {});
     }
 
-    auto evaluateClosure_with_(auto aPClosure, Object *anObject) {
-        return evaluateClosure_withArgs_(aPClosure, {anObject});
+    Object* evaluateClosure_with_(HeapObject * closure, Object *anObject) {
+        return evaluateClosure_withArgs_(closure, {anObject});
     }
 
-    auto evaluateClosure_with_with_(auto aPClosure, Object *anObject, Object *anotherObject) {
-        return evaluateClosure_withArgs_(aPClosure, {anObject, anotherObject});
+    Object* evaluateClosure_with_with_(HeapObject *closure, Object *anObject, Object *anotherObject) {
+        return evaluateClosure_withArgs_(closure, {anObject, anotherObject});
     }
 
-    auto evaluateClosure_withArgs_(auto receiver, const std::vector<Object*> _arguments)
+	HeapObject* prepareBlockExecutableCode_(HeapObject *block) {
+    	auto code = _runtime->blockExecutableCode_(block);
+
+    	if (code != _nilObj)
+    		return code;
+
+    	auto method = _runtime->blockMethod_(block);
+    	this->prepareForExecution_(method);
+
+    	code = _runtime->blockExecutableCode_(block);
+    	ASSERT(code != _nilObj);
+
+    	return code;
+
+    }
+    Object* evaluateClosure_withArgs_(HeapObject *closure, const std::vector<Object*> args)
     {
-		error("unimplemented");
+    	auto block = _runtime->closureBlock_(closure);
+    	auto code = this->prepareBlockExecutableCode_(block);
+    	_work = _runtime->executableCodeWork_(code);
+
+    	auto receiver = _runtime->blockCapturesSelf_(block) ? closure->slotAt_(_runtime->_closureInstSize + 1) : (Object*)_nilObj;
+
+    	_context->popFrame();
+		_context->buildClosureFrameFor_code_environment_(receiver, block, closure);
+
+    	return _regR;
     }
 
     void evaluatePerform_in_withArgs_(HeapObject *aSymbol, Object *receiver, Object *arguments);
@@ -114,19 +138,20 @@ public:
     void visitLiteral(SLiteral* sLiteral) override;
     void visitBlock(SBlock* sBlock) override;
 
-  	virtual void visitOpAssign(SOpAssign *anSOpAssign);
-    virtual void visitOpDispatchMessage(SOpDispatchMessage *anSOpDispatchMessage);
-    virtual void visitOpDropToS(SOpDropToS *anSOpDropToS);
-    virtual void visitOpJump(SOpJump *anSOpJump);
-    virtual void visitOpJumpFalse(SOpJumpFalse *anSOpJumpFalse);
-    virtual void visitOpJumpTrue(SOpJumpTrue *anSOpJumpTrue);
-    virtual void visitOpLoadRfromFrame(SOpLoadRfromFrame *anSOpLoadRfromFrame);
-    virtual void visitOpLoadRfromStack(SOpLoadRfromStack *anSOpLoadRfromStack);
-    virtual void visitOpLoadRwithNil(SOpLoadRwithNil *anSOpLoadRwithNil);
-    virtual void visitOpLoadRwithSelf(SOpLoadRwithSelf *anSOpLoadRwithSelf);
-    virtual void visitOpPrimitive(SOpPrimitive *anSOpPrimitive);
-    virtual void visitOpPopR(SOpPopR *anSOpPopR);
-    virtual void visitOpPushR(SOpPushR *anSOpPushR);
+  	void visitOpAssign(SOpAssign *anSOpAssign) override;
+    void visitOpDispatchMessage(SOpDispatchMessage *anSOpDispatchMessage) override;
+    void visitOpDropToS(SOpDropToS *anSOpDropToS) override;
+    void visitOpJump(SOpJump *anSOpJump) override;
+    void visitOpJumpFalse(SOpJumpFalse *anSOpJumpFalse) override;
+    void visitOpJumpTrue(SOpJumpTrue *anSOpJumpTrue) override;
+    void visitOpLoadRfromFrame(SOpLoadRfromFrame *anSOpLoadRfromFrame) override;
+    void visitOpLoadRfromStack(SOpLoadRfromStack *anSOpLoadRfromStack) override;
+    void visitOpLoadRwithNil(SOpLoadRwithNil *anSOpLoadRwithNil) override;
+    void visitOpLoadRwithSelf(SOpLoadRwithSelf *anSOpLoadRwithSelf) override;
+    void visitOpStoreRintoFrame(SOpStoreRintoFrame *anSOpStoreRintoFrame) override;
+    void visitOpPrimitive(SOpPrimitive *anSOpPrimitive) override;
+    void visitOpPopR(SOpPopR *anSOpPopR) override;
+    void visitOpPushR(SOpPushR *anSOpPushR) override;
 
 	void popFrameAndPrepare();
     virtual void visitOpReturn(SOpReturn *anSOpReturn);
@@ -136,6 +161,7 @@ private:
     void evaluate();
     SExpression* nextOperation();
 
+	void initializeUndermessages();
     void initializePrimitives();
     void convertUndermessages();
     void addPrimitive(const std::string &name, PrimitivePointer primitive);

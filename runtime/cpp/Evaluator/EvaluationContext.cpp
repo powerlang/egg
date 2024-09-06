@@ -1,5 +1,9 @@
 
 #include "EvaluationContext.h"
+
+#include <iomanip>
+#include <sstream>
+
 #include "Runtime.h"
 #include "SAssociationBinding.h"
 #include "SInstVarBinding.h"
@@ -20,12 +24,14 @@ HeapObject* EvaluationContext::classBinding()
 }
 
 Object *EvaluationContext::argumentAt_(int anInteger) {
-    auto executableCode = this->_runtime->executableCodeCompiledCode_(this->_regM);
-    int args = this->_runtime->isBlock_(executableCode) ?
-        this->_runtime->blockArgumentCount_(executableCode) :
-        this->_runtime->methodArgumentCount_(executableCode);
+    return argumentAt_frameIndex_(anInteger, 1);
+}
 
-    return this->stackAt_((this->_regBP + 1) + (args - anInteger) + 1);
+Object * EvaluationContext::argumentAt_frameIndex_(int anInteger, int anotherInteger) {
+    auto bp = this->bpForFrameAt_(anotherInteger);
+    auto code = _stack[bp - 2 - 1];
+    auto count = _runtime->argumentCountOf_(code->asHeapObject());
+    return _stack[bp + 1 + (count - anInteger + 1) - 1];
 }
 
 void EvaluationContext::buildFrameFor_code_environment_temps_(Object *receiver, HeapObject *compiledCode, HeapObject *environment, uint32_t temps) {
@@ -75,6 +81,12 @@ std::vector<SExpression*>* EvaluationContext::buildLaunchFrame(HeapObject *symbo
     return bytecodes;
 }
 
+void EvaluationContext::buildClosureFrameFor_code_environment_(Object *receiver, HeapObject *code,
+    HeapObject *environment) {
+    auto temps = _runtime->blockTempCount_(code);
+    this->buildFrameFor_code_environment_temps_(receiver, code, environment, temps);
+}
+
 void EvaluationContext::buildMethodFrameFor_code_environment_(Object *receiver, HeapObject *method, HeapObject *environment) { 
     auto temps = this->_runtime->methodTempCount_(method);
     this->buildFrameFor_code_environment_temps_(receiver, method, environment, temps);
@@ -119,16 +131,18 @@ HeapObject *EvaluationContext::captureClosure_(SBlock *anSBlock)
 	    switch (type)
         {
         case BlockCapturedVariables::Self:
-            closure->slotAt_(i) = this->self(); break;
+            _runtime->closureIndexedSlotAt_(closure, i) = this->self(); break;
 		case BlockCapturedVariables::Environment:
-            closure->slotAt_(i) = (Object*)this->environment(); break;
+            _runtime->closureIndexedSlotAt_(closure, i) = (Object*)this->environment(); break;
         case BlockCapturedVariables::EnvironmentValue: {
-			auto env = this->environment()->slotAt_(*it++);
-			closure->slotAt_(i) = env;
+            auto j = *it++;
+			auto env = _runtime->environmentIndexedSlotAt_(this->environment(), j);
+			_runtime->closureIndexedSlotAt_(closure, i) = env;
             break; }
 		case BlockCapturedVariables::LocalArgument: {
-			auto arg = this->argumentAt_(*it++);
-			closure->slotAt_(i) = arg;
+            auto j = *it++;
+			auto arg = this->argumentAt_(j);
+			_runtime->closureIndexedSlotAt_(closure, i) = arg;
             break; };
         }
 		i = i + 1;
@@ -138,8 +152,7 @@ HeapObject *EvaluationContext::captureClosure_(SBlock *anSBlock)
 
 HeapObject* EvaluationContext::method()
 {
-        auto code = this->_runtime->executableCodeCompiledCode_(this->_regM);
-		return this->_runtime->isBlock_(code) ? this->_runtime->blockMethod_(code) : code;
+		return this->_runtime->isBlock_(this->_regM) ? this->_runtime->blockMethod_(this->_regM) : this->_regM;
 }
 
 Object *EvaluationContext::stackTemporaryAt_(int anInteger)
@@ -150,7 +163,19 @@ Object *EvaluationContext::stackTemporaryAt_(int anInteger)
 Object *EvaluationContext::stackTemporaryAt_frameIndex_(int index, int anotherIndex)
 {
     uintptr_t bp = this->bpForFrameAt_(anotherIndex);
-    return _stack[bp - this->tempOffset() - index];
+    return _stack[bp - this->tempOffset() - index - 1];
+}
+
+Object *EvaluationContext::stackAt_frameIndex_(int index, int anotherIndex)
+{
+    uintptr_t bp = this->bpForFrameAt_(anotherIndex);
+    return _stack[bp - 1 - (index)];
+}
+
+Object *EvaluationContext::stackAt_frameIndex_put_(int index, int anotherIndex, Object *value)
+{
+    uintptr_t bp = this->bpForFrameAt_(anotherIndex);
+    return _stack[bp - 1 - (index)] = value;
 }
 
 void EvaluationContext::stackTemporaryAt_put_(int index, Object *value)
@@ -161,7 +186,7 @@ void EvaluationContext::stackTemporaryAt_put_(int index, Object *value)
 void EvaluationContext::stackTemporaryAt_frameIndex_put_(int index, int anotherIndex, Object *value)
 {
     uintptr_t bp = this->bpForFrameAt_(anotherIndex);
-    _stack[bp - this->tempOffset() - index] = value;
+    _stack[bp - this->tempOffset() - index - 1] = value;
 }
 
 void EvaluationContext::unwind()
@@ -172,14 +197,14 @@ void EvaluationContext::unwind()
 
     uintptr_t bp = _regBP;
     while (bp != 0) {
-        HeapObject* environment = _stack[bp - 4]->asHeapObject();
+        HeapObject* environment = _stack[bp - FRAME_TO_ENVIRONMENT_DELTA - 1]->asHeapObject();
         if (environment == home) {
             _regBP = bp;
             this->popFrame();
             return;
         }
 
-        bp = (uintptr_t)_stack[bp];
+        bp = (uintptr_t)_stack[bp - 1];
     }
 
     error("cannot return from this closure");
@@ -205,8 +230,7 @@ SBinding* EvaluationContext::staticBindingFor_inModule_(HeapObject *symbol, Heap
     return new SAssociationBinding(assoc);
 }
 
-SBinding* EvaluationContext::staticBindingForCvar_(HeapObject *aSymbol) {
-    auto species = this->_runtime->methodClassBinding_(this->method());
+SBinding* EvaluationContext::staticBindingForCvar_in_(HeapObject *aSymbol, HeapObject *species) {
     auto nilObj = this->_runtime->_nilObj;
     do {
         auto namespaces = this->_runtime->speciesNamespaces_(species);
@@ -222,6 +246,11 @@ SBinding* EvaluationContext::staticBindingForCvar_(HeapObject *aSymbol) {
     } while(species != nilObj);
 
     return nullptr;
+}
+
+SBinding* EvaluationContext::staticBindingForCvar_(HeapObject *aSymbol) {
+    auto species = this->_runtime->methodClassBinding_(this->method());
+    return staticBindingForCvar_in_(aSymbol, species);
 }
 
 uint16_t EvaluationContext::ivarIndex_in_(HeapObject *symbol, Object *receiver) {
@@ -264,4 +293,120 @@ SBinding* EvaluationContext::staticBindingForNested_(HeapObject *name) {
     auto binding = this->staticBindingFor_(name->slotAt_(1)->asHeapObject());
     auto module_ = binding->valueWithin_(this);
     return this->staticBindingFor_inModule_(name->slotAt_(2)->asHeapObject(), module_->asHeapObject());
+}
+
+HeapObject * EvaluationContext::codeOfFrameAt_(uintptr_t frame) {
+    return (HeapObject*)_stack[frame - FRAME_TO_CODE_DELTA - 1];
+}
+
+Object * EvaluationContext::receiverOfFrameAt_(uintptr_t frame) {
+    return _stack[frame - FRAME_TO_RECEIVER_DELTA - 1];
+}
+
+Object * EvaluationContext::argumentOfFrameAt_subscript_(uintptr_t frame, uintptr_t subscript) {
+    return _stack[frame + FRAME_TO_FIRST_ARG_DELTA + subscript - 1];
+}
+
+Object * EvaluationContext::temporaryOfFrameAt_subscript_(uintptr_t frame, uintptr_t subscript) {
+    return _stack[frame - FRAME_TO_FIRST_TEMP_DELTA - subscript - 1];
+}
+
+void printObject_into_(Object* o, std::ostringstream &s) {
+
+    if (o == nullptr)
+        s << "bad obj";
+    else
+        s << o->printString();
+
+    s<< " (" << std::hex << o << ")";
+}
+
+void EvaluationContext::printFrame_into_(uintptr_t frame, std::ostringstream &s) {
+    auto code = this->codeOfFrameAt_(frame);
+    auto receiver = this->receiverOfFrameAt_(frame);
+    auto argCount = this->_runtime->argumentCountOf_(code);
+    std::vector<Object*> args;
+    for (int i = argCount - 1; i >= 0; i--)
+        args.push_back(this->argumentOfFrameAt_subscript_(frame, i));
+
+    auto tempCount = this->_runtime->methodTempCount_(code);
+    std::vector<Object*> temps;
+    for (int i = 0; i < tempCount; i++)
+        temps.push_back(this->temporaryOfFrameAt_subscript_(frame, i));
+
+    printObject_into_((Object*)code, s);
+    s << std::endl;
+
+    s <<  "recv: ";
+    printObject_into_(receiver, s);
+    s << std::endl;
+
+    for(auto &arg : args) {
+        s << "arg: ";
+        printObject_into_(arg, s);
+        s << std::endl;
+    }
+    for(auto &temp : temps) {
+        s << "temp: ";
+        printObject_into_(temp, s);
+        s << std::endl;
+    }
+}
+
+std::string EvaluationContext::backtrace() {
+    std::ostringstream s;
+    std::vector<uintptr_t> frames;
+    uintptr_t current = _regBP;
+    while (current) {
+        frames.push_back( current);
+        current = (uintptr_t)_stack[current - 1];
+    }
+    for (int i = frames.size() - 1; i >= 0; i--) {
+        this->printFrame_into_(frames[i], s);
+        s << std::endl;
+    }
+
+    s << "regM: ";
+    printObject_into_((Object*)_regM, s);
+    s << std::endl;
+    s << "regS: ";
+    printObject_into_(_regS, s);
+    s << std::endl;
+
+    s << "regE: ";
+    printObject_into_((Object*)_regE, s);
+    s << std::endl;
+    //auto regR = _runtime->_evaluator->_regR;
+    //s << "regR: " << regR->printString() << "(" << std::hex << regR << ")" << std::endl;
+    return s.str();
+}
+
+void printStackObject_into_(Object *o, std::ostringstream &s)
+{
+    s << "| " << std::setw(sizeof(void*)*2) << std::setfill(' ') << std::hex << o << " | ";
+    if (o == nullptr)
+        s << "bad obj";
+    else
+        s << o->printString();
+}
+std::string EvaluationContext::printStackContents() {
+    std::ostringstream s;
+    std::vector<uintptr_t> frames;
+    uintptr_t current = _regSP;
+    uintptr_t next    = _regBP;
+    s << "|------------------|" << std::endl;
+
+    do {
+        for (uintptr_t index = current; index < next; index++) {
+            printStackObject_into_(_stack[index - 1], s);
+            s << std::endl;
+        }
+        s << "| " << std::setw(sizeof(void*)*2) << std::setfill(' ') << std::hex << _stack[next - 1] << " | fp" << std::endl;
+        s << "| " << std::setw(sizeof(void*)*2) << std::setfill(' ') << std::hex << _stack[next + 1 - 1] << " | retaddr" << std::endl;
+
+        current = next + 2;
+        next = (uintptr_t)_stack[next - 1];
+    } while (next != 0);
+
+    return s.str();
 }
