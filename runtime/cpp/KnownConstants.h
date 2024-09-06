@@ -9,8 +9,8 @@
 namespace Egg {
 
 enum BlockFlags {
-    CapturesHome = 0x1,
-    CapturesSelf = 0x1
+    CapturesHome = 0x800000,
+    CapturesSelf = 0x400000
 };
 
 enum BlockCapturedVariables {
