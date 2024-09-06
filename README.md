@@ -42,7 +42,8 @@ platforms use the same Egg code, which is stored in [modules](modules) directory
 now we have the following runtimes:
 
 - [Egg/Pharo](runtime/pharo) - Our main platform for bootstrapping and modifying Egg kernel.
-- [Egg/JS](runtime/js) - An implementation a VM for Egg that can run in node.js or a web browser.
+- [Egg/CPP](runtime/cpp) - An implementation of an Egg VM in C++. It runs on any platform for which there is a C++ compiler.
+- [Egg/JS](runtime/js) - An implementation of a VM for Egg that can run in node.js or a web browser.
 
 ## Building
 
