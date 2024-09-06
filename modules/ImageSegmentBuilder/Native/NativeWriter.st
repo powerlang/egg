@@ -88,6 +88,8 @@ NativeWriter >> encodedReferenceTo: anObject [
 	
 	key := HashTable nilToken == anObject ifTrue: [closure nilToken] ifFalse: [anObject].
 	offset := offsets at: key.
+	
+	(offset bitAnd: 0x2) == 0x2 ifTrue: [^offset].
 	^base + offset
 ]
 
@@ -191,7 +193,7 @@ NativeWriter >> write [
 
 { #category : #'own services' }
 NativeWriter >> writeExports [
-	"stream nextULargePut: exports size."
+	stream nextULongPut: exports size.
 	exports keys
 		do: [ :name | | object encoded |
 			object := exports at: name.
@@ -249,6 +251,7 @@ NativeWriter >> writeImport: aSymbolicReference [
 
 { #category : #'own services' }
 NativeWriter >> writeImports [
+	stream nextULongPut: imports size.
 	imports do: [ :symref | self writeImport: symref]
 ]
 
@@ -258,7 +261,7 @@ NativeWriter >> writeImportStrings [
 	sorted := Array new: importStrings size.
 	importStrings keysAndValuesDo: [:symref :subscript | sorted at: subscript + 1 put: symref].
 
-	stream nextULargePut: importStrings size.
+	stream nextULongPut: importStrings size.
 	sorted do: [ :string |
 		stream nextULongPut: string size; nextPutAll: string ]
 ]
