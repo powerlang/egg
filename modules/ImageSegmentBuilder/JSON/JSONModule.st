@@ -10,14 +10,23 @@ Class {
 { #category : #spec }
 JSONModule >> imports [
 	^{
-		#Kernel -> #Module.
-		#Kernel -> #HashTable.
-		#Kernel -> #IdentityDictionary.
+		#Kernel -> #(Module HashTable IdentityDictionary).
+		#ImageSegmentBuilder -> #Writer
 	}
 ]
 
 { #category : #initializing }
 JSONModule >> justLoaded [
 	super justLoaded.
-	self name: #'ImageSegmentBuilder.JSON'
+	    self name: #'ImageSegmentBuilder.JSON'
+]
+
+{ #category : #services }
+JSONModule >> newWriter [
+	^JSONWriter new
+]
+
+{ #category : #services }
+JSONModule >> fileExtension [
+	^'json'
 ]

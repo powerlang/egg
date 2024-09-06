@@ -7,10 +7,9 @@ Class {
 	#name : #SymbolicReference,
 	#superclass : #Object,
 	#instVars : [
+		'linker',
 		'token',
-		'object',
-		'moduleName',
-		'linker'
+		'object'
 	],
 	#category : #Kernel
 }
@@ -25,7 +24,7 @@ SymbolicReference class >> forBehavior: aBehavior [
 
 { #category : #knownObjects }
 SymbolicReference class >> forClass: aClass [
-	^self new token: {aClass module name. aClass name}; linker: #asClass
+	^self new linker: #asClass; token: {aClass module name. aClass name}
 ]
 
 { #category : #knownObjects }
@@ -35,37 +34,37 @@ SymbolicReference class >> forMetaclass: aMetaclass [
 
 { #category : #knownObjects }
 SymbolicReference class >> forCharacter: aCharacter [
-	^self new token: aCharacter codePoint asString; linker: #asCharacter
+	^self new linker: #asCharacter; token: aCharacter codePoint asString
 ]
 
 { #category : #knownObjects }
 SymbolicReference class >> forModule: aModule [
-	^self new token: aModule name; linker: #asModule
+	^self new linker: #asModule; token: aModule name
 ]
 
 { #category : #knownObjects }
 SymbolicReference class >> forSymbol: aSymbol [
-	^self new token: aSymbol; linker: #asSymbol
+	^self new linker: #asSymbol; token: aSymbol
 ]
 
 { #category : #knownObjects }
 SymbolicReference class >> nilToken [
-	^self new token: #nilToken
+	^self new linker: #nilToken
 ]
 
 { #category : #knownObjects }
 SymbolicReference class >> symbolTable [
-	^self new token: #symbolTable
+	^self new linker: #symbolTable
 ]
 
-SymbolicReference class >> token: anObject linker: anotherObject [
-	^self new token: anObject; linker: anotherObject
+SymbolicReference class >> linker: anObject token: anotherObject [
+	^self new linker: anObject; token: anotherObject
 ]
 
 { #category : #comparing }
 SymbolicReference >> = aSymbolicReference [
 	aSymbolicReference class == self class ifFalse: [^false].
-	^aSymbolicReference token = token
+	^linker = aSymbolicReference linker and: [token = aSymbolicReference token]
 ]
 
 { #category : #linking }
@@ -156,7 +155,7 @@ SymbolicReference >> printOn: aStream [
 
 { #category : #services }
 SymbolicReference >> referredValue [
-	^linker ifNil: [self perform: token] ifNotNil: [self perform: linker]
+	^self perform: linker
 ]
 
 { #category : #linking }

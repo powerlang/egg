@@ -4,7 +4,6 @@ Class {
 	#instVars : [
 		'module',
 		'closure',
-		'wordSize',
 		'classes'
 	],
 	#category : #ImageSegmentBuilder
@@ -40,6 +39,11 @@ Builder >> build [
 ]
 
 { #category : #accessing }
+Builder >> closure [
+	^closure
+]
+
+{ #category : #accessing }
 Builder >> objects [
 	^closure objects
 ]
@@ -52,11 +56,6 @@ Builder >> mapping [
 { #category : #accessing }
 Builder >> imports [
 	^closure boundary
-]
-
-{ #category : #accessing }
-Builder >> closure [
-	^closure
 ]
 
 { #category : #private }

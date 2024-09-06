@@ -78,7 +78,7 @@ SmallInteger >> // aNumber [
 					ifFalse: [-1]].
 			quotient := self / aNumber.
 			answer := quotient truncated.
-			^(quotient < 0 and: [quotient ~= answer])
+			^(quotient < 0 and: [quotient != answer])
 				ifTrue: [answer - 1]
 				ifFalse: [answer]]
 ]

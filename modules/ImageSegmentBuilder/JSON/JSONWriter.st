@@ -5,53 +5,17 @@
 
 Class {
 	#name : #JSONWriter,
-	#superclass : #Object,
+	#superclass : #Writer,
 	#instVars : [
-		'stream',
-		'objects',
-		'mapping',
-		'imports',
-		'exports',
-		'indexes',
-		'closure'
+		'indexes'
 	],
 	#category : #'JSONWriter'
 }
 
-{ #category : #accessing }
-JSONWriter >> closure: anObjectClosure [
-	closure := anObjectClosure
-]
-
-{ #category : #accessing }
-JSONWriter >> objects: aCollection [
-	objects := aCollection
-]
-
-{ #category : #accessing }
-JSONWriter >> mapping: aDictionary [
-	mapping := aDictionary
-]
-
-{ #category : #accessing }
-JSONWriter >> imports: anIdentityDictionary [
-	imports := anIdentityDictionary
-]
-
-{ #category : #accessing }
-JSONWriter >> exports: aDictionary [
-	exports := aDictionary
-]
-
-{ #category : #accessing }
-JSONWriter >> image [
-	^stream contents
-]
-
 { #category : #initializing }
 JSONWriter >> initialize [
+	super initialize.
 	indexes := IdentityDictionary new.
-	stream := '' writeStream.
 ]
 
 { #category : #closure }
@@ -76,11 +40,6 @@ JSONWriter >> indexOf: anObject [
 { #category : #private }
 JSONWriter >> quoted: aSymbol [
 	^'"', aSymbol asString, '"'
-]
-
-{ #category : #accessing }
-JSONWriter >> stream: aWriteStream [
-	stream := aWriteStream
 ]
 
 { #category : #services }
@@ -108,28 +67,19 @@ JSONWriter >> writeExports [
 		separatedBy: [stream nextPutAll: ', '; crtab: 2]
 ]
 
-{ #category : #'*snapshotting' }
-JSONWriter >> writeImportLinker: linker [
-	linker ifNil: [^self].
-	stream nextPutAll: ', '; nextPutAll: (self quoted: linker)
-]
-
-{ #category : #'*snapshotting' }
-JSONWriter >> writeImportToken: token [
-	token isString ifTrue: [^stream nextPutAll: (self quoted: token)].
-	stream nextPutAll: '['.
-	token
-		do: [:str | stream nextPutAll: (self quoted: str)]
-		separatedBy: [stream nextPutAll: ', '].
-	stream nextPutAll: ']'
-]
-
 { #category : #writing }
 JSONWriter >> writeImport: aSymbolicReference [
-	stream nextPutAll: '['.
-	self
-		writeImportToken: aSymbolicReference token;
-		writeImportLinker: aSymbolicReference linker.
+	| elements |
+	stream
+		nextPutAll: '[';
+		nextPutAll: (self quoted: aSymbolicReference linker).
+
+	aSymbolicReference token ifNotNil: [:token |
+		elements := token isString ifTrue: [{token}] ifFalse: [token].
+		elements do: [:str |
+			stream
+				nextPutAll: ', ';
+				nextPutAll: (self quoted: str)]].
 	stream nextPutAll: ']'
 ]
 
@@ -197,14 +147,3 @@ JSONWriter >> writeObjects [
 			stream nextPut: $] ]
 		separatedBy: [stream nextPut: $,; crtab: 2]
 ]
-
-{ #category : #writing }
-JSONWriter >> writeTo: aStream [
-	self stream: aStream; write.
-]
-
-{ #category : #writing }
-JSONWriter >> writeToFile: filename [
-	filename binaryWriteStreamDo: [ :s | self writeTo: byteStream ]
-]
-

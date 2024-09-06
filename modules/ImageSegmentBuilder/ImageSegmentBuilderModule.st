@@ -19,9 +19,3 @@ ImageSegmentBuilderModule >> imports [
 	}
 ]
 
-{ #category : #'pharo-bootstrap' }
-ImageSegmentBuilderModule >> prepareForJSBootstrap [
-	Kernel host fixOverrides.
-	self import: #JSONWriter from: #ImageSegmentBuilder.JSON.
-]
-

@@ -65,6 +65,7 @@ KernelModule >> bootstrap [
 	namespace at: #SymbolTable put: Symbol symbolTable.
 	Stream initializePools.
 	CharacterArray initializePools.
+	ProtoObject initializeConstants; initializeBitMasks.
 	
 	self initialize.
 	CRITICAL := false.
