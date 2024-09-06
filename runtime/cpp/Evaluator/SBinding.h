@@ -69,19 +69,15 @@ public:
         return nullptr;
     }
 
-    virtual Object* valueWithin_(EvaluationContext* anEvaluationContext) {
-        subclassResponsibility();
-        return nullptr;
-    }
+    virtual Object* valueWithin_(EvaluationContext* anEvaluationContext) = 0;
 
 private:
     static void subclassResponsibility() {
-        std::cerr << "Subclass must implement this method." << std::endl;
-        std::terminate();
+        error("Subclass must implement this method.");
     }
 
     virtual std::string printString() const {
-        return "Subclass must implement this method.";
+        return "Subclass must implement this printString.";
     }
 };
 

@@ -9,6 +9,7 @@ namespace Egg {
 class SOpJumpFalse : public SOpJump {
 public:
 	SOpJumpFalse(size_t target) : SOpJump(target) { }
+	SOpJumpFalse() : SOpJump() { }
 
 	void acceptVisitor_(SExpressionVisitor *visitor) override {
 		visitor->visitOpJumpFalse(this);

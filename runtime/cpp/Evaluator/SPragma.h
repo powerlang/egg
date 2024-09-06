@@ -13,6 +13,10 @@ public:
         _name = name;
     }
 
+    void acceptVisitor_(SExpressionVisitor* visitor) override {
+        visitor->visitPragma(this);
+    }
+
     HeapObject* name() const {
         return _name;
     }

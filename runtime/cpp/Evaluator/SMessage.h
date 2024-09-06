@@ -17,6 +17,10 @@ class SMessage : public SAbstractMessage {
         SAbstractMessage(selector, arguments), _receiver(receiver), _inlined(inlined)
         { }
 
+    void acceptVisitor_(SExpressionVisitor* visitor) override {
+        visitor->visitMessage(this);
+    }
+
     bool isInlined() const { return _inlined; }
     SExpression* receiver () { return _receiver; }
 };

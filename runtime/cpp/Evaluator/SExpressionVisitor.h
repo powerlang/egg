@@ -10,8 +10,9 @@ class SExpression;
 class SIdentifier;
 class SReturn;
 class SPragma;
-class SCascade;
+class SMessage;
 class SCascadeMessage;
+class SCascade;
 class SMethod;
 class SLiteral;
 class SLiteralVar;
@@ -27,6 +28,7 @@ class SOpLoadRfromFrame;
 class SOpLoadRfromStack;
 class SOpLoadRwithNil;
 class SOpLoadRwithSelf;
+class SOpStoreRintoFrame;
 class SOpPrimitive;
 class SOpPopR;
 class SOpPushR;
@@ -41,8 +43,9 @@ public:
     virtual void visitIdentifier(SIdentifier *identifier) = 0;
     virtual void visitReturn(SReturn *anSReturn) { ASSERT(false); };
     virtual void visitPragma(SPragma *anSPragma) { ASSERT(false); };
-    virtual void visitCascade(SCascade *anSCascade) { ASSERT(false); };
+    virtual void visitMessage(SMessage *message) { ASSERT(false); };
     virtual void visitCascadeMessage(SCascadeMessage *cascadeMessage) { ASSERT(false); };
+    virtual void visitCascade(SCascade *anSCascade) { ASSERT(false); };
     virtual void visitMethod(SMethod *anSMethod) { ASSERT(false); };
     virtual void visitLiteral(SLiteral *anSLiteral) = 0;
     virtual void visitBlock(SBlock *anSBlock) { ASSERT(false); };
@@ -58,6 +61,8 @@ public:
     virtual void visitOpLoadRfromStack(SOpLoadRfromStack *anSOpLoadRfromStack) { ASSERT(false); };
     virtual void visitOpLoadRwithNil(SOpLoadRwithNil *anSOpLoadRwithNil) { ASSERT(false); };
     virtual void visitOpLoadRwithSelf(SOpLoadRwithSelf *anSOpLoadRwithSelf) { ASSERT(false); };
+    virtual void visitOpStoreRintoFrame(SOpStoreRintoFrame *anSOpStoreRintoFrame) { ASSERT(false); };
+
     virtual void visitOpPrimitive(SOpPrimitive *anSOpPrimitive) { ASSERT(false); };
     virtual void visitOpPopR(SOpPopR *anSOpPopR) { ASSERT(false); };
     virtual void visitOpPushR(SOpPushR *anSOpPushR) { ASSERT(false); };

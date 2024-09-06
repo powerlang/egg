@@ -12,6 +12,9 @@ class SOpAssign : public SOperation {
 
     SOpAssign(auto assignees) : _assignees(assignees) {}
 
+    void acceptVisitor_(SExpressionVisitor* visitor) override {
+        visitor->visitOpAssign(this);
+    }
     std::vector<SIdentifier*>& assignees() { return _assignees; }
 
 };

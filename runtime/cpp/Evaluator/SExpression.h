@@ -12,9 +12,7 @@ class SExpressionVisitor;
 
 class SExpression {
 public:
-    virtual void acceptVisitor_(SExpressionVisitor* visitor) {
-        subclassResponsibility();
-    }
+    virtual void acceptVisitor_(SExpressionVisitor* visitor) = 0;
 
     virtual bool isAssignment() const {
         return false;
@@ -70,7 +68,7 @@ public:
 
 protected:
     void subclassResponsibility() {
-        // Implement the behavior or throw an exception as needed
+       error("Subclass responsibility");
     }
 };
 

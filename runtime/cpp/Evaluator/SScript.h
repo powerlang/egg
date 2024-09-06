@@ -24,7 +24,7 @@ public:
         _compiledCode = anObject;
     }
 
-    const std::vector<SExpression*>& statements() const {
+    std::vector<SExpression*>& statements() {
         return _statements;
     }
 

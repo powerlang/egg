@@ -11,6 +11,8 @@ class SOpJump : public SOperation {
 
 public:
 	SOpJump(size_t target) : _target(target) { }
+	SOpJump() : _target(0xFFFFFFFF) { }
+
 
 	void acceptVisitor_(SExpressionVisitor *visitor) override {
 		visitor->visitOpJump(this);

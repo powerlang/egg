@@ -13,7 +13,7 @@ class SOpPrimitive : public SOperation {
     PrimitivePointer _primitive;
 
     public:
-    SOpPrimitive(PrimitivePointer primitive) : _primitive(primitive) {}
+    SOpPrimitive(PrimitivePointer primitive) : _primitive(primitive) { }
 
     PrimitivePointer primitive() { return _primitive; }
     void acceptVisitor_(SExpressionVisitor *visitor) {
