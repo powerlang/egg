@@ -1,12 +1,12 @@
 Class {
-	#name : #EggRecursiveInterpreter,
-	#superclass : #EggEvaluator,
+	#name : 'EggRecursiveInterpreter',
+	#superclass : 'EggEvaluator',
 	#category : 'Powerlang-Core-Execution',
 	#package : 'Powerlang-Core',
 	#tag : 'Execution'
 }
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EggRecursiveInterpreter >> evaluateClosure: receiver whileFalse: arg [
 	| result |
 	[ result := self evaluateClosure: receiver.
@@ -15,7 +15,7 @@ EggRecursiveInterpreter >> evaluateClosure: receiver whileFalse: arg [
 	^ receiver
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EggRecursiveInterpreter >> evaluateClosure: receiver whileTrue: arg [
 	| result |
 	[ result := self evaluateClosure: receiver.
@@ -23,7 +23,7 @@ EggRecursiveInterpreter >> evaluateClosure: receiver whileTrue: arg [
 	^ receiver
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggRecursiveInterpreter >> evaluateClosure: closure withArgs: arguments [
 	| frame sblock result |
 	frame := closure builder.
@@ -37,7 +37,7 @@ EggRecursiveInterpreter >> evaluateClosure: closure withArgs: arguments [
 	^ result
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggRecursiveInterpreter >> evaluateMethodStatements: anSMethod [
 	| last result |
 	last := nil.
@@ -50,18 +50,18 @@ EggRecursiveInterpreter >> evaluateMethodStatements: anSMethod [
 		ifFalse: [ context self ]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EggRecursiveInterpreter >> hasFinished [
 	^context isNil
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EggRecursiveInterpreter >> initializeExecutableCodeOf: method [
 
 	^self initializeRecursiveExecutableCodeOf: method
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EggRecursiveInterpreter >> initializePrimitives [ 
 	super initializePrimitives.
 	primitives 
@@ -69,27 +69,27 @@ EggRecursiveInterpreter >> initializePrimitives [
 		at: #ClosureWhileFalse put: self primitiveClosureWhileFalse
 ]
 
-{ #category : #initializing }
+{ #category : 'initializing' }
 EggRecursiveInterpreter >> linearizer [
 
 	self shouldNotImplement
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EggRecursiveInterpreter >> primitiveClosureWhileFalse [
 	^ [ self
 		evaluateClosure: context self
 		whileFalse: context arguments first ]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EggRecursiveInterpreter >> primitiveClosureWhileTrue [
 	^ [ self
 		evaluateClosure: context self
 		whileTrue: context arguments first ]
 ]
 
-{ #category : #initializing }
+{ #category : 'initializing' }
 EggRecursiveInterpreter >> runtime: anEggRuntime [
 	super runtime: anEggRuntime.
 	anEggRuntime
@@ -97,13 +97,13 @@ EggRecursiveInterpreter >> runtime: anEggRuntime [
 		override: #Closure -> #whileFalse: withPrimitive: 'ClosureWhileFalse'
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EggRecursiveInterpreter >> send: aSymbol to: receiver with: arguments super: aBoolean [
 	^self send: aSymbol to: receiver with: arguments super: aBoolean sendSite: SMessage new
 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EggRecursiveInterpreter >> send: aSymbol to: receiver with: arguments super: aBoolean sendSite: anSMessage [
 	| behavior method environment size |
 	anSMessage cachedUndermessage
@@ -130,7 +130,7 @@ EggRecursiveInterpreter >> send: aSymbol to: receiver with: arguments super: aBo
 	^ context evaluateFor: self
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EggRecursiveInterpreter >> sendLocal: aSymbol to: receiver with: anArray [
 	| symbol res |
 	symbol := runtime symbolFromLocal: aSymbol.
@@ -142,7 +142,7 @@ EggRecursiveInterpreter >> sendLocal: aSymbol to: receiver with: anArray [
 	^ res
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EggRecursiveInterpreter >> visitAssignment: anSAssignment [
 
 	| result assignees binding |
@@ -154,12 +154,12 @@ EggRecursiveInterpreter >> visitAssignment: anSAssignment [
 	^ result
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EggRecursiveInterpreter >> visitBlock: anSBlock [
 	^ context captureClosure: anSBlock
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EggRecursiveInterpreter >> visitCascade: anSCascade [
 	| recv args  last |
 	recv := anSCascade receiver acceptVisitor: self.
@@ -175,19 +175,19 @@ EggRecursiveInterpreter >> visitCascade: anSCascade [
 	^ last
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EggRecursiveInterpreter >> visitIdentifier: anSIdentifier [
 	| binding |
 	binding := anSIdentifier binding.
 	^ binding valueWithin: context ifUnbound: [ self doesNotKnow: binding name ]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EggRecursiveInterpreter >> visitLiteral: anSLiteral [
 	^ runtime literalFor: anSLiteral value
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EggRecursiveInterpreter >> visitMessage: anSMessage [
 	| recv args |
 	recv := anSMessage receiver acceptVisitor: self.
@@ -201,7 +201,7 @@ EggRecursiveInterpreter >> visitMessage: anSMessage [
 		sendSite: anSMessage
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EggRecursiveInterpreter >> visitMethod: anSMethod [
 	| primitive |
 	primitive := anSMethod pragma.
@@ -212,7 +212,7 @@ EggRecursiveInterpreter >> visitMethod: anSMethod [
 	^ primitive value
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EggRecursiveInterpreter >> visitReturn: anSReturn [
 	| value |
 	value := anSReturn expression acceptVisitor: self.

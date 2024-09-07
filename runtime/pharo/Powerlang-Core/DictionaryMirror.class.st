@@ -1,33 +1,33 @@
 Class {
-	#name : #DictionaryMirror,
-	#superclass : #ObjectMirror,
+	#name : 'DictionaryMirror',
+	#superclass : 'ObjectMirror',
 	#category : 'Powerlang-Core-Mirrors',
 	#package : 'Powerlang-Core',
 	#tag : 'Mirrors'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 DictionaryMirror >> at: i [
 	^self contents at: i
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 DictionaryMirror >> at: key using: transform [
 	self do: [:k :value | (transform value: k) = key ifTrue: [^value]].
 	^nil
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 DictionaryMirror >> contents [
 	^self getInstVarNamed: #table
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 DictionaryMirror >> contentsSize [
 	^self contents size
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 DictionaryMirror >> do: aBlock [
 	1 to: self contentsSize do: [:i | | current |
 		current := self at: i.
@@ -36,7 +36,7 @@ DictionaryMirror >> do: aBlock [
 			aBlock value: mirror key value: mirror value]]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 DictionaryMirror >> structureType [
 	^#Dictionary
 ]

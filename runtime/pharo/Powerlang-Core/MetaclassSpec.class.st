@@ -3,8 +3,8 @@ Copyright (c) 2024 Quorum Software.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #MetaclassSpec,
-	#superclass : #SpeciesSpec,
+	#name : 'MetaclassSpec',
+	#superclass : 'SpeciesSpec',
 	#instVars : [
 		'class'
 	],
@@ -13,9 +13,9 @@ Class {
 	#tag : 'CodeSpecs'
 }
 
-{ #category : #testing }
+{ #category : 'inquiries' }
 MetaclassSpec >> allInstVarNames [
-
+	"unlike in ProtoObject class, the superclass of the spec of ProtoObject class is nil"
 	allIvars ifNotNil: [ ^ allIvars ].
 	^ allIvars := module classInstVarNames
 	              ,
@@ -23,7 +23,7 @@ MetaclassSpec >> allInstVarNames [
 			               c instVarNames ]) asArray
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 MetaclassSpec >> allSuperclassesDo: aBlock [
 	| s c |
 	class supername isNil ifTrue: [
@@ -36,71 +36,85 @@ MetaclassSpec >> allSuperclassesDo: aBlock [
 	s allSuperclassesDo: aBlock
 ]
 
-{ #category : #inquiries }
+{ #category : 'testing' }
+MetaclassSpec >> asWebsideJson [
+
+	^ super asWebsideJson
+		  at: #class put: 'Metaclass';
+		  yourself
+]
+
+{ #category : 'inquiries' }
 MetaclassSpec >> classVarNames [
 	^class classVarNames
 ]
 
-{ #category : #testing }
-MetaclassSpec >> instSize [
+{ #category : 'inquiries' }
+MetaclassSpec >> classVars [
 
-	^ instSize ifNil: [ 
-		  instSize := module classInstVarNames size + class allClassVarNames size ]
+	^ class classVars
 ]
 
-{ #category : #accessing }
+{ #category : 'testing' }
+MetaclassSpec >> definition [
+
+	^ self name , ' instanceVariableNames: '
+	  , (' ' join: instVarNames) storeString
+]
+
+{ #category : 'accessing' }
 MetaclassSpec >> instanceClass [
 	^class
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 MetaclassSpec >> instanceClass: aClassSpec [
 	class := aClassSpec
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 MetaclassSpec >> isBytes [
 
 	^ self isPointers not
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 MetaclassSpec >> isMetaclass [
 	^true
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 MetaclassSpec >> isPointers [
 	^true
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 MetaclassSpec >> isVariable [
 
 	^ false
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 MetaclassSpec >> metaMethods [
 	^#()
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 MetaclassSpec >> name [
 	^class name , ' class'
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 MetaclassSpec >> sharedPools [
 	^class sharedPools
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 MetaclassSpec >> superclass [
 	^class superclass ifNotNil: [:c | c metaclass]
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 MetaclassSpec >> supername [
 	^self superclass name
 ]

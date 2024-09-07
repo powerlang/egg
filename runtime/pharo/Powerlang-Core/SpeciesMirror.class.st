@@ -1,6 +1,6 @@
 Class {
-	#name : #SpeciesMirror,
-	#superclass : #ObjectMirror,
+	#name : 'SpeciesMirror',
+	#superclass : 'ObjectMirror',
 	#classVars : [
 		'Flags'
 	],
@@ -12,14 +12,14 @@ Class {
 	#tag : 'Mirrors'
 }
 
-{ #category : #'behavior protocol' }
+{ #category : 'behavior protocol' }
 SpeciesMirror >> allInstVarNames [
 	^(self withAllSuperclasses reversed gather: [:class | class instVarNames]) asArray
 	
 
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SpeciesMirror >> allSuperclasses [
 	| superclasses |
 	superclasses := OrderedCollection new.
@@ -27,7 +27,7 @@ SpeciesMirror >> allSuperclasses [
 	^superclasses
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SpeciesMirror >> allSuperclassesDo: aBlock [
 	| superclass |
 	superclass := self superclass.
@@ -37,26 +37,26 @@ SpeciesMirror >> allSuperclassesDo: aBlock [
 
 ]
 
-{ #category : #nativizing }
+{ #category : 'nativizing' }
 SpeciesMirror >> compiledMethodFor: selector [
 	^self instBehavior compiledMethodFor: selector
 ]
 
-{ #category : #'behavior protocol' }
+{ #category : 'behavior protocol' }
 SpeciesMirror >> indexOfSlot: name [
 	| instVars |
 	instVars := self allInstVarNames.
 	^instVars indexOf: name ifAbsent: 0
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SpeciesMirror >> instBehavior [
 	| name |
 	name := self getInstVarNamed: #instanceBehavior.
 	^name asBehaviorMirror
 ]
 
-{ #category : #'behavior protocol' }
+{ #category : 'behavior protocol' }
 SpeciesMirror >> instSize [
 	"optimize: 
 	self isPointers
@@ -72,7 +72,7 @@ SpeciesMirror >> instSize [
 	^ parents + vars slotSize
 ]
 
-{ #category : #'behavior protocol' }
+{ #category : 'behavior protocol' }
 SpeciesMirror >> instVarNames [
 	| instVars |
 	instVars := self getInstVarNamed: #instanceVariables.
@@ -82,17 +82,17 @@ SpeciesMirror >> instVarNames [
 		ifFalse: [instVars asLocalArray collect: #asLocalString]
 ]
 
-{ #category : #'behavior protocol' }
+{ #category : 'behavior protocol' }
 SpeciesMirror >> isPointers [
 	^ (self getInstVarNamed: #format) asLocalInteger anyMask: self pointersFlag
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SpeciesMirror >> localName [
 	^self subclassResponsibility 
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SpeciesMirror >> printOn: aStream [
 	| name | 
 	super printOn: aStream.
@@ -100,31 +100,31 @@ SpeciesMirror >> printOn: aStream [
 	aStream nextPutAll: '[' , name , ']'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SpeciesMirror >> project [
 	^nil
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SpeciesMirror >> reflectsMetaclass [
 	| metasize |
 	metasize := 6.
 	^handle size = metasize
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SpeciesMirror >> structureType [
 	^#Species
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SpeciesMirror >> superclass [
 	| name |
 	name := self getInstVarNamed: #superclass.
 	^name asSpeciesMirror
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SpeciesMirror >> withAllSuperclasses [
 	^ OrderedCollection new
 		add: self;

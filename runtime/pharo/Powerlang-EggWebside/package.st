@@ -1,1 +1,1 @@
-Package { #name : #'Powerlang-EggWebside' }
+Package { #name : 'Powerlang-EggWebside' }

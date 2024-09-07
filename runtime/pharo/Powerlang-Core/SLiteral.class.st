@@ -1,6 +1,6 @@
 Class {
-	#name : #SLiteral,
-	#superclass : #SLiteralVar,
+	#name : 'SLiteral',
+	#superclass : 'SLiteralVar',
 	#instVars : [
 		'value'
 	],
@@ -9,22 +9,22 @@ Class {
 	#tag : 'SExpressions'
 }
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SLiteral class >> decodeUsing: aTreecodeDecoder [
 	^aTreecodeDecoder decodeLiteral
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SLiteral >> acceptVisitor: visitor [
 	^ visitor visitLiteral: self
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SLiteral >> isLiteral [
 	^true
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SLiteral >> printOn: aStream indent: anInteger [
 	aStream
 		tab: anInteger;
@@ -33,12 +33,12 @@ SLiteral >> printOn: aStream indent: anInteger [
 		nextPutAll: '}'
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SLiteral >> value [
 	^value
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SLiteral >> value: anObject [
 	value := anObject
 ]

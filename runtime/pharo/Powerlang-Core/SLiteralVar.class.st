@@ -1,6 +1,6 @@
 Class {
-	#name : #SLiteralVar,
-	#superclass : #SExpression,
+	#name : 'SLiteralVar',
+	#superclass : 'SExpression',
 	#instVars : [
 		'index'
 	],
@@ -9,12 +9,12 @@ Class {
 	#tag : 'SExpressions'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SLiteralVar >> index [
 	^index
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SLiteralVar >> index: anInteger [
 	index := anInteger
 ]

@@ -1,6 +1,6 @@
 Class {
-	#name : #SCascadeMessage,
-	#superclass : #SExpression,
+	#name : 'SCascadeMessage',
+	#superclass : 'SExpression',
 	#instVars : [
 		'selector',
 		'arguments',
@@ -12,69 +12,69 @@ Class {
 	#tag : 'SExpressions'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 SCascadeMessage class >> decodeUsing: aTreecodeDecoder [
 	^aTreecodeDecoder decodeCascadeMessage
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCascadeMessage >> acceptVisitor: visitor [
 	^ visitor visitCascadeMessage: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCascadeMessage >> argumentCount [
 	^arguments size
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCascadeMessage >> arguments [
 	^arguments
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCascadeMessage >> arguments: aCollection [
 	arguments := aCollection
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCascadeMessage >> cache: anSCompiledMethod when: type [
 	cache ifNil: [ ^ cache := Array with: type with: anSCompiledMethod ].
 	cache := cache , (Array with: type with: anSCompiledMethod)
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCascadeMessage >> cacheUndermessage: aBlockClosure [
 	cache := aBlockClosure
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCascadeMessage >> cachedUndermessage [
 	^ cache isBlock
 		ifTrue: [ cache ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCascadeMessage >> cascade [ ^
 	cascade
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCascadeMessage >> cascade: anSCascade [
 	cascade := anSCascade
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCascadeMessage >> flushCache [
 	cache := nil
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCascadeMessage >> isCascadeMessage [
 	^true
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCascadeMessage >> methodFor: requiredType [
 	| type |
 	cache ifNil: [ ^ nil ].
@@ -85,22 +85,22 @@ SCascadeMessage >> methodFor: requiredType [
 	^ nil
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCascadeMessage >> receiver [
 	^cascade receiver
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCascadeMessage >> registerCacheWith: runtime [
 	cache ifNil: [ runtime registerCache: self for: selector ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCascadeMessage >> selector [
 	^selector
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SCascadeMessage >> selector: aSymbol [
 	selector := aSymbol
 ]

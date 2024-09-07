@@ -1,19 +1,21 @@
 Class {
-	#name : #EggObjectWrapper,
-	#superclass : #ProtoObject,
+	#name : 'EggObjectWrapper',
+	#superclass : 'ProtoObject',
 	#instVars : [
 		'wrappee',
 		'runtime'
 	],
-	#category : #'Powerlang-EggWebside-Base'
+	#category : 'Powerlang-EggWebside-Base',
+	#package : 'Powerlang-EggWebside',
+	#tag : 'Base'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 EggObjectWrapper class >> on: anLMRObject runtime: aPowerlangLMR [ 
 ^self new wrappee: anLMRObject ; runtime: aPowerlangLMR 
 ]
 
-{ #category : #comparing }
+{ #category : 'comparing' }
 EggObjectWrapper >> = anObject [
 
 	| object  |
@@ -23,7 +25,7 @@ EggObjectWrapper >> = anObject [
 	^ wrappee = object
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 EggObjectWrapper >> asLocalObject [
 	wrappee == runtime nil ifTrue: [ ^nil ].
 	wrappee == runtime true ifTrue: [ ^true ].
@@ -34,7 +36,13 @@ EggObjectWrapper >> asLocalObject [
 	^nil
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
+EggObjectWrapper >> asSpeciesWrapper [
+
+	^EggSpeciesWrapper on: wrappee runtime: runtime
+]
+
+{ #category : 'converting' }
 EggObjectWrapper >> asWebsideJson [
 
 	| variable printed |
@@ -50,13 +58,27 @@ EggObjectWrapper >> asWebsideJson [
 		  yourself
 ]
 
-{ #category : #printing }
+{ #category : 'comparing' }
+EggObjectWrapper >> collect: aBlock [
+
+	^self asArray wrappee slots collect: [ :slot |
+		  aBlock value: (EggObjectWrapper on: slot runtime: runtime) ]
+]
+
+{ #category : 'printing' }
 EggObjectWrapper >> displayString [
 
 	^ self printString
 ]
 
-{ #category : #accessing }
+{ #category : 'comparing' }
+EggObjectWrapper >> do: aBlock [
+
+	^ self asArray wrappee slots do: [ :slot |
+		  aBlock value: (EggObjectWrapper on: slot runtime: runtime) ]
+]
+
+{ #category : 'accessing' }
 EggObjectWrapper >> doesNotUnderstand: aMessage [
 	| arguments result class |
 	arguments := aMessage arguments collect: [ :a | (a class == EggObjectWrapper or: [ a class inheritsFrom: EggObjectWrapper]) ifTrue: [a wrappee] ifFalse: [ a ]].
@@ -72,80 +94,94 @@ EggObjectWrapper >> doesNotUnderstand: aMessage [
 	^ class on: result runtime: runtime
 ]
 
-{ #category : #comparing }
+{ #category : 'comparing' }
+EggObjectWrapper >> gather: aBlock [
+
+	^ self asArray wrappee slots gather: [ :slot |
+		  aBlock value: (EggObjectWrapper on: slot runtime: runtime) ]
+]
+
+{ #category : 'comparing' }
 EggObjectWrapper >> hash [
 	^wrappee hash
 ]
 
-{ #category : #inspecting }
+{ #category : 'inspecting' }
 EggObjectWrapper >> inspect [
 
 	^ wrappee inspect
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 EggObjectWrapper >> isKindOf: aClass [
 
 	^ self class == aClass or: [ self class inheritsFrom: aClass ]
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 EggObjectWrapper >> notNil [
 	^(runtime sendLocal: #notNil to: wrappee) != runtime nil
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 EggObjectWrapper >> object [
 	^wrappee
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 EggObjectWrapper >> objectClass [
 	| class |
 	class := runtime sendLocal: #class to: wrappee.
 	^ EggSpeciesWrapper on: class runtime: runtime
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 EggObjectWrapper >> printOn: aStream [
 	"aStream
 		nextPutAll: (runtime sendLocal: #printString to: wrappee) wrappee asLocalString"
 		wrappee printOn: aStream
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 EggObjectWrapper >> printString [
 	^ String streamContents: [ :strm | self printOn: strm ]
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 EggObjectWrapper >> respondsTo: aSymbol [
 
 	^ self class canUnderstand: aSymbol
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggObjectWrapper >> runtime: aPowerlangLMR [
 	runtime := aPowerlangLMR
 ]
 
-{ #category : #testing }
+{ #category : 'comparing' }
+EggObjectWrapper >> select: aBlock [
+
+	^ self asArray wrappee slots select: [ :slot |
+		  aBlock value: (EggObjectWrapper on: slot runtime: runtime) ]
+]
+
+{ #category : 'testing' }
 EggObjectWrapper >> slotAt: index [
 	^self class on: (wrappee slotAt: index) runtime: runtime 
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 EggObjectWrapper >> stDisplayString [
 
 	^ self printString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggObjectWrapper >> wrappee [
 	^wrappee 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggObjectWrapper >> wrappee: anLMRObject [
 	wrappee := anLMRObject
 ]

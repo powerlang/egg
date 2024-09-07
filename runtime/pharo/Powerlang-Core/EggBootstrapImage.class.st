@@ -1,6 +1,6 @@
 Class {
-	#name : #EggBootstrapImage,
-	#superclass : #EggBootstrapModule,
+	#name : 'EggBootstrapImage',
+	#superclass : 'EggBootstrapModule',
 	#instVars : [
 		'bootstrapDicts',
 		'arraySpec',
@@ -11,29 +11,29 @@ Class {
 		'minSMI',
 		'maxSMI'
 	],
-	#category : #'Powerlang-Core-Execution-Bootstrap',
+	#category : 'Powerlang-Core-Execution-Bootstrap',
 	#package : 'Powerlang-Core',
 	#tag : 'Execution-Bootstrap'
 }
 
-{ #category : #'own services' }
+{ #category : 'own services' }
 EggBootstrapImage >> bootstrap [
 	runtime
 		sendLocal: #bootstrap to: module;
 		removeBootstrapDictionaryOverrides
 ]
 
-{ #category : #'own services' }
+{ #category : 'own services' }
 EggBootstrapImage >> bootstrapDictionaries [
 	^bootstrapDicts
 ]
 
-{ #category : #'own services' }
+{ #category : 'own services' }
 EggBootstrapImage >> builder [
 	^	Ring2MetacircularConverter new image: self.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapImage >> createBootstrapNamespace [
 	| namespace |
 	namespace := self newBootstrapDictionaryOf: self => #Namespace.
@@ -44,20 +44,21 @@ EggBootstrapImage >> createBootstrapNamespace [
 	classes do: [ :c | namespace at: c name asSymbol put: c ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapImage >> createClassNamespaces: spec [
+
 	| names cvars array |
-	names := spec classVarNames.
-	names isEmpty
-		ifTrue: [ ^ self newArraySized: 0 ].
+	names := spec classVars.
+	names isEmpty ifTrue: [ ^ self newArraySized: 0 ].
+	self flag: 'ignoring class var contents'.
 	cvars := self newBootstrapDictionaryOf: self => #Namespace.
-	names do: [ :rgVar | cvars at: rgVar name put: nilObj ].
+	names do: [ :cvar | cvars at: cvar name put: nilObj ].
 	array := self newArraySized: 1.
 	array at: 1 put: cvars.
 	^ array
 ]
 
-{ #category : #building }
+{ #category : 'building' }
 EggBootstrapImage >> genesis [
 	"
 	Create the world (should take less than 6 days). This is named 'genesis' to remind us those who had
@@ -76,25 +77,25 @@ EggBootstrapImage >> genesis [
 	runtime image: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapImage >> initialize [
 	super initialize.
 	bootstrapDicts := OrderedCollection new.
 	kernel := self
 ]
 
-{ #category : #building }
+{ #category : 'building' }
 EggBootstrapImage >> kernel [
 	^module
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggBootstrapImage >> newArraySized: anInteger [
 ^self basicNewSlotsOf: arraySpec sized: anInteger.
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggBootstrapImage >> newAssociation: anAssociation [
 	| assoc key value |
 	assoc := self newSlots: 'Association'.
@@ -105,7 +106,7 @@ EggBootstrapImage >> newAssociation: anAssociation [
 		value: value; yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapImage >> newBootstrapDictionaryOf: anRGBehavior [
 	"
 	Allocate a bootstrap dictionary object. Its contents is managed by the
@@ -124,17 +125,17 @@ EggBootstrapImage >> newBootstrapDictionaryOf: anRGBehavior [
 		image: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapImage >> newClosure: anInteger [
 	^ ProtoeggClosure new: closureSpec size: anInteger withAll: nilObj
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapImage >> newFloatFrom: aFloat [
 	^ self newBytes: 'Float' contents: aFloat pointerDouble
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggBootstrapImage >> newInteger: anInteger [
 	anInteger > maxSMI
 		ifTrue: [ ^ self newLargePositiveInteger: anInteger ].
@@ -143,7 +144,7 @@ EggBootstrapImage >> newInteger: anInteger [
 	^ ProtoeggSmallInteger new: smiSpec valued: anInteger
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggBootstrapImage >> newLargeNegativeInteger: anInteger [
 	| size bytes byte |
 	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
@@ -156,7 +157,7 @@ EggBootstrapImage >> newLargeNegativeInteger: anInteger [
 	^ self newBytes: #LargeNegativeInteger contents: bytes
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggBootstrapImage >> newLargePositiveInteger: anInteger [
 	| size bytes |
 	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
@@ -164,14 +165,14 @@ EggBootstrapImage >> newLargePositiveInteger: anInteger [
 	^ self newBytes: #LargePositiveInteger contents: bytes reversed
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggBootstrapImage >> newString: aString [
 	| bytes |
 	bytes := aString copyWith: Character null.
 	^self newBytes: 'String' contents: bytes
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggBootstrapImage >> newStringArray: strings [
 	| array bytes |
 	array := self newSlots: 'Array' sized: strings size.
@@ -182,7 +183,7 @@ EggBootstrapImage >> newStringArray: strings [
 	^ array
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapImage >> newSymbol: aSymbol [
 	| new |
 	identityMap at: aSymbol ifPresent: [ :s | ^ s ].
@@ -191,7 +192,7 @@ EggBootstrapImage >> newSymbol: aSymbol [
 	^ identityMap at: aSymbol put: new
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapImage >> specs: aModuleSpec [
 	super specs: aModuleSpec.
 	closureSpec := self => #Closure.
@@ -200,7 +201,7 @@ EggBootstrapImage >> specs: aModuleSpec [
 	symbolSpec := self => #Symbol
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapImage >> transferBlock: anSCompiledBlock [
 	| transferred method format |
 	identityMap at: anSCompiledBlock
@@ -216,7 +217,7 @@ EggBootstrapImage >> transferBlock: anSCompiledBlock [
 	^ transferred
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapImage >> transferCharacter: aCharacter [
 	| class bytechars value transferred int |
 	identityMap at: aCharacter ifPresent: [ :c | ^ c ].
@@ -231,7 +232,7 @@ EggBootstrapImage >> transferCharacter: aCharacter [
 	^ transferred
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggBootstrapImage >> transferMethod: anSCompiledMethod in: species [
 
 	| size classname transferred treecodes selector format literal tliteral source |
@@ -260,12 +261,12 @@ EggBootstrapImage >> transferMethod: anSCompiledMethod in: species [
 	^ transferred
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapImage >> wordSize [
 	^ wordSize
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapImage >> wordSize: anInteger [
 	wordSize := anInteger.
 	maxSMI := (1 bitShift: wordSize * 8 - 2) - 1.

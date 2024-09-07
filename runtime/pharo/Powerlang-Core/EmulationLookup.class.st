@@ -1,6 +1,6 @@
 Class {
-	#name : #EmulationLookup,
-	#superclass : #MethodLookup,
+	#name : 'EmulationLookup',
+	#superclass : 'MethodLookup',
 	#instVars : [
 		'spec',
 		'globals',
@@ -11,7 +11,7 @@ Class {
 	#tag : 'Metaphysics'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 EmulationLookup class >> new [
 	"return an initialized instance"
 
@@ -19,7 +19,7 @@ EmulationLookup class >> new [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EmulationLookup >> compile: anRGMethod [
 	| compiler method |
 	compiler := SCompiler new.
@@ -29,7 +29,7 @@ EmulationLookup >> compile: anRGMethod [
 	^ method
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EmulationLookup >> compiledMethodFor: anRGMethod [
 	| method |
 	cache at: anRGMethod ifPresent: [ :cm | ^ cm ].
@@ -37,17 +37,17 @@ EmulationLookup >> compiledMethodFor: anRGMethod [
 	^ cache at: anRGMethod put: method
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EmulationLookup >> globals: aPoolDictionary [
 	globals := aPoolDictionary
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EmulationLookup >> initialize [
 	cache := Dictionary new
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EmulationLookup >> lookup: aSymbol on: aSubject [
 	| behavior classname |
 	classname := aSubject _gate handle oid classname.
@@ -55,7 +55,7 @@ EmulationLookup >> lookup: aSymbol on: aSubject [
 	^ self lookup: aSymbol startingAt: behavior
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EmulationLookup >> lookup: aSymbol startingAt: aBehavior [
 	| next m c |
 	next := aBehavior.
@@ -68,7 +68,7 @@ EmulationLookup >> lookup: aSymbol startingAt: aBehavior [
 			self lookup: aSymbol startingAt: c ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EmulationLookup >> lookupSuper: aSymbol on: aSubject from: classname [
 	| behavior |
 	cache at: classname -> aSymbol ifPresent: [ :cached | ^ cached ].
@@ -76,12 +76,12 @@ EmulationLookup >> lookupSuper: aSymbol on: aSubject from: classname [
 	^ self lookup: aSymbol startingAt: behavior
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EmulationLookup >> spec [
 	^spec
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EmulationLookup >> spec: anRGEnvironment [
 	spec := anRGEnvironment
 ]

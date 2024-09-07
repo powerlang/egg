@@ -1,37 +1,37 @@
 Class {
-	#name : #BootstrapObjectFormat,
-	#superclass : #ObjectFormat,
+	#name : 'BootstrapObjectFormat',
+	#superclass : 'ObjectFormat',
 	#category : 'Powerlang-Core-Metaphysics',
 	#package : 'Powerlang-Core',
 	#tag : 'Metaphysics'
 }
 
-{ #category : #public }
+{ #category : 'public' }
 BootstrapObjectFormat >> arrayedSizeOf: oid [
 	^ oid arrayedSize
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 BootstrapObjectFormat >> arrayedSlotOf: oid at: index [
 	^ oid at: index
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 BootstrapObjectFormat >> arrayedSlotOf: oid at: index put: anotherOid [
 	^ oid at: index put: anotherOid
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 BootstrapObjectFormat >> behaviorOf: oid [
 	^oid behavior
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 BootstrapObjectFormat >> bytesOf: oid count: size [
 	^oid bytes copyFrom: 1 to: size
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 BootstrapObjectFormat >> classOf: anObjectHandle [
 	| oid behavior handle class |
 	oid := anObjectHandle oid.
@@ -43,23 +43,23 @@ BootstrapObjectFormat >> classOf: anObjectHandle [
 	^handle mirror asBehaviorMirror instanceClass
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 BootstrapObjectFormat >> integerOf: oid [
 	self ASSERT: oid isImmediate.
 	^ oid value
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 BootstrapObjectFormat >> isBytes: oid [
 	^oid isBytes
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 BootstrapObjectFormat >> isInteger: oid [
 	^oid isImmediate
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 BootstrapObjectFormat >> labelFor: oid [
 	| c |
 	(self isInteger: oid) 
@@ -69,12 +69,12 @@ BootstrapObjectFormat >> labelFor: oid [
 	^c localName
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 BootstrapObjectFormat >> newInteger: anInteger [
 	^storage newSmallInteger: anInteger
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 BootstrapObjectFormat >> print: oid on: aStream [
 	| label |
 	label := self labelFor: oid.
@@ -87,17 +87,17 @@ BootstrapObjectFormat >> print: oid on: aStream [
 
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 BootstrapObjectFormat >> sizeOf: oid [
 	^oid size
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 BootstrapObjectFormat >> slotOf: oid at: index [
 	^ oid slotAt: index
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 BootstrapObjectFormat >> stringOf: oid count: size [
 	^(oid bytes copyFrom: 1 to: size) asString
 ]

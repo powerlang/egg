@@ -1,6 +1,6 @@
 Class {
-	#name : #SExpressionTypes,
-	#superclass : #PSharedPool,
+	#name : 'SExpressionTypes',
+	#superclass : 'PSharedPool',
 	#classVars : [
 		'AssignmentId',
 		'BlockId',
@@ -17,7 +17,7 @@ Class {
 	#tag : 'SExpressions'
 }
 
-{ #category : #'class initialization' }
+{ #category : 'class initialization' }
 SExpressionTypes class >> initialize [
 	MethodId := 1.
 	BlockId := 2.

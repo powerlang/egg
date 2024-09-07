@@ -1,6 +1,6 @@
 Class {
-	#name : #SExpressionLinearizer,
-	#superclass : #Object,
+	#name : 'SExpressionLinearizer',
+	#superclass : 'Object',
 	#instVars : [
 		'operations',
 		'primitives',
@@ -37,7 +37,7 @@ Class {
 	#tag : 'Execution'
 }
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> assign: aCollection [
 	| op |
 	op := SOpAssign new assignees: aCollection.
@@ -45,7 +45,7 @@ SExpressionLinearizer >> assign: aCollection [
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> branchIf: aBoolean [
 	| class op |
 	class := aBoolean
@@ -56,17 +56,17 @@ SExpressionLinearizer >> branchIf: aBoolean [
 	^op
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> branchTargetOf: branch [
 	branch target: self currentPC
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> currentPC [
 	^ operations size
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> dispatch: message [
 	| op count |
 	op := SOpDispatchMessage new message: message.
@@ -78,26 +78,26 @@ SExpressionLinearizer >> dispatch: message [
 	stackTop := stackTop - count 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> dropCascadeMessageArgs: argsize [
 	(argsize = 0 orNot: [ dropsArguments ])
 		ifTrue: [ ^ self ].
 	self dropToS: argsize
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> dropMessageArgs: argsize [
 	(argsize = 0 orNot: [ dropsArguments ])
 		ifTrue: [ ^ self ].
 	self dropToS: argsize + 1
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> dropToS [
 	^self dropToS: 1
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> dropToS: anInteger [
 	| op |
 	op := SOpDropToS new count: anInteger.
@@ -105,17 +105,17 @@ SExpressionLinearizer >> dropToS: anInteger [
 	stackTop := stackTop - anInteger
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> dropsArguments [
 	dropsArguments := true
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> initialize [
 	dropsArguments := false
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> inline: anSMessage binaryWhile: aBoolean [
 	"TODO: cleanup block locals to nil after each cycle"
 
@@ -130,7 +130,7 @@ SExpressionLinearizer >> inline: anSMessage binaryWhile: aBoolean [
 		
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> inline: anSMessage if: aBoolean [
 	| branch end |
 	anSMessage receiver acceptVisitor: self.
@@ -145,7 +145,7 @@ SExpressionLinearizer >> inline: anSMessage if: aBoolean [
 		
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> inline: anSMessage ifNil: aBoolean [
 	| nilObj message branch end arg index |
 	anSMessage receiver acceptVisitor: self.
@@ -175,7 +175,7 @@ SExpressionLinearizer >> inline: anSMessage ifNil: aBoolean [
 		branchTargetOf: end
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> inline: anSMessage ifNilIfNotNil: aBoolean [
 	| arguments nilObj message branch end arg index |
 	anSMessage receiver acceptVisitor: self.
@@ -202,7 +202,7 @@ SExpressionLinearizer >> inline: anSMessage ifNilIfNotNil: aBoolean [
 		dropToS
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> inline: anSMessage ifTrueIfFalse: aBoolean [
 	| branch end |
 	anSMessage receiver acceptVisitor: self.
@@ -216,7 +216,7 @@ SExpressionLinearizer >> inline: anSMessage ifTrueIfFalse: aBoolean [
 		branchTargetOf: end
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> inline: anSMessage unitaryWhile: aBoolean [
 	"TODO: cleanup block locals to nil after each cycle"
 
@@ -228,7 +228,7 @@ SExpressionLinearizer >> inline: anSMessage unitaryWhile: aBoolean [
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> inlineAnd: anSMessage [
 	| branches |
 	anSMessage receiver acceptVisitor: self.
@@ -242,7 +242,7 @@ SExpressionLinearizer >> inlineAnd: anSMessage [
 	branches do: [ :branch | self branchTargetOf: branch ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> inlineAndNot: anSMessage [
 	| branch message |
 	anSMessage receiver acceptVisitor: self.
@@ -258,7 +258,7 @@ SExpressionLinearizer >> inlineAndNot: anSMessage [
 		branchTargetOf: branch
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> inlineOr: anSMessage [
 	|  branches |
 	anSMessage receiver acceptVisitor: self.
@@ -269,7 +269,7 @@ SExpressionLinearizer >> inlineOr: anSMessage [
 	branches do: [:branch | self branchTargetOf: branch]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> inlineOrNot: anSMessage [
 	| branch message |
 	anSMessage receiver acceptVisitor: self.
@@ -285,7 +285,7 @@ SExpressionLinearizer >> inlineOrNot: anSMessage [
 		branchTargetOf: branch
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> inlineRepeat: anSMessage [
 	"TODO: cleanup block locals to nil after each cycle"
 
@@ -296,7 +296,7 @@ SExpressionLinearizer >> inlineRepeat: anSMessage [
 		jumpTo: start
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> inlineTimesRepeat: anSMessage [
 	"TODO: cleanup block locals to nil after each cycle"
 
@@ -327,7 +327,7 @@ SExpressionLinearizer >> inlineTimesRepeat: anSMessage [
 		dropToS: 2
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> inlineToDo: anSMessage [
 	"TODO: cleanup block locals to nil after each cycle"
 
@@ -359,7 +359,7 @@ SExpressionLinearizer >> inlineToDo: anSMessage [
 		dropToS: 1
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> jump [
 	| op |
 	op := SOpJump new.
@@ -367,14 +367,14 @@ SExpressionLinearizer >> jump [
 	^op
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> jumpTo: anInteger [
 | op |
 op := SOpJump new target: anInteger.
 	operations add: op
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> loadRfromStack: anInteger [
 	| op |
 	op := SOpLoadRfromStack new index: anInteger.
@@ -382,56 +382,56 @@ SExpressionLinearizer >> loadRfromStack: anInteger [
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> loadRwithNil [
 	operations add: SOpLoadRwithNil new
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> loadRwithSelf [
 	operations add: SOpLoadRwithSelf new
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> operations [
 ^operations
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> popR [
 	operations add: SOpPopR new.
 	stackTop := stackTop - 1
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> primitive: aClosure [
 	operations add: (SOpPrimitive new block: aClosure)
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SExpressionLinearizer >> primitives: aCollection [ 
 	primitives := aCollection
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> pushR [
 	operations add: SOpPushR new.
 	stackTop := stackTop + 1
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> reset [
 	operations := OrderedCollection new.
 	inBlock := false.
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> return [
 	operations add: SOpReturn new
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> return: isLocal [
 	|  class |
 	class := (isLocal andNot: [ inBlock ])
@@ -440,7 +440,7 @@ SExpressionLinearizer >> return: isLocal [
 	operations add: class new
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> runtime: anEggRuntime [
 	| literal |
 	runtime := anEggRuntime.
@@ -470,21 +470,21 @@ SExpressionLinearizer >> runtime: anEggRuntime [
 	orNot := runtime symbolFromLocal: #orNot:
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> storeRintoFrameAt: anInteger [
 	| op |
 	op := SOpStoreRintoFrame new index: anInteger.
 	operations add: op
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> visitAssignment: anSAssignment [
 	anSAssignment expression acceptVisitor: self.
 	self
 		assign: anSAssignment assignees
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> visitBlock: anSBlock [
 
 	| prevInBlock prevOperations prevStackTop statements code |
@@ -510,7 +510,7 @@ SExpressionLinearizer >> visitBlock: anSBlock [
 	inBlock := prevInBlock
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> visitCascade: anSCascade [
 	| args argsize |
 	anSCascade receiver acceptVisitor: self.
@@ -530,12 +530,12 @@ SExpressionLinearizer >> visitCascade: anSCascade [
 	self dropToS
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> visitIdentifier: anSIdentifier [
 	operations add: anSIdentifier
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> visitInlinedMessage: anSMessage [
 	| selector |
 	selector := anSMessage selector.
@@ -584,12 +584,12 @@ SExpressionLinearizer >> visitInlinedMessage: anSMessage [
 	self ASSERT: false
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> visitLiteral: anSLiteral [
 	operations add: anSLiteral
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> visitMessage: anSMessage [
 	| args argsize |
 	anSMessage isInlined
@@ -609,7 +609,7 @@ SExpressionLinearizer >> visitMessage: anSMessage [
 	
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> visitMethod: anSMethod [
 	| primitive statements symbol |
 	self reset.
@@ -629,24 +629,24 @@ SExpressionLinearizer >> visitMethod: anSMethod [
 				return ]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SExpressionLinearizer >> visitOpLoadRfromFrame: anSOpLoadRfromFrame [ 
 	operations add: anSOpLoadRfromFrame
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SExpressionLinearizer >> visitOpLoadRfromStack: anSOpLoadRfromStack [
 self loadRfromStack: anSOpLoadRfromStack index
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SExpressionLinearizer >> visitReturn: anSReturn [
 	anSReturn expression acceptVisitor: self.
 	self
 		return: anSReturn local
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SExpressionLinearizer >> visitStatements: aCollection [ 
 	aCollection do: [:sexpression | sexpression acceptVisitor: self]
 	

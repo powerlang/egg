@@ -1,6 +1,6 @@
 Class {
-	#name : #SScript,
-	#superclass : #SExpression,
+	#name : 'SScript',
+	#superclass : 'SExpression',
 	#instVars : [
 		'statements',
 		'compiledCode'
@@ -10,7 +10,7 @@ Class {
 	#tag : 'SExpressions'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 SScript class >> new [
 	"return an initialized instance"
 
@@ -18,49 +18,49 @@ SScript class >> new [
 
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SScript >> argumentCount [
 	^compiledCode argumentCount
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SScript >> compiledCode [
 	^compiledCode
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SScript >> compiledCode: anObject [
 	compiledCode := anObject
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SScript >> initialize [
 	statements := #()
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SScript >> optimizedCode: anObject [
 	^ self compiledCode optimizedCode: anObject
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SScript >> printOn: aStream indent: anInteger [
 	statements
 		do: [:statement | statement printOn: aStream indent: anInteger + 1]
 		separatedBy: [aStream nextPutAll: '.'; cr]
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SScript >> statements [
 	^statements
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SScript >> statements: aCollection [
 	statements := aCollection
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SScript >> tempCount [
 	^compiledCode tempCount
 ]

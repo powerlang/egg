@@ -1,12 +1,12 @@
 Class {
-	#name : #EggIterativeLinkedInterpreter,
-	#superclass : #EggIterativeInterpreter,
+	#name : 'EggIterativeLinkedInterpreter',
+	#superclass : 'EggIterativeInterpreter',
 	#category : 'Powerlang-Core-Execution',
 	#package : 'Powerlang-Core',
 	#tag : 'Execution'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 EggIterativeLinkedInterpreter >> evaluateClosure: closure withArgs: arguments [
 	| frame sblock |
 	frame := closure builder.
@@ -18,12 +18,12 @@ EggIterativeLinkedInterpreter >> evaluateClosure: closure withArgs: arguments [
 	^ self prepareForBlock: sblock
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggIterativeLinkedInterpreter >> evaluationContextClass [
 	^self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggIterativeLinkedInterpreter >> sendLocal: aSymbol to: receiver with: anArray [
 	| symbol literal dummy message dispatch |
 	symbol := runtime symbolFromLocal: aSymbol.
@@ -44,7 +44,7 @@ EggIterativeLinkedInterpreter >> sendLocal: aSymbol to: receiver with: anArray [
 	^ regR
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggIterativeLinkedInterpreter >> visitOpDispatchMessage: anSOpDispatchMessage [
 
 	| message argcount arguments behavior method size environment |
@@ -76,12 +76,12 @@ EggIterativeLinkedInterpreter >> visitOpDispatchMessage: anSOpDispatchMessage [
 	self prepareForExecuting: method
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggIterativeLinkedInterpreter >> visitOpNonLocalReturn: anSOpReturn [
 	context := context homeContext parent
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggIterativeLinkedInterpreter >> visitOpReturn: anSOpReturn [
 	context := context parent
 ]
