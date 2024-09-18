@@ -1,6 +1,24 @@
 Extension { #name : 'Integer' }
 
 { #category : '*Powerlang-Compatibility-Pharo' }
+Integer >> asEggByteArrayOfSize: n [
+
+	| bytes complement byte |
+
+	self >= 0
+		ifTrue: [
+			bytes := ByteArray new: n.
+			1 to: self bytesCount do: [ :i | bytes at: i put: (self byteAt: i) ] ]
+		ifFalse: [
+			complement := self negated - 1.
+			bytes := ByteArray new: n withAll: 16rFF.
+			1 to: self bytesCount do: [ :i |
+				byte := 255 - (complement byteAt: i).
+				bytes at: i put: byte ] ].
+	^ bytes
+]
+
+{ #category : '*Powerlang-Compatibility-Pharo' }
 Integer >> bin [
 	"
 	255 bin

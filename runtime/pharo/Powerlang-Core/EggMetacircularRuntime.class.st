@@ -701,26 +701,28 @@ EggMetacircularRuntime >> newInteger: anInteger [
 
 { #category : #initialization }
 EggMetacircularRuntime >> newLargeNegativeInteger: anInteger [
-	| size bytes byte result complement |
-	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
-	complement := anInteger negated - 1.
-	bytes := ByteArray new: size withAll: 16rFF.
-	1 to: anInteger bytesCount do: [ :i | 
-		byte := 255 - (complement byteAt: i).
-		bytes at: i put: byte ].
-	(bytes at: size) < 128 ifTrue: [ bytes := bytes, #[16rFF 16rFF] ].
-	result := self newBytes: largeNegativeIntegerClass size: bytes size.
-	^result bytes: bytes
+	"
+		phato's bytesCount is unsigned (i.e. 255 bytesCount = 1). In Egg, 
+		largenegs are twos-complement, and largepos are unsigned, so largenegs
+		have 1 less available bit
+	"
 
+	| size bytes result |
+	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
+	(anInteger byteAt: size) > 16r80 ifTrue: [ size := size + 2 ].
+	bytes := anInteger asEggByteArrayOfSize: size.
+	result := self newBytes: largeNegativeIntegerClass size: bytes size.
+	^ result bytes: bytes
 ]
 
 { #category : #initialization }
 EggMetacircularRuntime >> newLargePositiveInteger: anInteger [
+
 	| size bytes result |
 	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
-	bytes := anInteger asByteArrayOfSize: size.
+	bytes := anInteger asEggByteArrayOfSize: size.
 	result := self newBytes: largePositiveIntegerClass size: size.
-	^ result bytes: bytes reversed
+	^ result bytes: bytes
 ]
 
 { #category : #initialization }

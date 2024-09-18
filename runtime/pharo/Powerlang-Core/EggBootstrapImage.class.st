@@ -145,23 +145,27 @@ EggBootstrapImage >> newInteger: anInteger [
 
 { #category : #initialization }
 EggBootstrapImage >> newLargeNegativeInteger: anInteger [
-	| size bytes byte |
+	"
+		phato's bytesCount is unsigned (i.e. 255 bytesCount = 1). In Egg, 
+		largenegs are twos-complement, and largepos are unsigned, so largenegs
+		have 1 less available bit
+	"
+
+	| size bytes |
 	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
-	bytes := ByteArray new: size withAll: 16rFF.
-	1 to: anInteger bytesCount do: [ :i | 
-		byte := anInteger byteAt: i.
-		byte > 0
-			ifTrue: [ byte := 256 - byte ].
-		bytes at: i put: byte ].
+	((anInteger at: size) > 16r80) ifTrue: [
+		size := size + 2 ].
+	bytes := anInteger asEggByteArrayOfSize: size.
 	^ self newBytes: #LargeNegativeInteger contents: bytes
 ]
 
 { #category : #initialization }
 EggBootstrapImage >> newLargePositiveInteger: anInteger [
+
 	| size bytes |
 	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
-	bytes := anInteger asByteArrayOfSize: size.
-	^ self newBytes: #LargePositiveInteger contents: bytes reversed
+	bytes := anInteger asEggByteArrayOfSize: size.
+	^ self newBytes: #LargePositiveInteger contents: bytes
 ]
 
 { #category : #initialization }
