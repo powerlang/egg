@@ -1,6 +1,6 @@
 Class {
-	#name : #SmalltalkInterpreter,
-	#superclass : #SExpressionInterpreter,
+	#name : 'SmalltalkInterpreter',
+	#superclass : 'SExpressionInterpreter',
 	#instVars : [
 		'localRuntime'
 	],
@@ -12,7 +12,7 @@ Class {
 	#tag : 'Metaphysics'
 }
 
-{ #category : #'class initialization' }
+{ #category : 'class initialization' }
 SmalltalkInterpreter class >> initialize [
 	"
 	self initialize
@@ -21,12 +21,12 @@ SmalltalkInterpreter class >> initialize [
 	underprimitives := #(_basicAt: #_basicAt:put: _byteAt: #_byteAt:put: _smallSize _largeSize _isSmallInteger _basicHash _basicHash:)
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SmalltalkInterpreter >> dispatch: message to: msgReceiver [
 	^ msgReceiver _gate dispatch: message from: self
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SmalltalkInterpreter >> dispatchSpecial: message [
 	| selector mirror gate |
 	selector := message selector.
@@ -49,18 +49,18 @@ SmalltalkInterpreter >> dispatchSpecial: message [
 	self ASSERT: false
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SmalltalkInterpreter >> dispatchSuper: message to: msgReceiver [
 	^ msgReceiver _gate dispatchSuper: message from: self
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SmalltalkInterpreter >> falseLiteral [
 	^receiver _gate handle runtime false maneuverer.
 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SmalltalkInterpreter >> gateOnBlock: aPCompiledBlock [
 	| runtime closure handle |
 	runtime := receiver _gate handle runtime.
@@ -69,26 +69,26 @@ SmalltalkInterpreter >> gateOnBlock: aPCompiledBlock [
 	^ closure mirage
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SmalltalkInterpreter >> initialize [
 	super initialize.
 	localRuntime := Runtime forLocalPharo.
 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SmalltalkInterpreter >> isSpecial: selector [
 	^underprimitives includes: selector
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SmalltalkInterpreter >> literal: anObject [
 	| handle |
 	handle := receiver _gate handleOn: anObject.
 	^ self subjectOn: handle
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SmalltalkInterpreter >> mirageOnBlock: aPCompiledBlock [
 	| runtime handle |
 	runtime := receiver _gate handle runtime.
@@ -96,13 +96,13 @@ SmalltalkInterpreter >> mirageOnBlock: aPCompiledBlock [
 	^ handle mirage
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SmalltalkInterpreter >> nilLiteral [
 	^receiver _gate handle runtime nil maneuverer.
 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SmalltalkInterpreter >> primitiveClosureValue [
 	| closure block sblock prev result interpreter next |
 	closure := receiver _gate handle.
@@ -117,7 +117,7 @@ SmalltalkInterpreter >> primitiveClosureValue [
 	^result
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SmalltalkInterpreter >> primitivePrimeFor [
 	| num result  |
 	num := arguments first _gate handle asLocalInteger.
@@ -126,13 +126,13 @@ SmalltalkInterpreter >> primitivePrimeFor [
 	^ self subjectOnInteger: result in: receiver _gate handle runtime
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SmalltalkInterpreter >> trueLiteral [
 	^receiver _gate handle runtime true maneuverer.
 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SmalltalkInterpreter >> visitLiteral: anSLiteral [
 	| handle |
 	anSLiteral value isInteger ifTrue: [ 
@@ -141,7 +141,7 @@ SmalltalkInterpreter >> visitLiteral: anSLiteral [
 	^ handle mirage
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SmalltalkInterpreter >> visitPrimitive: primitive [
 	| gate new left right args rcvr runtime value class |
 	returned := true.
@@ -246,7 +246,7 @@ SmalltalkInterpreter >> visitPrimitive: primitive [
 	self ASSERT: false
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SmalltalkInterpreter >> visitPrimitiveOld: primitive [
 	| gate new left right args rcvr |
 	returned := true.

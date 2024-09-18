@@ -1,1 +1,1 @@
-Package { #name : #'PowerlangJS-Core' }
+Package { #name : 'PowerlangJS-Core' }

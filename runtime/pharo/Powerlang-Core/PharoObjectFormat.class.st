@@ -1,50 +1,50 @@
 Class {
-	#name : #PharoObjectFormat,
-	#superclass : #ObjectFormat,
+	#name : 'PharoObjectFormat',
+	#superclass : 'ObjectFormat',
 	#category : 'Powerlang-Core-Metaphysics',
 	#package : 'Powerlang-Core',
 	#tag : 'Metaphysics'
 }
 
-{ #category : #public }
+{ #category : 'public' }
 PharoObjectFormat >> behaviorOf: oid [
 	^self ASSERT: false
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 PharoObjectFormat >> bytesOf: oid count: size [
 	^oid copyFrom: 1 to: size
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 PharoObjectFormat >> classOf: anObjectHandle [
 	^anObjectHandle oid class
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 PharoObjectFormat >> integerOf: oid [
 	self ASSERT: oid isInteger.
 	^ oid
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 PharoObjectFormat >> isBytes: anObject [
 	^anObject class isBytes
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 PharoObjectFormat >> isInteger: oid [
 	^oid isInteger
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 PharoObjectFormat >> labelFor: oid [
 	| label |
 	label := storage ifNotNil: [storage nameOf: oid].
 	^label ifNil: [ 'unknown' ]
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 PharoObjectFormat >> print: oid on: aStream [
 	aStream
 		nextPutAll: '@local {';
@@ -52,17 +52,17 @@ PharoObjectFormat >> print: oid on: aStream [
 		nextPut: $}
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 PharoObjectFormat >> sizeOf: oid [
 	^oid basicSize + oid class instSize
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 PharoObjectFormat >> slotOf: oid at: index [
 	^ oid instVarAt: index
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 PharoObjectFormat >> stringOf: oid count: size [
 	^(oid copyFrom: 1 to: size) asString
 ]

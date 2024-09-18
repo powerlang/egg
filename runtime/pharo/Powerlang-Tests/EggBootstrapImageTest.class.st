@@ -1,6 +1,6 @@
 Class {
-	#name : #EggBootstrapImageTest,
-	#superclass : #TestCase,
+	#name : 'EggBootstrapImageTest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'image'
 	],
@@ -9,14 +9,14 @@ Class {
 	#tag : 'Bootstrap'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggBootstrapImageTest >> setUp [
 	image := EggBootstrapImage fromSpec
 		wordSize: 8;
 		genesis
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggBootstrapImageTest >> test010nil [
 	| nilObj class classname |
 	nilObj := image nil.
@@ -29,7 +29,7 @@ EggBootstrapImageTest >> test010nil [
 			equals: 'UndefinedObject'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggBootstrapImageTest >> test020true [
 	| trueObj class classname |
 	trueObj := image true.
@@ -41,7 +41,7 @@ EggBootstrapImageTest >> test020true [
 		assert: classname asString equals: 'True'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggBootstrapImageTest >> test030false [
 	| falseObj class classname |
 	falseObj := image false.
@@ -53,7 +53,7 @@ EggBootstrapImageTest >> test030false [
 		assert: classname asString equals: 'False'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggBootstrapImageTest >> test040superclasses [
 	|  proto object collection class metaproto |
 	proto := image classNamed: #ProtoObject.
@@ -68,7 +68,7 @@ EggBootstrapImageTest >> test040superclasses [
 		assert: metaproto superclass equals: class
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggBootstrapImageTest >> test050metaclasses [
 	| proto metaproto |
 	proto := image classNamed: #ProtoObject.

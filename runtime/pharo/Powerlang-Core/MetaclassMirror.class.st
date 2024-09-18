@@ -1,39 +1,39 @@
 Class {
-	#name : #MetaclassMirror,
-	#superclass : #SpeciesMirror,
+	#name : 'MetaclassMirror',
+	#superclass : 'SpeciesMirror',
 	#category : 'Powerlang-Core-Mirrors',
 	#package : 'Powerlang-Core',
 	#tag : 'Mirrors'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 MetaclassMirror >> classVariables [
 	^self instanceClass classVariables
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 MetaclassMirror >> instanceClass [
 	| class |
 	class := self getInstVarNamed: #class.
 	^class asClassMirror
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 MetaclassMirror >> localEquivalent [
 	^(handle runtime objectModel at: self instanceClass localName asSymbol) metaclass
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 MetaclassMirror >> localName [
 	^self instanceClass localName , ' class'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 MetaclassMirror >> structureType [
 	^#Metaclass
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 MetaclassMirror >> subclasses [
 	| instance |
 	instance := self instanceClass.

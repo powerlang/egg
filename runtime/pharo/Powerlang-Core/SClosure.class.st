@@ -1,7 +1,7 @@
 Class {
-	#name : #SClosure,
-	#superclass : #Array,
-	#type : #variable,
+	#name : 'SClosure',
+	#superclass : 'Array',
+	#type : 'variable',
 	#instVars : [
 		'block',
 		'home'
@@ -11,17 +11,17 @@ Class {
 	#tag : 'Metaphysics'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SClosure >> block [
 	^block
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SClosure >> block: aPCompiledMethod [
 	block := aPCompiledMethod
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SClosure >> evaluateWith: anObject with: anotherObject [
 	block argumentCount = 2
 		ifFalse: [^super evaluateWith: anObject with: anotherObject].
@@ -29,37 +29,37 @@ SClosure >> evaluateWith: anObject with: anotherObject [
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SClosure >> home: anObject [
 	home := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SClosure >> isSelfEvaluating [
 	^false
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SClosure >> value [
 	^ home evaluateClosure: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SClosure >> value: anObject [
 	^home evaluateClosure: self with: anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SClosure >> value: anObject1 value: anObject2 [ 
 	^ home evaluateClosure: self with: anObject1 with: anObject2
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SClosure >> value: anObject1 value: anObject2 with: anObject3 [
 	^ home evaluateBlock: self with: anObject1 with: anObject2 with: anObject3
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SClosure >> whileFalse: aBlockSubject [
 	| result |
 	[ result := home evaluateClosure: self.
@@ -67,7 +67,7 @@ SClosure >> whileFalse: aBlockSubject [
 		whileFalse: [ home evaluateClosure: aBlockSubject _gate handle oid ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SClosure >> whileTrue: aBlockSubject [
 	| result |
 	[ result := home evaluateClosure: self.

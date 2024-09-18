@@ -1,6 +1,6 @@
 Class {
-	#name : #ObjectHeaderOffsets,
-	#superclass : #PSharedPool,
+	#name : 'ObjectHeaderOffsets',
+	#superclass : 'PSharedPool',
 	#classVars : [
 		'BehaviorOffset',
 		'FlagsOffset',
@@ -13,7 +13,7 @@ Class {
 	#tag : 'Metaphysics'
 }
 
-{ #category : #'class initialization' }
+{ #category : 'class initialization' }
 ObjectHeaderOffsets class >> initialize [
 	BehaviorOffset := -4.
 	FlagsOffset := -5.

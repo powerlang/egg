@@ -9,7 +9,7 @@ Class {
 	],
 	#pools : [
 		'AstBindingTypes',
-		'SExpressionTypes'
+		'AstNodeTypes'
 	],
 	#category : 'Powerlang-TestsFailing-Metaphysics',
 	#package : 'Powerlang-TestsFailing',

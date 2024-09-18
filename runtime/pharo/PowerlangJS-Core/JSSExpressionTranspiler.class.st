@@ -1,6 +1,6 @@
 Class {
-	#name : #JSSExpressionTranspiler,
-	#superclass : #Object,
+	#name : 'JSSExpressionTranspiler',
+	#superclass : 'Object',
 	#instVars : [
 		'runtime',
 		'evaluator',
@@ -32,62 +32,63 @@ Class {
 		'andNot',
 		'orNot'
 	],
-	#category : #'PowerlangJS-Core'
+	#category : 'PowerlangJS-Core',
+	#package : 'PowerlangJS-Core'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 JSSExpressionTranspiler >> addLiteral: anObject [
 	literals add: anObject.
 	^literals size 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 JSSExpressionTranspiler >> args [
 	stream nextPutAll: 'frame.__arguments'
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 JSSExpressionTranspiler >> argumentAt: index [
 	self args; index: index
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 JSSExpressionTranspiler >> argumentAt: index in: environmentIndex [
 	environmentIndex ifNil: [ ^ self argumentAt: index ].
 	self loadEnvironmentFor: environmentIndex; index: index
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 JSSExpressionTranspiler >> assign: value [
 	stream
 		nextPutAll: ' = ';
 		print: value
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 JSSExpressionTranspiler >> currentEnv [
 	stream nextPutAll: 'frame.env'
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 JSSExpressionTranspiler >> end [
 	stream
 		nextPutAll: '})';
 		cr
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JSSExpressionTranspiler >> evaluator: aJSEggEvaluator [ 
  evaluator := aJSEggEvaluator.
 	self runtime: evaluator runtime
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 JSSExpressionTranspiler >> false [
 	stream nextPutAll: 'evaluator._falseObj'
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 JSSExpressionTranspiler >> index: anInteger [
 	stream
 		nextPutAll: '[';
@@ -95,14 +96,14 @@ JSSExpressionTranspiler >> index: anInteger [
 		nextPut: $]
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 JSSExpressionTranspiler >> initialize [
 	tabs := 2.
 	stream := '' writeStream.
 	literals := OrderedCollection new
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JSSExpressionTranspiler >> inline: anSMessage binaryWhile: aBoolean [
 	"we put while in a lambda to be able to use it as a js expression"
 	stream nextPutAll: '( () => {while ('.
@@ -116,7 +117,7 @@ JSSExpressionTranspiler >> inline: anSMessage binaryWhile: aBoolean [
 	stream nextPutAll: '} })()'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JSSExpressionTranspiler >> inline: anSMessage ifTrue: aBoolean [
 	stream nextPut: $(.
 	aBoolean
@@ -129,7 +130,7 @@ JSSExpressionTranspiler >> inline: anSMessage ifTrue: aBoolean [
 	stream nextPutAll: ') : evaluator._nilObj)'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JSSExpressionTranspiler >> inline: anSMessage ifTrueIfFalse: aBoolean [
 	stream nextPut: $(.
 	aBoolean
@@ -144,7 +145,7 @@ JSSExpressionTranspiler >> inline: anSMessage ifTrueIfFalse: aBoolean [
 	stream nextPutAll: '))'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JSSExpressionTranspiler >> inlineToDo: anSMessage [
 	"we put while in a lambda to be able to use it as a js expression"
 
@@ -199,7 +200,7 @@ JSSExpressionTranspiler >> inlineToDo: anSMessage [
 		nextPutAll: '}}) ()'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JSSExpressionTranspiler >> inlinedMessage: anSMessage with: nativizer [
 	| selector |
 	selector := anSMessage selector.
@@ -222,19 +223,19 @@ JSSExpressionTranspiler >> inlinedMessage: anSMessage with: nativizer [
 	self ASSERT: false
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 JSSExpressionTranspiler >> literalAt: index [
 	stream nextPutAll: 'literals'.
 	self
 		index: index
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 JSSExpressionTranspiler >> literals [
 	^literals
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 JSSExpressionTranspiler >> loadEnvironmentFor: anInteger [
 	"
 	-1: inlined argument.
@@ -248,7 +249,7 @@ JSSExpressionTranspiler >> loadEnvironmentFor: anInteger [
 	^ self currentEnv; index: anInteger
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 JSSExpressionTranspiler >> loadLiteral: value [
 	| index |
 
@@ -259,14 +260,14 @@ JSSExpressionTranspiler >> loadLiteral: value [
 	self literalAt: index
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 JSSExpressionTranspiler >> loadVMLiteral: value [
 	| index |
 	index := self addLiteral: value.
 	self literalAt: index
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JSSExpressionTranspiler >> message: anSMessage super: aBoolean [
 	| args |
 	args := anSMessage arguments.
@@ -288,7 +289,7 @@ JSSExpressionTranspiler >> message: anSMessage super: aBoolean [
 
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 JSSExpressionTranspiler >> nativize: anSMethod [
 	self visitMethod: anSMethod.
 	^ JSNativeCode new
@@ -296,32 +297,32 @@ JSSExpressionTranspiler >> nativize: anSMethod [
 		literals: self literals
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 JSSExpressionTranspiler >> nil [
 	stream nextPutAll: 'evaluator._nilObj'
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 JSSExpressionTranspiler >> receiver [
 	stream nextPutAll: 'frame.__self'
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 JSSExpressionTranspiler >> result [
 	^stream contents
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 JSSExpressionTranspiler >> return [
 	stream nextPutAll: 'return '
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 JSSExpressionTranspiler >> returnSelf [
 	stream return: [stream nextPutAll: 'frame.__self']
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JSSExpressionTranspiler >> runtime: anEggRuntime [
 	runtime := anEggRuntime.
 	one := runtime newInteger: 1.
@@ -349,7 +350,7 @@ JSSExpressionTranspiler >> runtime: anEggRuntime [
 	orNot := runtime symbolFromLocal: #orNot:
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 JSSExpressionTranspiler >> smallInteger: value [
 	stream
 		nextPutAll: 'LMRSmallInteger.new().value_(';
@@ -357,13 +358,13 @@ JSSExpressionTranspiler >> smallInteger: value [
 		nextPut: $)
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 JSSExpressionTranspiler >> stackTemporaryAt: index [
 	self temps; index: index
 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 JSSExpressionTranspiler >> stackTemporaryAt: index put: value [
 	self
 		temps;
@@ -371,7 +372,7 @@ JSSExpressionTranspiler >> stackTemporaryAt: index put: value [
 		assign: value
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 JSSExpressionTranspiler >> start [
 	stream
 		reset;
@@ -379,17 +380,17 @@ JSSExpressionTranspiler >> start [
 		crtab
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 JSSExpressionTranspiler >> statementEnd [
 	stream nextPut: $;; cr
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 JSSExpressionTranspiler >> stream: aWriteStream [
 stream := aWriteStream 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 JSSExpressionTranspiler >> temporaryAt: index in: environmentIndex [
 	environmentIndex ifNil: [ ^ self stackTemporaryAt: index ].
 	self
@@ -397,7 +398,7 @@ JSSExpressionTranspiler >> temporaryAt: index in: environmentIndex [
 		index: index
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 JSSExpressionTranspiler >> temporaryAt: index in: environmentIndex put: value [
 	environmentIndex ifNil: [ ^ self stackTemporaryAt: index put: value].
 	self
@@ -406,17 +407,17 @@ JSSExpressionTranspiler >> temporaryAt: index in: environmentIndex put: value [
 		stream nextPutAll: ' = '; nextPutAll: value
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 JSSExpressionTranspiler >> temps [
 	stream nextPutAll: 'frame._temporaries'
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 JSSExpressionTranspiler >> true [
 	stream nextPutAll: 'evaluator._trueObj'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JSSExpressionTranspiler >> visitAssignment: anSAssignment [
 	| result assignees |
 	result := self collect: [ 	anSAssignment expression acceptVisitor: self ].
@@ -434,14 +435,14 @@ JSSExpressionTranspiler >> visitAssignment: anSAssignment [
 	stream nextPutAll: '})'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JSSExpressionTranspiler >> visitBlock: anSBlock [
 	stream nextPutAll: 'frame.captureClosure_('.
 	self loadVMLiteral: anSBlock.
 	stream nextPut: $)
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JSSExpressionTranspiler >> visitIdentifier: anSIdentifier [
 	| binding |
 	binding := anSIdentifier binding.
@@ -451,19 +452,19 @@ JSSExpressionTranspiler >> visitIdentifier: anSIdentifier [
 		ifFalse: [ binding valueWithin: self ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JSSExpressionTranspiler >> visitLiteral: anSLiteral [
 	self loadLiteral: anSLiteral value
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JSSExpressionTranspiler >> visitMessage: anSMessage [
 	anSMessage isInlined
 		ifTrue: [ self inlinedMessage: anSMessage with: self ]
 		ifFalse: [ self message: anSMessage super: false ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JSSExpressionTranspiler >> visitMethod: anSMethod [
 	| statements primitive index |
 	self start.
@@ -484,13 +485,13 @@ JSSExpressionTranspiler >> visitMethod: anSMethod [
 	self end
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 JSSExpressionTranspiler >> visitReturn: anSReturn [
 	self return.
 	anSReturn expression acceptVisitor: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JSSExpressionTranspiler >> visitStatements: aCollection [
 	aCollection
 		do: [ :sexpression | sexpression acceptVisitor: self ]

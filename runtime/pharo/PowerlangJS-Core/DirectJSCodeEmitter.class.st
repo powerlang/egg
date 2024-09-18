@@ -1,10 +1,11 @@
 Class {
-	#name : #DirectJSCodeEmitter,
-	#superclass : #AbstractJSFunctionEmitter,
-	#category : #'PowerlangJS-Core'
+	#name : 'DirectJSCodeEmitter',
+	#superclass : 'AbstractJSFunctionEmitter',
+	#category : 'PowerlangJS-Core',
+	#package : 'PowerlangJS-Core'
 }
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> basicVisitMessageNode: anRBMessageNode [
 	| recv parentheses selector signature |
 	
@@ -27,7 +28,7 @@ DirectJSCodeEmitter >> basicVisitMessageNode: anRBMessageNode [
 	stream nextPut: $)
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> declareTemporaries: temps [
 
 	temps isEmpty ifTrue: [^self]. 
@@ -40,12 +41,12 @@ DirectJSCodeEmitter >> declareTemporaries: temps [
 			crtab: tabs
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> imports [
 	^ imports
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 DirectJSCodeEmitter >> initialize [
 	tabs := 2.
 	stream := '' writeStream.
@@ -53,30 +54,30 @@ DirectJSCodeEmitter >> initialize [
 	classMethod  := false
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> methodHasNonLocal: anRBMethodNode [
 
 	^ anRBMethodNode propertyAt: #hasNonLocal
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 DirectJSCodeEmitter >> methodSignatureFrom: anRBMethodNode [
 	| args |
 	args := anRBMethodNode arguments collect: [:arg | arg name].
 	^self methodSignature: anRBMethodNode selector arguments: args 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 DirectJSCodeEmitter >> stream [
 	^ stream
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 DirectJSCodeEmitter >> stream: aWriteStream [
 	stream := aWriteStream
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 DirectJSCodeEmitter >> transpile [
 	| ast |
 	ast := AST2JSOptimizer new
@@ -85,28 +86,28 @@ DirectJSCodeEmitter >> transpile [
 	ast acceptVisitor: self
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> visitArgumentVariableNode: anRBArgumentNode [
 	| translated |
 	translated := self translateIdentifier: anRBArgumentNode name.
 	stream nextPutAll: translated
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> visitArrayNode: aRBArrayNode [ 
 	stream nextPut: $[.
 	aRBArrayNode statements do: [:s | s acceptVisitor: self] separatedBy: [ stream nextPutAll: ', ' ].
 	stream nextPut: $]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> visitAssignmentNode: anRBAssignmentNode [ 
 	anRBAssignmentNode variable acceptVisitor: self.
 	stream nextPutAll: ' = '.
 	anRBAssignmentNode value acceptVisitor: self
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> visitBitsAt: message [
 
 	| argument stretch offset |
@@ -127,7 +128,7 @@ DirectJSCodeEmitter >> visitBitsAt: message [
 		nextPutAll: ')'
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> visitBlockNode: anRBBlockNode [
 
 	| prev translated |
@@ -151,7 +152,7 @@ DirectJSCodeEmitter >> visitBlockNode: anRBBlockNode [
 	currentBlock := prev
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> visitBlockStatements: anRBBlockNode inline: aBoolean [
 
 	| statements last separator |
@@ -172,7 +173,7 @@ DirectJSCodeEmitter >> visitBlockStatements: anRBBlockNode inline: aBoolean [
 	last acceptVisitor: self
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> visitCascadeMessageNode: anRBMessageNode [
 	| signature |
 	signature := self transpileSelector: anRBMessageNode selector.
@@ -187,7 +188,7 @@ DirectJSCodeEmitter >> visitCascadeMessageNode: anRBMessageNode [
 	stream nextPut: $)
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> visitCascadeNode: anRBCascadeNode [
 	| receiver messages |
 	messages := anRBCascadeNode messages.
@@ -211,7 +212,7 @@ DirectJSCodeEmitter >> visitCascadeNode: anRBCascadeNode [
 	stream nextPutAll: '})'
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> visitClassVariableNode: anRBVariableNode [
 	| translated binding |
 	translated := self translateIdentifier: anRBVariableNode name.
@@ -223,7 +224,7 @@ DirectJSCodeEmitter >> visitClassVariableNode: anRBVariableNode [
 	stream nextPutAll: translated
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> visitGlobalVariableNode: anRBGlobalNode [
 	| translated binding |
 	translated := self translateIdentifier: anRBGlobalNode name.
@@ -232,7 +233,7 @@ DirectJSCodeEmitter >> visitGlobalVariableNode: anRBGlobalNode [
 	stream nextPutAll: translated
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> visitIf: message check: aBlock [
 
 	| block |
@@ -255,7 +256,7 @@ DirectJSCodeEmitter >> visitIf: message check: aBlock [
 		crtab: tabs
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> visitIfElse: message check: aBlock [
 
 	| blockT blockF  |
@@ -287,7 +288,7 @@ DirectJSCodeEmitter >> visitIfElse: message check: aBlock [
 		crtab: tabs
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> visitInstanceVariableNode: anRBInstanceVariableNode [
 	| translated |
 	translated := self translateIdentifier: anRBInstanceVariableNode name.
@@ -296,14 +297,14 @@ DirectJSCodeEmitter >> visitInstanceVariableNode: anRBInstanceVariableNode [
 		nextPutAll: translated
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> visitLiteralArrayNode: anRBLiteralArrayNode [ 
 	stream nextPut: $[.
 	anRBLiteralArrayNode contents do: [:elem | elem acceptVisitor: self] separatedBy: [stream nextPutAll: ', '].
 	stream nextPut: $]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> visitLiteralValueNode: anRBLiteralValueNode [
  	| v |
 	v := anRBLiteralValueNode value.
@@ -312,7 +313,7 @@ DirectJSCodeEmitter >> visitLiteralValueNode: anRBLiteralValueNode [
 	STONJSON put: v onStream: stream
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> visitMessageNode: anRBMessageNode [
 
 	| selector |
@@ -322,7 +323,7 @@ DirectJSCodeEmitter >> visitMessageNode: anRBMessageNode [
 		ifFalse: [ self basicVisitMessageNode: anRBMessageNode  ]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> visitMethodNode: anRBMethodNode [
 
 	| signature nonlocal statements |
@@ -364,7 +365,7 @@ DirectJSCodeEmitter >> visitMethodNode: anRBMethodNode [
 		cr
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> visitReturnNode: anRBReturnNode [
 	currentBlock
 		ifNil: [ stream nextPutAll: 'return '.
@@ -374,17 +375,17 @@ DirectJSCodeEmitter >> visitReturnNode: anRBReturnNode [
 			stream nextPutAll: ']' ]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> visitSelfNode: aRBSelfNode [
 	stream nextPutAll: 'this'
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> visitSpecialIntegerBinaryMessage: message [
 self visitSpecialIntegerBinaryMessage: message selector: message selector
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> visitSpecialIntegerBinaryMessage: message selector: operand [
 	stream nextPutAll: '('.
 	message receiver acceptVisitor: self.
@@ -393,7 +394,7 @@ DirectJSCodeEmitter >> visitSpecialIntegerBinaryMessage: message selector: opera
 	stream	nextPutAll: ')'
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> visitSpecialMessage: message [
 
 	| selector |
@@ -425,13 +426,13 @@ DirectJSCodeEmitter >> visitSpecialMessage: message [
 	self assert: false
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> visitSuperNode: anRBSuperNode [ 
 	stream nextPutAll: 'super'
 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 DirectJSCodeEmitter >> visitTemporaryVariableNode: anRBTemporaryNode [
 	| translated |
 	translated := self translateIdentifier: anRBTemporaryNode name.

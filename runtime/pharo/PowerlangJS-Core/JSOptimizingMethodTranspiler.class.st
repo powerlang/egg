@@ -1,19 +1,20 @@
 Class {
-	#name : #JSOptimizingMethodTranspiler,
-	#superclass : #Object,
+	#name : 'JSOptimizingMethodTranspiler',
+	#superclass : 'Object',
 	#instVars : [
 		'method',
 		'ir'
 	],
-	#category : #'PowerlangJS-Core'
+	#category : 'PowerlangJS-Core',
+	#package : 'PowerlangJS-Core'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JSOptimizingMethodTranspiler >> method: aCompiledMethod [
 	method := aCompiledMethod
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JSOptimizingMethodTranspiler >> transpile [
 	| frontend emitter |
 	frontend := OptimizingRBVisitor new.

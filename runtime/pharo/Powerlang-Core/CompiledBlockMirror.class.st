@@ -1,6 +1,6 @@
 Class {
-	#name : #CompiledBlockMirror,
-	#superclass : #ObjectMirror,
+	#name : 'CompiledBlockMirror',
+	#superclass : 'ObjectMirror',
 	#classVars : [
 		'Flags'
 	],
@@ -12,7 +12,7 @@ Class {
 	#tag : 'Mirrors'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 CompiledBlockMirror >> structureType [
 	^ #CompiledBlock
 ]

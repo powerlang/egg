@@ -1,6 +1,6 @@
 Class {
-	#name : #ProtoeggSymbol,
-	#superclass : #ProtoeggByteObject,
+	#name : 'ProtoeggSymbol',
+	#superclass : 'ProtoeggByteObject',
 	#instVars : [
 		'symbol'
 	],
@@ -9,7 +9,7 @@ Class {
 	#tag : 'Execution-Bootstrap'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ProtoeggSymbol class >> new: anRGBehavior symbol: aSymbol [
 	| bytes |
 	bytes := aSymbol copyWith: Character null.
@@ -19,23 +19,23 @@ ProtoeggSymbol class >> new: anRGBehavior symbol: aSymbol [
 		symbol: aSymbol
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggSymbol >> asString [
 	^ symbol
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggSymbol >> contentsString [
 	^symbol storeString
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggSymbol >> symbol [
 	^symbol
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ProtoeggSymbol >> symbol: aSymbol [
 	symbol := aSymbol 
 ]

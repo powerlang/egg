@@ -1,30 +1,31 @@
 Class {
-	#name : #OptimizingJSCodeEmitter,
-	#superclass : #AbstractJSFunctionEmitter,
+	#name : 'OptimizingJSCodeEmitter',
+	#superclass : 'AbstractJSFunctionEmitter',
 	#instVars : [
 		'ir',
 		'names',
 		'nextTemp'
 	],
-	#category : #'PowerlangJS-Core'
+	#category : 'PowerlangJS-Core',
+	#package : 'PowerlangJS-Core'
 }
 
-{ #category : #'own services' }
+{ #category : 'own services' }
 OptimizingJSCodeEmitter >> >> aString [
 	stream nextPutAll: aString
 ]
 
-{ #category : #'own services' }
+{ #category : 'own services' }
 OptimizingJSCodeEmitter >> >>> aString [
 	stream tab: tabs; nextPutAll: aString
 ]
 
-{ #category : #'own services' }
+{ #category : 'own services' }
 OptimizingJSCodeEmitter >> @ anOInstruction [
 	^names at: anOInstruction
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 OptimizingJSCodeEmitter >> generate [
 	| signature |
 	signature := self
@@ -36,7 +37,7 @@ OptimizingJSCodeEmitter >> generate [
 	self >> String cr >> String tab >> '}' >> String cr >> String cr
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingJSCodeEmitter >> initialize [
 	names := IdentityDictionary new.
 	tabs := 2.
@@ -44,22 +45,22 @@ OptimizingJSCodeEmitter >> initialize [
 	nextTemp := 1
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingJSCodeEmitter >> ir: firstBlock [
 	ir := firstBlock
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingJSCodeEmitter >> method: aCompiledMethod [
 	method := aCompiledMethod
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingJSCodeEmitter >> name: anONode as: aString [
 	names at: anONode put: aString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingJSCodeEmitter >> nextTempName [
 	| name |
 	name := 't', nextTemp asString.
@@ -67,17 +68,17 @@ OptimizingJSCodeEmitter >> nextTempName [
 	^name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingJSCodeEmitter >> result [
 	^ stream contents
 ]
 
-{ #category : #'own services' }
+{ #category : 'own services' }
 OptimizingJSCodeEmitter >> tabs [
 	stream tab: tabs
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingJSCodeEmitter >> visitLoad: anOLoadOperation [
 	| base name |
     base := anOLoadOperation base.
@@ -86,7 +87,7 @@ OptimizingJSCodeEmitter >> visitLoad: anOLoadOperation [
 	self name: anOLoadOperation as: name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingJSCodeEmitter >> visitLoadConstant: anOLoadConstant [
 	| v json |
 	v := anOLoadConstant value.
@@ -97,7 +98,7 @@ OptimizingJSCodeEmitter >> visitLoadConstant: anOLoadConstant [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingJSCodeEmitter >> visitLoadImplicit: anOLoadImplicit [
 	| name |
 	name := anOLoadImplicit name.
@@ -106,7 +107,7 @@ OptimizingJSCodeEmitter >> visitLoadImplicit: anOLoadImplicit [
 	names at: anOLoadImplicit put: 'this'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingJSCodeEmitter >> visitMessageSend: anOMessageSend [
 	| receiver arguments selector temp |
 	temp := self nextTempName.
@@ -121,7 +122,7 @@ OptimizingJSCodeEmitter >> visitMessageSend: anOMessageSend [
 	>> arguments >> ');' >> String cr
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OptimizingJSCodeEmitter >> visitReturn: anOReturnNode [
 	self >>> 'return ' >> (self @ anOReturnNode source) >> ';'
 ]

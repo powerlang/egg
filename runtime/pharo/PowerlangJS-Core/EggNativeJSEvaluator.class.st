@@ -1,10 +1,11 @@
 Class {
-	#name : #EggNativeJSEvaluator,
-	#superclass : #EggEvaluator,
-	#category : #'PowerlangJS-Core'
+	#name : 'EggNativeJSEvaluator',
+	#superclass : 'EggEvaluator',
+	#category : 'PowerlangJS-Core',
+	#package : 'PowerlangJS-Core'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 EggNativeJSEvaluator >> initializeExecutableCodeOf: method [
 
 	| sexpressions js executable |
@@ -17,7 +18,7 @@ EggNativeJSEvaluator >> initializeExecutableCodeOf: method [
 	^ executable
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggNativeJSEvaluator >> lookup: anSMessage startingAt: aBehavior [
 	| method symbol |
 	method := anSMessage methodFor: aBehavior.
@@ -37,7 +38,7 @@ EggNativeJSEvaluator >> lookup: anSMessage startingAt: aBehavior [
 	^ method
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggNativeJSEvaluator >> send: anSMessage super: aBoolean to: receiver with: arguments [
 	| behavior method code prev result |
 	anSMessage cachedUndermessage
@@ -62,7 +63,7 @@ EggNativeJSEvaluator >> send: anSMessage super: aBoolean to: receiver with: argu
 	^result
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggNativeJSEvaluator >> sendLocal: aSymbol to: receiver with: anArray [
 	| symbol res message |
 	symbol := runtime symbolFromLocal: aSymbol.

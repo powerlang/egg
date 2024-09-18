@@ -1,12 +1,12 @@
 Class {
-	#name : #DirectGate,
-	#superclass : #Gate,
+	#name : 'DirectGate',
+	#superclass : 'Gate',
 	#category : 'Powerlang-Core-Metaphysics',
 	#package : 'Powerlang-Core',
 	#tag : 'Metaphysics'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 DirectGate >> dispatch: aMessage from: parentInterpreter [
 	| receiver method interpreter |
 	receiver := aMessage receiver.
@@ -21,7 +21,7 @@ DirectGate >> dispatch: aMessage from: parentInterpreter [
 		evaluate: method
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 DirectGate >> dispatchSuper: aMessage from: parentInterpreter [
 	| receiver method interpreter |
 	receiver := aMessage receiver.
@@ -39,7 +39,7 @@ DirectGate >> dispatchSuper: aMessage from: parentInterpreter [
 		evaluate: method
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 DirectGate >> getInstVarNamed: name [
 	| index |
 	index := handle mirror reflectedClass indexOfSlot: name.
@@ -47,7 +47,7 @@ DirectGate >> getInstVarNamed: name [
 	^self slotAt: index
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 DirectGate >> slotAt: index [
 	| slot |
 	slot := handle slotAt: index.
