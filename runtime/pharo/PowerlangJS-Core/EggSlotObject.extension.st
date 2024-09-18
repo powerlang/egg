@@ -1,6 +1,6 @@
-Extension { #name : #EggSlotObject }
+Extension { #name : 'EggSlotObject' }
 
-{ #category : #'*PowerlangJS-Core' }
+{ #category : '*PowerlangJS-Core' }
 EggSlotObject >> classInstSize [
 	"assuming this is a behavior object (on the js world we are not creating LMRBehavioObject instances anymore)"
 

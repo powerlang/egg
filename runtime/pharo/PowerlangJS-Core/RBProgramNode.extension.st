@@ -1,6 +1,6 @@
-Extension { #name : #RBProgramNode }
+Extension { #name : 'RBProgramNode' }
 
-{ #category : #'*PowerlangJS-Core' }
+{ #category : '*PowerlangJS-Core' }
 RBProgramNode >> returnCount [
 	| count |
 	count := 0.

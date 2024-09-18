@@ -1,19 +1,20 @@
 Class {
-	#name : #JSNativeCode,
-	#superclass : #Object,
+	#name : 'JSNativeCode',
+	#superclass : 'Object',
 	#instVars : [
 		'code',
 		'literals'
 	],
-	#category : #'PowerlangJS-Core'
+	#category : 'PowerlangJS-Core',
+	#package : 'PowerlangJS-Core'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JSNativeCode >> code [
 	^ code
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JSNativeCode >> executeFor: evaluator in: aNativeJSEvaluatioContext [
 	^ code
 		value: evaluator
@@ -21,17 +22,17 @@ JSNativeCode >> executeFor: evaluator in: aNativeJSEvaluatioContext [
 		value: literals
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JSNativeCode >> literals [
 	^ literals
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JSNativeCode >> literals: aCollection [
 	literals := aCollection
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JSNativeCode >> source: aString [
 
 	code := self eval: aString

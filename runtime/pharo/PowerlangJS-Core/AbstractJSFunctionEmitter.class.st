@@ -1,6 +1,6 @@
 Class {
-	#name : #AbstractJSFunctionEmitter,
-	#superclass : #Object,
+	#name : 'AbstractJSFunctionEmitter',
+	#superclass : 'Object',
 	#instVars : [
 		'stream',
 		'method',
@@ -9,10 +9,11 @@ Class {
 		'imports',
 		'classMethod'
 	],
-	#category : #'PowerlangJS-Core'
+	#category : 'PowerlangJS-Core',
+	#package : 'PowerlangJS-Core'
 }
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AbstractJSFunctionEmitter class >> translateIdentifier: aString [
 
 	aString = 'arguments' ifTrue: [ ^ '_arguments' ].
@@ -27,7 +28,7 @@ AbstractJSFunctionEmitter class >> translateIdentifier: aString [
 	^ aString
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AbstractJSFunctionEmitter >> isSpecialSelector: selector [
 
 	"	^ #(ifTrue: ifFalse: #ifTrue:ifFalse: whileTrue whileFalse whileTrue: whileFalse:)"
@@ -35,17 +36,17 @@ AbstractJSFunctionEmitter >> isSpecialSelector: selector [
 	^ #( #bitsAt: + - * / ifTrue: ifFalse: ifTrue:ifFalse: ifNil: ifNotNil: ifNil:ifNotNil:) includes: selector
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 AbstractJSFunctionEmitter >> method [
 	^ method
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 AbstractJSFunctionEmitter >> method: aCompiledMethod [ 
 	method := aCompiledMethod 
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 AbstractJSFunctionEmitter >> methodSignature: selector arguments: arguments [
 	| translated tselector |
 	tselector := self transpileSelector:  selector.
@@ -61,17 +62,17 @@ AbstractJSFunctionEmitter >> methodSignature: selector arguments: arguments [
 		  s nextPutAll: ')' ]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AbstractJSFunctionEmitter >> result [
 	^stream contents
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 AbstractJSFunctionEmitter >> translateIdentifier: aString [
 	^self class translateIdentifier: aString
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 AbstractJSFunctionEmitter >> transpileBinarySelector: selector [
 	selector = #/
 		ifTrue: [ ^ #_slash ].
@@ -100,13 +101,13 @@ AbstractJSFunctionEmitter >> transpileBinarySelector: selector [
 	self ASSERT: false
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 AbstractJSFunctionEmitter >> transpileClassMethod [
 	classMethod := true.
 	self transpile
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 AbstractJSFunctionEmitter >> transpileSelector: selector [
 	selector isBinary ifTrue: [ ^ self transpileBinarySelector: selector ].
 	selector isKeyword ifFalse: [ ^ selector ].

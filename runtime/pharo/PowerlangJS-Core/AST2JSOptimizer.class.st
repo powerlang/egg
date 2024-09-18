@@ -32,8 +32,8 @@ instead of the much more inefficient
 `x = condition.ifTrue_ifFalse_(() => {a . b. return c}, () => {d. e. return f})`
 "
 Class {
-	#name : #AST2JSOptimizer,
-	#superclass : #Object,
+	#name : 'AST2JSOptimizer',
+	#superclass : 'Object',
 	#instVars : [
 		'ast',
 		'method',
@@ -42,23 +42,24 @@ Class {
 	#classInstVars : [
 		'aCompiledMethod'
 	],
-	#category : #'PowerlangJS-Core'
+	#category : 'PowerlangJS-Core',
+	#package : 'PowerlangJS-Core'
 }
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> addTemporaryForConditionValue [
 
 	(ast body hasTemporaryNamed: '_condition') ifFalse: [ 
 		ast body addTemporaryNamed: '_condition' ]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> addTemporaryForReturnValue [
 		(ast body hasTemporaryNamed: '_retval') ifFalse: [ ast body addTemporaryNamed: '_retval' ].
 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> convertIfNotNilArgument: anRBMessageNode [
 
 	| condition variable assignment block arguments argument |
@@ -84,7 +85,7 @@ AST2JSOptimizer >> convertIfNotNilArgument: anRBMessageNode [
 		addNodeFirst: assignment
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> inlineAssignmentOf: anRBBlockNode into: anRBVariableNode [
 
 	| body last var assignment |
@@ -98,7 +99,7 @@ AST2JSOptimizer >> inlineAssignmentOf: anRBBlockNode into: anRBVariableNode [
 		addNode: assignment
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> inlineIfAssignment: anRBAssignmentNode [
 
 	| if variable nilval initial |
@@ -116,7 +117,7 @@ AST2JSOptimizer >> inlineIfAssignment: anRBAssignmentNode [
 		removeNode: anRBAssignmentNode
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> inlineIfElseAssignment: anRBAssignmentNode [
 
 	| if variable |
@@ -130,7 +131,7 @@ AST2JSOptimizer >> inlineIfElseAssignment: anRBAssignmentNode [
 		removeNode: anRBAssignmentNode
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> inlineIfElseImplicitReturn: if [
 
 	| variable |
@@ -144,7 +145,7 @@ AST2JSOptimizer >> inlineIfElseImplicitReturn: if [
 	if parent addNode: variable
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> inlineIfElseReturn: anRBReturnNode [
 
 	| if variable |
@@ -162,7 +163,7 @@ AST2JSOptimizer >> inlineIfElseReturn: anRBReturnNode [
 	anRBReturnNode parent addNode: if before: anRBReturnNode
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> inlineIfImplicitReturn: if [
 
 	| variable nilval initial |
@@ -178,7 +179,7 @@ AST2JSOptimizer >> inlineIfImplicitReturn: if [
 	if parent addNode: variable
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> inlineIfReturn: anRBReturnNode [
 
 	| if variable nilval initial |
@@ -199,13 +200,13 @@ AST2JSOptimizer >> inlineIfReturn: anRBReturnNode [
 	anRBReturnNode parent addNode: if before: anRBReturnNode
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> method: aCompiledMethod [
 
 	method := aCompiledMethod
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 AST2JSOptimizer >> transform [
 
 	| nonlocals |
@@ -218,13 +219,13 @@ AST2JSOptimizer >> transform [
 	^ ast
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> visitArgumentVariableNode: anRBArgumentNode [
 
 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> visitArrayNode: aRBArrayNode [
 
 
@@ -233,7 +234,7 @@ AST2JSOptimizer >> visitArrayNode: aRBArrayNode [
 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> visitAssignmentNode: anRBAssignmentNode [
 
 	| value selector |
@@ -252,7 +253,7 @@ AST2JSOptimizer >> visitAssignmentNode: anRBAssignmentNode [
 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> visitBlockNode: anRBBlockNode [
 
 	| statements last selector |
@@ -274,7 +275,7 @@ AST2JSOptimizer >> visitBlockNode: anRBBlockNode [
 		^ self inlineIfElseImplicitReturn: last ]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> visitCascadeMessageNode: anRBMessageNode [
 
 
@@ -283,7 +284,7 @@ AST2JSOptimizer >> visitCascadeMessageNode: anRBMessageNode [
 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> visitCascadeNode: anRBCascadeNode [
 
 	| receiver messages |
@@ -295,22 +296,22 @@ AST2JSOptimizer >> visitCascadeNode: anRBCascadeNode [
 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> visitClassVariableNode: anRBVariableNode [
 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> visitGlobalVariableNode: anRBGlobalNode [
 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> visitInstanceVariableNode: anRBInstanceVariableNode [
 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> visitLiteralArrayNode: anRBLiteralArrayNode [
 
 	anRBLiteralArrayNode contents
@@ -318,13 +319,13 @@ AST2JSOptimizer >> visitLiteralArrayNode: anRBLiteralArrayNode [
 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> visitLiteralValueNode: anRBLiteralValueNode [
 
 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> visitMessageNode: anRBMessageNode [
 
 	| selector |
@@ -343,7 +344,7 @@ AST2JSOptimizer >> visitMessageNode: anRBMessageNode [
 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> visitMethodNode: anRBMethodNode [
 
 
@@ -354,7 +355,7 @@ AST2JSOptimizer >> visitMethodNode: anRBMethodNode [
 			s acceptVisitor: self]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> visitReturnNode: anRBReturnNode [
 
 	| value selector |
@@ -372,18 +373,18 @@ AST2JSOptimizer >> visitReturnNode: anRBReturnNode [
 		^ self inlineIfElseReturn: anRBReturnNode ]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> visitSelfNode: aRBSelfNode [
 
 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> visitSuperNode: anRBSuperNode [
 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 AST2JSOptimizer >> visitTemporaryVariableNode: anRBTemporaryNode [
 
 ]
