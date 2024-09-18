@@ -40,7 +40,7 @@ have to build Egg Module Snapshots (ems files). For that we currently use the ph
 Using the pharo runtime in ../pharo, open egg.image and run:
 
 ```
-builder := EggBuilder new initializeDefaultRuntime; useNativeWriter.
+builder := EggBuilder forNativePlatform.
 builder generateKernelSegment.
 builder generateCompilerSegment.
 builder generateMainSegments.

@@ -8,9 +8,13 @@ EggBootstrapImage kernelSpec browse.
 "JS - for this you must have powerlangjs packages installed (make js in root dir)"
 JSTranspiler transpileEggInterpreter.
 
-JSTranspiler generateKernelSegment.
-JSTranspiler generateCompilerSegment.
-JSTranspiler generateMainSegments.
+EggBuilder forNativePlatform generateKernelSegment.
+EggBuilder forNativePlatform generateCompilerSegment.
+EggBuilder forNativePlatform generateMainSegments.
+
+EggBuilder forJSPlatform generateKernelSegment.
+EggBuilder forJSPlatform generateCompilerSegment.
+EggBuilder forJSPlatform generateMainSegments.
 
 
 "

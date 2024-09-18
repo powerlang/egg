@@ -24,19 +24,19 @@ interpreter: interpreter/EggEvaluator.js
 
 $(IMAGE_SEGMENTS_DIR)/Kernel.json: $(POWERLANG_DIR)/eggjs.image
 	export IMAGE_SEGMENTS_DIR
-	cd $(POWERLANG_DIR) && ./pharo eggjs.image eval "JSTranspiler generateKernelSegment"
+	cd $(POWERLANG_DIR) && ./pharo eggjs.image eval "EggBuilder forJSPlatform generateKernelSegment"
 
 compiler: $(IMAGE_SEGMENTS_DIR)/Compiler.json
 
 example-server: #$(IMAGE_SEGMENTS_DIR)/ImageSegmentBuilder.json $(IMAGE_SEGMENTS_DIR)/ImageSegmentBuilder.JSON.json $(IMAGE_SEGMENTS_DIR)/STON.json $(IMAGE_SEGMENTS_DIR)/Tonel.json $(IMAGE_SEGMENTS_DIR)/CodeSpecs.json
 	export IMAGE_SEGMENTS_DIR
-	cd $(POWERLANG_DIR) && ./pharo eggjs.image eval "JSTranspiler generateMainSegments"
+	cd $(POWERLANG_DIR) && ./pharo eggjs.image eval "EggBuilder forJSPlatform generateMainSegments"
 
 $(IMAGE_SEGMENTS_DIR)/Compiler.json: $(POWERLANG_DIR)/eggjs.image
 	export IMAGE_SEGMENTS_DIR
-	cd $(POWERLANG_DIR) && ./pharo eggjs.image eval "JSTranspiler generateCompilerSegment"
+	cd $(POWERLANG_DIR) && ./pharo eggjs.image eval "EggBuilder forJSPlatform generateCompilerSegment"
 
 $(IMAGE_SEGMENTS_DIR)/%.json: $(POWERLANG_DIR)/eggjs.image
 	export IMAGE_SEGMENTS_DIR
-	cd $(POWERLANG_DIR) && ./pharo eggjs.image eval "JSTranspiler generateSegmentFromModuleNamed: $@"
+	cd $(POWERLANG_DIR) && ./pharo eggjs.image eval "EggBuilder forJSPlatform generateSegmentFromModuleNamed: $@"
 
