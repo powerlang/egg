@@ -16,6 +16,16 @@ Class {
 	#tag : 'Building'
 }
 
+{ #category : 'instance creation' }
+EggBuilder class >> forJSPlatform [
+	^self new initializeDefaultRuntime; useJSONWriter
+]
+
+{ #category : 'instance creation' }
+EggBuilder class >> forNativePlatform [
+	^self new initializeDefaultRuntime; useNativeWriter
+]
+
 { #category : 'services' }
 EggBuilder >> generateCompilerSegment [
 
