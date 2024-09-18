@@ -466,10 +466,6 @@ EggEvaluator >> primitiveNewBytes [
 	runtime newBytesOf: context self sized: size ]
 ]
 
-{ #category : #primitives }
-EggEvaluator >> primitiveNewObjectHeap [
-	^ [ runtime newObjectHeap ]
-]
 
 { #category : #primitives }
 EggEvaluator >> primitiveNewSized [

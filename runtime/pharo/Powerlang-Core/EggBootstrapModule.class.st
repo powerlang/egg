@@ -56,7 +56,7 @@ EggBootstrapModule class >> new [
 
 { #category : #accessing }
 EggBootstrapModule class >> readSpec: specName at: path [
-	| dir subdir repo |
+	| dir subdir |
 	dir := '../../modules' asFileReference.
 	subdir := path isString ifTrue: [ path ] ifFalse: [ path asPath pathString ].
 	subdir notEmpty ifTrue: [ dir := dir  / subdir].
