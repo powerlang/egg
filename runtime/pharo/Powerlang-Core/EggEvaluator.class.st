@@ -194,6 +194,7 @@ EggEvaluator >> initializePrimitives [
 		at: #BootstrapDictAt put: self primitiveBootstrapDictAt;
 		at: #BootstrapDictAtPut put: self primitiveBootstrapDictAtPut;
 		at: #HostSuspendedBecause put: self primitiveHostSuspendedBecause;
+		at: #HostCurrentMilliseconds put: self primitiveHostCurrentMilliseconds;
 		at: #HostLoadModule put: self primitiveHostLoadModule;
 		at: #HostFixOverrides put: self primitiveHostFixOverrides;
 		at: #PrimeFor put: self primitivePrimeFor;
@@ -436,6 +437,11 @@ EggEvaluator >> primitiveFor: aSymbol [
 { #category : #primitives }
 EggEvaluator >> primitiveHash [
 	^ [ runtime newInteger: (runtime hashFor: context self) ]
+]
+
+{ #category : #primitives }
+EggEvaluator >> primitiveHostCurrentMilliseconds [
+	^ [ runtime newInteger: Time millisecondClockValue ]
 ]
 
 { #category : #primitives }
