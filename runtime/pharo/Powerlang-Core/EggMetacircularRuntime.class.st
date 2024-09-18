@@ -612,7 +612,7 @@ EggMetacircularRuntime >> newBytes: species size: anInteger [
 	behavior := self speciesInstanceBehavior: species.
 	header := EggObjectHeader new
 		behavior: behavior;
-		bytes: false arrayed: true named: false;
+		bytes: true arrayed: true named: false;
 		size: anInteger;
 		hash: 0.
 	^ EggByteObject new
@@ -744,7 +744,7 @@ EggMetacircularRuntime >> newSlots: class size: anInteger [
 	behavior := self speciesInstanceBehavior: class.
 	header := EggObjectHeader new
 		behavior: behavior;
-		bytes: false arrayed: false named: true;
+		bytes: false arrayed: anInteger > 0 named: ivars > 0;
 		size: ivars + anInteger;
 		hash: 0.
 	result := class == behaviorClass
@@ -772,7 +772,7 @@ EggMetacircularRuntime >> newString: aString [
 	bytes := aString asByteArray copyWith: 0.
 	header := EggObjectHeader new
 		behavior: behavior;
-		bytes: false arrayed: true named: false;
+		bytes: true arrayed: true named: false;
 		size: bytes size;
 		hash: 0.
 	^ EggByteObject new
