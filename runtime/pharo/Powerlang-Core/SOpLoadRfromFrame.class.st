@@ -1,6 +1,6 @@
 Class {
-	#name : #SOpLoadRfromFrame,
-	#superclass : #SInlinerOperation,
+	#name : 'SOpLoadRfromFrame',
+	#superclass : 'SInlinerOperation',
 	#instVars : [
 		'index'
 	],
@@ -9,17 +9,17 @@ Class {
 	#tag : 'SExpressions'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SOpLoadRfromFrame >> acceptVisitor: visitor [
 	^ visitor visitOpLoadRfromFrame: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SOpLoadRfromFrame >> index [
 ^	index
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SOpLoadRfromFrame >> index: anInteger [
 	index := anInteger
 ]

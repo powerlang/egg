@@ -1,6 +1,6 @@
 Class {
-	#name : #EggProcessSuspended,
-	#superclass : #Error,
+	#name : 'EggProcessSuspended',
+	#superclass : 'Error',
 	#instVars : [
 		'process',
 		'exception'
@@ -10,25 +10,25 @@ Class {
 	#tag : 'Execution'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggProcessSuspended >> exception [
 
 	^ exception
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggProcessSuspended >> exception: anObject [
 
 	exception := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggProcessSuspended >> process [
 
 	^ process
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggProcessSuspended >> process: anObject [
 
 	process := anObject

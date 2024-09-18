@@ -1,6 +1,6 @@
 Class {
-	#name : #SOpLoadRfromStack,
-	#superclass : #SOperation,
+	#name : 'SOpLoadRfromStack',
+	#superclass : 'SOperation',
 	#instVars : [
 		'index'
 	],
@@ -9,17 +9,17 @@ Class {
 	#tag : 'SExpressions'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SOpLoadRfromStack >> acceptVisitor: visitor [
 	^ visitor visitOpLoadRfromStack: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SOpLoadRfromStack >> index [
 	^index
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SOpLoadRfromStack >> index: anInteger [
 	index := anInteger
 ]

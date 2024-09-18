@@ -1,6 +1,6 @@
 Class {
-	#name : #EggIterativeStackedInterpreter,
-	#superclass : #EggIterativeInterpreter,
+	#name : 'EggIterativeStackedInterpreter',
+	#superclass : 'EggIterativeInterpreter',
 	#instVars : [
 		'linearizer',
 		'work'
@@ -10,7 +10,7 @@ Class {
 	#tag : 'Execution'
 }
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggIterativeStackedInterpreter >> contextSwitchTo: vmStack [
 
 	| sp |
@@ -24,7 +24,7 @@ EggIterativeStackedInterpreter >> contextSwitchTo: vmStack [
 	^ trueObj
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggIterativeStackedInterpreter >> evaluate [
 	| operation |
 	[ operation := self nextOperation.
@@ -32,7 +32,7 @@ EggIterativeStackedInterpreter >> evaluate [
 	^ regR
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggIterativeStackedInterpreter >> evaluateClosure: closure withArgs: arguments [
 
 	| block code receiver |
@@ -48,7 +48,7 @@ EggIterativeStackedInterpreter >> evaluateClosure: closure withArgs: arguments [
 	^ regR
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggIterativeStackedInterpreter >> evaluateUndermessage: message with: block [
 	| argcount arguments |
 	argcount := message argumentCount.
@@ -57,25 +57,25 @@ EggIterativeStackedInterpreter >> evaluateUndermessage: message with: block [
 	context reserveStackSlots: argcount
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggIterativeStackedInterpreter >> initialize [
 	super initialize.
 	linearizer := SExpressionLinearizer new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggIterativeStackedInterpreter >> initializeExecutableCodeOf: method [
 
 	^ self initializeLinearExecutableCodeOf: method
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggIterativeStackedInterpreter >> initializePrimitives [
 	super initializePrimitives.
 	linearizer primitives: primitives
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggIterativeStackedInterpreter >> invoke: method with: receiver [
 	| size environment |
 	(runtime methodNeedsEnvironment: method) 
@@ -91,12 +91,12 @@ EggIterativeStackedInterpreter >> invoke: method with: receiver [
 	^regR
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggIterativeStackedInterpreter >> linearizer [
 	^linearizer
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggIterativeStackedInterpreter >> messageNotUnderstood: anSMessage [
 
 	"
@@ -115,13 +115,13 @@ EggIterativeStackedInterpreter >> messageNotUnderstood: anSMessage [
 	self invoke: dnu with: regR
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggIterativeStackedInterpreter >> newEvaluationContext [
 
 	^StackedEvaluationContext new runtime: runtime
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggIterativeStackedInterpreter >> nextOperation [
  | pc |
 pc := context incRegPC.
@@ -130,7 +130,7 @@ pc := context incRegPC.
 	^ work at: pc
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggIterativeStackedInterpreter >> popFrameAndPrepare [
 	| code |
 	context popFrame.
@@ -138,7 +138,7 @@ EggIterativeStackedInterpreter >> popFrameAndPrepare [
 	work := runtime executableCodeWork: code
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggIterativeStackedInterpreter >> prepareBlockExecutableCode: block [
 
 	| code method |
@@ -151,7 +151,7 @@ EggIterativeStackedInterpreter >> prepareBlockExecutableCode: block [
 	^ code
 ]
 
-{ #category : #initializing }
+{ #category : 'initializing' }
 EggIterativeStackedInterpreter >> runtime: anEggRuntime [
 
 	super runtime: anEggRuntime.
@@ -161,7 +161,7 @@ EggIterativeStackedInterpreter >> runtime: anEggRuntime [
 	context := self newEvaluationContext
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggIterativeStackedInterpreter >> sendLocal: aSymbol to: receiver with: anArray [
 	| symbol literal dummy message dispatch prevWork prevPC |
 	symbol := runtime symbolFromLocal: aSymbol.
@@ -188,12 +188,12 @@ EggIterativeStackedInterpreter >> sendLocal: aSymbol to: receiver with: anArray 
 	^ regR
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggIterativeStackedInterpreter >> underprimitiveRestart [
 	^ [ :receiver :arguments | context restart ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggIterativeStackedInterpreter >> visitOpDispatchMessage: anSOpDispatchMessage [
 
 	| message behavior method |
@@ -213,24 +213,24 @@ EggIterativeStackedInterpreter >> visitOpDispatchMessage: anSOpDispatchMessage [
 	^ self invoke: method with: regR
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggIterativeStackedInterpreter >> visitOpJump: anSOpJump [
 	context regPC: anSOpJump target
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggIterativeStackedInterpreter >> visitOpJumpFalse: anSOpJumpFalse [
 	regR == falseObj
 		ifTrue: [ context regPC: anSOpJumpFalse target ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggIterativeStackedInterpreter >> visitOpJumpTrue: anSOpJumpTrue [
 	regR == trueObj
 		ifTrue: [ context regPC: anSOpJumpTrue target ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggIterativeStackedInterpreter >> visitOpNonLocalReturn: anSOpReturn [
 
 	| code |
@@ -239,17 +239,17 @@ EggIterativeStackedInterpreter >> visitOpNonLocalReturn: anSOpReturn [
 	work := runtime executableCodeWork: code
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggIterativeStackedInterpreter >> visitOpPopR: anSOpPopR [
 	regR := context pop
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggIterativeStackedInterpreter >> visitOpPrimitive: anSOpPrimtive [
 	regR := anSOpPrimtive block value
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggIterativeStackedInterpreter >> visitOpReturn: anSOpReturn [
 
 	self popFrameAndPrepare

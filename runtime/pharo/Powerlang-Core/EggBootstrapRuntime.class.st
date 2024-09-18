@@ -5,8 +5,8 @@ that virtual image, and our semantics tries to mimic as much as possible
 the one of the final system.
 "
 Class {
-	#name : #EggBootstrapRuntime,
-	#superclass : #EggRuntime,
+	#name : 'EggBootstrapRuntime',
+	#superclass : 'EggRuntime',
 	#instVars : [
 		'image',
 		'sexpressionsCache'
@@ -16,7 +16,7 @@ Class {
 	#tag : 'Execution-Bootstrap'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 EggBootstrapRuntime class >> new [
 	"return an initialized instance"
 
@@ -24,73 +24,73 @@ EggBootstrapRuntime class >> new [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> arrayedSizeOf: aProtoeggObject [
 
 	^ aProtoeggObject arrayedSize
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggBootstrapRuntime >> behaviorOf: aProtoeggObject [
 
 	^ aProtoeggObject spec
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggBootstrapRuntime >> blockArgumentCount: block [
 	^ block argumentCount
 ]
 
-{ #category : #'own services' }
+{ #category : 'own services' }
 EggBootstrapRuntime >> blockCapturesSelf: block [
 	^ block capturesSelf 
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggBootstrapRuntime >> blockExecutableCode: block [
 	^block optimizedCode
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggBootstrapRuntime >> blockExecutableCode: block put: anObject [
 	block optimizedCode: anObject
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggBootstrapRuntime >> blockExecutionTree: block [
 	^ block executionTree
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggBootstrapRuntime >> blockMethod: block [
 
 	^ block method
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggBootstrapRuntime >> blockTempCount: block [
 	^ block tempCount
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggBootstrapRuntime >> closureBlock: closure [
 
 	^ closure block
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggBootstrapRuntime >> closureHome: closure [
 
 	^ closure home
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggBootstrapRuntime >> closureHomeEnvironment: closure [
 
 	^ closure slotAt: 2
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> compile: method [
 	| class |
 	class := image speciesFor: method classBinding.
@@ -99,7 +99,7 @@ EggBootstrapRuntime >> compile: method [
 		compile: method source
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> doLookup: aSymbol startingAt: aSpecies [
 	| species m c smethod |
 	self ASSERT: aSymbol !== #error:.
@@ -115,23 +115,23 @@ EggBootstrapRuntime >> doLookup: aSymbol startingAt: aSpecies [
 			self doLookup: aSymbol startingAt: c]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> executableCodeWork: code [
 	^code
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggBootstrapRuntime >> extensionMethodModule: method [
 
 	^ method module
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> image [
 	^image
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> image: anEggBootstrapImage [
 
 	image := anEggBootstrapImage.
@@ -143,7 +143,7 @@ EggBootstrapRuntime >> image: anEggBootstrapImage [
 		initializeInterpreter
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> initializeDNU [
 	| proto selector |
 	proto := image classNamed: #ProtoObject.
@@ -152,7 +152,7 @@ EggBootstrapRuntime >> initializeDNU [
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggBootstrapRuntime >> initializeEmulationOverrides [
 	| classes |
 	classes := image vmPrimitivesSpec extendedClasses.
@@ -163,7 +163,7 @@ EggBootstrapRuntime >> initializeEmulationOverrides [
 				do: [ :m | self override: class metaclass name with: m ] ]
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggBootstrapRuntime >> integerFrom: anObjectMap [
 
 	anObjectMap isImmediate ifTrue: [ ^ anObjectMap value ].
@@ -173,78 +173,78 @@ EggBootstrapRuntime >> integerFrom: anObjectMap [
 		  ifFalse: [ anObjectMap bytes asLittleEndianNegativeInteger ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> isBlock: anSCompiledMethod [
 	^anSCompiledMethod isBlock
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggBootstrapRuntime >> isClosure: aProtoeggObject [
 
 	^ aProtoeggObject class = ProtoeggClosure
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggBootstrapRuntime >> isExecutableCode: code [
 
 	^ code !== nil and: [code !== nilObj]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> literalFor: anObject [
 	^ image transferLiteral: anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> loadAssociationValue: association [
 	^association value
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggBootstrapRuntime >> localMethodTreecodes: anSCompiledMethod [
 
 	^ self methodTreecodes: anSCompiledMethod
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggBootstrapRuntime >> localSymbolFrom: aProtoeggObject [
 
 	^ aProtoeggObject symbol
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> lookupAssociationFor: aSymbol in: dictionary [
 ^dictionary
 				associationAt: aSymbol
 				ifPresent: [ :assoc | assoc]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> method: anSCompiledMethod literalAt: index [
 	^anSCompiledMethod at: index
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggBootstrapRuntime >> methodArgumentCount: method [
 	^ method argumentCount
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggBootstrapRuntime >> methodClassBinding: method [
 	^ method classBinding
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggBootstrapRuntime >> methodEnvironmentSize: anSCompiledMethod [
 	^anSCompiledMethod environmentCount
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggBootstrapRuntime >> methodExecutableCode: anSCompiledMethod [
 	^ anSCompiledMethod optimizedCode
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggBootstrapRuntime >> methodExecutableCode: method put: anObject [
 
 	method optimizedCode: anObject.
@@ -252,52 +252,57 @@ EggBootstrapRuntime >> methodExecutableCode: method put: anObject [
 		
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> methodFor: aSymbol in: aSpeciesSpec [
 	overrides at: aSpeciesSpec->aSymbol ifPresent: [:m | ^m].
 	^aSpeciesSpec methodNamed: aSymbol
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggBootstrapRuntime >> methodIsExtension: method [
 
 	^ method isExtension
 ]
 
-{ #category : #services }
+{ #category : 'services' }
+EggBootstrapRuntime >> methodNeedsEnvironment: anSCompiledMethod [
+	^anSCompiledMethod hasEnvironment
+]
+
+{ #category : 'services' }
 EggBootstrapRuntime >> methodTempCount: method [
 	^ method tempCount
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggBootstrapRuntime >> methodTreecodes: anSCompiledMethod [
 
 	^ anSCompiledMethod treecodes
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> moduleNamespace: aProtoeggObject [
 
 	^ aProtoeggObject namespace
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> newArraySized: anInteger [
 	^ image newArraySized: anInteger
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> newBootstrapDictionaryOf: aProtoeggSpecies [
 
 	^ image newBootstrapDictionaryOf: aProtoeggSpecies spec instanceSide
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> newBytesOf:  aProtoeggSpecies sized: size [
 	^ image newOf: aProtoeggSpecies spec instanceSide sized: size
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> newClosureFor: compiledBlock [
 	| closure |
 	closure :=  image newClosure: compiledBlock environmentCount.
@@ -306,42 +311,42 @@ EggBootstrapRuntime >> newClosureFor: compiledBlock [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> newCompiledMethod [
 	^ SCompiledMethod new
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> newEnvironmentSized: anInteger [
 	^ image newArraySized: anInteger
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> newExecutableCodeFor: anObject [
 	^anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> newInteger: anInteger [
 	^image newInteger: anInteger
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> newOf: aProtoeggSpecies sized: size [
 	^ image newOf: aProtoeggSpecies spec instanceSide sized: size
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> newSlotsOf: aProtoeggSpecies [
 	^image newSlotsOf: aProtoeggSpecies spec instanceSide sized: 0
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggBootstrapRuntime >> newSymbol: aSymbol [
 	^ image newSymbol: aSymbol
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggBootstrapRuntime >> override: classname with: aMethodSpec [
 	| species selector method override |
 	species := image specs at: classname.
@@ -351,7 +356,7 @@ EggBootstrapRuntime >> override: classname with: aMethodSpec [
 	overrides at: species -> selector put: override
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> override: assoc withPrimitive: primitive [
 	| species selector method override count source |
 	species := image specs at: assoc key.
@@ -375,14 +380,14 @@ EggBootstrapRuntime >> override: assoc withPrimitive: primitive [
 	overrides at: species -> selector put: override
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> removeBootstrapDictionaryOverrides [
 self
 		removeOverride: #'Namespace class' -> #new
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> removeOverride: assoc [
 	| species selector symbol |
 	species := image specs at: assoc key.
@@ -395,60 +400,60 @@ EggBootstrapRuntime >> removeOverride: assoc [
 		ifPresent: [ :messages | messages do: #flushCache ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> speciesFor: aProtoeggObject [
 
 	^ image speciesFor: aProtoeggObject spec
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> speciesModule: aProtoeggSpecies [
 
 	^ aProtoeggSpecies module
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> speciesNamespaces: aProtoeggSpecies [
 	^ aProtoeggSpecies namespaces
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> speciesSuperclass: aProtoeggSpecies [
 	^ aProtoeggSpecies superclass
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> staticBindingForIvar: aSymbol in: receiver [
 	^receiver allSlotNames indexOf: aSymbol.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> storeAssociation: association value: anObject [
 	association value: anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> superBehaviorOf: aProtoeggSpecies [
 	^ aProtoeggSpecies superclass instanceSpec
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggBootstrapRuntime >> symbolFrom: aProtoeggObject [
 
 	^ aProtoeggObject symbol
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggBootstrapRuntime >> symbolFromLocal: aSymbol [
 	^ image newSymbol: aSymbol
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> transferLiteral: anObject [
 	^image transferLiteral: anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggBootstrapRuntime >> transferMethodLiterals: method [
 	| class |
 	method withIndexDo: [:literal :i | 

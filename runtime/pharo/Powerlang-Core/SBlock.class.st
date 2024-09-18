@@ -1,6 +1,6 @@
 Class {
-	#name : #SBlock,
-	#superclass : #SScript,
+	#name : 'SBlock',
+	#superclass : 'SScript',
 	#instVars : [
 		'index',
 		'capturedVariables',
@@ -11,77 +11,77 @@ Class {
 	#tag : 'SExpressions'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 SBlock class >> decodeUsing: aTreecodeDecoder [
 	^aTreecodeDecoder decodeBlock
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SBlock >> acceptVisitor: visitor [
 	^visitor visitBlock: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SBlock >> capturedVariables [
 	^capturedVariables
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SBlock >> capturedVariables: aCollection [
 	capturedVariables := aCollection
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SBlock >> capturesHome [
 	^compiledCode capturesHome
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SBlock >> index [
 	^index
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SBlock >> index: anInteger [
 	index := anInteger
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SBlock >> initialize [
 	capturedVariables := #()
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SBlock >> inlinedArgs [
 	^ inlinedArgs
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SBlock >> inlinedArgs: anArray [
 	inlinedArgs:= anArray 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SBlock >> isBlock [
 	^true
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SBlock >> isInlined [
 	^ compiledCode isNil
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SBlock >> offsetOfCurrentEnvironment [
 	^ 2
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SBlock >> optimizedCode [
 	^compiledCode optimizedCode
 ]
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 SBlock >> printOn: aStream indent: anInteger [
 	aStream
 		tab: anInteger;

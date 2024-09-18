@@ -1,6 +1,6 @@
 Class {
-	#name : #SmalltalkBridge,
-	#superclass : #Bridge,
+	#name : 'SmalltalkBridge',
+	#superclass : 'Bridge',
 	#instVars : [
 		'nilObj',
 		'trueObj',
@@ -11,23 +11,23 @@ Class {
 	#tag : 'Metaphysics'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 SmalltalkBridge class >> new [
 	^self basicNew initialize
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SmalltalkBridge >> false [
 	^falseObj
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SmalltalkBridge >> findRootObjects [
 	self subclassResponsibility
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SmalltalkBridge >> kernel [
 	^ self
 		objectNamed: #kernel
@@ -36,17 +36,17 @@ SmalltalkBridge >> kernel [
 				objectNamed: #kernel ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SmalltalkBridge >> nil [
 	^nilObj
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SmalltalkBridge >> true [
 	^trueObj
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SmalltalkBridge >> update [
 	self
 		findRootObjects

@@ -1,6 +1,6 @@
 Class {
-	#name : #FrameOffsets,
-	#superclass : #PSharedPool,
+	#name : 'FrameOffsets',
+	#superclass : 'PSharedPool',
 	#classVars : [
 		'CallerIndex',
 		'LastArgumentIndex',

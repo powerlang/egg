@@ -1,6 +1,6 @@
 Class {
-	#name : #SPragma,
-	#superclass : #SExpression,
+	#name : 'SPragma',
+	#superclass : 'SExpression',
 	#instVars : [
 		'name'
 	],
@@ -9,12 +9,12 @@ Class {
 	#tag : 'SExpressions'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SPragma >> name [
 	^ name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SPragma >> name: aString [
 	name := aString
 ]

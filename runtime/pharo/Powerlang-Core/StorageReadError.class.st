@@ -1,6 +1,6 @@
 Class {
-	#name : #StorageReadError,
-	#superclass : #Object,
+	#name : 'StorageReadError',
+	#superclass : 'Object',
 	#category : 'Powerlang-Core-Metaphysics',
 	#package : 'Powerlang-Core',
 	#tag : 'Metaphysics'

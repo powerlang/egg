@@ -1,6 +1,6 @@
 Class {
-	#name : #ObjectShape,
-	#superclass : #Object,
+	#name : 'ObjectShape',
+	#superclass : 'Object',
 	#instVars : [
 		'name',
 		'fields'
@@ -10,39 +10,39 @@ Class {
 	#tag : 'Metaphysics'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ObjectShape class >> new [
 	^self basicNew initialize
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ObjectShape >> indexOf: ivarName [
 	^fields at: ivarName asString
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ObjectShape >> indexOf: ivarName be: i [
 	fields at: ivarName put: i
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ObjectShape >> initialize [
 	fields := Dictionary new
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ObjectShape >> loadFrom: aClassDefinition [
 	name := aClassDefinition name asSymbol.
 	aClassDefinition allInstVarNames
 		withIndexDo: [:ivarName :i | self indexOf: ivarName be: i]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ObjectShape >> name [
 	^name
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ObjectShape >> printOn: aStream [
 	aStream nextPutAll: 'Shape of '; nextPutAll: name
 ]

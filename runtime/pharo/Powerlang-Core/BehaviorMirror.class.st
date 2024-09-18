@@ -1,24 +1,24 @@
 Class {
-	#name : #BehaviorMirror,
-	#superclass : #ObjectMirror,
+	#name : 'BehaviorMirror',
+	#superclass : 'ObjectMirror',
 	#category : 'Powerlang-Core-Mirrors',
 	#package : 'Powerlang-Core',
 	#tag : 'Mirrors'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BehaviorMirror >> at: i [
 	self ASSERT: false
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BehaviorMirror >> classBinding [
 	| class |
 	class := self getInstVarNamed: #class.
 	^class asSpeciesMirror
 ]
 
-{ #category : #nativizing }
+{ #category : 'nativizing' }
 BehaviorMirror >> compiledMethodFor: aSymbol [
 	| method next |
 	method := self methodDictionary compiledMethodFor: aSymbol.
@@ -27,7 +27,7 @@ BehaviorMirror >> compiledMethodFor: aSymbol [
 	^next reflectsNil ifFalse: [next compiledMethodFor: aSymbol]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BehaviorMirror >> instanceClass [
 	| behavior class |
 	behavior := self.
@@ -41,21 +41,21 @@ BehaviorMirror >> instanceClass [
 	self error: 'could not find the class corresponding to this behavior'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BehaviorMirror >> methodDictionary [
 	| slot |
 	slot := handle slotAt: 1.
 	^self methodDictionaryMirrorOn: slot
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BehaviorMirror >> next [
 	| slot |
 	slot := handle slotAt: 2.
 	^self behaviorMirrorOn: slot
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 BehaviorMirror >> structureType [
 	^#Behavior
 ]

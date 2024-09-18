@@ -1,6 +1,6 @@
 Class {
-	#name : #SInstVarBinding,
-	#superclass : #SBinding,
+	#name : 'SInstVarBinding',
+	#superclass : 'SBinding',
 	#instVars : [
 		'index'
 	],
@@ -9,37 +9,37 @@ Class {
 	#tag : 'SExpressions'
 }
 
-{ #category : #unclassified }
+{ #category : 'unclassified' }
 SInstVarBinding class >> decodeUsing: aTreecodeDecoder [
 	^aTreecodeDecoder decodeInstVar
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SInstVarBinding >> assign: value within: anEvaluationContext [
 	anEvaluationContext instanceVarAt: index put: value
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SInstVarBinding >> index [
 	^index
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SInstVarBinding >> index: anInteger [
 	index := anInteger
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SInstVarBinding >> isInstVar [
 	^true
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SInstVarBinding >> printOn: aStream [
 	aStream nextPutAll: 'InstVarId. '; nextPutAll: index printString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SInstVarBinding >> valueWithin: anEvaluationContext [
 	^ anEvaluationContext instanceVarAt: index
 ]

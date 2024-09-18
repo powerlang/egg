@@ -1,12 +1,12 @@
 Class {
-	#name : #SOpPopR,
-	#superclass : #SInlinerOperation,
+	#name : 'SOpPopR',
+	#superclass : 'SInlinerOperation',
 	#category : 'Powerlang-Core-SExpressions',
 	#package : 'Powerlang-Core',
 	#tag : 'SExpressions'
 }
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SOpPopR >> acceptVisitor: visitor [
 	^ visitor visitOpPopR: self
 ]

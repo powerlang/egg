@@ -1,6 +1,6 @@
 Class {
-	#name : #EggExecutableCode,
-	#superclass : #EggHeapObject,
+	#name : 'EggExecutableCode',
+	#superclass : 'EggHeapObject',
 	#instVars : [
 		'code'
 	],
@@ -9,12 +9,12 @@ Class {
 	#tag : 'Execution-Metacircular'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggExecutableCode >> code [
 	^code
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggExecutableCode >> code: anObject [
 	code := anObject
 ]

@@ -1,6 +1,6 @@
 Class {
-	#name : #SMethod,
-	#superclass : #SScript,
+	#name : 'SMethod',
+	#superclass : 'SScript',
 	#instVars : [
 		'pragma'
 	],
@@ -9,42 +9,42 @@ Class {
 	#tag : 'SExpressions'
 }
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 SMethod >> acceptVisitor: visitor [
 	^visitor visitMethod: self
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SMethod >> isMethod [
 	^true
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SMethod >> offsetOfCurrentEnvironment [
 	^ 0
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SMethod >> offsetOfEnvironment: anInteger [
 	^0
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SMethod >> pragma [
 	^pragma
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SMethod >> pragma: anSPragma [
 	pragma := anSPragma
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SMethod >> primitive [
 	^pragma ifNotNil: [ pragma name ]
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 SMethod >> printOn: aStream indent: anInteger [
 	aStream nextPutAll: '{MethodId. '; cr.
 	pragma ifNotNil: [ (pragma isKindOf: SExpression) ifTrue: [ pragma printOn: aStream indent: anInteger + 1] ifFalse: [ aStream tab: anInteger + 1; print: pragma ] ].

@@ -1,6 +1,6 @@
 Class {
-	#name : #EvaluationContext,
-	#superclass : #Object,
+	#name : 'EvaluationContext',
+	#superclass : 'Object',
 	#instVars : [
 		'runtime'
 	],
@@ -12,27 +12,27 @@ Class {
 	#tag : 'Execution'
 }
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EvaluationContext >> argumentAt: anInteger [
 	^ self subclassResponsibility
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EvaluationContext >> argumentAt: anInteger in: environmentIndex [
 	^ self subclassResponsibility
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EvaluationContext >> arguments [
 	^ self subclassResponsibility
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EvaluationContext >> backtrace [
 	^ self subclassResponsibility
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EvaluationContext >> captureClosure: anSBlock [
 	| closure s i type env arg |
 	closure := runtime newClosureFor: anSBlock compiledCode.
@@ -54,67 +54,67 @@ EvaluationContext >> captureClosure: anSBlock [
 	^ closure
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EvaluationContext >> classBinding [
 	^runtime methodClassBinding: self method
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EvaluationContext >> environment [
 	^ self subclassResponsibility
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EvaluationContext >> false [
 	^ runtime false
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EvaluationContext >> firstArgument [
 	^ self subclassResponsibility
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EvaluationContext >> fourthArgument [
 	^ self subclassResponsibility
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EvaluationContext >> instanceVarAt: index [
 	^ runtime instanceVarOf: self self at: index
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EvaluationContext >> instanceVarAt: index put: value [
 	^ runtime instanceVarOf: self self at: index put: value
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EvaluationContext >> loadAssociationValue: anObject [
 	^runtime loadAssociationValue: anObject
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EvaluationContext >> method [
 	^ self subclassResponsibility
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EvaluationContext >> method: anSCompiledMethod [
 	^ self subclassResponsibility
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EvaluationContext >> methodArguments [
 	^ self subclassResponsibility
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EvaluationContext >> nil [
 	^ runtime nil
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 EvaluationContext >> printOn: aStream [
  self backtrace
 				do: [ :frame | 
@@ -124,37 +124,37 @@ EvaluationContext >> printOn: aStream [
 					aStream cr ]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EvaluationContext >> receiver [
 	^self subclassResponsibility
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EvaluationContext >> runtime: anEggRuntime [
 	runtime := anEggRuntime
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EvaluationContext >> secondArgument [
 	^ self subclassResponsibility
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EvaluationContext >> self [
 	^ self subclassResponsibility
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EvaluationContext >> stackTemporaryAt: index [
 	^ self subclassResponsibility
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EvaluationContext >> stackTemporaryAt: index put: value [
 	^ self subclassResponsibility
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EvaluationContext >> staticBindingFor: aSymbol [
 	| symbol |
 	symbol := runtime symbolFrom: aSymbol.
@@ -163,7 +163,7 @@ EvaluationContext >> staticBindingFor: aSymbol [
 	^ self staticBindingForMvar: symbol
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EvaluationContext >> staticBindingFor: symbol inModule: module [
 
 	| namespace assoc |
@@ -173,7 +173,7 @@ EvaluationContext >> staticBindingFor: symbol inModule: module [
 	^ SAssociationBinding new association: assoc
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EvaluationContext >> staticBindingForCvar: aSymbol [
 	| species namespaces namespace nilObj |
 	species := runtime methodClassBinding: self method.
@@ -188,7 +188,7 @@ EvaluationContext >> staticBindingForCvar: aSymbol [
 	^ nil
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EvaluationContext >> staticBindingForIvar: aSymbol [
 	| ivar |
 	ivar := runtime staticBindingForIvar: aSymbol in: self self.
@@ -196,14 +196,14 @@ EvaluationContext >> staticBindingForIvar: aSymbol [
 		ifTrue: [ SInstVarBinding new index: ivar ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EvaluationContext >> staticBindingForMvar: symbol [
 	| module |
 	module := runtime methodModule: self method.
 	^ self staticBindingFor: symbol inModule: module
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EvaluationContext >> staticBindingForNested: name [
 
 	| binding module |
@@ -213,27 +213,27 @@ EvaluationContext >> staticBindingForNested: name [
 	^ self staticBindingFor: (name at: 2) inModule: module
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EvaluationContext >> storeAssociation: association value: anObject [ 
 	runtime storeAssociation: association value: anObject 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EvaluationContext >> temporaryAt: index in: environmentIndex [
 	^ self subclassResponsibility
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EvaluationContext >> temporaryAt: index in: environmentIndex put: value [
 	^ self subclassResponsibility
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EvaluationContext >> thirdArgument [
 	^ self subclassResponsibility
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 EvaluationContext >> true [
 	^ runtime true
 ]
