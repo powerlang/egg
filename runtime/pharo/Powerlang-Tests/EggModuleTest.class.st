@@ -1,20 +1,21 @@
 Class {
-	#name : #EggModuleTest,
-	#superclass : #TestCase,
+	#name : 'EggModuleTest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'runtime',
 		'bootstrapper'
 	],
 	#category : 'Powerlang-Tests-Bootstrap',
 	#package : 'Powerlang-Tests',
-	#tag : 'Bootstrap'}
+	#tag : 'Bootstrap'
+}
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggModuleTest class >> defaultTimeLimit [
 	^ 1000 seconds
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 EggModuleTest >> setUp [
 
 	| image |
@@ -30,7 +31,7 @@ EggModuleTest >> setUp [
 	bootstrapper useHostModuleLoader
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 EggModuleTest >> test010LoadClassAndMethod [
 
 	| st p module classes class a str |
@@ -67,7 +68,7 @@ A >> a [
 	self assert: str asLocalString equals: 'a'
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 EggModuleTest >> test020LoadClassMethodAndRequire [
 
 	| st p module classes class b str |
@@ -129,7 +130,7 @@ ModuleB >> imports [
 	self assert: str asLocalString equals: 'ab'
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 EggModuleTest >> test100LoadCompiler [
 
 	| module namespace name compiler object code method foo |

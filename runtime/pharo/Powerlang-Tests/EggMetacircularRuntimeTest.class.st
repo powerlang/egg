@@ -1,24 +1,25 @@
 Class {
-	#name : #EggMetacircularRuntimeTest,
-	#superclass : #TestCase,
+	#name : 'EggMetacircularRuntimeTest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'runtime'
 	],
 	#category : 'Powerlang-Tests-Bootstrap',
 	#package : 'Powerlang-Tests',
-	#tag : 'Bootstrap'}
+	#tag : 'Bootstrap'
+}
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggMetacircularRuntimeTest class >> defaultTimeLimit [
 	^ 100 seconds
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggMetacircularRuntimeTest class >> resources [
 	^ Array with: EggMetacircularRuntimeTestResource
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> ==> anObject [
 	| class |
 	class := anObject class.
@@ -39,12 +40,12 @@ EggMetacircularRuntimeTest >> ==> anObject [
 	self ASSERT: false
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> assertNoLeftoverFrames [
 	self assert: runtime interpreter hasFinished
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> compile: aString in: classname during: aBlock [
 
 	| class behavior md selector method |
@@ -62,7 +63,7 @@ EggMetacircularRuntimeTest >> compile: aString in: classname during: aBlock [
 	runtime sendLocal: #removeKey: to: md with: { selector }
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> convert: anObject with: map [
 	map at: anObject ifPresent: [:mapped | ^mapped ].
 	anObject ifNil: [ ^runtime nil ].
@@ -78,7 +79,7 @@ EggMetacircularRuntimeTest >> convert: anObject with: map [
 	self ASSERT: false
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> convertBlock: anSCompiledBlock with: map [
 	| class result instsize slot |
 	class := self globalNamed: #CompiledBlock.
@@ -91,7 +92,7 @@ EggMetacircularRuntimeTest >> convertBlock: anSCompiledBlock with: map [
 	^ result
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> convertMethod: anSCompiledMethod [
 	| class result map instsize slot |
 	class := self globalNamed: #CompiledMethod.
@@ -109,7 +110,7 @@ EggMetacircularRuntimeTest >> convertMethod: anSCompiledMethod [
 	^ result
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> globalNamed: aSymbol [
 	| symbol namespace assoc |
 	symbol := runtime symbolFromLocal: aSymbol.
@@ -118,19 +119,19 @@ EggMetacircularRuntimeTest >> globalNamed: aSymbol [
 	^runtime loadAssociationValue: assoc
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 EggMetacircularRuntimeTest >> setUp [
 	runtime := EggMetacircularRuntimeTestResource current runtime
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test100yourself [
 	| result |
 	result := runtime sendLocal: #yourself to: runtime nil.
 	self assert: result equals: runtime nil
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test110compute1plus1 [
 	| one result |
 	one := self ==> 1.
@@ -138,7 +139,7 @@ EggMetacircularRuntimeTest >> test110compute1plus1 [
 	self assert: result equals: self ==> 2; assertNoLeftoverFrames
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test111compute1minus1 [
 	| one result |
 	one := self ==> 1.
@@ -146,14 +147,14 @@ EggMetacircularRuntimeTest >> test111compute1minus1 [
 	self assert: result equals: self ==> 0
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test112compute3times4 [
 	| result |
 	result := runtime sendLocal: #* to: self ==> 3 with: {self ==> 4}.
 	self assert: result equals: self ==> 12
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test113compute20quotient5 [
 	|  result |
 
@@ -161,7 +162,7 @@ EggMetacircularRuntimeTest >> test113compute20quotient5 [
 	self assert: result equals: self ==>4
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test130sendIfTrueToFalse [
 	| result |
 	self
@@ -172,7 +173,7 @@ EggMetacircularRuntimeTest >> test130sendIfTrueToFalse [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test131sendIfFalseToTrue [
 	| result |
 	self
@@ -183,7 +184,7 @@ EggMetacircularRuntimeTest >> test131sendIfFalseToTrue [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test132sendIfTrueToTrue [
 	| result |
 	self
@@ -194,7 +195,31 @@ EggMetacircularRuntimeTest >> test132sendIfTrueToTrue [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
+EggMetacircularRuntimeTest >> test139sendIfNotNilWithArg [
+	| result |
+	self
+		compile: 'foo12 ^5 ifNotNil: [:a | a isString ifFalse: [a]]'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo12 to: runtime true.
+			self assert: result equals: self ==> 5 ].
+	self assertNoLeftoverFrames
+
+]
+
+{ #category : 'tests' }
+EggMetacircularRuntimeTest >> test139sendIfNotNilWithArgNonEvaluable [
+	| result |
+	self
+		compile: 'foo12 ^5 ifNotNil: [:a | a isString ifFalse: a]'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo12 to: runtime true.
+			self assert: result equals: self ==> 5 ].
+	self assertNoLeftoverFrames
+
+]
+
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test140evaluateClosure [
 	| result |
 	self
@@ -205,7 +230,7 @@ EggMetacircularRuntimeTest >> test140evaluateClosure [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test141evaluateClosureFrames [
 	| result |
 	self
@@ -216,7 +241,7 @@ EggMetacircularRuntimeTest >> test141evaluateClosureFrames [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test150sendWhileTrue [
 	| result |
 	self
@@ -232,7 +257,7 @@ EggMetacircularRuntimeTest >> test150sendWhileTrue [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test151sendToDo [
 	| result |
 	self
@@ -248,7 +273,7 @@ EggMetacircularRuntimeTest >> test151sendToDo [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test152compute20dividedBy5 [
 	| result |
 	result := runtime sendLocal: #/ to: self ==> 20 with: {(self ==> 5)}.
@@ -257,7 +282,7 @@ EggMetacircularRuntimeTest >> test152compute20dividedBy5 [
 		assertNoLeftoverFrames
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test153sendTimesRepeat [
 	| result |
 	self
@@ -273,7 +298,7 @@ EggMetacircularRuntimeTest >> test153sendTimesRepeat [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test154sendTimesRepeatInsideBlock [
 	| result |
 	self
@@ -289,7 +314,7 @@ EggMetacircularRuntimeTest >> test154sendTimesRepeatInsideBlock [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test161evaluateClosureWithArgs [
 	| result |
 	self
@@ -299,7 +324,7 @@ EggMetacircularRuntimeTest >> test161evaluateClosureWithArgs [
 			self assert: result equals: self ==> 7 ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test162evaluateClosureWithArgsAndTemps [
 	| result |
 	self
@@ -309,7 +334,7 @@ EggMetacircularRuntimeTest >> test162evaluateClosureWithArgsAndTemps [
 			self assert: result equals: self ==> 7 ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test163evaluateClosureWithArgsAndMethodTemps [
 	| result |
 	self
@@ -319,7 +344,7 @@ EggMetacircularRuntimeTest >> test163evaluateClosureWithArgsAndMethodTemps [
 			self assert: result equals: self ==> 7 ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test164evaluateClosureWithArgsAndMultipleTemps [
 	| result |
 	self
@@ -336,7 +361,7 @@ EggMetacircularRuntimeTest >> test164evaluateClosureWithArgsAndMultipleTemps [
 			self assert: result equals: self ==> 7 ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test165evaluateClosureNonLocalReturn [
 	| result |
 	self
@@ -351,7 +376,7 @@ EggMetacircularRuntimeTest >> test165evaluateClosureNonLocalReturn [
 			self assert: result equals: self ==> 3 ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test166evaluateNestedClosure [
 	| result |
 	self
@@ -361,7 +386,7 @@ EggMetacircularRuntimeTest >> test166evaluateNestedClosure [
 			self assert: result equals: self ==> 7 ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test167evaluateNestedClosureWithArgs [
 	| result |
 	self
@@ -371,7 +396,7 @@ EggMetacircularRuntimeTest >> test167evaluateNestedClosureWithArgs [
 			self assert: result equals: self ==> 7 ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test168evaluateNestedClosureWithTemps [
 	| result |
 	self
@@ -389,7 +414,7 @@ EggMetacircularRuntimeTest >> test168evaluateNestedClosureWithTemps [
 			self assert: result equals: self ==> 9 ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test169evaluateInlinedClosureInClosureWithMethodTemps [
 	| result |
 	self
@@ -404,7 +429,7 @@ EggMetacircularRuntimeTest >> test169evaluateInlinedClosureInClosureWithMethodTe
 			self assert: result equals: self ==> 7 ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test180evaluateToDo [
 	| result |
 	self
@@ -418,7 +443,7 @@ EggMetacircularRuntimeTest >> test180evaluateToDo [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test190evaluateStringConcatenation [
 	| result |
 	self
@@ -429,7 +454,7 @@ EggMetacircularRuntimeTest >> test190evaluateStringConcatenation [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test200createDictionary [
 	| class d |
 	class := self globalNamed: #Dictionary.
@@ -439,7 +464,7 @@ EggMetacircularRuntimeTest >> test200createDictionary [
 		assertNoLeftoverFrames
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test210addAssociationToDictionary [
 	| class symbol assoc d |
 	class := self globalNamed: #Dictionary.
@@ -452,7 +477,7 @@ EggMetacircularRuntimeTest >> test210addAssociationToDictionary [
 		assertNoLeftoverFrames
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test300smallIntegerPrintString [
 	| result |
 	self
@@ -465,7 +490,7 @@ EggMetacircularRuntimeTest >> test300smallIntegerPrintString [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test301smallIntegerPrintString [
 	| result |
 	self
@@ -478,7 +503,7 @@ EggMetacircularRuntimeTest >> test301smallIntegerPrintString [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test302smallIntegerPrintString [
 	| result |
 	self
@@ -492,7 +517,7 @@ EggMetacircularRuntimeTest >> test302smallIntegerPrintString [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test310smiFallbackToLNI [
 	| result |
 	self
@@ -507,7 +532,7 @@ EggMetacircularRuntimeTest >> test310smiFallbackToLNI [
 	self assertNoLeftoverFrames
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeTest >> test310smiFallbackToLPI [
 	| result expected |
 	self

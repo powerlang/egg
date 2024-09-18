@@ -1,20 +1,21 @@
 Class {
-	#name : #EggMetacircularRuntimeBootstrapTest,
-	#superclass : #TestCase,
+	#name : 'EggMetacircularRuntimeBootstrapTest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'runtime',
 		'bootstrapper'
 	],
 	#category : 'Powerlang-Tests-Bootstrap',
 	#package : 'Powerlang-Tests',
-	#tag : 'Bootstrap'}
+	#tag : 'Bootstrap'
+}
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggMetacircularRuntimeBootstrapTest class >> defaultTimeLimit [
 	^ 1000 seconds
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeBootstrapTest >> setUp [
 	bootstrapper := EggMetacircularRuntimeTestResource new
 		setUp;
@@ -22,7 +23,7 @@ EggMetacircularRuntimeBootstrapTest >> setUp [
 	runtime := bootstrapper result.
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 EggMetacircularRuntimeBootstrapTest >> test010GenenerateKernelSegment [
 
 	| output module  |
