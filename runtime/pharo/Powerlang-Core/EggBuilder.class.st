@@ -1,3 +1,8 @@
+"
+I'm in charge of generating image segments for other VMs.
+
+I know how to load the corresponding writer modules and then how to send the appropiate messages to the image-segment builder to write egg module snapshots to files.
+"
 Class {
 	#name : 'EggBuilder',
 	#superclass : 'Object',
