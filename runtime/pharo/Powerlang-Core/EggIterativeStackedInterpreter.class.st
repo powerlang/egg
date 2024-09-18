@@ -78,8 +78,11 @@ EggIterativeStackedInterpreter >> initializePrimitives [
 { #category : #initialization }
 EggIterativeStackedInterpreter >> invoke: method with: receiver [
 	| size environment |
-	size := runtime methodEnvironmentSize: method.
-	environment := runtime newEnvironmentSized: size.
+	(runtime methodNeedsEnvironment: method) 
+		ifTrue: [ 
+			size := runtime methodEnvironmentSize: method.
+			environment := runtime newEnvironmentSized: size]
+		ifFalse: [ environment := nilObj ].
 	work := self prepareForExecuting: method.
 	context
 		buildMethodFrameFor: receiver

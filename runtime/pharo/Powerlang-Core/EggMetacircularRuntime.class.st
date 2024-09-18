@@ -520,6 +520,13 @@ EggMetacircularRuntime >> methodIsExtension: anLMRObject [
 ]
 
 { #category : #initialization }
+EggMetacircularRuntime >> methodNeedsEnvironment: anLMRObject [
+	| flags |
+	flags := anLMRObject slotAt: methodFlagsIndex.
+	^ (flags value bitAnd: HasEnvironment) = HasEnvironment
+]
+
+{ #category : #initialization }
 EggMetacircularRuntime >> methodSelector: anLMRObject [
 
 	^ anLMRObject slotAt: methodSelectorIndex
