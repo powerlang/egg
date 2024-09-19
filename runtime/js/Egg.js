@@ -80,6 +80,7 @@ let Egg = class {
 	bindModuleImport(descriptor)
 	{
 		const linker = this.transferImportLiteral(descriptor[0]);
+		let token = null;
 		if (descriptor.length == 1)
 			token =  this.kernel.exports["nil"];
 		else if (descriptor.length == 2) 
@@ -127,7 +128,7 @@ let Egg = class {
 
 	findInPath(imageSegmentFile)
 	{
-		const dirs = ['./', '../'];
+		const dirs = ['../../', './', '../'];
 		const searched = 'image-segments/' + imageSegmentFile;
 		for (const dir of dirs) {
 			const filePath = path.join(dir, searched);
