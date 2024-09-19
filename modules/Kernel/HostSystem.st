@@ -9,6 +9,11 @@ Class {
 	#category : #Kernel
 }
 
+
+HostSystem >> currentMilliseconds [
+	<primitive: HostCurrentMilliseconds>
+]
+
 HostSystem >> exit: anInteger [
 	<primitive: HostExit>
 ]
