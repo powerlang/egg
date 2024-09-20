@@ -47,33 +47,25 @@ now we have the following runtimes:
 
 ## Building
 
-If you want to build things from scratch clone this repo and follow the next steps.
+To build egg from scratch you will need `make` and some tools that vary depending on your target platform (i.e.
+CMake and a C++ compiler for the cpp VM, Pharo for the egg VM that runs on top of Pharo, node.js if you want to
+host your egg in JavaScript as a server).
+In a nutshell, clone this repo and follow the steps provided in the respective platform READMEs in `runtime` subdirs.
 
 ```
 git clone git@github.com:powerlang/egg.git
+make <platform>
 ```
 
-Then just do `make <platform>`, where platform can be `js`, `native` or `native-lmr` (remember,
-only `js` works right now).
+where platform can be `js`, `cpp` or `lmr` (only `js` works right now, we are actively working in supporting the other two).
 
-### JavaScript platform
-
-```
-make js
-```
-
-This will build the ST vm that is written in JS, and small set of core image segments (kernel and compiler).
-You'll find the results in `runtime/js`, continue from there.
-
-### Native and Native-LMR platforms
-
-To be implemented
 
 ## Project status
 
 There are (at least) two mostly orthogonal sides in this project: runtimes and Egg Smalltalk modules.
 In the Egg Smalltalk axis, we already have: kernel, compiler, modules and image-segment builder, among others.
-In runtime axis, we started with JS platform as it is the easiest to get working (JS
-already includes a GC and JIT).
-We are also developing other VMs: a traditional C++-based VM with interpreter and JIT and an LMR (Live Metacircular Runtime, a.k.a. Smalltalk-in-Smalltalk VM)
+In runtime axis, we started using Pharo as a dev platform as it is the easiest to get working (it
+already includes a GC and JIT), then also implemented a VM for egg in JS, one in C++ and also an LMR (a Live
+Metacircular VM Runtime, a.k.a. a Smalltalk-in-Smalltalk VM).
 
+We haven't done a 1.0 release yet, so expect a bumpy road if trying egg in the short term, the code is in alpha state.
