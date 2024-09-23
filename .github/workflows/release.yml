@@ -12,17 +12,15 @@ on:
 #  pull_request:
 #    branches: [ main ]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  # we build most things from ubuntu: linux specific ones and also portable things (i.e. js-vm)
+  build-linux:
     name: Build and Test bootstrap - ${{matrix.go-version}} ${{matrix.os}}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest]
-    # Steps represent a sequence of tasks that will be executed as part of the job
+
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v3
@@ -51,19 +49,41 @@ jobs:
 #        bodyFile: "body.md" 
 
     - name: Package CPP
-      if: matrix.os == 'ubuntu-latest' || matrix.os == 'windows-latest'
       run: make release-cpp
 
     - name: Upload cpp vm for Linux
-      if: matrix.os == 'ubuntu-latest'
       uses: ncipollo/release-action@v1
       with:
         artifacts: "build/eggcpp-${{ env.RELEASE_TAG }}.tar.gz"
+
+  #only needed for windows-specific stuff (i.e. cpp-vm exe)
+  build-win:
+    name: Build and Test bootstrap - ${{matrix.go-version}} ${{matrix.os}}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest]
+
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v3
+
+    - name: Fetch at least 2 commits so that Iceberg doesn't break
+      run: git fetch --unshallow
+
+    - name: Fetch at main so that Iceberg doesn't break
+      run: git fetch origin main
+
+    - name: "Determine tag"
+      if: "${{ github.event_name }} == 'push' && ${{ github.ref_type }} == 'tag'"
+      run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV"
+      shell: "bash"
+
+    - name: Package CPP
+      run: make release-cpp
 
     - name: Upload cpp vm for Windows
       if: matrix.os == 'windows-latest'
       uses: ncipollo/release-action@v1
       with:
         artifacts: "build/eggcpp-${{ env.RELEASE_TAG }}.zip"
-
-
