@@ -80,7 +80,7 @@ jobs:
       shell: "bash"
 
     - name: Set up rsync on Windows # needed for packaging
-      run: choco install cwrsync --yes
+      run: choco install rsync --yes
 
     - name: Package CPP
       run: make release-cpp
