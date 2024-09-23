@@ -31,9 +31,6 @@ jobs:
     - name: Fetch at main so that Iceberg doesn't break
       run: git fetch origin main
 
-    - name: Compile
-      run: make js
-
     - name: "Determine tag"
       if: "${{ github.event_name }} == 'push' && ${{ github.ref_type }} == 'tag'"
       run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV"
@@ -43,18 +40,15 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: make release-js
 
-    - uses: ncipollo/release-action@v1
-      with:
-        artifacts: "build/eggjs-${{env.RELEASE_TAG}}.tar.gz,build/eggjs-${{env.RELEASE_TAG}}.zip"
-#        bodyFile: "body.md" 
-
     - name: Package CPP
       run: make release-cpp
 
-    - name: Upload cpp vm for Linux
+    - name: Upload cpp vm for Linux and js
       uses: ncipollo/release-action@v1
       with:
-        artifacts: "build/eggcpp-${{ env.RELEASE_TAG }}.tar.gz"
+        artifacts: "build/eggjs-${{env.RELEASE_TAG}}.tar.gz,build/eggjs-${{env.RELEASE_TAG}}.zip,build/eggcpp-${{ env.RELEASE_TAG }}.tar.gz"
+        allowUpdates: true
+
 
   #only needed for windows-specific stuff (i.e. cpp-vm exe)
   build-win:
@@ -89,3 +83,4 @@ jobs:
       uses: ncipollo/release-action@v1
       with:
         artifacts: "build/eggcpp-${{ env.RELEASE_TAG }}.zip"
+        allowUpdates: true
