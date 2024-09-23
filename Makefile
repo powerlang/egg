@@ -42,10 +42,9 @@ release-js:
 
 EGGCPP=$(EGG)cpp
 CPP_OUT := build/$(EGGCPP)
-#CPP_RELEASE_NAME=$(EGGCPP)-$(RELEASE_TAG)
-CPP_RELEASE_NAME=$(EGGCPP)-v0.1.0
+CPP_RELEASE_NAME=$(EGGCPP)-$(RELEASE_TAG)
 release-cpp:
-#	@test -n "$RELEASE_TAG" || (echo "RELEASE_TAG varible is not set!" && exit 1)
+	@test -n "$RELEASE_TAG" || (echo "RELEASE_TAG varible is not set!" && exit 1)
 	make -C runtime/cpp all
 	mkdir -p $(CPP_OUT)
 	rsync -t * $(CPP_OUT)

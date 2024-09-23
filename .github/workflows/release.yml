@@ -41,7 +41,7 @@ jobs:
       run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV"
       shell: "bash"
 
-    - name: Package
+    - name: Package JS
       if: matrix.os == 'ubuntu-latest'
       run: make release-js
 
@@ -49,4 +49,21 @@ jobs:
       with:
         artifacts: "build/eggjs-${{env.RELEASE_TAG}}.tar.gz,build/eggjs-${{env.RELEASE_TAG}}.zip"
 #        bodyFile: "body.md" 
+
+    - name: Package CPP
+      if: matrix.os == 'ubuntu-latest' or matrix.os == 'windows-latest'
+      run: make release-cpp
+
+    - name: Upload cpp vm for Linux
+      if: matrix.os == 'ubuntu-latest'
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "build/eggcpp-${{ env.RELEASE_TAG }}.tar.gz"
+
+    - name: Upload cpp vm for Windows
+      if: matrix.os == 'windows-latest'
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "build/eggcpp-${{ env.RELEASE_TAG }}.zip"
+
 
