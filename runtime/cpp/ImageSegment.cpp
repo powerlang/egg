@@ -4,7 +4,6 @@
     See (MIT) license in root directory.
  */
 
-#include <sys/mman.h>
 #include <unistd.h>
 #include <cstring>
 #include <iostream>
