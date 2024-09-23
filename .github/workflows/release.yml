@@ -79,6 +79,9 @@ jobs:
       run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV"
       shell: "bash"
 
+    - name: Set up rsync on Windows # needed for packaging
+      run: choco install cwrsync --yes
+
     - name: Package CPP
       run: make release-cpp
 
