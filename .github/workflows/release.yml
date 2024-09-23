@@ -86,7 +86,6 @@ jobs:
       run: make release-cpp
 
     - name: Upload cpp vm for Windows
-      if: matrix.os == 'windows-latest'
       uses: ncipollo/release-action@v1
       with:
         artifacts: "build/eggcpp-${{ env.RELEASE_TAG }}.zip"
