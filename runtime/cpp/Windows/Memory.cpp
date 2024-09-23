@@ -40,7 +40,7 @@ uintptr_t Egg::ReserveMemory(uintptr_t base, uintptr_t size)
             }
 
             // Free the memory and try next address
-            VirtualFree((void*)allocated);
+            VirtualFree((void*)allocated, 0, MEM_RELEASE);
             base += 0x10000;
 
         } else {
