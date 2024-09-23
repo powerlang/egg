@@ -12,17 +12,15 @@ on:
 #  pull_request:
 #    branches: [ main ]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
-    name: Build and Test bootstrap - ${{matrix.go-version}} ${{matrix.os}}
+  # we build most things from ubuntu: linux specific ones and also portable things (i.e. js-vm)
+  build-linux:
+    name: Build JS and native CPP linux
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest]
-    # Steps represent a sequence of tasks that will be executed as part of the job
+
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v3
@@ -33,20 +31,56 @@ jobs:
     - name: Fetch at main so that Iceberg doesn't break
       run: git fetch origin main
 
-    - name: Compile
-      run: make js
+    - name: "Determine tag"
+      if: "${{ github.event_name }} == 'push' && ${{ github.ref_type }} == 'tag'"
+      run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV"
+      shell: "bash"
+
+    - name: Package JS
+      if: matrix.os == 'ubuntu-latest'
+      run: make release-js
+
+    - name: Package CPP
+      run: make release-cpp
+
+    - name: Upload cpp vm for Linux and js
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "build/eggjs-${{env.RELEASE_TAG}}.tar.gz,build/eggjs-${{env.RELEASE_TAG}}.zip,build/eggcpp-${{ env.RELEASE_TAG }}.tar.gz"
+        allowUpdates: true
+
+
+  #only needed for windows-specific stuff (i.e. cpp-vm exe)
+  build-win:
+    name: Build native CPP windows
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest]
+
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v3
+
+    - name: Fetch at least 2 commits so that Iceberg doesn't break
+      run: git fetch --unshallow
+
+    - name: Fetch at main so that Iceberg doesn't break
+      run: git fetch origin main
 
     - name: "Determine tag"
       if: "${{ github.event_name }} == 'push' && ${{ github.ref_type }} == 'tag'"
       run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV"
       shell: "bash"
 
-    - name: Package
-      if: matrix.os == 'ubuntu-latest'
-      run: make release-js
+    - name: Set up rsync and zip on Windows # needed for packaging
+      run: choco install rsync zip --yes
 
-    - uses: ncipollo/release-action@v1
+    - name: Package CPP
+      run: make release-cpp
+
+    - name: Upload cpp vm for Windows
+      uses: ncipollo/release-action@v1
       with:
-        artifacts: "build/eggjs-${{env.RELEASE_TAG}}.tar.gz,build/eggjs-${{env.RELEASE_TAG}}.zip"
-#        bodyFile: "body.md" 
-
+        artifacts: "build/eggcpp-${{ env.RELEASE_TAG }}.zip"
+        allowUpdates: true

@@ -1,11 +1,10 @@
 
 /*
-    Copyright (c) 2019-2023 Javier Pimás, Jan Vrany, Labware. 
+    Copyright (c) 2024-2024 Javier Pimás. 
     See (MIT) license in root directory.
  */
 
-#include <sys/mman.h>
-#include <unistd.h>
+#include <windows.h>
 #include <cstring>
 
 #include "../Memory.h"
@@ -16,9 +15,12 @@ using namespace Egg;
 uintptr_t Egg::pagealign(uintptr_t addr)
 {
     static int pagesize = -1;
-    if (pagesize == -1) {
-        pagesize = (int)sysconf(_SC_PAGESIZE);
-        ASSERT(pagesize != -1);
+
+    if (pagesize == -1)
+    {
+        SYSTEM_INFO si;
+	    GetSystemInfo(&si);
+        pagesize = si.dwPageSize;
     }
     return align(addr, pagesize);
 }
@@ -30,15 +32,15 @@ uintptr_t Egg::ReserveMemory(uintptr_t base, uintptr_t size)
 
     while (true) {
         // Attempt to allocate at the aligned base
-        allocated = mmap(reinterpret_cast<void*>(base), pagealign(size), PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
-        if (allocated != MAP_FAILED) {
-            // Check if the allocated memory is at the desired base address
+        allocated = VirtualAlloc((void*)base, pagealign(size), MEM_RESERVE, PAGE_READWRITE);
+        
+        if (allocated != 0) {
             if ((uintptr_t)allocated == base) {
                 return (uintptr_t)allocated;
             }
 
             // Free the memory and try next address
-            munmap((void*)allocated, size);
+            VirtualFree((void*)allocated, 0, MEM_RELEASE);
             base += 0x10000;
 
         } else {
@@ -54,7 +56,7 @@ uintptr_t Egg::ReserveMemory(uintptr_t base, uintptr_t size)
 
 void Egg::CommitMemory(uintptr_t base, uintptr_t size)
 {
-    if (mprotect((void*)base, pagealign(size), PROT_READ | PROT_WRITE) != 0) {
+    if (VirtualAlloc((void*)base, pagealign(size), MEM_COMMIT, PAGE_READWRITE) == 0) {
         error("Failed to commit memory.");
     }
     std::memset((char*)base, 0, size);
@@ -62,5 +64,5 @@ void Egg::CommitMemory(uintptr_t base, uintptr_t size)
 
 void Egg::FreeMemory(uintptr_t base, uintptr_t size)
 {
-    munmap((void*)base, size);
+    VirtualFree((void*)base, 0, MEM_RELEASE);
 }

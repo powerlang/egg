@@ -1,0 +1,19 @@
+name: egg-st
+version: 0.0.0 # ensure to set this var using sed before building!
+summary: Egg Smalltalk Interpreter
+description: A C++ interpreter for Egg Smalltalk.
+
+base: core24
+grade: stable
+confinement: strict
+
+parts:
+  egg:
+    plugin: dump
+    source: eggcpp  # The directory with all needed things
+    stage:        # Stage everything under the snap/ directory
+      - "*"
+
+apps:
+  egg:
+    command: ./egg  # the binary
