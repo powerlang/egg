@@ -51,7 +51,7 @@ release-cpp:
 	rsync -a modules docs $(CPP_OUT)
 
 ifeq ($(OS),Windows_NT) # Windows
-	cp runtime/cpp/build/egg.exe $(CPP_OUT)/
+	cp runtime/cpp/build/Debug/egg.exe $(CPP_OUT)/
 	cd build && zip -q $(CPP_RELEASE_NAME).zip -r $(EGGCPP)
 else # Linux or other Unix-like OS
 	cp runtime/cpp/build/egg $(CPP_OUT)/
