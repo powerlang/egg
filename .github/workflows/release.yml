@@ -15,7 +15,7 @@ on:
 jobs:
   # we build most things from ubuntu: linux specific ones and also portable things (i.e. js-vm)
   build-linux:
-    name: Build and Test bootstrap - ${{matrix.go-version}} ${{matrix.os}}
+    name: Build JS and native CPP linux
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -58,7 +58,7 @@ jobs:
 
   #only needed for windows-specific stuff (i.e. cpp-vm exe)
   build-win:
-    name: Build and Test bootstrap - ${{matrix.go-version}} ${{matrix.os}}
+    name: Build native CPP windows
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -79,8 +79,8 @@ jobs:
       run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV"
       shell: "bash"
 
-    - name: Set up rsync on Windows # needed for packaging
-      run: choco install rsync --yes
+    - name: Set up rsync and zip on Windows # needed for packaging
+      run: choco install rsync zip --yes
 
     - name: Package CPP
       run: make release-cpp
