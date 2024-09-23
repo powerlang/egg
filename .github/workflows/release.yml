@@ -51,7 +51,7 @@ jobs:
 #        bodyFile: "body.md" 
 
     - name: Package CPP
-      if: matrix.os == 'ubuntu-latest' or matrix.os == 'windows-latest'
+      if: matrix.os == 'ubuntu-latest' || matrix.os == 'windows-latest'
       run: make release-cpp
 
     - name: Upload cpp vm for Linux
