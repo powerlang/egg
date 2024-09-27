@@ -1,0 +1,1423 @@
+[31mreceiver of "runtime" is nil
+[0mUndefinedObject(Object)>>doesNotUnderstand: #runtime
+EggBootstrapWebsideAPITest>>setUp
+[
+		self setUp.
+		self performTest ] in [ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [...
+FullBlockClosure(BlockClosure)>>ensure:
+[ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [ [...
+FullBlockClosure(BlockClosure)>>ensure:
+EggBootstrapWebsideAPITest(TestCase)>>runCase
+[aTestCase runCase] in [
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [aTestCase runCase]
+FullBlockClosure(BlockClosure)>>ensure:
+[
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [...
+FullBlockClosure(BlockClosure)>>on:do:
+TestExecutionEnvironment>>runTestCaseUnderWatchdog:
+[self runTestCaseUnderWatchdog: aTestCase] in TestExecutionEnvironment>>runTestCase: in Block: [self runTestCaseUnderWatchdog: aTestCase]
+FullBlockClosure(BlockClosure)>>ensure:
+TestExecutionEnvironment>>runTestCase:
+[
+		testEnv runTestCase: aTestCase] in DefaultExecutionEnvironment>>runTestCase: in Block: [...
+[ self value: anExecutionEnvironment.
+	anExecutionEnvironment activated.
+	aBlock value  ] in CurrentExecutionEnvironment class>>activate:for: in Block: [ self value: anExecutionEnvironment....
+FullBlockClosure(BlockClosure)>>ensure:
+CurrentExecutionEnvironment class>>activate:for:
+TestExecutionEnvironment(ExecutionEnvironment)>>beActiveDuring:
+DefaultExecutionEnvironment>>runTestCase:
+CurrentExecutionEnvironment class>>runTestCase:
+EggBootstrapWebsideAPITest(TestCase)>>runCaseManaged
+[
+	aTestCase announce: TestCaseStarted withResult: self.
+	aTestCase runCaseManaged.
+	aTestCase announce: TestCaseEnded  withResult: self.
+	"To not affect performance of big test suites following logic is not inside addPass: method"
+	errors remove: aTestCase ifAbsent: [].
+	failures remove: aTestCase ifAbsent: [].
+	self addPass: aTestCase] in TestResult>>runCaseForDebug: in Block: [...
+FullBlockClosure(BlockClosure)>>on:do:
+TestResult>>runCaseForDebug:
+[ result runCaseForDebug: self ] in EggBootstrapWebsideAPITest(TestCase)>>debug in Block: [ result runCaseForDebug: self ]
+FullBlockClosure(BlockClosure)>>ensure:
+EggBootstrapWebsideAPITest(TestCase)>>debug
+EggBootstrapWebsideAPITest class(TestCase class)>>debug:
+[0m[31mreceiver of "stop" is nil
+[0mUndefinedObject(Object)>>doesNotUnderstand: #stop
+EggBootstrapWebsideAPITest>>tearDown
+[ self tearDown ] in [ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [ self tearDown ]
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+[ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [ [...
+FullBlockClosure(BlockClosure)>>ensure:
+EggBootstrapWebsideAPITest(TestCase)>>runCase
+[aTestCase runCase] in [
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [aTestCase runCase]
+FullBlockClosure(BlockClosure)>>ensure:
+[
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [...
+FullBlockClosure(BlockClosure)>>on:do:
+TestExecutionEnvironment>>runTestCaseUnderWatchdog:
+[self runTestCaseUnderWatchdog: aTestCase] in TestExecutionEnvironment>>runTestCase: in Block: [self runTestCaseUnderWatchdog: aTestCase]
+FullBlockClosure(BlockClosure)>>ensure:
+TestExecutionEnvironment>>runTestCase:
+[
+		testEnv runTestCase: aTestCase] in DefaultExecutionEnvironment>>runTestCase: in Block: [...
+[ self value: anExecutionEnvironment.
+	anExecutionEnvironment activated.
+	aBlock value  ] in CurrentExecutionEnvironment class>>activate:for: in Block: [ self value: anExecutionEnvironment....
+FullBlockClosure(BlockClosure)>>ensure:
+CurrentExecutionEnvironment class>>activate:for:
+TestExecutionEnvironment(ExecutionEnvironment)>>beActiveDuring:
+DefaultExecutionEnvironment>>runTestCase:
+CurrentExecutionEnvironment class>>runTestCase:
+EggBootstrapWebsideAPITest(TestCase)>>runCaseManaged
+[
+	aTestCase announce: TestCaseStarted withResult: self.
+	aTestCase runCaseManaged.
+	aTestCase announce: TestCaseEnded  withResult: self.
+	"To not affect performance of big test suites following logic is not inside addPass: method"
+	errors remove: aTestCase ifAbsent: [].
+	failures remove: aTestCase ifAbsent: [].
+	self addPass: aTestCase] in TestResult>>runCaseForDebug: in Block: [...
+FullBlockClosure(BlockClosure)>>on:do:
+TestResult>>runCaseForDebug:
+[ result runCaseForDebug: self ] in EggBootstrapWebsideAPITest(TestCase)>>debug in Block: [ result runCaseForDebug: self ]
+FullBlockClosure(BlockClosure)>>ensure:
+EggBootstrapWebsideAPITest(TestCase)>>debug
+[0m[31mreceiver of "stop" is nil
+[0mUndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+EggBootstrapWebsideAPITest>>tearDown
+[ self tearDown ] in [ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [ self tearDown ]
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+[ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [ [...
+FullBlockClosure(BlockClosure)>>ensure:
+EggBootstrapWebsideAPITest(TestCase)>>runCase
+[aTestCase runCase] in [
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [aTestCase runCase]
+FullBlockClosure(BlockClosure)>>ensure:
+[
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [...
+FullBlockClosure(BlockClosure)>>on:do:
+TestExecutionEnvironment>>runTestCaseUnderWatchdog:
+[self runTestCaseUnderWatchdog: aTestCase] in TestExecutionEnvironment>>runTestCase: in Block: [self runTestCaseUnderWatchdog: aTestCase]
+FullBlockClosure(BlockClosure)>>ensure:
+TestExecutionEnvironment>>runTestCase:
+[
+		testEnv runTestCase: aTestCase] in DefaultExecutionEnvironment>>runTestCase: in Block: [...
+[ self value: anExecutionEnvironment.
+	anExecutionEnvironment activated.
+	aBlock value  ] in CurrentExecutionEnvironment class>>activate:for: in Block: [ self value: anExecutionEnvironment....
+FullBlockClosure(BlockClosure)>>ensure:
+CurrentExecutionEnvironment class>>activate:for:
+TestExecutionEnvironment(ExecutionEnvironment)>>beActiveDuring:
+DefaultExecutionEnvironment>>runTestCase:
+CurrentExecutionEnvironment class>>runTestCase:
+EggBootstrapWebsideAPITest(TestCase)>>runCaseManaged
+[
+	aTestCase announce: TestCaseStarted withResult: self.
+	aTestCase runCaseManaged.
+	aTestCase announce: TestCaseEnded  withResult: self.
+	"To not affect performance of big test suites following logic is not inside addPass: method"
+	errors remove: aTestCase ifAbsent: [].
+	failures remove: aTestCase ifAbsent: [].
+	self addPass: aTestCase] in TestResult>>runCaseForDebug: in Block: [...
+FullBlockClosure(BlockClosure)>>on:do:
+TestResult>>runCaseForDebug:
+[0m[31mreceiver of "stop" is nil
+[0mUndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+EggBootstrapWebsideAPITest>>tearDown
+[ self tearDown ] in [ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [ self tearDown ]
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+[ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [ [...
+FullBlockClosure(BlockClosure)>>ensure:
+EggBootstrapWebsideAPITest(TestCase)>>runCase
+[aTestCase runCase] in [
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [aTestCase runCase]
+FullBlockClosure(BlockClosure)>>ensure:
+[
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [...
+FullBlockClosure(BlockClosure)>>on:do:
+TestExecutionEnvironment>>runTestCaseUnderWatchdog:
+[self runTestCaseUnderWatchdog: aTestCase] in TestExecutionEnvironment>>runTestCase: in Block: [self runTestCaseUnderWatchdog: aTestCase]
+FullBlockClosure(BlockClosure)>>ensure:
+TestExecutionEnvironment>>runTestCase:
+[
+		testEnv runTestCase: aTestCase] in DefaultExecutionEnvironment>>runTestCase: in Block: [...
+[ self value: anExecutionEnvironment.
+	anExecutionEnvironment activated.
+	aBlock value  ] in CurrentExecutionEnvironment class>>activate:for: in Block: [ self value: anExecutionEnvironment....
+FullBlockClosure(BlockClosure)>>ensure:
+CurrentExecutionEnvironment class>>activate:for:
+TestExecutionEnvironment(ExecutionEnvironment)>>beActiveDuring:
+DefaultExecutionEnvironment>>runTestCase:
+CurrentExecutionEnvironment class>>runTestCase:
+EggBootstrapWebsideAPITest(TestCase)>>runCaseManaged
+[0m[31mreceiver of "stop" is nil
+[0mUndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+EggBootstrapWebsideAPITest>>tearDown
+[ self tearDown ] in [ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [ self tearDown ]
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+[ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [ [...
+FullBlockClosure(BlockClosure)>>ensure:
+EggBootstrapWebsideAPITest(TestCase)>>runCase
+[aTestCase runCase] in [
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [aTestCase runCase]
+FullBlockClosure(BlockClosure)>>ensure:
+[
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [...
+FullBlockClosure(BlockClosure)>>on:do:
+TestExecutionEnvironment>>runTestCaseUnderWatchdog:
+[self runTestCaseUnderWatchdog: aTestCase] in TestExecutionEnvironment>>runTestCase: in Block: [self runTestCaseUnderWatchdog: aTestCase]
+FullBlockClosure(BlockClosure)>>ensure:
+TestExecutionEnvironment>>runTestCase:
+[
+		testEnv runTestCase: aTestCase] in DefaultExecutionEnvironment>>runTestCase: in Block: [...
+[ self value: anExecutionEnvironment.
+	anExecutionEnvironment activated.
+	aBlock value  ] in CurrentExecutionEnvironment class>>activate:for: in Block: [ self value: anExecutionEnvironment....
+FullBlockClosure(BlockClosure)>>ensure:
+CurrentExecutionEnvironment class>>activate:for:
+TestExecutionEnvironment(ExecutionEnvironment)>>beActiveDuring:
+[0m[31mreceiver of "stop" is nil
+[0mUndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+EggBootstrapWebsideAPITest>>tearDown
+[ self tearDown ] in [ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [ self tearDown ]
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+[ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [ [...
+FullBlockClosure(BlockClosure)>>ensure:
+EggBootstrapWebsideAPITest(TestCase)>>runCase
+[aTestCase runCase] in [
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [aTestCase runCase]
+FullBlockClosure(BlockClosure)>>ensure:
+[
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [...
+FullBlockClosure(BlockClosure)>>on:do:
+TestExecutionEnvironment>>runTestCaseUnderWatchdog:
+[self runTestCaseUnderWatchdog: aTestCase] in TestExecutionEnvironment>>runTestCase: in Block: [self runTestCaseUnderWatchdog: aTestCase]
+FullBlockClosure(BlockClosure)>>ensure:
+TestExecutionEnvironment>>runTestCase:
+[
+		testEnv runTestCase: aTestCase] in DefaultExecutionEnvironment>>runTestCase: in Block: [...
+[ self value: anExecutionEnvironment.
+	anExecutionEnvironment activated.
+	aBlock value  ] in CurrentExecutionEnvironment class>>activate:for: in Block: [ self value: anExecutionEnvironment....
+[0m[31mreceiver of "stop" is nil
+[0mUndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+EggBootstrapWebsideAPITest>>tearDown
+[ self tearDown ] in [ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [ self tearDown ]
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+[ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [ [...
+FullBlockClosure(BlockClosure)>>ensure:
+EggBootstrapWebsideAPITest(TestCase)>>runCase
+[aTestCase runCase] in [
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [aTestCase runCase]
+FullBlockClosure(BlockClosure)>>ensure:
+[
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [...
+FullBlockClosure(BlockClosure)>>on:do:
+TestExecutionEnvironment>>runTestCaseUnderWatchdog:
+[self runTestCaseUnderWatchdog: aTestCase] in TestExecutionEnvironment>>runTestCase: in Block: [self runTestCaseUnderWatchdog: aTestCase]
+FullBlockClosure(BlockClosure)>>ensure:
+[0m[31mreceiver of "stop" is nil
+[0mUndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+EggBootstrapWebsideAPITest>>tearDown
+[ self tearDown ] in [ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [ self tearDown ]
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+[ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [ [...
+FullBlockClosure(BlockClosure)>>ensure:
+EggBootstrapWebsideAPITest(TestCase)>>runCase
+[aTestCase runCase] in [
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [aTestCase runCase]
+FullBlockClosure(BlockClosure)>>ensure:
+[
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [...
+FullBlockClosure(BlockClosure)>>on:do:
+[0m[31mreceiver of "stop" is nil
+[0mUndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+Message>>sentTo:
+UndefinedObject(Object)>>doesNotUnderstand: #stop
+EggBootstrapWebsideAPITest>>tearDown
+[ self tearDown ] in [ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [ self tearDown ]
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+[ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [ [...
+FullBlockClosure(BlockClosure)>>ensure:
+EggBootstrapWebsideAPITest(TestCase)>>runCase
+[aTestCase runCase] in [
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [aTestCase runCase]
+[0m[31m4 in FullBlockClosure(BlockClosure)>>ensure:
+[0mContext(Object)>>errorSubscriptBounds:
+Context>>at:
+Context>>pushTemporaryVariable:
+InstructionStream>>interpretNextSistaV1InstructionFor:
+EncoderForSistaV1 class>>interpretNextInstructionFor:in:
+InstructionStream>>interpretNextInstructionFor:
+Context>>step
+Context>>stepToCalleeOrNil
+Context>>runUntilErrorOrReturnFrom:
+[ ctxt runUntilErrorOrReturnFrom: aContext ] in Process>>complete: in Block: [ ctxt runUntilErrorOrReturnFrom: aContext ]
+FullBlockClosure(BlockClosure)>>ensure:
+Process>>evaluate:onBehalfOf:
+Process>>complete:
+Process>>return:value:
+[self return: callee value: aValue] in Process>>popTo:value: in Block: [self return: callee value: aValue]
+FullBlockClosure(BlockClosure)>>ensure:
+Process>>evaluate:onBehalfOf:
+Process>>popTo:value:
+DebugSession>>returnValue:from:
+StDebuggerActionModel>>returnValueFromExpression:fromContext:
+StDebugger>>returnEnteredValue
+StReturnValueCommand>>execute
+SpCommand(CmCommandDecorator)>>execute
+[ specCommand execute ] in [ :specCommand | 
+			aButtonClass new
+				label: specCommand name;
+				help: specCommand description;
+				in: [ :button | 
+					specCommand hasIcon
+						ifTrue: [ button icon: specCommand icon ] ];
+				action: [ specCommand execute ];
+				yourself ] in SpCommand>>configureAsButtonOfClass: in Block: [ specCommand execute ]
+FullBlockClosure(BlockClosure)>>cull:
+SpMorphicToolbarButtonAdapter>>execute
+SpToolbarButtonMorph(PluggableButtonMorph)>>performAction:
+[:m |
+		(m containsPoint: evt cursorPoint) ifTrue: [m enabled ifTrue: [ m performAction: evt ]]] in SpToolbarButtonMorph(PluggableButtonMorph)>>mouseUp: in Block: [:m |...
+Array(SequenceableCollection)>>do:
+SpToolbarButtonMorph(PluggableButtonMorph)>>mouseUp:
+[0m[31mAssertion failed
+[0mEggBootstrapWebsideAPITest(TestAsserter)>>assert:description:resumable:
+EggBootstrapWebsideAPITest(TestAsserter)>>assert:description:
+EggBootstrapWebsideAPITest(Object)>>assert:
+EggBootstrapWebsideAPITest>>testAccessors
+EggBootstrapWebsideAPITest(TestCase)>>performTest
+[
+		self setUp.
+		self performTest ] in [ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [...
+FullBlockClosure(BlockClosure)>>ensure:
+[ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [ [...
+FullBlockClosure(BlockClosure)>>ensure:
+EggBootstrapWebsideAPITest(TestCase)>>runCase
+[aTestCase runCase] in [
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [aTestCase runCase]
+FullBlockClosure(BlockClosure)>>ensure:
+[
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [...
+FullBlockClosure(BlockClosure)>>on:do:
+TestExecutionEnvironment>>runTestCaseUnderWatchdog:
+[self runTestCaseUnderWatchdog: aTestCase] in TestExecutionEnvironment>>runTestCase: in Block: [self runTestCaseUnderWatchdog: aTestCase]
+FullBlockClosure(BlockClosure)>>ensure:
+TestExecutionEnvironment>>runTestCase:
+[
+		testEnv runTestCase: aTestCase] in DefaultExecutionEnvironment>>runTestCase: in Block: [...
+[ self value: anExecutionEnvironment.
+	anExecutionEnvironment activated.
+	aBlock value  ] in CurrentExecutionEnvironment class>>activate:for: in Block: [ self value: anExecutionEnvironment....
+FullBlockClosure(BlockClosure)>>ensure:
+CurrentExecutionEnvironment class>>activate:for:
+TestExecutionEnvironment(ExecutionEnvironment)>>beActiveDuring:
+DefaultExecutionEnvironment>>runTestCase:
+CurrentExecutionEnvironment class>>runTestCase:
+EggBootstrapWebsideAPITest(TestCase)>>runCaseManaged
+[
+	aTestCase announce: TestCaseStarted withResult: self.
+	aTestCase runCaseManaged.
+	aTestCase announce: TestCaseEnded  withResult: self.
+	"To not affect performance of big test suites following logic is not inside addPass: method"
+	errors remove: aTestCase ifAbsent: [].
+	failures remove: aTestCase ifAbsent: [].
+	self addPass: aTestCase] in TestResult>>runCaseForDebug: in Block: [...
+FullBlockClosure(BlockClosure)>>on:do:
+TestResult>>runCaseForDebug:
+[ result runCaseForDebug: self ] in EggBootstrapWebsideAPITest(TestCase)>>debug in Block: [ result runCaseForDebug: self ]
+[0m[31mAssertion failed
+[0mEggBootstrapWebsideAPITest(TestAsserter)>>assert:description:resumable:
+EggBootstrapWebsideAPITest(TestAsserter)>>assert:description:
+EggBootstrapWebsideAPITest(Object)>>assert:
+EggBootstrapWebsideAPITest>>testAccessors
+EggBootstrapWebsideAPITest(TestCase)>>performTest
+[
+		self setUp.
+		self performTest ] in [ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [...
+FullBlockClosure(BlockClosure)>>ensure:
+[ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [ [...
+FullBlockClosure(BlockClosure)>>ensure:
+EggBootstrapWebsideAPITest(TestCase)>>runCase
+[aTestCase runCase] in [
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [aTestCase runCase]
+FullBlockClosure(BlockClosure)>>ensure:
+[
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [...
+FullBlockClosure(BlockClosure)>>on:do:
+TestExecutionEnvironment>>runTestCaseUnderWatchdog:
+[self runTestCaseUnderWatchdog: aTestCase] in TestExecutionEnvironment>>runTestCase: in Block: [self runTestCaseUnderWatchdog: aTestCase]
+FullBlockClosure(BlockClosure)>>ensure:
+TestExecutionEnvironment>>runTestCase:
+[
+		testEnv runTestCase: aTestCase] in DefaultExecutionEnvironment>>runTestCase: in Block: [...
+[ self value: anExecutionEnvironment.
+	anExecutionEnvironment activated.
+	aBlock value  ] in CurrentExecutionEnvironment class>>activate:for: in Block: [ self value: anExecutionEnvironment....
+FullBlockClosure(BlockClosure)>>ensure:
+CurrentExecutionEnvironment class>>activate:for:
+TestExecutionEnvironment(ExecutionEnvironment)>>beActiveDuring:
+DefaultExecutionEnvironment>>runTestCase:
+CurrentExecutionEnvironment class>>runTestCase:
+EggBootstrapWebsideAPITest(TestCase)>>runCaseManaged
+[
+	aTestCase announce: TestCaseStarted withResult: self.
+	aTestCase runCaseManaged.
+	aTestCase announce: TestCaseEnded  withResult: self.
+	"To not affect performance of big test suites following logic is not inside addPass: method"
+	errors remove: aTestCase ifAbsent: [].
+	failures remove: aTestCase ifAbsent: [].
+	self addPass: aTestCase] in TestResult>>runCaseForDebug: in Block: [...
+FullBlockClosure(BlockClosure)>>on:do:
+TestResult>>runCaseForDebug:
+[ result runCaseForDebug: self ] in EggBootstrapWebsideAPITest(TestCase)>>debug in Block: [ result runCaseForDebug: self ]
+[0m[31mAssertion failed
+[0mEggBootstrapWebsideAPITest(TestAsserter)>>assert:description:resumable:
+EggBootstrapWebsideAPITest(TestAsserter)>>assert:description:
+EggBootstrapWebsideAPITest(Object)>>assert:
+EggBootstrapWebsideAPITest>>testAccessors
+EggBootstrapWebsideAPITest(TestCase)>>performTest
+[
+		self setUp.
+		self performTest ] in [ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [...
+FullBlockClosure(BlockClosure)>>ensure:
+[ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [ [...
+FullBlockClosure(BlockClosure)>>ensure:
+EggBootstrapWebsideAPITest(TestCase)>>runCase
+[aTestCase runCase] in [
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [aTestCase runCase]
+FullBlockClosure(BlockClosure)>>ensure:
+[
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [...
+FullBlockClosure(BlockClosure)>>on:do:
+TestExecutionEnvironment>>runTestCaseUnderWatchdog:
+[self runTestCaseUnderWatchdog: aTestCase] in TestExecutionEnvironment>>runTestCase: in Block: [self runTestCaseUnderWatchdog: aTestCase]
+FullBlockClosure(BlockClosure)>>ensure:
+TestExecutionEnvironment>>runTestCase:
+[
+		testEnv runTestCase: aTestCase] in DefaultExecutionEnvironment>>runTestCase: in Block: [...
+[ self value: anExecutionEnvironment.
+	anExecutionEnvironment activated.
+	aBlock value  ] in CurrentExecutionEnvironment class>>activate:for: in Block: [ self value: anExecutionEnvironment....
+FullBlockClosure(BlockClosure)>>ensure:
+CurrentExecutionEnvironment class>>activate:for:
+TestExecutionEnvironment(ExecutionEnvironment)>>beActiveDuring:
+DefaultExecutionEnvironment>>runTestCase:
+CurrentExecutionEnvironment class>>runTestCase:
+EggBootstrapWebsideAPITest(TestCase)>>runCaseManaged
+[
+	aTestCase announce: TestCaseStarted withResult: self.
+	aTestCase runCaseManaged.
+	aTestCase announce: TestCaseEnded  withResult: self.
+	"To not affect performance of big test suites following logic is not inside addPass: method"
+	errors remove: aTestCase ifAbsent: [].
+	failures remove: aTestCase ifAbsent: [].
+	self addPass: aTestCase] in TestResult>>runCaseForDebug: in Block: [...
+FullBlockClosure(BlockClosure)>>on:do:
+TestResult>>runCaseForDebug:
+[ result runCaseForDebug: self ] in EggBootstrapWebsideAPITest(TestCase)>>debug in Block: [ result runCaseForDebug: self ]
+[0m[31mInstance of EggBootstrapWebsideAPI did not understand #activeEvaluations
+
+[0mEggBootstrapWebsideAPITest(Object)>>error:
+EggBootstrapWebsideAPITest>>get:
+[ | active |
+	id := result at: 'id'.
+	active := self get: '/evaluations'.
+	self
+		assert: active notEmpty;
+		assert: (active anySatisfy: [ :e | (e at: 'id') = id ]) ] in EggBootstrapWebsideAPITest>>testActiveEvaluations in Block: [ | active |...
+FullBlockClosure(BlockClosure)>>ensure:
+EggBootstrapWebsideAPITest>>testActiveEvaluations
+EggBootstrapWebsideAPITest(TestCase)>>performTest
+[
+		self setUp.
+		self performTest ] in [ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [...
+FullBlockClosure(BlockClosure)>>ensure:
+[ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [ [...
+FullBlockClosure(BlockClosure)>>ensure:
+EggBootstrapWebsideAPITest(TestCase)>>runCase
+[aTestCase runCase] in [
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [aTestCase runCase]
+FullBlockClosure(BlockClosure)>>ensure:
+[
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [...
+FullBlockClosure(BlockClosure)>>on:do:
+TestExecutionEnvironment>>runTestCaseUnderWatchdog:
+[self runTestCaseUnderWatchdog: aTestCase] in TestExecutionEnvironment>>runTestCase: in Block: [self runTestCaseUnderWatchdog: aTestCase]
+FullBlockClosure(BlockClosure)>>ensure:
+TestExecutionEnvironment>>runTestCase:
+[
+		testEnv runTestCase: aTestCase] in DefaultExecutionEnvironment>>runTestCase: in Block: [...
+[ self value: anExecutionEnvironment.
+	anExecutionEnvironment activated.
+	aBlock value  ] in CurrentExecutionEnvironment class>>activate:for: in Block: [ self value: anExecutionEnvironment....
+FullBlockClosure(BlockClosure)>>ensure:
+CurrentExecutionEnvironment class>>activate:for:
+TestExecutionEnvironment(ExecutionEnvironment)>>beActiveDuring:
+DefaultExecutionEnvironment>>runTestCase:
+CurrentExecutionEnvironment class>>runTestCase:
+EggBootstrapWebsideAPITest(TestCase)>>runCaseManaged
+[
+	aTestCase announce: TestCaseStarted withResult: self.
+	aTestCase runCaseManaged.
+	aTestCase announce: TestCaseEnded  withResult: self.
+	"To not affect performance of big test suites following logic is not inside addPass: method"
+	errors remove: aTestCase ifAbsent: [].
+	failures remove: aTestCase ifAbsent: [].
+	self addPass: aTestCase] in TestResult>>runCaseForDebug: in Block: [...
+FullBlockClosure(BlockClosure)>>on:do:
+TestResult>>runCaseForDebug:
+[0m[31minvalid input: I
+[0mNeoJSONReader>>error:
+NeoJSONReader>>parseValue
+NeoJSONReader>>next
+NeoJSONObject class>>fromStream:
+NeoJSONObject class>>fromString:
+EggBootstrapWebsideAPITest>>delete:
+[ self delete: '/evaluations/' , id asString ] in EggBootstrapWebsideAPITest>>testActiveEvaluations in Block: [ self delete: '/evaluations/' , id asString ]
+FullBlockClosure(BlockClosure)>>ensure:
+FullBlockClosure(BlockClosure)>>ensure:
+EggBootstrapWebsideAPITest>>testActiveEvaluations
+EggBootstrapWebsideAPITest(TestCase)>>performTest
+[
+		self setUp.
+		self performTest ] in [ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [...
+FullBlockClosure(BlockClosure)>>ensure:
+[ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [ [...
+FullBlockClosure(BlockClosure)>>ensure:
+EggBootstrapWebsideAPITest(TestCase)>>runCase
+[aTestCase runCase] in [
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [aTestCase runCase]
+FullBlockClosure(BlockClosure)>>ensure:
+[
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [...
+FullBlockClosure(BlockClosure)>>on:do:
+TestExecutionEnvironment>>runTestCaseUnderWatchdog:
+[self runTestCaseUnderWatchdog: aTestCase] in TestExecutionEnvironment>>runTestCase: in Block: [self runTestCaseUnderWatchdog: aTestCase]
+FullBlockClosure(BlockClosure)>>ensure:
+TestExecutionEnvironment>>runTestCase:
+[
+		testEnv runTestCase: aTestCase] in DefaultExecutionEnvironment>>runTestCase: in Block: [...
+[ self value: anExecutionEnvironment.
+	anExecutionEnvironment activated.
+	aBlock value  ] in CurrentExecutionEnvironment class>>activate:for: in Block: [ self value: anExecutionEnvironment....
+FullBlockClosure(BlockClosure)>>ensure:
+CurrentExecutionEnvironment class>>activate:for:
+TestExecutionEnvironment(ExecutionEnvironment)>>beActiveDuring:
+DefaultExecutionEnvironment>>runTestCase:
+[0m[31mAssertion failed
+[0mEggBootstrapWebsideAPITest(TestAsserter)>>assert:description:resumable:
+EggBootstrapWebsideAPITest(TestAsserter)>>assert:description:
+EggBootstrapWebsideAPITest(Object)>>assert:
+EggBootstrapWebsideAPITest>>testAccessors
+EggBootstrapWebsideAPITest(TestCase)>>performTest
+[
+		self setUp.
+		self performTest ] in [ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [...
+FullBlockClosure(BlockClosure)>>ensure:
+[ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [ [...
+FullBlockClosure(BlockClosure)>>ensure:
+EggBootstrapWebsideAPITest(TestCase)>>runCase
+[aTestCase runCase] in [
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [aTestCase runCase]
+FullBlockClosure(BlockClosure)>>ensure:
+[
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [...
+FullBlockClosure(BlockClosure)>>on:do:
+TestExecutionEnvironment>>runTestCaseUnderWatchdog:
+[self runTestCaseUnderWatchdog: aTestCase] in TestExecutionEnvironment>>runTestCase: in Block: [self runTestCaseUnderWatchdog: aTestCase]
+FullBlockClosure(BlockClosure)>>ensure:
+TestExecutionEnvironment>>runTestCase:
+[
+		testEnv runTestCase: aTestCase] in DefaultExecutionEnvironment>>runTestCase: in Block: [...
+[ self value: anExecutionEnvironment.
+	anExecutionEnvironment activated.
+	aBlock value  ] in CurrentExecutionEnvironment class>>activate:for: in Block: [ self value: anExecutionEnvironment....
+FullBlockClosure(BlockClosure)>>ensure:
+CurrentExecutionEnvironment class>>activate:for:
+TestExecutionEnvironment(ExecutionEnvironment)>>beActiveDuring:
+DefaultExecutionEnvironment>>runTestCase:
+CurrentExecutionEnvironment class>>runTestCase:
+EggBootstrapWebsideAPITest(TestCase)>>runCaseManaged
+[
+	aTestCase announce: TestCaseStarted withResult: self.
+	aTestCase runCaseManaged.
+	aTestCase announce: TestCaseEnded  withResult: self.
+	"To not affect performance of big test suites following logic is not inside addPass: method"
+	errors remove: aTestCase ifAbsent: [].
+	failures remove: aTestCase ifAbsent: [].
+	self addPass: aTestCase] in TestResult>>runCaseForDebug: in Block: [...
+FullBlockClosure(BlockClosure)>>on:do:
+TestResult>>runCaseForDebug:
+[ result runCaseForDebug: self ] in EggBootstrapWebsideAPITest(TestCase)>>debug in Block: [ result runCaseForDebug: self ]
+[0m[31mAssertion failed
+[0mEggBootstrapWebsideAPITest(TestAsserter)>>assert:description:resumable:
+EggBootstrapWebsideAPITest(TestAsserter)>>assert:description:
+EggBootstrapWebsideAPITest(Object)>>assert:
+[ 
+	self post: '/changes' with: change.
+	method := self get: '/classes/Point/methods/testMethodDefinition'.
+	self
+		assert: method notNil;
+		assert: method selector equals: 'testMethodDefinition';
+		assert: method category equals: self class name;
+		assert: method source equals: 'testMethodDefinition
+	^x + 1' ] in EggBootstrapWebsideAPITest>>testMethodDefinition in Block: [ ...
+FullBlockClosure(BlockClosure)>>ensure:
+EggBootstrapWebsideAPITest>>testMethodDefinition
+EggBootstrapWebsideAPITest(TestCase)>>performTest
+[
+		self setUp.
+		self performTest ] in [ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [...
+FullBlockClosure(BlockClosure)>>ensure:
+[ [
+		self setUp.
+		self performTest ]
+			ensure: [ self tearDown ] ] in EggBootstrapWebsideAPITest(TestCase)>>runCase in Block: [ [...
+FullBlockClosure(BlockClosure)>>ensure:
+EggBootstrapWebsideAPITest(TestCase)>>runCase
+[aTestCase runCase] in [
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [aTestCase runCase]
+FullBlockClosure(BlockClosure)>>ensure:
+[
+		[aTestCase runCase] ensure: [
+			"Terminated test is not considered as completed (user just closed a debugger for example)"
+			mainTestProcess isTerminating ifFalse: [
+				self handleCompletedTest ]]
+	] in TestExecutionEnvironment>>runTestCaseUnderWatchdog: in Block: [...
+FullBlockClosure(BlockClosure)>>on:do:
+TestExecutionEnvironment>>runTestCaseUnderWatchdog:
+[self runTestCaseUnderWatchdog: aTestCase] in TestExecutionEnvironment>>runTestCase: in Block: [self runTestCaseUnderWatchdog: aTestCase]
+FullBlockClosure(BlockClosure)>>ensure:
+TestExecutionEnvironment>>runTestCase:
+[
+		testEnv runTestCase: aTestCase] in DefaultExecutionEnvironment>>runTestCase: in Block: [...
+[ self value: anExecutionEnvironment.
+	anExecutionEnvironment activated.
+	aBlock value  ] in CurrentExecutionEnvironment class>>activate:for: in Block: [ self value: anExecutionEnvironment....
+FullBlockClosure(BlockClosure)>>ensure:
+CurrentExecutionEnvironment class>>activate:for:
+TestExecutionEnvironment(ExecutionEnvironment)>>beActiveDuring:
+DefaultExecutionEnvironment>>runTestCase:
+CurrentExecutionEnvironment class>>runTestCase:
+EggBootstrapWebsideAPITest(TestCase)>>runCaseManaged
+[
+	aTestCase announce: TestCaseStarted withResult: self.
+	aTestCase runCaseManaged.
+	aTestCase announce: TestCaseEnded  withResult: self.
+	"To not affect performance of big test suites following logic is not inside addPass: method"
+	errors remove: aTestCase ifAbsent: [].
+	failures remove: aTestCase ifAbsent: [].
+	self addPass: aTestCase] in TestResult>>runCaseForDebug: in Block: [...
+FullBlockClosure(BlockClosure)>>on:do:
+[0m[31m
+[0mEggBootstrapWebsideAPI(Object)>>halt
+EggBootstrapWebsideAPI>>applyRemoveMethodChange:
+EggBootstrapWebsideAPI>>applyChange:
+[ self applyChange: change ] in EggBootstrapWebsideAPI>>addChange in Block: [ self applyChange: change ]
+FullBlockClosure(BlockClosure)>>on:do:
+EggBootstrapWebsideAPI>>addChange
+[ result := api perform: selector.
+	(result isKindOf: ZnResponse)
+		ifTrue: [ result ]
+		ifFalse: [ self responseFrom: result ] ] in WebsideServer>>handleRequest:with: in Block: [ result := api perform: selector....
+FullBlockClosure(BlockClosure)>>on:do:
+WebsideServer>>handleRequest:with:
+[ :request | self handleRequest: request with: selector ] in WebsideServer>>routePOST:to: in Block: [ :request | self handleRequest: request with:[..]
+FullBlockClosure(BlockClosure)>>cull:
+FullBlockClosure(BlockClosure)>>teaEvalActionOnRequest:
+[ :aTeaRequest |
+			(action teaEvalActionOnRequest: aTeaRequest)
+				teaTransform: responseTransformer
+				request: aTeaRequest ] in TeaRoute>>handleRequest:ifUnhandled: in Block: [ :aTeaRequest |...
+[ matchBlock value: (TeaRequest fromZnRequest: aZnRequest pathParams: placeholders) ] in TeaRequestMatcher>>matchRequest:ifMatch:ifNoMatch: in Block: [ matchBlock value: (TeaRequest fromZnRequest:[..]
+True>>ifTrue:ifFalse:
+TeaRequestMatcher>>matchRequest:ifMatch:ifNoMatch:
+TeaRoute>>handleRequest:ifUnhandled:
+[ :each | | response |
+		response := each handleRequest: aZnRequest ifUnhandled: nil.
+		response ifNotNil: [ ^ response ] ] in TeaDynamicRouter>>handleRequest:ifUnhandled: in Block: [ :each | | response |...
+OrderedCollection>>do:
+TeaDynamicRouter>>handleRequest:ifUnhandled:
+[ :each | | response |
+		response := each handleRequest: aZnRequest ifUnhandled: nil.
+		response ifNotNil: [ ^ response ] ] in TeaCompositeRouter>>evaluateRouters:ifUnhandled: in Block: [ :each | | response |...
+Array(SequenceableCollection)>>do:
+TeaCompositeRouter>>evaluateRouters:ifUnhandled:
+[ self evaluateBeforeFilters: aZnRequest.
+	     response := self evaluateRouters: aZnRequest ifUnhandled: aBlock.
+	     self evaluateAfterFilters: aZnRequest response: response.
+	     response	
+	   ] in TeaCompositeRouter>>handleRequest:ifUnhandled: in Block: [ self evaluateBeforeFilters: aZnRequest....
+FullBlockClosure(BlockClosure)>>on:do:
+TeaCompositeRouter>>handleRequest:ifUnhandled:
+TeaCompositeRouter>>handleRequest:
+[
+			self delegate
+				ifNil: [ ZnResponse notFound: request uri ]
+				ifNotNil: [ :delegate | delegate handleRequest: request ] ] in ZnManagingMultiThreadedServer(ZnSingleThreadedServer)>>authenticateAndDelegateRequest: in Block: [...
+ZnManagingMultiThreadedServer(ZnSingleThreadedServer)>>authenticateRequest:do:
+ZnManagingMultiThreadedServer(ZnSingleThreadedServer)>>authenticateAndDelegateRequest:
+[0m[31m[ | oldList context terminator |
+		terminating := true.
+		oldList := self suspend.
+		suspendedContext ifNil: [^self].
+		context := oldList handleProcessTerminationOfWaitingContext: suspendedContext.
+		terminator := Semaphore new.
+		context bottomContext insertSender: 
+			(Context contextOn: UnhandledException do: [:ex | terminator signal. ex pass]).
+		context bottomContext insertSender: (Context contextEnsure: [terminator signal]).
+		suspendedContext := context unwindAndStop: self.
+		self priority: Processor activePriority; resume.
+		terminator wait
+	] in Process>>doTerminationFromAnotherProcess
+[0m[ | oldList context terminator |
+		terminating := true.
+		oldList := self suspend.
+		suspendedContext ifNil: [^self].
+		context := oldList handleProcessTerminationOfWaitingContext: suspendedContext.
+		terminator := Semaphore new.
+		context bottomContext insertSender: 
+			(Context contextOn: UnhandledException do: [:ex | terminator signal. ex pass]).
+		context bottomContext insertSender: (Context contextEnsure: [terminator signal]).
+		suspendedContext := context unwindAndStop: self.
+		self priority: Processor activePriority; resume.
+		terminator wait
+	] in Process>>doTerminationFromAnotherProcess in Block: [ | oldList context terminator |...
+ConstantBlockClosure(BlockClosure)>>ensure:
+Process>>doTerminationFromAnotherProcess
+Process>>terminate
+DebugSession>>terminate
+StDebuggerActionModel>>clearDebugSession
+StDebugger>>clearDebugSession
+StDebugger>>clear
+[ self clear ] in StDebugger>>initializeWindow: in Block: [ self clear ]
+True>>ifTrue:
+[ :value | value ifTrue: aBlock ] in SpWindowPresenter>>whenClosedDo: in Block: [ :value | value ifTrue: aBlock ]
+FullBlockClosure(BlockClosure)>>cull:
+FullBlockClosure(BlockClosure)>>cull:cull:
+[ :block | block cull: self value cull: oldValue ] in ObservableValueHolder>>valueChanged: in Block: [ :block | block cull: self value cull: oldValue ]
+OrderedCollection>>do:
+ObservableValueHolder>>valueChanged:
+[ | oldValue |
+	oldValue := value.
+	value := anObject.
+	self valueChanged: oldValue ] in ObservableValueHolder>>value: in Block: [ | oldValue |...
+FullBlockClosure(BlockClosure)>>ensure:
+ObservableValueHolder>>value:
+SpWindowPresenter>>windowClosed
+SpMorphicWindowAdapter>>windowClosed
+MessageSend>>value
+MessageSend>>cull:
+MessageSend>>cull:cull:
+[ action cull: anAnnouncement cull: announcer ] in AnnouncementSubscription(AbstractAnnouncementSubscription)>>deliver: in Block: [ action cull: anAnnouncement cull: announcer ]
+FullBlockClosure(BlockClosure)>>on:do:
+FullBlockClosure(BlockClosure)>>on:fork:
+AnnouncementSubscription(AbstractAnnouncementSubscription)>>deliver:
+[ subscription deliver: anAnnouncement ] in SubscriptionRegistry>>deliver:to:startingAt: in Block: [ subscription deliver: anAnnouncement ]
+FullBlockClosure(BlockClosure)>>ifCurtailed:
+[0m[31m
+[0mEggBootstrapWebsideAPI(Object)>>halt
+EggBootstrapWebsideAPI>>applyRemoveMethodChange:
+EggBootstrapWebsideAPI>>applyChange:
+[ self applyChange: change ] in EggBootstrapWebsideAPI>>addChange in Block: [ self applyChange: change ]
+FullBlockClosure(BlockClosure)>>on:do:
+EggBootstrapWebsideAPI>>addChange
+[ result := api perform: selector.
+	(result isKindOf: ZnResponse)
+		ifTrue: [ result ]
+		ifFalse: [ self responseFrom: result ] ] in WebsideServer>>handleRequest:with: in Block: [ result := api perform: selector....
+FullBlockClosure(BlockClosure)>>on:do:
+WebsideServer>>handleRequest:with:
+[ :request | self handleRequest: request with: selector ] in WebsideServer>>routePOST:to: in Block: [ :request | self handleRequest: request with:[..]
+FullBlockClosure(BlockClosure)>>cull:
+FullBlockClosure(BlockClosure)>>teaEvalActionOnRequest:
+[ :aTeaRequest |
+			(action teaEvalActionOnRequest: aTeaRequest)
+				teaTransform: responseTransformer
+				request: aTeaRequest ] in TeaRoute>>handleRequest:ifUnhandled: in Block: [ :aTeaRequest |...
+[ matchBlock value: (TeaRequest fromZnRequest: aZnRequest pathParams: placeholders) ] in TeaRequestMatcher>>matchRequest:ifMatch:ifNoMatch: in Block: [ matchBlock value: (TeaRequest fromZnRequest:[..]
+True>>ifTrue:ifFalse:
+TeaRequestMatcher>>matchRequest:ifMatch:ifNoMatch:
+TeaRoute>>handleRequest:ifUnhandled:
+[ :each | | response |
+		response := each handleRequest: aZnRequest ifUnhandled: nil.
+		response ifNotNil: [ ^ response ] ] in TeaDynamicRouter>>handleRequest:ifUnhandled: in Block: [ :each | | response |...
+OrderedCollection>>do:
+TeaDynamicRouter>>handleRequest:ifUnhandled:
+[ :each | | response |
+		response := each handleRequest: aZnRequest ifUnhandled: nil.
+		response ifNotNil: [ ^ response ] ] in TeaCompositeRouter>>evaluateRouters:ifUnhandled: in Block: [ :each | | response |...
+Array(SequenceableCollection)>>do:
+TeaCompositeRouter>>evaluateRouters:ifUnhandled:
+[ self evaluateBeforeFilters: aZnRequest.
+	     response := self evaluateRouters: aZnRequest ifUnhandled: aBlock.
+	     self evaluateAfterFilters: aZnRequest response: response.
+	     response	
+	   ] in TeaCompositeRouter>>handleRequest:ifUnhandled: in Block: [ self evaluateBeforeFilters: aZnRequest....
+FullBlockClosure(BlockClosure)>>on:do:
+TeaCompositeRouter>>handleRequest:ifUnhandled:
+TeaCompositeRouter>>handleRequest:
+[
+			self delegate
+				ifNil: [ ZnResponse notFound: request uri ]
+				ifNotNil: [ :delegate | delegate handleRequest: request ] ] in ZnManagingMultiThreadedServer(ZnSingleThreadedServer)>>authenticateAndDelegateRequest: in Block: [...
+ZnManagingMultiThreadedServer(ZnSingleThreadedServer)>>authenticateRequest:do:
+ZnManagingMultiThreadedServer(ZnSingleThreadedServer)>>authenticateAndDelegateRequest:
+[0m[31mData receive timed out.
+[0m[ConnectionTimedOut signal: 'Data receive timed out.'] in Socket>>waitForDataFor: in Block: [ConnectionTimedOut signal: 'Data receive time[..]
+Socket>>waitForDataFor:ifClosed:ifTimedOut:
+Socket>>waitForDataFor:
+ZdcSocketStream(ZdcAbstractSocketStream)>>socketWaitForData
+[ self socketWaitForData ] in ZdcSocketStream(ZdcSimpleSocketStream)>>fillReadBuffer in Block: [ self socketWaitForData ]
+FullBlockClosure(BlockClosure)>>on:do:
+ZdcSocketStream(ZdcSimpleSocketStream)>>fillReadBuffer
+ZdcSocketStream(ZdcAbstractSocketStream)>>next
+ZnLineReader>>processNext
+ZnLineReader>>nextLine
+ZnStatusLine>>readFrom:
+ZnStatusLine class>>readFrom:
+ZnResponse>>readHeaderFrom:
+ZnResponse(ZnMessage)>>readFrom:
+ZnResponse class(ZnMessage class)>>readFrom:
+[ :stream | ZnResponse readFrom: stream ] in [ [ :stream | ZnResponse readFrom: stream ] ] in ZnClient>>reader in Block: [ :stream | ZnResponse readFrom: stream ]
+[
+			response := (#(HEAD CONNECT) includes: request method)
+				ifTrue: [ ZnResponse readHeaderFrom: connection ]
+				ifFalse: [
+					self streaming
+						ifTrue: [ ZnResponse readStreamingFrom: connection ]
+						ifFalse: [
+							self reader value: connection ] ] ] in [
+		self withDefaultCharacterEncoderDo: [
+			response := (#(HEAD CONNECT) includes: request method)
+				ifTrue: [ ZnResponse readHeaderFrom: connection ]
+				ifFalse: [
+					self streaming
+						ifTrue: [ ZnResponse readStreamingFrom: connection ]
+						ifFalse: [
+							self reader value: connection ] ] ] ] in ZnClient>>readResponse in Block: [...
+True>>ifTrue:ifFalse:
+ZnClient>>withDefaultCharacterEncoderDo:
+[
+		self withDefaultCharacterEncoderDo: [
+			response := (#(HEAD CONNECT) includes: request method)
+				ifTrue: [ ZnResponse readHeaderFrom: connection ]
+				ifFalse: [
+					self streaming
+						ifTrue: [ ZnResponse readStreamingFrom: connection ]
+						ifFalse: [
+							self reader value: connection ] ] ] ] in ZnClient>>readResponse in Block: [...
+True>>ifTrue:ifFalse:
+ZnClient>>withMaximumNumberOfDictionaryEntriesDo:
+ZnClient>>readResponse
+ZnClient>>executeRequestResponse
+[ self executeRequestResponse ] in ZnClient>>getConnectionAndExecute in Block: [ self executeRequestResponse ]
+FullBlockClosure(BlockClosure)>>ensure:
+ZnClient>>getConnectionAndExecute
+ZnClient>>executeWithRedirectsRemaining:trail:
+[ self 
+			executeWithRedirectsRemaining: self maxNumberOfRedirects
+			trail: OrderedCollection new ] in ZnClient>>executeWithRetriesRemaining: in Block: [ self ...
+FullBlockClosure(BlockClosure)>>on:do:
+[0m[31m[ | oldList context terminator |
+		terminating := true.
+		oldList := self suspend.
+		suspendedContext ifNil: [^self].
+		context := oldList handleProcessTerminationOfWaitingContext: suspendedContext.
+		terminator := Semaphore new.
+		context bottomContext insertSender: 
+			(Context contextOn: UnhandledException do: [:ex | terminator signal. ex pass]).
+		context bottomContext insertSender: (Context contextEnsure: [terminator signal]).
+		suspendedContext := context unwindAndStop: self.
+		self priority: Processor activePriority; resume.
+		terminator wait
+	] in Process>>doTerminationFromAnotherProcess
+[0m[ | oldList context terminator |
+		terminating := true.
+		oldList := self suspend.
+		suspendedContext ifNil: [^self].
+		context := oldList handleProcessTerminationOfWaitingContext: suspendedContext.
+		terminator := Semaphore new.
+		context bottomContext insertSender: 
+			(Context contextOn: UnhandledException do: [:ex | terminator signal. ex pass]).
+		context bottomContext insertSender: (Context contextEnsure: [terminator signal]).
+		suspendedContext := context unwindAndStop: self.
+		self priority: Processor activePriority; resume.
+		terminator wait
+	] in Process>>doTerminationFromAnotherProcess in Block: [ | oldList context terminator |...
+ConstantBlockClosure(BlockClosure)>>ensure:
+Process>>doTerminationFromAnotherProcess
+Process>>terminate
+DebugSession>>terminate
+StDebuggerActionModel>>clearDebugSession
+StDebugger>>clearDebugSession
+StDebugger>>clear
+[ self clear ] in StDebugger>>initializeWindow: in Block: [ self clear ]
+True>>ifTrue:
+[ :value | value ifTrue: aBlock ] in SpWindowPresenter>>whenClosedDo: in Block: [ :value | value ifTrue: aBlock ]
+FullBlockClosure(BlockClosure)>>cull:
+FullBlockClosure(BlockClosure)>>cull:cull:
+[ :block | block cull: self value cull: oldValue ] in ObservableValueHolder>>valueChanged: in Block: [ :block | block cull: self value cull: oldValue ]
+OrderedCollection>>do:
+ObservableValueHolder>>valueChanged:
+[ | oldValue |
+	oldValue := value.
+	value := anObject.
+	self valueChanged: oldValue ] in ObservableValueHolder>>value: in Block: [ | oldValue |...
+FullBlockClosure(BlockClosure)>>ensure:
+ObservableValueHolder>>value:
+SpWindowPresenter>>windowClosed
+SpMorphicWindowAdapter>>windowClosed
+MessageSend>>value
+MessageSend>>cull:
+MessageSend>>cull:cull:
+[ action cull: anAnnouncement cull: announcer ] in AnnouncementSubscription(AbstractAnnouncementSubscription)>>deliver: in Block: [ action cull: anAnnouncement cull: announcer ]
+FullBlockClosure(BlockClosure)>>on:do:
+FullBlockClosure(BlockClosure)>>on:fork:
+AnnouncementSubscription(AbstractAnnouncementSubscription)>>deliver:
+[ subscription deliver: anAnnouncement ] in SubscriptionRegistry>>deliver:to:startingAt: in Block: [ subscription deliver: anAnnouncement ]
+FullBlockClosure(BlockClosure)>>ifCurtailed:
+[0m[31m
+[0m[ (ZnUnknownHttpVersion version: string) signal ] in ZnStatusLine>>version: in Block: [ (ZnUnknownHttpVersion version: string) signal ]
+Array(Collection)>>detect:ifFound:ifNone:
+Array(Collection)>>detect:ifNone:
+ZnStatusLine>>version:
+ZnStatusLine>>readFrom:
+ZnStatusLine class>>readFrom:
+ZnResponse>>readHeaderFrom:
+ZnResponse(ZnMessage)>>readFrom:
+ZnResponse class(ZnMessage class)>>readFrom:
+[ :stream | ZnResponse readFrom: stream ] in [ [ :stream | ZnResponse readFrom: stream ] ] in ZnClient>>reader in Block: [ :stream | ZnResponse readFrom: stream ]
+[
+			response := (#(HEAD CONNECT) includes: request method)
+				ifTrue: [ ZnResponse readHeaderFrom: connection ]
+				ifFalse: [
+					self streaming
+						ifTrue: [ ZnResponse readStreamingFrom: connection ]
+						ifFalse: [
+							self reader value: connection ] ] ] in [
+		self withDefaultCharacterEncoderDo: [
+			response := (#(HEAD CONNECT) includes: request method)
+				ifTrue: [ ZnResponse readHeaderFrom: connection ]
+				ifFalse: [
+					self streaming
+						ifTrue: [ ZnResponse readStreamingFrom: connection ]
+						ifFalse: [
+							self reader value: connection ] ] ] ] in ZnClient>>readResponse in Block: [...
+True>>ifTrue:ifFalse:
+ZnClient>>withDefaultCharacterEncoderDo:
+[
+		self withDefaultCharacterEncoderDo: [
+			response := (#(HEAD CONNECT) includes: request method)
+				ifTrue: [ ZnResponse readHeaderFrom: connection ]
+				ifFalse: [
+					self streaming
+						ifTrue: [ ZnResponse readStreamingFrom: connection ]
+						ifFalse: [
+							self reader value: connection ] ] ] ] in ZnClient>>readResponse in Block: [...
+True>>ifTrue:ifFalse:
+ZnClient>>withMaximumNumberOfDictionaryEntriesDo:
+ZnClient>>readResponse
+ZnClient>>executeRequestResponse
+[ self executeRequestResponse ] in ZnClient>>getConnectionAndExecute in Block: [ self executeRequestResponse ]
+FullBlockClosure(BlockClosure)>>ensure:
+ZnClient>>getConnectionAndExecute
+ZnClient>>executeWithRedirectsRemaining:trail:
+[ self 
+			executeWithRedirectsRemaining: self maxNumberOfRedirects
+			trail: OrderedCollection new ] in ZnClient>>executeWithRetriesRemaining: in Block: [ self ...
+FullBlockClosure(BlockClosure)>>on:do:
+ZnClient>>executeWithRetriesRemaining:
+[ self executeWithRetriesRemaining: self numberOfRetries ] in [
+		[ self executeWithRetriesRemaining: self numberOfRetries ]
+			on: Error
+			do: self ifFailBlock ] in ZnClient>>executeWithTimeout in Block: [ self executeWithRetriesRemaining: self numbe[..]
+FullBlockClosure(BlockClosure)>>on:do:
+[
+		[ self executeWithRetriesRemaining: self numberOfRetries ]
+			on: Error
+			do: self ifFailBlock ] in ZnClient>>executeWithTimeout in Block: [...
+[ ^ block value ] in ZnClient>>withTimeoutDo: in Block: [ ^ block value ]
+[ activeProcess
+			psValueAt: index
+			put: anObject.
+		aBlock value ] in ZnConnectionTimeout(DynamicVariable)>>value:during: in Block: [ activeProcess...
+[0m[31m
+[0m[ (ZnUnknownHttpStatusCode code: httpCode) signal ] in ZnStatusLine>>readFrom: in Block: [ (ZnUnknownHttpStatusCode code: httpCode) sig[..]
+NumberParser>>nextIntegerBase:ifFail:
+Integer class>>readFrom:ifFail:
+ZnStatusLine>>readFrom:
+ZnStatusLine class>>readFrom:
+ZnResponse>>readHeaderFrom:
+ZnResponse(ZnMessage)>>readFrom:
+ZnResponse class(ZnMessage class)>>readFrom:
+[ :stream | ZnResponse readFrom: stream ] in [ [ :stream | ZnResponse readFrom: stream ] ] in ZnClient>>reader in Block: [ :stream | ZnResponse readFrom: stream ]
+[
+			response := (#(HEAD CONNECT) includes: request method)
+				ifTrue: [ ZnResponse readHeaderFrom: connection ]
+				ifFalse: [
+					self streaming
+						ifTrue: [ ZnResponse readStreamingFrom: connection ]
+						ifFalse: [
+							self reader value: connection ] ] ] in [
+		self withDefaultCharacterEncoderDo: [
+			response := (#(HEAD CONNECT) includes: request method)
+				ifTrue: [ ZnResponse readHeaderFrom: connection ]
+				ifFalse: [
+					self streaming
+						ifTrue: [ ZnResponse readStreamingFrom: connection ]
+						ifFalse: [
+							self reader value: connection ] ] ] ] in ZnClient>>readResponse in Block: [...
+True>>ifTrue:ifFalse:
+ZnClient>>withDefaultCharacterEncoderDo:
+[
+		self withDefaultCharacterEncoderDo: [
+			response := (#(HEAD CONNECT) includes: request method)
+				ifTrue: [ ZnResponse readHeaderFrom: connection ]
+				ifFalse: [
+					self streaming
+						ifTrue: [ ZnResponse readStreamingFrom: connection ]
+						ifFalse: [
+							self reader value: connection ] ] ] ] in ZnClient>>readResponse in Block: [...
+True>>ifTrue:ifFalse:
+ZnClient>>withMaximumNumberOfDictionaryEntriesDo:
+ZnClient>>readResponse
+ZnClient>>executeRequestResponse
+[ self executeRequestResponse ] in ZnClient>>getConnectionAndExecute in Block: [ self executeRequestResponse ]
+FullBlockClosure(BlockClosure)>>ensure:
+ZnClient>>getConnectionAndExecute
+ZnClient>>executeWithRedirectsRemaining:trail:
+[ self 
+			executeWithRedirectsRemaining: self maxNumberOfRedirects
+			trail: OrderedCollection new ] in ZnClient>>executeWithRetriesRemaining: in Block: [ self ...
+FullBlockClosure(BlockClosure)>>on:do:
+ZnClient>>executeWithRetriesRemaining:
+[ self executeWithRetriesRemaining: self numberOfRetries ] in [
+		[ self executeWithRetriesRemaining: self numberOfRetries ]
+			on: Error
+			do: self ifFailBlock ] in ZnClient>>executeWithTimeout in Block: [ self executeWithRetriesRemaining: self numbe[..]
+FullBlockClosure(BlockClosure)>>on:do:
+[
+		[ self executeWithRetriesRemaining: self numberOfRetries ]
+			on: Error
+			do: self ifFailBlock ] in ZnClient>>executeWithTimeout in Block: [...
+[ ^ block value ] in ZnClient>>withTimeoutDo: in Block: [ ^ block value ]
+[ activeProcess
+			psValueAt: index
+			put: anObject.
+		aBlock value ] in ZnConnectionTimeout(DynamicVariable)>>value:during: in Block: [ activeProcess...
+FullBlockClosure(BlockClosure)>>ensure:
+[0m[31mMessage not understood: MorphicUIManager >> #between:and:
+[0mMorphicUIManager(Object)>>doesNotUnderstand: #between:and:
+ZnStatusLine>>code:
+ZnStatusLine>>readFrom:
+ZnStatusLine class>>readFrom:
+ZnResponse>>readHeaderFrom:
+ZnResponse(ZnMessage)>>readFrom:
+ZnResponse class(ZnMessage class)>>readFrom:
+[ :stream | ZnResponse readFrom: stream ] in [ [ :stream | ZnResponse readFrom: stream ] ] in ZnClient>>reader in Block: [ :stream | ZnResponse readFrom: stream ]
+[
+			response := (#(HEAD CONNECT) includes: request method)
+				ifTrue: [ ZnResponse readHeaderFrom: connection ]
+				ifFalse: [
+					self streaming
+						ifTrue: [ ZnResponse readStreamingFrom: connection ]
+						ifFalse: [
+							self reader value: connection ] ] ] in [
+		self withDefaultCharacterEncoderDo: [
+			response := (#(HEAD CONNECT) includes: request method)
+				ifTrue: [ ZnResponse readHeaderFrom: connection ]
+				ifFalse: [
+					self streaming
+						ifTrue: [ ZnResponse readStreamingFrom: connection ]
+						ifFalse: [
+							self reader value: connection ] ] ] ] in ZnClient>>readResponse in Block: [...
+True>>ifTrue:ifFalse:
+ZnClient>>withDefaultCharacterEncoderDo:
+[
+		self withDefaultCharacterEncoderDo: [
+			response := (#(HEAD CONNECT) includes: request method)
+				ifTrue: [ ZnResponse readHeaderFrom: connection ]
+				ifFalse: [
+					self streaming
+						ifTrue: [ ZnResponse readStreamingFrom: connection ]
+						ifFalse: [
+							self reader value: connection ] ] ] ] in ZnClient>>readResponse in Block: [...
+True>>ifTrue:ifFalse:
+ZnClient>>withMaximumNumberOfDictionaryEntriesDo:
+ZnClient>>readResponse
+ZnClient>>executeRequestResponse
+[ self executeRequestResponse ] in ZnClient>>getConnectionAndExecute in Block: [ self executeRequestResponse ]
+FullBlockClosure(BlockClosure)>>ensure:
+ZnClient>>getConnectionAndExecute
+ZnClient>>executeWithRedirectsRemaining:trail:
+[ self 
+			executeWithRedirectsRemaining: self maxNumberOfRedirects
+			trail: OrderedCollection new ] in ZnClient>>executeWithRetriesRemaining: in Block: [ self ...
+FullBlockClosure(BlockClosure)>>on:do:
+ZnClient>>executeWithRetriesRemaining:
+[ self executeWithRetriesRemaining: self numberOfRetries ] in [
+		[ self executeWithRetriesRemaining: self numberOfRetries ]
+			on: Error
+			do: self ifFailBlock ] in ZnClient>>executeWithTimeout in Block: [ self executeWithRetriesRemaining: self numbe[..]
+FullBlockClosure(BlockClosure)>>on:do:
+[
+		[ self executeWithRetriesRemaining: self numberOfRetries ]
+			on: Error
+			do: self ifFailBlock ] in ZnClient>>executeWithTimeout in Block: [...
+[ ^ block value ] in ZnClient>>withTimeoutDo: in Block: [ ^ block value ]
+[ activeProcess
+			psValueAt: index
+			put: anObject.
+		aBlock value ] in ZnConnectionTimeout(DynamicVariable)>>value:during: in Block: [ activeProcess...
+FullBlockClosure(BlockClosure)>>ensure:
+ZnConnectionTimeout(DynamicVariable)>>value:during:
+[0m[31m4 in FullBlockClosure(BlockClosure)>>ensure:
+[0mContext(Object)>>errorSubscriptBounds:
+Context>>at:
+Context>>pushTemporaryVariable:
+InstructionStream>>interpretNextSistaV1InstructionFor:
+EncoderForSistaV1 class>>interpretNextInstructionFor:in:
+InstructionStream>>interpretNextInstructionFor:
+Context>>step
+Context>>stepToCalleeOrNil
+Context>>runUntilErrorOrReturnFrom:
+[ ctxt runUntilErrorOrReturnFrom: aContext ] in Process>>complete: in Block: [ ctxt runUntilErrorOrReturnFrom: aContext ]
+FullBlockClosure(BlockClosure)>>ensure:
+Process>>evaluate:onBehalfOf:
+Process>>complete:
+Process>>return:value:
+[self return: callee value: aValue] in Process>>popTo:value: in Block: [self return: callee value: aValue]
+FullBlockClosure(BlockClosure)>>ensure:
+Process>>evaluate:onBehalfOf:
+Process>>popTo:value:
+DebugSession>>returnValue:from:
+StDebuggerActionModel>>returnValueFromExpression:fromContext:
+StDebugger>>returnEnteredValue
+StReturnValueCommand>>execute
+SpCommand(CmCommandDecorator)>>execute
+[ specCommand execute ] in [ :specCommand | 
+			aButtonClass new
+				label: specCommand name;
+				help: specCommand description;
+				in: [ :button | 
+					specCommand hasIcon
+						ifTrue: [ button icon: specCommand icon ] ];
+				action: [ specCommand execute ];
+				yourself ] in SpCommand>>configureAsButtonOfClass: in Block: [ specCommand execute ]
+FullBlockClosure(BlockClosure)>>cull:
+SpMorphicToolbarButtonAdapter>>execute
+SpToolbarButtonMorph(PluggableButtonMorph)>>performAction:
+[:m |
+		(m containsPoint: evt cursorPoint) ifTrue: [m enabled ifTrue: [ m performAction: evt ]]] in SpToolbarButtonMorph(PluggableButtonMorph)>>mouseUp: in Block: [:m |...
+Array(SequenceableCollection)>>do:
+SpToolbarButtonMorph(PluggableButtonMorph)>>mouseUp:
+[0m

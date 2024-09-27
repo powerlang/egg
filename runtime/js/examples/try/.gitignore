@@ -1,0 +1,9 @@
+# dependencies
+/node_modules
+
+# production
+/build
+/dist
+
+/src/Webside
+/scr/eggjs
