@@ -71,7 +71,7 @@ EggBuilder >> imageSegmentDirectory [
 	| dir |
 	dir := Smalltalk os environment
 		        at: 'IMAGE_SEGMENT_DIRECTORY'
-		        ifAbsent: [self rootDirectory / 'image-segments'].
+		        ifAbsent: [self runtimeDirectory / 'image-segments'].
 	^ dir asFileReference
 ]
 
@@ -111,6 +111,15 @@ EggBuilder >> rootDirectory [
 { #category : 'services' }
 EggBuilder >> runtime: anEggRuntime [
 	runtime := anEggRuntime
+]
+
+{ #category : 'private' }
+EggBuilder >> runtimeDirectory [
+
+	| subdirectory |
+	subdirectory := type = #native 
+		ifTrue: [ 'cpp' ] ifFalse: [ 'js' ].
+	^ (self rootDirectory / 'runtime' / subdirectory) asFileReference
 ]
 
 { #category : 'services' }
