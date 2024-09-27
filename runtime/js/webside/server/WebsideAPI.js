@@ -212,7 +212,7 @@ class WebsideAPI extends Object {
 	}
 
 	subclasses() {
-		let species = this.requestedClass(this.request);
+		let species = this.requestedClass();
 		if (!species) return this.notFound();
 		let subclasses = species.subclasses().map((c) => c.asWebsideJson());
 		this.respondWithJson(subclasses);
