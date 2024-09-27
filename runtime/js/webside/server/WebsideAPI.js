@@ -197,8 +197,9 @@ class WebsideAPI extends Object {
 		this.respondWithJson(variables);
 	}
 
+
 	superclasses() {
-		let species = this.requestedClass(this.request);
+		let species = this.requestedClass();
 		if (!species) return this.notFound();
 		let superclasses = species
 			.withAllSuperclasses()
