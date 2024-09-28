@@ -18,11 +18,6 @@ ByteArray class >> fromBytes: anObject length: anInteger [
 	^bytes
 ]
 
-{ #category : #'instance creation' }
-ByteArray class >> fromMemory: anExternalMemory length: anInteger [
-	^self fromBytes: anExternalMemory length: anInteger
-]
-
 { #category : #converting }
 ByteArray >> asByteArray [
 	^self
@@ -62,11 +57,6 @@ ByteArray >> canBePrintedAsLiteral [
 	^true
 ]
 
-{ #category : #copying }
-ByteArray >> copyToMemory: anExternalMemory [
-	anExternalMemory replaceFrom: 1 to: self size with: self startingAt: 1
-]
-
 { #category : #services }
 ByteArray >> eol [
 	| n byte |
@@ -84,11 +74,6 @@ ByteArray >> eol [
 			ifTrue: [^(self at: i + 1) = 10 ifTrue: [String crlf] ifFalse: [String cr]].
 		byte = 10 ifTrue: [^String lf]].
 	^nil
-]
-
-{ #category : #copying }
-ByteArray >> externalCopy [
-	^ExternalMemory fromByteArray: self
 ]
 
 { #category : #comparing }
@@ -130,11 +115,6 @@ ByteArray >> isByteArray [
 { #category : #testing }
 ByteArray >> isValid [
 	^true
-]
-
-{ #category : #converting }
-ByteArray >> pointedMemory [
-	^ExternalMemory at: self
 ]
 
 { #category : #printing }

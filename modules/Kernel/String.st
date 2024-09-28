@@ -38,22 +38,6 @@ String class >> fromBytes: aByteArray [
 ]
 
 { #category : #'instance creation' }
-String class >> fromMemory: anExternalMemory [
-	| length |
-	length := 1.
-	[(anExternalMemory at: length) = 0] whileFalse: [length := length + 1].
-	^self fromMemory: anExternalMemory length: length - 1
-]
-
-{ #category : #'instance creation' }
-String class >> fromMemory: anExternalMemory length: anInteger [
-	| string |
-	string := self new: anInteger.
-	string replaceFrom: 1 to: anInteger with: anExternalMemory startingAt: 1.
-	^string
-]
-
-{ #category : #'instance creation' }
 String class >> fromUTF8: aByteArray [
 	^(aByteArray conform: [:byte | byte asInteger < 128])
 		ifTrue: [String fromBytes: aByteArray]
@@ -668,8 +652,7 @@ String >> replaceFrom: start
 to: stop
 with: aString
 startingAt: position [
-	(aString class isBytes
-		or: [aString isExternalMemory or: [aString isMemoryBuffer]])
+	aString hasBytes
 		ifTrue: [self
 			replaceBytesFrom: start
 			to: stop

@@ -611,11 +611,6 @@ Float >> exponent [
 		ifFalse: [self asNormalized exponent]
 ]
 
-{ #category : #copying }
-Float >> externalCopy [
-	^ExternalMemory fromByteArray: self
-]
-
 { #category : #arithmetic }
 Float >> floor [
 	^self isNaN ifTrue: [self] ifFalse: [super floor]

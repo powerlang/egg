@@ -276,6 +276,11 @@ Object >> hasActionForEvent: aSymbol [
 ]
 
 { #category : #testing }
+Object >> hasBytes [
+	^self isBytes
+]
+
+{ #category : #testing }
 Object >> hasInstanceBehavior [
 	^self behavior isInstanceBehavior
 ]
@@ -451,6 +456,11 @@ Object >> isBoolean [
 ]
 
 { #category : #testing }
+Object >> isBytes [
+	^self class isBytes
+]
+
+{ #category : #testing }
 Object >> isByteArray [
 	^false
 ]
@@ -497,11 +507,6 @@ Object >> isDirectory [
 
 { #category : #testing }
 Object >> isEmptyOrNil [
-	^false
-]
-
-{ #category : #testing }
-Object >> isExternalMemory [
 	^false
 ]
 

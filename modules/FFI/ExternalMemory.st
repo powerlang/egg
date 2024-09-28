@@ -198,6 +198,11 @@ ExternalMemory >> hash [
 	^address hash
 ]
 
+{ #category : #comparing }
+ExternalMemory >> hasBytes [
+	^true
+]
+
 { #category : #inquiries }
 ExternalMemory >> indexOf: byte [
 	| offset |

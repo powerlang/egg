@@ -14,7 +14,10 @@ Class {
 		'moduleLoaders',
 		'host',
 		'CRITICAL',
-		'unhandledErrorHandler'
+		'unhandledErrorHandler',
+		'utf8',
+		'utf16',
+		'utf32'
 	],
 	#category : #Kernel
 }
@@ -40,7 +43,6 @@ KernelModule >> bootstrap [
 	Species initializeFormatFlags.
 	Character initializeCharacters; initializeNamedCharacters.
 	Closure initializeIndexes.
-	ExternalMemory initializeConstants.
 	Float initializeConstants.
 	HashTable initializeConstants; initializeSizes.
 	HashTablePolicy initializeEmptySlot.
@@ -60,12 +62,15 @@ KernelModule >> bootstrap [
 		at: #KnownSymbols put: #(+ - < > <= >= = == not);
 		at: #Processor put: ProcessorScheduler new.
 	StarToken initializeCurrent.
-	Unicode allSubclasses do: [:c | c initializeCurrent].
+	utf8 := UTF8 new.
+	utf16 := UTF16 new.
+	utf32 := UTF32 new.
 	Symbol initializeSymbolTable.
 	namespace at: #SymbolTable put: Symbol symbolTable.
 	Stream initializePools.
 	CharacterArray initializePools.
 	ProtoObject initializeConstants; initializeBitMasks.
+
 	
 	self initialize.
 	CRITICAL := false.
@@ -210,6 +215,21 @@ KernelModule >> unhandledExceptionHandler: aClosure [
 { #category : #loading }
 KernelModule >> useHostModuleLoader [
 	self addModuleLoader: host.
+]
+
+{ #category : #accessing }
+KernelModule >> utf8 [
+	^utf8
+]
+
+{ #category : #accessing }
+KernelModule >> utf16 [
+	^utf16
+]
+
+{ #category : #accessing }
+KernelModule >> utf32 [
+	^utf32
 ]
 
 KernelModule >> foo [

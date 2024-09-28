@@ -279,16 +279,6 @@ Integer >> digitsBase: anInteger [
 	^digits
 ]
 
-{ #category : #services }
-Integer >> externalBytes [
-	^ExternalMemory allocate: self
-]
-
-{ #category : #services }
-Integer >> externalCharacters [
-	^ExternalMemory allocate: self + 1 * 2
-]
-
 { #category : #arithmetic }
 Integer >> factorial [
 	self > 1 ifTrue: [^(self - 1) factorial * self].
@@ -402,11 +392,6 @@ Integer >> oct [
 	255 oct
 	"
 	^self radix: 8
-]
-
-{ #category : #converting }
-Integer >> pointedMemory [
-	^ExternalMemory at: self
 ]
 
 { #category : #printing }
