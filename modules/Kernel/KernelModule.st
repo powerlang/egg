@@ -93,12 +93,6 @@ KernelModule >> critical: aBlock [
 	aBlock value
 ]
 
-KernelModule >> entry: argc argv: argv [
-	<callback: long (long, pointer)>
-	"^Smalltalk startSession"
-	^KernelModule new foo.
-]
-
 KernelModule >> exit [
 	host exit: 0
 ]
