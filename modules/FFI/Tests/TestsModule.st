@@ -6,20 +6,20 @@
 Class {
 	#name : #TestsModule,
 	#superclass : #Module,
-	#category : #Kernel
+	#category : #Tests
 }
 
 { #category : #private }
 TestsModule >> imports [
 	^{
-		#Kernel -> #(WordSize)
+		#Kernel -> #(WordSize).
+		#FFI -> #(ExternalLibrary)
 	}
 ]
 
 { #category : #initialization }
-TestsModule >> justLoaded [
+TestsModule >> main: args [
 	| result |
-	super justLoaded.
 	test := TestLibrary new open.
 	result := test addInt: 3 toInt: 4.
 	result = 7 ifFalse: [self error: 'addInt:toInt: failed!'].
@@ -28,8 +28,4 @@ TestsModule >> justLoaded [
 	Kernel log: 'all FFI tests passed!'
 ]
 
-{ #category : #accessing }
-TestsModule >> loader [
-	^loader
-]
 

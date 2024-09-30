@@ -15,7 +15,7 @@ Class {
 { #category : #private }
 FFIModule >> imports [
 	^{
-		#Kernel -> #(IdentitySet WordSize)
+		#Kernel -> #(ArrayedCollection Behavior ByteArray ByteArraySegment CharacterArray Float Integer IdentitySet String WordSize)
 	}
 ]
 

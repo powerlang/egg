@@ -9,9 +9,6 @@ Class {
 	#instVars : [
 		'address'
 	],
-	#classVars : [
-		'NullAddress'
-	],
 	#category : #Kernel
 }
 
@@ -55,7 +52,9 @@ ExternalMemory class >> hasVariableSize [
 
 { #category : #initialization }
 ExternalMemory class >> initializeConstants [
-	NullAddress := ByteArray new: WordSize
+	self addNamespace
+		at: #NullAddress put: (ByteArray new: WordSize);
+		yourself.
 ]
 
 { #category : #accessing }
