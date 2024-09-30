@@ -1,0 +1,35 @@
+"
+    Copyright (c) 2024, Javier Pimás. 
+    See (MIT) license in root directory.
+"
+
+Class {
+	#name : #TestsModule,
+	#superclass : #Module,
+	#category : #Kernel
+}
+
+{ #category : #private }
+TestsModule >> imports [
+	^{
+		#Kernel -> #(WordSize)
+	}
+]
+
+{ #category : #initialization }
+TestsModule >> justLoaded [
+	| result |
+	super justLoaded.
+	test := TestLibrary new open.
+	result := test addInt: 3 toInt: 4.
+	result = 7 ifFalse: [self error: 'addInt:toInt: failed!'].
+	result := test addDouble: 3.0 toDouble: 4.0.
+	result = 7.0 ifFalse: [self error: 'addDouble:toDouble: failed!'].
+	Kernel log: 'all FFI tests passed!'
+]
+
+{ #category : #accessing }
+TestsModule >> loader [
+	^loader
+]
+
