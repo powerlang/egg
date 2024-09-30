@@ -59,7 +59,8 @@ void start(Runtime *runtime, HeapObject *kernel, std::vector<Object*> &args) {
     name = runtime->sendLocal_to_("name", module)->asHeapObject();
     std::cout << "The name of loaded module is " << name->asLocalString() << std::endl;
 
-    //runtime->sendLocal_to_with_("main:", module, args);
+    auto array = runtime->newArray_(args);
+    runtime->sendLocal_to_with_("main:", module, (Object*)array);
 
 }
 
