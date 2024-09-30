@@ -84,6 +84,10 @@ public:
 	    return this->argumentAt_(4);
     }
 
+    Object* lastArgumentAddress(){
+	    return (Object*)&_stack[_regBP - 1 + 2];
+    }
+
     std::vector<Object*> methodArguments();
 
 	void buildFrameFor_code_environment_temps_(Object *receiver, HeapObject *compiledCode, HeapObject *environment, uint32_t temps);

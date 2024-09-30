@@ -72,6 +72,12 @@ public:
     void flushDispatchCache_(HeapObject *aSymbol);
     void flushDispatchCache_in_(HeapObject *aSymbol, HeapObject *klass);
 
+    HeapObject* newDouble_(double value) {
+        auto result = newBytes_size_(_floatClass, sizeof(double));
+        *((double*)result) = value;
+        return result;
+    }
+    
     SmallInteger* newInteger_(intptr_t value) {
         return SmallInteger::from(value);
     }
@@ -318,7 +324,15 @@ public:
     HeapObject* methodSelector_(HeapObject *method) {
         return method->slot(Offsets::MethodSelector)->asHeapObject();
     }
-    
+
+    HeapObject* ffiMethodDescriptor_(HeapObject * method) {
+	    return method->slot(Offsets::FFIMethodDescriptor)->asHeapObject();
+	}
+
+    HeapObject* ffiMethodSymbol_(HeapObject * method) {
+	    return method->slot(Offsets::FFIMethodSymbol)->asHeapObject();
+	}
+
     HeapObject* moduleNamespace_(HeapObject *module) {
         return module->slot(Offsets::ModuleNamespace)->asHeapObject();
     }
@@ -408,6 +422,7 @@ public:
 		this->_smallIntegerClass =         _kernel->_exports["SmallInteger"];
 		this->_largePositiveIntegerClass = _kernel->_exports["LargePositiveInteger"];
 		this->_largeNegativeIntegerClass = _kernel->_exports["LargeNegativeInteger"];
+		this->_floatClass =                _kernel->_exports["Float"];
 		this->_blockClass =                _kernel->_exports["CompiledBlock"];
 		this->_byteArrayClass =            _kernel->_exports["ByteArray"];
 		this->_stringClass =               _kernel->_exports["String"];
@@ -428,6 +443,7 @@ public:
     HeapObject *_smallIntegerClass;
     HeapObject *_largePositiveIntegerClass;
     HeapObject *_largeNegativeIntegerClass;
+    HeapObject *_floatClass;
     HeapObject *_blockClass;
     HeapObject *_byteArrayClass;
     HeapObject *_stringClass;

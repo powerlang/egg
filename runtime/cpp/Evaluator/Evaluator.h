@@ -169,6 +169,7 @@ private:
 
 	PrimitivePointer primitiveFor_(HeapObject *symbol);
 
+    Object* newDoubleObject(double aDouble);
     Object* newIntObject(auto anInteger);
     Object* boolObject(bool aBoolean);
 
@@ -222,6 +223,10 @@ private:
 	Object* primitiveUnderIsBytes();
 	Object* primitiveUnderPointersSize();
 	Object* primitiveUnderSize();
+
+	void initializeCIF(HeapObject *method, HeapObject *descriptor, int argCount);
+	Object* demarshalFFIResult(void *, uint8_t type);
+	Object* primitiveFFICall();
 
 	Object* underprimitiveBasicAt(Object *receiver, std::vector<Object*> &args);
 	Object* underprimitiveBasicAtPut(Object *receiver, std::vector<Object*> &args);
