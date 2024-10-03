@@ -71,7 +71,7 @@ KernelModule >> bootstrap [
 	CharacterArray initializePools.
 	ProtoObject initializeConstants; initializeBitMasks.
 
-	
+	#FFICall. "hack to have this symbol (used by primitiveFFICall) in kernel ims"
 	self initialize.
 	CRITICAL := false.
 	self suspendOnUnhandledExceptions
