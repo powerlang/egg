@@ -81,7 +81,7 @@ SMethodNode >> literals [
 	| literals v l literalsWithClasses |
 	literals := OrderedCollection new.
 	pragma isUsed
-		ifTrue: [ literals add: pragma name ].
+		ifTrue: [ literals add: pragma type asSymbol; add: pragma name asSymbol].
 	self
 		nodesDo: [ :n | 
 			n isLiteral
