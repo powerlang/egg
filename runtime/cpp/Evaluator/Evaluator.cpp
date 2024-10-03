@@ -1008,7 +1008,7 @@ Object* Evaluator::underprimitiveSMITimes(Object *receiver, std::vector<Object*>
 Object* Evaluator::underprimitiveSmallIntegerByteAt(Object *receiver, std::vector<Object*> &args) {
     auto integer = receiver->asSmallInteger()->asNative();
     auto offset = args[0]->asSmallInteger()->asNative() - 1;
-    auto result = integer > 7 ? 0 : reinterpret_cast<uint8_t*>(&integer)[offset];
+    auto result = offset > 7 ? 0 : reinterpret_cast<uint8_t*>(&integer)[offset];
     return newIntObject(result);
 }
 
