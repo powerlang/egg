@@ -163,7 +163,7 @@ EggIterativeStackedInterpreter >> runtime: anEggRuntime [
 
 { #category : 'initialization' }
 EggIterativeStackedInterpreter >> sendLocal: aSymbol to: receiver with: anArray [
-	| symbol literal dummy message dispatch prevWork prevPC |
+	| symbol literal dummy message dispatch prevWork prevPC prevRegE |
 	symbol := runtime symbolFromLocal: aSymbol.
 	literal := SLiteral new value: nilObj.
 	dummy := Array new: anArray size withAll: nil.
@@ -174,6 +174,7 @@ EggIterativeStackedInterpreter >> sendLocal: aSymbol to: receiver with: anArray 
 	dispatch := SOpDispatchMessage new message: message.
 	prevWork := work.
 	prevPC := context regPC.
+	prevRegE := context environment.
 	context buildLaunchFrame.
 	regR := receiver.
 	anArray isEmpty
@@ -182,7 +183,7 @@ EggIterativeStackedInterpreter >> sendLocal: aSymbol to: receiver with: anArray 
 	work := {dispatch}.
 	context regPC: 0.
 	self evaluate.
-	context popLaunchFrame.
+	context popLaunchFrame: prevRegE.
 	work := prevWork.
 	context regPC: prevPC.
 	^ regR
