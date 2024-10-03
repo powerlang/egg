@@ -209,7 +209,7 @@ HeapObject* Evaluator::prepareForExecution_(HeapObject *method) {
     decoder.runtime_(_runtime);
     auto sexpressions = decoder.decodeMethod();
 
-    this->_linearizer->visitMethod(sexpressions);
+    this->_linearizer->visitMethod(sexpressions, method);
     executableCode = this->_runtime->newExecutableCodeFor_with_(method, reinterpret_cast<HeapObject*>(this->_linearizer->operations()));
     this->_runtime->methodExecutableCode_put_(method, (Object*)executableCode);
 
