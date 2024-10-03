@@ -45,7 +45,7 @@ MetaclassSpec >> classVarNames [
 MetaclassSpec >> instSize [
 
 	^ instSize ifNil: [ 
-		  instSize := module classInstVarNames size + class allClassVarNames size ]
+		  instSize := self allInstVarNames size ]
 ]
 
 { #category : 'accessing' }
