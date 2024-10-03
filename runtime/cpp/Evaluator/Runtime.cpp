@@ -281,7 +281,7 @@ std::string Egg::Runtime::print_(HeapObject *obj) {
 	auto species = this->behaviorClass_(obj->behavior());
 	if (species == _stringClass)
 		return "'" + obj->asLocalString() + "'";
-	if (species == _methodClass)
+	if (species == _methodClass || species == _ffiMethodClass)
 	{
         auto selector = (HeapObject*)obj->slot(Offsets::MethodSelector);
 		auto s = (selector == _nilObj) ? "nil" : selector->asLocalString();
@@ -302,6 +302,10 @@ std::string Egg::Runtime::print_(HeapObject *obj) {
     if (speciesIsMetaclass_(species)) // then obj is a class
     {
         return "" + speciesLocalName_(obj) + "";
+    }
+
+    if (species == _metaclassClass) {
+        return this->metaclassInstanceClass_(obj)->printString() + " class";
     }
 
 	auto name = this->speciesLocalName_(species);
