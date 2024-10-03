@@ -23,14 +23,31 @@ HostSystem >> fixOverrides [
 	<primitive: HostFixOverrides>
 ]
 
+{ #category : #bootstrapping }
+HostSystem >> initializeFFI: anExternalLibrary symbolFinder: anFFIMethod [
+	<primitive: HostInitializeFFI>
+]
+
+{ #category : #loading }
+HostSystem >> primitiveLoad: aSymbol [
+	<primitive: HostLoadModule>
+]
+
 { #category : #loading }
 HostSystem >> load: aSymbol [
-	<primitive: HostLoadModule>
+	| module |
+	module := self primitiveLoad: aSymbol.
+	^module justLoaded
 ]
 
 { #category : #logging }
 HostSystem >> logError: aString [
 	<primitive: HostLogError>
+]
+
+{ #category : #loading }
+HostSystem >> platformName [
+	<primitive: HostPlatformName>
 ]
 
 { #category : #private }
