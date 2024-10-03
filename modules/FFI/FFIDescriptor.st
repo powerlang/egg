@@ -13,17 +13,17 @@ Class {
 
 { #category : #accessing }
 FFIDescriptor >> argumentCount [
-	^self size - WordSize - 2
+	^self size - 2
 ]
 
 { #category : #accessing }
 FFIDescriptor >> argumentTypeAt: index [
-	^self at: WordSize + 1 + index
+	^self at: index
 ]
 
 { #category : #accessing }
 FFIDescriptor >> argumentTypeAt: index put: typeInteger [
-	self at: WordSize + 1 + index put: typeInteger
+	self at: index put: typeInteger
 ]
 
 { #category : #accessing }
@@ -38,20 +38,20 @@ FFIDescriptor >> argumentTypes: types [
 
 { #category : #accessing }
 FFIDescriptor >> callingConvention [
-	^self at: WordSize + 1
-]
-
-{ #category : #accessing }
-FFIDescriptor >> callingConvention: ccCode [
-	self at: WordSize + 1 put: ccCode
-]
-
-{ #category : #accessing }
-FFIDescriptor >>returnType [
 	^self at: self size
 ]
 
 { #category : #accessing }
+FFIDescriptor >> callingConvention: ccCode [
+	self at: self size put: ccCode
+]
+
+{ #category : #accessing }
+FFIDescriptor >>returnType [
+	^self at: self size - 1
+]
+
+{ #category : #accessing }
 FFIDescriptor >> returnType: anInteger [
-	self at: WordSize + 2 + self argumentCount put: anInteger
+	self at: self size - 1 put: anInteger
 ]
