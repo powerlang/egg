@@ -20,6 +20,13 @@ enum BlockCapturedVariables {
     EnvironmentValue = 3
 };
 
+enum MethodFlags {
+    MethodArgCount = 0x3F,
+    MethodTempCount = 0x1FE000,
+    MethodTempCountShift = 13,
+    MethodIsExtension = 0x80000000
+};
+
 enum Offsets {
     AssociationKey = 0,
     AssociationValue = 1,
@@ -45,8 +52,9 @@ enum Offsets {
     MethodSourceCode = 5,
     MethodInstSize = 6,
 
+    FFIMethodDescriptor = 6,
     FFIMethodSymbol = 7,
-    FFIMethodDescriptor = 7,
+    FFIMethodAddress = 8,
 
     ModuleName = 0,
     ModuleVersion = 1,
