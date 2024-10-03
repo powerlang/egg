@@ -389,7 +389,7 @@ SSmalltalkParser >> ffiOrPrimitive: aMethodNode [
 	token value: tag.
 	tag = 'primitive' ifTrue: [^self primitive].
 	tag = 'callback' ifTrue: [ ^self ffiCall: false method: aMethodNode ].
-	tag = 'callout' ifTrue: [ ^self ffiCall: true method: aMethodNode ].	
+	tag = 'cdecl' ifTrue: [ ^self ffiCall: true method: aMethodNode ].	
 	self invalidPragma
 ]
 

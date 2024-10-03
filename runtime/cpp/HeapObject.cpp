@@ -243,6 +243,14 @@ HeapObject::slot(const uint32_t index)
     return ((ObjectSlot*)this)[index];
 }
 
+HeapObject::ObjectSlot&
+HeapObject::untypedSlot(const uint32_t index)
+{
+	ASSERT(/*index >= 0 &&*/ index < this->size());
+
+	return ((ObjectSlot*)this)[index];
+}
+
 uint8_t&
 HeapObject::byte(const uint32_t subscript)
 {
@@ -252,22 +260,37 @@ HeapObject::byte(const uint32_t subscript)
     return *(((uint8_t*)this) + subscript);
 }
 
+uint8_t&
+HeapObject::unsafeByte(const uint32_t subscript)
+{
+	return *(((uint8_t*)this) + subscript);
+}
+
 uint16_t&
-HeapObject::uint16(const uint32_t subscript)
+HeapObject::uint16offset(const uint32_t subscript)
 {
     ASSERT(this->isBytes());
-    ASSERT(subscript * 2 + 1 < this->size());
+    ASSERT(subscript + 1 < this->size());
 
-    return *(((uint16_t*)this) + subscript);
+    return *(uint16_t*)((uintptr_t)this + subscript);
 }
 
 uint32_t&
-HeapObject::uint32(const uint32_t subscript)
+HeapObject::uint32offset(const uint32_t subscript)
 {
     ASSERT(this->isBytes());
     ASSERT(subscript * 4 + 3 < this->size());
 
-    return *(((uint32_t*)this) + subscript);
+    return *(uint32_t*)((uintptr_t)this + subscript);
+}
+
+uint64_t&
+HeapObject::uint64offset(const uint32_t subscript)
+{
+	ASSERT(this->isBytes());
+	ASSERT(subscript + 7 < this->size());
+
+	return *(uint64_t*)((uintptr_t)this + subscript);
 }
 
 void HeapObject::replaceBytesFrom_to_with_startingAt_(
@@ -278,8 +301,8 @@ void HeapObject::replaceBytesFrom_to_with_startingAt_(
 
 		auto size = to - from + 1;
 		auto startingAtOffset = startingAt - 1;
-		if (size > anObject->size() - startingAtOffset)
-			error("out of bounds");
+		//if (size > anObject->size() - startingAtOffset) // cannot check bounds as anObject could be just a buffer
+		//	error("out of bounds");
 		
 		auto dst = ((char*)this) + from - 1;
 		auto src = ((char*)anObject) + startingAtOffset;

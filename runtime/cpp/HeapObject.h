@@ -203,19 +203,27 @@ struct HeapObject
 
       typedef Object* ObjectSlot;
       ObjectSlot &slot(const uint32_t subscript); // return a reference to a slot of
-                                              // this object. `index` is 0-based
+                                                  // this object. `index` is 0-based
+      ObjectSlot &untypedSlot(const uint32_t subscript); // same but without checking that the object has pointers
+
 
       ObjectSlot& slotAt_(uint32_t index) { return slot(index - 1); }; // 1-based slot for compatibility reasons
+      ObjectSlot& untypedSlotAt_(uint32_t index) { return untypedSlot(index - 1); }; // 1-based slot for compatibility reasons
 
       uint8_t& byte(const uint32_t subscript);       /// Return a byte of this object at 0-based `subscript`
+      uint8_t& unsafeByte(const uint32_t subscript);       /// same but without checking bounds and being of bytes type
+
       uint8_t& byteAt_(uint32_t index) { return byte(index - 1); }; // 1-based index for compatibility reasons
+      uint8_t& unsafeByteAt_(uint32_t index) { return unsafeByte(index - 1); }; // 1-based index for compatibility reasons
 
-      uint16_t& uint16(const uint32_t subscript);       /// Return a 16-bit uint of this object at 0-based `subscript`
-      uint16_t& unsignedShortAt_(uint32_t index) { return uint16(index - 1); }; // 1-based index for compatibility reasons
+      uint16_t& uint16offset(const uint32_t subscript);       /// Return a 16-bit uint of this object at 0-based `subscript`
+      uint16_t& unsignedShortAt_(uint32_t index) { return uint16offset((index - 1) * 2); }; // 1-based index for compatibility reasons
 
-      uint32_t& uint32(const uint32_t subscript);       /// Return a 32-bit uint of this object at 0-based `subscript`
-      uint32_t& unsignedLongAt_(uint32_t index) { return uint32(index - 1); }; // 1-based index for compatibility reasons
+      uint32_t& uint32offset(const uint32_t subscript);       /// Return a 32-bit uint of this object at 0-based `subscript`
+      uint32_t& unsignedLongAt_(uint32_t index) { return uint32offset((index - 1) * 4); }; // 1-based index for compatibility reasons
 
+      uint64_t& uint64offset(const uint32_t subscript);       /// Return a 64-bit uint of this object at 0-based `subscript`
+      uint64_t& unsignedLargeAt_(uint32_t index) { return uint64offset((index - 1) * 8); }; // 1-based index for compatibility reasons
 
     /// ~ object bytes ~
       void replaceBytesFrom_to_with_startingAt_(

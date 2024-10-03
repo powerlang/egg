@@ -6,16 +6,8 @@
 Class {
 	#name : #Unicode,
 	#superclass : #Object,
-	#classInstVars : [
-		'current'
-	],
 	#category : #Kernel
 }
-
-{ #category : #accessing }
-Unicode class >> current [
-	^current
-]
 
 { #category : #services }
 Unicode class >> decode: aByteArray [
@@ -42,11 +34,6 @@ Unicode class >> decoderFor: aStream [
 	(aStream peekForAll: UTF32 prefix) ifTrue: [^UTF32].
 	(aStream peekForAll: UTF16 prefix) ifTrue: [^UTF16].
 	^UTF8
-]
-
-{ #category : #initialization }
-Unicode class >> initializeCurrent [
-	current := self == Unicode ifFalse: [self new]
 ]
 
 { #category : #services }

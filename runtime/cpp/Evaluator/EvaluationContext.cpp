@@ -93,9 +93,9 @@ void EvaluationContext::buildMethodFrameFor_code_environment_(Object *receiver, 
 }
 
 
-void EvaluationContext::popLaunchFrame() {
+void EvaluationContext::popLaunchFrame(HeapObject *prevRegE) {
     _regSP = _regBP;
-	_regE = this->stackAt_(_regBP - 3)->asHeapObject();
+	_regE = prevRegE;
 	_regBP = reinterpret_cast<uintptr_t>(this->pop());
 	_regPC = reinterpret_cast<uintptr_t>(this->pop());
 	
@@ -284,8 +284,7 @@ SBinding* EvaluationContext::staticBindingForIvar_(HeapObject *aSymbol) {
 }
 
 SBinding* EvaluationContext::staticBindingForMvar_(HeapObject *symbol) {
-    auto species = this->_runtime->methodClassBinding_(this->method());
-    auto module_ = this->_runtime->speciesModule_(species);
+    auto module_ = this->_runtime->methodModule_(this->method());
     return this->staticBindingFor_inModule_(symbol, module_);
 }
 
@@ -311,6 +310,10 @@ Object * EvaluationContext::temporaryOfFrameAt_subscript_(uintptr_t frame, uintp
     return _stack[frame - FRAME_TO_FIRST_TEMP_DELTA - subscript - 1];
 }
 
+HeapObject * EvaluationContext::environmentOfFrameAt_(uintptr_t frame) {
+    return (HeapObject*)_stack[frame - FRAME_TO_ENVIRONMENT_DELTA - 1];
+}
+
 void printObject_into_(Object* o, std::ostringstream &s) {
 
     if (o == nullptr)
@@ -329,10 +332,19 @@ void EvaluationContext::printFrame_into_(uintptr_t frame, std::ostringstream &s)
     for (int i = argCount - 1; i >= 0; i--)
         args.push_back(this->argumentOfFrameAt_subscript_(frame, i));
 
-    auto tempCount = this->_runtime->methodTempCount_(code);
+    auto tempCount = this->_runtime->temporaryCountOf_(code);
     std::vector<Object*> temps;
     for (int i = 0; i < tempCount; i++)
         temps.push_back(this->temporaryOfFrameAt_subscript_(frame, i));
+
+    auto envCount = 0;
+    if (!this->_runtime->isBlock_(code))
+        envCount = this->_runtime->methodEnvironmentSize_(code);
+
+    std::vector<Object*> envTemps;
+    for (int i = 0; i < envCount; i++)
+        envTemps.push_back(this->environmentOfFrameAt_(frame)->slot(i));
+
 
     printObject_into_((Object*)code, s);
     s << std::endl;
@@ -351,6 +363,12 @@ void EvaluationContext::printFrame_into_(uintptr_t frame, std::ostringstream &s)
         printObject_into_(temp, s);
         s << std::endl;
     }
+
+    for(auto &envtemp : envTemps) {
+        s << "envtemp: ";
+        printObject_into_(envtemp, s);
+        s << std::endl;
+    }
 }
 
 std::string EvaluationContext::backtrace() {
@@ -358,7 +376,7 @@ std::string EvaluationContext::backtrace() {
     std::vector<uintptr_t> frames;
     uintptr_t current = _regBP;
     while (current) {
-        frames.push_back( current);
+        frames.push_back(current);
         current = (uintptr_t)_stack[current - 1];
     }
     for (int i = frames.size() - 1; i >= 0; i--) {
@@ -366,6 +384,9 @@ std::string EvaluationContext::backtrace() {
         s << std::endl;
     }
 
+    s << "-----------------" << std::endl;
+    s << "regs:" << std::endl;
+    s << "-----------------" << std::endl;
     s << "regM: ";
     printObject_into_((Object*)_regM, s);
     s << std::endl;

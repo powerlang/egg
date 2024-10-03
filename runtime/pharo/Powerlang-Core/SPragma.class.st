@@ -2,12 +2,23 @@ Class {
 	#name : 'SPragma',
 	#superclass : 'SExpression',
 	#instVars : [
-		'name'
+		'name',
+		'descriptor'
 	],
 	#category : 'Powerlang-Core-SExpressions',
 	#package : 'Powerlang-Core',
 	#tag : 'SExpressions'
 }
+
+{ #category : 'accessing' }
+SPragma >> descriptor [
+	^descriptor
+]
+
+{ #category : 'accessing' }
+SPragma >> descriptor: anFFIDescriptor [
+	descriptor := anFFIDescriptor
+]
 
 { #category : 'accessing' }
 SPragma >> name [

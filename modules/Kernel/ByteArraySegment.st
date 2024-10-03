@@ -114,11 +114,6 @@ ByteArraySegment >> endOffset [
 	^offset + size
 ]
 
-{ #category : #accessing }
-ByteArraySegment >> externalCopy [
-	^ExternalMemory fromByteArray: self asByteArray
-]
-
 { #category : #comparing }
 ByteArraySegment >> hash [
 	| hash |

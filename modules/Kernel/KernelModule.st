@@ -14,7 +14,10 @@ Class {
 		'moduleLoaders',
 		'host',
 		'CRITICAL',
-		'unhandledErrorHandler'
+		'unhandledErrorHandler',
+		'utf8',
+		'utf16',
+		'utf32'
 	],
 	#category : #Kernel
 }
@@ -40,7 +43,6 @@ KernelModule >> bootstrap [
 	Species initializeFormatFlags.
 	Character initializeCharacters; initializeNamedCharacters.
 	Closure initializeIndexes.
-	ExternalMemory initializeConstants.
 	Float initializeConstants.
 	HashTable initializeConstants; initializeSizes.
 	HashTablePolicy initializeEmptySlot.
@@ -60,13 +62,16 @@ KernelModule >> bootstrap [
 		at: #KnownSymbols put: #(+ - < > <= >= = == not);
 		at: #Processor put: ProcessorScheduler new.
 	StarToken initializeCurrent.
-	Unicode allSubclasses do: [:c | c initializeCurrent].
+	utf8 := UTF8 new.
+	utf16 := UTF16 new.
+	utf32 := UTF32 new.
 	Symbol initializeSymbolTable.
 	namespace at: #SymbolTable put: Symbol symbolTable.
 	Stream initializePools.
 	CharacterArray initializePools.
 	ProtoObject initializeConstants; initializeBitMasks.
-	
+
+	#FFICall. "hack to have this symbol (used by primitiveFFICall) in kernel ims"
 	self initialize.
 	CRITICAL := false.
 	self suspendOnUnhandledExceptions
@@ -88,12 +93,6 @@ KernelModule >> critical: aBlock [
 	aBlock value
 ]
 
-KernelModule >> entry: argc argv: argv [
-	<callback: long (long, pointer)>
-	"^Smalltalk startSession"
-	^KernelModule new foo.
-]
-
 KernelModule >> exit [
 	host exit: 0
 ]
@@ -111,9 +110,7 @@ KernelModule >> host [
 { #category : #initialization }
 KernelModule >> initialize [
 	"
-		we cannot do super initialize here, because it would
-		reset our bootstrapped namespace. We cannot use addClass:
-		because it creates new symbol instances, which must be
+		We cannot use addClass: because it creates new symbol instances, which must be
 		avoided during bootstrap (else we would end with duplicated symbols)
 	"
 	self basicInitialize; freezeOnUnhandledExceptions.
@@ -210,6 +207,21 @@ KernelModule >> unhandledExceptionHandler: aClosure [
 { #category : #loading }
 KernelModule >> useHostModuleLoader [
 	self addModuleLoader: host.
+]
+
+{ #category : #accessing }
+KernelModule >> utf8 [
+	^utf8
+]
+
+{ #category : #accessing }
+KernelModule >> utf16 [
+	^utf16
+]
+
+{ #category : #accessing }
+KernelModule >> utf32 [
+	^utf32
 ]
 
 KernelModule >> foo [

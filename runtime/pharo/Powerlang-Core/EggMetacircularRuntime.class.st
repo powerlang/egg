@@ -43,7 +43,8 @@ Class {
 		'methodSelectorIndex',
 		'compiledCodeExecutableCodeIndex',
 		'floatClass',
-		'processStackSPIndex'
+		'processStackSPIndex',
+		'ffiMethodClass'
 	],
 	#pools : [
 		'SCompiledBlockFlags',
@@ -298,6 +299,16 @@ EggMetacircularRuntime >> extensionMethodModule: anLMRObject [
 ]
 
 { #category : 'initialization' }
+EggMetacircularRuntime >> ffiMethodClass [
+	^ffiMethodClass
+]
+
+{ #category : 'initialization' }
+EggMetacircularRuntime >> ffiMethodClass: anEggObject [
+	ffiMethodClass := anEggObject
+]
+
+{ #category : 'initialization' }
 EggMetacircularRuntime >> fixOverrides [
 	| selector md |
 	overrides
@@ -509,6 +520,11 @@ EggMetacircularRuntime >> methodFor: aSymbol in: behavior [
 { #category : 'initialization' }
 EggMetacircularRuntime >> methodInstSize: anInteger [
 	methodInstSize := anInteger
+]
+
+{ #category : 'initialization' }
+EggMetacircularRuntime >> methodIsCallout: method [
+	^(self speciesFor: method) == ffiMethodClass
 ]
 
 { #category : 'initialization' }
@@ -880,9 +896,9 @@ EggMetacircularRuntime >> smallIntegerClass: anLMRObject [
 ]
 
 { #category : 'initialization' }
-EggMetacircularRuntime >> speciesFor: anLMRObject [
+EggMetacircularRuntime >> speciesFor: anEggObject [
 	| behavior |
-	behavior := self behaviorOf: anLMRObject.
+	behavior := self behaviorOf: anEggObject.
 	^self behaviorClass: behavior.
 
 

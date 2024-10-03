@@ -22,9 +22,17 @@ ELSE()
     set(PLATFORM Posix)
 ENDIF()
 
+# **** instructions for linking against libffi ****
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(FFI REQUIRED libffi)
+
+include_directories(${FFI_INCLUDE_DIRS})
+# *************************************************
+
 file(GLOB ALL_SRC "*.cpp" "Evaluator/*.cpp" "${PLATFORM}/*.cpp")
 
 add_executable(${EXE} ${ALL_SRC})
+target_link_libraries(${EXE} ${FFI_LIBRARIES}) # link agains libffi
 
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

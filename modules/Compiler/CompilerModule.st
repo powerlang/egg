@@ -11,8 +11,8 @@ Class {
 }
 
 { #category : #initializing }
-CompilerModule >> justLoaded [
-	super justLoaded.
+CompilerModule >> initialize [
+	super initialize.
 	TreecodeEncoder initializeBindingIds; initializeTreecodeIds; initializeClosureElementIds
 ]
 

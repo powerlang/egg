@@ -19,6 +19,9 @@
 #include "SOpReturn.h"
 
 #include "TreecodeDecoder.h"
+
+#include "FFIGlue.h"
+
 #include <cmath>
 #include <bit>
 
@@ -68,6 +71,8 @@ void Evaluator::initializeUndermessages() {
     this->addUndermessage("_basicHash:", &Evaluator::underprimitiveBasicHashPut);
     this->addUndermessage("_smallIntegerByteAt:", &Evaluator::underprimitiveSmallIntegerByteAt);
     this->addUndermessage("_bitShiftLeft:", &Evaluator::underprimitiveBitShiftLeft);
+    this->addUndermessage("_uLargeAtOffset:", &Evaluator::underprimitiveULargeAtOffset);
+    this->addUndermessage("_uLargeAtOffset:put:", &Evaluator::underprimitiveULargeAtOffsetPut);
     this->addUndermessage("_primitiveULongAtOffset:", &Evaluator::underprimitiveULongAtOffset);
     this->addUndermessage("_primitiveULongAtOffset:put:", &Evaluator::underprimitiveULongAtOffsetPut);
     this->addUndermessage("_uShortAtOffset:", &Evaluator::underprimitiveUShortAtOffset);
@@ -141,6 +146,10 @@ void Evaluator::initializePrimitives()
     //this->addPrimitive("HostFixOverrides", &Evaluator::primitiveHostFixOverrides);
     this->addPrimitive("PrimeFor", &Evaluator::primitivePrimeFor);
     this->addPrimitive("FlushFromCaches", &Evaluator::primitiveFlushFromCaches);
+    this->addPrimitive("FFICall", &Evaluator::primitiveFFICall);
+    this->addPrimitive("HostInitializeFFI", &Evaluator::primitiveHostInitializeFFI);
+    this->addPrimitive("HostPlatformName", &Evaluator::primitiveHostPlatformName);
+
     /*this->addPrimitive("PrepareForExecution", &Evaluator::primitivePrepareForExecution);
     this->addPrimitive("ProcessVMStackInitialize", &Evaluator::primitiveProcessVMStackInitialize);
     this->addPrimitive("ProcessVMStackAt", &Evaluator::primitiveProcessVMStackAt);
@@ -205,7 +214,7 @@ HeapObject* Evaluator::prepareForExecution_(HeapObject *method) {
     decoder.runtime_(_runtime);
     auto sexpressions = decoder.decodeMethod();
 
-    this->_linearizer->visitMethod(sexpressions);
+    this->_linearizer->visitMethod(sexpressions, method);
     executableCode = this->_runtime->newExecutableCodeFor_with_(method, reinterpret_cast<HeapObject*>(this->_linearizer->operations()));
     this->_runtime->methodExecutableCode_put_(method, (Object*)executableCode);
 
@@ -231,6 +240,7 @@ void Egg::Evaluator::evaluateUndermessage_with_(SAbstractMessage * message, Unde
 
 Object* Evaluator::send_to_with_(HeapObject *symbol, Object *receiver, std::vector<Object*> &args) {
     auto bytecodes = this->_context->buildLaunchFrame(symbol, args.size());
+    auto prevRegE = this->_context->environment();
     this->_regR = receiver;
     if (!args.empty())
         this->_context->pushOperand_(receiver);
@@ -241,17 +251,19 @@ Object* Evaluator::send_to_with_(HeapObject *symbol, Object *receiver, std::vect
     this->_work = bytecodes;
     this->_context->regPC_(0);
     this->evaluate();
-    this->_context->popLaunchFrame();
+    this->_context->popLaunchFrame(prevRegE);
+    auto executableCode = this->_runtime->methodExecutableCode_(this->_context->method());
+    this->_work = reinterpret_cast<std::vector<SExpression*>* >(_runtime->executableCodePlatformCode_(executableCode));;
     return this->_regR;
 }
 
 void Egg::Evaluator::messageNotUnderstood_(SAbstractMessage *message)
-{ 
-    std::cout
-        << "Message not understood!" << std::endl
-        << this->_regR->printString() << " does not understand " << message->selector()->printString();
+{
+    std::string errmsg = std::string("Message not understood!\n") +
+        this->_regR->printString() + " does not understand " + message->selector()->printString() +
+        "\ndnu recovery not implemented yet";
     
-    error("dnu recovery not implemented yet");
+    error_(errmsg);
 }
 
 void Evaluator::doesNotKnow(HeapObject *symbol) { ASSERT(false); }
@@ -420,6 +432,9 @@ SExpression* Evaluator::nextOperation() {
 
     return _work->at(pc - 1);
 }
+Object* Evaluator::newDoubleObject(double aDouble){
+    return (Object*)this->_runtime->newDouble_(aDouble);
+}
 
 Object* Evaluator::newIntObject(auto anInteger){
     return (Object*)this->_runtime->newInteger_(anInteger);
@@ -544,7 +559,7 @@ Object* Evaluator::primitiveEqual() {
 }
 
 Object* Evaluator::primitiveFloatNew() {
-    return (Object*)this->_runtime->newBytesOf_sized_(this->_context->self()->asHeapObject(), 8);
+    return (Object*)this->_runtime->newBytes_size_(this->_context->self()->asHeapObject(), 8);
 }
 
 Object* Evaluator::primitiveFlushDispatchCaches() {
@@ -565,8 +580,28 @@ Object* Evaluator::primitiveHash() {
     return newIntObject(this->_runtime->hashFor_(this->_context->self()));
 }
 
+Object* Evaluator::primitiveHostPlatformName() {
+    return (Object*)this->_runtime->newString_(PlatformName());
+}
+
+Object* Evaluator::primitiveHostInitializeFFI() {
+    auto library = this->_context->firstArgument()->asHeapObject();
+    auto handle = library->slotAt_(1);
+    *((uintptr_t*)handle) = LoaderHandle();
+
+    auto symbolFinder = this->_context->secondArgument()->asHeapObject();
+
+    auto ffiMethodClass = this->_runtime->speciesOf_((Object*)symbolFinder);
+    this->_runtime->_ffiMethodClass = ffiMethodClass;
+
+    return (Object*)this->_context->self();
+}
 Object* Evaluator::primitiveHostLoadModule() {
-    return (Object*)this->_runtime->loadModule_(this->_context->firstArgument()->asHeapObject());
+    auto name = this->_context->firstArgument()->asHeapObject()->asLocalString();
+    std::cout << "loading " << name << "..." << std::endl;
+    auto module = (Object*)this->_runtime->loadModule_(this->_context->firstArgument()->asHeapObject());
+    std::cout << " done loading " << name << std::endl;
+    return module;
 }
 
 Object* Evaluator::primitiveNew() {
@@ -575,7 +610,7 @@ Object* Evaluator::primitiveNew() {
 
 Object* Evaluator::primitiveNewBytes() {
     auto size = this->_context->firstArgument()->asSmallInteger()->asNative();
-    return (Object*)this->_runtime->newBytesOf_sized_(this->_context->self()->asHeapObject(), size);
+    return (Object*)this->_runtime->newBytes_size_(this->_context->self()->asHeapObject(), size);
 }
 
 Object* Evaluator::primitiveNewSized() {
@@ -712,12 +747,145 @@ Object* Evaluator::primitiveUnderSize() {
     return newIntObject(this->_context->self()->asHeapObject()->size());
 }
 
+void Evaluator::initializeCIF(HeapObject *method, int argCount) {
+
+    HeapObject *dll = this->_context->receiver()->asHeapObject();
+    Object *handle = dll->slotAt_(1); // the handle
+    if (handle->asHeapObject()->untypedSlot(0) == nullptr) {
+        error("trying to execute FFI method on closed library");
+    }
+
+    HeapObject *fnName = _runtime->ffiMethodSymbol_(method);
+
+    FFIDescriptorImpl *descriptor_impl = new FFIDescriptorImpl;
+    descriptor_impl->cif = new ffi_cif();
+    descriptor_impl->argTypes = new ffi_type*[argCount + 1];
+    descriptor_impl->fnAddr = (void(*)())FindSymbol(*(uintptr_t*)handle, (char*)fnName);;
+
+    HeapObject *descriptor = _runtime->ffiMethodDescriptor_(method);
+
+    // iterate all arguments _and_ return type
+    for (int i = 0; i < argCount + 1; i++) {
+        uchar type = descriptor->byteAt_(i + 1); // 1-based index
+        ffi_type **argType = &descriptor_impl->argTypes[i];
+        switch (type) {
+            //case FFI_void:
+            case FFI_uint8:  *argType = &ffi_type_uint8; break;
+            case FFI_sint8:  *argType = &ffi_type_sint8; break;
+            case FFI_uint16: *argType = &ffi_type_uint16; break;
+            case FFI_sint16: *argType = &ffi_type_sint16; break;
+            case FFI_uint32: *argType = &ffi_type_uint32; break;
+            case FFI_sint32: *argType = &ffi_type_sint32; break;
+            case FFI_uint64: *argType = &ffi_type_uint64; break;
+            case FFI_sint64: *argType = &ffi_type_sint64; break;
+
+            case FFI_float:  *argType = &ffi_type_float; break;
+            case FFI_double: *argType = &ffi_type_double; break;
+
+            case FFI_uchar:  *argType = &ffi_type_uchar; break;
+            case FFI_schar:  *argType = &ffi_type_schar; break;
+            case FFI_ushort: *argType = &ffi_type_ushort; break;
+            case FFI_sshort: *argType = &ffi_type_sshort; break;
+            case FFI_uint:   *argType = &ffi_type_uint; break;
+            case FFI_sint:   *argType = &ffi_type_sint; break;
+            case FFI_ulong:  *argType = &ffi_type_ulong; break;
+            case FFI_slong:  *argType = &ffi_type_slong; break;
+            case FFI_longdouble: *argType = &ffi_type_longdouble; break;
+
+            case FFI_pointer: *argType = &ffi_type_pointer; break;
+
+            case FFI_complex_float:      *argType = &ffi_type_complex_float; break;
+            case FFI_complex_double:     *argType = &ffi_type_complex_double; break;
+            case FFI_complex_longdouble: *argType = &ffi_type_complex_longdouble; break;
+            default: error_("wrong descriptor"); break;
+        }
+    }
+    if (ffi_prep_cif(descriptor_impl->cif, FFI_DEFAULT_ABI, argCount, descriptor_impl->argTypes[argCount], descriptor_impl->argTypes) != FFI_OK) {
+        error_(std::string("ffi_prep_cif failed for ") + method->printString());
+    }
+
+    _runtime->ffiMethodAddress_put_(method, SmallInteger::from((intptr_t)descriptor_impl));
+
+}
+
+Object* Evaluator::demarshalFFIResult(void *retval, uint8_t type) {
+    switch (type) {
+       case FFI_uint8:  return newIntObject(*reinterpret_cast<uint8_t*>(retval)); break;
+       case FFI_sint8:  return newIntObject(*reinterpret_cast<int8_t*>(retval)); break;
+       case FFI_uint16: return newIntObject(*reinterpret_cast<uint16_t*>(retval)); break;
+       case FFI_sint16: return newIntObject(*reinterpret_cast<int16_t*>(retval)); break;
+       case FFI_uint32: return newIntObject(*reinterpret_cast<uint32_t*>(retval)); break;
+       case FFI_sint32: return newIntObject(*reinterpret_cast<int32_t*>(retval)); break;
+       case FFI_uint64: return newIntObject(*reinterpret_cast<uint64_t*>(retval)); break;
+       case FFI_sint64: return newIntObject(*reinterpret_cast<int64_t*>(retval)); break;
+
+       case FFI_float:  return newDoubleObject(*reinterpret_cast<float*>(retval)); break;
+       case FFI_double: return newDoubleObject(*reinterpret_cast<double*>(retval)); break;
+
+       case FFI_uchar:  return newIntObject(*reinterpret_cast<uint8_t*>(retval)); break;
+       case FFI_schar:  return newIntObject(*reinterpret_cast<int8_t*>(retval)); break;
+       case FFI_ushort: return newIntObject(*reinterpret_cast<uint16_t*>(retval)); break;
+       case FFI_sshort: return newIntObject(*reinterpret_cast<int16_t*>(retval)); break;
+       case FFI_uint:   return newIntObject(*reinterpret_cast<uint*>(retval)); break;
+       case FFI_sint:   return newIntObject(*reinterpret_cast<int*>(retval)); break;
+       case FFI_ulong:  return newIntObject(*reinterpret_cast<ulong*>(retval)); break;
+       case FFI_slong:  return newIntObject(*reinterpret_cast<long*>(retval)); break;
+
+       case FFI_pointer: return newIntObject(*reinterpret_cast<uintptr_t*>(retval)); break;
+
+       default: error_("wrong descriptor"); break;
+    }
+    error_("unreachable");
+    return nullptr;
+}
+
+
+Object* Evaluator::primitiveFFICall() {
+    HeapObject *method = this->_context->method();
+    int argCount = _runtime->methodArgumentCount_(method);
+    Object *address = _runtime->ffiMethodAddress_(method);
+
+    if (address == (Object*)_nilObj) {
+        initializeCIF(method, argCount);
+        address = _runtime->ffiMethodAddress_(method);
+    }
+
+    FFIDescriptorImpl *desc = (FFIDescriptorImpl*)address->asSmallInteger()->asNative();
+
+    void **args = (void**)alloca(argCount* sizeof(void*));
+    Object **lastArg = this->_context->lastArgumentAddress();
+
+    for (int i = 0; i < argCount; i++)
+    {
+        Object **argAddress = &lastArg[argCount - i - 1];
+
+        // the arg passed is either:
+        // a. a tagged smi (and has to be converted to a native int), or
+        // b. a heap object, so its pointed memory _has_ the native value
+        if (argAddress[0]->isSmallInteger()) {
+            argAddress[0] = (Object*)argAddress[0]->asSmallInteger()->asNative();
+            args[i] = argAddress;
+        } else {
+            args[i] = *argAddress;
+        }
+    }
+
+    HeapObject *descriptor = _runtime->ffiMethodDescriptor_(method);
+
+    void *retval = alloca(desc->argTypes[argCount]->size); // FIXME: we are assuming result fits in sizeof(uintptr_t)
+    ffi_call(desc->cif, desc->fnAddr, retval, args);
+
+
+    uint8_t retType = descriptor->byteAt_(descriptor->size() - 1);
+    return this->demarshalFFIResult(retval, retType);
+}
+
 Object* Evaluator::underprimitiveBasicAt(Object *receiver, std::vector<Object*> &args) {
-    return receiver->asHeapObject()->slotAt_(args[0]->asSmallInteger()->asNative());
+    return receiver->asHeapObject()->untypedSlotAt_(args[0]->asSmallInteger()->asNative());
 }
 
 Object* Evaluator::underprimitiveBasicAtPut(Object *receiver, std::vector<Object*> &args) {
-    receiver->asHeapObject()->slotAt_(args[0]->asSmallInteger()->asNative()) = args[1];
+    receiver->asHeapObject()->untypedSlotAt_(args[0]->asSmallInteger()->asNative()) = args[1];
     return args[1];
 }
 
@@ -740,12 +908,12 @@ Object* Evaluator::underprimitiveBitShiftLeft(Object *receiver, std::vector<Obje
 }
 
 Object* Evaluator::underprimitiveByteAt(Object *receiver, std::vector<Object*> &args) {
-    auto result = receiver->asHeapObject()->byteAt_(args[0]->asSmallInteger()->asNative());
+    auto result = receiver->asHeapObject()->unsafeByteAt_(args[0]->asSmallInteger()->asNative());
     return newIntObject(result);
 }
 
 Object* Evaluator::underprimitiveByteAtPut(Object *receiver, std::vector<Object*> &args) {
-    receiver->asHeapObject()->byteAt_(args[0]->asSmallInteger()->asNative()) = args[1]->asSmallInteger()->asNative();
+    receiver->asHeapObject()->unsafeByteAt_(args[0]->asSmallInteger()->asNative()) = args[1]->asSmallInteger()->asNative();
     return args[1];
 }
 
@@ -840,7 +1008,7 @@ Object* Evaluator::underprimitiveSMITimes(Object *receiver, std::vector<Object*>
 Object* Evaluator::underprimitiveSmallIntegerByteAt(Object *receiver, std::vector<Object*> &args) {
     auto integer = receiver->asSmallInteger()->asNative();
     auto offset = args[0]->asSmallInteger()->asNative() - 1;
-    auto result = integer > 7 ? 0 : reinterpret_cast<uint8_t*>(&integer)[offset];
+    auto result = offset > 7 ? 0 : reinterpret_cast<uint8_t*>(&integer)[offset];
     return newIntObject(result);
 }
 
@@ -851,24 +1019,35 @@ Object* Evaluator::underprimitiveSmallSize(Object *receiver, std::vector<Object*
     return newIntObject(receiver->asHeapObject()->size());
 }
 
+Object* Evaluator::underprimitiveULargeAtOffset(Object *receiver, std::vector<Object*> &args) {
+    auto result = receiver->asHeapObject()->uint64offset((args[1]->asSmallInteger()->asNative()));
+    return newIntObject(result);
+}
+
+Object* Evaluator::underprimitiveULargeAtOffsetPut(Object *receiver, std::vector<Object*> &args) {
+    auto value = args[1];
+    receiver->asHeapObject()->uint64offset((args[0]->asSmallInteger()->asNative())) = value->asSmallInteger()->asNative();
+    return value;
+}
+
 Object* Evaluator::underprimitiveULongAtOffset(Object *receiver, std::vector<Object*> &args) {
-    auto result = receiver->asHeapObject()->unsignedLongAt_((args[1]->asSmallInteger()->asNative()+1));
+    auto result = receiver->asHeapObject()->uint32offset((args[1]->asSmallInteger()->asNative()));
     return newIntObject(result);
 }
 
 Object* Evaluator::underprimitiveULongAtOffsetPut(Object *receiver, std::vector<Object*> &args) {
     auto value = args[1];
-    receiver->asHeapObject()->unsignedLongAt_((args[0]->asSmallInteger()->asNative()+1)) = value->asSmallInteger()->asNative();
+    receiver->asHeapObject()->uint32offset((args[0]->asSmallInteger()->asNative())) = value->asSmallInteger()->asNative();
     return value;
 }
 
 Object* Evaluator::underprimitiveUShortAtOffset(Object *receiver, std::vector<Object*> &args) {
-    auto result = receiver->asHeapObject()->unsignedShortAt_((args[1]->asSmallInteger()->asNative()+1));
+    auto result = receiver->asHeapObject()->uint16offset((args[1]->asSmallInteger()->asNative()));
     return newIntObject(result);
 }
 
 Object* Evaluator::underprimitiveUShortAtOffsetPut(Object *receiver, std::vector<Object*> &args) {
     auto value = args[1];
-    receiver->asHeapObject()->unsignedShortAt_((args[0]->asSmallInteger()->asNative()+1)) = value->asSmallInteger()->asNative();
+    receiver->asHeapObject()->uint16offset((args[0]->asSmallInteger()->asNative())) = value->asSmallInteger()->asNative();
     return value;
 }

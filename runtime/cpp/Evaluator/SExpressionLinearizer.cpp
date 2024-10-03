@@ -536,10 +536,15 @@ void SExpressionLinearizer::visitMessage(SMessage *anSMessage) {
 }
 
 void SExpressionLinearizer::visitMethod(SMethod *anSMethod) {
+    ASSERT(false);
+}
+
+void SExpressionLinearizer::visitMethod(SMethod *anSMethod, HeapObject *method) {
     this->reset();
     auto primitive = anSMethod->pragma();
     if (primitive != nullptr) {
-        PrimitivePointer primitive = this->_primitives[anSMethod->primitive()];
+        auto name = (_runtime->methodIsFFI_(method)) ? _runtime->existingSymbolFrom_("FFICall") : anSMethod->primitive();
+        PrimitivePointer primitive = this->_primitives[name];
         this->primitive_(primitive);
         this->returnOp();
         return;

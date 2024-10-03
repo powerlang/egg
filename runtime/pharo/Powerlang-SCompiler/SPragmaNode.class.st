@@ -26,13 +26,6 @@ SPragmaNode >> ffi: cc name: aString with: anFFIDescriptor [
 ]
 
 { #category : 'as yet unclassified' }
-SPragmaNode >> ffi: aString with: anFFIDescriptor [
-	type := #ffi.
-	name := aString.
-	info := anFFIDescriptor
-]
-
-{ #category : 'as yet unclassified' }
 SPragmaNode >> info [
 	^info
 ]

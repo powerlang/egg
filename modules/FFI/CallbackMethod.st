@@ -11,7 +11,7 @@ Class {
 		'receiver',
 		'descriptor'
 	],
-	#category : #Kernel
+	#category : #FFI
 }
 
 

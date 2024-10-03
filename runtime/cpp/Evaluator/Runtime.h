@@ -72,6 +72,12 @@ public:
     void flushDispatchCache_(HeapObject *aSymbol);
     void flushDispatchCache_in_(HeapObject *aSymbol, HeapObject *klass);
 
+    HeapObject* newDouble_(double value) {
+        auto result = newBytes_size_(_floatClass, sizeof(double));
+        *((double*)result) = value;
+        return result;
+    }
+    
     SmallInteger* newInteger_(intptr_t value) {
         return SmallInteger::from(value);
     }
@@ -79,7 +85,6 @@ public:
     uintptr_t arrayedSizeOf_(Object *anObject);
 
     HeapObject* newBytes_size_(HeapObject* species, uint32_t size);
-    HeapObject* newBytesOf_sized_(HeapObject* species, uint32_t size);
     HeapObject* newSlots_size_(HeapObject *species, uint32_t size);
     HeapObject* newSlotsOf_(HeapObject* species);
     HeapObject* newOf_sized_(HeapObject* species, uint32_t size);
@@ -281,12 +286,16 @@ public:
     }
 
     int methodArgumentCount_(HeapObject *method) {
-        return (this->methodFlags(method) & 0x3F);
+        return (this->methodFlags(method) & MethodFlags::MethodArgCount);
     }
 
     int methodTempCount_(HeapObject *method) {
-        return (this->methodFlags(method) & 0x1FE000) >> 13;
+        return (this->methodFlags(method) & MethodFlags::MethodTempCount) >> MethodFlags::MethodTempCountShift;
     }
+
+    bool methodIsExtension_(HeapObject *method) {
+	    return this->methodFlags(method) & MethodFlags::MethodIsExtension;
+	}
 
     HeapObject* methodTreecodes_(HeapObject *method) {
         return method->slot(Offsets::MethodTreecodes)->asHeapObject();
@@ -315,10 +324,44 @@ public:
         method->slot(Offsets::CompiledCodeExecutableCode) = anObject;
     }
 
+    HeapObject* methodExtensionModule_(HeapObject *method) {
+        return this->associationValue_(method->slotAt_(method->size())->asHeapObject())->asHeapObject();
+    }
+
+    HeapObject* methodModule_(HeapObject * method) {
+	    if (this->methodIsExtension_(method)) {
+            return this->methodExtensionModule_(method);
+	    }
+	    else {
+	        auto species = this->methodClassBinding_(method);
+	        return this->speciesModule_(species);
+	    }
+	}
+
     HeapObject* methodSelector_(HeapObject *method) {
         return method->slot(Offsets::MethodSelector)->asHeapObject();
     }
-    
+
+    bool methodIsFFI_(HeapObject *method) {
+	    return this->speciesOf_((Object*)method) == _ffiMethodClass;
+	}
+
+    Object* ffiMethodAddress_(HeapObject * method) {
+	    return method->slot(Offsets::FFIMethodAddress);
+	}
+
+    void ffiMethodAddress_put_(HeapObject * method, SmallInteger *address) {
+	    method->slot(Offsets::FFIMethodAddress) = (Object*)address;
+	}
+
+    HeapObject* ffiMethodDescriptor_(HeapObject * method) {
+	    return method->slot(Offsets::FFIMethodDescriptor)->asHeapObject();
+	}
+
+    HeapObject* ffiMethodSymbol_(HeapObject * method) {
+	    return method->slot(Offsets::FFIMethodSymbol)->asHeapObject();
+	}
+
     HeapObject* moduleNamespace_(HeapObject *module) {
         return module->slot(Offsets::ModuleNamespace)->asHeapObject();
     }
@@ -405,9 +448,11 @@ public:
 		this->_arrayClass =                _kernel->_exports["Array"];
 		this->_metaclassClass =            _kernel->_exports["Metaclass"];
 		this->_methodClass =               _kernel->_exports["CompiledMethod"];
+		this->_ffiMethodClass =            nullptr; // initialized lazily after FFI module is loaded
 		this->_smallIntegerClass =         _kernel->_exports["SmallInteger"];
 		this->_largePositiveIntegerClass = _kernel->_exports["LargePositiveInteger"];
 		this->_largeNegativeIntegerClass = _kernel->_exports["LargeNegativeInteger"];
+		this->_floatClass =                _kernel->_exports["Float"];
 		this->_blockClass =                _kernel->_exports["CompiledBlock"];
 		this->_byteArrayClass =            _kernel->_exports["ByteArray"];
 		this->_stringClass =               _kernel->_exports["String"];
@@ -419,15 +464,18 @@ public:
         this->_smallIntegerBehavior = this->speciesInstanceBehavior_(_smallIntegerClass);
 	}
 
+
     HeapObject *_falseObj;
     HeapObject *_trueObj;
     HeapObject *_nilObj;
     HeapObject *_arrayClass;
     HeapObject *_metaclassClass;
     HeapObject *_methodClass;
+    HeapObject *_ffiMethodClass;
     HeapObject *_smallIntegerClass;
     HeapObject *_largePositiveIntegerClass;
     HeapObject *_largeNegativeIntegerClass;
+    HeapObject *_floatClass;
     HeapObject *_blockClass;
     HeapObject *_byteArrayClass;
     HeapObject *_stringClass;

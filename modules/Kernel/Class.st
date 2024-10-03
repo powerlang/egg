@@ -58,6 +58,11 @@ Class >> addNamespaceAs: aSymbol [
 	^self classVarNamed: aSymbol put: names
 ]
 
+{ #category : #flags }
+Species >> beBytes [
+	format := Variable
+]
+
 { #category : #services }
 Class >> beDeleted [
 	| behavior md |

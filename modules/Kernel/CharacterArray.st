@@ -320,11 +320,6 @@ CharacterArray >> equalsCaseInsensitive: aString [
 	^self <= aString andNot: [self < aString]
 ]
 
-{ #category : #services }
-CharacterArray >> externalCopy [
-	^UTF16 current externalCopyOf: self
-]
-
 { #category : #filenames }
 CharacterArray >> fileExtension [
 	^self asFilename extension

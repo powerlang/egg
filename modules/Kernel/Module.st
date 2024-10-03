@@ -21,6 +21,11 @@ Class {
 	#category : #Kernel
 }
 
+{ #category : #services }
+Module class >> new [
+	^self basicNew basicInitialize
+]
+
 { #category : #'snapshotting' }
 Module >> prepareForSnapshot: aBuilder [
 	aBuilder
@@ -50,11 +55,31 @@ Module >> addOverride: aCompiledMethod [
 { #category : #initialization }
 Module >> basicInitialize [
 	name := self defaultName.
+	namespace ifNil: [namespace := Namespace new].
 	exports := Set new.
 	cachedLookups := Dictionary new.
 	classes := OrderedCollection new.
 	extensions := Dictionary new.
-	overriden := Dictionary new
+	overriden := Dictionary new.
+	requires := #()
+]
+
+{ #category : #services }
+Module >> bind [
+	classes
+		reject: [:c | classes includes: c superclass]
+		thenDo: [:c | c superclass addSubclass: c].
+	extensions keysAndValuesDo: [:s :methods | | meta key target |
+		meta := s endsWith: ' class'.
+		key := meta ifTrue: [(s trimTail: ' class') asSymbol] ifFalse: [s].
+		target := namespace at: key ifAbsent: [self _halt].
+		meta ifTrue: [target := target class].
+		methods do: [:m | | current extension |
+			current := target compiledMethodAt: m selector.
+			extension := m asExtensionFor: self.
+			target addSelector: m selector withMethod: extension.
+			current notNil ifTrue: [current module addOverride: current]]
+	]
 ]
 
 { #category : #services }
@@ -197,13 +222,6 @@ Module >> imports [
 	^#()
 ]
 
-{ #category : #initialization }
-Module >> initialize [
-	self basicInitialize.
-	namespace := Namespace new.
-	requires := #()
-]
-
 { #category : #private }
 Module >> justDefined: aSymbol [
 	| lookups |
@@ -211,22 +229,9 @@ Module >> justDefined: aSymbol [
 	lookups do: [:lookup | lookup flush]
 ]
 
-{ #category : #services }
+{ #category : #accessing }
 Module >> justLoaded [
-	classes
-		reject: [:c | classes includes: c superclass]
-		thenDo: [:c | c superclass addSubclass: c].
-	extensions keysAndValuesDo: [:s :methods | | meta key target |
-		meta := s endsWith: ' class'.
-		key := meta ifTrue: [(s trimTail: ' class') asSymbol] ifFalse: [s].
-		target := namespace at: key ifAbsent: [self _halt].
-		meta ifTrue: [target := target class].
-		methods do: [:m | | current extension |
-			current := target compiledMethodAt: m selector.
-			extension := m asExtensionFor: self.
-			target addSelector: m selector withMethod: extension.
-			current notNil ifTrue: [current module addOverride: current]]
-	]
+	self bind
 ]
 
 { #category : #accessing }

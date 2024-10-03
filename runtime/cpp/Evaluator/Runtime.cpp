@@ -36,19 +36,18 @@ HeapObject* Runtime::newBytes_size_(HeapObject *species, uint32_t size)
     return result;
 }
 
-HeapObject* Runtime::newBytesOf_sized_(HeapObject *species, uint32_t size)
-{
-    return this->newBytes_size_(species, size);
-}
-
 HeapObject *Runtime::newSlots_size_(HeapObject *species, uint32_t size) {
 	auto ivars = this->speciesInstanceSize_(species);
     HeapObject *behavior = this->speciesInstanceBehavior_(species);
     auto slotSize = ivars + size;
     HeapObject *result = _heap->allocateSlots_(slotSize);
     result->behavior(behavior);
+    if (size > 0)
+        result->beArrayed();
+    if (ivars > 0)
+        result->beNamed();
     return result;
- }
+}
 
 HeapObject* Runtime::newSlotsOf_(HeapObject *species) {
     return this->newSlots_size_(species, 0);
@@ -88,22 +87,14 @@ HeapObject *Runtime::newClosureFor_(HeapObject *block)
 {
 	auto size = this->blockEnvironmentCount_(block);
 	auto closure = this->newSlots_size_(_closureClass, size);
-    closure->beNamed();
-    closure->beArrayed();
 	closure->slot(Offsets::ClosureBlock) = (Object*)block;
 	return  closure;
 }
 
  HeapObject *Runtime::newCompiledMethod() {
-     HeapObject *behavior = this->speciesInstanceBehavior_(_methodClass);
-     HeapObject *result = _heap->allocateSlots_(Offsets::MethodInstSize);
-     result->behavior(behavior);
-     result->beNamed();
-     result->beArrayed();
+     HeapObject *result = this->newSlots_size_(_methodClass, 0);
      result->slot(Offsets::MethodFormat) = (Object *)this->newInteger_(0);
-
      return result;
- 
 }
 
 HeapObject *Runtime::newEnvironmentSized_(uint32_t size)
@@ -113,10 +104,7 @@ HeapObject *Runtime::newEnvironmentSized_(uint32_t size)
 
 HeapObject *Runtime::newExecutableCodeFor_with_(HeapObject *compiledCode,
                                                 HeapObject *platformCode) {
-    auto behavior = this->speciesInstanceBehavior_(_arrayClass);
-    auto result = _heap->allocateSlots_(2); // fixme: use a proper kind of object for this
-    result->behavior(behavior);
-    result->beArrayed();
+    auto result = this->newSlots_size_(_arrayClass, 2); // fixme: use a proper kind of object for this
     this->executableCodePlatformCode_put_(result, (Object *)platformCode);
     this->executableCodeCompiledCode_put_(result, (Object *)compiledCode);
     return result;
@@ -124,11 +112,7 @@ HeapObject *Runtime::newExecutableCodeFor_with_(HeapObject *compiledCode,
 
 HeapObject *Runtime::newString_(const std::string &str)
 {
-    auto behavior = this->speciesInstanceBehavior_(_stringClass);
-    auto result = _heap->allocateBytes_(str.size() + 1); // fixme: use a proper kind of object for this
-    result->behavior(behavior);
-    result->beBytes();
-    result->beArrayed();
+    auto result = this->newBytes_size_(_stringClass, str.size() + 1); // fixme: use a proper kind of object for this
     str.copy((char*)result, str.size());
     return result;
 }
@@ -297,7 +281,7 @@ std::string Egg::Runtime::print_(HeapObject *obj) {
 	auto species = this->behaviorClass_(obj->behavior());
 	if (species == _stringClass)
 		return "'" + obj->asLocalString() + "'";
-	if (species == _methodClass)
+	if (species == _methodClass || species == _ffiMethodClass)
 	{
         auto selector = (HeapObject*)obj->slot(Offsets::MethodSelector);
 		auto s = (selector == _nilObj) ? "nil" : selector->asLocalString();
@@ -318,6 +302,10 @@ std::string Egg::Runtime::print_(HeapObject *obj) {
     if (speciesIsMetaclass_(species)) // then obj is a class
     {
         return "" + speciesLocalName_(obj) + "";
+    }
+
+    if (species == _metaclassClass) {
+        return this->metaclassInstanceClass_(obj)->printString() + " class";
     }
 
 	auto name = this->speciesLocalName_(species);

@@ -81,7 +81,7 @@ SMethodNode >> literals [
 	| literals v l literalsWithClasses |
 	literals := OrderedCollection new.
 	pragma isUsed
-		ifTrue: [ literals add: pragma name ].
+		ifTrue: [ literals add: pragma type asSymbol; add: pragma name asSymbol].
 	self
 		nodesDo: [ :n | 
 			n isLiteral
@@ -116,7 +116,7 @@ SMethodNode >> methodClass [
 	type := pragma type.
 	type = #callback
 		ifTrue: [ ^ SCallbackMethod ].
-	type = #callout
+	type = #cdecl
 		ifTrue: [ ^ SCalloutMethod ].
 	^ SCompiledMethod
 ]

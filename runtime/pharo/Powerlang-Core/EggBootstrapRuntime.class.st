@@ -259,6 +259,12 @@ EggBootstrapRuntime >> methodFor: aSymbol in: aSpeciesSpec [
 ]
 
 { #category : 'services' }
+EggBootstrapRuntime >> methodIsCallout: anSCompiledMethod [
+	anSCompiledMethod isCalloutMethod ifTrue: [ self halt ].
+	^anSCompiledMethod isCalloutMethod
+]
+
+{ #category : 'services' }
 EggBootstrapRuntime >> methodIsExtension: method [
 
 	^ method isExtension

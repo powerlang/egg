@@ -113,6 +113,7 @@ public:
 	void visitLiteral(SLiteral *anSLiteral) override;
 	void visitMessage(SMessage *anSMessage) override;
 	void visitMethod(SMethod *anSMethod) override;
+	void visitMethod(SMethod *anSMethod, HeapObject *method);
 	void visitOpLoadRfromFrame(SOpLoadRfromFrame *anSOpLoadRfromFrame) override;
 	void visitOpLoadRfromStack(SOpLoadRfromStack *anSOpLoadRfromStack) override;
 	void visitReturn(SReturn *anSReturn) override;

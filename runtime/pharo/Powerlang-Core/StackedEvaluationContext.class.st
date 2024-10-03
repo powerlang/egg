@@ -271,6 +271,19 @@ StackedEvaluationContext >> popLaunchFrame [
 ]
 
 { #category : 'initialization' }
+StackedEvaluationContext >> popLaunchFrame: prevRegE [
+	regSP := regBP.
+	regE := prevRegE.
+	regBP := self pop.
+	pc := self pop.
+	regBP = 0
+		ifTrue: [ ^ self ].
+	regM := stack at: regBP - 2.
+	regS := stack at: regBP - 1.
+
+]
+
+{ #category : 'initialization' }
 StackedEvaluationContext >> popOperand [
 	^self pop
 ]

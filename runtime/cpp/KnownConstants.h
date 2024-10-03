@@ -20,6 +20,13 @@ enum BlockCapturedVariables {
     EnvironmentValue = 3
 };
 
+enum MethodFlags {
+    MethodArgCount = 0x3F,
+    MethodTempCount = 0x1FE000,
+    MethodTempCountShift = 13,
+    MethodIsExtension = 0x80000000
+};
+
 enum Offsets {
     AssociationKey = 0,
     AssociationValue = 1,
@@ -45,6 +52,10 @@ enum Offsets {
     MethodSourceCode = 5,
     MethodInstSize = 6,
 
+    FFIMethodDescriptor = 6,
+    FFIMethodSymbol = 7,
+    FFIMethodAddress = 8,
+
     ModuleName = 0,
     ModuleVersion = 1,
     ModuleExports = 2,
@@ -64,7 +75,35 @@ enum Offsets {
     CompiledCodeExecutableCode = 1,
 
     ExecutableCodePlatformCode = 0,
-    ExecutableCodeCompiledCode = 1
+    ExecutableCodeCompiledCode = 1,
+
+    FFI_uint8 = 0,
+    FFI_sint8 = 1,
+    FFI_uint16 = 2,
+    FFI_sint16 = 3,
+    FFI_uint32 = 4,
+    FFI_sint32 = 5,
+    FFI_uint64 = 6,
+    FFI_sint64 = 7,
+    
+    FFI_float = 8,
+    FFI_double = 9,
+
+    FFI_uchar = 10,
+    FFI_schar = 11,
+    FFI_ushort = 12,
+    FFI_sshort = 13,
+    FFI_uint = 14,
+    FFI_sint = 15,
+    FFI_ulong = 16,
+    FFI_slong = 17,
+    FFI_longdouble = 18,
+
+    FFI_pointer = 19,
+
+    FFI_complex_float = 20,
+    FFI_complex_double = 21,
+    FFI_complex_longdouble = 22
 };
 
 } // namespace Egg

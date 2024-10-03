@@ -162,6 +162,35 @@ Ring2MetacircularConverter >> createExtensionMethodsOf: spec in: module [
 ]
 
 { #category : 'initialization' }
+Ring2MetacircularConverter >> createMethodsOf: class spec: spec [
+	| metaclass |
+	spec methods do: [ :m | self createNewMethod: m in: class ].
+	metaclass := dest speciesFor: class.
+	spec metaclass methods do: [ :m | 
+		self createNewMethod: m in: metaclass ].
+]
+
+{ #category : 'initialization' }
+Ring2MetacircularConverter >> createModuleClassAndInstance: symbol spec: spec [
+	| moduleName moduleSpec moduleClass module name |
+	moduleName := ('.' split: symbol) last asSymbol.
+	moduleSpec := spec at: moduleName , #Module.
+	moduleSpec ifNil: [ moduleSpec := spec at: #Module , moduleName ].
+	moduleSpec
+		ifNil: [ moduleSpec := source specs at: #Module ]
+		ifNotNil: [ 
+			moduleClass := self createNewClassFrom: moduleSpec in: nil.
+			self createMethodsOf: moduleClass spec: moduleSpec. 
+			spec classes remove: moduleSpec ].
+	module := self createNewModule: moduleSpec.
+	name := dest sendLocal: #name to: module.
+	(dest sendLocal: #isEmpty to: name) == dest true ifTrue: [ 
+		name := dest newString: symbol asString.
+		dest sendLocal: #name: to: module with: { name } ].
+	^module
+]
+
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> createNamespaceWith: aCollection [
 
 	| namespace |
@@ -207,6 +236,8 @@ Ring2MetacircularConverter >> createNewClassFrom: spec in: module [
 		         sendLocal: #newSubclassOf:
 		         to: self => #Class
 		         with: { superclass }.
+	spec isBytes ifTrue: [ dest sendLocal: #beBytes to: class ].
+	spec name == #FFIMethod ifTrue: [ dest ffiMethodClass: class].
 	metaclass := dest sendLocal: #class to: class.
 	dest
 		sendLocal: #name:
@@ -220,9 +251,6 @@ Ring2MetacircularConverter >> createNewClassFrom: spec in: module [
 	behaviors
 		at: spec put: instanceBehavior;
 		at: spec metaclass put: classBehavior.
-	spec methods do: [ :m | self createNewMethod: m in: class ].
-	spec metaclass methods do: [ :m | 
-		self createNewMethod: m in: metaclass ].
 	module ifNotNil: [ 
 		dest
 			sendLocal: #addClass: to: module with: { class };
@@ -233,13 +261,15 @@ Ring2MetacircularConverter >> createNewClassFrom: spec in: module [
 { #category : 'initialization' }
 Ring2MetacircularConverter >> createNewMethod: m in: species [
 
-	| smethod size transferred treecodes selector format tliteral md organizer code category |
+	| smethod size transferred treecodes selector format tliteral md organizer code category methodType symbol descriptor |
 	smethod := SCompiler new compile: m sourceCode.
 	smethod classBinding: species.
 	size := dest newInteger: smethod size.
+
+	methodType := smethod isCalloutMethod ifTrue: [dest ffiMethodClass ] ifFalse: [self => #CompiledMethod].
 	transferred := dest
 		               sendLocal: #new:
-		               to: self => #CompiledMethod
+		               to: methodType
 		               with: { size }.
 	mapping at: smethod put: transferred.
 	treecodes := dest newByteArray: smethod treecodes.
@@ -252,6 +282,14 @@ Ring2MetacircularConverter >> createNewMethod: m in: species [
 		sendLocal: #selector: to: transferred with: { selector };
 		sendLocal: #format: to: transferred with: { format };
 		sendLocal: #sourceObject: to: transferred with: { code }.
+		
+	smethod isCalloutMethod ifTrue: [ 
+		symbol := dest addSymbol: smethod symbol.
+		descriptor := dest newByteArray: (ByteArray withAll: smethod descriptor).
+		dest
+			sendLocal: #symbol: to: transferred with: { symbol };
+			sendLocal: #descriptorBytes: to: transferred with: { descriptor }.
+	].
 	smethod withIndexDo: [ :literal :i | 
 		tliteral := self transferLiteral: literal.
 		transferred at: i put: tliteral ].
@@ -500,28 +538,16 @@ Ring2MetacircularConverter >> instantiateMetaobjects [
 { #category : 'initialization' }
 Ring2MetacircularConverter >> loadModule: symbol [
 
-	| spec classes moduleName moduleSpec module extensions name |
+	| spec module extensions sorted classes |
 	spec := self readModuleSpec: symbol.
-	classes := spec classes.
-	moduleName := ('.' split: symbol) last asSymbol.
-	moduleSpec := spec at: moduleName , #Module.
-	moduleSpec ifNil: [ moduleSpec := spec at: #Module , moduleName ].
-	moduleSpec
-		ifNil: [ moduleSpec := source specs at: #Module ]
-		ifNotNil: [ 
-			self createNewClassFrom: moduleSpec in: nil.
-			classes remove: moduleSpec ].
-	module := self createNewModule: moduleSpec.
-	name := dest sendLocal: #name to: module.
-	(dest sendLocal: #isEmpty to: name) == dest true ifTrue: [ 
-		name := dest newString: symbol asString.
-		dest sendLocal: #name: to: module with: { name } ].
-	classes := self classesSortedBySuperclass: classes.
-	classes := classes collect: [ :classSpec | 
+	module := self createModuleClassAndInstance: symbol spec: spec.
+	sorted := self classesSortedBySuperclass: spec classes.
+	classes := sorted collect: [ :classSpec | 
 		           self createNewClassFrom: classSpec in: module ].
+	classes with: sorted do: [ :class :classSpec | self createMethodsOf: class spec: classSpec ].
 	extensions := spec extendedClasses do: [ :classSpec | 
 		              self createExtensionMethodsOf: classSpec in: module ].
-	dest sendLocal: #justLoaded to: module.
+	dest sendLocal: #initialize to: module; sendLocal: #justLoaded to: module.
 	^ module
 ]
 

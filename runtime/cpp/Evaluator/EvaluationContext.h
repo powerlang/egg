@@ -84,13 +84,17 @@ public:
 	    return this->argumentAt_(4);
     }
 
+    Object** lastArgumentAddress(){
+	    return &_stack[_regBP - 1 + 2];
+    }
+
     std::vector<Object*> methodArguments();
 
 	void buildFrameFor_code_environment_temps_(Object *receiver, HeapObject *compiledCode, HeapObject *environment, uint32_t temps);
     std::vector<SExpression*>* buildLaunchFrame(HeapObject *symbol, int argCount);
     void buildClosureFrameFor_code_environment_(Object *receiver, HeapObject *compiledCode, HeapObject *environment);
     void buildMethodFrameFor_code_environment_(Object *receiver, HeapObject *compiledCode, HeapObject *environment);
-    void popLaunchFrame();
+    void popLaunchFrame(HeapObject *prevRegE);
 
     Object* environment_at_(int environmentIndex, int index) {
 	if (environmentIndex == INLINED_ENVIRONMENT)
@@ -253,6 +257,7 @@ public:
     Object* receiverOfFrameAt_(uintptr_t frame);
     Object* argumentOfFrameAt_subscript_(uintptr_t frame, uintptr_t subscript);
     Object* temporaryOfFrameAt_subscript_(uintptr_t frame, uintptr_t subscript);
+    HeapObject* environmentOfFrameAt_(uintptr_t frame);
     void printFrame_into_(uintptr_t frame, std::ostringstream &s);
     std::string backtrace();
     std::string printStackContents();

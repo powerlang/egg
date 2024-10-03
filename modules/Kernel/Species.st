@@ -367,7 +367,10 @@ Species >> instVarNames [
 
 { #category : #accessing }
 Species >> instVarNames: aCollection [
-	instanceVariables := aCollection isEmpty ifFalse: [aCollection asArray].
+	instanceVariables := aCollection isEmpty 
+		ifFalse: [
+			self isBytes ifTrue: [^self error: 'byte objects cannot have named instance variables'].
+			aCollection asArray].
 	self updateInstSize; allSubspeciesDo: [:class | class updateInstSize]
 ]
 

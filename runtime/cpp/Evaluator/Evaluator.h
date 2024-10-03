@@ -169,6 +169,7 @@ private:
 
 	PrimitivePointer primitiveFor_(HeapObject *symbol);
 
+    Object* newDoubleObject(double aDouble);
     Object* newIntObject(auto anInteger);
     Object* boolObject(bool aBoolean);
 
@@ -192,7 +193,9 @@ private:
 
 	Object* primitiveHash();
 	Object* primitiveHostFixOverrides();
+	Object* primitiveHostInitializeFFI();
 	Object* primitiveHostLoadModule();
+	Object* primitiveHostPlatformName();
 	Object* primitiveNew();
 	Object* primitiveNewBytes();
 	Object* primitiveNewObjectHeap();
@@ -222,6 +225,10 @@ private:
 	Object* primitiveUnderIsBytes();
 	Object* primitiveUnderPointersSize();
 	Object* primitiveUnderSize();
+
+	void initializeCIF(HeapObject *method, int argCount);
+	Object* demarshalFFIResult(void *, uint8_t type);
+	Object* primitiveFFICall();
 
 	Object* underprimitiveBasicAt(Object *receiver, std::vector<Object*> &args);
 	Object* underprimitiveBasicAtPut(Object *receiver, std::vector<Object*> &args);
@@ -254,6 +261,8 @@ private:
 	Object* underprimitiveSMITimes(Object *receiver, std::vector<Object*> &args);
 	Object* underprimitiveSmallIntegerByteAt(Object *receiver, std::vector<Object*> &args);
 	Object* underprimitiveSmallSize(Object *receiver, std::vector<Object*> &args);
+	Object* underprimitiveULargeAtOffset(Object *receiver, std::vector<Object*> &args);
+	Object* underprimitiveULargeAtOffsetPut(Object *receiver, std::vector<Object*> &args);
 	Object* underprimitiveULongAtOffset(Object *receiver, std::vector<Object*> &args);
 	Object* underprimitiveULongAtOffsetPut(Object *receiver, std::vector<Object*> &args);
 	Object* underprimitiveUShortAtOffset(Object *receiver, std::vector<Object*> &args);
