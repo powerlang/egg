@@ -8,12 +8,22 @@ Class {
 	#superclass : #CompiledMethod,
 	#type : #variable,
 	#instVars : [
-		'ffiName',
-		'descriptor'
+		'descriptor',
+		'symbol',
+		'address'
 	],
 	#category : #FFI
 }
 
+{ #category : #accessing }
+FFIMethod >> address [
+	^address
+]
+
+{ #category : #accessing }
+FFIMethod >> address: anInteger [
+	address := anInteger
+]
 
 { #category : #accessing }
 FFIMethod >> descriptor [
@@ -26,11 +36,16 @@ FFIMethod >> descriptor: anFFIDescriptor [
 ]
 
 { #category : #accessing }
-FFIMethod >> ffiName [
-	^ffiName
+FFIMethod >> descriptorBytes: aByteArray [
+	descriptor := FFIDescriptor withAll: aByteArray
 ]
 
 { #category : #accessing }
-FFIMethod >> ffiName: aString [
-	ffiName := aString
+FFIMethod >> symbol [
+	^symbol
+]
+
+{ #category : #accessing }
+FFIMethod >> symbol: aString [
+	symbol := aString
 ]
