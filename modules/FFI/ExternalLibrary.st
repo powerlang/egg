@@ -15,13 +15,48 @@ Class {
 }
 
 { #category : #accessing }
-ExternalLibrary >> filename [
+ExternalLibrary class >> filename [
 	^self loader libraryFilename: self
 ]
 
 { #category : #accessing }
+ExternalLibrary class >> libpath [
+	^''
+]
+
+{ #category : #accessing }
+ExternalLibrary class >> linuxFilename [
+	^'lib', self libname, '.so'
+]
+
+{ #category : #accessing }
+ExternalLibrary class >> windowsFilename [
+	^self libname, '.dll'
+]
+
+{ #category : #accessing }
+ExternalLibrary >> address [
+	^handle pointerAtOffset: 0
+]
+
+{ #category : #accessing }
+ExternalLibrary >> address: anInteger [
+	handle pointerAtOffset: 0 put: anInteger
+]
+
+{ #category : #accessing }
+ExternalLibrary >> handle [
+	^handle
+]
+
+{ #category : #accessing }
 ExternalLibrary >> loader [
-	^self module loader
+	^ExternalLibrary module loader
+]
+
+{ #category : #accessing }
+ExternalLibrary >> initialize [
+	handle := ExternalHandle new
 ]
 
 { #category : #accessing }

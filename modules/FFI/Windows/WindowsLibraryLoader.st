@@ -16,14 +16,35 @@ Class {
 	#category : #FFI
 }
 
-{ #category : #accessing }
-WindowsLibraryLoader >> open: anExternalLibrary [
-	| handle |
-	handle := kernel32 LoadLibraryW: anExternalLibrary filename externalCopy.
+{ #category : #services }
+WindowsLibraryLoader >> bootstrapOpen: anExternalLibrary [
+	| path parameter handle |
+	path := anExternalLibrary class libpath, anExternalLibrary class windowsFilename.
+	parameter := Array with: path.
+	handle := kernel32 LoadLibraryW: parameter.
 	anExternalLibrary handle: handle.
 ]
 
 { #category : #accessing }
 WindowsLibraryLoader >> findSymbol: aSymbol in: anExternalLibrary [
 	^kernel32 GetProcAddressW: anExternalLibrary asParameter lpProcName: aSymbol externalCopy asParameter.
+]
+
+{ #category : #accessing }
+WindowsLibraryLoader >> initialize [
+	kernel32 := KernelDLL new.
+	Kernel host initializeFFI: kernel32 symbolFinder: KernelDLL >> #GetProcAddressW
+]
+
+{ #category : #accessing }
+WindowsLibraryLoader >> libraryFilename: externalLibrary [
+	^externalLibrary windowsFilename.
+]
+
+{ #category : #services }
+WindowsLibraryLoader >> open: anExternalLibrary [
+	| path handle |
+	path := anExternalLibrary class libpath, anExternalLibrary class windowsFilename.
+	handle := kernel32 LoadLibraryW: path externalCopy asParameter.
+	anExternalLibrary address: handle.
 ]

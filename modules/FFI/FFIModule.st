@@ -7,10 +7,18 @@ Class {
 	#name : #FFIModule,
 	#superclass : #Module,
 	#instVars : [
-		'loader'
+		'loader',
+		'mallocHeap',
+		'defaultHeap',
+		'libc'
 	],
 	#category : #FFI
 }
+
+{ #category : #accessing }
+FFIModule >> defaultHeap [
+	^defaultHeap
+]
 
 { #category : #private }
 FFIModule >> imports [
@@ -21,10 +29,26 @@ FFIModule >> imports [
 
 { #category : #private }
 FFIModule >> initializeFor: moduleName loader: loaderName [
-	| module |
-	module := Kernel loadModule: #moduleName.
-	self namespace at: #OS put: module.
-	loader := module at: loaderName
+	| module loaderType |
+	module := Kernel load: moduleName.
+	self namespace
+		at: #FFI put: self;
+		at: #OS put: module.
+	loaderType := module namespace at: loaderName.
+	loader := loaderType new.
+	libc := LibC new.
+	loader bootstrapOpen: libc.
+	defaultHeap := mallocHeap := MallocHeap new
+]
+
+{ #category : #initialization }
+FFIModule >> initializeForCurrentPlatform [
+	| platform |
+	platform := Kernel host platformName.
+	(platform endsWith: 'linux-gnu') ifTrue: [^self initializeForLinux].
+	(platform endsWith: 'darwin') ifTrue: [^self initializeForMac].
+	(platform endsWith: 'win32') ifTrue: [^self initializeForWindows].
+	self error: platform, ' platform not yet supported by FFI module'
 ]
 
 { #category : #initialization }
@@ -43,9 +67,14 @@ FFIModule >> initializeForWindows [
 ]
 
 { #category : #initialization }
-FFIModule >> justLoaded [
-	super justLoaded.
+FFIModule >> initialize [
+	super initialize.
 	ExternalMemory initializeConstants.
+]
+
+{ #category : #accessing }
+FFIModule >> libc [
+	^libc
 ]
 
 { #category : #accessing }

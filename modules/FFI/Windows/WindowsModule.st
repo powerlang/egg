@@ -13,3 +13,9 @@ Class {
 WindowsModule >> externalCopyOfString: aString [
 	^Kernel utf16 externalCopyOf: aString
 ]
+
+
+{ #category : #services }
+WindowsModule >> imports [
+	^{ #FFI -> #(ExternalLibrary LibraryLoader) }
+]

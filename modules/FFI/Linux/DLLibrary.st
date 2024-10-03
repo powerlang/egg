@@ -12,11 +12,25 @@ Class {
 }
 
 { #category : #accessing }
-DLLibrary >> dlopen: filename [
-	<cdecl: uintptr_t dlopen (uintptr_t)>
+DLLibrary >> dlerror [
+	<cdecl: pointer dlerror ()>
 ]
 
 { #category : #accessing }
-DLLibrary >> dlsym: handle function: functionName [
-	<cdecl: uintptr_t dlsym (uintptr_t, uintptr_t)>
+DLLibrary >> dlopen: filename flags: flags [
+	<cdecl: pointer dlopen (pointer, sint)>
+]
+
+{ #category : #accessing }
+DLLibrary >> dlsym: handle symbol: functionName [
+	<cdecl: pointer dlsym (pointer, pointer)>
+]
+
+{ #category : #accessing }
+DLLibrary >> lastError [
+	| address cstring |
+	address := self dlerror.
+	address = 0 ifTrue: [self error: 'no error message when a dlerror was expected'].
+	cstring := ExternalMemory at: address.
+	String fromMemory: cstring
 ]

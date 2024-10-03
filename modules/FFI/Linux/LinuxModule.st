@@ -13,3 +13,8 @@ Class {
 LinuxModule >> externalCopyOfString: aString [
 	^Kernel utf8 externalCopyOf: aString
 ]
+
+{ #category : #services }
+LinuxModule >> imports [
+	^{ #FFI -> #(ExternalLibrary ExternalMemory LibraryLoader) }
+]

@@ -17,10 +17,10 @@ KernelDLL class >> name [
 
 { #category : #accessing }
 KernelDLL >> LoadLibraryW: lpLibFileName [
-	<cdecl: uintptr_t LoadLibrary (uintptr_t)>
+	<cdecl: pointer LoadLibrary (pointer)>
 ]
 
 { #category : #accessing }
 KernelDLL >> GetProcAddress: hModule lpProcName: lpProcName [
-	<cdecl: uintptr_t GetProcAddress (uintptr_t, uintptr_t)>
+	<cdecl: pointer GetProcAddress (pointer, pointer)>
 ]

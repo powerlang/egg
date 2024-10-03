@@ -7,10 +7,15 @@ Class {
 	#name : #ExternalMemory,
 	#superclass : #Object,
 	#instVars : [
-		'address'
+		'address',
+		'heap'
 	],
 	#category : #FFI
 }
+{ #category : #inspecting }
+ExternalMemory class >> allocate: anInteger [
+	^FFI defaultHeap allocate: anInteger
+]
 
 { #category : #inspecting }
 ExternalMemory class >> aspects [
@@ -20,6 +25,11 @@ ExternalMemory class >> aspects [
 { #category : #'instance creation' }
 ExternalMemory class >> at: anInteger [
 	^self new address: anInteger
+]
+
+{ #category : #'instance creation' }
+ExternalMemory class >> at: anInteger heap: anExternalHeap [
+	^self new address: anInteger; heap: anExternalHeap
 ]
 
 { #category : #'instance creation' }
@@ -202,6 +212,16 @@ ExternalMemory >> hasBytes [
 	^true
 ]
 
+{ #category : #accessing }
+ExternalMemory >> heap [
+	^heap
+]
+
+{ #category : #accessing }
+ExternalMemory >> heap: anExternalHeap [
+	heap := anExternalHeap
+]
+
 { #category : #inquiries }
 ExternalMemory >> indexOf: byte [
 	| offset |
@@ -381,9 +401,7 @@ ExternalMemory >> release [
 
 { #category : #finalization }
 ExternalMemory >> releaseMemory [
-	"
-	default is do nothing
-	"	
+	heap ifNotNil: [heap free: self]	
 ]
 
 { #category : #accessing }
