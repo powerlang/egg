@@ -19,7 +19,9 @@ TestsModule >> imports [
 
 { #category : #initialization }
 TestsModule >> main: args [
-	| result |
+	| test result |
+	ExternalLibrary module initializeForCurrentPlatform.
+
 	test := TestLibrary new open.
 	result := test addInt: 3 toInt: 4.
 	result = 7 ifFalse: [self error: 'addInt:toInt: failed!'].

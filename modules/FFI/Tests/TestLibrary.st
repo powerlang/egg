@@ -6,15 +6,17 @@
 Class {
 	#name : #TestLibrary,
 	#superclass : #ExternalLibrary,
-	#instVars : [
-		'handle'
-	],
-	#category : #FFI
+	#category : #Tests
 }
 
 { #category : #accessing }
-TestLibrary class >> name [
+TestLibrary class >> libname [
 	^'test'
+]
+
+{ #category : #accessing }
+TestLibrary class >> libpath [
+	^'./'
 ]
 
 { #category : #accessing }
