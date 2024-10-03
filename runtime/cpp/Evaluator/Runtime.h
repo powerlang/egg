@@ -325,6 +325,18 @@ public:
         return method->slot(Offsets::MethodSelector)->asHeapObject();
     }
 
+    bool methodIsFFI_(HeapObject *method) {
+	    return this->speciesOf_((Object*)method) == _ffiMethodClass;
+	}
+
+    Object* ffiMethodAddress_(HeapObject * method) {
+	    return method->slot(Offsets::FFIMethodAddress);
+	}
+
+    void ffiMethodAddress_put_(HeapObject * method, SmallInteger *address) {
+	    method->slot(Offsets::FFIMethodAddress) = (Object*)address;
+	}
+
     HeapObject* ffiMethodDescriptor_(HeapObject * method) {
 	    return method->slot(Offsets::FFIMethodDescriptor)->asHeapObject();
 	}
@@ -419,6 +431,7 @@ public:
 		this->_arrayClass =                _kernel->_exports["Array"];
 		this->_metaclassClass =            _kernel->_exports["Metaclass"];
 		this->_methodClass =               _kernel->_exports["CompiledMethod"];
+		this->_ffiMethodClass =            nullptr; // initialized lazily after FFI module is loaded
 		this->_smallIntegerClass =         _kernel->_exports["SmallInteger"];
 		this->_largePositiveIntegerClass = _kernel->_exports["LargePositiveInteger"];
 		this->_largeNegativeIntegerClass = _kernel->_exports["LargeNegativeInteger"];
@@ -434,12 +447,14 @@ public:
         this->_smallIntegerBehavior = this->speciesInstanceBehavior_(_smallIntegerClass);
 	}
 
+
     HeapObject *_falseObj;
     HeapObject *_trueObj;
     HeapObject *_nilObj;
     HeapObject *_arrayClass;
     HeapObject *_metaclassClass;
     HeapObject *_methodClass;
+    HeapObject *_ffiMethodClass;
     HeapObject *_smallIntegerClass;
     HeapObject *_largePositiveIntegerClass;
     HeapObject *_largeNegativeIntegerClass;
