@@ -311,6 +311,10 @@ Object * EvaluationContext::temporaryOfFrameAt_subscript_(uintptr_t frame, uintp
     return _stack[frame - FRAME_TO_FIRST_TEMP_DELTA - subscript - 1];
 }
 
+HeapObject * EvaluationContext::environmentOfFrameAt_(uintptr_t frame) {
+    return (HeapObject*)_stack[frame - FRAME_TO_ENVIRONMENT_DELTA - 1];
+}
+
 void printObject_into_(Object* o, std::ostringstream &s) {
 
     if (o == nullptr)
@@ -329,10 +333,19 @@ void EvaluationContext::printFrame_into_(uintptr_t frame, std::ostringstream &s)
     for (int i = argCount - 1; i >= 0; i--)
         args.push_back(this->argumentOfFrameAt_subscript_(frame, i));
 
-    auto tempCount = this->_runtime->methodTempCount_(code);
+    auto tempCount = this->_runtime->temporaryCountOf_(code);
     std::vector<Object*> temps;
     for (int i = 0; i < tempCount; i++)
         temps.push_back(this->temporaryOfFrameAt_subscript_(frame, i));
+
+    auto envCount = 0;
+    if (!this->_runtime->isBlock_(code))
+        envCount = this->_runtime->methodEnvironmentSize_(code);
+
+    std::vector<Object*> envTemps;
+    for (int i = 0; i < envCount; i++)
+        envTemps.push_back(this->environmentOfFrameAt_(frame)->slot(i));
+
 
     printObject_into_((Object*)code, s);
     s << std::endl;

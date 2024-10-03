@@ -257,6 +257,7 @@ public:
     Object* receiverOfFrameAt_(uintptr_t frame);
     Object* argumentOfFrameAt_subscript_(uintptr_t frame, uintptr_t subscript);
     Object* temporaryOfFrameAt_subscript_(uintptr_t frame, uintptr_t subscript);
+    HeapObject* environmentOfFrameAt_(uintptr_t frame);
     void printFrame_into_(uintptr_t frame, std::ostringstream &s);
     std::string backtrace();
     std::string printStackContents();
