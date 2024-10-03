@@ -250,12 +250,12 @@ Object* Evaluator::send_to_with_(HeapObject *symbol, Object *receiver, std::vect
 }
 
 void Egg::Evaluator::messageNotUnderstood_(SAbstractMessage *message)
-{ 
-    std::cout
-        << "Message not understood!" << std::endl
-        << this->_regR->printString() << " does not understand " << message->selector()->printString();
+{
+    std::string errmsg = std::string("Message not understood!\n") +
+        this->_regR->printString() + " does not understand " + message->selector()->printString() +
+        "\ndnu recovery not implemented yet";
     
-    error("dnu recovery not implemented yet");
+    error_(errmsg);
 }
 
 void Evaluator::doesNotKnow(HeapObject *symbol) { ASSERT(false); }

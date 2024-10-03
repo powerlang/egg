@@ -351,6 +351,12 @@ void EvaluationContext::printFrame_into_(uintptr_t frame, std::ostringstream &s)
         printObject_into_(temp, s);
         s << std::endl;
     }
+
+    for(auto &envtemp : envTemps) {
+        s << "envtemp: ";
+        printObject_into_(envtemp, s);
+        s << std::endl;
+    }
 }
 
 std::string EvaluationContext::backtrace() {
@@ -358,7 +364,7 @@ std::string EvaluationContext::backtrace() {
     std::vector<uintptr_t> frames;
     uintptr_t current = _regBP;
     while (current) {
-        frames.push_back( current);
+        frames.push_back(current);
         current = (uintptr_t)_stack[current - 1];
     }
     for (int i = frames.size() - 1; i >= 0; i--) {
@@ -366,6 +372,9 @@ std::string EvaluationContext::backtrace() {
         s << std::endl;
     }
 
+    s << "-----------------" << std::endl;
+    s << "regs:" << std::endl;
+    s << "-----------------" << std::endl;
     s << "regM: ";
     printObject_into_((Object*)_regM, s);
     s << std::endl;
