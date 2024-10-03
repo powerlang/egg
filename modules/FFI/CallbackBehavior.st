@@ -9,7 +9,7 @@ Class {
 	#instVars : [
 		'nativeCode'
 	],
-	#category : #Kernel
+	#category : #FFI
 }
 
 { #category : #accessing }

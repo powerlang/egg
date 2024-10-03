@@ -7,7 +7,7 @@ Class {
 	#name : #FFIDescriptor,
 	#superclass : #ArrayedCollection,
 	#type : #bytes,
-	#category : #Kernel
+	#category : #FFI
 }
 
 

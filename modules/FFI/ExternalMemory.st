@@ -9,7 +9,7 @@ Class {
 	#instVars : [
 		'address'
 	],
-	#category : #Kernel
+	#category : #FFI
 }
 
 { #category : #inspecting }

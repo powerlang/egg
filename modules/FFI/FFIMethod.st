@@ -11,7 +11,7 @@ Class {
 		'ffiName',
 		'descriptor'
 	],
-	#category : #Kernel
+	#category : #FFI
 }
 
 

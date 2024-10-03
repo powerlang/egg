@@ -9,7 +9,7 @@ Class {
 	#instVars : [
 		'loader'
 	],
-	#category : #Kernel
+	#category : #FFI
 }
 
 { #category : #private }
