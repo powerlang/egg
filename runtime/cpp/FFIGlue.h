@@ -14,10 +14,14 @@ namespace Egg
 struct FFIDescriptorImpl {
     ffi_cif *cif;
     ffi_type **argTypes;
-    uintptr_t fnAddr;
+    void(*fnAddr)();
 };
 
 uintptr_t FindSymbol(uintptr_t libHandle, char *symbol);
+uintptr_t LoaderHandle();
+uintptr_t SymbolFinder();
+
+const char* PlatformName();
 
 } // namespace Egg
 
