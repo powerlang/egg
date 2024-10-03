@@ -116,7 +116,7 @@ SMethodNode >> methodClass [
 	type := pragma type.
 	type = #callback
 		ifTrue: [ ^ SCallbackMethod ].
-	type = #callout
+	type = #cdecl
 		ifTrue: [ ^ SCalloutMethod ].
 	^ SCompiledMethod
 ]
