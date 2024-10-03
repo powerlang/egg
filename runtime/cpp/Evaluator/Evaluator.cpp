@@ -559,7 +559,7 @@ Object* Evaluator::primitiveEqual() {
 }
 
 Object* Evaluator::primitiveFloatNew() {
-    return (Object*)this->_runtime->newBytesOf_sized_(this->_context->self()->asHeapObject(), 8);
+    return (Object*)this->_runtime->newBytes_size_(this->_context->self()->asHeapObject(), 8);
 }
 
 Object* Evaluator::primitiveFlushDispatchCaches() {
@@ -610,7 +610,7 @@ Object* Evaluator::primitiveNew() {
 
 Object* Evaluator::primitiveNewBytes() {
     auto size = this->_context->firstArgument()->asSmallInteger()->asNative();
-    return (Object*)this->_runtime->newBytesOf_sized_(this->_context->self()->asHeapObject(), size);
+    return (Object*)this->_runtime->newBytes_size_(this->_context->self()->asHeapObject(), size);
 }
 
 Object* Evaluator::primitiveNewSized() {

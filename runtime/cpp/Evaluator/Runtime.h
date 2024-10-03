@@ -85,7 +85,6 @@ public:
     uintptr_t arrayedSizeOf_(Object *anObject);
 
     HeapObject* newBytes_size_(HeapObject* species, uint32_t size);
-    HeapObject* newBytesOf_sized_(HeapObject* species, uint32_t size);
     HeapObject* newSlots_size_(HeapObject *species, uint32_t size);
     HeapObject* newSlotsOf_(HeapObject* species);
     HeapObject* newOf_sized_(HeapObject* species, uint32_t size);
