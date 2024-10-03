@@ -881,11 +881,11 @@ Object* Evaluator::primitiveFFICall() {
 }
 
 Object* Evaluator::underprimitiveBasicAt(Object *receiver, std::vector<Object*> &args) {
-    return receiver->asHeapObject()->slotAt_(args[0]->asSmallInteger()->asNative());
+    return receiver->asHeapObject()->untypedSlotAt_(args[0]->asSmallInteger()->asNative());
 }
 
 Object* Evaluator::underprimitiveBasicAtPut(Object *receiver, std::vector<Object*> &args) {
-    receiver->asHeapObject()->slotAt_(args[0]->asSmallInteger()->asNative()) = args[1];
+    receiver->asHeapObject()->untypedSlotAt_(args[0]->asSmallInteger()->asNative()) = args[1];
     return args[1];
 }
 
@@ -908,12 +908,12 @@ Object* Evaluator::underprimitiveBitShiftLeft(Object *receiver, std::vector<Obje
 }
 
 Object* Evaluator::underprimitiveByteAt(Object *receiver, std::vector<Object*> &args) {
-    auto result = receiver->asHeapObject()->byteAt_(args[0]->asSmallInteger()->asNative());
+    auto result = receiver->asHeapObject()->unsafeByteAt_(args[0]->asSmallInteger()->asNative());
     return newIntObject(result);
 }
 
 Object* Evaluator::underprimitiveByteAtPut(Object *receiver, std::vector<Object*> &args) {
-    receiver->asHeapObject()->byteAt_(args[0]->asSmallInteger()->asNative()) = args[1]->asSmallInteger()->asNative();
+    receiver->asHeapObject()->unsafeByteAt_(args[0]->asSmallInteger()->asNative()) = args[1]->asSmallInteger()->asNative();
     return args[1];
 }
 
@@ -1031,23 +1031,23 @@ Object* Evaluator::underprimitiveULargeAtOffsetPut(Object *receiver, std::vector
 }
 
 Object* Evaluator::underprimitiveULongAtOffset(Object *receiver, std::vector<Object*> &args) {
-    auto result = receiver->asHeapObject()->unsignedLongAt_((args[1]->asSmallInteger()->asNative()+1));
+    auto result = receiver->asHeapObject()->uint32offset((args[1]->asSmallInteger()->asNative()));
     return newIntObject(result);
 }
 
 Object* Evaluator::underprimitiveULongAtOffsetPut(Object *receiver, std::vector<Object*> &args) {
     auto value = args[1];
-    receiver->asHeapObject()->unsignedLongAt_((args[0]->asSmallInteger()->asNative()+1)) = value->asSmallInteger()->asNative();
+    receiver->asHeapObject()->uint32offset((args[0]->asSmallInteger()->asNative())) = value->asSmallInteger()->asNative();
     return value;
 }
 
 Object* Evaluator::underprimitiveUShortAtOffset(Object *receiver, std::vector<Object*> &args) {
-    auto result = receiver->asHeapObject()->unsignedShortAt_((args[1]->asSmallInteger()->asNative()+1));
+    auto result = receiver->asHeapObject()->uint16offset((args[1]->asSmallInteger()->asNative()));
     return newIntObject(result);
 }
 
 Object* Evaluator::underprimitiveUShortAtOffsetPut(Object *receiver, std::vector<Object*> &args) {
     auto value = args[1];
-    receiver->asHeapObject()->unsignedShortAt_((args[0]->asSmallInteger()->asNative()+1)) = value->asSmallInteger()->asNative();
+    receiver->asHeapObject()->uint16offset((args[0]->asSmallInteger()->asNative())) = value->asSmallInteger()->asNative();
     return value;
 }
