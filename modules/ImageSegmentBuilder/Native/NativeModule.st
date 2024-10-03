@@ -25,9 +25,9 @@ NativeModule >> imports [
 ] 
 
 { #category : #services }
-NativeModule >> justLoaded [
+NativeModule >> initialize [
 	| names |
-	super justLoaded.
+	super initialize.
 	names := (ProtoObject classVarNamed: #ObjectBitsMasks).
 	names ifNil: [self _halt].
 	NativeWriter addNamespace: names.

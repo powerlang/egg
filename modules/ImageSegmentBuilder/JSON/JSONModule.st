@@ -16,9 +16,9 @@ JSONModule >> imports [
 ]
 
 { #category : #initializing }
-JSONModule >> justLoaded [
-	super justLoaded.
-	    self name: #'ImageSegmentBuilder.JSON'
+JSONModule >> initialize [
+	super initialize.
+	self name: #'ImageSegmentBuilder.JSON'
 ]
 
 { #category : #services }

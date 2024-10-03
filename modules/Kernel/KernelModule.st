@@ -110,9 +110,7 @@ KernelModule >> host [
 { #category : #initialization }
 KernelModule >> initialize [
 	"
-		we cannot do super initialize here, because it would
-		reset our bootstrapped namespace. We cannot use addClass:
-		because it creates new symbol instances, which must be
+		We cannot use addClass: because it creates new symbol instances, which must be
 		avoided during bootstrap (else we would end with duplicated symbols)
 	"
 	self basicInitialize; freezeOnUnhandledExceptions.
