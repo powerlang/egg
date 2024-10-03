@@ -284,8 +284,7 @@ SBinding* EvaluationContext::staticBindingForIvar_(HeapObject *aSymbol) {
 }
 
 SBinding* EvaluationContext::staticBindingForMvar_(HeapObject *symbol) {
-    auto species = this->_runtime->methodClassBinding_(this->method());
-    auto module_ = this->_runtime->speciesModule_(species);
+    auto module_ = this->_runtime->methodModule_(this->method());
     return this->staticBindingFor_inModule_(symbol, module_);
 }
 

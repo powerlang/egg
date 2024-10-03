@@ -286,12 +286,16 @@ public:
     }
 
     int methodArgumentCount_(HeapObject *method) {
-        return (this->methodFlags(method) & 0x3F);
+        return (this->methodFlags(method) & MethodFlags::MethodArgCount);
     }
 
     int methodTempCount_(HeapObject *method) {
-        return (this->methodFlags(method) & 0x1FE000) >> 13;
+        return (this->methodFlags(method) & MethodFlags::MethodTempCount) >> MethodFlags::MethodTempCountShift;
     }
+
+    bool methodIsExtension_(HeapObject *method) {
+	    return this->methodFlags(method) & MethodFlags::MethodIsExtension;
+	}
 
     HeapObject* methodTreecodes_(HeapObject *method) {
         return method->slot(Offsets::MethodTreecodes)->asHeapObject();
@@ -319,6 +323,20 @@ public:
     void methodExecutableCode_put_(HeapObject *method, Object *anObject) {
         method->slot(Offsets::CompiledCodeExecutableCode) = anObject;
     }
+
+    HeapObject* methodExtensionModule_(HeapObject *method) {
+        return this->associationValue_(method->slotAt_(method->size())->asHeapObject())->asHeapObject();
+    }
+
+    HeapObject* methodModule_(HeapObject * method) {
+	    if (this->methodIsExtension_(method)) {
+            return this->methodExtensionModule_(method);
+	    }
+	    else {
+	        auto species = this->methodClassBinding_(method);
+	        return this->speciesModule_(species);
+	    }
+	}
 
     HeapObject* methodSelector_(HeapObject *method) {
         return method->slot(Offsets::MethodSelector)->asHeapObject();
