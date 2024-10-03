@@ -138,7 +138,9 @@ EggEvaluator >> initializeLinearExecutableCodeOf: method [
 
 	| sexpressions executable |
 	sexpressions := runtime sexpressionsOf: method.
-	self linearizer visitMethod: sexpressions.
+	(runtime methodIsCallout: method) 
+		ifTrue: [ self linearizer visitFFIMethod: sexpressions]
+		ifFalse: [ self linearizer visitMethod: sexpressions].
 	executable := runtime newExecutableCodeFor:
 		              self linearizer operations asArray.
 	^runtime methodExecutableCode: method put: executable
@@ -196,6 +198,7 @@ EggEvaluator >> initializePrimitives [
 		at: #HostSuspendedBecause put: self primitiveHostSuspendedBecause;
 		at: #HostCurrentMilliseconds put: self primitiveHostCurrentMilliseconds;
 		at: #HostLoadModule put: self primitiveHostLoadModule;
+		at: #HostPlatformName put: self primitiveHostPlatformName;
 		at: #HostFixOverrides put: self primitiveHostFixOverrides;
 		at: #PrimeFor put: self primitivePrimeFor;
 		at: #FlushFromCaches put: self primitiveFlushFromCaches;
@@ -452,6 +455,11 @@ EggEvaluator >> primitiveHostFixOverrides [
 { #category : 'primitives' }
 EggEvaluator >> primitiveHostLoadModule [
 	^ [ runtime loadModule: context firstArgument]
+]
+
+{ #category : 'primitives' }
+EggEvaluator >> primitiveHostPlatformName [
+	^ [ runtime newString: Smalltalk vm architectureName, ' - Pharo']
 ]
 
 { #category : 'primitives' }

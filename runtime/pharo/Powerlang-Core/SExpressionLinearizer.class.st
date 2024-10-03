@@ -531,6 +531,17 @@ SExpressionLinearizer >> visitCascade: anSCascade [
 ]
 
 { #category : 'initialization' }
+SExpressionLinearizer >> visitFFIMethod: anSMethod [
+	| handler |
+	self reset.
+	handler := primitives at: #FFICall.
+	^ self 
+		primitive: handler;
+		return 
+
+]
+
+{ #category : 'initialization' }
 SExpressionLinearizer >> visitIdentifier: anSIdentifier [
 	operations add: anSIdentifier
 ]
@@ -611,14 +622,14 @@ SExpressionLinearizer >> visitMessage: anSMessage [
 
 { #category : 'initialization' }
 SExpressionLinearizer >> visitMethod: anSMethod [
-	| primitive statements symbol |
+	| primitive statements symbol descriptor handler |
 	self reset.
 	primitive := anSMethod pragma.
 	primitive
 		ifNotNil: [ symbol := runtime localSymbolFrom: anSMethod primitive.
-			primitive := primitives at: symbol.
+			handler := primitives at: symbol.
 			^ self
-				primitive: primitive;
+				primitive: handler;
 				return ].
 	stackTop := runtime methodTempCount: anSMethod compiledCode.
 	statements := anSMethod statements.
