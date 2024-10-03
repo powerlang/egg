@@ -94,7 +94,7 @@ public:
     std::vector<SExpression*>* buildLaunchFrame(HeapObject *symbol, int argCount);
     void buildClosureFrameFor_code_environment_(Object *receiver, HeapObject *compiledCode, HeapObject *environment);
     void buildMethodFrameFor_code_environment_(Object *receiver, HeapObject *compiledCode, HeapObject *environment);
-    void popLaunchFrame();
+    void popLaunchFrame(HeapObject *prevRegE);
 
     Object* environment_at_(int environmentIndex, int index) {
 	if (environmentIndex == INLINED_ENVIRONMENT)

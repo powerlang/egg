@@ -93,9 +93,9 @@ void EvaluationContext::buildMethodFrameFor_code_environment_(Object *receiver, 
 }
 
 
-void EvaluationContext::popLaunchFrame() {
+void EvaluationContext::popLaunchFrame(HeapObject *prevRegE) {
     _regSP = _regBP;
-	_regE = this->stackAt_(_regBP - 3)->asHeapObject();
+	_regE = prevRegE;
 	_regBP = reinterpret_cast<uintptr_t>(this->pop());
 	_regPC = reinterpret_cast<uintptr_t>(this->pop());
 	

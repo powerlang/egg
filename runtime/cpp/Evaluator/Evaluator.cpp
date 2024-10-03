@@ -235,6 +235,7 @@ void Egg::Evaluator::evaluateUndermessage_with_(SAbstractMessage * message, Unde
 
 Object* Evaluator::send_to_with_(HeapObject *symbol, Object *receiver, std::vector<Object*> &args) {
     auto bytecodes = this->_context->buildLaunchFrame(symbol, args.size());
+    auto prevRegE = this->_context->environment();
     this->_regR = receiver;
     if (!args.empty())
         this->_context->pushOperand_(receiver);
@@ -245,7 +246,9 @@ Object* Evaluator::send_to_with_(HeapObject *symbol, Object *receiver, std::vect
     this->_work = bytecodes;
     this->_context->regPC_(0);
     this->evaluate();
-    this->_context->popLaunchFrame();
+    this->_context->popLaunchFrame(prevRegE);
+    auto executableCode = this->_runtime->methodExecutableCode_(this->_context->method());
+    this->_work = reinterpret_cast<std::vector<SExpression*>* >(_runtime->executableCodePlatformCode_(executableCode));;
     return this->_regR;
 }
 
