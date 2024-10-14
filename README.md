@@ -1,4 +1,4 @@
-# Egg Smalltalk
+# Egg Smalltalk 🥚
 
 Egg is a MIT-licensed implementation of a Smalltalk-80 derived environment.
 Egg is not strictly a ST80 though. Some egg characteristics
