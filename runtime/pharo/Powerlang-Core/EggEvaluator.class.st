@@ -444,7 +444,8 @@ EggEvaluator >> primitiveHash [
 
 { #category : 'primitives' }
 EggEvaluator >> primitiveHostCurrentMilliseconds [
-	^ [ runtime newInteger: Time millisecondClockValue ]
+
+	^ [ runtime newInteger: runtime bootstrapper millisecondClockValue ]
 ]
 
 { #category : 'primitives' }
@@ -459,7 +460,8 @@ EggEvaluator >> primitiveHostLoadModule [
 
 { #category : 'primitives' }
 EggEvaluator >> primitiveHostPlatformName [
-	^ [ runtime newString: Smalltalk vm architectureName, ' - Pharo']
+
+	^ [ runtime newString: runtime bootstrapper architectureName ]
 ]
 
 { #category : 'primitives' }
