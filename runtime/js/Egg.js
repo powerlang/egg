@@ -30,6 +30,14 @@ let Egg = class {
 	    return this.runtime.sendLocal_to_with_("load:", kernel, [symbol]);
 	}
 
+	architectureName() {
+		return typeof window === "undefined" ? `Node ${process.version}` : "Browser";
+	}
+
+	millisecondClockValue(){
+		return Date.now();
+	}
+
 	send(receiver, message, args = [])
 	{
 		return this.runtime.sendLocal_to_with_(message, receiver, args);
