@@ -47,6 +47,12 @@ Ring2MetacircularConverter >> addClasses: classes to: module [
 ]
 
 { #category : 'initialization' }
+Ring2MetacircularConverter >> architectureName [
+
+	^ Smalltalk vm architectureName , ' - Pharo'
+]
+
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> classesSortedBySuperclass: anArray [
 
 	| result seen s dfs |
@@ -554,6 +560,12 @@ Ring2MetacircularConverter >> loadModule: symbol [
 { #category : 'initialization' }
 Ring2MetacircularConverter >> map: aRingObject to: anLMRObject [
 	mapping at: aRingObject put: anLMRObject
+]
+
+{ #category : 'initialization' }
+Ring2MetacircularConverter >> millisecondClockValue [
+
+	^ Time millisecondClockValue
 ]
 
 { #category : 'initialization' }

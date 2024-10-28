@@ -67,11 +67,17 @@ JSTranspiler >> classImports: aClass [
 	result add: aClass superclass name.
 	result addAll: aClass sharedPoolNames.
 	transpilers do: [ :t | result addAll: t imports ].
-	#( 'Object' 'Map' 'Array' 'Function' 'ArgCount' 'TempCount'
-	   'EnvCount' 'BlockArgCount' 'BlockEnvCount' 'BlockTempCount'
-	   'BlockCapturesHome' 'BlockCapturesSelf' 'EggProcessSuspended' ) do: [ 
+	self ignoredImports do: [ 
 		:name | result remove: name ifAbsent: nil ].
 	^ result
+]
+
+{ #category : 'transpiling' }
+JSTranspiler >> ignoredImports [
+
+	^ #( 'Object' 'Map' 'Array' 'Function' 'ArgCount' 'TempCount'
+	     'EnvCount' 'BlockArgCount' 'BlockEnvCount' 'BlockTempCount'
+	     'BlockCapturesHome' 'BlockCapturesSelf' 'EggProcessSuspended' )
 ]
 
 { #category : 'transpiling' }
