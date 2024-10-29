@@ -1,0 +1,4 @@
+Importing a module do not import all its submodules. What are the meaning of the sub modules?
+The name of a submodule is set in a initialization method. why?
+The naming convention for sub module names is not clear. for example PetitParser/Tools/ToolsModule?
+The segments are not generated in the corresponding runtime folder
