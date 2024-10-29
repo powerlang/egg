@@ -43,7 +43,7 @@ EggBuilder >> generateMainSegments [
 
 	self generateSegmentsFromModulesNamed:
 	#( 'ImageSegmentBuilder' 'ImageSegmentBuilder.JSON'
-	   'STON' 'Tonel' 'CodeSpecs' )
+	   'STON' 'Tonel' 'CodeSpecs' 'PetitParser' 'PetitParser.Extensions' 'PetitParser.Parsers' 'PetitParser.Tools')
 		
 ]
 

@@ -86,6 +86,14 @@ class WebsideServer extends Object {
 		);
 
 		this.server.get(
+			"/classes/:classname/superclasses",
+			(request, response) => {
+				this.api(request, response).superclasses();
+			}
+		);
+
+
+		this.server.get(
 			"/classes/:classname/categories",
 			(request, response) => {
 				this.api(request, response).categories();
