@@ -203,7 +203,7 @@ Ring2MetacircularConverter >> createNamespaceWith: aCollection [
 	namespace := dest sendLocal: #new to: self => #Namespace.
 	aCollection do: [ :variable | 
 		dest sendLocal: #at:put: to: namespace with: { 
-				(dest addSymbol: variable).
+				(dest addSymbol: variable name halt).
 				nilObj } ].
 	^ namespace
 ]
