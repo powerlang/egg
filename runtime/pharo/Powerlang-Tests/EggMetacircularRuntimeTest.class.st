@@ -224,10 +224,10 @@ EggMetacircularRuntimeTest >> test139strangeCase [
 	| result |
 	self
 		compile: 'foo12
-			1 ifNotNil: [:token | true ifTrue: [token] ifFalse: token]'
+			^1 ifNotNil: [:token | true ifTrue: [token] ifFalse: token]'
 		in: #ProtoObject
 		during: [ result := runtime sendLocal: #foo12 to: runtime true.
-			self assert: result equals: self ==> 5 ].
+			self assert: result equals: self ==> 1 ].
 	self assertNoLeftoverFrames
 
 ]

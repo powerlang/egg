@@ -4,6 +4,7 @@ Class {
 	#classVars : [
 		'Environment',
 		'EnvironmentValue',
+		'InlinedArgument',
 		'LocalArgument',
 		'Self'
 	],
@@ -17,5 +18,6 @@ ClosureElementTypes class >> initialize [
 	Self := 0.
 	LocalArgument := 1.
 	Environment := 2.
-	EnvironmentValue := 3
+	EnvironmentValue := 3.
+	InlinedArgument := 4
 ]

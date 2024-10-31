@@ -50,6 +50,9 @@ EvaluationContext >> captureClosure: anSBlock [
 			type = LocalArgument
 				ifTrue: [ arg := self argumentAt: s next.
 					closure at: i put: arg ].
+			type = InlinedArgument
+				ifTrue: [ arg := self argumentAt: s next in: -1.
+					closure at: i put: arg ].
 			i := i + 1 ].
 	^ closure
 ]
