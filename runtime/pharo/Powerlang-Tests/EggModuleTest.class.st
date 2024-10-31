@@ -16,6 +16,15 @@ EggModuleTest class >> defaultTimeLimit [
 ]
 
 { #category : 'running' }
+EggModuleTest >> classNamed: name in: module [
+	| namespace symbol |
+	namespace := runtime sendLocal: #namespace to: module.
+	symbol := runtime addSymbol: name.
+	^runtime sendLocal: #at: to: namespace with: { symbol }.
+
+]
+
+{ #category : 'running' }
 EggModuleTest >> setUp [
 
 	| image |
@@ -133,12 +142,10 @@ ModuleB >> imports [
 { #category : 'running' }
 EggModuleTest >> test100LoadCompiler [
 
-	| module namespace name compiler object code method foo |
+	| module compiler object code method foo |
 
 	module := bootstrapper sendLoadModule: #Compiler.
-	namespace := runtime sendLocal: #namespace to: module.
-	name := runtime addSymbol: #SCompiler.
-	compiler := runtime sendLocal: #at: to: namespace with: { name }.
+	compiler := self classNamed: #SCompiler in: module.
 	object := bootstrapper => #Object.
 	code := runtime newString: 'foo ^''foo'''.
 	method := runtime sendLocal: #compile:in: to: compiler with: { 

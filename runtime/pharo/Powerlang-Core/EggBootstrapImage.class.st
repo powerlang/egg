@@ -46,12 +46,13 @@ EggBootstrapImage >> createBootstrapNamespace [
 
 { #category : 'accessing' }
 EggBootstrapImage >> createClassNamespaces: spec [
+
 	| names cvars array |
-	names := spec classVarNames.
-	names isEmpty
-		ifTrue: [ ^ self newArraySized: 0 ].
+	names := spec classVars.
+	names isEmpty ifTrue: [ ^ self newArraySized: 0 ].
+	self flag: 'ignoring class var contents'.
 	cvars := self newBootstrapDictionaryOf: self => #Namespace.
-	names do: [ :rgVar | cvars at: rgVar name put: nilObj ].
+	names do: [ :cvar | cvars at: cvar name put: nilObj ].
 	array := self newArraySized: 1.
 	array at: 1 put: cvars.
 	^ array

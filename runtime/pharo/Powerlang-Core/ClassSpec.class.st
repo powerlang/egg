@@ -12,7 +12,7 @@ Class {
 		'metaclass',
 		'variable',
 		'pointers',
-		'classVarNames'
+		'classVars'
 	],
 	#category : 'Powerlang-Core-CodeSpecs',
 	#package : 'Powerlang-Core',
@@ -76,7 +76,13 @@ ClassSpec >> beBytes [
 { #category : 'inquiries' }
 ClassSpec >> classVarNames [
 
-	^ classVarNames
+	^classVars collect: [ :cvar | cvar name ]
+]
+
+{ #category : 'inquiries' }
+ClassSpec >> classVars [
+
+	^classVars
 ]
 
 { #category : 'accessing' }
@@ -85,13 +91,9 @@ ClassSpec >> configureCompiler: aCompiler [
 ]
 
 { #category : 'accessing' }
-ClassSpec >> cvarNames: aCollection [
-	aCollection do: [:cvar | classVarNames at: cvar put: nil]
-]
-
-{ #category : 'accessing' }
 ClassSpec >> cvars: aCollection [
-	classVarNames := aCollection
+
+	classVars := aCollection
 ]
 
 { #category : 'testing' }
@@ -102,7 +104,7 @@ ClassSpec >> hasMethods [
 { #category : 'initialization' }
 ClassSpec >> initialize [
 	super initialize.
-	classVarNames := OrderedDictionary new.
+	classVars := OrderedDictionary new.
 	sharedPools := OrderedCollection new.
 	pointers := true.
 	variable := false

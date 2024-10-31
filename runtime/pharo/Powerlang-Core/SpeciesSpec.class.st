@@ -43,9 +43,7 @@ SpeciesSpec >> addReplacingMethod: aMethodSpec [
 { #category : 'inquiries' }
 SpeciesSpec >> allInstVarNames [
 
-	allIvars ifNotNil: [^allIvars]. 
-	^allIvars := (self withAllSuperclasses reversed gather: [ :c | 
-			               c instVarNames ]) asArray 
+	^self subclassResponsibility
 ]
 
 { #category : 'inquiries' }
@@ -77,6 +75,12 @@ SpeciesSpec >> allSuperclasses [
 	superclasses := OrderedCollection new.
 	self allSuperclassesDo: [:s | superclasses add: s].
 	^superclasses
+]
+
+{ #category : 'accessing' }
+SpeciesSpec >> categories [
+
+	^ (self methods collect: [ :m | m category ]) asSet
 ]
 
 { #category : 'testing' }
@@ -172,6 +176,11 @@ SpeciesSpec >> module: aModuleSpec [
 	module := aModuleSpec
 ]
 
+{ #category : 'accessing' }
+SpeciesSpec >> name [
+	^self subclassResponsibility
+]
+
 { #category : 'printing' }
 SpeciesSpec >> printOn: aStream [
 	aStream nextPutAll: '<' , self name , '>'
@@ -205,6 +214,12 @@ SpeciesSpec >> selectors [
 { #category : 'accessing' }
 SpeciesSpec >> subclasses [
 	^module allClasses select: [:c | c supername = self name]
+]
+
+{ #category : 'accessing' }
+SpeciesSpec >> superclass [
+
+	^ self subclassResponsibility
 ]
 
 { #category : 'accessing' }

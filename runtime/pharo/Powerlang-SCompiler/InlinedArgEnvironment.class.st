@@ -7,6 +7,11 @@ Class {
 }
 
 { #category : 'accessing' }
+InlinedArgEnvironment >> environmentType [
+	^InlinedArgument
+]
+
+{ #category : 'accessing' }
 InlinedArgEnvironment >> isInlinedArgument [
 	^true
 ]
