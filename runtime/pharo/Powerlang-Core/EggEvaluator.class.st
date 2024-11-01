@@ -198,6 +198,7 @@ EggEvaluator >> initializePrimitives [
 		at: #HostSuspendedBecause put: self primitiveHostSuspendedBecause;
 		at: #HostCurrentMilliseconds put: self primitiveHostCurrentMilliseconds;
 		at: #HostLoadModule put: self primitiveHostLoadModule;
+		at: #HostReadFile put: self primitiveHostReadFile;
 		at: #HostPlatformName put: self primitiveHostPlatformName;
 		at: #HostFixOverrides put: self primitiveHostFixOverrides;
 		at: #PrimeFor put: self primitivePrimeFor;
@@ -462,6 +463,11 @@ EggEvaluator >> primitiveHostLoadModule [
 EggEvaluator >> primitiveHostPlatformName [
 
 	^ [ runtime newString: runtime bootstrapper architectureName ]
+]
+
+{ #category : 'primitives' }
+EggEvaluator >> primitiveHostReadFile [
+	^ [ runtime readFile: context firstArgument ]
 ]
 
 { #category : 'primitives' }
