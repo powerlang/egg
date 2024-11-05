@@ -395,7 +395,7 @@ EggEvaluator >> primitiveClass [
 
 { #category : 'primitives' }
 EggEvaluator >> primitiveClosureArgumentCount [
-	^ [ runtime newInteger: context self block argumentCount ]
+	^ [ runtime newInteger: (runtime blockArgumentCount: (runtime closureBlock: context self)) ]
 ]
 
 { #category : 'primitives' }
