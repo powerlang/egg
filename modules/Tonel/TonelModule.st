@@ -7,8 +7,8 @@ Class {
 { #category : #spec }
 TonelModule >> imports [
 	^{
-		#STON -> #(#STONReader #STONWriter).
+		#STON -> #(#STONReader #STONWriter #STON).
 		#Compiler -> #(#SSmalltalkParser).
-		#Kernel -> #(#OrderedDictionary)
+		#Kernel -> #(#OrderedDictionary #ReadStream)
 	}
 ]

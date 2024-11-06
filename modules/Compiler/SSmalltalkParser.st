@@ -20,8 +20,9 @@ SSmalltalkParser >> addBodyTo: aMethodNode [
 
 { #category : #parsing }
 SSmalltalkParser class >> parseSelector: aString [
-	| parser |
-	parser := self new on: aString.
+	| cmp parser |
+    cmp := SCompiler new. 
+	parser := self new compiler: cmp smalltalkCompiler; on: aString.
 	^parser methodSelector ifNotNil: [:n | n value]
 ]
 
