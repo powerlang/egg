@@ -43,7 +43,6 @@ public:
         _lastHash(0)
     {
         this->initializeKernelObjects();
-        debugRuntime = this;
         KnownObjects::initializeFrom(this);
     }
 

@@ -103,7 +103,9 @@ enum Offsets {
 
     FFI_complex_float = 20,
     FFI_complex_double = 21,
-    FFI_complex_longdouble = 22
+    FFI_complex_longdouble = 22,
+
+    FFI_void = 23
 };
 
 } // namespace Egg

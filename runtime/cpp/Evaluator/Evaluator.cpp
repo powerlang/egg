@@ -24,8 +24,15 @@
 
 #include <cmath>
 #include <bit>
+#include <cstring>
 
 using namespace Egg;
+
+// as libffi cannot directly call C++ lambdas, here is a plain C wrapper
+extern "C" void closureCallbackWrapper(ffi_cif* cif, void* ret, void** args, void* userData) {
+    auto lambda = *reinterpret_cast<std::function<void(void*, int, void**)>*>(userData);
+    lambda(ret, cif->nargs, args);
+}
 
 Evaluator::Evaluator(Runtime *runtime, HeapObject *falseObj, HeapObject *trueObj, HeapObject *nilObj) : 
         _runtime(runtime),
@@ -38,6 +45,7 @@ Evaluator::Evaluator(Runtime *runtime, HeapObject *falseObj, HeapObject *trueObj
         _context = new EvaluationContext(runtime);
         this->initializeUndermessages();
         this->initializePrimitives();
+        debugRuntime = _runtime;
     }
 
 
@@ -132,6 +140,7 @@ void Evaluator::initializePrimitives()
     this->addPrimitive("ClosureValue", &Evaluator::primitiveClosureValue);
     this->addPrimitive("ClosureValueWithArgs", &Evaluator::primitiveClosureValueWithArgs);
     this->addPrimitive("ClosureArgumentCount", &Evaluator::primitiveClosureArgumentCount);
+    this->addPrimitive("ClosureAsCallback", &Evaluator::primitiveClosureAsCallback);
     this->addPrimitive("PerformWithArguments", &Evaluator::primitivePerformWithArguments);
     this->addPrimitive("StringReplaceFromToWithStartingAt", &Evaluator::primitiveStringReplaceFromToWithStartingAt);
     this->addPrimitive("FloatNew", &Evaluator::primitiveFloatNew);
@@ -544,6 +553,77 @@ Object* Evaluator::primitiveClosureArgumentCount() {
     return newIntObject(count);
 }
 
+void Evaluator::evaluateCallback_(void *ret, HeapObject *closure, int argc, void *args[])
+{
+    std::vector<Object*> arguments;
+
+    for (size_t i = 0; i < argc; ++i) {
+        uintptr_t arg = *reinterpret_cast<uintptr_t*>(args[i]);
+        //arguments.push_back((Object*)this->_runtime->newInteger_(arg));
+        this->_context->push_((Object*)this->_runtime->newInteger_(arg));
+    }
+
+    // push args here or fix evaluateClosure_withArgs_
+    //for (int i = 0; i < arguments.size(); i++)
+    //    this->_context->push_(arguments[i]);
+
+    //this->evaluateClosure_withArgs_(closure, arguments);
+    auto prevPC = this->_context->regPC();
+    {
+        auto block = _runtime->closureBlock_(closure);
+        auto code = this->prepareBlockExecutableCode_(block);
+        _work = _runtime->executableCodeWork_(code);
+
+        auto receiver = _runtime->blockCapturesSelf_(block) ? closure->slotAt_(_runtime->_closureInstSize + 1) : (Object*)_nilObj;
+
+        this->_context->regPC_(_work->size());
+        _context->buildClosureFrameFor_code_environment_(receiver, block, closure);
+    }
+    this->evaluate();
+    this->_context->regPC_(prevPC);
+    for (size_t i = 0; i < argc; ++i) {
+        this->_context->pop();
+    }
+    *reinterpret_cast<uintptr_t*>(ret) = this->_regR->asSmallInteger()->asNative();
+}
+
+Object* Evaluator::primitiveClosureAsCallback() {
+    auto block = _runtime->closureBlock_(this->_context->self()->asHeapObject());
+    auto count = _runtime->blockArgumentCount_(block);
+
+
+    ffi_cif* cif = new ffi_cif();
+    void* code_location = nullptr;
+    ffi_closure* closure = reinterpret_cast<ffi_closure*>(ffi_closure_alloc(sizeof(ffi_closure), &code_location));
+
+    ffi_type** argTypes = new ffi_type*[count];
+    for (int i = 0; i < count; ++i) {
+        argTypes[i] = &ffi_type_pointer; // for now we only support pointer args and ret-type
+    }
+
+    if (ffi_prep_cif(cif, FFI_DEFAULT_ABI, count, &ffi_type_pointer, argTypes) != FFI_OK) {
+        delete[] argTypes;
+        delete cif;
+        return nullptr;
+    }
+    auto self = this->_context->self()->asHeapObject();
+    auto lambda = new std::function<void(void*, int, void**)>(
+    [self, this](void *ret, int argc, void *args[]) {
+        this->evaluateCallback_(ret, self, argc, args);
+    }
+);
+
+    // Bind the closure
+    if (ffi_prep_closure_loc(closure, cif, closureCallbackWrapper, (void*)lambda, closure) != FFI_OK) {
+        delete[] argTypes;
+        delete cif;
+        ffi_closure_free(closure);
+        return nullptr;
+    }
+
+    return (Object*)this->_runtime->newInteger_(reinterpret_cast<intptr_t>(closure));
+}
+
 Object* Evaluator::primitiveClosureValue() {
     this->evaluateClosure_(this->_context->self()->asHeapObject());
     return this->_context->self();
@@ -769,7 +849,7 @@ void Evaluator::initializeCIF(HeapObject *method, int argCount) {
         uchar type = descriptor->byteAt_(i + 1); // 1-based index
         ffi_type **argType = &descriptor_impl->argTypes[i];
         switch (type) {
-            //case FFI_void:
+            case FFI_void: ASSERT(i == argCount);  *argType = &ffi_type_void; break;
             case FFI_uint8:  *argType = &ffi_type_uint8; break;
             case FFI_sint8:  *argType = &ffi_type_sint8; break;
             case FFI_uint16: *argType = &ffi_type_uint16; break;
@@ -832,7 +912,7 @@ Object* Evaluator::demarshalFFIResult(void *retval, uint8_t type) {
        case FFI_slong:  return newIntObject(*reinterpret_cast<long*>(retval)); break;
 
        case FFI_pointer: return newIntObject(*reinterpret_cast<uintptr_t*>(retval)); break;
-
+       case FFI_void: return newIntObject(0); break;
        default: error_("wrong descriptor"); break;
     }
     error_("unreachable");
@@ -855,13 +935,20 @@ Object* Evaluator::primitiveFFICall() {
     void **args = (void**)alloca(argCount* sizeof(void*));
     Object **lastArg = this->_context->lastArgumentAddress();
 
+    Object **passedArgs = (Object**)alloca(argCount * sizeof(uintptr_t*));
+    memcpy(passedArgs, lastArg, argCount * sizeof(uintptr_t*));
+
     for (int i = 0; i < argCount; i++)
     {
-        Object **argAddress = &lastArg[argCount - i - 1];
+        Object **argAddress = &passedArgs[argCount - i - 1];
 
         // the arg passed is either:
         // a. a tagged smi (and has to be converted to a native int), or
-        // b. a heap object, so its pointed memory _has_ the native value
+        // b. a heap object where its first slot _is_ the native value.
+        // Notice that this just works for passing small ints, floats/doubles,
+        // addresses, and large integers.
+        // Support for passing structures by value greater than pointer size remains
+        // to be implemented.
         if (argAddress[0]->isSmallInteger()) {
             argAddress[0] = (Object*)argAddress[0]->asSmallInteger()->asNative();
             args[i] = argAddress;
@@ -872,7 +959,7 @@ Object* Evaluator::primitiveFFICall() {
 
     HeapObject *descriptor = _runtime->ffiMethodDescriptor_(method);
 
-    void *retval = alloca(desc->argTypes[argCount]->size); // FIXME: we are assuming result fits in sizeof(uintptr_t)
+    void *retval = alloca(desc->argTypes[argCount]->size);
     ffi_call(desc->cif, desc->fnAddr, retval, args);
 
 
