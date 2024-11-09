@@ -69,6 +69,12 @@ Closure >> arityError: anInteger [
 	^self error: msg
 ]
 
+{ #category : #'ffi' }
+Closure >> asCallback [
+	#ClosureAsCallback.
+	^self errorVMSpecific
+]
+
 { #category : #errors }
 Closure >> basicAt: anInteger [
 	anInteger _isSmallInteger ifFalse: [^self outOfBoundsIndex: anInteger].

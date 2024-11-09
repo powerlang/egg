@@ -6,6 +6,8 @@
 #include <map>
 #include <functional>
 
+#include "FFIGlue.h"
+
 #include "../HeapObject.h"
 
 #include "SExpression.h"
@@ -15,6 +17,9 @@
 #include "SLiteral.h"
 #include "SMessage.h"
 #include "SOpDispatchMessage.h"
+
+
+extern "C" void closureCallbackWrapper(ffi_cif* cif, void* ret, void** args, void* userData);
 
 namespace Egg {
 
@@ -119,6 +124,8 @@ public:
     void evaluatePerform_in_withArgs_(HeapObject *aSymbol, Object *receiver, Object *arguments);
     SmallInteger* evaluatePrimitiveHash_(HeapObject *receiver);
 
+    void evaluateCallback_(void *ret, HeapObject *self, int argc, void *args[]);
+
 	void evaluateUndermessage_with_(SAbstractMessage *message, UndermessagePointer undermessage);
 
     HeapObject* false_() {
@@ -183,6 +190,7 @@ private:
 	Object* primitiveBootstrapDictNew();
 	Object* primitiveClass();
 	Object* primitiveClosureArgumentCount();
+	Object* primitiveClosureAsCallback();
 	Object* primitiveClosureValue();
 	Object* primitiveClosureValueWithArgs();
 	Object* primitiveEqual();
