@@ -5,6 +5,11 @@
 
 Extension { #name : #Closure }
 
+{ #category : #'*Primitives' }
+Closure >> asCallback [
+	<primitive: ClosureAsCallback>
+]
+
 { #category : '*Primitives' }
 Closure >> value [
 	<primitive: ClosureValue>

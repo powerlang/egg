@@ -12,6 +12,10 @@ Class {
 	#category : #FFI
 }
 
+{ #category : #'accessing' }
+ExternalObject >> asParameter [
+	^handle
+]
 
 { #category : #'accessing' }
 ExternalObject >> handle [

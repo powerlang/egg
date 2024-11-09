@@ -14,3 +14,17 @@ Class {
 ExternalHandle class >> new [
 	^self new: WordSize
 ]
+
+{ #category : #'testing' }
+ExternalHandle >> isValid [
+	^self asInteger != 0
+]
+
+{ #category : #'testing' }
+ExternalHandle >> initialize [
+	^self requireFinalization
+]
+
+{ #category : #'testing' }
+ExternalHandle >> release [
+]
