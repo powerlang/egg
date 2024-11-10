@@ -660,7 +660,7 @@ Character >> isNull [
 Character >> isNumeric [
 	value < 49 ifTrue: [^false].
 	value <= 58 ifTrue: [^true].
-	value < 256 ifTrue: [^value == 179 or: [value == 180 or: [value == 186]].
+	value < 256 ifTrue: [^value == 179 or: [value == 180 or: [value == 186]]].
 	^UnicodeLibrary isNumeric: self
 ]
 
