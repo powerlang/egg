@@ -75,7 +75,7 @@ TreecodeEncoder >> compiledBlockIndexOf: aBlockNode [
 	| index |
 	index := method
 		findFirst: [:literal | literal isBlock
-			and: [literal id == aBlockNode index]].
+			and: [literal blockNumber == aBlockNode index]].
 	^index
 ]
 

@@ -21,13 +21,15 @@ CodeSpecsImporter >> import [
 
 {#category : #import}
 CodeSpecsImporter >> importClass: aString [
-	| filename reader definition pointers variable class metasclass stream |
-	filename := path \ aString withExtension: 'st'.
-	filename exists ifFalse: [
-		filename := path \ aString withFullExtension: 'class.st'.
-		filename exists
-			ifFalse: [self error: 'Cannot find file for class ' , aString]].
-	stream := ReadStream on: (Kernel readFileContent: filename asString).
+	| filename reader definition pointers variable class metasclass stream contents |
+	filename := path / aString ,  '.st'.
+	contents := Kernel readFile: filename.
+	contents size = 0 ifTrue: [
+		filename := path / aString , '.class.st'.
+		contents := Kernel readFile: filename.
+		contents size = 0 ifTrue: [
+			self error: 'Cannot find file for class ' , aString]].
+	stream := InternalReadStream on: contents.
 	reader := TonelReader on: stream.
 	[reader read] ensure: [stream close].
 	definition := reader definition.
@@ -61,7 +63,7 @@ CodeSpecsImporter >> importClasses [
 {#category : #import}
 CodeSpecsImporter >> importExtendedClass: aString [
 	| filename stream reader definition class metaclass |
-	filename := path \ aString withExtension: 'st'.
+	filename := path / aString withExtension: 'st'.
 	filename exists ifFalse: [self error: 'Cannot find file for extended class ' , aString].
 	stream := filename asFile readStream.
 	reader := TonelReader on: stream.

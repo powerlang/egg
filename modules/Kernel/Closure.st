@@ -105,6 +105,13 @@ Closure >> canReturn [
 ]
 
 { #category : #evaluating }
+Closure >> cull: a [
+	^self argumentCount < 1
+		ifTrue: [self value]
+		ifFalse: [self value: a]
+]
+
+{ #category : #evaluating }
 Closure >> cull: a cull: b [
 	^self argumentCount < 2
 		ifTrue: [self cull: a]

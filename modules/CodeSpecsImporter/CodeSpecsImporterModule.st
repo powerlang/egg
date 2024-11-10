@@ -13,7 +13,7 @@ Class {
 { #category : #spec }
 CodeSpecsImporterModule >> imports [
 	^{
-		#Kernel -> #(#ReadStream #Character).
+		#Kernel -> #(#InternalReadStream #Character).
 		#Tonel -> #(#TonelReader).
 		#CodeSpecs -> #(#ModuleSpec #ClassSpec #MetaclassSpec #MethodSpec).
 		#STON -> #(#STONReader)

@@ -42,9 +42,7 @@ CharacterArray >> / aString [
 
 { #category : #operations }
 CharacterArray >> \ aString [
-	| filename |
-	filename := self asFilename \ aString.
-	^filename asString
+	^self, '\', aString
 ]
 
 { #category : #comparing }
@@ -473,10 +471,11 @@ CharacterArray >> pathName [
 	"
 	'c:\dir\name.ext' pathName
 	"
-	| slash index |
+	| slash1 slash2 index |
 	self asFilename directoryExists ifTrue: [^self].
-	slash := $\.
-	index := self findLast: [:char | char == slash] ifAbsent: [^'.'].
+	slash1 := $\.
+	slash2 := $/.
+	index := self findLast: [:char | char == slash1 or: [char == slash2]] ifAbsent: [^'.'].
 	^self copyFrom: 1 to: index - 1
 ]
 
