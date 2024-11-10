@@ -44,8 +44,8 @@ InternalWriteStream >> atEnd [
 ]
 
 { #category : #configuration }
-InternalWriteStream >> beUnicode [
-	self isUnicode ifTrue: [^self].
+InternalWriteStream >> beWide [
+	self isWide ifTrue: [^self].
 	contents := contents asWideString.
 	eol := eol asWideString
 ]
@@ -130,8 +130,8 @@ InternalWriteStream >> isEmpty [
 ]
 
 { #category : #testing }
-InternalWriteStream >> isUnicode [
-	^contents isString and: [contents isUnicode]
+InternalWriteStream >> isWide [
+	^contents isString and: [contents isWide]
 ]
 
 { #category : #accessing }
@@ -179,9 +179,9 @@ InternalWriteStream >> nextPutAll: aCollection [
 	extra := n - (limit - position).
 	extra > 0 ifTrue: [self growAtLeast: extra].
 	stop := position + n.
-	(contents class == String and: [aCollection isUnicodeString])
+	(contents class == String and: [aCollection isWideString])
 		ifTrue: [
-			self beUnicode.
+			self beWide.
 			contents
 				replaceBytesFrom: position * 2 + 1
 				to: stop * 2
@@ -199,14 +199,14 @@ InternalWriteStream >> nextPutAll: aCollection [
 
 { #category : #writing }
 InternalWriteStream >> nextPutChar: aCharacter [
-	(self isUnicode not andNot: [aCharacter isAnsi]) ifTrue: [self beUnicode].
+	(self isWide not andNot: [aCharacter isByteCharacter]) ifTrue: [self beWide].
 	^self nextPut: aCharacter
 ]
 
 { #category : #writing }
 InternalWriteStream >> nextPutString: aString [
-	self isUnicode ifTrue: [^self nextPutAll: aString asWideString].
-	aString isWideString ifTrue: [self beUnicode].
+	self isWide ifTrue: [^self nextPutAll: aString asWideString].
+	aString isWideString ifTrue: [self beWide].
 	^self nextPutAll: aString
 ]
 
@@ -247,7 +247,7 @@ InternalWriteStream >> putBytesFrom: aByteArray from: start to: stop [
 	| length end s e w |
 	aByteArray isNil ifTrue: [^nil].
 	length := stop - start + 1.
-	contents isUnicodeString
+	contents isWideString
 		ifTrue: [
 			w := contents characterSize.
 			end := length // w + position.

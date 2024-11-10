@@ -70,7 +70,7 @@ SmalltalkSystem >> at: aSymbol ifAbsentPut: aBlock [
 { #category : #accessing }
 SmalltalkSystem >> at: aSymbol put: anObject [
 	| key global |
-	key := aSymbol asSelector.
+	key := aSymbol asSymbol.
 	global := globals at: key ifAbsent: nil.
 	global isClass ifTrue: [
 		anObject == global ifTrue: [^self].
@@ -370,13 +370,13 @@ SmalltalkSystem >> removeKey: aSymbol from: aMethodDictionary ifAbsent: aBlock [
 	| cm |
 	cm := aMethodDictionary at: aSymbol ifAbsent: [^aBlock value].
 	self devenv forgetMethod: cm.
-	^aMethodDictionary basicRemoveKey: aSymbol asSelector ifAbsent: aBlock
+	^aMethodDictionary basicRemoveKey: aSymbol asSymbol ifAbsent: aBlock
 ]
 
 { #category : #removing }
 SmalltalkSystem >> removeKey: aSymbol ifAbsent: aBlock [
 	| selector global |
-	selector := aSymbol asSelector.
+	selector := aSymbol asSymbol.
 	global := globals at: selector ifAbsent: [^aBlock value].
 	(global isClass and: [global symbol == selector]) ifTrue: [
 		global allInstances notEmpty
@@ -389,7 +389,7 @@ SmalltalkSystem >> removeKey: aSymbol ifAbsent: aBlock [
 { #category : #updating }
 SmalltalkSystem >> renameClass: aClass to: aSymbol [
 	| symbol token assoc |
-	symbol := aSymbol asSymbol asSelector.
+	symbol := aSymbol asSymbol.
 	(globals includesKey: symbol)
 		ifTrue: [self error: 'the global ' , symbol , ' already exists'].
 	token := aClass symbol.

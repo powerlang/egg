@@ -71,24 +71,24 @@ String class >> readFrom: aStream [
 { #category : #'instance creation' }
 String class >> with: aCharacter [
 	self == String ifFalse: [^super with: aCharacter].
-	aCharacter isAnsi ifTrue: [^super with: aCharacter].
+	aCharacter isByteCharacter ifTrue: [^super with: aCharacter].
 	^WideString with: aCharacter
 ]
 
 { #category : #'instance creation' }
 String class >> with: ch1 with: ch2 [
 	self == String ifFalse: [^super with: ch1 with: ch2].
-	ch1 isAnsi ifFalse: [^WideString with: ch1 with: ch2].
-	ch2 isAnsi ifFalse: [^WideString with: ch1 with: ch2].
+	ch1 isByteCharacter ifFalse: [^WideString with: ch1 with: ch2].
+	ch2 isByteCharacter ifFalse: [^WideString with: ch1 with: ch2].
 	^super with: ch1 with: ch2
 ]
 
 { #category : #'instance creation' }
 String class >> with: ch1 with: ch2 with: ch3 [
 	self == String ifFalse: [^super with: ch1 with: ch2 with: ch3].
-	ch1 isAnsi ifFalse: [^WideString with: ch1 with: ch2 with: ch3].
-	ch2 isAnsi ifFalse: [^WideString with: ch1 with: ch2 with: ch3].
-	ch3 isAnsi ifFalse: [^WideString with: ch1 with: ch2 with: ch3].
+	ch1 isByteCharacter ifFalse: [^WideString with: ch1 with: ch2 with: ch3].
+	ch2 isByteCharacter ifFalse: [^WideString with: ch1 with: ch2 with: ch3].
+	ch3 isByteCharacter ifFalse: [^WideString with: ch1 with: ch2 with: ch3].
 	^super with: ch1 with: ch2 with: ch3
 ]
 
@@ -98,10 +98,10 @@ with: ch2
 with: ch3
 with: ch4 [
 	self == String ifFalse: [^super with: ch1 with: ch2 with: ch3 with: ch4].
-	ch1 isAnsi ifFalse: [^WideString with: ch1 with: ch2 with: ch3 with: ch4].
-	ch2 isAnsi ifFalse: [^WideString with: ch1 with: ch2 with: ch3 with: ch4].
-	ch3 isAnsi ifFalse: [^WideString with: ch1 with: ch2 with: ch3 with: ch4].
-	ch4 isAnsi ifFalse: [^WideString with: ch1 with: ch2 with: ch3 with: ch4].
+	ch1 isByteCharacter ifFalse: [^WideString with: ch1 with: ch2 with: ch3 with: ch4].
+	ch2 isByteCharacter ifFalse: [^WideString with: ch1 with: ch2 with: ch3 with: ch4].
+	ch3 isByteCharacter ifFalse: [^WideString with: ch1 with: ch2 with: ch3 with: ch4].
+	ch4 isByteCharacter ifFalse: [^WideString with: ch1 with: ch2 with: ch3 with: ch4].
 	^super with: ch1 with: ch2 with: ch3 with: ch4
 ]
 
@@ -118,35 +118,35 @@ with: ch5 [
 			with: ch3
 			with: ch4
 			with: ch5].
-	ch1 isAnsi ifFalse: [
+	ch1 isByteCharacter ifFalse: [
 		^WideString
 			with: ch1
 			with: ch2
 			with: ch3
 			with: ch4
 			with: ch5].
-	ch2 isAnsi ifFalse: [
+	ch2 isByteCharacter ifFalse: [
 		^WideString
 			with: ch1
 			with: ch2
 			with: ch3
 			with: ch4
 			with: ch5].
-	ch3 isAnsi ifFalse: [
+	ch3 isByteCharacter ifFalse: [
 		^WideString
 			with: ch1
 			with: ch2
 			with: ch3
 			with: ch4
 			with: ch5].
-	ch4 isAnsi ifFalse: [
+	ch4 isByteCharacter ifFalse: [
 		^WideString
 			with: ch1
 			with: ch2
 			with: ch3
 			with: ch4
 			with: ch5].
-	ch5 isAnsi ifFalse: [
+	ch5 isByteCharacter ifFalse: [
 		^WideString
 			with: ch1
 			with: ch2
@@ -176,7 +176,7 @@ with: ch6 [
 			with: ch4
 			with: ch5
 			with: ch6].
-	ch1 isAnsi ifFalse: [
+	ch1 isByteCharacter ifFalse: [
 		^WideString
 			with: ch1
 			with: ch2
@@ -184,7 +184,7 @@ with: ch6 [
 			with: ch4
 			with: ch5
 			with: ch6].
-	ch2 isAnsi ifFalse: [
+	ch2 isByteCharacter ifFalse: [
 		^WideString
 			with: ch1
 			with: ch2
@@ -192,7 +192,7 @@ with: ch6 [
 			with: ch4
 			with: ch5
 			with: ch6].
-	ch3 isAnsi ifFalse: [
+	ch3 isByteCharacter ifFalse: [
 		^WideString
 			with: ch1
 			with: ch2
@@ -200,7 +200,7 @@ with: ch6 [
 			with: ch4
 			with: ch5
 			with: ch6].
-	ch4 isAnsi ifFalse: [
+	ch4 isByteCharacter ifFalse: [
 		^WideString
 			with: ch1
 			with: ch2
@@ -208,7 +208,7 @@ with: ch6 [
 			with: ch4
 			with: ch5
 			with: ch6].
-	ch5 isAnsi ifFalse: [
+	ch5 isByteCharacter ifFalse: [
 		^WideString
 			with: ch1
 			with: ch2
@@ -216,7 +216,7 @@ with: ch6 [
 			with: ch4
 			with: ch5
 			with: ch6].
-	ch6 isAnsi ifFalse: [
+	ch6 isByteCharacter ifFalse: [
 		^WideString
 			with: ch1
 			with: ch2
@@ -250,7 +250,7 @@ with: ch7 [
 			with: ch5
 			with: ch6
 			with: ch7].
-	ch1 isAnsi ifFalse: [
+	ch1 isByteCharacter ifFalse: [
 		^WideString
 			with: ch1
 			with: ch2
@@ -259,7 +259,7 @@ with: ch7 [
 			with: ch5
 			with: ch6
 			with: ch7].
-	ch2 isAnsi ifFalse: [
+	ch2 isByteCharacter ifFalse: [
 		^WideString
 			with: ch1
 			with: ch2
@@ -268,7 +268,7 @@ with: ch7 [
 			with: ch5
 			with: ch6
 			with: ch7].
-	ch3 isAnsi ifFalse: [
+	ch3 isByteCharacter ifFalse: [
 		^WideString
 			with: ch1
 			with: ch2
@@ -277,7 +277,7 @@ with: ch7 [
 			with: ch5
 			with: ch6
 			with: ch7].
-	ch4 isAnsi ifFalse: [
+	ch4 isByteCharacter ifFalse: [
 		^WideString
 			with: ch1
 			with: ch2
@@ -286,7 +286,7 @@ with: ch7 [
 			with: ch5
 			with: ch6
 			with: ch7].
-	ch5 isAnsi ifFalse: [
+	ch5 isByteCharacter ifFalse: [
 		^WideString
 			with: ch1
 			with: ch2
@@ -295,7 +295,7 @@ with: ch7 [
 			with: ch5
 			with: ch6
 			with: ch7].
-	ch6 isAnsi ifFalse: [
+	ch6 isByteCharacter ifFalse: [
 		^WideString
 			with: ch1
 			with: ch2
@@ -304,7 +304,7 @@ with: ch7 [
 			with: ch5
 			with: ch6
 			with: ch7].
-	ch7 isAnsi ifFalse: [
+	ch7 isByteCharacter ifFalse: [
 		^WideString
 			with: ch1
 			with: ch2
@@ -326,9 +326,9 @@ with: ch7 [
 { #category : #'instance creation' }
 String class >> with: ch1 with: ch2 withAll: collection [
 	self == String ifFalse: [^super with: ch1 with: ch2 withAll: collection].
-	ch1 isAnsi ifFalse: [^WideString with: ch1 with: ch2 withAll: collection].
-	ch2 isAnsi ifFalse: [^WideString with: ch1 with: ch2 withAll: collection].
-	(collection conform: [:ch | ch isAnsi])
+	ch1 isByteCharacter ifFalse: [^WideString with: ch1 with: ch2 withAll: collection].
+	ch2 isByteCharacter ifFalse: [^WideString with: ch1 with: ch2 withAll: collection].
+	(collection conform: [:ch | ch isByteCharacter])
 		ifFalse: [^WideString with: ch1 with: ch2 withAll: collection].
 	^super with: ch1 with: ch2 withAll: collection
 ]
@@ -336,9 +336,9 @@ String class >> with: ch1 with: ch2 withAll: collection [
 { #category : #'instance creation' }
 String class >> with: aCharacter withAll: aCollection [
 	self == String ifFalse: [^super with: aCharacter withAll: aCollection].
-	aCharacter isAnsi
+	aCharacter isByteCharacter
 		ifFalse: [^WideString with: aCharacter withAll: aCollection].
-	(aCollection conform: [:ch | ch isAnsi])
+	(aCollection conform: [:ch | ch isByteCharacter])
 		ifFalse: [^WideString with: aCharacter withAll: aCollection].
 	^super with: aCharacter withAll: aCollection
 ]
@@ -346,7 +346,7 @@ String class >> with: aCharacter withAll: aCollection [
 { #category : #'instance creation' }
 String class >> withAll: aCollection [
 	self == String ifFalse: [^super withAll: aCollection].
-	(aCollection conform: [:ch | ch isAnsi])
+	(aCollection conform: [:ch | ch isByteCharacter])
 		ifFalse: [^WideString withAll: aCollection].
 	^super withAll: aCollection
 ]
@@ -354,9 +354,9 @@ String class >> withAll: aCollection [
 { #category : #'instance creation' }
 String class >> withAll: aCollection with: aCharacter [
 	self == String ifFalse: [^super withAll: aCollection with: aCharacter].
-	aCharacter isAnsi
+	aCharacter isByteCharacter
 		ifFalse: [^WideString withAll: aCollection with: aCharacter].
-	(aCollection conform: [:ch | ch isAnsi])
+	(aCollection conform: [:ch | ch isByteCharacter])
 		ifFalse: [^WideString withAll: aCollection with: aCharacter].
 	^super withAll: aCollection with: aCharacter
 ]
@@ -364,9 +364,9 @@ String class >> withAll: aCollection with: aCharacter [
 { #category : #'instance creation' }
 String class >> withAll: collection with: ch1 with: ch2 [
 	self == String ifFalse: [^super withAll: collection with: ch1 with: ch2].
-	ch1 isAnsi ifFalse: [^WideString withAll: collection with: ch1 with: ch2].
-	ch2 isAnsi ifFalse: [^WideString withAll: collection with: ch1 with: ch2].
-	(collection conform: [:ch | ch isAnsi])
+	ch1 isByteCharacter ifFalse: [^WideString withAll: collection with: ch1 with: ch2].
+	ch2 isByteCharacter ifFalse: [^WideString withAll: collection with: ch1 with: ch2].
+	(collection conform: [:ch | ch isByteCharacter])
 		ifFalse: [^WideString withAll: collection with: ch1 with: ch2].
 	^super withAll: collection with: ch1 with: ch2
 ]
@@ -374,7 +374,7 @@ String class >> withAll: collection with: ch1 with: ch2 [
 { #category : #operations }
 String >> , aString [
 	aString isString ifFalse: [^super , aString].
-	self isUnicode = aString isUnicode ifTrue: [^super , aString].
+	self isWide = aString isWide ifTrue: [^super , aString].
 	^self asWideString , aString asWideString
 ]
 
@@ -393,11 +393,6 @@ String >> = aString [
 { #category : #converting }
 String >> ansiz [
 	^Ansi current parameterFrom: self
-]
-
-{ #category : #converting }
-String >> asAnsi [
-	^self
 ]
 
 { #category : #converting }
@@ -468,7 +463,7 @@ String >> basicAt: anInteger put: aCharacter [
 			error: self class name , ' can''t hold ' , aCharacter class name].
 	aCharacter isByteCharacter
 		ifFalse: [^self
-			error: 'Strings cannot hold Unicode characters greater than 255'].
+			error: 'Byte strings cannot hold non-latin1 characters'].
 	^self _byteAt: anInteger put: aCharacter asInteger
 ]
 
@@ -610,8 +605,8 @@ String >> nullTerminated [
 { #category : #private }
 String >> primitiveReplaceFrom: start to: stop withObject: aCharacter [
 	self checkCharacter: aCharacter.
-	aCharacter isUnicode
-		ifTrue: [self error: 'Strings cannot hold Unicode characters'].
+	aCharacter isByteCharacter
+		ifFalse: [self error: 'Strings cannot hold non-latin1 characters'].
 	start to: stop do: [:i | self at: i put: aCharacter].
 	^aCharacter
 

@@ -154,7 +154,7 @@ with: collection
 startingAt: position [
 	| pos |
 	collection class isBytes ifTrue: [
-		pos := collection isUnicodeString
+		pos := collection isWideString
 			ifTrue: [collection indexAt: position]
 			ifFalse: [position].
 		^self replaceBytesFrom: start to: stop with: collection startingAt: pos].

@@ -114,7 +114,7 @@ UTF16 >> isDBS: aString [
 
 { #category : #services }
 UTF16 >> isDBS: aString upTo: anInteger [
-	aString isUnicode ifFalse: [^true].
+	aString isWide ifFalse: [^true].
 	2
 		to: anInteger * 4
 		by: 4

@@ -43,7 +43,7 @@ Symbol class >> initializeSymbolTable [
 { #category : #accessing }
 Symbol class >> intern: aString [
 	| symbol existing |
-	aString isUnicode ifTrue: [^WideSymbol intern: aString].
+	aString isWide ifTrue: [^WideSymbol intern: aString].
 	symbol := aString bytes changeClassTo: self.
 	existing := SymbolTable lookup: symbol.
 	existing == nil ifTrue: [
@@ -94,20 +94,10 @@ Symbol >> arity [
 ]
 
 { #category : #converting }
-Symbol >> asAnsi [
-	^self
-]
-
-{ #category : #converting }
 Symbol >> asByteArray [
 	| array |
 	array := ByteArray new: self sizeInBytes.
 	^array replaceBytesFrom: 1 to: array size with: self startingAt: 1
-]
-
-{ #category : #converting }
-Symbol >> asSelector [
-	^self
 ]
 
 { #category : #converting }
@@ -299,8 +289,8 @@ Symbol >> nullTerminated [
 { #category : #private }
 Symbol >> primitiveReplaceFrom: start to: stop withObject: aCharacter [
 	self checkCharacter: aCharacter.
-	aCharacter isUnicode
-		ifTrue: [self error: 'Strings cannot hold Unicode characters'].
+	aCharacter isByteCharacter
+		ifFalse: [self error: 'Byte symbols cannot hold non-latin1 characters'].
 	start to: stop do: [:i | self at: i put: aCharacter].
 	^aCharacter
 ]

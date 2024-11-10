@@ -7,7 +7,6 @@ Class {
 	#name : #Locale,
 	#superclass : #Object,
 	#instVars : [
-		'collator',
 		'currency',
 		'date',
 		'number',
@@ -16,9 +15,9 @@ Class {
 	#category : #Kernel
 }
 
-{ #category : #execution }
+{ #category : #initialization }
 Locale class >> startUp [
-	self namespace at: #ActiveLocale put: self new initialize
+	self module namespace at: #ActiveLocale put: self new
 ]
 
 { #category : #times }
@@ -100,61 +99,17 @@ Locale >> indexOfMonth: aString [
 
 { #category : #initialization }
 Locale >> initialize [
-	collator := Smalltalk os characterCollator new.
+	"Pending....
 	currency := Smalltalk os currencyFormat default.
 	date := Smalltalk os dateFormat default.
 	number := Smalltalk os numberFormat default.
-	time := Smalltalk os timeFormat default
+	time := Smalltalk os timeFormat default"
 ]
 
-{ #category : #strings }
-Locale >> isAlphanumeric: aCharacter [
-	^collator isAlphanumeric: aCharacter
-]
-
-{ #category : #strings }
-Locale >> isCharacter: char1 greaterThan: char2 [
-	^collator isCharacter: char1 greaterThan: char2
-]
-
-{ #category : #strings }
-Locale >> isCharacter: char1 greaterThanOrEqualTo: char2 [
-	^collator isCharacter: char1 greaterThanOrEqualTo: char2
-]
-
-{ #category : #strings }
-Locale >> isCharacter: char1 lessThan: char2 [
-	^collator isCharacter: char1 lessThan: char2
-]
-
-{ #category : #strings }
-Locale >> isCharacter: char1 lessThanOrEqualTo: char2 [
-	^collator isCharacter: char1 lessThanOrEqualTo: char2
-]
-
-{ #category : #numbers }
-Locale >> isLetter: aCharacter [
-	^collator isLetter: aCharacter
-]
-
-{ #category : #strings }
-Locale >> isLowercase: aCharacter [
-	^collator isLowercase: aCharacter
-]
-
-{ #category : #numbers }
-Locale >> isNumeric: aCharacter [
-	^collator isNumeric: aCharacter
-]
 
 { #category : #times }
 Locale >> isTimeFormat12Hour [
 	^time is12hr
-]
-
-{ #category : #strings }
-Locale >> isUppercase: aCharacter [
-	^collator isUppercase: aCharacter
 ]
 
 { #category : #language }
@@ -170,11 +125,6 @@ Locale >> listSeparator [
 { #category : #dates }
 Locale >> longDateFormat [
 	^date longFormat
-]
-
-{ #category : #strings }
-Locale >> lowercaseOf: aCharacter [
-	^collator lowercaseOf: aCharacter
 ]
 
 { #category : #dates }
@@ -240,10 +190,5 @@ Locale >> thousandsSeparator [
 { #category : #times }
 Locale >> timeSeparator [
 	^time separator
-]
-
-{ #category : #strings }
-Locale >> uppercaseOf: aCharacter [
-	^collator uppercaseOf: aCharacter
 ]
 

@@ -18,10 +18,10 @@ ReadWriteStream >> atEnd [
 ]
 
 { #category : #configuration }
-ReadWriteStream >> beUnicode [
+ReadWriteStream >> beWide [
 	| pos delimiter |
-	self isUnicode ifTrue: [^self].
-	super beUnicode.
+	self isWide ifTrue: [^self].
+	super beWide.
 	pos := reader position.
 	delimiter := reader eol asWideString.
 	reader := InternalReadStream on: contents.
