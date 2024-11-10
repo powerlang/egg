@@ -223,11 +223,3 @@ KernelModule >> utf16 [
 KernelModule >> utf32 [
 	^utf32
 ]
-
-KernelModule >> foo [
-	| result |
-	"self _halt."
-	"#(1 2 3 4 5) do: [:i | result := i]."
-	result := 42 factorial "0x10000000000000000 * 1".
-	^result = 0x3C1581D491B28F523C23ABDF35B689C908000000000 ifTrue: [1] ifFalse: [0]
-]
