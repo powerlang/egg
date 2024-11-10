@@ -84,6 +84,23 @@ TonelReader >> readDefinition [
 ]
 
 {#category : #reading}
+TonelReader >> readMethod [
+	| metadata classname signature selector method |
+	metadata := STON fromStream: stream.
+	classname := stream skipSeparators; upToAll: '>>'.
+	signature := stream upTo: $[.
+	selector := SSmalltalkParser parseSelector: signature.
+	method := OrderedDictionary new.
+	method
+		addAll: metadata;
+		at: #class put: classname trimBlanks;
+		at: #signature put: signature trimBlanks;
+		at: #selector put: selector;
+		at: #body put: self nextBlock.
+	methods add: method
+]
+
+{#category : #reading}
 TonelReader >> readMethods [
 	[stream skipSeparators; atEnd] whileFalse: [self readMethod]
 ]

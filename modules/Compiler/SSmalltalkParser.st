@@ -18,6 +18,13 @@ SSmalltalkParser >> addBodyTo: aMethodNode [
 		addStatementsTo: aMethodNode
 ]
 
+{ #category : #parsing }
+SSmalltalkParser class >> parseSelector: aString [
+	| parser |
+	parser := self new on: aString.
+	^parser methodSelector ifNotNil: [:n | n value]
+]
+
 { #category : #private }
 SSmalltalkParser >> addByteTo: aCollection [
 	| byte |
