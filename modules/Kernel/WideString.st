@@ -146,8 +146,15 @@ WideString >> <= aString [
 ]
 
 { #category : #converting }
-WideString >> asAnsi [
-	^Ansi current reduce: self
+WideString >> asByteCharacters [
+	| n result |
+	n := self size.
+	result := String new: n.
+	1 to: n do: [:i | | code char |
+		code := self codeAt: i.
+		char := code < 256 ifTrue: [code] ifFalse: [$? asInteger].
+		result byteAt: i put: char].
+	^result
 ]
 
 { #category : #converting }
@@ -157,14 +164,7 @@ WideString >> asLowercase [
 
 { #category : #converting }
 WideString >> asSymbol [
-	self isAnsiCompliant ifTrue: [^self reduced asSymbol].
 	^WideSymbol intern: self
-]
-
-{ #category : #converting }
-WideString >> asUnicode [
-	self ASSERT: false.
-	^self
 ]
 
 { #category : #converting }
@@ -335,6 +335,14 @@ td1: anArray [
 ]
 
 { #category : #testing }
+WideString >> isByteCompliant [
+	1 to: self size do: [:i | | char |
+		char := self at: i.
+		char isByteCharacter ifFalse: [^false]].
+	^true
+]
+
+{ #category : #testing }
 WideString >> isCNormal [
 	^UTF16 current isCNormal: self
 ]
@@ -355,12 +363,7 @@ WideString >> isKDNormal [
 ]
 
 { #category : #testing }
-WideString >> isUnicode [
-	^true
-]
-
-{ #category : #testing }
-WideString >> isUnicodeString [
+WideString >> isWide [
 	^true
 ]
 
@@ -401,7 +404,7 @@ WideString >> printChunkOn: aStream from: anInteger [
 
 { #category : #converting }
 WideString >> reduced [
-	^self isAnsiCompliant ifTrue: [self asAnsi] ifFalse: [self]
+	^self isByteCompliant ifTrue: [self asByteCharacters] ifFalse: [self]
 ]
 
 { #category : #replacing }

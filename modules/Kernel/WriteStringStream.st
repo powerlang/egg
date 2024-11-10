@@ -10,16 +10,16 @@ Class {
 }
 
 { #category : #configuration }
-WriteStringStream >> beUnicode [
-	super beUnicode.
+WriteStringStream >> beWide [
+	super beWide.
 	limit := contents size
 
 ]
 
 { #category : #writing }
 WriteStringStream >> nextPut: aCharacter [
-	aCharacter isAnsi ifTrue: [^super nextPut: aCharacter].
-	self beUnicode.
+	aCharacter isByteCharacter ifTrue: [^super nextPut: aCharacter].
+	self beWide.
 	^super nextPut: aCharacter
 ]
 
@@ -29,7 +29,7 @@ WriteStringStream >> nextPutAll: aString [
 	contents isWideString = aString isWideString
 		ifTrue: [^super nextPutAll: aString].
 	contents isWideString ifTrue: [^super nextPutAll: aString asWideString].
-	self beUnicode.
+	self beWide.
 	^super nextPutAll: aString
 ]
 

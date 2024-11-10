@@ -34,11 +34,6 @@ UndefinedObject >> asParameter [
 	^0
 ]
 
-{ #category : #converting }
-UndefinedObject >> asUnicode [
-	
-]
-
 { #category : #printing }
 UndefinedObject >> canBePrintedAsLiteral [
 	^true

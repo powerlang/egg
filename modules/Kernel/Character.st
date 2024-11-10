@@ -504,21 +504,6 @@ Character >> isAlphaNumericOrUnderscore [
 ]
 
 { #category : #testing }
-Character >> isAnsi [
-	^Ansi isAnsi: value
-]
-
-{ #category : #testing }
-Character >> isAnsiCompliant [
-	"
-	8240 asCharacter isAnsiCompliant
-	"
-	value < 128 ifTrue: [^true].
-	value < 160 ifTrue: [^false].
-	^value < 256
-]
-
-{ #category : #testing }
 Character >> isAsciiLetter [
 	value < 65 ifTrue: [^false].
 	value < 91 ifTrue: [^true].
@@ -801,15 +786,8 @@ Character >> numericValue [
 
 { #category : #printing }
 Character >> printOn: aStream [
-	self isUnicode ifTrue: [aStream beUnicode].
+	self isByteCharacter ifFalse: [aStream beWide].
 	aStream nextPut: $$; nextPut: self
-]
-
-{ #category : #converting }
-Character >> reduced [
-	self ASSERT: false.
-	value < 256 ifTrue: [^self].
-	^self isAnsiCompliant ifTrue: [self asAnsi] ifFalse: [self]
 ]
 
 { #category : #private }

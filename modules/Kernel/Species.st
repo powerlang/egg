@@ -55,7 +55,7 @@ Species >> >> aSelector [
 { #category : #'add/remove' }
 Species >> addSelector: aSymbol withMethod: aCompiledMethod [
 	| selector |
-	selector := aSymbol asSelector.
+	selector := aSymbol asSymbol.
 	self methodDictionary at: selector put: aCompiledMethod.
 	self organization notNil ifTrue: [self organization classify: selector]
 ]

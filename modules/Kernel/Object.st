@@ -656,12 +656,12 @@ Object >> isTimestamp [
 ]
 
 { #category : #testing }
-Object >> isUnicodeString [
+Object >> isWideString [
 	^false
 ]
 
 { #category : #testing }
-Object >> isUnicodeSymbol [
+Object >> isWideSymbol [
 	^false
 ]
 

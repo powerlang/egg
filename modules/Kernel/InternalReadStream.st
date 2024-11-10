@@ -31,8 +31,8 @@ InternalReadStream >> atEnd [
 ]
 
 { #category : #configuration }
-InternalReadStream >> beUnicode [
-	self isUnicode ifTrue: [^self].
+InternalReadStream >> beWide [
+	self isWide ifTrue: [^self].
 	contents := contents asWideString.
 	eol := eol asWideString
 ]
@@ -94,8 +94,8 @@ InternalReadStream >> isEmpty [
 ]
 
 { #category : #testing }
-InternalReadStream >> isUnicode [
-	^contents isString and: [contents isUnicode]
+InternalReadStream >> isWide [
+	^contents isString and: [contents isWideString]
 ]
 
 { #category : #accessing }

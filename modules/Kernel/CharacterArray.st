@@ -67,7 +67,7 @@ CharacterArray >> << aString [
 { #category : #comparing }
 CharacterArray >> <= aString [
 	| iterations |
-	self isUnicode == aString isUnicode ifFalse: [
+	self isWide == aString isWide ifFalse: [
 		^(self isSymbol or: [aString isSymbol])
 			ifTrue: [self asWideSymbol <= aString asWideSymbol]
 			ifFalse: [self asWideString <= aString asWideString]].
@@ -153,12 +153,6 @@ CharacterArray >> asString [
 ]
 
 { #category : #converting }
-CharacterArray >> asUnicode [
-	self ASSERT: false.
-	^self asWideString
-]
-
-{ #category : #converting }
 CharacterArray >> asUppercase [
 	| changed answer size c uc |
 	changed := false.
@@ -209,7 +203,7 @@ CharacterArray >> basicAt: anInteger put: aCharacter [
 			error: self class name , ' can''t hold ' , aCharacter class name].
 	aCharacter isByteCharacter
 		ifFalse: [^self
-			error: 'Strings cannot hold Unicode characters greater than 255'].
+			error: 'Strings cannot hold non-latin1 characters'].
 	^self _byteAt: anInteger put: aCharacter asInteger
 ]
 
@@ -432,20 +426,17 @@ td1: anArray [
 ]
 
 { #category : #testing }
-CharacterArray >> isAnsiCompliant [
-	1 to: self size do: [:i | | char |
-		char := self at: i.
-		char isAnsiCompliant ifFalse: [^false]].
+CharacterArray >> isByteCompliant [
 	^true
 ]
 
 { #category : #testing }
-CharacterArray >> isString [
+CharacterArray >> isByteString [
 	^true
 ]
 
 { #category : #testing }
-CharacterArray >> isUnicode [
+CharacterArray >> isWide [
 	^false
 ]
 
@@ -701,14 +692,6 @@ CharacterArray >> uLongAtOffset: offset [
 	high := self uShortAtOffset: offset + 2.
 	high := high bitShift: 16.
 	^high + low
-]
-
-{ #category : #converting }
-CharacterArray >> unaccented [
-	"
-	'áéíóúñü' unaccented
-	"
-	^self asWideString unaccented asAnsi
 ]
 
 { #category : #converting }
