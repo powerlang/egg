@@ -62,7 +62,8 @@ Boolean.prototype.and_ = function (closure) { return this && closure() }
 Boolean.prototype.andNot_ = function (closure) { return this && !closure() }
 Boolean.prototype.not = function () { return !this }
 
-Array.new_ = function(size) { return new Array(size); }
+Array.new_ = function(size) { return new Array(size).fill(nil); }
+Array.newBytes_ = function(size) { return new Array(size).fill(0); }
 Array.new_withAll_ = function(size, value) { return Array(size).fill(value); }
 Array.with_with_ = function(first, second) { return [first, second]; }
 Array.prototype.size  = function()         { return this.length; }

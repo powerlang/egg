@@ -84,30 +84,16 @@ class WebsideAPI extends Object {
 		return this.respondWithJson(result);
 	}
 
-	applyAddMethod(change) {
-		const method = this.compile(change.sourceCode, change.className);
-		const selector = this.runtime.sendLocal_to_("selector", method);
-		//const label = this.runtime.sendLocal_to_("printString", method);
-		change.label = method.toString();
-		//change.sourceCode = this.runtime.sendLocal_to_("sourceObject", method).asLocalString();
-		change.currentSourceCode = change.sourceCode;
-		change.selector = selector.asLocalString();
-		change.timestamp = new Date().toISOString();
-		change.category = "unclassified";
-		return change;
-	}
-
 	applyRemoveMethod(change) {
 		return change;
 	}
 
-	compile(source, classname) {
-		const species = this.classNamed(classname).wrappee();
+	compile(source, species) {
 		const code = this.runtime.newString_(source);
 		const method = this.runtime.sendLocal_to_with_(
 			"compile:in:",
 			this.scompiler(),
-			[code, species]
+			[code, species.wrappee()]
 		);
 		this.runtime.sendLocal_to_("install", method);
 		return method;
@@ -214,12 +200,14 @@ class WebsideAPI extends Object {
 	superclasses() {
 		let species = this.requestedClass(this.request);
 		if (!species) return this.notFound();
-		let superclasses = species.withAllSuperclasses().map((c) => c.asWebsideJson())
+		let superclasses = species
+			.withAllSuperclasses()
+			.map((c) => c.asWebsideJson());
 		this.respondWithJson(superclasses);
 	}
 
 	subclasses() {
-		let species = this.requestedClass(this.request);
+		let species = this.requestedClass();
 		if (!species) return this.notFound();
 		let subclasses = species.subclasses().map((c) => c.asWebsideJson());
 		this.respondWithJson(subclasses);
@@ -276,6 +264,15 @@ class WebsideAPI extends Object {
 
 	usualCategories() {
 		this.respondWithJson([]);
+	}
+
+	compileMethod() {
+		let species = this.requestedClass();
+		if (!species) return this.notFound();
+		const source = this.bodyAt("sourceCode");
+		const method = this.compile(source, species);
+		const wrapper = EggMethodWrapper.on_runtime_(method, this.runtime);
+		return this.respondWithJson(wrapper.asWebsideJson());
 	}
 
 	//Objects endpoints..."
@@ -420,8 +417,9 @@ class WebsideAPI extends Object {
 			state: "pending",
 		};
 		this.server.evaluations[id] = evaluation;
+		const target = this.classNamed("Object");
 		try {
-			this.compile(source, "Object");
+			this.compile(source, target);
 			object = this.runtime.sendLocal_to_("doIt", this.runtime.nil());
 			//this.runtime.sendLocal_to_with_("removeSelector:", species, [selector]);
 			object = this.wrapWithId(object, id);
@@ -716,34 +714,28 @@ class WebsideAPI extends Object {
 	}
 
 	queriedAccessing() {
-		return this.parameterAt("accessing") || this.queryAt("accessing");
+		return this.queryAt("accessing");
 	}
 
 	queriedCategory() {
-		return this.parameterAt("category") || this.queryAt("category");
+		return this.queryAt("category");
 	}
 
 	queriedClass() {
-		let name = this.parameterAt("class") || this.queryAt("class");
+		let name = this.queryAt("class");
 		return typeof name == "function" ? undefined : name;
 	}
 
 	queriedReferencingClass() {
-		return (
-			this.parameterAt("referencingClass") ||
-			this.queryAt("referencingClass")
-		);
+		return this.queryAt("referencingClass");
 	}
 
 	queriedReferencingString() {
-		return (
-			this.parameterAt("referencingString") ||
-			this.queryAt("referencingString")
-		);
+		return this.queryAt("referencingString");
 	}
 
 	queriedScope() {
-		let scope = this.parameterAt("scope") || this.queryAt("scope");
+		let scope = this.queryAt("scope");
 		return this.classNamed(scope);
 	}
 
@@ -752,7 +744,7 @@ class WebsideAPI extends Object {
 	}
 
 	queriedSending() {
-		return this.parameterAt("sending");
+		return this.queryAt("sending");
 	}
 
 	requestedSelector() {
