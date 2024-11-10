@@ -62,10 +62,13 @@ CodeSpecsImporter >> importClasses [
 
 {#category : #import}
 CodeSpecsImporter >> importExtendedClass: aString [
-	| filename stream reader definition class metaclass |
-	filename := path / aString withExtension: 'st'.
-	filename exists ifFalse: [self error: 'Cannot find file for extended class ' , aString].
-	stream := filename asFile readStream.
+
+	| filename contents stream reader definition class metaclass |
+	filename := path / aString ,  '.st'.
+	contents := Kernel readFile: filename.
+	contents size = 0 ifTrue: [
+			self error: 'Cannot find file for extended class ' , aString].
+	stream := InternalReadStream on: contents.
 	reader := TonelReader on: stream.
 	[reader read] ensure: [stream close].
 	definition := reader definition.
