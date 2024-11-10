@@ -126,6 +126,11 @@ KernelModule >> initialize [
 ]
 
 { #category : #services }
+KernelModule >> readFile: filename [
+	^host readFile: filename
+]
+
+{ #category : #services }
 KernelModule >> load: aSymbol [
 	| filename |
 	loadedModules at: aSymbol ifPresent: [:module | ^module].

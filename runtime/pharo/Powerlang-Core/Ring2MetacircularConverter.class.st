@@ -635,6 +635,15 @@ Ring2MetacircularConverter >> prepareClosuresForExecution [
 ]
 
 { #category : 'initialization' }
+Ring2MetacircularConverter >> readFile: pathname [
+
+	| reference |
+	reference := pathname asFileReference.
+	reference exists ifFalse: [ ^nil ].
+	^reference readStream contents
+]
+
+{ #category : 'initialization' }
 Ring2MetacircularConverter >> readModuleSpec: aSymbol [
 	| path |
 	path := self findModulePath: aSymbol.

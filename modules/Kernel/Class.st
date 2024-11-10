@@ -114,11 +114,12 @@ Class >> classVariables: aNamespace [
 
 { #category : #accessing }
 Class >> classVarNamed: aString [
-	^namespaces first at: aString
+	^self classVariables at: aString ifAbsent: []
 ]
 
 { #category : #accessing }
 Class >> classVarNamed: aString put: anObject [
+    namespaces isEmpty ifTrue: [self addNamespace].
 	^namespaces first at: aString put: anObject
 ]
 

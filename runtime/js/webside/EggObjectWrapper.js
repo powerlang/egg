@@ -536,7 +536,7 @@ let EggMethodWrapper = class extends EggObjectWrapper {
 		if (this.respondsTo("selector")) {
 			s = this.send("selector");
 		}
-		if (s) return s.wrappee().asLocalString();
+		if (s && s !== nil) return s.wrappee().asLocalString();
 		//This means the wrappee is a block...
 		return "[]";
 	}

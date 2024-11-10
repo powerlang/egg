@@ -15,6 +15,6 @@ STONModule >> imports [
 	^{
 		#Kernel -> {#Error. #Association. #Boolean. #ByteArray. #Closure. #Collection. #Date. #Dictionary. 
 		#HashedCollection. #Integer. #Interval. #Module. #Number. #OrderedDictionary. #Point. #SequenceableCollection.
-		#String. #Symbol. #Time. #Timestamp. #UndefinedObject}.
+		#String. #Symbol. #Time. #Timestamp. #UndefinedObject. #IdentityDictionary. #MessageNotUnderstood}.
 	}
 ] 

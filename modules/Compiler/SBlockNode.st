@@ -24,14 +24,14 @@ SBlockNode >> beInlined [
 SBlockNode >> buildBlock [
 	| block |
 	self isInlined ifTrue: [ ^ nil ].
-	block := SCompiledBlock new.
+	block := CompiledBlock new.
 	^ block
-		  id: index;
-		  argumentCount: arguments size;
-		  tempCount: scope stackSize;
-		  environmentCount: scope environmentSize;
-		  capturesSelf: scope capturesSelf;
-			capturesHome: scope capturesHome
+		blockNumber: index;
+		argumentCount: arguments size;
+		tempCount: scope stackSize;
+		environmentCount: scope environmentSize;
+		capturesSelf: scope capturesSelf;
+		capturesHome: scope capturesHome
 ]
 
 { #category : #private }

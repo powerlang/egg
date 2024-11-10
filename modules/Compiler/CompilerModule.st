@@ -19,6 +19,6 @@ CompilerModule >> initialize [
 { #category : #spec }
 CompilerModule >> imports [
 	^{
-		#Kernel -> #(Error ByteArray Module NumberParser Species OrderedDictionary)
+		#Kernel -> #(Error ByteArray CompiledBlock Module NumberParser Species OrderedDictionary)
 	}
 ] 

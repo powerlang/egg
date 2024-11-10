@@ -111,6 +111,10 @@ class WebsideServer extends Object {
 			this.api(request, response).methods();
 		});
 
+		this.server.post("/classes/:classname/methods", (request, response) => {
+			this.api(request, response).compileMethod();
+		});
+
 		this.server.get(
 			"/classes/:classname/methods/:selector",
 			(request, response) => {
@@ -182,11 +186,6 @@ class WebsideServer extends Object {
 
 		this.server.delete("/debuggers/:id", (request, response) => {
 			this.api(request, response).deleteDebugger();
-		});
-
-		//Changes endpoints...
-		this.server.post("/changes", (request, response) => {
-			this.api(request, response).addChange();
 		});
 
 		//Extensions endpoints...

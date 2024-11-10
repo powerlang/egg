@@ -160,6 +160,11 @@ CompiledBlock >> environmentCount [
 ]
 
 { #category : #accessing }
+CompiledBlock >> environmentCount: anInteger [
+	format := format bitsAt: EnvCount put: anInteger
+]
+
+{ #category : #accessing }
 CompiledBlock >> format [
 	^format
 ]

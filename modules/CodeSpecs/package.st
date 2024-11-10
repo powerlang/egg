@@ -10,6 +10,8 @@ Package {
 		'MetaclassSpec', 
 		'MethodSpec', 
 		'ModuleSpec', 
-		'SpeciesSpec'
+		'SpeciesSpec',
+		'ModuleReader',
+		'ModuleWriter'
 	]
 }

@@ -54,3 +54,8 @@ HostSystem >> platformName [
 HostSystem >> suspended: aProcess because: anException [
 	<primitive: HostSuspendedBecause>
 ]
+
+{ #category : #services }
+HostSystem >> readFile: filename [
+	<primitive: HostReadFile>
+]

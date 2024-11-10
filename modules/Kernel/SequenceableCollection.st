@@ -651,6 +651,12 @@ SequenceableCollection >> replaceFrom: start to: stop withObject: anObject [
 	^anObject
 ]
 
+{ #category : #replacing }
+SequenceableCollection >> replace: anObject with: anotherObject [
+	self
+		withIndexDo: [:e :i | e = anObject ifTrue: [self at: i put: anotherObject]]
+]
+
 { #category : #accessing }
 SequenceableCollection >> reverse [
 	^self reversed

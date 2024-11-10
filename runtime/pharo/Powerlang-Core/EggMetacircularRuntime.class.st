@@ -640,7 +640,7 @@ EggMetacircularRuntime >> newBytes: species size: anInteger [
 		hash: 0.
 	^ EggByteObject new
 		header: header;
-		bytes: (ByteArray new: anInteger)
+		bytes: (ByteArray newBytes: anInteger)
 ]
 
 { #category : 'initialization' }
@@ -858,6 +858,11 @@ EggMetacircularRuntime >> processStackSP: anLMRObject [
 { #category : 'initialization' }
 EggMetacircularRuntime >> processStackSPIndex: anInteger [
  processStackSPIndex := anInteger
+]
+
+{ #category : 'initialization' }
+EggMetacircularRuntime >> readFile: filename [
+	^ bootstrapper readFile: filename asLocalString
 ]
 
 { #category : 'validating' }
