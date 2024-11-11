@@ -55,11 +55,6 @@ STONWriter class >> isSimpleSymbolChar: aCharacter [
 ]
 
 {#category : #'instance creation'}
-STONWriter class >> new [
-	^super new initialize
-]
-
-{#category : #'instance creation'}
 STONWriter class >> on: aWriteStream [
 	^self new on: aWriteStream
 ]

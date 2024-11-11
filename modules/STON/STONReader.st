@@ -18,11 +18,6 @@ Class {
 }
 
 {#category : #'instance creation'}
-STONReader class >> new [
-	^super new initialize
-]
-
-{#category : #'instance creation'}
 STONReader class >> on: aStream [
 	^self new on: aStream
 ]

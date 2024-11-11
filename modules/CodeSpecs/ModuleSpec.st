@@ -18,11 +18,6 @@ Class {
 	#category : #CodeSpecs
 }
 
-{#category : #'instance creation'}
-ModuleSpec class >> new [
-	^super new initialize
-]
-
 {#category : #'adding / removing'}
 ModuleSpec >> addClass: aClassSpec [
 	classes add: aClassSpec

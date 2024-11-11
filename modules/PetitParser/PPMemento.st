@@ -15,11 +15,6 @@ Class {
 	#category : #PetitParser
 }
 
-{ #category : #'instance creation' }
-PPMemento class >> new [
-	^ self basicNew initialize
-]
-
 { #category : #'accessing-readonly' }
 PPMemento >> count [
 	^ count
