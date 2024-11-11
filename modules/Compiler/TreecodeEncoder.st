@@ -6,11 +6,6 @@ Class {
 		'stream',
 		'script'
 	],
-	#pools : [
-		'AstBindingTypes',
-		'AstNodeTypes',
-		'ClosureElementTypes'
-	],
 	#category : #'Powerlang-Core-SExpressions'
 }
 
@@ -58,18 +53,6 @@ TreecodeEncoder class >> initializeBindingIds [
 ]
 
 
-{ #category : #'class initialization' }
-TreecodeEncoder class >> initializeClosureElementIds [
-	| named |
-	named := self addNamespaceAs: #ClosureElementIds.
-	named
-		at: #Self put: 0;
-		at: #LocalArgument put: 1;
-		at: #Environment put: 2;
-		at: #EnvironmentValue put: 3
-]
-
-
 { #category : #visiting }
 TreecodeEncoder >> compiledBlockIndexOf: aBlockNode [
 	| index |
@@ -95,15 +78,15 @@ TreecodeEncoder >> encodeClosureElements: aBlockNode [
 	scope := aBlockNode scope.
 	parent := aBlockNode realParent.
 	^Array streamContents: [:s |
-		scope capturesSelf ifTrue: [ s nextPut: Self ].
+		scope capturesSelf ifTrue: [ s nextPut: CaptureSelf ].
 		scope capturedEnvironments do: [:e | | index |
-			e == parent ifTrue: [s nextPut: Environment] ifFalse: [
+			e == parent ifTrue: [s nextPut: CaptureEnvironment] ifFalse: [
 				index := aBlockNode environmentIndexOf: e.
 				self ASSERT: index notNil.
-				s nextPut: EnvironmentValue; nextPut: index]].
+				s nextPut: CaptureEnvironmentValue; nextPut: index]].
 		scope capturedArguments do: [:a | | binding |
 			binding := aBlockNode parent scope resolve: a name.
-			s 	nextPut: binding environmentType; nextPut: binding index]]
+			s 	nextPut: binding environmentCaptureType; nextPut: binding index]]
 	
 ]
 

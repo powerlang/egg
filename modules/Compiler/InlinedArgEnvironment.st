@@ -5,6 +5,11 @@ Class {
 }
 
 { #category : #accessing }
+InlinedArgEnvironment >> captureType [
+	^CaptureInlinedArgument
+]
+
+{ #category : #accessing }
 InlinedArgEnvironment >> isInlinedArgument [
 	^true
 ]

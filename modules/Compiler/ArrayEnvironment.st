@@ -8,8 +8,8 @@ Class {
 }
 
 { #category : #private }
-ArrayEnvironment >> environmentType [
-	^EnvironmentValue
+ArrayEnvironment >> captureType [
+	^CaptureEnvironmentValue
 ]
 
 { #category : #private }

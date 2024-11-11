@@ -5,6 +5,6 @@ Class {
 }
 
 { #category : #private }
-ArgumentEnvironment >> environmentType [
-	^LocalArgument
+ArgumentEnvironment >> captureType [
+	^CaptureLocalArgument
 ]
