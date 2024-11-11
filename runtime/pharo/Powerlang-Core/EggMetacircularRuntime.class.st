@@ -63,6 +63,14 @@ EggMetacircularRuntime >> addSymbol: aSymbol [
 ]
 
 { #category : 'initialization' }
+EggMetacircularRuntime >> argumentCountOf: anEggObject [
+	^(self isBlock: anEggObject)
+		ifTrue: [ self blockArgumentCount: anEggObject ]
+		ifFalse: [ self methodArgumentCount: anEggObject ]
+
+]
+
+{ #category : 'initialization' }
 EggMetacircularRuntime >> arrayClass: anLMRObject [
 	arrayClass := anLMRObject 
 ]
@@ -1036,6 +1044,14 @@ EggMetacircularRuntime >> symbolFromLocal: aSymbol [
 { #category : 'initialization' }
 EggMetacircularRuntime >> symbolTable: anLMRObject [
 	symbolTable:= anLMRObject
+]
+
+{ #category : 'initialization' }
+EggMetacircularRuntime >> temporaryCountOf: anEggObject [
+	^(self isBlock: anEggObject)
+		ifTrue: [ self blockTempCount: anEggObject ]
+		ifFalse: [ self methodTempCount: anEggObject ]
+
 ]
 
 { #category : 'initialization' }

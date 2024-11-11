@@ -21,14 +21,21 @@ StackedEvaluationContext >> argumentAt: anInteger [
 	^self argumentAt: anInteger frameIndex: 1 
 ]
 
-{ #category : 'initialization' }
-StackedEvaluationContext >> argumentAt: anInteger frameIndex: anotherInteger [
+{ #category : 'services' }
+StackedEvaluationContext >> argumentAt: anInteger frame: bp [
 
-	| bp code count |
-	bp := self bpForFrameAt: anotherInteger.
+	| code count |
 	code := stack at: bp - 2.
 	count := runtime argumentCountOf: code.
 	^ stack at: bp + 1 + (count - anInteger + 1)
+]
+
+{ #category : 'services' }
+StackedEvaluationContext >> argumentAt: anInteger frameIndex: anotherInteger [
+
+	| bp |
+	bp := self bpForFrameAt: anotherInteger.
+	^self argumentAt: anInteger frame: bp
 ]
 
 { #category : 'initialization' }
@@ -47,14 +54,34 @@ StackedEvaluationContext >> arguments [
 
 { #category : 'services' }
 StackedEvaluationContext >> backtrace [
-	| result bp code receiver |
+	| result bp code receiver argcount args tempcount temps envcount envtemps |
 	result := OrderedCollection new.
 	bp := regBP.
-	[ bp != 0 ]
-		whileTrue: [ code := stack at: bp - 2.
-			receiver := stack at: bp - 1.
-			result add: {code. receiver}.
-			bp := stack at: bp ].
+	[ bp != 0 ] whileTrue: [
+		code := stack at: bp - 2.
+		receiver := stack at: bp - 1.
+		argcount := runtime argumentCountOf: code.
+		args := (1 to: argcount) collect: [ :i |
+			        self argumentAt: i frame: bp ].
+
+		tempcount := runtime temporaryCountOf: code.
+		temps := (1 to: tempcount) collect: [ :i |
+			         self stackTemporaryAt: i frame: bp ].
+
+		envcount := (runtime isBlock: code)
+			            ifTrue: [ 0 ]
+			            ifFalse: [ runtime methodEnvironmentSize: code ].
+
+		envtemps := (1 to: envcount) collect: [ :i |
+			self environmentAt: i frame: bp ].
+
+		result add: {
+				code.
+				receiver.
+				args.
+				temps.
+				envtemps }.
+		bp := stack at: bp ].
 	^ result
 ]
 
@@ -175,6 +202,11 @@ StackedEvaluationContext >> environment: environmentIndex at: index put: value [
 		ifTrue: [ regE ]
 		ifFalse: [ regE at: environmentIndex ].
 	^ env at: index put: value
+]
+
+{ #category : 'initialization' }
+StackedEvaluationContext >> environmentAt: anInteger frame: bp [
+	^ (stack at: bp - self tempOffset) slotAt: anInteger
 ]
 
 { #category : 'initialization' }
@@ -414,15 +446,6 @@ StackedEvaluationContext >> self [
 ]
 
 { #category : 'services' }
-StackedEvaluationContext >> signalSuspension [
-
-	EggProcessSuspended new
-		process: self firstArgument;
-		exception: self secondArgument;
-		signal
-]
-
-{ #category : 'services' }
 StackedEvaluationContext >> stack [
 
 	^stack
@@ -442,21 +465,32 @@ StackedEvaluationContext >> stackSize [
 { #category : 'initialization' }
 StackedEvaluationContext >> stackTemporaryAt: anInteger [
 
-	^ self stackTemporaryAt: anInteger frameIndex: 1 
+	^ self stackTemporaryAt: anInteger frame: regBP
+]
+
+{ #category : 'initialization' }
+StackedEvaluationContext >> stackTemporaryAt: anInteger frame: bp [
+	^ stack at: bp - self tempOffset - anInteger
+]
+
+{ #category : 'initialization' }
+StackedEvaluationContext >> stackTemporaryAt: anInteger frame: bp put: anObject [
+
+	^ stack at: bp - self tempOffset - anInteger put: anObject
 ]
 
 { #category : 'initialization' }
 StackedEvaluationContext >> stackTemporaryAt: anInteger frameIndex: anotherInteger [
 	| bp |
 	bp := self bpForFrameAt: anotherInteger.
-	^ stack at: bp - self tempOffset - anInteger
+	^self stackTemporaryAt: anInteger frame: bp
 ]
 
 { #category : 'initialization' }
 StackedEvaluationContext >> stackTemporaryAt: anInteger frameIndex: anotherInteger put: anObject [
 	| bp |
 	bp := self bpForFrameAt: anotherInteger.
-	^ stack at: bp - self tempOffset - anInteger put: anObject
+	^ self stackTemporaryAt: anInteger frame: bp put: anObject
 ]
 
 { #category : 'initialization' }

@@ -473,7 +473,7 @@ EggEvaluator >> primitiveHostReadFile [
 { #category : 'primitives' }
 EggEvaluator >> primitiveHostSuspendedBecause [
 
-	^ [ context signalSuspension]
+	^ [ self signalSuspension]
 ]
 
 { #category : 'primitives' }
@@ -762,6 +762,17 @@ EggEvaluator >> runtime: anEggRuntime [
 { #category : 'accessing' }
 EggEvaluator >> sendLocal: aSymbol to: receiver [
 	^ self sendLocal: aSymbol to: receiver with: {}
+]
+
+{ #category : 'accessing' }
+EggEvaluator >> signalSuspension [
+	| originator error |
+	originator := self contextForProcess: context firstArgument.
+	error := EggProcessSuspended new
+		process: originator;
+		exception: context secondArgument;
+		context: originator.
+	error signal
 ]
 
 { #category : 'accessing' }

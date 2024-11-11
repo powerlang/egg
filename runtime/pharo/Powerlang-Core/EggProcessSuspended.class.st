@@ -3,12 +3,24 @@ Class {
 	#superclass : 'Error',
 	#instVars : [
 		'process',
-		'exception'
+		'exception',
+		'context'
 	],
 	#category : 'Powerlang-Core-Execution',
 	#package : 'Powerlang-Core',
 	#tag : 'Execution'
 }
+
+{ #category : 'accessing' }
+EggProcessSuspended >> backtrace [
+	^context backtrace
+]
+
+{ #category : 'accessing' }
+EggProcessSuspended >> context: anEvaluationContext [
+
+	context := anEvaluationContext
+]
 
 { #category : 'accessing' }
 EggProcessSuspended >> exception [

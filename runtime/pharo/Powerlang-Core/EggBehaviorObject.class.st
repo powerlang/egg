@@ -34,6 +34,11 @@ EggBehaviorObject >> printOn: aStream [
 ]
 
 { #category : 'accessing' }
+EggBehaviorObject >> runtime [
+	^runtime
+]
+
+{ #category : 'accessing' }
 EggBehaviorObject >> runtime: anEggRuntime [
 	runtime := anEggRuntime
 ]
