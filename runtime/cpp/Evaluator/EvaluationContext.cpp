@@ -148,7 +148,7 @@ HeapObject *EvaluationContext::captureClosure_(SBlock *anSBlock)
 			auto arg = this->argumentAt_(j);
 			_runtime->closureIndexedSlotAt_(closure, i) = arg;
             break; };
-        case BlockCapturedVariables::OuterInlinedArgument:
+        case BlockCapturedVariables::InlinedArgument:
             auto j = *it++;
             auto arg = this->stackTemporaryAt_frame_(j, this->_regBP);
 			_runtime->closureIndexedSlotAt_(closure, i) = arg;

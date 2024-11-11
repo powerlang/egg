@@ -18,7 +18,7 @@ enum BlockCapturedVariables {
     LocalArgument = 1,
     Environment = 2,
     EnvironmentValue = 3,
-    OuterInlinedArgument = 4
+    InlinedArgument = 4
 };
 
 enum MethodFlags {
