@@ -1,18 +1,19 @@
 Class {
-	#name : #EggDebuggerWrapper,
-	#superclass : #Object,
+	#name : 'EggDebuggerWrapper',
+	#superclass : 'Object',
 	#instVars : [
 		'context'
 	],
-	#category : #'Powerlang-EggWebside-Base'
+	#category : 'Powerlang-EggWebside-Base',
+	#package : 'Powerlang-EggWebside-Base'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggDebuggerWrapper >> context [
 	^context
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggDebuggerWrapper >> context: anEvaluatorContext [
 
 	context := anEvaluatorContext

@@ -1,10 +1,11 @@
 Class {
-	#name : #EggSpeciesWrapper,
-	#superclass : #EggObjectWrapper,
-	#category : #'Powerlang-EggWebside-Base'
+	#name : 'EggSpeciesWrapper',
+	#superclass : 'EggObjectWrapper',
+	#category : 'Powerlang-EggWebside-Base',
+	#package : 'Powerlang-EggWebside-Base'
 }
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 EggSpeciesWrapper >> >> aSymbol [
 	
 	| symbol |
@@ -14,26 +15,26 @@ EggSpeciesWrapper >> >> aSymbol [
 		  runtime: runtime
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 EggSpeciesWrapper >> allInstVarNames [
 
 	^ super allInstVarNames asArray wrappee slots collect: [ :s | 
 		  s asLocalString ]
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 EggSpeciesWrapper >> allSubclasses [
 	^ super allSubclasses asArray wrappee slots
 		collect: [ :c | EggSpeciesWrapper on: c runtime: runtime ]
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 EggSpeciesWrapper >> allSuperclasses [
 	^ super allSuperclasses asArray wrappee slots
 		collect: [ :c | EggSpeciesWrapper on: c runtime: runtime ]
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 EggSpeciesWrapper >> asWebsideJson [
 
 	^ super asWebsideJson
@@ -48,19 +49,19 @@ EggSpeciesWrapper >> asWebsideJson [
 		  yourself
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 EggSpeciesWrapper >> categories [
 	^ super categories asArray wrappee slots
 		collect: [ :c | c asLocalString  ]
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 EggSpeciesWrapper >> classVarNames [
 	^ super classVarNames asArray wrappee slots
 		collect: [ :s | s asLocalString ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggSpeciesWrapper >> classVariablesString [
 	^ String
 		streamContents: [ :s | 
@@ -69,12 +70,12 @@ EggSpeciesWrapper >> classVariablesString [
 				separatedBy: [ s space ] ]
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 EggSpeciesWrapper >> comment [
 	^ super comment wrappee asLocalString
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggSpeciesWrapper >> compile: aString [
 
 	| local size kernel name class method treecodes selector format code md |
@@ -105,7 +106,7 @@ EggSpeciesWrapper >> compile: aString [
 	^ method
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 EggSpeciesWrapper >> definition [
 
 	| highest |
@@ -144,20 +145,20 @@ EggSpeciesWrapper >> definition [
 				  nextPutAll: 'superclass: nil' ] ]
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 EggSpeciesWrapper >> includesSelector: aSymbol [
 	| symbol |
 	symbol := runtime addSymbol: aSymbol.
 	^(super includesSelector: symbol) asLocalObject
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 EggSpeciesWrapper >> instVarNames [
 	^ super instVarNames asArray wrappee slots
 		collect: [ :s |  s asLocalString]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggSpeciesWrapper >> instanceVariablesString [
 	^ String
 		streamContents: [ :s | 
@@ -166,12 +167,12 @@ EggSpeciesWrapper >> instanceVariablesString [
 				separatedBy: [ s space ] ]
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 EggSpeciesWrapper >> metaclass [
 	^self class on: (runtime sendLocal: #class to: wrappee) runtime: runtime 
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 EggSpeciesWrapper >> methods [
 	| md |
 	md := self methodDictionary.
@@ -180,12 +181,12 @@ EggSpeciesWrapper >> methods [
 			[ :k | EggMethodWrapper on: (md at: k) wrappee runtime: runtime ]
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 EggSpeciesWrapper >> name [
 	^super name wrappee asLocalString
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 EggSpeciesWrapper >> removeSelector: aSymbol [
 
 	| symbol |
@@ -193,24 +194,24 @@ EggSpeciesWrapper >> removeSelector: aSymbol [
 	super removeSelector: symbol
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggSpeciesWrapper >> sharedPoolsString [
 
 	^ ''
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 EggSpeciesWrapper >> subclasses [
 	^ super subclasses asArray wrappee slots
 		collect: [ :c | EggSpeciesWrapper on: c runtime: runtime ]
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 EggSpeciesWrapper >> withAllSubclasses [
 	^ OrderedCollection with: self withAll: self allSubclasses
 ]
 
-{ #category : #inquiries }
+{ #category : 'inquiries' }
 EggSpeciesWrapper >> withAllSuperclasses [
 	^ OrderedCollection with:
 		self withAll: self allSuperclasses
