@@ -1,5 +1,6 @@
 import { performance } from "perf_hooks"; // nodejs built-in for measuring time
-import Egg from '../Egg.js';
+import Egg from '../../Egg.js';
+
 
 var egg = new Egg();
 egg.loadKernelFile("Kernel.json");

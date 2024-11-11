@@ -1,5 +1,5 @@
-import Egg from "../Egg.js";
-import WebsideServer from "../webside/WebsideServer.js";
+import Egg from "../../Egg.js";
+import WebsideServer from "../../webside/server/WebsideServer.js";
 
 var egg = new Egg();
 egg.loadKernelFile("Kernel.json");
