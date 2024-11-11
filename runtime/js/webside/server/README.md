@@ -1,1 +1,2 @@
-# EggJS-Webside
+# Webside server for EggJS
+
