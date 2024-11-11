@@ -41,7 +41,7 @@ KernelModule >> bootstrap [
 	CompiledBlock initializeFormatFlags.
 	CompiledMethod initializeFormatFlags.
 	Species initializeFormatFlags.
-	Character initializeCharacters; initializeNamedCharacters.
+	Character initializeCharacters; initializeNamedCharacters; initializeLatin1Tables.
 	Closure initializeIndexes.
 	Float initializeConstants.
 	HashTable initializeConstants; initializeSizes.

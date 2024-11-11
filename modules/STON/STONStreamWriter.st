@@ -14,11 +14,6 @@ Class {
 }
 
 {#category : #'instance creation'}
-STONStreamWriter class >> new [
-	^super new initialize
-]
-
-{#category : #'instance creation'}
 STONStreamWriter class >> on: aSTONWriter [
 	^self new on: aSTONWriter
 ]

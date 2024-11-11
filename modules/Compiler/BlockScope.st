@@ -15,8 +15,6 @@ BlockScope >> captureArgument: anArgumentBinding [
 	^captured at: name ifAbsentPut: [| transferred copy |
 		transferred := self parent transferLocal: name.
 		copy := self copyLocal: transferred.
-		(anArgumentBinding isInlined and: [copy != anArgumentBinding])
-			ifTrue: [anArgumentBinding beInArray].
 		copy declaration: transferred declaration]
 ]
 

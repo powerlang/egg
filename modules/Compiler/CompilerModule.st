@@ -13,7 +13,8 @@ Class {
 { #category : #initializing }
 CompilerModule >> initialize [
 	super initialize.
-	TreecodeEncoder initializeBindingIds; initializeTreecodeIds; initializeClosureElementIds
+	TreecodeEncoder initializeBindingIds; initializeTreecodeIds.
+	self initializeClosureElementIds
 ]
 
 { #category : #spec }
@@ -22,3 +23,13 @@ CompilerModule >> imports [
 		#Kernel -> #(Error ByteArray CompiledBlock Module NumberParser Species OrderedDictionary)
 	}
 ] 
+
+{ #category : #'class initialization' }
+CompilerModule >> initializeClosureElementIds [
+	self namespace
+		at: #CaptureSelf put: 0;
+		at: #CaptureLocalArgument put: 1;
+		at: #CaptureEnvironment put: 2;
+		at: #CaptureEnvironmentValue put: 3;
+		at: #CaptureInlinedArgument put: 4
+]

@@ -11,6 +11,18 @@ Class {
 }
 
 { #category : 'initialization' }
+EggIterativeStackedInterpreter >> contextFor: vmStack [
+	^stacks at: vmStack
+]
+
+{ #category : 'initialization' }
+EggIterativeStackedInterpreter >> contextForProcess: process [
+	| stack |
+	stack := process slotAt: 2.
+	^stacks at: stack
+]
+
+{ #category : 'initialization' }
 EggIterativeStackedInterpreter >> contextSwitchTo: vmStack [
 
 	| sp |

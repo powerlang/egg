@@ -57,7 +57,7 @@ public:
     int tempOffset() { return 4; }
 
     Object* argumentAt_(int anInteger);
-
+    Object* argumentAt_frame_(int anInteger, uintptr_t bp);
     Object* argumentAt_frameIndex_(int anInteger, int anotherInteger);
 
     Object* argumentAt_in_(int index, int environmentIndex) {
@@ -197,6 +197,7 @@ public:
     Object* stackAt_frameIndex_put_(int index, int anotherIndex, Object *value);
 
     Object* stackTemporaryAt_(int index);
+    Object* stackTemporaryAt_frame_(int index, uintptr_t bp);
     Object* stackTemporaryAt_frameIndex_(int index, int anotherIndex);
 
     void stackTemporaryAt_put_(int index, Object *value);

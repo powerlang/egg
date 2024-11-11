@@ -45,8 +45,8 @@ LocalBinding >> environmentObject [
 ]
 
 { #category : #accessing }
-LocalBinding >> environmentType [
-	^environment environmentType
+LocalBinding >> environmentCaptureType [
+	^environment captureType
 ]
 
 { #category : #accessing }

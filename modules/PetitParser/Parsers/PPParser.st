@@ -18,11 +18,6 @@ PPParser class >> named: aString [
 	^ self new name: aString
 ]
 
-{ #category : #'instance creation' }
-PPParser class >> new [
-	^ self basicNew initialize
-]
-
 { #category : #parsing }
 PPParser class >> parse: anObject for: requestor [
 	^self parse: anObject

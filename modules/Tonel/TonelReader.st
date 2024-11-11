@@ -15,11 +15,6 @@ Class {
 }
 
 {#category : #'instance creation'}
-TonelReader class >> new [
-	^super new initialize
-]
-
-{#category : #'instance creation'}
 TonelReader class >> on: aStream [
 	^self new stream: aStream
 ]

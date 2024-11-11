@@ -26,11 +26,6 @@ SpeciesSpec class >> initializeFormatMasks [
 		at: 'IsBytes' put: 0x2
 ]
 
-{#category : #'instance creation'}
-SpeciesSpec class >> new [
-	^super new initialize
-]
-
 {#category : #'adding / removing'}
 SpeciesSpec >> addMethod: aMethodSpec [
 	^methods add: aMethodSpec
