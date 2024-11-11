@@ -103,6 +103,16 @@ SScriptNode >> scope [
 	^scope
 ]
 
+{ #category : 'enumerating' }
+SScriptNode >> sendsSelector: aSymbol [
+	statements do: [ :s |
+		s
+			nodesDo: [ :n |
+				(n isMessageNode and: [ n symbol == aSymbol ]) ifTrue: [ ^ true ] ]
+			includingDeclarations: false ].
+	^ false
+]
+
 { #category : 'accessing' }
 SScriptNode >> statements [
 	^statements

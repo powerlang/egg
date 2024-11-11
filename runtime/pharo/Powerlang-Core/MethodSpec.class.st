@@ -35,8 +35,9 @@ MethodSpec >> asCompiledMethod [
 
 { #category : 'converting' }
 MethodSpec >> ast [
-	self canBeCompiled ifFalse: [^nil].
-	^ast ifNil: [ast := self compiler parseMethod: source]
+
+	self canBeCompiled ifFalse: [ ^ nil ].
+	^ ast ifNil: [ ast := self compiler parse: source ]
 ]
 
 { #category : 'inquiries' }
@@ -84,6 +85,12 @@ MethodSpec >> classBinding: aSpeciesSpec [
 { #category : 'inquiries' }
 MethodSpec >> classname [
 	^class name
+]
+
+{ #category : 'converting' }
+MethodSpec >> compiler [
+
+	^ SCompiler new
 ]
 
 { #category : 'testing' }
@@ -165,6 +172,12 @@ MethodSpec >> selector [
 { #category : 'accessing' }
 MethodSpec >> selector: aSymbol [
 	selector := aSymbol
+]
+
+{ #category : 'converting' }
+MethodSpec >> sendsSelector: aSymbol [
+
+	^ self ast ifNil: [ false ] ifNotNil: [ :node | node sendsSelector: aSymbol ]
 ]
 
 { #category : 'accessing' }

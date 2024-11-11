@@ -740,11 +740,11 @@ EggMetacircularRuntime >> newLargeNegativeInteger: anInteger [
 
 { #category : 'initialization' }
 EggMetacircularRuntime >> newLargePositiveInteger: anInteger [
-
 	| size bytes result |
 	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
+	(anInteger byteAt: size) > 16r80 ifTrue: [ size := size + 2 ].
 	bytes := anInteger asEggByteArrayOfSize: size.
-	result := self newBytes: largePositiveIntegerClass size: size.
+	result := self newBytes: largePositiveIntegerClass size: bytes size.
 	^ result bytes: bytes
 ]
 
@@ -905,8 +905,6 @@ EggMetacircularRuntime >> speciesFor: anEggObject [
 	| behavior |
 	behavior := self behaviorOf: anEggObject.
 	^self behaviorClass: behavior.
-
-
 ]
 
 { #category : 'initialization' }

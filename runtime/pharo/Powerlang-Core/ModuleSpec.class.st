@@ -124,6 +124,16 @@ ModuleSpec >> allMethodsDo: aBlock [
 		c methods do: aBlock]
 ]
 
+{ #category : 'accessing' }
+ModuleSpec >> allReferencesTo: aSymbol [
+
+	| result |
+	result := OrderedCollection new.
+	self allMethodsDo: [ :m |
+		(m referencesIdentifier: aSymbol) ifTrue: [ result add: m ]].
+	^ result
+]
+
 { #category : 'adding / removing' }
 ModuleSpec >> associationAt: aSymbol ifAbsent: aBlock [
 	^imports associationAt: aSymbol ifAbsent: aBlock
@@ -426,6 +436,15 @@ ModuleSpec >> resolveClass: class [
 	metaclass ifTrue: [moniker := moniker trimTail: ' class'].
 	found := self basicResolveClass: moniker.
 	^found ifNotNil: [metaclass ifTrue: [found metaclass] ifFalse: [found]]
+]
+
+{ #category : 'accessing' }
+ModuleSpec >> sendersOf: aSymbol [
+	| result |
+	result := OrderedCollection new.
+	self allMethodsDo: [ :m |
+		(m sendsSelector: aSymbol) ifTrue: [ result add: m ] ].
+	^ result
 ]
 
 { #category : 'private' }

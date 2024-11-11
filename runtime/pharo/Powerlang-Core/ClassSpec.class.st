@@ -64,6 +64,14 @@ ClassSpec >> allSuperclassesDo: aBlock [
 ]
 
 { #category : 'accessing' }
+ClassSpec >> asWebsideJson [
+
+	^ super asWebsideJson
+		  at: #class put: self metaclass name;
+		  yourself
+]
+
+{ #category : 'accessing' }
 ClassSpec >> beArrayed [
 	variable := true
 ]

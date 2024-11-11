@@ -1,6 +1,6 @@
 Class {
-	#name : #EggWebsideAPITest,
-	#superclass : #TestCase,
+	#name : 'EggWebsideAPITest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'server',
 		'client'
@@ -8,39 +8,43 @@ Class {
 	#classVars : [
 		'Cache'
 	],
-	#category : #'Powerlang-EggWebside-Tests'
+	#category : 'Powerlang-EggWebside-Tests',
+	#package : 'Powerlang-EggWebside-Tests'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 EggWebsideAPITest class >> defaultTimeLimit [
 
 	^ 100 seconds
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EggWebsideAPITest class >> initializeCache [
-
 	"
 	self initializeCache 
 	"
 
-	Cache := (EggRingImage fromSpec
-		          wordSize: 8;
-		          genesis;
-		          bootstrap;
-		          fillClasses;
-		          fillSymbols;
-		          generateMetacircularImage) result
+	^Cache := EggBootstrapImage fromSpec
+		         wordSize: 8;
+		         genesis;
+		         bootstrap;
+		         fillClasses;
+		         fillSymbols
 ]
 
-{ #category : #private }
+{ #category : 'running' }
+EggWebsideAPITest >> cache [
+	^Cache ifNil: [ self class initializeCache ]
+]
+
+{ #category : 'private' }
 EggWebsideAPITest >> delete: uri [
 	| data |
 	data := client delete: server baseUrl / uri.
 	^ data ifNotNil: [ NeoJSONObject fromString: data ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPITest >> get: uri [
 
 	| url data |
@@ -53,31 +57,30 @@ EggWebsideAPITest >> get: uri [
 	^ data ifNotNil: [ NeoJSONObject fromString: data ]
 ]
 
-{ #category : #private }
+{ #category : 'changes endpoints' }
+EggWebsideAPITest >> newJsonObject [
+
+	^ NeoJSONObject new
+]
+
+{ #category : 'private' }
 EggWebsideAPITest >> post: uri [
 	^ self post: uri with: ''
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 EggWebsideAPITest >> post: uri with: body [
 	| data |
 	data := client post: server baseUrl / uri contents: body asString.
 	^ NeoJSONObject fromString: data
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 EggWebsideAPITest >> setUp [
 
 	| runtime |
 	super setUp.
-	runtime := Cache ifNil: [ 
-		           (EggRingImage fromSpec
-			            wordSize: 8;
-			            genesis;
-			            bootstrap;
-			            fillClasses;
-			            fillSymbols;
-			            generateMetacircularImage) result ].
+	runtime := self cache generateMetacircularImage result.
 	server := WebsideServer new.
 	server
 		apiClass: EggWebsideAPI;
@@ -88,30 +91,30 @@ EggWebsideAPITest >> setUp [
 	client := ZnClient new accept: ZnMimeType applicationJson
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 EggWebsideAPITest >> tearDown [
 	super tearDown.
 	server stop.
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 EggWebsideAPITest >> testAccessors [
+
 	| accessors |
-	accessors := self get: 'methods?class=Fraction&referencing=numerator'.
+	accessors := self get: 'methods?class=Fraction&accessing=numerator'.
 	self
 		assert: accessors notEmpty;
 		assert:
-			(accessors
-				allSatisfy: [ :m | m source includesSubstring: 'numerator' ]).
+			(accessors allSatisfy: [ :m |
+					 m source includesSubstring: 'numerator' ]).
 	accessors := self get: 'methods?class=Fraction&assigning=numerator'.
 	self
 		assert: accessors notEmpty;
-		assert:
-			(accessors
-				allSatisfy: [ :m | m source includesSubstring: 'numerator :=' ])
+		assert: (accessors allSatisfy: [ :m |
+					 m source includesSubstring: 'numerator :=' ])
 ]
 
-{ #category : #'evaluation  endpoints' }
+{ #category : 'evaluation  endpoints' }
 EggWebsideAPITest >> testActiveEvaluations [
 	| evaluation result id |
 	evaluation := NeoJSONObject new
@@ -128,7 +131,37 @@ EggWebsideAPITest >> testActiveEvaluations [
 		ensure: [ self delete: '/evaluations/' , id asString ]
 ]
 
-{ #category : #'evaluation  endpoints' }
+{ #category : 'changes endpoints' }
+EggWebsideAPITest >> testAddMethod [
+
+	| change method remotion |
+	change := self newJsonObject
+		          at: 'type' put: 'AddMethod';
+		          at: 'className' put: 'Point';
+		          at: 'category' put: self class name;
+		          at: 'sourceCode' put: 'testMethodDefinition
+	^x + 1';
+		          at: 'author' put: self class name;
+		          yourself.
+	[
+	self post: '/changes' with: change.
+	method := self get: '/classes/Point/methods/testMethodDefinition'.
+	self
+		assert: method notNil;
+		assert: method selector equals: 'testMethodDefinition';
+		assert: method category equals: self class name;
+		assert: method source equals: 'testMethodDefinition
+
+	^ x + 1' ] ensure: [
+		remotion := self newJsonObject
+			            at: 'type' put: 'RemoveMethod';
+			            at: 'className' put: 'Point';
+			            at: 'selector' put: 'testMethodDefinition';
+			            yourself.
+		self post: '/changes' with: remotion ]
+]
+
+{ #category : 'evaluation  endpoints' }
 EggWebsideAPITest >> testAsynchronousEvaluation [
 	| evaluation result id |
 	evaluation := NeoJSONObject new
@@ -155,7 +188,7 @@ EggWebsideAPITest >> testAsynchronousEvaluation [
 		ensure: [ self delete: '/objects/' , id asString ]
 ]
 
-{ #category : #'evaluation  endpoints' }
+{ #category : 'evaluation  endpoints' }
 EggWebsideAPITest >> testCancelEvaluation [
 	| evaluation result id active |
 	evaluation := NeoJSONObject new
@@ -169,7 +202,7 @@ EggWebsideAPITest >> testCancelEvaluation [
 	self assert: (active noneSatisfy: [ :e | (e at: 'id') = id ])
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 EggWebsideAPITest >> testCassDefinition [
 	| definition |
 	definition := NeoJSONObject new
@@ -198,7 +231,7 @@ EggWebsideAPITest >> testCassDefinition [
 			self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 EggWebsideAPITest >> testCategories [
 
 	| categories |
@@ -209,7 +242,7 @@ EggWebsideAPITest >> testCategories [
 		assert: (categories includes: 'arithmetic')
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 EggWebsideAPITest >> testCategoryRemove [
 	| class method remotion |
 	class := NeoJSONObject new
@@ -250,7 +283,7 @@ EggWebsideAPITest >> testCategoryRemove [
 			self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 EggWebsideAPITest >> testCategoryRename [
 	| class method renaming |
 	class := NeoJSONObject new
@@ -295,7 +328,7 @@ EggWebsideAPITest >> testCategoryRename [
 			self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 EggWebsideAPITest >> testChanges [
 
 	| change changes |
@@ -326,7 +359,7 @@ EggWebsideAPITest >> testChanges [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 EggWebsideAPITest >> testClassCommentDefinition [
 
 	| definition comment |
@@ -362,7 +395,7 @@ EggWebsideAPITest >> testClassCommentDefinition [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 EggWebsideAPITest >> testClassDefinition [
 	| definition |
 	definition := self get: 'classes/Point'.
@@ -372,7 +405,7 @@ EggWebsideAPITest >> testClassDefinition [
 		assert: (definition definition includesSubstring: 'y')
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 EggWebsideAPITest >> testClassRemove [
 
 	| definition remotion class |
@@ -397,7 +430,7 @@ EggWebsideAPITest >> testClassRemove [
 	self assert: class isNil
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 EggWebsideAPITest >> testClassRename [
 
 	| definition renaming class |
@@ -432,14 +465,14 @@ EggWebsideAPITest >> testClassRename [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 EggWebsideAPITest >> testClassVariables [
 	| variables |
 	variables := self get: 'classes/Float/class-variables'.
 	self assert: (variables anySatisfy: [ :v | v name = 'Infinity' ])
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 EggWebsideAPITest >> testClasses [
 	| classes names tree root integer |
 	classes := self get: 'classes'.
@@ -468,7 +501,7 @@ EggWebsideAPITest >> testClasses [
 		assert: (integer subclasses anySatisfy: [ :c | c name = 'SmallInteger' ])
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 EggWebsideAPITest >> testCodeSuggestion [
 
 	| change method error changes |
@@ -505,7 +538,7 @@ EggWebsideAPITest >> testCodeSuggestion [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'debugging endpoints' }
+{ #category : 'debugging endpoints' }
 EggWebsideAPITest >> testCreateDebugger [
 	| evaluation halt id debugger |
 	evaluation := NeoJSONObject new
@@ -541,7 +574,7 @@ EggWebsideAPITest >> testCreateDebugger [
 				ifTrue: [ self delete: '/debuggers/' , debugger asString ] ]
 ]
 
-{ #category : #'evaluation  endpoints' }
+{ #category : 'evaluation  endpoints' }
 EggWebsideAPITest >> testDebuggerContext [
 	| evaluation id debugger error |
 	evaluation := NeoJSONObject new
@@ -576,7 +609,7 @@ EggWebsideAPITest >> testDebuggerContext [
 		ensure: [ self delete: '/debuggers/' , debugger asString ]
 ]
 
-{ #category : #'debugging endpoints' }
+{ #category : 'debugging endpoints' }
 EggWebsideAPITest >> testDebuggerFrames [
 	| evaluation id debugger |
 	evaluation := NeoJSONObject new
@@ -599,15 +632,15 @@ EggWebsideAPITest >> testDebuggerFrames [
 		ensure: [ self delete: '/debuggers/' , debugger asString ]
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 EggWebsideAPITest >> testDialect [
 
 	| dialect |
 	dialect := self get: 'dialect'.
-	self assert: dialect equals: 'Powerlang'
+	self assert: dialect equals: 'Egg'
 ]
 
-{ #category : #'evaluation  endpoints' }
+{ #category : 'evaluation  endpoints' }
 EggWebsideAPITest >> testEvaluationError [
 	| evaluation error description |
 	evaluation := NeoJSONObject new
@@ -624,7 +657,7 @@ EggWebsideAPITest >> testEvaluationError [
 				| (description includesSubstring: 'variable or expression expected')
 ]
 
-{ #category : #'debugging endpoints' }
+{ #category : 'debugging endpoints' }
 EggWebsideAPITest >> testFrameBindings [
 	| evaluation id debugger |
 	evaluation := NeoJSONObject new
@@ -649,7 +682,7 @@ EggWebsideAPITest >> testFrameBindings [
 		ensure: [ self delete: '/debuggers/' , debugger asString ]
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 EggWebsideAPITest >> testImplementors [
 
 	| implementors local |
@@ -667,7 +700,7 @@ EggWebsideAPITest >> testImplementors [
 		assert: (local allSatisfy: [ :m | (m at: 'methodClass') = 'Fraction' ])
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 EggWebsideAPITest >> testInstanceVariableAddition [
 
 	| definition addition |
@@ -704,7 +737,7 @@ EggWebsideAPITest >> testInstanceVariableAddition [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 EggWebsideAPITest >> testInstanceVariableMoveDown [
 
 	| superclass class movement |
@@ -761,7 +794,7 @@ EggWebsideAPITest >> testInstanceVariableMoveDown [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 EggWebsideAPITest >> testInstanceVariableMoveUp [
 
 	| superclass class movement |
@@ -821,7 +854,7 @@ EggWebsideAPITest >> testInstanceVariableMoveUp [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 EggWebsideAPITest >> testInstanceVariableRemove [
 
 	| definition remotion |
@@ -855,7 +888,7 @@ EggWebsideAPITest >> testInstanceVariableRemove [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 EggWebsideAPITest >> testInstanceVariableRename [
 
 	| definition renaming |
@@ -893,7 +926,7 @@ EggWebsideAPITest >> testInstanceVariableRename [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 EggWebsideAPITest >> testInstanceVariables [
 	| variables |
 	variables := self get: 'classes/Fraction/instance-variables'.
@@ -902,7 +935,7 @@ EggWebsideAPITest >> testInstanceVariables [
 		assert: (variables anySatisfy: [ :v | v name = 'denominator' ])
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 EggWebsideAPITest >> testMethod [
 	| method |
 	method := self get: 'classes/Point/methods/x'.
@@ -913,70 +946,16 @@ EggWebsideAPITest >> testMethod [
 				or: [ method source includesSubstring: '^ x' ])
 ]
 
-{ #category : #'changes endpoints' }
-EggWebsideAPITest >> testMethodDefinition [
-
-	| change method |
-	change := NeoJSONObject new
-		          at: 'type' put: 'AddMethod';
-		          at: 'class' put: 'Point';
-		          at: 'category' put: self class name;
-		          at: 'sourceCode' put: 'testMethodDefinition
-	^x + 1';
-		          at: 'author' put: self class name;
-		          yourself.
-	[ 
-	self post: '/changes' with: change.
-	method := self get: '/classes/Point/methods/testMethodDefinition'.
-	self
-		assert: method notNil;
-		assert: method selector equals: 'testMethodDefinition';
-		assert: method category equals: self class name;
-		assert: method source equals: 'testMethodDefinition
-	^x + 1' ] ensure: [ 
-		| remotion |
-		remotion := NeoJSONObject new
-			            at: 'type' put: 'RemoveMethod';
-			            at: 'class' put: 'Point';
-			            at: 'selector' put: 'testMethodDefinition';
-			            yourself.
-		self post: '/changes' with: remotion ]
-]
-
-{ #category : #'changes endpoints' }
-EggWebsideAPITest >> testMethodRemove [
-
-	| definition remotion method |
-	definition := NeoJSONObject new
-		              at: 'type' put: 'AddMethod';
-		              at: 'class' put: 'Point';
-		              at: 'category' put: self class name;
-		              at: 'sourceCode' put: 'testMethodRemove
-	^x + 1';
-		              at: 'author' put: self class name;
-		              yourself.
-	remotion := NeoJSONObject new
-		            at: 'type' put: 'RemoveMethod';
-		            at: 'class' put: 'Point';
-		            at: 'selector' put: 'testMethodRemove';
-		            yourself.
-	self
-		post: '/changes' with: definition;
-		post: '/changes' with: remotion.
-	method := self get: '/classes/Point/methods/testMethodRemove'.
-	self assert: method isNil
-]
-
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 EggWebsideAPITest >> testMethods [
 	| methods |
 	methods := self get: 'classes/Point/methods'.
 	self
 		assert: methods notEmpty;
-		assert: (methods allSatisfy: [ :m | (m at: 'class') = 'Point' ])
+		assert: (methods allSatisfy: [ :m | (m at: 'methodClass') = 'Point' ])
 ]
 
-{ #category : #'evaluation  endpoints' }
+{ #category : 'evaluation  endpoints' }
 EggWebsideAPITest >> testObjectContext [
 	| evaluation object |
 	evaluation := NeoJSONObject new
@@ -1002,7 +981,7 @@ EggWebsideAPITest >> testObjectContext [
 		ensure: [ self delete: '/objects/' , (object at: 'id') asString ]
 ]
 
-{ #category : #'evaluation  endpoints' }
+{ #category : 'evaluation  endpoints' }
 EggWebsideAPITest >> testPinEvaluationResult [
 	| evaluation result |
 	evaluation := NeoJSONObject new
@@ -1018,7 +997,7 @@ EggWebsideAPITest >> testPinEvaluationResult [
 		ensure: [ self delete: '/objects/' , (result at: 'id') asString ]
 ]
 
-{ #category : #'objects endpoints' }
+{ #category : 'objects endpoints' }
 EggWebsideAPITest >> testPinnedObject [
 	| evaluation result id |
 	evaluation := NeoJSONObject new
@@ -1037,7 +1016,7 @@ EggWebsideAPITest >> testPinnedObject [
 		ensure: [ self delete: '/objects/' , id asString ]
 ]
 
-{ #category : #'objects endpoints' }
+{ #category : 'objects endpoints' }
 EggWebsideAPITest >> testPinnedObjectInstanceVariables [
 	| evaluation result id vars |
 	evaluation := NeoJSONObject new
@@ -1063,7 +1042,7 @@ EggWebsideAPITest >> testPinnedObjectInstanceVariables [
 				allSatisfy: [ :n | vars anySatisfy: [ :v | (v at: 'name') = n ] ])
 ]
 
-{ #category : #'objects endpoints' }
+{ #category : 'objects endpoints' }
 EggWebsideAPITest >> testPinnedObjectSlot [
 	| evaluation result id x |
 	evaluation := NeoJSONObject new
@@ -1080,7 +1059,7 @@ EggWebsideAPITest >> testPinnedObjectSlot [
 		assert: (x at: 'printString') equals: '3'
 ]
 
-{ #category : #'objects endpoints' }
+{ #category : 'objects endpoints' }
 EggWebsideAPITest >> testPinnedObjects [
 	| evaluation result id |
 	evaluation := NeoJSONObject new
@@ -1102,18 +1081,54 @@ EggWebsideAPITest >> testPinnedObjects [
 		ensure: [ self delete: '/objects/' , id asString ]
 ]
 
-{ #category : #'code endpoints' }
-EggWebsideAPITest >> testReferences [
+{ #category : 'code endpoints' }
+EggWebsideAPITest >> testReferencesToClass [
+
 	| references |
-	references := self get: 'methods?referencing=Fraction'.
+	references := self get: 'methods?referencingClass=Fraction'.
 	self
 		assert: references notEmpty;
 		assert:
-			(references
-				allSatisfy: [ :m | m source includesSubstring: 'Fraction' ])
+			(references allSatisfy: [ :m |
+					 m source includesSubstring: 'Fraction' ])
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'code endpoints' }
+EggWebsideAPITest >> testReferencesToString [
+
+	| references |
+	references := self get: 'methods?referencingString=referencingString'.
+	self
+		assert: references notEmpty;
+		assert: (references allSatisfy: [ :m |
+					 m source includesSubstring: 'referencingString' ])
+]
+
+{ #category : 'objects endpoints' }
+EggWebsideAPITest >> testRemoveMethod [
+
+	| definition remotion method |
+	definition := self newJsonObject
+		              at: 'type' put: 'AddMethod';
+		              at: 'className' put: 'Point';
+		              at: 'category' put: self class name;
+		              at: 'sourceCode' put: 'testMethodRemove
+	^x + 1';
+		              at: 'author' put: self class name;
+		              yourself.
+	remotion := self newJsonObject
+		            at: 'type' put: 'RemoveMethod';
+		            at: 'className' put: 'Point';
+		            at: 'selector' put: 'testMethodRemove';
+		            yourself.
+	self
+		post: '/changes' with: definition;
+		post: '/changes' with: remotion.
+	method := self get: '/classes/Point/methods/testMethodRemove'.
+	self assert: method isNil
+]
+
+{ #category : 'changes endpoints' }
 EggWebsideAPITest >> testSelectorRename2 [
 
 	| definition renaming |
@@ -1150,22 +1165,27 @@ EggWebsideAPITest >> testSelectorRename2 [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 EggWebsideAPITest >> testSenders [
+
 	| senders local |
 	senders := self get: 'methods?sending=reciprocal'.
 	self
 		assert: senders notEmpty;
-		assert: (senders allSatisfy: [ :m | m source includesSubstring: 'reciprocal' ]);
-		assert: (senders anySatisfy: [ :m | (m at: 'class') = 'Fraction' ]).
+		assert:
+			(senders allSatisfy: [ :m |
+					 m source includesSubstring: 'reciprocal' ]);
+		assert: (senders anySatisfy: [ :m | (m at: 'methodClass') = 'Fraction' ]).
 	local := self get: 'methods?sending=reciprocal&class=Fraction'.
 	self
 		assert: local notEmpty;
-		assert: (local allSatisfy: [ :m | m source includesSubstring: ' reciprocal' ]);
-		assert: (local allSatisfy: [ :m | (m at: 'class') = 'Fraction' ])
+		assert:
+			(local allSatisfy: [ :m |
+					 m source includesSubstring: ' reciprocal' ]);
+		assert: (local allSatisfy: [ :m | (m at: 'methodClass') = 'Fraction' ])
 ]
 
-{ #category : #'debugging endpoints' }
+{ #category : 'debugging endpoints' }
 EggWebsideAPITest >> testStepInto [
 	| evaluation id debugger |
 	evaluation := NeoJSONObject new
@@ -1187,7 +1207,7 @@ EggWebsideAPITest >> testStepInto [
 		ensure: [ self delete: '/debuggers/' , debugger asString ]
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 EggWebsideAPITest >> testSubclasses [
 	| subclasses |
 	subclasses := self get: 'classes/Magnitude/subclasses'.
@@ -1196,7 +1216,7 @@ EggWebsideAPITest >> testSubclasses [
 		assert: (subclasses anySatisfy: [ :c | c name = 'Number' ])
 ]
 
-{ #category : #'evaluation  endpoints' }
+{ #category : 'evaluation  endpoints' }
 EggWebsideAPITest >> testSynchronousEvaluation [
 	| evaluation result |
 	evaluation := NeoJSONObject new
@@ -1209,7 +1229,7 @@ EggWebsideAPITest >> testSynchronousEvaluation [
 		assert: (result at: 'printString') equals: '7'
 ]
 
-{ #category : #'objects endpoints' }
+{ #category : 'objects endpoints' }
 EggWebsideAPITest >> testUnpinObject [
 	| evaluation result id pinned |
 	evaluation := NeoJSONObject new
@@ -1224,7 +1244,7 @@ EggWebsideAPITest >> testUnpinObject [
 	self assert: (pinned noneSatisfy: [ :o | (o at: 'id') = id ])
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 EggWebsideAPITest >> testVariables [
 	| variables |
 	variables := self get: 'classes/Float/variables'.
@@ -1235,7 +1255,7 @@ EggWebsideAPITest >> testVariables [
 		assert: (variables anySatisfy: [ :v | v name = 'denominator' ])
 ]
 
-{ #category : #'workspaces endpoints' }
+{ #category : 'workspaces endpoints' }
 EggWebsideAPITest >> testWorkspace [
 	| id |
 	id := self post: '/workspaces'.
@@ -1261,7 +1281,7 @@ EggWebsideAPITest >> testWorkspace [
 		ensure: [ self delete: '/workspaces/' , id ]
 ]
 
-{ #category : #'workspaces endpoints' }
+{ #category : 'workspaces endpoints' }
 EggWebsideAPITest >> testWorkspaces [
 	| id result |
 	id := self post: '/workspaces'.
