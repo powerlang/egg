@@ -3,97 +3,106 @@
 	See (MIT) license in root directory.
 "
 
-Extension { #name : #ProtoObject }
+Class {
+	#name : #LMRProtoObject,
+	#superclass : #ProtoObject,
+	#category : #Kernel
+}
 
 { #category : #'*system' }
-ProtoObject >> == anObject [
+ProtoObject class >> undermethodSelectors [
+	^LMRProtoObject methodDictionary values asArray select: [:m | m selector beginsWith: '_']
+]
+
+{ #category : #'*system' }
+LMRProtoObject >> == anObject [
 	^self _identityEquals: anObject
 ]
 
 { #category : #'*header access' }
-ProtoObject >> _beArrayed [
+LMRProtoObject >> _beArrayed [
 	self _flagsSet: IsArrayed
 ]
 
 { #category : #'*header access' }
-ProtoObject >> _beBytes [
+LMRProtoObject >> _beBytes [
 	self _flagsSet: IsBytes
 ]
 
 { #category : #'*header access' }
-ProtoObject >> _beFirstGeneration [
+LMRProtoObject >> _beFirstGeneration [
 	self _flagsMask: IsSecondGenerationMask
 ]
 
 { #category : #'*header access' }
-ProtoObject >> _beLarge [
+LMRProtoObject >> _beLarge [
 	self _flagsMask: IsSmallMask
 ]
 
 { #category : #'*header access' }
-ProtoObject >> _beNamed [
+LMRProtoObject >> _beNamed [
 	self _flagsSet: IsNamed
 ]
 
 { #category : #'*header access' }
-ProtoObject >> _beNotRemembered [
+LMRProtoObject >> _beNotRemembered [
 	self _flagsMask: IsRememberedMask
 ]
 
 { #category : #'*header access' }
-ProtoObject >> _beNotSpecial [
+LMRProtoObject >> _beNotSpecial [
 	self _flagsMask: IsSpecialMask
 ]
 
 { #category : #'*header access' }
-ProtoObject >> _beRemembered [
+LMRProtoObject >> _beRemembered [
 	self _flagsSet: IsRemembered
 ]
 
 { #category : #'*header access' }
-ProtoObject >> _beSecondGeneration [
+LMRProtoObject >> _beSecondGeneration [
 	self _flagsSet: IsSecondGeneration
 ]
 
 { #category : #'*header access' }
-ProtoObject >> _beSeen [
+LMRProtoObject >> _beSeen [
 	self _flagsSet: HasBeenSeen
 ]
 
 { #category : #'*header access' }
-ProtoObject >> _beSmall [
+LMRProtoObject >> _beSmall [
 	self _flagsSet: IsSmall
 ]
 
 { #category : #'*header access' }
-ProtoObject >> _beSpecial [
+LMRProtoObject >> _beSpecial [
 	self _flagsSet: IsSpecial
 ]
 
 { #category : #'*header access' }
-ProtoObject >> _beUnseen [
+LMRProtoObject >> _beUnseen [
 	self _flagsMask: HasBeenSeenMask
 ]
 
 { #category : #lookup }
-ProtoObject >> _cachedLookup: aSymbol [
+LMRProtoObject >> _cachedLookup: aSymbol [
 	^self _cachedLookup: aSymbol in: self behavior
 ]
 
 { #category : #lookup }
-ProtoObject >> _cachedLookup: aSymbol in: behavior [
+LMRProtoObject >> _cachedLookup: aSymbol in: behavior [
 	^GlobalDispatchCache current lookupAndCache: aSymbol in: behavior
 ]
 
 { #category : #'*header access' }
-ProtoObject >> _copyBasicHeaderFrom: other [
+LMRProtoObject >> _copyBasicHeaderFrom: other [
 	self
 		_basicULongAt: -1 put: (other _basicULongAt: -1);
 		_basicULongAt: 0 put: (other _basicULongAt: 0)
 ]
 
 { #category : #'*header access' }
-ProtoObject >> _copyHeaderSized: byteSize from: anObject [
+LMRProtoObject >> _copyHeaderSized: byteSize from: anObject [
 	byteSize = 16 ifTrue: [
 		self
 			_basicULongAt: -3 put: (anObject _basicULongAt: -3);
@@ -104,37 +113,37 @@ ProtoObject >> _copyHeaderSized: byteSize from: anObject [
 ]
 
 { #category : #'header access' }
-ProtoObject >> _flagsMask: mask [
+LMRProtoObject >> _flagsMask: mask [
 	self _basicFlags: (self _basicFlags bitAnd: mask)
 ]
 
 { #category : #'header access' }
-ProtoObject >> _flagsSet: mask [
+LMRProtoObject >> _flagsSet: mask [
 	self _basicFlags: (self _basicFlags bitOr: mask)
 ]
 
 { #category : #'header access' }
-ProtoObject >> _hasBeenSeen [
+LMRProtoObject >> _hasBeenSeen [
 	^(self _basicFlags bitAnd: HasBeenSeen) == HasBeenSeen
 ]
 
 { #category : #'header access' }
-ProtoObject >> _hasNamedSlots [
+LMRProtoObject >> _hasNamedSlots [
 	^(self _basicFlags bitAnd: IsNamed) = IsNamed
 ]
 
 { #category : #'header access' }
-ProtoObject >> _headerSizeInBytes [
+LMRProtoObject >> _headerSizeInBytes [
 	^self _isSmall ifTrue: [8] ifFalse: [16]
 ]
 
 { #category : #underprimitives }
-ProtoObject >> _highHalf [
+LMRProtoObject >> _highHalf [
 	^self _oop bitShift: WordSize * 8 // -2
 ]
 
 { #category : #lookup }
-ProtoObject >> _invoke: aNativeCode [
+LMRProtoObject >> _invoke: aNativeCode [
 	"
 	senders of _invoke: MUST have at least 1 temporary. The argument of
 	_invoke: is removed twice: once here and once again after returning from
@@ -147,62 +156,62 @@ ProtoObject >> _invoke: aNativeCode [
 ]
 
 { #category : #'header access' }
-ProtoObject >> _isArrayed [
+LMRProtoObject >> _isArrayed [
 	^false == self _isFixed
 ]
 
 { #category : #'header access' }
-ProtoObject >> _isBytes [
+LMRProtoObject >> _isBytes [
 	^(self _basicFlags bitAnd: IsBytes) = IsBytes
 ]
 
 { #category : #'header access' }
-ProtoObject >> _isFixed [
+LMRProtoObject >> _isFixed [
 	^(self _basicFlags bitAnd: IsArrayed) == 0
 ]
 
 { #category : #'header access' }
-ProtoObject >> _isLarge [
+LMRProtoObject >> _isLarge [
 	^(self _basicFlags bitAnd: IsSmall) == 0
 ]
 
 { #category : #'header access' }
-ProtoObject >> _isProxy [
+LMRProtoObject >> _isProxy [
 	^self _hasBeenSeen
 ]
 
 { #category : #'header access' }
-ProtoObject >> _isRemembered [
+LMRProtoObject >> _isRemembered [
 	^(self _basicFlags bitAnd: IsRemembered) = IsRemembered
 ]
 
 { #category : #'header access' }
-ProtoObject >> _isSecondGeneration [
+LMRProtoObject >> _isSecondGeneration [
 	^(self _basicFlags bitAnd: IsSecondGeneration) = IsSecondGeneration
 ]
 
 { #category : #'header access' }
-ProtoObject >> _isSmall [
+LMRProtoObject >> _isSmall [
 	^(self _basicFlags bitAnd: IsSmall) = IsSmall
 ]
 
 { #category : #'header access' }
-ProtoObject >> _isSpecial [
+LMRProtoObject >> _isSpecial [
 	^(self _basicFlags bitAnd: IsSpecial) = IsSpecial
 ]
 
 { #category : #'header access' }
-ProtoObject >> _largeSize: size [
+LMRProtoObject >> _largeSize: size [
 	self _basicULongAt: _ExtendedSize put: size _asNative
 ]
 
 { #category : #lookup }
-ProtoObject >> _lookup: aSymbol [
+LMRProtoObject >> _lookup: aSymbol [
 	^self _lookup: aSymbol in: self behavior
 ]
 
 { #category : #lookup }
-ProtoObject >> _lookup: aSymbol in: behavior [
+LMRProtoObject >> _lookup: aSymbol in: behavior [
 	| methods cm next |
 	methods := behavior _basicAt: 2.
 	cm := self _lookup: aSymbol inDictionary: methods.
@@ -212,7 +221,7 @@ ProtoObject >> _lookup: aSymbol in: behavior [
 ]
 
 { #category : #lookup }
-ProtoObject >> _lookup: aSymbol inDictionary: methodDictionary [
+LMRProtoObject >> _lookup: aSymbol inDictionary: methodDictionary [
 	| table |
 	table := methodDictionary _basicAt: 2.
 	2
@@ -223,17 +232,17 @@ ProtoObject >> _lookup: aSymbol inDictionary: methodDictionary [
 ]
 
 { #category : #underprimitives }
-ProtoObject >> _low32 [
+LMRProtoObject >> _low32 [
 	^WordSize > 4 ifTrue: [self bitAnd: 0xFFFFFFFF] ifFalse: [self]
 ]
 
 { #category : #underprimitives }
-ProtoObject >> _lowHalf [
+LMRProtoObject >> _lowHalf [
 	^self _oop bitAnd: 16rFFFF
 ]
 
 { #category : #'header access' }
-ProtoObject >> _makeExtendedSize: size [
+LMRProtoObject >> _makeExtendedSize: size [
 	self
 		_beLarge;
 		_smallSize: 4;
@@ -242,48 +251,48 @@ ProtoObject >> _makeExtendedSize: size [
 ]
 
 { #category : #'header access' }
-ProtoObject >> _nextBasePointer [
+LMRProtoObject >> _nextBasePointer [
 	^self _asPointer + self _sizeInBytes _asPointer
 ]
 
 { #category : #'header access' }
-ProtoObject >> _objectFromBasePointer [
+LMRProtoObject >> _objectFromBasePointer [
 	| offset |
 	offset := (self _asObject _byteAt: 4) > 127 ifTrue: [8] ifFalse: [16].
 	^(self + offset _asPointer) _asObject
 ]
 
 { #category : #underprimitives }
-ProtoObject >> _oop [
+LMRProtoObject >> _oop [
 	^self _asPointer * 2
 ]
 
 { #category : #'header access' }
-ProtoObject >> _pointersSize [
+LMRProtoObject >> _pointersSize [
 	^self _isBytes ifTrue: [0] ifFalse: [self _size]
 ]
 
 { #category : #'raw access' }
-ProtoObject >> _uLongAtValidOffset: offset put: anInteger [
+LMRProtoObject >> _uLongAtValidOffset: offset put: anInteger [
 	anInteger size > 4 ifTrue: [self error: 'does not fit in 32 bits'].
 	self _primitiveULongAtOffset: offset put: anInteger.
 	^anInteger
 ]
 
 { #category : #unwinding }
-ProtoObject >> _returnTo: aBeeFrame [
+LMRProtoObject >> _returnTo: aBeeFrame [
 	[#forceEnvironment].
 	aBeeFrame _beCurrent.
 	^self
 ]
 
 { #category : #'*header access' }
-ProtoObject >> _size [
+LMRProtoObject >> _size [
 	^self _isSmall ifTrue: [self _smallSize] ifFalse: [self _largeSize]
 ]
 
 { #category : #'header access' }
-ProtoObject >> _sizeInBytes [
+LMRProtoObject >> _sizeInBytes [
 	| total |
 	total := self _size.
 	^self _isBytes
@@ -292,12 +301,17 @@ ProtoObject >> _sizeInBytes [
 ]
 
 { #category : #'header access' }
-ProtoObject >> _strongPointersSize [
+LMRProtoObject >> _strongPointersSize [
 	^(self _isBytes or: [self _isSpecial]) ifTrue: [0] ifFalse: [0 + self _size]
 ]
 
+{ #category : #system }
+LMRProtoObject >> allReferences [
+	^Memory current collectAndCompactOldSpace; referencesTo: self
+]
+
 { #category : #'*system' }
-ProtoObject >> basicHash [
+LMRProtoObject >> basicHash [
 	| hash shifted |
 	"
 	LastHash := 1. 
@@ -314,19 +328,24 @@ ProtoObject >> basicHash [
 ]
 
 { #category : #'*system' }
-ProtoObject >> basicHash: anInteger [
+LMRProtoObject >> basicHash: anInteger [
 	self _basicHash: anInteger
 ]
 
+{ #category : #services }
+LMRProtoObject >> become: anotherObject [
+	Memory current make: self become: anotherObject
+]
+
 { #category : #'*meta accessing' }
-ProtoObject >> behavior [
+LMRProtoObject >> behavior [
 	^self _isSmallInteger
 		ifTrue: [SmallInteger instanceBehavior]
 		ifFalse: [self _basicULongAt: 0]
 ]
 
 { #category : #'*meta accessing' }
-ProtoObject >> behavior: aBehavior [
+LMRProtoObject >> behavior: aBehavior [
 	^self _isSmallInteger
 		ifTrue: [self error: 'can''t change behavior of a small integer']
 		ifFalse: [
@@ -335,7 +354,7 @@ ProtoObject >> behavior: aBehavior [
 ]
 
 { #category : #private }
-ProtoObject >> doesNotUnderstandSelector: selector [
+LMRProtoObject >> doesNotUnderstandSelector: selector [
 	| arguments message |
 	arguments := StackFrameCursor top moveNext
 		argumentsWithArity: selector arity.
@@ -343,8 +362,19 @@ ProtoObject >> doesNotUnderstandSelector: selector [
 	^self doesNotUnderstand: message
 ]
 
+{ #category : #private }
+LMRProtoObject >> holdRefererIfNeeded: referent [
+	| memory |
+	#savePreviousSelf.
+	self _isSmallInteger ifTrue: [^self].
+	referent _isRemembered ifTrue: [^self].
+	memory := Memory current.
+	(memory isYoungSafe: referent)
+		ifFalse: [(memory isYoungSafe: self) ifTrue: [memory remember: referent]]
+]
+
 { #category : #'header access' }
-ProtoObject >> initializeExtended: aBoolean contentSize: size [
+LMRProtoObject >> initializeExtended: aBoolean contentSize: size [
 	self _basicULongAt: -1 put: 0 _asNative.
 	aBoolean
 		ifTrue: [
@@ -356,7 +386,7 @@ ProtoObject >> initializeExtended: aBoolean contentSize: size [
 ]
 
 { #category : #lookup }
-ProtoObject >> lookupAndInvoke: aSymbol [
+LMRProtoObject >> lookupAndInvoke: aSymbol [
 	| cm |
 	cm := self _cachedLookup: aSymbol.
 	cm == nil ifTrue: [^self doesNotUnderstandSelector: aSymbol].
@@ -365,7 +395,7 @@ ProtoObject >> lookupAndInvoke: aSymbol [
 ]
 
 { #category : #system }
-ProtoObject >> perform: aSymbol withArguments: anArray [
+LMRProtoObject >> perform: aSymbol withArguments: anArray [
 	| size |
 	size := anArray basicSize.
 	aSymbol arity = size ifFalse: [^self error: 'incorrect arity'].
@@ -373,17 +403,8 @@ ProtoObject >> perform: aSymbol withArguments: anArray [
 	^self lookupAndInvoke: aSymbol
 ]
 
-{ #category : #'*system' }
-ProtoObject >> primitiveSize [
-	| size |
-	self _isSmallInteger ifTrue: [^0].
-	self _isArrayed ifFalse: [^0].
-	size := self _size.
-	^self _hasNamedSlots ifTrue: [size - self class instSize] ifFalse: [size]
-]
-
 { #category : #'*accessing' }
-ProtoObject >> primitiveAt: i [
+LMRProtoObject >> primitiveAt: i [
 	self _isSmallInteger ifTrue: [^self shouldNotImplement].
 	^self _isBytes
 		ifTrue: [self basicByteAt: i]
@@ -391,15 +412,24 @@ ProtoObject >> primitiveAt: i [
 ]
 
 { #category : #'*accessing' }
-ProtoObject >> primitiveAt: i put: anObject [
+LMRProtoObject >> primitiveAt: i put: anObject [
 	self _isSmallInteger ifTrue: [^self shouldNotImplement].
 	^self _isBytes
 		ifTrue: [self basicByteAt: i put: anObject]
 		ifFalse: [self basicObjectAt: i put: anObject]
 ]
 
+{ #category : #'*system' }
+LMRProtoObject >> primitiveSize [
+	| size |
+	self _isSmallInteger ifTrue: [^0].
+	self _isArrayed ifFalse: [^0].
+	size := self _size.
+	^self _hasNamedSlots ifTrue: [size - self class instSize] ifFalse: [size]
+]
+
 { #category : #private }
-ProtoObject >> shouldBeInRememberedSet [
+LMRProtoObject >> shouldBeInRememberedSet [
 	| m |
 	m := Memory current.
 	(m isYoung: self) ifTrue: [^false].
@@ -411,7 +441,7 @@ ProtoObject >> shouldBeInRememberedSet [
 ]
 
 { #category : #underprimitives }
-ProtoObject >> smallOop [
+LMRProtoObject >> smallOop [
 	^self _asPointer
 ]
 

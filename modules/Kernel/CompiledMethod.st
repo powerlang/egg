@@ -395,7 +395,7 @@ CompiledMethod >> optimizedCode [
 
 { #category : #accessing }
 CompiledMethod >> optimizedCode: anObject [
-	code method: self.
+	anObject method: self.
 	optimizedCode := anObject
 ]
 

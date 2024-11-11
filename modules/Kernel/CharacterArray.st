@@ -255,11 +255,6 @@ CharacterArray >> codeAt: i [
 	^self byteAt: i
 ]
 
-{ #category : #inquiries }
-CharacterArray >> codePage [
-	^KernelLibrary GetACP
-]
-
 { #category : #services }
 CharacterArray >> doubleQuoted [
 	"

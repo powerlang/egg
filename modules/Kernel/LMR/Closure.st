@@ -3,54 +3,58 @@
 	See (MIT) license in root directory.
 "
 
-Extension { #name : #Closure }
+Class {
+	#name : #LMRClosure,
+	#superclass : #Closure,
+	#category : #Kernel
+}
 
 { #category : '*handling' }
-Closure >> evaluateAtomically [
+LMRClosure >> evaluateAtomically [
 	| enabled |
 	enabled := Processor enableInterrupts: false.
 	^self ensure: [Processor enableInterrupts: enabled]
 ]
 
 { #category : '*handling' }
-Closure >> evaluateWith: value [
+LMRClosure >> evaluateWith: value [
 	block argumentCount = 1 ifFalse: [^self arityError: 1].
 	self _transferControlTo: block blockNativeCode
 ]
 
 { #category : '*handling' }
-Closure >> evaluateWith: anObject with: anotherObject [
+LMRClosure >> evaluateWith: anObject with: anotherObject [
 	block argumentCount = 2
 		ifFalse: [^super evaluateWith: anObject with: anotherObject].
 	self _transferControlTo: block blockNativeCode
 ]
 
 { #category : '*handling' }
-Closure >> value [
+LMRClosure >> value [
 	block argumentCount = 0 ifFalse: [^self arityError: 0].
 	self _transferControlTo: block blockNativeCode
 ]
 
 { #category : '*handling' }
-Closure >> value: first [
+LMRClosure >> value: first [
 	block argumentCount = 1 ifFalse: [^self arityError: 1].
 	self _transferControlTo: block blockNativeCode
 ]
 
 { #category : '*handling' }
-Closure >> value: first value: second [
+LMRClosure >> value: first value: second [
 	block argumentCount = 2 ifFalse: [^self arityError: 2].
 	self _transferControlTo: block blockNativeCode
 ]
 
 { #category : '*handling' }
-Closure >> value: first value: second value: third [
+LMRClosure >> value: first value: second value: third [
 	block argumentCount = 3 ifFalse: [^self arityError: 3].
 	self _transferControlTo: block blockNativeCode
 ]
 
 { #category : '*handling' }
-Closure >> valueWithArguments: arguments [
+LMRClosure >> valueWithArguments: arguments [
 	| size |
 	size := arguments basicSize.
 	block argumentCount = size ifFalse: [^self arityError: size].
@@ -59,14 +63,14 @@ Closure >> valueWithArguments: arguments [
 ]
 
 { #category : '*handling' }
-Closure >> whileFalse: aBlock [
+LMRClosure >> whileFalse: aBlock [
 	self value ifTrue: [^nil].
 	aBlock value.
 	self _restart
 ]
 
 { #category : '*handling' }
-Closure >> whileTrue: aBlock [
+LMRClosure >> whileTrue: aBlock [
 	self value ifFalse: [^nil].
 	aBlock value.
 	self _restart
