@@ -48,6 +48,13 @@ MetaclassSpec >> classVars [
 ]
 
 { #category : 'testing' }
+MetaclassSpec >> definition [
+
+	^ self name , ' instanceVariableNames: '
+	  , (' ' join: instVarNames) storeString
+]
+
+{ #category : 'testing' }
 MetaclassSpec >> instSize [
 
 	^ instSize ifNil: [ 

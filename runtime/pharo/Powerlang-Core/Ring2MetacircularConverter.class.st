@@ -232,7 +232,7 @@ Ring2MetacircularConverter >> createNewClassFrom: spec in: module [
 
 	| supername superclass namespace metaclass class instanceBehavior classBehavior ivars |
 	supername := spec supername.
-	superclass := module ifNil: [ self => supername ] ifNotNil: [ 
+	superclass := module ifNil: [ self => supername ] ifNotNil: [
 		              namespace := dest sendLocal: #namespace to: module.
 		              dest
 			              sendLocal: #at:
@@ -257,7 +257,7 @@ Ring2MetacircularConverter >> createNewClassFrom: spec in: module [
 	behaviors
 		at: spec put: instanceBehavior;
 		at: spec metaclass put: classBehavior.
-	module ifNotNil: [ 
+	module ifNotNil: [
 		dest
 			sendLocal: #addClass: to: module with: { class };
 			sendLocal: #module: to: class with: { module } ].

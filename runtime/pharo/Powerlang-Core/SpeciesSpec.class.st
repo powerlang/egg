@@ -84,6 +84,12 @@ SpeciesSpec >> categories [
 ]
 
 { #category : 'testing' }
+SpeciesSpec >> hasInstVarNamed: aString [
+
+	^ instVarNames includes: aString
+]
+
+{ #category : 'testing' }
 SpeciesSpec >> hasMethods [
 	^methods notEmpty
 ]

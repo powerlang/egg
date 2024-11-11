@@ -96,6 +96,19 @@ ClassSpec >> cvars: aCollection [
 	classVars := aCollection
 ]
 
+{ #category : 'accessing' }
+ClassSpec >> definition [
+
+	| definition |
+	definition := supername , ' subclass: #' , name , '
+	instVarNames: ' , (' ' join: instVarNames) storeString , '
+	classVarNames: ' , (' ' join: self classVarNames) storeString , '
+	sharedPools: ' , (' ' join: sharedPools) storeString.
+
+	^ definition
+]
+
+
 { #category : 'testing' }
 ClassSpec >> hasMethods [
 	^super hasMethods or: [metaclass hasMethods]
