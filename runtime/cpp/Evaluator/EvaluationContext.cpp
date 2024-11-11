@@ -24,14 +24,18 @@ HeapObject* EvaluationContext::classBinding()
 }
 
 Object *EvaluationContext::argumentAt_(int anInteger) {
-    return argumentAt_frameIndex_(anInteger, 1);
+    return argumentAt_frame_(anInteger, this->_regBP);
+}
+
+Object * EvaluationContext::argumentAt_frame_(int anInteger, uintptr_t bp) {
+    auto code = _stack[bp - 2 - 1];
+    auto count = _runtime->argumentCountOf_(code->asHeapObject());
+    return _stack[bp + 1 + (count - anInteger + 1) - 1];
 }
 
 Object * EvaluationContext::argumentAt_frameIndex_(int anInteger, int anotherInteger) {
     auto bp = this->bpForFrameAt_(anotherInteger);
-    auto code = _stack[bp - 2 - 1];
-    auto count = _runtime->argumentCountOf_(code->asHeapObject());
-    return _stack[bp + 1 + (count - anInteger + 1) - 1];
+    return this->argumentAt_frame_(anInteger, bp);
 }
 
 void EvaluationContext::buildFrameFor_code_environment_temps_(Object *receiver, HeapObject *compiledCode, HeapObject *environment, uint32_t temps) {
@@ -144,6 +148,10 @@ HeapObject *EvaluationContext::captureClosure_(SBlock *anSBlock)
 			auto arg = this->argumentAt_(j);
 			_runtime->closureIndexedSlotAt_(closure, i) = arg;
             break; };
+        case BlockCapturedVariables::OuterInlinedArgument:
+            auto j = *it++;
+            auto arg = this->stackTemporaryAt_frame_(j, this->_regBP);
+			_runtime->closureIndexedSlotAt_(closure, i) = arg;
         }
 		i = i + 1;
     }
@@ -160,10 +168,15 @@ Object *EvaluationContext::stackTemporaryAt_(int anInteger)
     return this->stackTemporaryAt_frameIndex_(anInteger, 1);
 }
 
+Object *EvaluationContext::stackTemporaryAt_frame_(int index, uintptr_t bp)
+{
+    return _stack[bp - this->tempOffset() - index - 1];
+}
+
 Object *EvaluationContext::stackTemporaryAt_frameIndex_(int index, int anotherIndex)
 {
     uintptr_t bp = this->bpForFrameAt_(anotherIndex);
-    return _stack[bp - this->tempOffset() - index - 1];
+    return this->stackTemporaryAt_frame_(index, bp);
 }
 
 Object *EvaluationContext::stackAt_frameIndex_(int index, int anotherIndex)
