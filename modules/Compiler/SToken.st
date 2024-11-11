@@ -9,14 +9,6 @@ Class {
 	#category : #'Powerlang-Core-SCompiler-Smalltalk-Parser'
 }
 
-{ #category : #'instance creation' }
-SToken class >> new [
-	"return an initialized instance"
-
-	^ self basicNew initialize.
-
-]
-
 { #category : #printing }
 SToken >> comment [
 	^comments notNil ifTrue: [comments anyOne]

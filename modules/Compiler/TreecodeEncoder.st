@@ -9,14 +9,6 @@ Class {
 	#category : #'Powerlang-Core-SExpressions'
 }
 
-{ #category : #'instance creation' }
-TreecodeEncoder class >> new [
-	"return an initialized instance"
-
-	^ self basicNew initialize.
-
-]
-
 { #category : #'class initialization' }
 TreecodeEncoder class >> initializeTreecodeIds [
 	| named |

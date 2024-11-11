@@ -26,7 +26,6 @@ CompilerModule >> imports [
 
 { #category : #'class initialization' }
 CompilerModule class >> initializeClosureElementIds [
-	| namespace |
 	self namespace
 		at: #CaptureSelf put: 0;
 		at: #CaptureLocalArgument put: 1;

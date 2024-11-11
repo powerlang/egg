@@ -4,14 +4,6 @@ Class {
 	#category : #'Powerlang-Core-SCompiler-Bindings'
 }
 
-{ #category : #'instance creation' }
-TemporaryBinding class >> new [
-	"return an initialized instance"
-
-	^ self basicNew initialize.
-
-]
-
 { #category : #printing }
 TemporaryBinding >> description [
 	^'temporary ' , name

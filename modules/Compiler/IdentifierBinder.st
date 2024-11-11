@@ -7,11 +7,6 @@ Class {
 	#category : #'Powerlang-Core-SCompiler'
 }
 
-{ #category : #'instance creation' }
-IdentifierBinder class >> new [
-	^super new initialize
-]
-
 { #category : #accessing }
 IdentifierBinder >> contents [
 	^contents

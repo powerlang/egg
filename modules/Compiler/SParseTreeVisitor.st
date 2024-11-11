@@ -4,11 +4,6 @@ Class {
 	#category : #'Powerlang-Core-SCompiler'
 }
 
-{ #category : #'instance creation' }
-SParseTreeVisitor class >> new [
-	^super new initialize
-]
-
 { #category : #visiting }
 SParseTreeVisitor >> visit: aParseNode [
 	^aParseNode notNil ifTrue: [aParseNode acceptVisitor: self] 

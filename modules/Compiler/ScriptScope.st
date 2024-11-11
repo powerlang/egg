@@ -13,11 +13,6 @@ Class {
 }
 
 { #category : #'instance creation' }
-ScriptScope class >> new [
-	^super new initialize
-]
-
-{ #category : #'instance creation' }
 ScriptScope class >> on: aScriptNode [
 	^self new script: aScriptNode
 ]
