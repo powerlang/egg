@@ -294,6 +294,14 @@ EggRuntime >> symbolFromLocal: aSymbol [
 ]
 
 { #category : 'initialization' }
+EggRuntime >> temporaryCountOf: anEggObject [
+	^(self isBlock: anEggObject)
+		ifTrue: [ self blockTempCount: anEggObject ]
+		ifFalse: [ self methodTempCount: anEggObject ]
+
+]
+
+{ #category : 'initialization' }
 EggRuntime >> true [
 	^ trueObj
 ]
