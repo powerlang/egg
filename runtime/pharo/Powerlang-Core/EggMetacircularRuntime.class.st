@@ -742,7 +742,6 @@ EggMetacircularRuntime >> newLargeNegativeInteger: anInteger [
 EggMetacircularRuntime >> newLargePositiveInteger: anInteger [
 	| size bytes result |
 	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
-	(anInteger byteAt: size) > 16r80 ifTrue: [ size := size + 2 ].
 	bytes := anInteger asEggByteArrayOfSize: size.
 	result := self newBytes: largePositiveIntegerClass size: bytes size.
 	^ result bytes: bytes
