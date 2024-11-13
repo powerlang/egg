@@ -74,7 +74,7 @@ jobs:
       shell: "bash"
 
     - name: Set up rsync and zip on Windows # needed for packaging
-      run: choco install rsync zip --yes
+      run: choco install rsync zip pkgconfiglite --yes
 
     - name: Package CPP
       run: make release-cpp
