@@ -76,7 +76,15 @@ jobs:
     - name: Set up rsync and zip on Windows # needed for packaging
       run: choco install rsync zip pkgconfiglite --yes
 
-    - name: Package CPP
+    - name: Set up vcpkg
+      uses: microsoft/vcpkg-action@v1
+      with:
+        package-name: libffi
+
+    - name: Configure CMake
+      run: cmake -DCMAKE_TOOLCHAIN_FILE=${{ runner.temp }}/vcpkg/scripts/buildsystems/vcpkg.cmake .
+
+- name: Package CPP
       run: make release-cpp
 
     - name: Upload cpp vm for Windows
