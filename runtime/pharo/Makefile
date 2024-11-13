@@ -61,14 +61,16 @@ mrproper: clean
 	rm -rf Pharo* pharo* icon-packs
 
 eggjs-kernel: egg.image pharo |
-	test -n "$(KERNEL_FILE)" || (echo "you must define KERNEL_FILE variable to set the output filename" && exit 1)
 	./pharo egg.image eval \
-		"| bootstrapper module runtime filename | \
-		bootstrapper := EggRingImage fromSpec wordSize: 8; genesis; bootstrap; fillClasses; fillSymbols; generateMetacircularImage. \
-		module := bootstrapper loadBootstrapModule. \
-		runtime := bootstrapper result. \
-		filename := runtme newString: '$(KERNEL_FILE)'. \
-		runtime sendLocal: #writeJsonKernelTo: to: module with: {filename}"
+		"| builder | \
+		builder := EggBuilder forJSPlatform. \
+		builder generateKernelSegment; generateCompilerSegment; generateMainSegments"
+
+egg-native-modules: egg.image pharo |
+	./pharo egg.image eval \
+		"| builder | \
+		builder := EggBuilder forNativePlatform. \
+		builder generateKernelSegment; generateCompilerSegment; generateMainSegments"
 
 webside:
 	./pharo egg.image metacello install github://guillermoamaral/Pharo-Webside:main BaselineOfWebside

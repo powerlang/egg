@@ -272,6 +272,11 @@ ProtoObject >> hasIndexedSlots [
 	^self class _instancesAreArrayed
 ]
 
+{ #category : #private }
+ProtoObject >> _holdRefererIfNeeded: referent [
+
+]
+
 { #category : #comparing }
 ProtoObject >> identityHash [
 	^self basicHash
