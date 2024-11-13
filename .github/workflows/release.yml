@@ -84,7 +84,7 @@ jobs:
     - name: Configure CMake
       run: cmake -DCMAKE_TOOLCHAIN_FILE=${{ runner.temp }}/vcpkg/scripts/buildsystems/vcpkg.cmake .
 
-- name: Package CPP
+    - name: Package CPP
       run: make release-cpp
 
     - name: Upload cpp vm for Windows
