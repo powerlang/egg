@@ -60,13 +60,13 @@ clean:
 mrproper: clean
 	rm -rf Pharo* pharo* icon-packs
 
-eggjs-kernel: egg.image pharo |
+core-js-segments: egg.image pharo |
 	./pharo egg.image eval \
 		"| builder | \
 		builder := EggBuilder forJSPlatform. \
 		builder generateKernelSegment; generateCompilerSegment; generateMainSegments"
 
-egg-native-modules: egg.image pharo |
+core-native-segments: egg.image pharo |
 	./pharo egg.image eval \
 		"| builder | \
 		builder := EggBuilder forNativePlatform. \

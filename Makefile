@@ -35,7 +35,7 @@ release-js:
 	make -C runtime/js all
 	mkdir -p $(JS_OUT) $(JS_OUT)/runtime/js
 	rsync -vt * $(JS_OUT)
-	rsync -av modules docs $(JS_OUT)
+	rsync -av modules docs image-segments $(JS_OUT)
 	rsync -av --exclude=*/node_modules runtime/js $(JS_OUT)/runtime
 	cd build && tar -czvf $(RELEASE_NAME).tar.gz $(EGGJS)
 	cd build && zip $(RELEASE_NAME).zip -r $(EGGJS)
@@ -45,10 +45,10 @@ CPP_OUT := build/$(EGGCPP)
 CPP_RELEASE_NAME=$(EGGCPP)-$(RELEASE_TAG)
 release-cpp:
 	@test -n "$RELEASE_TAG" || (echo "RELEASE_TAG varible is not set!" && exit 1)
-	make -C runtime/cpp all
+	make -C runtime/cpp all core-segments
 	mkdir -p $(CPP_OUT)
 	rsync -t * $(CPP_OUT)
-	rsync -a modules docs $(CPP_OUT)
+	rsync -a modules docs image-segments $(CPP_OUT)
 
 ifeq ($(OS),Windows_NT) # Windows
 	cp runtime/cpp/build/Debug/egg.exe $(CPP_OUT)/

@@ -4,7 +4,7 @@ ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 IMAGE_SEGMENTS_DIR=$(ROOT_DIR)/image-segments
 POWERLANG_DIR=$(GIT_PATH)/runtime/pharo
 
-.PHONY: all interpreter kernel compiler example-server
+.PHONY: all interpreter kernel compiler core-segments example-server
 
 all: interpreter kernel compiler example-server
 
@@ -22,21 +22,16 @@ interpreter/EggEvaluator.js: $(POWERLANG_DIR)/eggjs.image
 
 interpreter: interpreter/EggEvaluator.js
 
-$(IMAGE_SEGMENTS_DIR)/Kernel.json: $(POWERLANG_DIR)/eggjs.image
+$(IMAGE_SEGMENTS_DIR)/%.json: $(POWERLANG_DIR)/eggjs.image
 	export IMAGE_SEGMENTS_DIR
-	cd $(POWERLANG_DIR) && ./pharo eggjs.image eval "EggBuilder forJSPlatform generateKernelSegment"
+	cd $(POWERLANG_DIR) && ./pharo eggjs.image eval "EggBuilder forJSPlatform generateSegmentFromModuleNamed: '$*'"
 
-compiler: $(IMAGE_SEGMENTS_DIR)/Compiler.json
-
-example-server: #$(IMAGE_SEGMENTS_DIR)/ImageSegmentBuilder.json $(IMAGE_SEGMENTS_DIR)/ImageSegmentBuilder.JSON.json $(IMAGE_SEGMENTS_DIR)/STON.json $(IMAGE_SEGMENTS_DIR)/Tonel.json $(IMAGE_SEGMENTS_DIR)/CodeSpecs.json
+core-segments: $(POWERLANG_DIR)/eggjs.image
 	export IMAGE_SEGMENTS_DIR
 	cd $(POWERLANG_DIR) && ./pharo eggjs.image eval "EggBuilder forJSPlatform generateMainSegments"
 
-$(IMAGE_SEGMENTS_DIR)/Compiler.json: $(POWERLANG_DIR)/eggjs.image
-	export IMAGE_SEGMENTS_DIR
-	cd $(POWERLANG_DIR) && ./pharo eggjs.image eval "EggBuilder forJSPlatform generateCompilerSegment"
+kernel: $(IMAGE_SEGMENTS_DIR)/Kernel.json
+compiler: $(IMAGE_SEGMENTS_DIR)/Compiler.json
 
-$(IMAGE_SEGMENTS_DIR)/%.json: $(POWERLANG_DIR)/eggjs.image
-	export IMAGE_SEGMENTS_DIR
-	cd $(POWERLANG_DIR) && ./pharo eggjs.image eval "EggBuilder forJSPlatform generateSegmentFromModuleNamed: $@"
+example-server: kernel compiler core-segments
 
