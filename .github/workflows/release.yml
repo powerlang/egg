@@ -76,13 +76,17 @@ jobs:
     - name: Set up rsync and zip on Windows # needed for packaging
       run: choco install rsync zip pkgconfiglite --yes
 
-    - name: Set up vcpkg
-      uses: microsoft/vcpkg-action@v1
+    # Set up vcpkg and install libffi
+    - name: Set up vcpkg and install libffi
+      uses: lukka/run-vcpkg@v11
       with:
-        package-name: libffi
+        vcpkgArguments: "libffi"
+      env:
+        VCPKG_ROOT: ${{ runner.temp }}/vcpkg
 
+    # Configure CMake
     - name: Configure CMake
-      run: cmake -DCMAKE_TOOLCHAIN_FILE=${{ runner.temp }}/vcpkg/scripts/buildsystems/vcpkg.cmake .
+      run: cmake -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake .
 
     - name: Package CPP
       run: make release-cpp
