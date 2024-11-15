@@ -74,7 +74,7 @@ NativeWriter >> computeImportStrings [
 	imports do: [:import |
 		self addImportString: import linker.
 		import token ifNotNil: [:token |
-			(token isString or: [token isSymbol])
+			token isString
 				ifTrue: [self addImportString: token]
 				ifFalse: [token do: [:s | self addImportString: s]]]
 	]
