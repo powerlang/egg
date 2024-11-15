@@ -429,6 +429,11 @@ CharacterArray >> isByteString [
 ]
 
 { #category : #testing }
+CharacterArray >> isString [
+	^true
+]
+
+{ #category : #testing }
 CharacterArray >> isWide [
 	^false
 ]
