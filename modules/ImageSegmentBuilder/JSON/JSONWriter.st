@@ -75,7 +75,7 @@ JSONWriter >> writeImport: aSymbolicReference [
 		nextPutAll: (self quoted: aSymbolicReference linker).
 
 	aSymbolicReference token ifNotNil: [:token |
-		elements := token isString ifTrue: [{token}] ifFalse: [token].
+		elements := (token isString or: [token isSymbol]) ifTrue: [{token}] ifFalse: [token].
 		elements do: [:str |
 			stream
 				nextPutAll: ', ';
