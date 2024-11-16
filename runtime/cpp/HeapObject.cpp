@@ -146,11 +146,12 @@ void HeapObject::beLarge()
 
 HeapObject* HeapObject::behavior()
 {
-    return reinterpret_cast<HeapObject*>((uintptr_t)smallHeader()->behavior);
+    return reinterpret_cast<HeapObject*>(((uintptr_t)smallHeader()->behavior) | BEHAVIOR_ADDRESS_SPACE);
 }
 
 void HeapObject::behavior(HeapObject *behavior)
 {
+	ASSERT(((uintptr_t)behavior) & 0xFFFFFFFF00000000 == BEHAVIOR_ADDRESS_SPACE);
     smallHeader()->behavior = (uint32_t)((uintptr_t)behavior);
 	//std::cout << "made " << this << " a " << behavior->slot(0)->printString() << " of size " << this->size() << std::endl;
 }
