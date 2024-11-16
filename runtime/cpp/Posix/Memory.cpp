@@ -26,7 +26,7 @@ uintptr_t Egg::pagealign(uintptr_t addr)
 uintptr_t Egg::ReserveMemory(uintptr_t base, uintptr_t size)
 {
     void* allocated = nullptr;
-    if (base == 0) base = 0x100000;
+    if (base == 0) base = BEHAVIOR_ADDRESS_SPACE | 0x100000;
 
     while (true) {
         // Attempt to allocate at the aligned base
@@ -45,7 +45,7 @@ uintptr_t Egg::ReserveMemory(uintptr_t base, uintptr_t size)
             base += 0x10000;
         }
 
-        if (base >=  0x100000000) { // We are limiting to the first 4gb for now
+        if (base >= BEHAVIOR_ADDRESS_SPACE + 0x100000000) { // We are limiting to reserve up to 4gb for now
             error("Memory allocation failed");
             return 0;
         }
