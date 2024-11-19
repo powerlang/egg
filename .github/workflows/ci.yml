@@ -27,8 +27,18 @@ jobs:
     - name: Fetch at least 2 commits so that Iceberg doesn't break
       run: git fetch --unshallow
 
-    - name: Compile
+    - name: Build Egg/Pharo Virtual VM
       run: make -C runtime/pharo
+
+    - name: Install libffi with vcpkg on Windows
+      if: runner.os == 'Windows'
+      run: |
+        curl -LO https://aka.ms/vcpkg-init.cmd
+        .\vcpkg-init.cmd
+        .\vcpkg\vcpkg.exe install libffi   
+    
+    - name: Build CPP VM
+      run: make -C runtime/cpp
 
     - name: Run tests
       run: make -C runtime/pharo/ test-ci
