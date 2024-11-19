@@ -17,6 +17,7 @@ struct Object;
 struct HeapObject;
 struct SmallInteger;
 
+void Initialize();
 void osError();
 void error(const char *message);
 void error_(const std::string &message);

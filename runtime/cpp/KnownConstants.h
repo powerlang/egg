@@ -9,7 +9,7 @@
 
 // We use the lowmost 4gb "page" for allocation, unless on MacOS which doesn't allow it
 #ifdef __APPLE__
-#define BEHAVIOR_ADDRESS_SPACE 0xBEBE00000000
+extern uintptr_t BEHAVIOR_ADDRESS_SPACE;
 #else
 #define BEHAVIOR_ADDRESS_SPACE 0
 #endif

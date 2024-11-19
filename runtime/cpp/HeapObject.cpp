@@ -151,7 +151,7 @@ HeapObject* HeapObject::behavior()
 
 void HeapObject::behavior(HeapObject *behavior)
 {
-	ASSERT(((uintptr_t)behavior) & 0xFFFFFFFF00000000 == BEHAVIOR_ADDRESS_SPACE);
+	ASSERT((((uintptr_t)behavior) & 0xFFFFFFFF00000000) == BEHAVIOR_ADDRESS_SPACE);
     smallHeader()->behavior = (uint32_t)((uintptr_t)behavior);
 }
 

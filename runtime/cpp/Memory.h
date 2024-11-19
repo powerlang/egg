@@ -12,10 +12,13 @@
 namespace Egg
 {
 
+void     InitializeMemory();
 uintptr_t ReserveMemory(uintptr_t base, uintptr_t size);
 void     CommitMemory(uintptr_t base, uintptr_t size);
 void     FreeMemory(uintptr_t base, uintptr_t size);
 
+
+void* ReserveAligned4GB();
 uintptr_t pagealign(uintptr_t addr);
 
 class HeapObject;
