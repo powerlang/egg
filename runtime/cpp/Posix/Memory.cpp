@@ -29,7 +29,7 @@ namespace Egg {
     static uintptr_t limit = 0;
 }
 
-void* Egg::ReserveAligned4GB() {
+uintptr_t Egg::ReserveAligned4GB() {
     uintptr_t size = 4L * 1024 * 1024 * 1024; // 4GB
     uintptr_t alignment = 4L * 1024 * 1024 * 1024; // 4GB alignment
     uintptr_t total_size = size + alignment;
@@ -51,7 +51,7 @@ void* Egg::ReserveAligned4GB() {
     uintptr_t limit = aligned_addr + size;
     munmap((void*)limit, (uintptr_t)allocated + alignment + size - limit); // After the aligned region
 
-    return (void*)aligned_addr;
+    return aligned_addr;
 }
 
 void Egg::InitializeMemory()
