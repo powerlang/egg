@@ -27,6 +27,8 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(FFI REQUIRED libffi)
 
 include_directories(${FFI_INCLUDE_DIRS})
+link_directories(${FFI_LIBRARY_DIRS})
+
 # *************************************************
 
 file(GLOB ALL_SRC "*.cpp" "Evaluator/*.cpp" "${PLATFORM}/*.cpp")

@@ -30,7 +30,7 @@ uintptr_t Egg::ReserveMemory(uintptr_t base, uintptr_t size)
 
     while (true) {
         // Attempt to allocate at the aligned base
-        allocated = mmap(reinterpret_cast<void*>(base), pagealign(size), PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
+        allocated = mmap(reinterpret_cast<void*>(base), pagealign(size), PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
         if (allocated != MAP_FAILED) {
             // Check if the allocated memory is at the desired base address
             if ((uintptr_t)allocated == base) {
