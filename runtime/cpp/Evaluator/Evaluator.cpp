@@ -874,9 +874,9 @@ void Evaluator::initializeCIF(HeapObject *method, int argCount) {
 
             case FFI_pointer: *argType = &ffi_type_pointer; break;
 
-            case FFI_complex_float:      *argType = &ffi_type_complex_float; break;
-            case FFI_complex_double:     *argType = &ffi_type_complex_double; break;
-            case FFI_complex_longdouble: *argType = &ffi_type_complex_longdouble; break;
+            // case FFI_complex_float:      *argType = &ffi_type_complex_float; break;
+            // case FFI_complex_double:     *argType = &ffi_type_complex_double; break;
+            // case FFI_complex_longdouble: *argType = &ffi_type_complex_longdouble; break;
             default: error_("wrong descriptor"); break;
         }
     }
