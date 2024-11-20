@@ -40,7 +40,7 @@ jobs:
         curl -LO https://aka.ms/vcpkg-init.cmd
         .\vcpkg-init.cmd
         vcpkg install libffi
-        $env:PKG_CONFIG_PATH = "$C:\vcpkg\packages\libffi_x64-windows\lib\pkgconfig"
+        $env:PKG_CONFIG_PATH = "C:\vcpkg\packages\libffi_x64-windows\lib\pkgconfig"
         echo $env:PKG_CONFIG_PATH
         ls C:\vcpkg\packages\libffi_x64-windows\lib\pkgconfig
       
