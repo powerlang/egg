@@ -30,20 +30,22 @@ jobs:
     - name: Build Egg/Pharo Virtual VM
       run: make -C runtime/pharo
 
+    - name: Set up pkgconfig on Windows # needed for libffi
+      if: runner.os == 'Windows'
+      run: choco install pkgconfiglite --yes
+
     - name: Install libffi with vcpkg on Windows
       if: runner.os == 'Windows'
       run: |
         curl -LO https://aka.ms/vcpkg-init.cmd
         .\vcpkg-init.cmd
         vcpkg install libffi
-        $env:PKG_CONFIG_PATH = "$env:PKG_CONFIG_PATH;C:\vcpkg\packages\libffi_x64-windows\lib\pkgconfig"
-
-    - name: Set up pkgconfig on Windows # needed for libffi
-      if: runner.os == 'Windows'
-      run: choco install pkgconfiglite --yes
       
     - name: Build CPP VM
-      run: make -C runtime/cpp
+      run: |
+        $env:PKG_CONFIG_PATH = "$env:PKG_CONFIG_PATH;C:\vcpkg\packages\libffi_x64-windows\lib\pkgconfig"
+        echo $env:PKG_CONFIG_PATH
+        make -C runtime/cpp
 
     - name: Run tests
       run: make -C runtime/pharo/ test-ci
