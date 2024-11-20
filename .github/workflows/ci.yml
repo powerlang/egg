@@ -35,8 +35,12 @@ jobs:
       run: |
         curl -LO https://aka.ms/vcpkg-init.cmd
         .\vcpkg-init.cmd
-        vcpkg install libffi   
-    
+        vcpkg install libffi
+
+    - name: Set up pkgconfig on Windows # needed for libffi
+      if: runner.os == 'Windows'
+      run: choco install pkgconfiglite --yes
+      
     - name: Build CPP VM
       run: make -C runtime/cpp
 
