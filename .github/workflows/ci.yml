@@ -35,7 +35,7 @@ jobs:
       run: |
         curl -LO https://aka.ms/vcpkg-init.cmd
         .\vcpkg-init.cmd
-        .\vcpkg\vcpkg.exe install libffi   
+        vcpkg install libffi   
     
     - name: Build CPP VM
       run: make -C runtime/cpp
