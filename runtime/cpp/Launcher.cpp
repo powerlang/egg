@@ -35,6 +35,7 @@ Launcher::main(const int argc, const char** argv)
         return 1;
     }
 
+    Egg::Initialize();
     auto kernelSegment = new ImageSegment(&kernelFile);
     auto bootstrapper = new Bootstrapper(kernelSegment);
     auto runtime = bootstrapper->_runtime;

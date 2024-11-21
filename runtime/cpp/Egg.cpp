@@ -1,4 +1,5 @@
 #include "Egg.h"
+#include "Memory.h"
 #include "Evaluator/Runtime.h"
 #include "Evaluator/Evaluator.h"
 #include "Evaluator/EvaluationContext.h"
@@ -17,4 +18,9 @@ void Egg::error(const char *message) {
 
 void Egg::error_(const std::string &message) { 
     error(message.c_str());
+}
+
+void Egg::Initialize()
+{
+    InitializeMemory();
 }

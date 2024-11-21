@@ -8,7 +8,7 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/runtime/js/example-server/index.js",
+            "program": "${workspaceFolder}/runtime/js/examples/server/index.js",
             "cwd": "${workspaceFolder}/runtime/js"
         },
         {

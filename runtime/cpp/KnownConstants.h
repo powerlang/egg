@@ -6,6 +6,14 @@
  *  Kernel module in the future
  */
 
+
+// We use the lowmost 4gb "page" for allocation, unless on MacOS which doesn't allow it
+#ifdef __APPLE__
+extern uintptr_t BEHAVIOR_ADDRESS_SPACE;
+#else
+#define BEHAVIOR_ADDRESS_SPACE 0
+#endif
+
 namespace Egg {
 
 enum BlockFlags {

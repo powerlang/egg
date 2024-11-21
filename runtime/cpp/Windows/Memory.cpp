@@ -9,8 +9,27 @@
 
 #include "../Memory.h"
 #include "../Egg.h"
+#include "../KnownConstants.h"
 
 using namespace Egg;
+
+
+namespace Egg {
+    static uintptr_t nextFree = 0;
+    static uintptr_t limit = 0;
+}
+
+void Egg::InitializeMemory()
+{
+    Egg::nextFree = BEHAVIOR_ADDRESS_SPACE;
+
+    // avoid the zero address as mmap would confuse it with "allocate anywhere"
+    if (Egg::nextFree == 0)
+        Egg::nextFree = 0x100000;
+
+    Egg::limit = BEHAVIOR_ADDRESS_SPACE + (4L * 1024 * 1024 * 1024);  // We are limiting to reserve up to 4gb for now
+}
+
 
 uintptr_t Egg::pagealign(uintptr_t addr)
 {
@@ -28,7 +47,7 @@ uintptr_t Egg::pagealign(uintptr_t addr)
 uintptr_t Egg::ReserveMemory(uintptr_t base, uintptr_t size)
 {
     void* allocated = nullptr;
-    if (base == 0) base = 0x100000;
+    if (base == 0) base = Egg::nextFree;
 
     while (true) {
         // Attempt to allocate at the aligned base
@@ -36,6 +55,7 @@ uintptr_t Egg::ReserveMemory(uintptr_t base, uintptr_t size)
         
         if (allocated != 0) {
             if ((uintptr_t)allocated == base) {
+                Egg::nextFree = pagealign((uintptr_t)allocated + size);
                 return (uintptr_t)allocated;
             }
 
@@ -47,7 +67,7 @@ uintptr_t Egg::ReserveMemory(uintptr_t base, uintptr_t size)
             base += 0x10000;
         }
 
-        if (base >=  0x100000000) { // We are limiting to the first 4gb for now
+        if (base >= Egg::limit) {
             error("Memory allocation failed");
             return 0;
         }

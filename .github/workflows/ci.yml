@@ -27,8 +27,26 @@ jobs:
     - name: Fetch at least 2 commits so that Iceberg doesn't break
       run: git fetch --unshallow
 
-    - name: Compile
+    - name: Build Egg/Pharo Virtual VM
       run: make -C runtime/pharo
+
+    - name: Set up pkgconfig on Windows # needed for libffi
+      if: runner.os == 'Windows'
+      run: choco install pkgconfiglite --yes
+
+    - name: Install libffi with vcpkg on Windows
+      if: runner.os == 'Windows'
+      run: |
+        curl -LO https://aka.ms/vcpkg-init.cmd
+        .\vcpkg-init.cmd
+        vcpkg install libffi
+        echo "PKG_CONFIG_PATH=C:\vcpkg\packages\libffi_x64-windows\lib\pkgconfig" >> $env:GITHUB_ENV
+        echo $env:PKG_CONFIG_PATH
+        ls C:\vcpkg\packages\libffi_x64-windows\lib\pkgconfig
+      
+    - name: Build CPP VM
+      run: |
+        make -C runtime/cpp
 
     - name: Run tests
       run: make -C runtime/pharo/ test-ci
