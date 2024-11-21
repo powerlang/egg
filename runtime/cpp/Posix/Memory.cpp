@@ -66,7 +66,7 @@ void Egg::InitializeMemory()
     if (Egg::nextFree == 0)
         Egg::nextFree = 0x100000;
 
-    Egg::limit = BEHAVIOR_ADDRESS_SPACE + (4L * 1024 * 1024 * 1024);
+    Egg::limit = BEHAVIOR_ADDRESS_SPACE + (4L * 1024 * 1024 * 1024); // We are limiting to reserve up to 4gb for now
 
 }
 
@@ -103,7 +103,7 @@ uintptr_t Egg::ReserveMemory(uintptr_t base, uintptr_t size)
             base += 0x10000;
         }
 
-        if (base >= Egg::limit) { // We are limiting to reserve up to 4gb for now
+        if (base >= Egg::limit) {
             error("Memory allocation failed");
             return 0;
         }
