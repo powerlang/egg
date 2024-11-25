@@ -35,6 +35,9 @@ file(GLOB ALL_SRC "*.cpp" "Evaluator/*.cpp" "${PLATFORM}/*.cpp")
 add_executable(${EXE} ${ALL_SRC})
 target_link_libraries(${EXE} ${FFI_LIBRARIES}) # link agains libffi
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    target_link_libraries(${EXE} dl)
+endif()
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

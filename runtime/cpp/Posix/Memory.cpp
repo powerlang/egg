@@ -39,7 +39,7 @@ uintptr_t Egg::ReserveAligned4GB() {
     void* allocated = mmap(NULL, total_size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (allocated == MAP_FAILED) {
         error("Couldn't reserve memory for future allocations");
-        return NULL;
+        return (uintptr_t)NULL;
     }
 
     uintptr_t aligned_addr = align((uintptr_t)allocated, size);
