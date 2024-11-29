@@ -7,9 +7,9 @@
 #include <windows.h>
 #include <cstring>
 
-#include "../Memory.h"
-#include "../Egg.h"
-#include "../KnownConstants.h"
+#include "Allocator/Memory.h"
+#include "Egg.h"
+#include "KnownConstants.h"
 
 using namespace Egg;
 

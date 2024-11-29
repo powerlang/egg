@@ -16,7 +16,7 @@
 
 #include <iomanip>
 
-#include "Memory.h"
+#include "Allocator/Memory.h"
 
 
 namespace Egg

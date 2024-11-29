@@ -30,7 +30,7 @@ include_directories(${FFI_INCLUDE_DIRS})
 link_directories(${FFI_LIBRARY_DIRS})
 # *************************************************
 
-file(GLOB ALL_SRC "*.cpp" "Evaluator/*.cpp" "${PLATFORM}/*.cpp")
+file(GLOB ALL_SRC "*.cpp" "Evaluator/*.cpp" "Allocator/*.cpp" "${PLATFORM}/*.cpp")
 
 add_executable(${EXE} ${ALL_SRC})
 target_link_libraries(${EXE} ${FFI_LIBRARIES}) # link agains libffi

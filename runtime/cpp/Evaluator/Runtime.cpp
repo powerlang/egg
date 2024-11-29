@@ -4,7 +4,7 @@
 #include <Bootstrapper.h>
 
 #include "Evaluator.h"
-#include "GCHeap.h"
+#include "Allocator/GCHeap.h"
 #include "SAbstractMessage.h"
 #include "KnownConstants.h"
 
