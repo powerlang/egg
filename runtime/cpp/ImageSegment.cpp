@@ -14,7 +14,8 @@
 
 #include "Util.h"
 #include "ImageSegment.h"
-#include "Memory.h"
+
+#include "Allocator/Memory.h"
 
 namespace Egg
 {

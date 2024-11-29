@@ -11,9 +11,9 @@
 
 #include <iostream>
 
-#include "../Memory.h"
-#include "../Egg.h"
-#include "../KnownConstants.h"
+#include "Allocator/Memory.h"
+#include "Egg.h"
+#include "KnownConstants.h"
 
 using namespace Egg;
 
