@@ -906,7 +906,7 @@ Object* Evaluator::demarshalFFIResult(void *retval, uint8_t type) {
        case FFI_schar:  return newIntObject(*reinterpret_cast<int8_t*>(retval)); break;
        case FFI_ushort: return newIntObject(*reinterpret_cast<uint16_t*>(retval)); break;
        case FFI_sshort: return newIntObject(*reinterpret_cast<int16_t*>(retval)); break;
-       case FFI_uint:   return newIntObject(*reinterpret_cast<uint*>(retval)); break;
+       case FFI_uint:   return newIntObject(*reinterpret_cast<unsigned int*>(retval)); break;
        case FFI_sint:   return newIntObject(*reinterpret_cast<int*>(retval)); break;
        case FFI_ulong:  return newIntObject(*reinterpret_cast<ulong*>(retval)); break;
        case FFI_slong:  return newIntObject(*reinterpret_cast<long*>(retval)); break;
