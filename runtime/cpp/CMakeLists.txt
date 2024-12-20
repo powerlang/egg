@@ -7,6 +7,19 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 set(BUILD_SHARED_LIBS OFF)
 
+if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
+    set(CMAKE_BUILD_TYPE Debug)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s EXPORTED_RUNTIME_METHODS='[\"FS_createDataFile\"]'")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s ALLOW_MEMORY_GROWTH=1")
+
+    # libffi requires a special version, clone https://github.com/hoodmane/libffi-emscripten
+    set(FFI_INCLUDE_DIR ${EMSDK}/libffi-emscripten/build/include)
+    set(FFI_LIBRARY_DIR ${EMSDK}/libffi-emscripten/build/lib)
+    include_directories(${FFI_INCLUDE_DIR})
+    link_directories(${FFI_LIBRARY_DIR})
+
+endif()
+
 project(launcher VERSION 0.1.0)
 
 include(CTest)
