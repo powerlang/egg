@@ -874,9 +874,11 @@ void Evaluator::initializeCIF(HeapObject *method, int argCount) {
 
             case FFI_pointer: *argType = &ffi_type_pointer; break;
 
+#ifdef LIBFFI_COMPLEX_SUPPORTED // off by default, as complex are unsupported in some platforms, and we don't really need them
             case FFI_complex_float:      *argType = &ffi_type_complex_float; break;
             case FFI_complex_double:     *argType = &ffi_type_complex_double; break;
             case FFI_complex_longdouble: *argType = &ffi_type_complex_longdouble; break;
+#endif
             default: error_("wrong descriptor"); break;
         }
     }
