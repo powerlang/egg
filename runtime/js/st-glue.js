@@ -426,6 +426,9 @@ globalThis.EggProcessSuspended = class {
 
 	process_(process) {this._process = process; return this;}
 	process() { return this._process; }
+
+	context_(context) {this._context = context; return this;}
+	context() { return this._context; }
 	
 	signal() { throw this; }
 }

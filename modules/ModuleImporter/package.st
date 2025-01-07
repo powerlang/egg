@@ -4,9 +4,9 @@
 "
 
 Package {
-	#name : #CodeSpecsImporter,
+	#name : #ModuleImporter,
 	#requires : [],
 	#classes : [
-		'CodeSpecsImporter'
+		'ModuleSpecReader', 'ModuleLoader'
 	]
 }

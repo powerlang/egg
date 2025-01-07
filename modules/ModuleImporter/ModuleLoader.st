@@ -28,16 +28,15 @@ ModuleLoader >> loadModuleNamed: aString [
 	spec := self readModuleSpecNamed: aString.
 	classes := self classesSortedBySuperclass: spec classes.
 	moduleName := ('.' split: aString) last asSymbol.
-	moduleSpec := spec at: moduleName , #Module.
-	moduleSpec ifNil: [ moduleSpec := spec at: #Module , moduleName ].
+	moduleSpec := spec classes detect: [:cls | cls name = (moduleName , #Module)] ifNone: nil.
+	moduleSpec ifNil: [ moduleSpec := spec classes detect: [:cls | cls name = (#Module , moduleName)] ifNone: nil].
 	moduleSpec
 		ifNil: [
-			moduleClass := Module.
-			moduleSpec := Module spec ]
+			moduleClass := Module.]
 		ifNotNil: [ 
 			moduleClass := self createNewClassFrom: moduleSpec in: nil.
 			classes remove: moduleSpec ].
-	module := self createNewModule: moduleSpec class: moduleClass.
+	module := self createNewModule: moduleClass.
 	module name isEmpty ifTrue: [ module name: symbol asString ].
 	classes do: [:c | self createNewClassFrom: c in: module ].
 	spec extendedClasses do: [:c | self createExtensionMethodsOf: c in: module ].
@@ -88,4 +87,13 @@ ModuleLoader >> createNewMethod: aMethodSpec in: aSpecies [
 	aSpecies methodDictionary at: selector put: smethod.
 	aSpecies organization classify: selector under: category.
 	^method
+]
+
+{#category : #creating}
+ModuleLoader >> createNewModule: aClass [
+	| module |
+	module := aClass new.
+	module bindKernelExports; importRequiredModules.
+	aClass name != #Module ifTrue: [ aClass module: module. module addClass: aClass].
+	^module
 ]

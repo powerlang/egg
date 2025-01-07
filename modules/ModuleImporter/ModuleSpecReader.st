@@ -90,12 +90,15 @@ ModuleSpecReader >> readExtendedClasses [
 
 {#category : #read}
 ModuleSpecReader >> readMetadata [
-	| stream name |
+	| stream name classes |
 	stream := (Kernel  readFile: path , '/package.st') readStream.
 	stream throughAll: 'Package '.
 	metadata := (STONReader on: stream) parseMap.
 	name := (metadata at: #name) replace: $- with: Character space.
-	module name: name asString
+	module name: name asString.
+	classes := metadata at: #classes.
+	classes := classes copyWith: name asString, 'Module'.
+	metadata at: #classes put: classes
 ]
 
 {#category : #read}
