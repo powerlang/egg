@@ -133,7 +133,7 @@ Class >> classVarNames [
 Class >> classVarNames: aCollection [
 	| new old |
 	new := Namespace new.
-	old := sef classVariables.
+	old := self classVariables.
 	
 	aCollection do: [:k | | assoc |
 		assoc := old associationAt: k ifAbsent: [k -> nil].

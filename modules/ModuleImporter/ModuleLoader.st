@@ -24,10 +24,10 @@ ModuleLoader >> readModuleSpecNamed: aString [
 
 {#category : #loading}
 ModuleLoader >> loadModuleNamed: aString [
-	| spec classes moduleName moduleSpec moduleClass module |
+	| classes moduleName moduleSpec moduleClass |
 	spec := self readModuleSpecNamed: aString.
 	classes := self classesSortedBySuperclass: spec classes.
-	moduleName := ('.' split: aString) last asSymbol.
+	moduleName := ('.' split: spec name) last asSymbol.
 	moduleSpec := spec classes detect: [:cls | cls name = (moduleName , #Module)] ifNone: nil.
 	moduleSpec ifNil: [ moduleSpec := spec classes detect: [:cls | cls name = (#Module , moduleName)] ifNone: nil].
 	moduleSpec
@@ -37,10 +37,11 @@ ModuleLoader >> loadModuleNamed: aString [
 			moduleClass := self createNewClassFrom: moduleSpec in: nil.
 			classes remove: moduleSpec ].
 	module := self createNewModule: moduleClass.
-	module name isEmpty ifTrue: [ module name: symbol asString ].
+	module name isEmpty ifTrue: [ module name: moduleName asString ].
 	classes do: [:c | self createNewClassFrom: c in: module ].
-	spec extendedClasses do: [:c | self createExtensionMethodsOf: c in: module ].
+	spec extendedClasses do: [:c | self createExtensionMethodsOf: c ].
 	module justLoaded.
+	Kernel loadedModules at: module name asSymbol put: module.
 	^ module
 ]
 
@@ -62,14 +63,11 @@ ModuleLoader >> classesSortedBySuperclass: anArray [
 
 {#category : #creating}
 ModuleLoader >> createNewClassFrom: aClassSpec in: module [
-	| supername superclass metaclass class |
-	supername := aClassSpec supername.
-	superclass := module 
-					ifNil: [ (Kernel namespace at: supername)  ]
-					ifNotNil: [ module namespace at: supername ].
+	| superclass metaclass class |
+	superclass := (module ifNil: [ Kernel ]) namespace at: aClassSpec supername asSymbol.
 	class := Class newSubclassOf: superclass.
 	metaclass := class class.
-	class name: aClassSpec name; instVarNames: aClassSpec instVarNames; classVarNames: aClassSpec classVars.
+	class name: aClassSpec name; instVarNames: aClassSpec instVarNames; classVarNames: aClassSpec classVarNames.
 	aClassSpec methods do: [ :m | self createNewMethod: m in: class ].
 	aClassSpec metaclass methods do: [ :m | self createNewMethod: m in: metaclass ].
 	module ifNotNil: [
@@ -84,8 +82,8 @@ ModuleLoader >> createNewMethod: aMethodSpec in: aSpecies [
 	method := SCompiler new compile: aMethodSpec sourceCode.
 	selector := method selector.
 	method classBinding: aSpecies.
-	aSpecies methodDictionary at: selector put: smethod.
-	aSpecies organization classify: selector under: category.
+	aSpecies methodDictionary at: selector put: method.
+	aSpecies organization classify: selector under: method category.
 	^method
 ]
 
@@ -96,4 +94,18 @@ ModuleLoader >> createNewModule: aClass [
 	module bindKernelExports; importRequiredModules.
 	aClass name != #Module ifTrue: [ aClass module: module. module addClass: aClass].
 	^module
+]
+
+{#category : #creating}
+ModuleLoader >> createExtensionMethodsOf: aClassSpec [
+	| class metaclass |
+	class := module namespace at: aClassSpec name asSymbol.
+	metaclass := class behavior classBinding.
+	aClassSpec methods do: [ :m | | cm |
+		 cm := self createNewMethod: m in: class.
+		module ifNotNil: [ module addExtension: cm ] ].
+	aClassSpec metaclass methods do: [ :m | | cm | 
+		cm := self createNewMethod: m in: metaclass.
+		module ifNotNil: [ module addExtension: cm ] ].
+	^ module
 ]
