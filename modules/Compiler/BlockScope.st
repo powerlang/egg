@@ -21,7 +21,7 @@ BlockScope >> captureArgument: anArgumentBinding [
 { #category : #private }
 BlockScope >> captureEnvironment: aScriptNode [
 	script == aScriptNode ifTrue: [^self].
-	(environments identityIncludes: aScriptNode) ifTrue: [^self].
+	(environments includesIdentical: aScriptNode) ifTrue: [^self].
 	self realParent captureEnvironment: aScriptNode.
 	aScriptNode isMethod
 		ifTrue: [environments addFirst: aScriptNode]

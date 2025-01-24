@@ -769,7 +769,7 @@ EggEvaluator >> signalSuspension [
 	| originator error |
 	originator := self contextForProcess: context firstArgument.
 	error := EggProcessSuspended new
-		process: originator;
+		process: context firstArgument;
 		exception: context secondArgument;
 		context: originator.
 	error signal

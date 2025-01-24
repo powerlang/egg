@@ -124,6 +124,11 @@ Module >> classes [
 	^classes
 ]
 
+{ #category : #inquiries }
+Module >> classNamed: aString [
+	^classes detect: [:cls | cls name = aString ] ifNone: nil
+]
+
 { #category : #initialization }
 Module >> defaultName [
 	| classname i |
