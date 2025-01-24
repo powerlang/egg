@@ -4,18 +4,19 @@
 "
 
 Class {
-	#name : #CodeSpecsImporterModule,
+	#name : #ModuleImporterModule,
 	#superclass : #Module,
 	#instVars : [],
-	#category : #'CodeSpecsImporter'
+	#category : #'ModuleImporter'
 }
 
 { #category : #spec }
-CodeSpecsImporterModule >> imports [
+ModuleImporterModule >> imports [
 	^{
-		#Kernel -> #(#InternalReadStream #Character #CharacterArray).
+		#Kernel -> #(#InternalReadStream #Character #CharacterArray #IdentitySet #Module).
 		#Tonel -> #(#TonelReader).
 		#CodeSpecs -> #(#ModuleSpec #ClassSpec #MetaclassSpec #MethodSpec).
-		#STON -> #(#STONReader)
+		#STON -> #(#STONReader).
+		#Compiler -> #(#SCompiler).
 	}
 ]

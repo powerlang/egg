@@ -9,7 +9,7 @@ const modules = [
 	"STON",
 	"Tonel",
 	"CodeSpecs",
-	"CodeSpecsImporter",
+	"ModuleImporter",
 	"PetitParser",
 	"PetitParser.Parsers",
 	"PetitParser.Extensions",

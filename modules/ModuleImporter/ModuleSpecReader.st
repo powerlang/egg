@@ -4,23 +4,24 @@
 "
 
 Class {
-	#name : #CodeSpecsImporter,
+	#name : #ModuleSpecReader,
 	#superclass : #Object,
 	#instVars : [
 		'module',
 		'path',
 		'metadata'
 	],
-	#category : #CodeSpecsImporter
+	#category : #ModuleSpecReader
 }
 
-{#category : #import}
-CodeSpecsImporter >> import [
-	self importMetadata; importClasses; importExtendedClasses
+{#category : #read}
+ModuleSpecReader >> read [
+	self readMetadata; readClasses; readExtendedClasses.
+	^module
 ]
 
-{#category : #import}
-CodeSpecsImporter >> importClass: aString [
+{#category : #read}
+ModuleSpecReader >> readClass: aString [
 	| filename reader definition pointers variable class metasclass stream contents |
 	filename := path / aString ,  '.st'.
 	contents := Kernel readFile: filename.
@@ -52,16 +53,16 @@ CodeSpecsImporter >> importClass: aString [
 		ivars: (definition at: #classInstVars ifAbsent: #()).
 	class metaclass: metasclass.
 	module addClass: class.
-	reader methods do: [:m | self importMethod: m]
+	reader methods do: [:m | self readMethod: m]
 ]
 
-{#category : #import}
-CodeSpecsImporter >> importClasses [
-	(metadata at: #classes) do: [:name | self importClass: name]
+{#category : #read}
+ModuleSpecReader >> readClasses [
+	(metadata at: #classes) do: [:name | self readClass: name]
 ]
 
-{#category : #import}
-CodeSpecsImporter >> importExtendedClass: aString [
+{#category : #read}
+ModuleSpecReader >> readExtendedClass: aString [
 
 	| filename contents stream reader definition class metaclass |
 	filename := path / aString ,  '.st'.
@@ -78,17 +79,17 @@ CodeSpecsImporter >> importExtendedClass: aString [
 	metaclass := MetaclassSpec new module: module; instanceClass: class.
 	class metaclass: metaclass.
 	module addClassExtension: class.
-	reader methods do: [:m | self importMethod: m]
+	reader methods do: [:m | self readMethod: m]
 ]
 
-{#category : #import}
-CodeSpecsImporter >> importExtendedClasses [
+{#category : #read}
+ModuleSpecReader >> readExtendedClasses [
 	(metadata at: #extendedClasses ifAbsent: [#()])
-		do: [:name | self importExtendedClass: name]
+		do: [:name | self readExtendedClass: name]
 ]
 
-{#category : #import}
-CodeSpecsImporter >> importMetadata [
+{#category : #read}
+ModuleSpecReader >> readMetadata [
 	| stream name |
 	stream := (Kernel  readFile: path , '/package.st') readStream.
 	stream throughAll: 'Package '.
@@ -97,8 +98,8 @@ CodeSpecsImporter >> importMetadata [
 	module name: name asString
 ]
 
-{#category : #import}
-CodeSpecsImporter >> importMethod: aDictionary [
+{#category : #read}
+ModuleSpecReader >> readMethod: aDictionary [
 	| classname selector category class signature body source method |
 	classname := aDictionary at: #class.
 	selector := aDictionary at: #selector.
@@ -122,23 +123,23 @@ CodeSpecsImporter >> importMethod: aDictionary [
 ]
 
 {#category : #initialization}
-CodeSpecsImporter >> initialize [
+ModuleSpecReader >> initialize [
 	super initialize.
 	module := ModuleSpec new
 ]
 
 {#category : #accessing}
-CodeSpecsImporter >> module [
+ModuleSpecReader >> module [
 	^module
 ]
 
 {#category : #accessing}
-CodeSpecsImporter >> module: aModuleSpec [
+ModuleSpecReader >> module: aModuleSpec [
 	module := aModuleSpec
 ]
 
 {#category : #accessing}
-CodeSpecsImporter >> path: aFilename [
+ModuleSpecReader >> path: aFilename [
 	path := aFilename
 ]
 
