@@ -194,10 +194,7 @@ let EggObjectWrapper = class {
 	}
 
 	slotAt_(index) {
-		return this.class().on_runtime_(
-			this._wrappee.slotAt_(index),
-			this._runtime
-		);
+		return this.wrap(this._wrappee.slotAt_(index));
 	}
 
 	wrappee() {

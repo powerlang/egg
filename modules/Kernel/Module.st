@@ -131,12 +131,11 @@ Module >> classNamed: aString [
 
 { #category : #initialization }
 Module >> defaultName [
-	| classname i |
+	| classname |
 	classname := self class name.
-	i := classname indexOfString: 'Module'.
-	i = 0 ifTrue: [^classname].
-	i = 1 ifTrue: [^classname copyFrom: 'Module' size + 1 to: classname size].
-	^classname copyTo: i - 1
+	(classname endsWith: 'Module') ifTrue: [^classname trimTail: 'Module'].
+	(classname beginsWith: 'Module') ifTrue: [^classname trimPrefix: 'Module'].
+	^classname
 ]
 
 { #category : #services }
