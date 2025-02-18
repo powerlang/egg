@@ -45,9 +45,9 @@ TonelReader >> nextBlock [
 	[
 		(char == $[ andNot: [prev == $$]) ifTrue: [nested := nested + 1].
 		(char = $] andNot: [prev == $$]) ifTrue: [nested := nested - 1].
+		(char = $' andNot: [prev == $$]) ifTrue: [self skipString].
+		(char = $" andNot: [prev == $$]) ifTrue: [self skipComment].
 		prev := char.
-		char = $' ifTrue: [self skipString].
-		char = $" ifTrue: [self skipComment].
 		nested = 0]
 		whileFalse: [char := stream next].
 	eol := stream eol size.

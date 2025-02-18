@@ -197,7 +197,6 @@ class WebsideAPI extends Object {
 		this.respondWithJson(variables);
 	}
 
-
 	superclasses() {
 		let species = this.requestedClass();
 		if (!species) return this.notFound();
@@ -418,10 +417,21 @@ class WebsideAPI extends Object {
 			state: "pending",
 		};
 		this.server.evaluations[id] = evaluation;
-		const target = this.classNamed("Object");
+		let requestedClass = this.requestedClassContext();
+		let requestedObject = this.requestedObjectContext();
+		let targetClass = requestedClass
+			? requestedClass.metaclass()
+			: requestedObject
+			? requestedObject.objectClass()
+			: this.classNamed("Object");
+		let receiver = requestedObject
+			? requestedObject.wrappee()
+			: requestedClass
+			? requestedClass.wrappee()
+			: this.runtime.nil();
 		try {
-			this.compile(source, target);
-			object = this.runtime.sendLocal_to_("doIt", this.runtime.nil());
+			this.compile(source, targetClass);
+			object = this.runtime.sendLocal_to_("doIt", receiver);
 			//this.runtime.sendLocal_to_with_("removeSelector:", species, [selector]);
 			object = this.wrapWithId(object, id);
 			evaluation.state = "finished";
@@ -460,7 +470,7 @@ class WebsideAPI extends Object {
 	createDebugger() {
 		let id = this.bodyAt("evaluation");
 		if (!id) return this.notFound();
-		let evaluation = this.server.evaluations[id];
+		let evaluation = this.evaluationWithId(id);
 		if (!evaluation) return this.notFound();
 		let _debugger = {
 			id: id,
@@ -472,9 +482,9 @@ class WebsideAPI extends Object {
 
 	debuggerFrames() {
 		let id = this.requestedId();
-		let _debugger = this.server.debuggers[id];
+		let _debugger = this.debuggerWithId(id);
 		if (!_debugger) return this.notFound();
-		let evaluation = this.server.evaluations[id];
+		let evaluation = this.evaluationWithId(id);
 		let context = this.errorContext(evaluation.error);
 		let frames = context.backtrace();
 		let json = frames.map((frame, index) => {
@@ -489,10 +499,10 @@ class WebsideAPI extends Object {
 
 	debuggerFrame() {
 		let id = this.requestedId();
-		let _debugger = this.server.debuggers[id];
+		let _debugger = this.debuggerWithId(id);
 		if (!_debugger) return this.notFound();
 		let index = this.requestedIndex();
-		let evaluation = this.server.evaluations[id];
+		let evaluation = this.evaluationWithId(id);
 		let context = this.errorContext(evaluation.error);
 		let frames = context.backtrace();
 		if (index > frames.length - 1) return this.notFound();
@@ -512,10 +522,10 @@ class WebsideAPI extends Object {
 
 	frameBindings() {
 		let id = this.requestedId();
-		let _debugger = this.server.debuggers[id];
+		let _debugger = this.debuggerWithId(id);
 		if (!_debugger) return this.notFound();
 		let index = this.requestedIndex();
-		let evaluation = this.server.evaluations[id];
+		let evaluation = this.evaluationWithId(id);
 		let context = this.errorContext(evaluation.error);
 		let frames = context.backtrace();
 		if (index > frames.length - 1) return this.notFound();
@@ -534,21 +544,11 @@ class WebsideAPI extends Object {
 				type: "argument",
 				value: wrapper.printString(),
 			};
-			binding = {
-				name: "argument" + i,
-				type: "argument",
-				value: wrapper.printString(),
-			};
 			bindings.push(binding);
 		}
 		for (let i = 1; i <= code.tempCount().asLocalObject(); i++) {
 			object = context.stackTemporaryAt_frameIndex_(i, index + 1);
 			wrapper = EggObjectWrapper.on_runtime_(object, this.runtime);
-			binding = {
-				name: "temporary" + i,
-				type: "temporary",
-				value: wrapper.printString(),
-			};
 			binding = {
 				name: "temporary" + i,
 				type: "temporary",
@@ -561,7 +561,7 @@ class WebsideAPI extends Object {
 
 	deleteDebugger() {
 		let id = this.requestedId();
-		let _debugger = this.server.debuggers[id];
+		let _debugger = this.debuggerWithId(id);
 		if (_debugger) {
 			delete this.server.debuggers[id];
 			delete this.server.evaluations[id];
@@ -663,7 +663,7 @@ class WebsideAPI extends Object {
 	}
 
 	classNamed(name) {
-		if (!name) return null;
+		if (!name) return;
 		let identifier = name;
 		let metaclass = name.endsWith(" class");
 		if (metaclass) identifier = identifier.slice(0, -" class".length);
@@ -671,8 +671,7 @@ class WebsideAPI extends Object {
 		let species = root
 			.withAllSubclasses()
 			.detect_((c) => c.name() == identifier);
-		if (!species) return null;
-
+		if (!species) return;
 		return metaclass ? species.metaclass() : species;
 	}
 
@@ -757,6 +756,40 @@ class WebsideAPI extends Object {
 		return this.classNamed(name);
 	}
 
+	requestedClassContext() {
+		const context = this.bodyAt("context");
+		if (!context) return;
+		const classname = context.class;
+		if (classname && typeof classname === "string")
+			return this.classNamed(classname);
+	}
+
+	requestedObjectContext() {
+		const context = this.bodyAt("context");
+		if (!context) return;
+		const path = context.object;
+		if (path) return this.objectFromPath(path);
+	}
+
+	requestedWorkspaceContext() {
+		const context = this.bodyAt("context");
+		let id = context.workspace;
+		if (id) return this.workspaceWithId(id);
+	}
+
+	requestedDebuggerContext() {
+		const context = this.bodyAt("context");
+		id = context.debugger;
+		if (id) {
+			const _debugger = this.debuggerWithId(id);
+			if (!_debugger) return;
+			const index = context.frame;
+			const evaluation = this.evaluationWithId(id);
+			let frames = this.errorContext(evaluation.error).backtrace();
+			if (index < frames.length) return frames[index];
+		}
+	}
+
 	requestedPackage() {
 		const name = this.parameterAt("packagename");
 		return this.packageNamed(name);
@@ -773,6 +806,14 @@ class WebsideAPI extends Object {
 
 	objectWithId(id) {
 		return this.server.pinnedObjects[id];
+	}
+
+	workspaceWithId(id) {
+		return this.server.workspaces[id];
+	}
+
+	debuggerWithId(id) {
+		return this.server.debuggers[id];
 	}
 
 	queryAt(option) {
