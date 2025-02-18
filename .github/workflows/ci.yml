@@ -53,7 +53,7 @@ jobs:
 
     - name: Attach the report
       if: always() && matrix.os == 'ubuntu-latest' # run this step even if previous step failed (only on ubuntu)
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: test-results
         path: runtime/pharo/test-reports/Powerlang-Tests-Test.xml
