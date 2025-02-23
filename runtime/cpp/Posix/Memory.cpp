@@ -19,7 +19,7 @@ using namespace Egg;
 
 #ifdef __APPLE__
 uintptr_t BEHAVIOR_ADDRESS_SPACE; // in mac OS, this address can vary. Elsewhere it is a constant optimized away
-#define EGG_NOREPLACE 0
+#define EGG_NOREPLACE MAP_FIXED
 #else
 #define EGG_NOREPLACE MAP_FIXED_NOREPLACE
 #endif
@@ -83,7 +83,7 @@ uintptr_t Egg::pagealign(uintptr_t addr)
 uintptr_t Egg::ReserveMemory(uintptr_t base, uintptr_t size)
 {
     void* allocated = nullptr;
-    if (base == 0) base = Egg::nextFree;
+    if (base == 0 || base < BEHAVIOR_ADDRESS_SPACE || base > Egg::limit) base = Egg::nextFree;
 
     while (true) {
         // Attempt to allocate at the aligned base

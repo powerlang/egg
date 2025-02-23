@@ -37,6 +37,8 @@ Launcher::main(const int argc, const char** argv)
 
     Egg::Initialize();
     auto kernelSegment = new ImageSegment(&kernelFile);
+    kernelSegment->fixPointerSlots({});
+
     auto bootstrapper = new Bootstrapper(kernelSegment);
     auto runtime = bootstrapper->_runtime;
     HeapObject *kernel = bootstrapper->_kernel->_exports["Kernel"];

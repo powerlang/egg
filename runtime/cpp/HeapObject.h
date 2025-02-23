@@ -171,8 +171,14 @@ struct HeapObject
 
      /// ~ behavior and hash
 
+      /** 32-bit behavior field as-is*/
+      uint32_t basicBehavior();
+
+      /** behavior adjusted to behavior zone start */
       HeapObject* behavior();
       void behavior(HeapObject *behavior);
+
+
 
       uint16_t hash() const;
       void hash(uint16_t hash);
