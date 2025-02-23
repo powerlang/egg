@@ -13,7 +13,7 @@ namespace Egg
 {
 
 static inline uintptr_t
-align(uintptr_t value, int alignment)
+align(uintptr_t value, uintptr_t alignment)
 {
     return ((value + (alignment - 1)) & ~(alignment - 1));
 }
