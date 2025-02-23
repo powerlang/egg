@@ -144,6 +144,11 @@ void HeapObject::beLarge()
 
 /// ~ behavior and hash ~
 
+uint32_t HeapObject::basicBehavior()
+{
+	return smallHeader()->behavior;
+}
+
 HeapObject* HeapObject::behavior()
 {
     return reinterpret_cast<HeapObject*>(((uintptr_t)smallHeader()->behavior) | BEHAVIOR_ADDRESS_SPACE);
