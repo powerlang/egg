@@ -9,15 +9,12 @@
 #include <algorithm>
 #include <vector>
 #include <string>
+#include <iomanip>
 
 
 #include "Util.h"
 #include "ImageSegment.h"
-
-#include <iomanip>
-
 #include "Memory.h"
-
 
 namespace Egg
 {
