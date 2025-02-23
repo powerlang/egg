@@ -75,7 +75,19 @@ class ImageSegment
      */
     void load(std::istream* data);
 
+    /**
+     * Traverses the image segment space looking for pointers.
+     *  - References to other objects in same space need to be relocated.
+     *  - References to imports (last two bits are 10b) are indices in import table,
+     *    and need to be changed to actual object addresses.
+     */
+    void fixPointerSlots(const std::vector<Object*> &imports);
+
+    uintptr_t spaceStart();
+    uintptr_t spaceEnd();
+
     std::string& importStringAt_(uint32_t index);
+    HeapObject* relocatedAddress_(const HeapObject* object);
 
     void dumpObjects();
 

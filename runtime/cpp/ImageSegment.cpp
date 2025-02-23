@@ -47,9 +47,60 @@ ImageSegment::load(std::istream *data)
     this->readExports(data);
 }
 
+void ImageSegment::fixPointerSlots(const std::vector<Object*>& imports)
+{
+    intptr_t delta = this->_currentBase - this->header.baseAddress;
+    uintptr_t oldBehaviorBase = this->header.baseAddress & (-1 << 32); // discards lower 32 bits
+    auto spaceStart = this->spaceStart();
+    auto current = ((HeapObject::ObjectHeader*)spaceStart)->object();
+    auto end = (HeapObject*)this->spaceEnd();
+    while (current < end)
+    {
+        auto behavior = current->basicBehavior();
+        if (((uintptr_t)behavior & 0x3) == 0x0) // if an oop
+        {
+            current->behavior((HeapObject*)(oldBehaviorBase + behavior + delta));
+        }
+        else if (((uintptr_t)behavior & 0x3) == 0x2) // if an import
+        {
+            current->behavior(imports[((uintptr_t)behavior)>>2]->asHeapObject());
+        }
+
+        for (uintptr_t i = 0; i < current->pointersSize(); i++)
+        {
+            auto &slot = current->slot(i);
+            if (((uintptr_t)slot & 0x3) == 0x0)
+            {
+                slot = (Object*)(((intptr_t)slot) + delta);
+            }
+            else if (((uintptr_t)slot & 0x3) == 0x2)
+            {
+                slot = imports[((uintptr_t)slot)>>2];
+            }
+        }
+        current = current->nextObject();
+    }
+}
+
+uintptr_t ImageSegment::spaceStart()
+{
+    return this->_currentBase + sizeof(ImageSegmentHeader);
+}
+
+uintptr_t ImageSegment::spaceEnd()
+{
+    return this->_currentBase + header.size;
+}
+
 std::string& ImageSegment::importStringAt_(uint32_t index)
 {
     return _importStrings[index];
+}
+
+HeapObject* ImageSegment::relocatedAddress_(const HeapObject* object)
+{
+    uintptr_t delta = _currentBase - header.baseAddress;
+    return (HeapObject*)((uintptr_t)object + delta);
 }
 
 void ImageSegment::dumpObjects() {
@@ -153,7 +204,7 @@ void ImageSegment::readExports(std::istream *data)
         //std::cout << "Found " << exportName << " at 0x" << std::hex << exportHeapAddress << std::endl;
 
         // Map the export name to the heap address
-        _exports[exportName] = reinterpret_cast<HeapObject*>(exportHeapAddress);
+        _exports[exportName] = this->relocatedAddress_(reinterpret_cast<HeapObject*>(exportHeapAddress));
     }
     ASSERT(data->peek() == EOF);
 

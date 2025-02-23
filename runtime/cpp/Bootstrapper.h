@@ -32,48 +32,6 @@ class Bootstrapper {
 		return imageSegment->_exports["__module__"];
 	}
 
-	/**
-	 * Traverses the image segment looking for references to imports (last two bits are 10b),
-	 * converting them to the corresponding imported value.
-	 */
-	void
-	fixObjectReferences(ImageSegment *imageSegment, std::vector<Object*> &imports)
-	{
-		intptr_t delta = imageSegment->_currentBase - imageSegment->header.baseAddress;
-		auto heapStart = imageSegment->_currentBase + sizeof(ImageSegmentHeader);
-		auto current = ((HeapObject::ObjectHeader*)heapStart)->object();
-		auto end = (HeapObject*)(imageSegment->_currentBase + imageSegment->header.size);
-		while (current < end)
-		{
-			auto behavior = current->behavior();
-			if (((uintptr_t)behavior & 0x3) == 0x0) // if an oop
-			{
-				current->behavior((HeapObject*)(((intptr_t)current->behavior()) + delta));
-			}
-			else if (((uintptr_t)behavior & 0x3) == 0x2) // if an import
-			{
-				current->behavior(imports[((uintptr_t)behavior)>>2]->asHeapObject());
-			}
-
-			for (uintptr_t i = 0; i < current->pointersSize(); i++)
-			{
-				auto &slot = current->slot(i);
-				if (((uintptr_t)slot & 0x3) == 0x0)
-				{
-					slot = (Object*)(((intptr_t)slot) + delta);
-				}
-				else if (((uintptr_t)slot & 0x3) == 0x2)
-				{
-					slot = imports[((uintptr_t)slot)>>2];
-				}
-			}
-			current = current->nextObject();
-		}
-		for (auto &pair : imageSegment->_exports) {
-			pair.second = reinterpret_cast<HeapObject*>(reinterpret_cast<uintptr_t>(pair.second) + delta);
-		}
-	}
-
 	void 
 	bindModuleImports(ImageSegment *imageSegment, std::vector<Object*> &imports)
 	{
@@ -132,7 +90,7 @@ class Bootstrapper {
 		auto imageSegment = new ImageSegment(&stream);
 		std::vector<Object*> imports;
 		this->bindModuleImports(imageSegment, imports);
-		this->fixObjectReferences(imageSegment, imports);
+		imageSegment->fixPointerSlots(imports);
 		return imageSegment;
 	}
 
@@ -166,7 +124,7 @@ class Bootstrapper {
 			std::cout << "import " << i << " is: " << import->printString() << std::endl;
 			imports.push_back(import);
 		}
-		this->fixObjectReferences(imageSegment, imports);
+		imageSegment->fixPointerSlots(imports);
 		return imageSegment;
 	}
 
