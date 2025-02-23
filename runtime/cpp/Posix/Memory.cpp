@@ -19,7 +19,7 @@ using namespace Egg;
 
 #ifdef __APPLE__
 uintptr_t BEHAVIOR_ADDRESS_SPACE; // in mac OS, this address can vary. Elsewhere it is a constant optimized away
-#define EGG_NOREPLACE 0
+#define EGG_NOREPLACE MAP_FIXED
 #else
 #define EGG_NOREPLACE MAP_FIXED_NOREPLACE
 #endif
