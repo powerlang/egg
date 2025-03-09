@@ -24,13 +24,24 @@ Hello, world!
 
 ## Building the VM
 
-To compile the VM, just run from cli:
+To compile the VM, be sure to install dependencies listed in next section and then just run from cli:
 
 ```
 cmake -S . -B build && cmake --build build
 ```
 
 This will build you an executable, you still need to run modules. 
+
+### Dependencies
+
+We aim for minimality everywhere, however you'll need some tools to be
+able to compile egg. In ubuntu, this should be all:
+
+```
+sudo apt install g++ cmake pkg-config libffi-dev
+```
+
+That should be all for compiling the VM.
 
 ## Building module snapshots
 
