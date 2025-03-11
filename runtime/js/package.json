@@ -1,6 +1,6 @@
 {
 	"name": "@powerlang/egg-js",
-	"version": "0.1.12",
+	"version": "0.1.15",
 	"description": "A Smalltalk VM that runs on top of JavaScript",
 	"type": "module",
 	"main": "Egg.js",
@@ -8,10 +8,12 @@
 		"interpreter",
 		"Egg.js",
 		"ImageSegmentReader.js",
-		"st-glue.js"
+		"st-glue.js",
+		"image-segments"
 	],
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"prepublishOnly": "bash -c 'cp -r ../../image-segments/*.json image-segments'"
 	},
 	"repository": {
 		"type": "git",

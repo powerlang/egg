@@ -5,6 +5,7 @@ import EggMetacircularRuntime from "./interpreter/EggMetacircularRuntime.js";
 import ImageSegmentReader from "./ImageSegmentReader.js";
 import path from "path";
 import fs, { readFileSync } from "fs";
+import { fileURLToPath } from 'url';
 import EggByteObject from "./interpreter/EggByteObject.js";
 import EggObject from "./interpreter/EggObject.js";
 import EggSmallInteger from "./interpreter/EggSmallInteger.js";
@@ -103,17 +104,14 @@ let Egg = class {
 	transferImportLiteral(anObject) {
 		if (Number.isInteger(anObject))
 			return this.runtime.newInteger_(anObject);
-
 		if (typeof anObject === "string")
 			return this.runtime.addSymbol_(anObject);
-
 		if (Array.isArray(anObject)) {
 			let transferred = anObject.map((o) =>
 				this.transferImportLiteral(o)
 			);
 			return this.runtime.newArray_(transferred);
 		}
-
 		debugger;
 	}
 
@@ -123,6 +121,7 @@ let Egg = class {
 			throw new Error(`Failed to load ${filename}`);
 		}
 		const reader = new ImageSegmentReader();
+		console.log(`Loading module ${filename}...`);
 		reader.loadFile(filepath);
 		this.bindModuleImports(reader);
 		reader.loadObjects();
@@ -134,14 +133,13 @@ let Egg = class {
 	}
 
 	findInPath(imageSegmentFile) {
-		const dirs = ["../../", "./", "../"];
+		const root = path.dirname(fileURLToPath(import.meta.url));
+		const dirs = ["../../", "./", "../", root];
 		const searched = "image-segments/" + imageSegmentFile;
 		for (const dir of dirs) {
 			const filePath = path.join(dir, searched);
-
 			try {
 				const stats = fs.statSync(filePath);
-
 				if (stats.isFile()) {
 					return filePath;
 				}

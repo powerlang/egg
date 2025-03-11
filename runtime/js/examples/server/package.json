@@ -15,7 +15,7 @@
   "author": "Javier Pimás",
   "license": "MIT",
   "dependencies": {
-    "@powerlang/egg-js": "^0.1.12",
+    "@powerlang/egg-js": "^0.1.15",
     "@powerlang/egg-js-webside": "^0.1.0"
   }
 }
