@@ -1,9 +1,3 @@
-// import EggByteObject from "../interpreter/EggByteObject.js";
-// import EggObject from "../interpreter/EggObject.js";
-// import EggSmallInteger from "../interpreter/EggSmallInteger.js";
-
-import { EggObject, EggByteObject, EggSmallInteger } from "@powerlang/egg-js"
-
 let selectorFor = function (selector, args) {
 	if (args.length == 0) return selector;
 	if (args.length == 1) return selector + ":";
@@ -90,10 +84,8 @@ let EggObjectWrapper = class {
 		if (this._wrappee === this._runtime.nil()) return nil;
 		if (this._wrappee === this._runtime.true()) return true;
 		if (this._wrappee === this._runtime.false()) return false;
-		if (this._wrappee.class() === EggSmallInteger)
-			return this._wrappee.value();
-		if (this._wrappee.class() === EggByteObject)
-			return this._wrappee.asLocalString();
+		if (this._wrappee.isImmediate()) return this._wrappee.value();
+		if (this._wrappee.isBytes()) return this._wrappee.asLocalString();
 		this.error_(
 			"Cannot determine local equivalent of "._comma(
 				this._wrappee.printString()
@@ -148,7 +140,7 @@ let EggObjectWrapper = class {
 			this._wrappee,
 			_arguments
 		);
-		if (!(result instanceof EggObject)) return result;
+		if (!result.isEggObject()) return result;
 		_class =
 			this._runtime.sendLocal_to_("isSpecies", result) ===
 			this._runtime.true()

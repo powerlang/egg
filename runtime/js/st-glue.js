@@ -256,10 +256,13 @@ Number.prototype.to_by_do_ = function(limit, increment, closure) {
 		for (let i = this; i >= limit; i=i+increment) { closure(i); }
 }
 
+import EggObject from "./interpreter/EggObject.js";
 import EggByteObject from "./interpreter/EggByteObject.js";
 import EggSlotObject from "./interpreter/EggSlotObject.js";
 import EggHeapObject from "./interpreter/EggHeapObject.js";
 import EggSmallInteger from "./interpreter/EggSmallInteger.js";
+
+Object.prototype.isEggObject = function() { return this instanceof EggObject; }
 
 EggSlotObject.prototype.pointersSize = function() { return this.size(); }
 EggSlotObject.prototype.size = function() { return this._slots.length; }
