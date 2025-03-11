@@ -44,19 +44,19 @@ requests, so that you can browse and debug it remotely:
 
     ## clone and enter the main dir for js platform
     $ git clone git@github.com:powerlang/egg.git
-    $ cd egg/runtime/js
+    $ cd egg/runtime/js/examples/server
 
-    ## first install webside server dependencies
-    $ cd webside && npm install && cd .. 
+    ## fetch dependencies (including built egg-js and webside server)
+    $ npm install 
 
     ## Now run the server
     $ node example-server/index.js
 
-    ## Now connect from a webside client to address http://localhost:9005/
+    ## Finally, connect from a webside client to address http://localhost:9005/
 
 ## Using Smalltalk as a library from nodejs
 
-For this example, let's look at `runtime/js/example-bench`.
+For this example, let's look at `runtime/js/examples/bench`.
 
     // bench.js
     import { performance } from "perf_hooks"; // nodejs built-in for measuring time
@@ -90,12 +90,16 @@ For this example, let's look at `runtime/js/example-bench`.
 
 You can run it with the following lines:
 
+    # fetch js dependencies (basically, egg-js)
+    $ npm install
+
+    # run
     $ node example-bench/bench.js
     1242848 bytecodes/sec; 95553 sends/sec
 
 ## Using egg as a node module (not yet implemented)
 
-    npm install egg-js
+    $ npm install egg-js
 
     ## Opening a Smalltalk REPL
     $ node repl.js
