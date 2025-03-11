@@ -1,25 +1,31 @@
 {
-  "name": "egg-js",
-  "version": "0.1.0",
-  "description": "A Smalltalk VM that runs on top of JavaScript",
-  "type": "module",
-  "main": "main.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/powerlang/egg.git"
-  },
-  "keywords": [
-    "Smalltalk",
-    "VM",
-    "JavaScript"
-  ],
-  "author": "Javier E. Pimás",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/powerlang/egg/issues"
-  },
-  "homepage": "https://github.com/powerlang/egg#readme"
+	"name": "@powerlang/egg-js",
+	"version": "0.1.12",
+	"description": "A Smalltalk VM that runs on top of JavaScript",
+	"type": "module",
+	"main": "Egg.js",
+	"files": [
+		"interpreter",
+		"Egg.js",
+		"ImageSegmentReader.js",
+		"st-glue.js"
+	],
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/powerlang/egg.git"
+	},
+	"keywords": [
+		"Smalltalk",
+		"VM",
+		"JavaScript"
+	],
+	"author": "Javier E. Pimás",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/powerlang/egg/issues"
+	},
+	"homepage": "https://github.com/powerlang/egg#readme"
 }

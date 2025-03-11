@@ -1,9 +1,9 @@
 {
-  "name": "egg-js-webside",
-  "version": "1.0.0",
+  "name": "@powerlang/egg-js-webside",
+  "version": "0.1.0",
   "description": "A backend to serve webside requests using egg",
   "type": "module",
-  "main": "index.js",
+  "main": "WebsideServer.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

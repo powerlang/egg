@@ -6,7 +6,8 @@ import ImageSegmentReader from "./ImageSegmentReader.js";
 import path from "path";
 import fs, { readFileSync } from "fs";
 import EggByteObject from "./interpreter/EggByteObject.js";
-import EggObjectHeader from "./interpreter/EggObjectHeader.js";
+import EggObject from "./interpreter/EggObject.js";
+import EggSmallInteger from "./interpreter/EggSmallInteger.js";
 
 let Egg = class {
 	constructor() {
@@ -218,3 +219,5 @@ let Egg = class {
 };
 
 export default Egg;
+
+export { EggByteObject, EggObject, EggSmallInteger };
