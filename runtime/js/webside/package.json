@@ -1,6 +1,6 @@
 {
   "name": "@powerlang/egg-js-webside",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "A backend to serve webside requests using egg",
   "type": "module",
   "main": "WebsideServer.js",
@@ -10,7 +10,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@powerlang/egg-js": "^0.1.11",
     "cors": "^2.8.5",
     "express": "^4.21.1",
     "uuid": "^9.0.1"
