@@ -49,8 +49,8 @@ requests, so that you can browse and debug it remotely:
     ## fetch dependencies (including built egg-js and webside server)
     $ npm install 
 
-    ## Now run the server
-    $ node example-server/index.js
+    ## Now, run the server
+    $ node index.js
 
     ## Finally, connect from a webside client to address http://localhost:9005/
 
