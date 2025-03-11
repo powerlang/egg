@@ -1,6 +1,8 @@
-import EggByteObject from "../../interpreter/EggByteObject.js";
-import EggObject from "../../interpreter/EggObject.js";
-import EggSmallInteger from "../../interpreter/EggSmallInteger.js";
+// import EggByteObject from "../interpreter/EggByteObject.js";
+// import EggObject from "../interpreter/EggObject.js";
+// import EggSmallInteger from "../interpreter/EggSmallInteger.js";
+
+import { EggObject, EggByteObject, EggSmallInteger } from "@powerlang/egg-js"
 
 let selectorFor = function (selector, args) {
 	if (args.length == 0) return selector;

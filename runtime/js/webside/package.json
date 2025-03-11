@@ -1,15 +1,16 @@
 {
-  "name": "egg-js-webside",
-  "version": "1.0.0",
+  "name": "@powerlang/egg-js-webside",
+  "version": "0.0.2",
   "description": "A backend to serve webside requests using egg",
   "type": "module",
-  "main": "index.js",
+  "main": "WebsideServer.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@powerlang/egg-js": "^0.1.11",
     "cors": "^2.8.5",
     "express": "^4.21.1",
     "uuid": "^9.0.1"
