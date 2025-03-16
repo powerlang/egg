@@ -77,11 +77,10 @@ jobs:
       run: choco install rsync zip --yes
 
     - name: Install Conan
-      id: conan
-      uses: turtlebrowser/get-conan@main
+      run: pip install --user conan
 
     - name: Conan version
-      run: echo "${{ steps.conan.outputs.version }}"
+      run: conan -v
 
     - name: Create default Conan profile
       run: conan profile new default --detect
