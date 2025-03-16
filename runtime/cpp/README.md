@@ -27,7 +27,9 @@ Hello, world!
 To compile the VM, be sure to install dependencies listed in next section and then just run from cli:
 
 ```
-cmake -S . -B build && cmake --build build
+conan install . --output-folder=build --build=missing -s compiler.cppstd=gnu20 -s build_type=Debug
+cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH=build
+cmake --build build
 ```
 
 This will build you an executable, you still need to run modules. 
@@ -38,7 +40,7 @@ We aim for minimality everywhere, however you'll need some tools to be
 able to compile egg. In ubuntu, this should be all:
 
 ```
-sudo apt install g++ cmake pkg-config libffi-dev
+sudo apt install g++ cmake conan
 ```
 
 That should be all for compiling the VM.
