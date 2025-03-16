@@ -40,6 +40,16 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: make release-js
 
+    - name: Install Conan
+      id: conan
+      uses: turtlebrowser/get-conan@main
+
+    - name: Conan version
+      run: echo "${{ steps.conan.outputs.version }}"
+
+    - name: Create default Conan profile
+      run: conan profile new default --detect
+
     - name: Package CPP
       run: make release-cpp
 
@@ -77,12 +87,11 @@ jobs:
       run: choco install rsync zip --yes
 
     - name: Install Conan
-      run: |
-        pip install --user conan
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
+      id: conan
+      uses: turtlebrowser/get-conan@main
 
     - name: Conan version
-      run: conan -v
+      run: echo "${{ steps.conan.outputs.version }}"
 
     - name: Create default Conan profile
       run: conan profile new default --detect

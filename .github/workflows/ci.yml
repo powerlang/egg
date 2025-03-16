@@ -30,17 +30,22 @@ jobs:
     - name: Build Egg/Pharo Virtual VM
       run: make -C runtime/pharo
 
+    - name: Change python version in mac as pip install can be broken
+      if: runner.os == 'macOS'
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
     - name: Install Conan
-      run: |
-        pip install --user conan
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
+      id: conan
+      uses: turtlebrowser/get-conan@main
 
     - name: Conan version
-      run: conan -v
+      run: echo "${{ steps.conan.outputs.version }}"
 
     - name: Create default Conan profile
       run: conan profile new default --detect
-
+        
     - name: Build CPP VM
       run: |
         make -C runtime/cpp
