@@ -31,7 +31,9 @@ jobs:
       run: make -C runtime/pharo
 
     - name: Install Conan
-      run: pip install --user conan
+      run: |
+        pip install --user conan
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
 
     - name: Conan version
       run: conan -v
