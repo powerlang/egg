@@ -48,7 +48,7 @@ jobs:
       run: echo "${{ steps.conan.outputs.version }}"
 
     - name: Create default Conan profile
-      run: conan profile new default --detect
+      run: conan profile detect -f
 
     - name: Package CPP
       run: make release-cpp
@@ -94,7 +94,7 @@ jobs:
       run: echo "${{ steps.conan.outputs.version }}"
 
     - name: Create default Conan profile
-      run: conan profile new default --detect
+      run: conan profile detect -f
   
     - name: Package CPP
       run: make release-cpp
