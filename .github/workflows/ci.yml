@@ -30,20 +30,22 @@ jobs:
     - name: Build Egg/Pharo Virtual VM
       run: make -C runtime/pharo
 
-    - name: Set up pkgconfig on Windows # needed for libffi
-      if: runner.os == 'Windows'
-      run: choco install pkgconfiglite --yes
+    - name: Change python version in mac as pip install can be broken
+      if: runner.os == 'macOS'
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
 
-    - name: Install libffi with vcpkg on Windows
-      if: runner.os == 'Windows'
-      run: |
-        curl -LO https://aka.ms/vcpkg-init.cmd
-        .\vcpkg-init.cmd
-        vcpkg install libffi
-        echo "PKG_CONFIG_PATH=C:\vcpkg\packages\libffi_x64-windows\lib\pkgconfig" >> $env:GITHUB_ENV
-        echo $env:PKG_CONFIG_PATH
-        ls C:\vcpkg\packages\libffi_x64-windows\lib\pkgconfig
-      
+    - name: Install Conan
+      id: conan
+      uses: turtlebrowser/get-conan@main
+
+    - name: Conan version
+      run: echo "${{ steps.conan.outputs.version }}"
+
+    - name: Create default Conan profile
+      run: conan profile detect -f
+        
     - name: Build CPP VM
       run: |
         make -C runtime/cpp

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5.0)
+cmake_minimum_required(VERSION 3.15)
 
 set( CMAKE_VERBOSE_MAKEFILE on )
 set(CMAKE_CXX_STANDARD 20)
@@ -22,18 +22,23 @@ ELSE()
     set(PLATFORM Posix)
 ENDIF()
 
-# **** instructions for linking against libffi ****
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(FFI REQUIRED libffi)
+# **** instructions for linking dependencies through conan ****
+# this automagically sets up include and library directories,
+# so that we can easily link to libffi and cxxopts
 
-include_directories(${FFI_INCLUDE_DIRS})
-link_directories(${FFI_LIBRARY_DIRS})
+#include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+#conan_basic_setup()
+
+find_package(libffi REQUIRED)
+find_package(cxxopts REQUIRED)
+
 # *************************************************
 
 file(GLOB ALL_SRC "*.cpp" "Evaluator/*.cpp" "${PLATFORM}/*.cpp")
 
 add_executable(${EXE} ${ALL_SRC})
-target_link_libraries(${EXE} ${FFI_LIBRARIES}) # link agains libffi
+target_link_libraries(${EXE} libffi::libffi cxxopts::cxxopts) # link agains libffi
+
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_link_libraries(${EXE} dl)

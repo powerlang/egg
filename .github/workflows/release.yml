@@ -40,6 +40,16 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: make release-js
 
+    - name: Install Conan
+      id: conan
+      uses: turtlebrowser/get-conan@main
+
+    - name: Conan version
+      run: echo "${{ steps.conan.outputs.version }}"
+
+    - name: Create default Conan profile
+      run: conan profile detect -f
+
     - name: Package CPP
       run: make release-cpp
 
@@ -74,20 +84,18 @@ jobs:
       shell: "bash"
 
     - name: Set up rsync and zip on Windows # needed for packaging
-      run: choco install rsync zip pkgconfiglite --yes
+      run: choco install rsync zip --yes
 
-    # Set up vcpkg and install libffi
-    - name: Set up vcpkg and install libffi
-      uses: lukka/run-vcpkg@v11
-      with:
-        vcpkgArguments: "libffi"
-      env:
-        VCPKG_ROOT: ${{ runner.temp }}/vcpkg
+    - name: Install Conan
+      id: conan
+      uses: turtlebrowser/get-conan@main
 
-    # Configure CMake
-    - name: Configure CMake
-      run: cmake -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake .
+    - name: Conan version
+      run: echo "${{ steps.conan.outputs.version }}"
 
+    - name: Create default Conan profile
+      run: conan profile detect -f
+  
     - name: Package CPP
       run: make release-cpp
 
