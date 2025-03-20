@@ -44,7 +44,12 @@ jobs:
     - name: Install Conan on Windows
       id: conan-win
       if: runner.os == 'Windows'
-      run: choco install conan && refreshenv
+      run: choco install conan
+
+    - name: Update path on windows
+      if: runner.os == 'Windows'
+      run: echo "C:\Program Files\Conan" >> $GITHUB_PATH
+      shell: bash
 
     - name: Conan version
       run: echo "${{ steps.conan.outputs.version }}"
