@@ -48,9 +48,7 @@ jobs:
 
     - name: Update path on windows
       if: runner.os == 'Windows'
-      run: |
-        Import-Module "$env:ChocolateyInstall/helpers/chocolateyInstaller.psm1"
-        refreshenv
+      run: Add-Content $env:GITHUB_PATH "C:\Program Files\Conan\conan"
 
     - name: Conan version
       run: echo "${{ steps.conan.outputs.version }}"
