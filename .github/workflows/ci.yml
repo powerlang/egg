@@ -48,8 +48,7 @@ jobs:
 
     - name: Update path on windows
       if: runner.os == 'Windows'
-      run: echo "C:\Program Files\Conan" >> $GITHUB_PATH
-      shell: bash
+      run: echo "C:\Program Files\Conan\conan" >> $GITHUB_PATH
 
     - name: Conan version
       run: echo "${{ steps.conan.outputs.version }}"
