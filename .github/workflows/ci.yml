@@ -44,7 +44,7 @@ jobs:
     - name: Install Conan on Windows
       id: conan-win
       if: runner.os == 'Windows'
-      run: choco install conan
+      run: choco install conan && refreshenv
 
     - name: Conan version
       run: echo "${{ steps.conan.outputs.version }}"
