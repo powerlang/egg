@@ -86,7 +86,7 @@ class Bootstrapper {
 	ImageSegment* loadModuleFromFile(const std::string &filename)
 	{
 		auto filepath = this->findInPath(filename);
-		auto stream = std::ifstream(filepath);
+		auto stream = std::ifstream(filepath, std::ios::binary);
 		auto imageSegment = new ImageSegment(&stream);
 		std::vector<Object*> imports;
 		this->bindModuleImports(imageSegment, imports);
