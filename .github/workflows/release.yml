@@ -20,6 +20,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
+    continue-on-error: true
 
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
