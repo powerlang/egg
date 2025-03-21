@@ -62,13 +62,13 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       uses: ncipollo/release-action@v1
       with:
-        artifacts: "build/eggjs-${{env.RELEASE_TAG}}.tar.gz,build/eggjs-${{env.RELEASE_TAG}}.zip,build/eggcpp-${{ env.RELEASE_TAG }}.tar.gz"
+        artifacts: "release/eggjs-${{env.RELEASE_TAG}}.tar.gz,release/eggjs-${{env.RELEASE_TAG}}.zip,release/eggcpp-${{ env.RELEASE_TAG }}.tar.gz"
         allowUpdates: true
 
     - name: Upload cpp vm for Windows
       if: matrix.os == 'windows-latest'
       uses: ncipollo/release-action@v1
       with:
-        artifacts: "build/eggcpp-${{ env.RELEASE_TAG }}.zip"
+        artifacts: "release/eggcpp-${{ env.RELEASE_TAG }}.zip"
         allowUpdates: true
 
