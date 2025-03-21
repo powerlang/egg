@@ -17,10 +17,20 @@ using namespace Egg;
 namespace Egg {
     static uintptr_t nextFree = 0;
     static uintptr_t limit = 0;
+
+    static uintptr_t allocation_alignment = 0;
+    static uintptr_t page_alignment = 0;
+
+    uintptr_t allocalign(uintptr_t addr);
 }
 
 void Egg::InitializeMemory()
 {
+    SYSTEM_INFO si;
+    GetSystemInfo(&si);
+    Egg::page_alignment = si.dwPageSize;
+    Egg::allocation_alignment = si.dwAllocationGranularity;
+    
     Egg::nextFree = BEHAVIOR_ADDRESS_SPACE;
 
     // avoid the zero address as mmap would confuse it with "allocate anywhere"
@@ -33,15 +43,12 @@ void Egg::InitializeMemory()
 
 uintptr_t Egg::pagealign(uintptr_t addr)
 {
-    static int pagesize = -1;
+    return align(addr, Egg::page_alignment);
+}
 
-    if (pagesize == -1)
-    {
-        SYSTEM_INFO si;
-	    GetSystemInfo(&si);
-        pagesize = si.dwPageSize;
-    }
-    return align(addr, pagesize);
+uintptr_t Egg::allocalign(uintptr_t addr)
+{
+    return align(addr, Egg::allocation_alignment);
 }
 
 uintptr_t Egg::ReserveMemory(uintptr_t base, uintptr_t size)
@@ -49,29 +56,25 @@ uintptr_t Egg::ReserveMemory(uintptr_t base, uintptr_t size)
     void* allocated = nullptr;
     if (base == 0) base = Egg::nextFree;
 
-    while (true) {
+    while (base < Egg::limit) {
         // Attempt to allocate at the aligned base
         allocated = VirtualAlloc((void*)base, pagealign(size), MEM_RESERVE, PAGE_READWRITE);
         
         if (allocated != 0) {
             if ((uintptr_t)allocated == base) {
-                Egg::nextFree = pagealign((uintptr_t)allocated + size);
+                Egg::nextFree = allocalign((uintptr_t)allocated + size);
                 return (uintptr_t)allocated;
             }
 
             // Free the memory and try next address
             VirtualFree((void*)allocated, 0, MEM_RELEASE);
-            base += 0x10000;
-
-        } else {
-            base += 0x10000;
         }
-
-        if (base >= Egg::limit) {
-            error("Memory allocation failed");
-            return 0;
-        }
+        
+        base += Egg::allocation_alignment;
     }
+
+    error("Memory allocation failed");
+    return 0;
 }
 
 void Egg::CommitMemory(uintptr_t base, uintptr_t size)
