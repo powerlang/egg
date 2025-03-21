@@ -27,7 +27,7 @@ void Egg::InitializeMemory()
     if (Egg::nextFree == 0)
         Egg::nextFree = 0x100000;
 
-    Egg::limit = BEHAVIOR_ADDRESS_SPACE + (4L * 1024 * 1024 * 1024);  // We are limiting to reserve up to 4gb for now
+    Egg::limit = BEHAVIOR_ADDRESS_SPACE + (4LL * 1024 * 1024 * 1024);  // We are limiting to reserve up to 4gb for now
 }
 
 
