@@ -19,7 +19,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, windows-latest]
 
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -50,57 +50,24 @@ jobs:
     - name: Create default Conan profile
       run: conan profile detect -f
 
+    - name: Set up rsync and zip on Windows # needed for packaging
+      if: matrix.os == 'windows-latest'
+      run: choco install rsync zip --yes
+
     - name: Package CPP
       run: make release-cpp
 
     - name: Upload cpp vm for Linux and js
+      if: matrix.os == 'ubuntu-latest'
       uses: ncipollo/release-action@v1
       with:
         artifacts: "build/eggjs-${{env.RELEASE_TAG}}.tar.gz,build/eggjs-${{env.RELEASE_TAG}}.zip,build/eggcpp-${{ env.RELEASE_TAG }}.tar.gz"
         allowUpdates: true
 
-
-  #only needed for windows-specific stuff (i.e. cpp-vm exe)
-  build-win:
-    name: Build native CPP windows
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [windows-latest]
-
-    steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - uses: actions/checkout@v4
-
-    - name: Fetch at least 2 commits so that Iceberg doesn't break
-      run: git fetch --unshallow
-
-    - name: Fetch at main so that Iceberg doesn't break
-      run: git fetch origin main
-
-    - name: "Determine tag"
-      if: "${{ github.event_name }} == 'push' && ${{ github.ref_type }} == 'tag'"
-      run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV"
-      shell: "bash"
-
-    - name: Set up rsync and zip on Windows # needed for packaging
-      run: choco install rsync zip --yes
-
-    - name: Install Conan
-      id: conan
-      uses: turtlebrowser/get-conan@main
-
-    - name: Conan version
-      run: echo "${{ steps.conan.outputs.version }}"
-
-    - name: Create default Conan profile
-      run: conan profile detect -f
-  
-    - name: Package CPP
-      run: make release-cpp
-
     - name: Upload cpp vm for Windows
+      if: matrix.os == 'windows-latest'
       uses: ncipollo/release-action@v1
       with:
         artifacts: "build/eggcpp-${{ env.RELEASE_TAG }}.zip"
         allowUpdates: true
+
