@@ -39,8 +39,11 @@ ImageSegment::load(std::istream *data)
 
     _currentBase = this->alloc(header.baseAddress, header.reservedSize);
 
-    data->seekg(0, data->beg);
+    data->seekg(0, std::ios::beg);
     data->read(reinterpret_cast<char*>(_currentBase), header.size);
+
+    if (data->fail())
+        error("error reading image segment");
 
     this->readImportStrings(data);
     this->readImportDescriptors(data);
