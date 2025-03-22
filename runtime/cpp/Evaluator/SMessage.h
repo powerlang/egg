@@ -22,7 +22,7 @@ class SMessage : public SAbstractMessage {
     }
 
     bool isInlined() const { return _inlined; }
-    SExpression* receiver () { return _receiver; }
+    SExpression* receiver () override { return _receiver; }
 };
 
 } // namespace Egg

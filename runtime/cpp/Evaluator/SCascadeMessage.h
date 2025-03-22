@@ -33,7 +33,7 @@ public:
         return true;
     }
 
-    SExpression* receiver() {
+    SExpression* receiver() override {
         return _cascade ? _cascade->receiver() : nullptr;
     }
 

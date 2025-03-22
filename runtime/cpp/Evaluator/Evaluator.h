@@ -161,8 +161,8 @@ public:
     void visitOpPushR(SOpPushR *anSOpPushR) override;
 
 	void popFrameAndPrepare();
-    virtual void visitOpReturn(SOpReturn *anSOpReturn);
-    virtual void visitOpNonLocalReturn(SOpNonLocalReturn *anSOpNonLocalReturn);
+    virtual void visitOpReturn(SOpReturn *anSOpReturn) override;
+    virtual void visitOpNonLocalReturn(SOpNonLocalReturn *anSOpNonLocalReturn) override;
 
 private:
     void evaluate();
