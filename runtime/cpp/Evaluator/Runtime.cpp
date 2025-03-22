@@ -10,7 +10,7 @@
 
 using namespace Egg;
 
-Runtime *Egg::debugRuntime = 0;
+Runtime *Egg::debugRuntime = nullptr;
 
 void Runtime::initializeEvaluator() {
     _heap = new GCHeap;
