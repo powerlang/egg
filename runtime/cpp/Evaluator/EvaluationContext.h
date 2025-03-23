@@ -52,6 +52,10 @@ public:
     HeapObject* environment() { return _regE; }
     HeapObject* compiledCode() { return _regM; }
 
+    uintptr_t stackPointer() { return _regSP; }
+    uintptr_t framePointer() { return _regBP; }
+    Object** stack() { return _stack; }
+
     HeapObject* classBinding();
 
     int tempOffset() { return 4; }
@@ -91,7 +95,7 @@ public:
     std::vector<Object*> methodArguments();
 
 	void buildFrameFor_code_environment_temps_(Object *receiver, HeapObject *compiledCode, HeapObject *environment, uint32_t temps);
-    std::vector<SExpression*>* buildLaunchFrame(HeapObject *symbol, int argCount);
+    PlatformCode* buildLaunchFrame(HeapObject *symbol, int argCount);
     void buildClosureFrameFor_code_environment_(Object *receiver, HeapObject *compiledCode, HeapObject *environment);
     void buildMethodFrameFor_code_environment_(Object *receiver, HeapObject *compiledCode, HeapObject *environment);
     void popLaunchFrame(HeapObject *prevRegE);

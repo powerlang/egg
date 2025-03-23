@@ -16,8 +16,6 @@
 
 using namespace Egg;
 
-class Runtime;
-
 HeapObject* EvaluationContext::classBinding()
 {
     return _runtime->methodClassBinding_(this->method());
@@ -68,12 +66,12 @@ std::vector<Object*> EvaluationContext::methodArguments() {
     return arguments;
 }
 
-std::vector<SExpression*>* EvaluationContext::buildLaunchFrame(HeapObject *symbol, int argCount)
+PlatformCode* EvaluationContext::buildLaunchFrame(HeapObject *symbol, int argCount)
 {
     auto launcher = _runtime->newCompiledMethod();
-    auto bytecodes = new std::vector<SExpression*>();
-    auto executable = _runtime->newExecutableCodeFor_with_(launcher, reinterpret_cast<HeapObject*>(bytecodes));
-    _runtime->methodExecutableCode_put_(launcher, (Object*)executable);
+    auto bytecodes = newPlatformCode();
+    auto executable = _runtime->newExecutableCodeFor_with_(launcher, bytecodes);
+    _runtime->methodExecutableCode_put_(launcher, executable);
     this->buildMethodFrameFor_code_environment_((Object*)_runtime->_nilObj, launcher, _runtime->_nilObj);
 
     auto literal = new SLiteral(0, (Object*)_runtime->_nilObj);
