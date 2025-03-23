@@ -30,6 +30,7 @@ namespace Egg {
 }
 
 uintptr_t Egg::ReserveAligned4GB() {
+
     uintptr_t size = 4L * 1024 * 1024 * 1024; // 4GB
     uintptr_t alignment = 4L * 1024 * 1024 * 1024; // 4GB alignment
     uintptr_t total_size = size + alignment;
@@ -116,6 +117,13 @@ void Egg::CommitMemory(uintptr_t base, uintptr_t size)
         error("Failed to commit memory.");
     }
     std::memset((char*)base, 0, size);
+}
+
+void Egg::DecommitMemory(uintptr_t base, uintptr_t size)
+{
+    if (madvise((void*)base, size, MADV_DONTNEED) != 0) {
+        error("Failed to decommit memory.");
+    }
 }
 
 void Egg::FreeMemory(uintptr_t base, uintptr_t size)
