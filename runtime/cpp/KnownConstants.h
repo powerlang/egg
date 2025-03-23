@@ -86,6 +86,15 @@ enum Offsets {
     ExecutableCodePlatformCode = 0,
     ExecutableCodeCompiledCode = 1,
 
+    // inst vars of Process
+    ProcessNativeStack = 1,
+    ProcessTopContext = 2,
+
+    // inst vars of ProcessVMStack (the VM's internal stack object for processes)
+    ProcessVMStackProcess = 0,
+    ProcessVMStackSP = 1,
+    ProcessVMStackBP = 2,
+
     FFI_uint8 = 0,
     FFI_sint8 = 1,
     FFI_uint16 = 2,
