@@ -7,8 +7,6 @@
 #include <iostream>
 #include <cstdlib>
 
-bool Egg::GC_CRITICAL = false;
-
 void Egg::error(const char *message) {
     if (debugRuntime)
         std::cerr << debugRuntime->_evaluator->context()->backtrace() << std::endl << std::endl;
