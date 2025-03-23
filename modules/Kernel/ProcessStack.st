@@ -8,7 +8,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'process',
-		'sp'
+		'sp',
+		'bp'
 	],
 	#category : #Kernel
 }
