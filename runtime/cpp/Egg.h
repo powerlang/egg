@@ -2,16 +2,20 @@
 #define _EGG_H_
 
 #include <cstdint>
+#include <cinttypes>
 #include <string>
 
 typedef unsigned long ulong;
 typedef unsigned short ushort;
 typedef unsigned char uchar;
 
-#define WORD_SIZE 8
-#define WORD_SIZE_SHIFT 3
-
 namespace Egg {
+
+constexpr uintptr_t WORD_SIZE = sizeof(uintptr_t);
+constexpr uintptr_t WORD_SIZE_SHIFT = WORD_SIZE == 4 ? 2 : 3;
+
+constexpr uintptr_t KB = 1024;
+constexpr uintptr_t MB = 1024 * 1024;
 
 struct Object;
 struct HeapObject;
