@@ -24,7 +24,9 @@ class Bootstrapper;
 extern Runtime *debugRuntime;
 
 class Runtime {
+	std::string printGlobalCache();
 public:
+	void checkCache();
     Bootstrapper *_bootstrapper;
     ImageSegment *_kernel;
     Evaluator *_evaluator;
