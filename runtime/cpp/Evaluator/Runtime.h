@@ -1,14 +1,14 @@
 #ifndef _RUNTIME_H_
 #define _RUNTIME_H_
 
-#include <GCedRef.h>
 #include <KnownObjects.h>
 #include <vector>
 #include <map>
+#include <functional>
 
-#include "../HeapObject.h"
-#include "../ImageSegment.h"
-#include "../KnownConstants.h"
+#include "HeapObject.h"
+#include "ImageSegment.h"
+#include "KnownConstants.h"
 #include "PlatformCode.h"
 #include "GCedRef.h"
 
