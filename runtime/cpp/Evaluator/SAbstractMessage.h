@@ -5,13 +5,14 @@
 #include "SExpression.h"
 #include "SExpressionVisitor.h"
 #include "../HeapObject.h"
+#include "GCedRef.h"
 
 namespace Egg {
 
 class SAbstractMessage : public SExpression {
-    HeapObject* _selector;
+    GCedRef _selector;
     std::vector<SExpression*> _arguments;
-    std::vector<HeapObject*> _cache;
+    std::vector<GCedRef*> _cache;
 
  public:
     using UndermessagePointer = Object* (Evaluator::*)(Object *, std::vector<Object*> &args);
@@ -19,7 +20,8 @@ class SAbstractMessage : public SExpression {
     // this is a hack to make C++ type system stop crying
     struct UndermessageWrapper {
     public:
-        UndermessageWrapper(UndermessagePointer ptr) : _undermessage(ptr) {}
+        UndermessageWrapper(UndermessagePointer ptr) :
+            _undermessage(ptr) {}
 
         UndermessagePointer _undermessage;
     };
@@ -42,12 +44,12 @@ public:
     }
 
     void cache_when_(HeapObject* anSCompiledMethod, HeapObject* type) {        
-        _cache.push_back(type);
-        _cache.push_back(anSCompiledMethod);
+        _cache.push_back(new GCedRef(type));
+        _cache.push_back(new GCedRef(anSCompiledMethod));
     }
 
     void cacheUndermessage_(UndermessagePointer anUndermessage) {
-        _cache.push_back(reinterpret_cast<HeapObject*>(new UndermessageWrapper(anUndermessage)));
+        _cache.push_back(reinterpret_cast<GCedRef*>(new UndermessageWrapper(anUndermessage)));
     }
 
     UndermessagePointer cachedUndermessage() const {
@@ -66,9 +68,9 @@ public:
 
     HeapObject* methodFor_(HeapObject *behavior) const {
         for (size_t i = 0; i < _cache.size(); i += 2) {
-            HeapObject *cached = _cache[i];
-            if (cached == behavior) {
-                return _cache[i + 1];
+            GCedRef *cached = _cache[i];
+            if (cached->get() == behavior) {
+                return _cache[i + 1]->get();
             }
         }
 
@@ -79,16 +81,12 @@ public:
 
     void registerCacheWith_(Runtime* runtime) {
         if (_cache.empty()) {
-            runtime->registerCache_for_(this, _selector);
+            runtime->registerCache_for_(this, _selector.get());
         }
     }
 
-    HeapObject* selector() const {
-        return _selector;
-    }
-
-    void selector_(HeapObject* aSymbol) {
-        _selector = aSymbol;
+    HeapObject* selector() {
+        return _selector.get();
     }
 
 };
