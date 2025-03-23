@@ -1,6 +1,7 @@
 
 #include "Evaluator.h"
 #include "Runtime.h"
+#include "Allocator/GCSafepoint.h"
 #include "SExpressionLinearizer.h"
 #include "SOpAssign.h"
 #include "SOpDispatchMessage.h"
@@ -203,7 +204,7 @@ Object *Evaluator::invoke_with_(HeapObject *method, Object *receiver) {
     int size = _runtime->methodEnvironmentSize_(method);
     HeapObject *environment = _runtime->newEnvironmentSized_(size);
     HeapObject *executable = this->prepareForExecution_(method);
-    _work = reinterpret_cast<std::vector<SExpression*>*>(_runtime->executableCodePlatformCode_(executable));
+    _work = _runtime->executableCodeWork_(executable);
 
     this->_context->buildMethodFrameFor_code_environment_(receiver, method,
                                                           environment);
@@ -224,8 +225,8 @@ HeapObject* Evaluator::prepareForExecution_(HeapObject *method) {
     auto sexpressions = decoder.decodeMethod();
 
     this->_linearizer->visitMethod(sexpressions, method);
-    executableCode = this->_runtime->newExecutableCodeFor_with_(method, reinterpret_cast<HeapObject*>(this->_linearizer->operations()));
-    this->_runtime->methodExecutableCode_put_(method, (Object*)executableCode);
+    executableCode = this->_runtime->newExecutableCodeFor_with_(method, this->_linearizer->operations());
+    this->_runtime->methodExecutableCode_put_(method, executableCode);
 
 	return executableCode;
 }
@@ -262,7 +263,7 @@ Object* Evaluator::send_to_with_(HeapObject *symbol, Object *receiver, std::vect
     this->evaluate();
     this->_context->popLaunchFrame(prevRegE);
     auto executableCode = this->_runtime->methodExecutableCode_(this->_context->method());
-    this->_work = reinterpret_cast<std::vector<SExpression*>* >(_runtime->executableCodePlatformCode_(executableCode));;
+    this->_work = _runtime->executableCodeWork_(executableCode);
     return this->_regR;
 }
 
@@ -419,6 +420,8 @@ void Evaluator::popFrameAndPrepare()
 void Evaluator::visitOpReturn(SOpReturn *anSOpReturn)
 {
     this->popFrameAndPrepare();
+
+    _runtime->_heap->collectIfTime();
 }
 
 void Evaluator::visitOpNonLocalReturn(SOpNonLocalReturn *anSOpNonLocalReturn)
@@ -685,15 +688,18 @@ Object* Evaluator::primitiveHostLoadModule() {
 }
 
 Object* Evaluator::primitiveNew() {
+    GCSafepoint safepoint(this->_runtime->_heap);
     return (Object*)this->_runtime->newSlotsOf_(this->_context->self()->asHeapObject());
 }
 
 Object* Evaluator::primitiveNewBytes() {
+    GCSafepoint safepoint(this->_runtime->_heap);
     auto size = this->_context->firstArgument()->asSmallInteger()->asNative();
     return (Object*)this->_runtime->newBytes_size_(this->_context->self()->asHeapObject(), size);
 }
 
 Object* Evaluator::primitiveNewSized() {
+    GCSafepoint safepoint(this->_runtime->_heap);
     auto size = this->_context->firstArgument()->asSmallInteger()->asNative();
     return (Object*)this->_runtime->newOf_sized_(this->_context->self()->asHeapObject(), size);
 }
