@@ -200,6 +200,7 @@ private:
 
 
 	Object* primitiveHash();
+	Object* primitiveHostCurrentMilliseconds();
 	Object* primitiveHostFixOverrides();
 	Object* primitiveHostInitializeFFI();
 	Object* primitiveHostLoadModule();

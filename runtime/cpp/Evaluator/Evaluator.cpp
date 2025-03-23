@@ -23,6 +23,7 @@
 
 #include "FFIGlue.h"
 
+#include <chrono>
 #include <cmath>
 #include <bit>
 #include <cstring>
@@ -159,7 +160,7 @@ void Evaluator::initializePrimitives()
     this->addPrimitive("FFICall", &Evaluator::primitiveFFICall);
     this->addPrimitive("HostInitializeFFI", &Evaluator::primitiveHostInitializeFFI);
     this->addPrimitive("HostPlatformName", &Evaluator::primitiveHostPlatformName);
-
+    this->addPrimitive("HostCurrentMilliseconds", &Evaluator::primitiveHostCurrentMilliseconds);
     /*this->addPrimitive("PrepareForExecution", &Evaluator::primitivePrepareForExecution);
     this->addPrimitive("ProcessVMStackInitialize", &Evaluator::primitiveProcessVMStackInitialize);
     this->addPrimitive("ProcessVMStackAt", &Evaluator::primitiveProcessVMStackAt);
@@ -661,6 +662,12 @@ Evaluator::PrimitivePointer Evaluator::primitiveFor_(HeapObject *aSymbol) {
 
 Object* Evaluator::primitiveHash() {
     return newIntObject(this->_runtime->hashFor_(this->_context->self()));
+}
+
+Object * Evaluator::primitiveHostCurrentMilliseconds() {
+    intptr_t now = std::chrono::duration_cast< std::chrono::milliseconds >(
+            std::chrono::system_clock::now().time_since_epoch()).count();
+    return newIntObject((intptr_t)now);
 }
 
 Object* Evaluator::primitiveHostPlatformName() {
