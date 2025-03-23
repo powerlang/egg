@@ -8,6 +8,7 @@
 
 #include <cstdint>
 #include "Util.h"
+#include "Egg.h"
 
 namespace Egg
 {
@@ -15,6 +16,7 @@ namespace Egg
 void     InitializeMemory();
 uintptr_t ReserveMemory(uintptr_t base, uintptr_t size);
 void     CommitMemory(uintptr_t base, uintptr_t size);
+void     DecommitMemory(uintptr_t base, uintptr_t size);
 void     FreeMemory(uintptr_t base, uintptr_t size);
 
 

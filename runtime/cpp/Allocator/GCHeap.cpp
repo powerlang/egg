@@ -1,54 +1,104 @@
-#include "GCHeap.h"
-#include "KnownObjects.h"
-
 #include <cstring>
+
+#include "GCHeap.h"
+#include "GCSpace.h"
+#include "KnownObjects.h"
+#include "AllocationZone.h"
+#include "G1GC.h"
 
 using namespace Egg;
 
-Egg::GCHeap::GCHeap()
+GCHeap::GCHeap(Runtime *runtime) : _runtime(runtime), _gcNeeded(false)
 {
-    eden = this->addNewSpaceSized(16*MB);
+    _atGCSafepoint = false; // defaults to false, only particular points enable GC
+    _eden = this->addNewSpaceSized_(16*MB);
+    _eden->_name = "Eden";
+
+    auto size = 128*MB;
+    auto address = ReserveMemory(0x100000000,size);
+    _oldZone = new AllocationZone(this, address, address + size);
+    _fullGC = new G1GC(_runtime, _oldZone, this);
 }
 
-Egg::GCHeap::~GCHeap()
+GCHeap::~GCHeap()
 {
-    for (auto &space : spaces)
+    for (auto &space : _spaces)
         delete space;
 }
 
-GCSpace *GCHeap::addSpace(GCSpace *space)
+GCSpace *GCHeap::addSpace_(GCSpace *space)
 {
-    spaces.push_back(space);
+    _spaces.push_back(space);
     return space;
 }
 
-GCSpace *GCHeap::addNewSpaceSized(int size) {
+GCSpace *GCHeap::addNewSpaceSized_(int size) {
     auto space = new GCSpace(size);
-    return this->addSpace(space);
+    return this->addSpace_(space);
 }
 
-uintptr_t GCHeap::allocate(uint32_t size) {
-    auto result = eden->allocate(size);
+GCSpace *Egg::GCHeap::createLargeSpace_(uintptr_t size)
+{
+	auto address = ReserveMemory(0, size);
+	if (!address)
+		error_(std::string("Not enough memory to allocate ") + std::to_string(size) + "bytes");
+
+    auto limit = address + size;
+	auto space = GCSpace::allocatedAt_limit_(address, limit);
+
+	space->_name = "Large";
+	space->_committedLimit = limit;
+	space->_softLimit = limit;
+	this->addSpace_(space);
+	_largeSpaces.push_back(space);
+	return space;
+}
+
+/*
+uintptr_t GCHeap::allocate_(uint32_t size) {
+    // GenGC unimplemented yet
+    auto result = _eden->allocateIfPossible_(size);
     if (result)
         return result;
 
-	if (size > LargeThreshold)
-        return this->allocateLarge(size);
-	
-    if (!GC_CRITICAL)
+    if (size > LargeThreshold)
+        return this->allocateLarge_(size);
+
+    if (atGCSafepoint())
         this->collectIfTime();
 
-    return this->allocateCommitting(size);
+    return this->allocateCommitting_(size);
+}
+*/
+
+uintptr_t GCHeap::allocate_(uint32_t size) {
+    auto result = _oldZone->allocateIfPossibleCurrent_(size);
+    if (result) {
+        _fullGC->tenured_(size);
+        return result;
+    }
+    if (size > LargeThreshold)
+        return this->allocateLarge_(size);
+
+    if (this->isAtGCSafepoint())
+        this->collectIfTime();
+    else
+        requestGC();
+
+    _fullGC->tenured_(size);
+
+    return _oldZone->allocateIfPossibleBumping_(size);
 }
 
-uintptr_t GCHeap::allocateLarge(uint32_t size) {
-    auto space = this->addNewSpaceSized(size);
-    return space->allocate(size);
+uintptr_t GCHeap::allocateLarge_(uint32_t size) {
+    auto space = this->addNewSpaceSized_(size);
+    return space->allocateIfPossible_(size);
 }
 
-uintptr_t GCHeap::allocateCommitting(uint32_t size)
+
+uintptr_t GCHeap::allocateCommitting_(uint32_t size)
 {
-    auto result = eden->allocate(size);
+    auto result = _eden->allocateIfPossible_(size);
     if (result) return result;
 
     // should allocate committing in old here
@@ -61,7 +111,7 @@ HeapObject* GCHeap::allocateSlots_(uint32_t size) {
     bool small = size <= HeapObject::MAX_SMALL_SIZE;
     auto headerSize = small ? 8 : 16;
     auto totalSize = headerSize + size * sizeof(uintptr_t);
-    auto buffer = this->allocate(totalSize);
+    auto buffer = this->allocate_(totalSize);
     std::memset((void*)buffer, 0, headerSize);
     HeapObject *result;
 
@@ -89,7 +139,7 @@ HeapObject* GCHeap::allocateBytes_(uint32_t size)
     bool small = size <= HeapObject::MAX_SMALL_SIZE;
     auto headerSize = small ? 8 : 16;
     auto totalSize = headerSize + align(size, sizeof(uintptr_t));
-    auto buffer = this->allocate(totalSize);
+    auto buffer = this->allocate_(totalSize);
     std::memset((void*)buffer, 0, totalSize);
     HeapObject *result;
 
@@ -112,10 +162,11 @@ HeapObject* GCHeap::allocateBytes_(uint32_t size)
     return result;
 }
 
-void GCHeap::collectIfTime()
+/* GenGC unimplemented yet
+ void GCHeap::collectIfTime()
 {
-    eden->commitMemory(256*KB);
-    bool success = eden->increaseSoftLimit_(256 * KB);
+    _eden->commitMemory_(256*KB);
+    bool success = _eden->increaseSoftLimit_(256 * KB);
     if (success) return;
 	
     this->collectYoung();
@@ -123,8 +174,37 @@ void GCHeap::collectIfTime()
 	//if (fullCollector->reachedCountdown())
     //    this->collectOld();
 }
+*/
+
+bool GCHeap::isAtGCSafepoint()
+{
+    return _atGCSafepoint;
+}
+
+void GCHeap::collectIfTime()
+{
+    if (_gcNeeded || _fullGC->hasReachedCountdown())
+        this->collectOld();
+}
 
 void GCHeap::collectYoung()
 {
     error("Fixme: Collect young hasn't been implemented yet");
+}
+
+void GCHeap::collectOld()
+{
+    //warning("GCHeap::collectOld()\n");
+    for (auto space : _spaces) {
+        space->unmarkAll();
+    }
+
+    //_runtime->checkCache();
+    _fullGC->collect();
+    //_runtime->checkCache();
+    // this->rescueEphemerons();
+    finishedGC();
+
+    //warning("GCHeap::collectOld() done\n");
+
 }
