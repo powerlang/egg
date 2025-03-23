@@ -358,3 +358,12 @@ std::string Egg::HeapObject::printString()
 {
 	return debugRuntime->print_(this);
 }
+
+void HeapObject::copyFrom_headerSize_bodySize_(HeapObject *object, uintptr_t headerSize, uintptr_t bodySize)
+{
+	auto srcbase = ((uintptr_t)object) - headerSize;
+	auto srcend  = ((uintptr_t)object) + bodySize;
+	auto dstbase = ((uintptr_t)this) - headerSize;
+
+	std::copy((uintptr_t*)srcbase, (uintptr_t*)srcend, (uintptr_t*)dstbase);
+}
