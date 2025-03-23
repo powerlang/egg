@@ -2,18 +2,33 @@
 #include "Runtime.h"
 
 #include <Bootstrapper.h>
+#include <map>
+#include <sstream>
 
 #include "Evaluator.h"
 #include "Allocator/GCHeap.h"
 #include "SAbstractMessage.h"
 #include "KnownConstants.h"
+#include "GCedRef.h"
+#include "StackGCedRef.h"
 
 using namespace Egg;
 
 Runtime *Egg::debugRuntime = nullptr;
 
+
+Runtime::Runtime(Bootstrapper* bootstrapper, ImageSegment* kernel):
+    _bootstrapper(bootstrapper),
+    _kernel(kernel),
+    _lastHash(0)
+{
+    this->initializeKernelObjects();
+    KnownObjects::initializeFrom(this);
+    _heap = new GCHeap(this);
+
+}
+
 void Runtime::initializeEvaluator() {
-    _heap = new GCHeap;
     _evaluator = new Evaluator(this, _falseObj, _trueObj, _nilObj);
 }
 
@@ -30,9 +45,10 @@ uintptr_t Runtime::arrayedSizeOf_(Object *anObject) {
 HeapObject* Runtime::newBytes_size_(HeapObject *species, uint32_t size)
 {
 	auto behavior = this->speciesInstanceBehavior_(species);
+    StackGCedRef gcedBehavior(_evaluator->context(), (Object*)behavior);
 	auto result = _heap->allocateBytes_(size);
               
-    result->behavior(behavior);
+    result->behavior(gcedBehavior.asHeapObject());
     return result;
 }
 
@@ -40,8 +56,9 @@ HeapObject *Runtime::newSlots_size_(HeapObject *species, uint32_t size) {
 	auto ivars = this->speciesInstanceSize_(species);
     HeapObject *behavior = this->speciesInstanceBehavior_(species);
     auto slotSize = ivars + size;
+    StackGCedRef gcedBehavior(_evaluator->context(), (Object*)behavior);
     HeapObject *result = _heap->allocateSlots_(slotSize);
-    result->behavior(behavior);
+    result->behavior(gcedBehavior.asHeapObject());
     if (size > 0)
         result->beArrayed();
     if (ivars > 0)
@@ -100,13 +117,13 @@ HeapObject *Runtime::newClosureFor_(HeapObject *block)
 HeapObject *Runtime::newEnvironmentSized_(uint32_t size)
 {
     return this->newArraySized_(size);
- }
+}
 
 HeapObject *Runtime::newExecutableCodeFor_with_(HeapObject *compiledCode,
-                                                HeapObject *platformCode) {
+                                                PlatformCode *platformCode) {
     auto result = this->newSlots_size_(_arrayClass, 2); // fixme: use a proper kind of object for this
-    this->executableCodePlatformCode_put_(result, (Object *)platformCode);
-    this->executableCodeCompiledCode_put_(result, (Object *)compiledCode);
+    this->executableCodePlatformCode_put_(result, platformCode);
+    this->executableCodeCompiledCode_put_(result, compiledCode);
     return result;
 }
 
@@ -123,6 +140,13 @@ HeapObject *Runtime::addSymbol_(const std::string &str){
 
 HeapObject *Runtime::loadModule_(HeapObject *name) {
     return _bootstrapper->loadModule_(name->asLocalString());
+}
+
+void Runtime::addSegmentSpace_(ImageSegment* segment)
+{
+    GCSpace *space = GCSpace::allocatedAt_limit_(segment->spaceStart(), segment->spaceEnd(), false);
+    space->_name = this->moduleName_(segment->header.module)->asLocalString();
+    this->_heap->addSpace_(space);
 }
 
 uintptr_t Runtime::hashFor_(Object *anObject)
@@ -161,14 +185,53 @@ Object* Runtime::sendLocal_to_with_with_(const std::string &selector, Object *re
 
     return this->_evaluator->send_to_with_(symbol, receiver, args);
 }
+
+std::string Runtime::printGlobalCache() {
+    std::ostringstream stream;
+    for (const auto& entry : _globalCache) {
+        auto key_first = entry.first.first;
+        auto key_second = entry.first.second;
+        auto value = entry.second;
+
+        stream << "Key: <" << key_first->get()->printString();
+        stream << ", " << key_second->get()->printString();
+        stream << "> -> Value: " << value->get()->printString();
+        stream << std::endl;
+    }
+
+    return stream.str();
+}
+
+void Runtime::checkCache() {
+    for (const auto& entry : _globalCache) {
+        auto symbol = entry.first.first->get();
+        auto methodSelector = debugRuntime->methodSelector_(entry.second->get());
+        ASSERT( symbol ==  methodSelector);
+        if (symbol != methodSelector) {
+            int a = 0;
+        }
+    }
+}
+
 HeapObject* Runtime::lookup_startingAt_(HeapObject *symbol, HeapObject *behavior)
 {
+    checkCache();
+
+    if (symbol->printString() == "#sizeInBytes") {
+        int a = 0;
+    }
     auto iter = _globalCache.find(global_cache_key(symbol,behavior));
-    if (iter != _globalCache.end())
-        return iter->second;
+    if (iter != _globalCache.end()) {
+        if (iter->second->get()->slotAt_(5)->printString() != symbol->printString())
+            int b = 1;
+        return iter->second->get();
+    }
     
     auto method = this->doLookup_startingAt_(symbol, behavior);
-	_globalCache[global_cache_key(symbol,behavior)] = method;
+    auto key = gced_global_cache_key(new GCedRef(symbol),new GCedRef(behavior));
+    auto value = new GCedRef(method);
+	_globalCache.insert({key, value});
+    checkCache();
     return method;
 }
 
@@ -243,15 +306,15 @@ void Runtime::flushDispatchCache_(HeapObject *aSymbol) {
 
     auto iter = _inlineCaches.find(aSymbol);
     if (iter != _inlineCaches.end()) {
-        auto messages = _inlineCaches[aSymbol];
+        auto messages = iter->second;
         for (auto& m : *messages) {
             m->flushCache();
         }
     }
 
-    std::vector<global_cache_key> cached;
+    std::vector<gced_global_cache_key> cached;
     for (const auto& entry : _globalCache) {
-        if (entry.first.first == aSymbol) {
+        if (entry.first.first->get() == aSymbol) {
             cached.push_back(entry.first);
         }
     }
@@ -268,13 +331,57 @@ void Runtime::flushDispatchCache_in_(HeapObject *aSymbol, HeapObject *klass) {
     auto iter = _inlineCaches.find(aSymbol);
     if (iter != _inlineCaches.end()) {
     
-        auto messages = _inlineCaches[aSymbol];
+        auto messages = iter->second;
         for (auto& m : *messages) {
             m->flushCache();
         }
     }
 
-    _globalCache.erase(std::make_pair(aSymbol, behavior));
+    global_cache_key pair = std::make_pair(aSymbol, behavior);
+    auto globalIter = _globalCache.find(pair);
+    if (globalIter != _globalCache.end())
+        _globalCache.erase(globalIter);
+}
+
+uintptr_t Runtime::assignGCedRefIndex() {
+    if (_freeGCedRefs.empty())
+    {
+        auto index = _gcedRefs.size();
+        _gcedRefs.push_back(nullptr);
+        return index;
+    }
+    else
+    {
+        auto index = _freeGCedRefs.back();
+        _freeGCedRefs.pop_back();
+        return index;
+    }
+}
+
+void Runtime::registerGCedRef_(GCedRef *gcedRef) {
+    _gcedRefs[gcedRef->index()] = gcedRef;
+}
+
+GCedRef * Runtime::createGCedRef_(HeapObject *object) {
+
+    auto index = this->assignGCedRefIndex();
+    GCedRef *result = new GCedRef(object, index);
+
+    return result;
+}
+
+void Runtime::releaseGCedRef_(uintptr_t index) {
+    _freeGCedRefs.push_back(index);
+    _gcedRefs[index] = nullptr;
+}
+
+void Runtime::gcedRefsDo_(const std::function<void(GCedRef *)> &aBlock)
+{
+    for (auto ref : _gcedRefs)
+    {
+        if (ref != nullptr)
+            aBlock(ref);
+    }
 }
 
 std::string Egg::Runtime::print_(HeapObject *obj) {
