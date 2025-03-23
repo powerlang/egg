@@ -87,6 +87,8 @@ void ImageSegment::fixPointerSlots(const std::vector<Object*>& imports)
         }
         current = current->nextObject();
     }
+
+    header.module = relocatedAddress_(header.module);
 }
 
 uintptr_t ImageSegment::spaceStart()
