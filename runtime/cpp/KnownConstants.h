@@ -16,6 +16,7 @@ extern uintptr_t BEHAVIOR_ADDRESS_SPACE;
 
 namespace Egg {
 
+
 enum BlockFlags {
     CapturesHome = 0x800000,
     CapturesSelf = 0x400000
@@ -33,6 +34,7 @@ enum MethodFlags {
     MethodArgCount = 0x3F,
     MethodTempCount = 0x1FE000,
     MethodTempCountShift = 13,
+    MethodNeedsEnvironment = 0x400000,
     MethodIsExtension = 0x80000000
 };
 

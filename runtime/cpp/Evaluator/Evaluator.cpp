@@ -203,7 +203,8 @@ Evaluator::lookup_startingAt_sendSite_(HeapObject *symbol, HeapObject *behavior,
 
 Object *Evaluator::invoke_with_(HeapObject *method, Object *receiver) {
     int size = _runtime->methodEnvironmentSize_(method);
-    HeapObject *environment = _runtime->newEnvironmentSized_(size);
+
+    HeapObject *environment = _runtime->methodNeedsEnviornment_(method) ? _runtime->newEnvironmentSized_(size) : _runtime-> _nilObj;
     HeapObject *executable = this->prepareForExecution_(method);
     _work = _runtime->executableCodeWork_(executable);
 
