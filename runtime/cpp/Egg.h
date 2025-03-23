@@ -21,9 +21,9 @@ void Initialize();
 void osError();
 void error(const char *message);
 void error_(const std::string &message);
-void debug(const char *message);
-
 extern bool GC_CRITICAL;
+void warning(const char *message);
+void warning_(const std::string &message);
 
 }
 

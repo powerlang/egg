@@ -20,6 +20,13 @@ void Egg::error_(const std::string &message) {
     error(message.c_str());
 }
 
+void Egg::warning(const char *message) {
+    std::cerr << "WARNING: " << message << std::endl;
+}
+
+void Egg::warning_(const std::string &message) {
+    warning(message.c_str());
+}
 void Egg::Initialize()
 {
     InitializeMemory();
