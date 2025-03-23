@@ -413,9 +413,9 @@ std::string EvaluationContext::backtrace() {
     return s.str();
 }
 
-void printStackObject_into_(Object *o, std::ostringstream &s)
+void printStackObject_into_(uintptr_t index, Object *o, std::ostringstream &s)
 {
-    s << "| " << std::setw(sizeof(void*)*2) << std::setfill(' ') << std::hex << o << " | ";
+    s << std::setw(sizeof(void*)*2) << std::setfill(' ') << std::hex << index - 1 << " | " << std::setw(sizeof(void*)*2) << std::setfill(' ') << std::hex << o << " | ";
     if (o == nullptr)
         s << "bad obj";
     else
@@ -426,15 +426,15 @@ std::string EvaluationContext::printStackContents() {
     std::vector<uintptr_t> frames;
     uintptr_t current = _regSP;
     uintptr_t next    = _regBP;
-    s << "|------------------|" << std::endl;
+    s << "                  |------------------|" << std::endl;
 
     do {
         for (uintptr_t index = current; index < next; index++) {
-            printStackObject_into_(_stack[index - 1], s);
+            printStackObject_into_(index, _stack[index - 1], s);
             s << std::endl;
         }
-        s << "| " << std::setw(sizeof(void*)*2) << std::setfill(' ') << std::hex << _stack[next - 1] << " | fp" << std::endl;
-        s << "| " << std::setw(sizeof(void*)*2) << std::setfill(' ') << std::hex << _stack[next + 1 - 1] << " | retaddr" << std::endl;
+        s << std::setw(sizeof(void*)*2) << std::setfill(' ') << std::hex << next - 1 << " | " << std::setw(sizeof(void*)*2) << std::setfill(' ') << std::hex << _stack[next - 1] << " | fp" << std::endl;
+        s << std::setw(sizeof(void*)*2) << std::setfill(' ') << std::hex << next + 1 - 1 << " | " << std::setw(sizeof(void*)*2) << std::setfill(' ') << std::hex << _stack[next + 1 - 1] << " | retaddr" << std::endl;
 
         current = next + 2;
         next = (uintptr_t)_stack[next - 1];
