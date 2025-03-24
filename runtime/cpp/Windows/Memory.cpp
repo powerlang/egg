@@ -85,6 +85,13 @@ void Egg::CommitMemory(uintptr_t base, uintptr_t size)
     std::memset((char*)base, 0, size);
 }
 
+void Egg::DecommitMemory(uintptr_t base, uintptr_t size)
+{
+    if (!VirtualFree((void*)base, size, MEM_DECOMMIT)) {
+        error("Failed to decommit memory.");
+    }
+}
+
 void Egg::FreeMemory(uintptr_t base, uintptr_t size)
 {
     VirtualFree((void*)base, 0, MEM_RELEASE);
