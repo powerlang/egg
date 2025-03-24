@@ -41,6 +41,11 @@ void Egg::InitializeMemory()
 }
 
 
+void Egg::aligned_free(void* mem)
+{
+    _aligned_free(mem);
+}
+
 uintptr_t Egg::pagealign(uintptr_t addr)
 {
     return align(addr, Egg::page_alignment);

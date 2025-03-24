@@ -71,6 +71,11 @@ void Egg::InitializeMemory()
 
 }
 
+void Egg::aligned_free(void* mem)
+{
+    std::free(mem);
+}
+
 uintptr_t Egg::pagealign(uintptr_t addr)
 {
     static int pagesize = -1;
