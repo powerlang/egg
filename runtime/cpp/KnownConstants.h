@@ -16,6 +16,7 @@ extern uintptr_t BEHAVIOR_ADDRESS_SPACE;
 
 namespace Egg {
 
+
 enum BlockFlags {
     CapturesHome = 0x800000,
     CapturesSelf = 0x400000
@@ -33,6 +34,7 @@ enum MethodFlags {
     MethodArgCount = 0x3F,
     MethodTempCount = 0x1FE000,
     MethodTempCountShift = 13,
+    MethodNeedsEnvironment = 0x400000,
     MethodIsExtension = 0x80000000
 };
 
@@ -85,6 +87,15 @@ enum Offsets {
 
     ExecutableCodePlatformCode = 0,
     ExecutableCodeCompiledCode = 1,
+
+    // inst vars of Process
+    ProcessNativeStack = 1,
+    ProcessTopContext = 2,
+
+    // inst vars of ProcessVMStack (the VM's internal stack object for processes)
+    ProcessVMStackProcess = 0,
+    ProcessVMStackSP = 1,
+    ProcessVMStackBP = 2,
 
     FFI_uint8 = 0,
     FFI_sint8 = 1,

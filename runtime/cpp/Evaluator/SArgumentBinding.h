@@ -16,7 +16,7 @@ public:
         ASSERT(false);
     }
 
-    bool isArgument() const {
+    bool isArgument() const override {
         return true;
     }
 

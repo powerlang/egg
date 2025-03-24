@@ -35,14 +35,33 @@ struct SmallInteger {
         return (SmallInteger *)(((uintptr_t)intVal << 1) | 1);
     }
 
+    /**
+     * Returns a `small pointer` from an aligned address: it is a way to encode
+     * a pointer as a small integer (marking int bit), so that GC doesn't mess
+     * with it when tracing. It only requires the pointer is aligned to pointer
+     * size (rightmost bits are 0). Used for example to encode native code addresses.
+     */
+    static SmallInteger*
+    smallpointerFrom(void* alignedBuffer)
+    {
+        ASSERT( ((uintptr_t)alignedBuffer & 1) == 0 );
+        return (SmallInteger *)(((uintptr_t)alignedBuffer) | 1);
+    }
+
     bool isSmallInteger();
 
-    intptr_t asNative(); /// Assuming `this` encodes a SmallInteger, decode its
-                         /// (signed) integer value
+    /**
+     * Assuming `this` encodes a SmallInteger, decode its
+     * (signed) integer value
+    **/
+    intptr_t asNative();
 
+    /**
+     * Assuming `this` encodes a pointer stored as a SmallInteger,
+     * return the address of the original pointer (by clearing last bit)
+    **/
     template <typename T = void *>
-    T asObject() /// Assuming `this` encodes a pointer stored as a SmallInteger,
-                 /// return the address of the original pointer
+    T asObject()
     {
         // ASSERT(this->object()->isSmallInteger());
 

@@ -5,10 +5,11 @@
 #include <map>
 #include "../HeapObject.h"
 #include "SExpressionVisitor.h"
+#include "Runtime.h"
+#include "PlatformCode.h"
 
 namespace Egg {
 
-class Runtime;
 class Evaluator;
 
 class SExpressionLinearizer : public SExpressionVisitor {
@@ -17,7 +18,7 @@ class SExpressionLinearizer : public SExpressionVisitor {
 	bool _inBlock;
 	bool _dropsArguments;
 	size_t _stackTop;
-	std::vector<SExpression*> *_operations;
+	PlatformCode *_operations;
 	
 	using PrimitivePointer = Object* (Evaluator::*)();
 	std::map<HeapObject*, PrimitivePointer> _primitives;
@@ -58,7 +59,7 @@ public:
 		this->_orNot = nullptr;
 	}
 
-	std::vector<SExpression*>* operations() {
+	PlatformCode* operations() {
 		return this->_operations;
 	}
 

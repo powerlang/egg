@@ -11,9 +11,9 @@
 
 #include <iostream>
 
-#include "../Memory.h"
-#include "../Egg.h"
-#include "../KnownConstants.h"
+#include "Allocator/Memory.h"
+#include "Egg.h"
+#include "KnownConstants.h"
 
 using namespace Egg;
 
@@ -30,6 +30,7 @@ namespace Egg {
 }
 
 uintptr_t Egg::ReserveAligned4GB() {
+
     uintptr_t size = 4L * 1024 * 1024 * 1024; // 4GB
     uintptr_t alignment = 4L * 1024 * 1024 * 1024; // 4GB alignment
     uintptr_t total_size = size + alignment;
@@ -68,6 +69,11 @@ void Egg::InitializeMemory()
 
     Egg::limit = BEHAVIOR_ADDRESS_SPACE + (4L * 1024 * 1024 * 1024); // We are limiting to reserve up to 4gb for now
 
+}
+
+void Egg::aligned_free(void* mem)
+{
+    std::free(mem);
 }
 
 uintptr_t Egg::pagealign(uintptr_t addr)
@@ -116,6 +122,13 @@ void Egg::CommitMemory(uintptr_t base, uintptr_t size)
         error("Failed to commit memory.");
     }
     std::memset((char*)base, 0, size);
+}
+
+void Egg::DecommitMemory(uintptr_t base, uintptr_t size)
+{
+    if (madvise((void*)base, size, MADV_DONTNEED) != 0) {
+        error("Failed to decommit memory.");
+    }
 }
 
 void Egg::FreeMemory(uintptr_t base, uintptr_t size)

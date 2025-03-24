@@ -34,7 +34,7 @@ find_package(cxxopts REQUIRED)
 
 # *************************************************
 
-file(GLOB ALL_SRC "*.cpp" "Evaluator/*.cpp" "${PLATFORM}/*.cpp")
+file(GLOB ALL_SRC "*.cpp" "Evaluator/*.cpp" "Allocator/*.cpp" "${PLATFORM}/*.cpp")
 
 add_executable(${EXE} ${ALL_SRC})
 target_link_libraries(${EXE} libffi::libffi cxxopts::cxxopts) # link agains libffi

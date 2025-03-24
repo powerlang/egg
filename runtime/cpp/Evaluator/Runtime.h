@@ -1,13 +1,16 @@
-#ifndef _POWERTALKRUNTIME_H_
-#define _POWERTALKRUNTIME_H_
+#ifndef _RUNTIME_H_
+#define _RUNTIME_H_
 
 #include <KnownObjects.h>
 #include <vector>
 #include <map>
+#include <functional>
 
-#include "../HeapObject.h"
-#include "../ImageSegment.h"
-#include "../KnownConstants.h"
+#include "HeapObject.h"
+#include "ImageSegment.h"
+#include "KnownConstants.h"
+#include "PlatformCode.h"
+#include "GCedRef.h"
 
 namespace Egg {
 
@@ -21,7 +24,9 @@ class Bootstrapper;
 extern Runtime *debugRuntime;
 
 class Runtime {
+	std::string printGlobalCache();
 public:
+	void checkCache();
     Bootstrapper *_bootstrapper;
     ImageSegment *_kernel;
     Evaluator *_evaluator;
@@ -30,21 +35,16 @@ public:
     std::map<std::string, HeapObject*> _knownSymbols;
 
     //typedef std::vector<SAbstractMessage*> inline_cache;
-    std::map<HeapObject*, std::vector <SAbstractMessage *> * > _inlineCaches;
+    std::map<GCedRef*, std::vector <SAbstractMessage *> *, GCedRef::Comparator > _inlineCaches;
 
-    typedef std::pair<HeapObject*,HeapObject*> global_cache_key;
-    std::map<global_cache_key, HeapObject*> _globalCache;
+    typedef std::pair<GCedRef*,GCedRef*> gced_global_cache_key;
+	typedef std::pair<HeapObject*,HeapObject*> global_cache_key;
+
+    std::map<gced_global_cache_key, GCedRef*, GCedRef::Comparator> _globalCache;
     uint16_t _lastHash;
 
 public:
-    Runtime(Bootstrapper *bootstrapper, ImageSegment *kernel) :
-        _bootstrapper(bootstrapper),
-        _kernel(kernel),
-        _lastHash(0)
-    {
-        this->initializeKernelObjects();
-        KnownObjects::initializeFrom(this);
-    }
+    Runtime(Bootstrapper *bootstrapper, ImageSegment *kernel);
 
     std::string print_(HeapObject* obj);
 
@@ -83,6 +83,7 @@ public:
 
     uintptr_t arrayedSizeOf_(Object *anObject);
 
+
     HeapObject* newBytes_size_(HeapObject* species, uint32_t size);
     HeapObject* newSlots_size_(HeapObject *species, uint32_t size);
     HeapObject* newSlotsOf_(HeapObject* species);
@@ -94,19 +95,25 @@ public:
     HeapObject* newClosureFor_(HeapObject *block);
     HeapObject* newCompiledMethod();
     HeapObject* newEnvironmentSized_(uint32_t);
-    HeapObject* newExecutableCodeFor_with_(HeapObject *compiledCode, HeapObject *platformCode);
+
+    HeapObject* newExecutableCodeFor_with_(HeapObject *compiledCode, PlatformCode *platformCode);
     HeapObject* newString_(const std::string &str);
     HeapObject* addSymbol_(const std::string &str);
     void addKnownSymbol_(const std::string &str, HeapObject *symbol) {
         _knownSymbols[str] = symbol;
     }
     HeapObject* loadModule_(HeapObject *name);
+	void addSegmentSpace_(ImageSegment *segment);
 
     uintptr_t hashFor_(Object *anObject);
 
 	int16_t nextHash() {
+		auto prev = this->_lastHash;
 			auto shifted = this->_lastHash >> 1;
 			this->_lastHash = (this->_lastHash & 1) == 0 ? shifted : shifted ^ 0xB9C8;
+		if (this->_lastHash == 0) {
+			return prev;
+		}
 			return this->_lastHash;
 	}
 
@@ -116,7 +123,7 @@ public:
         if (it == _inlineCaches.end())
         {
             messages = new std::vector<SAbstractMessage*>();
-            _inlineCaches[symbol] = messages;
+            _inlineCaches.insert({new GCedRef(symbol), messages});
         }
         else {
             messages = it->second;
@@ -204,7 +211,7 @@ public:
         return methodExecutableCode_(block);
     }
 
-    void blockExecutableCode_put_(HeapObject* block, Object *anObject) {
+    void blockExecutableCode_put_(HeapObject* block, HeapObject *anObject) {
         return methodExecutableCode_put_(block, anObject);
     }
 
@@ -242,23 +249,25 @@ public:
     }
 
     Object* executableCodePlatformCode_(HeapObject *code) {
-        return code->slot(Offsets::ExecutableCodePlatformCode);
+		return code->slot(Offsets::ExecutableCodePlatformCode);
     }
 
-    void executableCodePlatformCode_put_(HeapObject *code, Object *platformCode) {
-        code->slot(Offsets::ExecutableCodePlatformCode) = platformCode;
+    void executableCodePlatformCode_put_(HeapObject *code, PlatformCode *platformCode) {
+        auto smi = SmallInteger::smallpointerFrom((void*)platformCode);
+        code->slot(Offsets::ExecutableCodePlatformCode) = (Object*)smi;
     }
 
     HeapObject* executableCodeCompiledCode_(HeapObject *code) {
         return code->slot(Offsets::ExecutableCodeCompiledCode)->asHeapObject();
     }
 
-    std::vector<SExpression*>* executableCodeWork_(HeapObject *code) {
-        return (std::vector<SExpression*> *)(code->slot(Offsets::ExecutableCodePlatformCode));
+    PlatformCode* executableCodeWork_(HeapObject *code) {
+        auto slot = this->executableCodePlatformCode_(code);
+		return (PlatformCode*)slot->asSmallInteger()->asObject();
     }
 
-    void executableCodeCompiledCode_put_(HeapObject *code, Object *compiledCode) {
-        code->slot(Offsets::ExecutableCodeCompiledCode) = compiledCode;
+    void executableCodeCompiledCode_put_(HeapObject *code, HeapObject *compiledCode) {
+        code->slot(Offsets::ExecutableCodeCompiledCode) = (Object*)compiledCode;
     }
 
     HeapObject* blockMethod_(HeapObject* block) {
@@ -315,12 +324,17 @@ public:
         return ((this->methodFlags(method) >> 25) & 0x3F);
     }
 
+    int methodNeedsEnviornment_(HeapObject *method) {
+		return this->methodFlags(method) & MethodFlags::MethodNeedsEnvironment;
+    }
+
     HeapObject* methodExecutableCode_(HeapObject *method) {
+
         return method->slot(Offsets::CompiledCodeExecutableCode)->asHeapObject();
     }
 
-    void methodExecutableCode_put_(HeapObject *method, Object *anObject) {
-        method->slot(Offsets::CompiledCodeExecutableCode) = anObject;
+    void methodExecutableCode_put_(HeapObject *method, HeapObject *executableCode) {
+        method->slot(Offsets::CompiledCodeExecutableCode) = (Object*)executableCode;
     }
 
     HeapObject* methodExtensionModule_(HeapObject *method) {
@@ -364,6 +378,10 @@ public:
     HeapObject* moduleNamespace_(HeapObject *module) {
         return module->slot(Offsets::ModuleNamespace)->asHeapObject();
     }
+
+	HeapObject* moduleName_(HeapObject *module) {
+		return module->slot(Offsets::ModuleName)->asHeapObject();
+	}
 
     HeapObject* classModule_(HeapObject *class_) {
         return class_->slot(Offsets::ClassModule)->asHeapObject();
@@ -439,6 +457,26 @@ public:
 	    return this->speciesInstanceBehavior_(superclass);
     }
 
+	HeapObject* processStack_(HeapObject *process) {
+		return process->slot(Offsets::ProcessNativeStack)->asHeapObject();
+	}
+
+	bool processStackIsValid_(HeapObject *process) {
+		return process->slot(Offsets::ProcessTopContext) != (Object*)KnownObjects::nil;
+	}
+
+	HeapObject* processVMStackProcess_(HeapObject * processVMStack) {
+		return processVMStack->slot(Offsets::ProcessVMStackProcess)->asHeapObject();
+	}
+
+	uintptr_t processVMStackSP_(HeapObject * processVMStack) {
+		return processVMStack->slot(Offsets::ProcessVMStackSP)->asSmallInteger()->asNative();
+	}
+
+	uintptr_t processVMStackBP_(HeapObject * processVMStack) {
+		return processVMStack->slot(Offsets::ProcessVMStackBP)->asSmallInteger()->asNative();
+	}
+
 	void initializeKernelObjects()
 	{
 		this->_falseObj =                  _kernel->_exports["false"];
@@ -458,11 +496,12 @@ public:
 		this->_closureClass =              _kernel->_exports["Closure"];
 		this->_closureInstSize =           this->speciesInstanceSize_(this->_closureClass);
 		this->_behaviorClass =             _kernel->_exports["Behavior"];
+	    this->_ephemeronClass =            _kernel->_exports["Ephemeron"];
+		this->_processStackClass =         _kernel->_exports["ProcessVMStack"];
         this->_symbolTable =               _kernel->_exports["SymbolTable"];
 
         this->_smallIntegerBehavior = this->speciesInstanceBehavior_(_smallIntegerClass);
 	}
-
 
     HeapObject *_falseObj;
     HeapObject *_trueObj;
@@ -481,11 +520,26 @@ public:
     HeapObject *_closureClass;
     int _closureInstSize;
     HeapObject *_behaviorClass;
+	HeapObject *_ephemeronClass;
+	HeapObject *_processStackClass;
     HeapObject *_symbolTable;
 
     HeapObject *_smallIntegerBehavior;
+
+	// API and state needed to alloc and free GCedRefs
+
+	uintptr_t assignGCedRefIndex();
+	void registerGCedRef_(GCedRef *gcedRef);
+	GCedRef* createGCedRef_(HeapObject * object);
+	void releaseGCedRef_(uintptr_t index);
+	void gcedRefsDo_(const std::function<void(GCedRef *)> &aBlock);
+
+
+	std::vector<GCedRef*> _gcedRefs;
+	std::vector<uintptr_t> _freeGCedRefs;
+
 };
 
 } // namespace Egg
 
-#endif // ~ _POWERTALKRUNTIME_H_ ~
+#endif // ~ _RUNTIME_H_ ~

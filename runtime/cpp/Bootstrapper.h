@@ -8,6 +8,8 @@
 #include <vector>
 #include <filesystem>
 #include <fstream>
+#include <Allocator/GCHeap.h>
+#include <Allocator/GCSpace.h>
 #include <Evaluator/Evaluator.h>
 #include <Evaluator/SAssociationBinding.h>
 
@@ -22,6 +24,8 @@ class Bootstrapper {
 	Bootstrapper(ImageSegment *kernel) {
 		this->_kernel = kernel;
 		this->_runtime = new Runtime(this, this->_kernel);
+
+		this->_runtime->addSegmentSpace_(kernel);
 //		this->_runtime->bootstrapper_(this);
 		this->_runtime->initializeEvaluator();
 	}
@@ -91,6 +95,7 @@ class Bootstrapper {
 		std::vector<Object*> imports;
 		this->bindModuleImports(imageSegment, imports);
 		imageSegment->fixPointerSlots(imports);
+		this->_runtime->addSegmentSpace_(imageSegment);
 		return imageSegment;
 	}
 

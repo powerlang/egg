@@ -364,7 +364,7 @@ void SExpressionLinearizer::pushR() {
 }
 
 void SExpressionLinearizer::reset() {
-    this->_operations = new std::vector<SExpression*>;
+    this->_operations = newPlatformCode();
     this->_inBlock = false;
 }
 
@@ -436,7 +436,7 @@ void SExpressionLinearizer::visitBlock(SBlock *anSBlock) {
     auto prevStackTop = _stackTop;
     this->_stackTop = _runtime->blockTempCount_(anSBlock->compiledCode());
     this->_inBlock = true;
-    this->_operations = new std::vector<SExpression*>;
+    this->_operations = newPlatformCode();
     auto statements = anSBlock->statements();
     for (auto node : statements) {
         node->acceptVisitor_(this);
@@ -451,8 +451,8 @@ void SExpressionLinearizer::visitBlock(SBlock *anSBlock) {
 
     if (!anSBlock->isInlined()) {
 
-        auto code = _runtime->newExecutableCodeFor_with_(anSBlock->_compiledCode, reinterpret_cast<HeapObject*>(this->_operations));
-        _runtime->blockExecutableCode_put_(anSBlock->compiledCode(), (Object*)code);
+        auto code = _runtime->newExecutableCodeFor_with_(anSBlock->_compiledCode, this->_operations);
+        _runtime->blockExecutableCode_put_(anSBlock->compiledCode(), code);
     }
 
     this->_stackTop = prevStackTop;

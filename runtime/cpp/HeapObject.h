@@ -231,6 +231,9 @@ struct HeapObject
       uint64_t& uint64offset(const uint32_t subscript);       /// Return a 64-bit uint of this object at 0-based `subscript`
       uint64_t& unsignedLargeAt_(uint32_t index) { return uint64offset((index - 1) * 8); }; // 1-based index for compatibility reasons
 
+    /// ~ copying ~
+    void copyFrom_headerSize_bodySize_(HeapObject *object, uintptr_t headerSize, uintptr_t bodySize);
+
     /// ~ object bytes ~
       void replaceBytesFrom_to_with_startingAt_(
           const uintptr_t from,

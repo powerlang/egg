@@ -7,9 +7,9 @@
 #include <windows.h>
 #include <cstring>
 
-#include "../Memory.h"
-#include "../Egg.h"
-#include "../KnownConstants.h"
+#include "Allocator/Memory.h"
+#include "Egg.h"
+#include "KnownConstants.h"
 
 using namespace Egg;
 
@@ -40,6 +40,11 @@ void Egg::InitializeMemory()
     Egg::limit = BEHAVIOR_ADDRESS_SPACE + (4LL * 1024 * 1024 * 1024);  // We are limiting to reserve up to 4gb for now
 }
 
+
+void Egg::aligned_free(void* mem)
+{
+    _aligned_free(mem);
+}
 
 uintptr_t Egg::pagealign(uintptr_t addr)
 {
@@ -83,6 +88,13 @@ void Egg::CommitMemory(uintptr_t base, uintptr_t size)
         error("Failed to commit memory.");
     }
     std::memset((char*)base, 0, size);
+}
+
+void Egg::DecommitMemory(uintptr_t base, uintptr_t size)
+{
+    if (!VirtualFree((void*)base, size, MEM_DECOMMIT)) {
+        error("Failed to decommit memory.");
+    }
 }
 
 void Egg::FreeMemory(uintptr_t base, uintptr_t size)
