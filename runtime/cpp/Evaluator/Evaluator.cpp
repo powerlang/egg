@@ -161,6 +161,8 @@ void Evaluator::initializePrimitives()
     this->addPrimitive("HostInitializeFFI", &Evaluator::primitiveHostInitializeFFI);
     this->addPrimitive("HostPlatformName", &Evaluator::primitiveHostPlatformName);
     this->addPrimitive("HostCurrentMilliseconds", &Evaluator::primitiveHostCurrentMilliseconds);
+    this->addPrimitive("HostLog", &Evaluator::primitiveHostLog);
+
     /*this->addPrimitive("PrepareForExecution", &Evaluator::primitivePrepareForExecution);
     this->addPrimitive("ProcessVMStackInitialize", &Evaluator::primitiveProcessVMStackInitialize);
     this->addPrimitive("ProcessVMStackAt", &Evaluator::primitiveProcessVMStackAt);
@@ -673,6 +675,27 @@ Object * Evaluator::primitiveHostCurrentMilliseconds() {
 
 Object* Evaluator::primitiveHostPlatformName() {
     return (Object*)this->_runtime->newString_(PlatformName());
+}
+
+Object* Evaluator::primitiveHostLog() {
+    auto arg = this->_context->firstArgument();
+    auto code = this->_context->secondArgument()->asSmallInteger()->asNative();
+
+    std::string message;
+    if (arg->isSmallInteger())
+        message = arg->printString();
+    else
+    {
+        auto harg = arg->asHeapObject();
+        auto species = _runtime->behaviorClass_(harg->behavior());
+        if (species == _runtime->_stringClass)
+            message = harg->asLocalString();
+        else
+            message = harg->printString();
+    }
+
+    _runtime->log_code_(message, code);
+    return this->_regR;
 }
 
 Object* Evaluator::primitiveHostInitializeFFI() {

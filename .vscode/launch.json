@@ -15,13 +15,21 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/cpp/egg",
-            "args": ["${workspaceFolder}/image-segments/Kernel.ems"],
+            "program": "${workspaceFolder}/runtime/cpp/build/egg",
+            "args": ["TinyBenchmarks"],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "cwd": "${workspaceFolder}/image-segments/",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "gdb",
+            "linux" : {
+                "MIMode": "gdb",
+            },
+            "osx" : {
+                "MIMode": "lldb"
+            },
+            "windows": {
+                "MIMode": "gdb"
+            },
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",

@@ -1,0 +1,7 @@
+{
+    "cmake.sourceDirectory": "${workspaceFolder}/runtime/cpp",
+    "cmake.configureArgs": [
+        "-DCMAKE_TOOLCHAIN_FILE=${workspaceFolder}/runtime/cpp/build/conan_toolchain.cmake",
+        "-DCMAKE_PREFIX_PATH=${workspaceFolder}/runtime/cpp/build"
+    ]
+}

@@ -1,16 +1,15 @@
-
-#include "Runtime.h"
-
-#include <Bootstrapper.h>
 #include <map>
 #include <sstream>
 
+#include "Runtime.h"
+#include "Bootstrapper.h"
 #include "Evaluator.h"
 #include "Allocator/GCHeap.h"
 #include "SAbstractMessage.h"
 #include "KnownConstants.h"
 #include "GCedRef.h"
 #include "StackGCedRef.h"
+#include "Utils/CRLFStream.h"
 
 using namespace Egg;
 
@@ -421,3 +420,48 @@ std::string Egg::Runtime::print_(HeapObject *obj) {
 	
     return "a " + name + "";
  }
+
+
+// Color codes for different log levels
+#define RESET   "\033[0m"
+#define RED     "\033[31m"
+#define YELLOW  "\033[33m"
+#define GREEN   "\033[32m"
+#define BLUE    "\033[34m"
+#define MAGENTA "\033[35m"
+#define CYAN    "\033[36m"
+
+void Runtime::log_code_(std::string &message, uintptr_t level)
+{
+    std::ofstream logFile("error-log.txt", std::ios_base::app); // Open log file in append mode
+
+    CRLFStream lfout(std::cout);
+
+    switch(level) {
+        case 0: // TRACE
+            lfout << BLUE << "[trace] " + message; break;
+        case 1: // DEBUG
+            lfout << GREEN << message; break;
+        case 2: // INFO
+            lfout << message; break;
+        case 3: // WARN
+            lfout << YELLOW << "[warn] " + message;
+            break;
+        case 4: // ERROR
+            lfout.setStream(std::cerr);
+            lfout << RED << "[error] " + message;
+            break;
+        case 5: // FATAL
+            lfout.setStream(std::cerr);
+            lfout << MAGENTA << "[FATAL] " + message;
+            break;
+        default:
+            return; // Invalid level
+    }
+
+    // Also write to file for all error levels
+    if (level > 4) {
+        logFile << "[LEVEL " << level << "] " << message;
+    }
+}
+
