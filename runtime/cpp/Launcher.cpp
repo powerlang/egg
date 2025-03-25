@@ -6,16 +6,14 @@
 #include <iostream>
 #include <vector>
 #include <cstring>
+#include <algorithm>
 
 #include "Launcher.h"
-
-#include <algorithm>
-#include <Evaluator/Evaluator.h>
-
 #include "ImageSegment.h"
 #include "Util.h"
 #include "Bootstrapper.h"
 
+#include "Evaluator/Evaluator.h"
 #include "Evaluator/Runtime.h"
 
 using namespace Egg;

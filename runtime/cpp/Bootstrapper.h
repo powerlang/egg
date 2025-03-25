@@ -1,17 +1,15 @@
 
-#include "Evaluator/Runtime.h"
-#include "ImageSegment.h"
-#include "HeapObject.h"
 
 #include <map>
 #include <string>
 #include <vector>
 #include <filesystem>
 #include <fstream>
-#include <Allocator/GCHeap.h>
-#include <Allocator/GCSpace.h>
-#include <Evaluator/Evaluator.h>
-#include <Evaluator/SAssociationBinding.h>
+
+#include "Allocator/GCHeap.h"
+#include "Allocator/GCSpace.h"
+#include "Evaluator/Evaluator.h"
+#include "Evaluator/SAssociationBinding.h"
 
 namespace Egg {
 
