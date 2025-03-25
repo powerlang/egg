@@ -151,6 +151,11 @@ KernelModule >> loadedModuleNamed: aSymbol [
 	^loadedModules at: aSymbol ifAbsent: []
 ]
 
+{ #category : #logging }
+KernelModule >> log: aString [
+	^host log: aString level: 2
+]
+
 { #category : #accessing }
 KernelModule >> memory [
 	^memory

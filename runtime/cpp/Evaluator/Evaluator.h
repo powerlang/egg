@@ -204,6 +204,7 @@ private:
 	Object* primitiveHostFixOverrides();
 	Object* primitiveHostInitializeFFI();
 	Object* primitiveHostLoadModule();
+	Object* primitiveHostLog();
 	Object* primitiveHostPlatformName();
 	Object* primitiveNew();
 	Object* primitiveNewBytes();

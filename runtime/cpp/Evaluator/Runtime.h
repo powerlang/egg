@@ -47,6 +47,7 @@ public:
     Runtime(Bootstrapper *bootstrapper, ImageSegment *kernel);
 
     std::string print_(HeapObject* obj);
+    void log_code_(std::string &string, uintptr_t code);
 
     void initializeEvaluator();
 

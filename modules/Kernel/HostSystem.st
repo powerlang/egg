@@ -41,10 +41,40 @@ HostSystem >> load: aSymbol [
 ]
 
 { #category : #logging }
-HostSystem >> logError: aString [
-	<primitive: HostLogError>
+HostSystem >> log: aString level: anInteger [
+	<primitive: HostLog>
 ]
 
+{ #category : #logging }
+HostSystem >> logTrace: aString [
+	self log: aString level: 0
+]
+
+{ #category : #logging }
+HostSystem >> logDebug: aString [
+	self log: aString level: 1
+]
+
+{ #category : #logging }
+HostSystem >> logInfo: aString [
+	self log: aString level: 2
+]
+
+{ #category : #logging }
+HostSystem >> logWarning: aString [
+	self log: aString level: 3
+]
+
+{ #category : #logging }
+HostSystem >> logError: aString [
+	self log: aString level: 4
+]
+
+{ #category : #logging }
+HostSystem >> logFatal: aString [
+	self log: aString level: 5
+
+]
 { #category : #loading }
 HostSystem >> platformName [
 	<primitive: HostPlatformName>
