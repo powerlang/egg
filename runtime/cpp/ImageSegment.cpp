@@ -50,14 +50,11 @@ ImageSegment::load(std::istream *data)
     this->readImportDescriptors(data);
     this->readExports(data);
 }
-
+#include <inttypes.h>
 void ImageSegment::fixPointerSlots(const std::vector<Object*>& imports)
 {
     intptr_t delta = this->_currentBase - this->header.baseAddress;
-
-    constexpr auto mask = static_cast<uintptr_t>(-1LL << 32); // discards lower 32 bits
-    uintptr_t oldBehaviorBase = this->header.baseAddress & mask;
-
+    uintptr_t oldBehaviorBase = this->header.baseAddress & (((intptr_t)-1) << 32); // discards lower 32 bits
     auto spaceStart = this->spaceStart();
     auto current = ((HeapObject::ObjectHeader*)spaceStart)->object();
     auto end = (HeapObject*)this->spaceEnd();
@@ -66,7 +63,8 @@ void ImageSegment::fixPointerSlots(const std::vector<Object*>& imports)
         auto behavior = current->basicBehavior();
         if (((uintptr_t)behavior & 0x3) == 0x0) // if an oop
         {
-            current->behavior((HeapObject*)(oldBehaviorBase + behavior + delta));
+            auto newBehavior = oldBehaviorBase + (intptr_t)behavior + delta;
+            current->behavior((HeapObject*)newBehavior);
         }
         else if (((uintptr_t)behavior & 0x3) == 0x2) // if an import
         {
