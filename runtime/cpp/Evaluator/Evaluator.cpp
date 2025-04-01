@@ -460,6 +460,14 @@ Object* Evaluator::boolObject(bool aBoolean){
     return (Object*)this->_runtime->booleanFor_(aBoolean);
 }
 
+Object* Evaluator::failPrimitive()
+{
+    // failing a primitive implies skipping the return just after the primop bytecode
+    // after that return comes the normal Smalltalk failure code of the method
+    this->_context->incRegPC();
+    return this->_regR;
+}
+
 
 Object* Evaluator::primitiveAt() {
     auto receiver = this->_context->self();
