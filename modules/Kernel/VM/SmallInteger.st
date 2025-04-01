@@ -8,16 +8,19 @@ Extension { #name : #SmallInteger }
 { #category : '*Primitives' }
 SmallInteger >> - aNumber [
 	<primitive: SMIMinus>
+	^(aNumber - self) negated
 ]
 
 { #category : '*Primitives' }
 SmallInteger >> != aNumber [
 	<primitive: SMINotEqual>
+	^aNumber != self
 ]
 
 { #category : '*Primitives' }
 SmallInteger >> * aNumber [
 	<primitive: SMITimes>
+	^aNumber * self
 ]
 
 { #category : '*Primitives' }
@@ -33,21 +36,25 @@ SmallInteger >> \\ aNumber [
 { #category : '*Primitives' }
 SmallInteger >> + aNumber [
 	<primitive: SMIPlus>
+	^aNumber + self
 ]
 
 { #category : '*Primitives' }
 SmallInteger >> = aNumber [
 	<primitive: SMIEqual>
+	^aNumber = self
 ]
 
 { #category : '*Primitives' }
 SmallInteger >> > aNumber [
 	<primitive: SMIGreaterThan>
+	^aNumber < self
 ]
 
 { #category : '*Primitives' }
 SmallInteger >> >= aNumber [
 	<primitive: SMIGreaterEqualThan>
+	^aNumber <= self
 ]
 
 { #category : '*Primitives' }
