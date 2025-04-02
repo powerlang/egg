@@ -172,6 +172,7 @@ class Bootstrapper {
 			return binding->valueWithin_(_runtime->_evaluator->context());
 		}
 		ASSERT(false);
+		std::terminate();
 	}
 };
 

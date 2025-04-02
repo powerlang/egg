@@ -180,6 +180,8 @@ private:
     Object* newIntObject(auto anInteger);
     Object* boolObject(bool aBoolean);
 
+	Object* failPrimitive();
+
 	Object* primitiveAt();
 	Object* primitiveAtPut();
 	Object* primitiveBehavior();

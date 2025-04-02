@@ -547,7 +547,6 @@ void SExpressionLinearizer::visitMethod(SMethod *anSMethod, HeapObject *method) 
         PrimitivePointer primitive = this->_primitives[name];
         this->primitive_(primitive);
         this->returnOp();
-        return;
     }
     this->_stackTop = _runtime->methodTempCount_(anSMethod->compiledCode());
     auto statements = anSMethod->statements();

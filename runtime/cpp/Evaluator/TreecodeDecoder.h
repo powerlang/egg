@@ -192,7 +192,6 @@ public:
 			this->_stream >> dummy;
 			auto pragma = new SPragma(this->nextSymbolOrNil());
 			node->pragma_(pragma);
-			return node;
 		}
 		node->compiledCode_(this->_method);
 		node->statements_(this->nextExpressionArray());

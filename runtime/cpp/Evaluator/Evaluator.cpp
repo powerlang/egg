@@ -460,6 +460,14 @@ Object* Evaluator::boolObject(bool aBoolean){
     return (Object*)this->_runtime->booleanFor_(aBoolean);
 }
 
+Object* Evaluator::failPrimitive()
+{
+    // failing a primitive implies skipping the return just after the primop bytecode
+    // after that return comes the normal Smalltalk failure code of the method
+    this->_context->incRegPC();
+    return this->_regR;
+}
+
 
 Object* Evaluator::primitiveAt() {
     auto receiver = this->_context->self();
@@ -778,15 +786,24 @@ Object* Evaluator::primitiveSMIBitXor() {
 }
 
 Object* Evaluator::primitiveSMIEqual() {
-    return boolObject(this->_context->self()->asSmallInteger()->asNative() == (this->_context->firstArgument()->asSmallInteger()->asNative()));
+    auto arg = this->_context->firstArgument();
+    return arg->isSmallInteger() ?
+        boolObject(this->_context->self()->asSmallInteger()->asNative() == (arg->asSmallInteger()->asNative())) :
+        this->failPrimitive();
 }
 
 Object* Evaluator::primitiveSMIGreaterEqualThan() {
-    return boolObject(this->_context->self()->asSmallInteger()->asNative() >= (this->_context->firstArgument()->asSmallInteger()->asNative()));
+    auto arg = this->_context->firstArgument();
+    return arg->isSmallInteger() ?
+        boolObject(this->_context->self()->asSmallInteger()->asNative() >= (arg->asSmallInteger()->asNative())) :
+        this->failPrimitive();
 }
 
 Object* Evaluator::primitiveSMIGreaterThan() {
-    return boolObject(this->_context->self()->asSmallInteger()->asNative() > (this->_context->firstArgument()->asSmallInteger()->asNative()));
+    auto arg = this->_context->firstArgument();
+    return arg->isSmallInteger() ?
+        boolObject(this->_context->self()->asSmallInteger()->asNative() > (arg->asSmallInteger()->asNative())) :
+        this->failPrimitive();
 }
 
 Object* Evaluator::primitiveSMIHighBit() {
@@ -809,11 +826,17 @@ Object* Evaluator::primitiveSMIMinus() {
 }
 
 Object* Evaluator::primitiveSMINotEqual() {
-    return boolObject(this->_context->self()->asSmallInteger()->asNative() != (this->_context->firstArgument()->asSmallInteger()->asNative()));
+    auto arg = this->_context->firstArgument();
+    return arg->isSmallInteger() ?
+        boolObject(this->_context->self()->asSmallInteger()->asNative() != (arg->asSmallInteger()->asNative())) :
+        this->failPrimitive();
 }
 
 Object* Evaluator::primitiveSMIPlus() {
-    return newIntObject((this->_context->self()->asSmallInteger()->asNative() + this->_context->firstArgument()->asSmallInteger()->asNative()));
+    auto arg = this->_context->firstArgument();
+    return arg->isSmallInteger() ?
+        newIntObject((this->_context->self()->asSmallInteger()->asNative() + this->_context->firstArgument()->asSmallInteger()->asNative())) :
+        this->failPrimitive();
 }
 
 Object* Evaluator::primitiveSMISize() {
@@ -825,7 +848,10 @@ Object* Evaluator::primitiveSMISize() {
 }
 
 Object* Evaluator::primitiveSMITimes() {
-    return newIntObject((this->_context->self()->asSmallInteger()->asNative() * this->_context->firstArgument()->asSmallInteger()->asNative()));
+    auto arg = this->_context->firstArgument();
+    return arg->isSmallInteger() ?
+        newIntObject((this->_context->self()->asSmallInteger()->asNative() * arg->asSmallInteger()->asNative())) :
+        this->failPrimitive();
 }
 
 Object* Evaluator::primitiveSetBehavior() {

@@ -622,13 +622,13 @@ SExpressionLinearizer >> visitMessage: anSMessage [
 
 { #category : 'initialization' }
 SExpressionLinearizer >> visitMethod: anSMethod [
-	| primitive statements symbol descriptor handler |
+	| primitive statements symbol handler |
 	self reset.
 	primitive := anSMethod pragma.
 	primitive
 		ifNotNil: [ symbol := runtime localSymbolFrom: anSMethod primitive.
 			handler := primitives at: symbol.
-			^ self
+			self
 				primitive: handler;
 				return ].
 	stackTop := runtime methodTempCount: anSMethod compiledCode.
