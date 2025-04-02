@@ -38,6 +38,12 @@ EggIterativeInterpreter >> prepareForBlock: sblock [
 ]
 
 { #category : 'accessing' }
+EggIterativeInterpreter >> regR [
+
+	^regR
+]
+
+{ #category : 'accessing' }
 EggIterativeInterpreter >> regR: anObject [ 
 	regR := anObject
 ]

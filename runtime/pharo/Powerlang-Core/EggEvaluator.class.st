@@ -115,6 +115,12 @@ EggEvaluator >> evaluatePrimitiveHash: receiver [
 	^ runtime newInteger: hash
 ]
 
+{ #category : 'primitives' }
+EggEvaluator >> failPrimitive [
+	context incRegPC.
+	^self regR
+]
+
 { #category : 'initialization' }
 EggEvaluator >> false [
 	^ falseObj
@@ -619,24 +625,30 @@ EggEvaluator >> primitiveSMIBitXor [
 
 { #category : 'primitives' }
 EggEvaluator >> primitiveSMIEqual [
-	^ [ runtime
-		booleanFor: (
-			context self value = 
-				context firstArgument value) ]
+	^ [
+	  | arg |
+	  arg := context firstArgument.
+	  arg isImmediate
+		  ifTrue: [ runtime booleanFor: context self value = arg value ]
+		  ifFalse: [ self failPrimitive ] ]
 ]
 
 { #category : 'primitives' }
 EggEvaluator >> primitiveSMIGreaterEqualThan [
-	^ [ runtime
-		booleanFor:
-			context self value
-				>= (runtime integerFrom: context firstArgument) ]
+	^ [ | arg |
+		arg := context firstArgument.
+		arg isImmediate
+			ifTrue: [ runtime booleanFor: context self value >= (runtime integerFrom: arg) ]
+		 	ifFalse: [ self failPrimitive ] ]
 ]
 
 { #category : 'primitives' }
 EggEvaluator >> primitiveSMIGreaterThan [
-	^ [ runtime
-		booleanFor: context self value > (runtime integerFrom: context firstArgument) ]
+	^ [ | arg |
+		arg := context firstArgument.
+		arg isImmediate
+			ifTrue: [ runtime booleanFor: context self value > (runtime integerFrom: arg) ]
+			ifFalse: [ self failPrimitive ] ]
 ]
 
 { #category : 'primitives' }
@@ -662,26 +674,29 @@ EggEvaluator >> primitiveSMIIntQuot [
 
 { #category : 'primitives' }
 EggEvaluator >> primitiveSMIMinus [
-	^ [ runtime
-		newInteger:
-			context self value
-				- (runtime integerFrom: context firstArgument) ]
+	^ [  | arg |
+		arg := context firstArgument.
+		arg isImmediate
+			ifTrue: [ runtime newInteger: context self value - (runtime integerFrom: arg) ]
+			ifFalse: [ self failPrimitive ] ]
 ]
 
 { #category : 'primitives' }
 EggEvaluator >> primitiveSMINotEqual [
-	^ [ runtime
-		booleanFor:
-			context self value
-				!= (runtime integerFrom: context firstArgument) ]
+	^ [ | arg |
+		arg := context firstArgument.
+		arg isImmediate
+			ifTrue: [ runtime booleanFor: context self value != (runtime integerFrom: arg) ]
+			ifFalse: [ self failPrimitive ] ]
 ]
 
 { #category : 'primitives' }
 EggEvaluator >> primitiveSMIPlus [
-	^ [ runtime
-		newInteger:
-			context self value
-				+ (runtime integerFrom: context firstArgument) ]
+	^ [ | arg |
+		arg := context firstArgument.
+		arg isImmediate
+			ifTrue: [ runtime newInteger: context self value + (runtime integerFrom: arg) ]
+			ifFalse: [ self failPrimitive ] ]
 ]
 
 { #category : 'primitives' }
@@ -691,10 +706,11 @@ EggEvaluator >> primitiveSMISize [
 
 { #category : 'primitives' }
 EggEvaluator >> primitiveSMITimes [
-	^ [ runtime
-		newInteger:
-			context self value
-				* (runtime integerFrom: context firstArgument) ]
+	^ [ | arg |
+		arg := context firstArgument.
+		arg isImmediate
+			ifTrue: [ runtime newInteger: context self value 	* (runtime integerFrom: arg) ]
+			ifFalse: [ self failPrimitive ] ]
 ]
 
 { #category : 'primitives' }
@@ -740,6 +756,11 @@ EggEvaluator >> primitiveUnderPointersSize [
 { #category : 'primitives' }
 EggEvaluator >> primitiveUnderSize [
 	^ [ runtime newInteger: context self size ]
+]
+
+{ #category : 'initializing' }
+EggEvaluator >> regR [
+	^self subclassResponsibility
 ]
 
 { #category : 'initializing' }
