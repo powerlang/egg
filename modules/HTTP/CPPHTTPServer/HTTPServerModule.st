@@ -4,7 +4,7 @@
 "
 
 Class {
-	#name : #CPPHTTPServerModule,
+	#name : #HTTPServerModule,
 	#superclass : #Module,
 	#instVars : [
 		'server'
@@ -13,7 +13,7 @@ Class {
 }
 
 { #category : #spec }
-CPPHTTPServerModule >> imports [
+HTTPServerModule >> imports [
 	^{
 		#FFI -> #(ExternalLibrary ExternalObject).
 	}

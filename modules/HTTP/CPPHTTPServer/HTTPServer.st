@@ -4,43 +4,43 @@
 "
 
 Class {
-	#name : #CPPHTTPServer,
+	#name : #HTTPServer,
 	#superclass : #ExternalObject,
 	#instVars : [
 		'library'
 	],
-	#category : #'CPPHTTPServer'
+	#category : #'HTTPServer'
 }
 
 { #category : #accessing }
-CPPHTTPServer >> baseUri [
+HTTPServer >> baseUri [
 	^baseUri
 ]
 
 { #category : #accessing }
-CPPHTTPServer >> baseUri: aString [
+HTTPServer >> baseUri: aString [
 	baseUri := aString
 ]
 
 { #category : #spec }
-CPPHTTPServer >> handle: request with: handler into: response with: selector [
+HTTPServer >> handle: request with: handler into: response with: selector [
 	handler handle: request into: response with: selector.
 	^ response
 ]
 
 { #category : #spec }
-CPPHTTPServer >> initialize [
-	library := CPPHTTPServerLibrary new open.
+HTTPServer >> initialize [
+	library := HTTPServerLibrary new open.
 	self handle: library newServer.
 ]
 
 { #category : #spec }
-CPPHTTPServer >> library [
+HTTPServer >> library [
 	^library
 ]
 
 { #category : #spec }
-CPPHTTPServer >> routeGET: uri to: selector with: handler [
+HTTPServer >> routeGET: uri to: selector with: handler [
 	library
 		server: self asParameter
 		GET: uri externalCopy asParameter
@@ -48,11 +48,11 @@ CPPHTTPServer >> routeGET: uri to: selector with: handler [
 ]
 
 { #category : #spec }
-CPPHTTPServer >> start [
+HTTPServer >> start [
 	library startServer: self asParameter
 ]
 
 { #category : #initializing }
-CPPHTTPServer >> stop [
+HTTPServer >> stop [
 	library stopServer: self asParameter
 ]

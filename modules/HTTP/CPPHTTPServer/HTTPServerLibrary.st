@@ -4,47 +4,47 @@
 "
 
 Class {
-	#name : #CPPHTTPServerLibrary,
+	#name : #HTTPServerLibrary,
 	#superclass : #ExternalLibrary,
 	#category : #'CPPHTTPServer'
 }
 
 { #category : #accessing }
-CPPHTTPServerLibrary class >> libname [
+HTTPServerLibrary class >> libname [
 	^'httpserver'
 ]
 
 { #category : #accessing }
-CPPHTTPServerLibrary class >> libpath [
+HTTPServerLibrary class >> libpath [
 	^'./'
 ]
 
 { #category : #spec }
-CPPHTTPServerLibrary >> deleteServer: aServer [
+HTTPServerLibrary >> deleteServer: aServer [
 	<cdecl: void Server_Delete(pointer)>
 ]
 
 { #category : #spec }
-CPPHTTPServerLibrary >> newServer [
+HTTPServerLibrary >> newServer [
 	<cdecl: pointer Server_New()>
 ]
 
 { #category : #spec }
-CPPHTTPServerLibrary >> server: aServer GET: url callback: aCallback [
+HTTPServerLibrary >> server: aServer GET: url callback: aCallback [
 	<cdecl: void Server_Get(pointer, pointer, pointer)>
 ]
 
 { #category : #spec }
-CPPHTTPServerLibrary >> startServer: aServer [
+HTTPServerLibrary >> startServer: aServer [
 	<cdecl: void Server_Start(pointer)>
 ]
 
 { #category : #initializing }
-CPPHTTPServerLibrary >> stopServer: aServer [
+HTTPServerLibrary >> stopServer: aServer [
 	<cdecl: void Server_Stop(pointer)>
 ]
 
 { #category : #initializing }
-CPPHTTPServerLibrary >> response: aResponse setContents: aString type: anotherString [
+HTTPServerLibrary >> response: aResponse setContents: aString type: anotherString [
 	<cdecl: void Response_SetContent(pointer, pointer, pointer)>
 ]
