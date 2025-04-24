@@ -7,17 +7,10 @@ Class {
 	#name : #CPPHTTPServer,
 	#superclass : #ExternalObject,
 	#instVars : [
-		'library',
-		'apiClass',
-		'baseUri'
+		'library'
 	],
 	#category : #'CPPHTTPServer'
 }
-
-{ #category : #accessing }
-CPPHTTPServer >> apiClass: aClass [
-	apiClass := aClass
-]
 
 { #category : #accessing }
 CPPHTTPServer >> baseUri [
@@ -30,14 +23,8 @@ CPPHTTPServer >> baseUri: aString [
 ]
 
 { #category : #spec }
-CPPHTTPServer >> handleRequest: request into: response with: selector [
-	| api |
-	api := apiClass new
-		       server: self;
-		       request: request;
-			   response: response.
-	api perform: selector.
-	"response headersAt: 'Access-Control-Allow-Origin' put: '*'."
+CPPHTTPServer >> handle: request with: handler into: response with: selector [
+	handler handle: request into: response with: selector.
 	^ response
 ]
 
@@ -53,11 +40,11 @@ CPPHTTPServer >> library [
 ]
 
 { #category : #spec }
-CPPHTTPServer >> routeGET: uri to: selector [
+CPPHTTPServer >> routeGET: uri to: selector with: handler [
 	library
 		server: self asParameter
-		GET: (baseUri , uri) externalCopy asParameter
-		callback: [ :request :response | self handleRequest: request into: response with: selector ] asCallback
+		GET: uri externalCopy asParameter
+		callback: [ :request :response | self handle: request with: handler into: response with: selector ] asCallback
 ]
 
 { #category : #spec }
