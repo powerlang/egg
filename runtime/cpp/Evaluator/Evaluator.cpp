@@ -617,26 +617,29 @@ Object* Evaluator::primitiveClosureAsCallback() {
     }
 
     if (ffi_prep_cif(cif, FFI_DEFAULT_ABI, count, &ffi_type_pointer, argTypes) != FFI_OK) {
-        delete[] argTypes;
         delete cif;
-        return nullptr;
+        delete[] argTypes;
+        ffi_closure_free(closure);
+        return (Object*)_runtime->_nilObj;
     }
+
     auto self = this->_context->self()->asHeapObject();
-    auto lambda = new std::function<void(void*, int, void**)>(
-    [self, this](void *ret, int argc, void *args[]) {
-        this->evaluateCallback_(ret, self, argc, args);
-    }
-);
+    auto lambda = new std::function(
+        [self, this](void *ret, int argc, void *args[]) {
+            this->evaluateCallback_(ret, self, argc, args);
+        }
+    );
 
     // Bind the closure
-    if (ffi_prep_closure_loc(closure, cif, closureCallbackWrapper, (void*)lambda, closure) != FFI_OK) {
-        delete[] argTypes;
+    if (ffi_prep_closure_loc(closure, cif, closureCallbackWrapper, (void*)lambda, code_location) != FFI_OK) {
         delete cif;
+        delete[] argTypes;
         ffi_closure_free(closure);
-        return nullptr;
+        delete lambda;
+        return (Object*)_runtime->_nilObj;
     }
 
-    return (Object*)this->_runtime->newInteger_(reinterpret_cast<intptr_t>(closure));
+    return (Object*)this->_runtime->newInteger_(reinterpret_cast<intptr_t>(code_location));
 }
 
 Object* Evaluator::primitiveClosureValue() {
@@ -895,7 +898,7 @@ void Evaluator::initializeCIF(HeapObject *method, int argCount) {
     HeapObject *dll = this->_context->receiver()->asHeapObject();
     Object *handle = dll->slotAt_(1); // the handle
     if (handle->asHeapObject()->untypedSlot(0) == nullptr) {
-        error("trying to execute FFI method on closed library");
+        error_("trying to execute FFI method " + method->printString() + " on closed library");
     }
 
     HeapObject *fnName = _runtime->ffiMethodSymbol_(method);
