@@ -15,6 +15,11 @@ ExternalHandle class >> new [
 	^self new: WordSize
 ]
 
+{ #category : #'accessing' }
+ExternalHandle >> asInteger [
+	^self pointerAtOffset: 0
+]
+
 { #category : #'testing' }
 ExternalHandle >> isValid [
 	^self asInteger != 0
