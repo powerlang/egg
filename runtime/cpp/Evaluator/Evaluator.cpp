@@ -1173,7 +1173,7 @@ Object* Evaluator::underprimitiveSmallSize(Object *receiver, std::vector<Object*
 }
 
 Object* Evaluator::underprimitiveULargeAtOffset(Object *receiver, std::vector<Object*> &args) {
-    auto result = receiver->asHeapObject()->uint64offset((args[1]->asSmallInteger()->asNative()));
+    auto result = receiver->asHeapObject()->uint64offset((args[0]->asSmallInteger()->asNative()));
     return newIntObject(result);
 }
 
@@ -1184,7 +1184,7 @@ Object* Evaluator::underprimitiveULargeAtOffsetPut(Object *receiver, std::vector
 }
 
 Object* Evaluator::underprimitiveULongAtOffset(Object *receiver, std::vector<Object*> &args) {
-    auto result = receiver->asHeapObject()->uint32offset((args[1]->asSmallInteger()->asNative()));
+    auto result = receiver->asHeapObject()->uint32offset((args[0]->asSmallInteger()->asNative()));
     return newIntObject(result);
 }
 
@@ -1195,7 +1195,7 @@ Object* Evaluator::underprimitiveULongAtOffsetPut(Object *receiver, std::vector<
 }
 
 Object* Evaluator::underprimitiveUShortAtOffset(Object *receiver, std::vector<Object*> &args) {
-    auto result = receiver->asHeapObject()->uint16offset((args[1]->asSmallInteger()->asNative()));
+    auto result = receiver->asHeapObject()->uint16offset((args[0]->asSmallInteger()->asNative()));
     return newIntObject(result);
 }
 
