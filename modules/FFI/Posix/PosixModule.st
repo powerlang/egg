@@ -4,17 +4,17 @@
 "
 
 Class {
-	#name : #LinuxModule,
+	#name : #PosixModule,
 	#superclass : #Module,
 	#category : #FFI
 }
 
 { #category : #services }
-LinuxModule >> externalCopyOfString: aString [
+PosixModule >> externalCopyOfString: aString [
 	^Kernel utf8 externalCopyOf: aString
 ]
 
 { #category : #services }
-LinuxModule >> imports [
+PosixModule >> imports [
 	^{ #FFI -> #(ExternalLibrary ExternalMemory LibraryLoader) }
 ]
