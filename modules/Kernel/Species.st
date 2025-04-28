@@ -74,16 +74,9 @@ Species >> allClassVarNames [
 	^(self withAllSuperclasses reversed gather: [:cls | cls classVarNames]) asArray
 ]
 
-{ #category : #private }
-Species >> allExistingInstances [
-	^Memory current allInstancesOf: self
-]
-
 { #category : #instances }
 Species >> allInstances [
-	^[
-		Smalltalk collectGarbage.
-		self allExistingInstances] evaluateAtomically
+	^Kernel memory allInstancesOf: self
 ]
 
 { #category : #queries }
@@ -111,7 +104,6 @@ Species >> allSubinstances [
 	| subinstances |
 	subinstances := OrderedCollection new.
 	[
-		Smalltalk collectGarbage.
 		self
 			withAllSubclassesDo: [:cls | subinstances
 				addAll: cls allExistingInstances]]

@@ -249,7 +249,7 @@ ProtoObject >> errorVMSpecific [
 
 { #category : #finalization }
 ProtoObject >> finalizationRegistry [
-	^Smalltalk finalizer
+	^Kernel finalizer
 ]
 
 { #category : #finalization }

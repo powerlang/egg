@@ -11,6 +11,6 @@ Class {
 
 { #category : #actions }
 Warning >> defaultAction [
-	Smalltalk session warnAbout: self description
+	Kernel host logWarning: self description, String cr
 ]
 

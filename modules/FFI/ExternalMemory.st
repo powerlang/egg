@@ -189,7 +189,7 @@ ExternalMemory >> externalCopy [
 
 { #category : #finalization }
 ExternalMemory >> finalizationRegistry [
-	^Smalltalk resourceRegistry
+	^Kernel session resourceRegistry
 ]
 
 { #category : #finalization }
