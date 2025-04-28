@@ -112,6 +112,7 @@ void Evaluator::initializePrimitives()
     this->addPrimitive("Behavior", &Evaluator::primitiveBehavior);
     this->addPrimitive("SetBehavior", &Evaluator::primitiveSetBehavior);
     this->addPrimitive("Class", &Evaluator::primitiveClass);
+    this->addPrimitive("UnderBeSpecial", &Evaluator::primitiveUnderBeSpecial);
     this->addPrimitive("UnderHash", &Evaluator::primitiveUnderHash);
     this->addPrimitive("UnderIsBytes", &Evaluator::primitiveUnderIsBytes);
     this->addPrimitive("UnderPointersSize", &Evaluator::primitiveUnderPointersSize);
@@ -874,6 +875,14 @@ Object* Evaluator::primitiveStringReplaceFromToWithStartingAt() {
         this->_context->secondArgument()->asSmallInteger()->asNative(),
         this->_context->thirdArgument()->asHeapObject(),
         this->_context->fourthArgument()->asSmallInteger()->asNative());
+    return receiver;
+}
+
+Object* Evaluator::primitiveUnderBeSpecial() {
+    auto receiver = this->_context->self();
+    if (!receiver->isSmallInteger())
+        receiver->asHeapObject()->beSpecial();
+
     return receiver;
 }
 

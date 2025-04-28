@@ -233,6 +233,7 @@ private:
 	Object* primitiveSetBehavior();
 	Object* primitiveSize();
 	Object* primitiveStringReplaceFromToWithStartingAt();
+	Object* primitiveUnderBeSpecial();
 	Object* primitiveUnderHash();
 	Object* primitiveUnderIsBytes();
 	Object* primitiveUnderPointersSize();
