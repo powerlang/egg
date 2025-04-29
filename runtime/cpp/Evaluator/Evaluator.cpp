@@ -874,13 +874,38 @@ Object* Evaluator::primitiveSize() {
 }
 
 Object* Evaluator::primitiveStringReplaceFromToWithStartingAt() {
-    auto receiver = this->_context->self();
-    receiver->asHeapObject()->replaceBytesFrom_to_with_startingAt_(
-        this->_context->firstArgument()->asSmallInteger()->asNative(),
-        this->_context->secondArgument()->asSmallInteger()->asNative(),
-        this->_context->thirdArgument()->asHeapObject(),
-        this->_context->fourthArgument()->asSmallInteger()->asNative());
-    return receiver;
+    auto receiver = this->_context->self()->asHeapObject();
+    auto from = this->_context->firstArgument();
+    auto to = this->_context->secondArgument();
+    auto source = this->_context->thirdArgument();
+    auto starting = this->_context->fourthArgument();
+
+    if (!from->isSmallInteger() || !to->isSmallInteger() || !starting->isSmallInteger())
+        return this->failPrimitive();
+
+    if (source->isSmallInteger())
+        return this->failPrimitive();
+
+    if (_runtime->speciesOf_((Object*)receiver) != _runtime->speciesOf_(source))
+        return this->failPrimitive();
+
+    auto fromint = from->asSmallInteger()->asNative();
+    auto toint = to->asSmallInteger()->asNative();
+    auto startingint = starting->asSmallInteger()->asNative();
+
+    if (toint > receiver->size())
+        return this->failPrimitive();
+
+    auto len = to - from + 1;
+    auto last = startingint + len - 1;
+    auto hsource = source->asHeapObject();
+    if (last > hsource->size())
+        return this->failPrimitive();
+
+    receiver->replaceBytesFrom_to_with_startingAt_(
+        fromint, toint, hsource, startingint);
+
+    return (Object*)receiver;
 }
 
 Object* Evaluator::primitiveUnderBeSpecial() {
