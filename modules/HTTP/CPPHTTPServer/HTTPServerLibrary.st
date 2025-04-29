@@ -19,32 +19,37 @@ HTTPServerLibrary class >> libpath [
 	^'./'
 ]
 
-{ #category : #spec }
+{ #category : #server }
 HTTPServerLibrary >> deleteServer: aServer [
 	<cdecl: void Server_Delete(pointer)>
 ]
 
-{ #category : #spec }
+{ #category : #server }
 HTTPServerLibrary >> newServer [
 	<cdecl: pointer Server_New()>
 ]
 
-{ #category : #spec }
+{ #category : #server }
 HTTPServerLibrary >> server: aServer GET: url callback: aCallback [
 	<cdecl: void Server_Get(pointer, pointer, pointer)>
 ]
 
-{ #category : #spec }
+{ #category : #server }
 HTTPServerLibrary >> startServer: aServer [
 	<cdecl: void Server_Start(pointer)>
 ]
 
-{ #category : #initializing }
+{ #category : #server }
 HTTPServerLibrary >> stopServer: aServer [
 	<cdecl: void Server_Stop(pointer)>
 ]
 
-{ #category : #initializing }
+{ #category : #request }
+HTTPServerLibrary >> request: aRequest paramAt: aString [
+	<cdecl: pointer Request_ParamAt(pointer, pointer)>
+]
+
+{ #category : #response }
 HTTPServerLibrary >> response: aResponse setContents: aString type: anotherString [
 	<cdecl: void Response_SetContent(pointer, pointer, pointer)>
 ]
