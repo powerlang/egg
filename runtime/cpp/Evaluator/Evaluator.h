@@ -40,6 +40,8 @@ private:
 
     std::vector<SExpression*> *_work;
 
+	bool _inCallback;
+
 public:
     using PrimitivePointer = Object* (Evaluator::*)();
     using UndermessagePointer = Object* (Evaluator::*)(Object *, std::vector<Object*> &args);
@@ -131,6 +133,8 @@ public:
     HeapObject* false_() {
         return this->_falseObj;
     }
+
+	bool isInCallback() { return _inCallback; }
     
 	HeapObject* lookup_startingAt_sendSite_(HeapObject* symbol, HeapObject *behavior, SAbstractMessage *message);
     Object* invoke_with_(HeapObject* method, Object *receiver);

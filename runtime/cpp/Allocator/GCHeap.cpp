@@ -1,6 +1,9 @@
 #include <cstring>
 
 #include "GCHeap.h"
+
+#include "Evaluator/Evaluator.h"
+
 #include "GCSpace.h"
 #include "KnownObjects.h"
 #include "AllocationZone.h"
@@ -80,7 +83,7 @@ uintptr_t GCHeap::allocate_(uint32_t size) {
     if (size > LargeThreshold)
         return this->allocateLarge_(size);
 
-    if (this->isAtGCSafepoint())
+    if (this->isAtGCSafepoint() && !_runtime->_evaluator->isInCallback())
         this->collectIfTime();
     else
         requestGC();

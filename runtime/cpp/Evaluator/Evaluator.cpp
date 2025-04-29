@@ -40,7 +40,8 @@ Evaluator::Evaluator(Runtime *runtime, HeapObject *falseObj, HeapObject *trueObj
         _runtime(runtime),
         _nilObj(nilObj),
         _trueObj(trueObj),
-        _falseObj(falseObj)
+        _falseObj(falseObj),
+        _inCallback(false)
     {
         _linearizer = new SExpressionLinearizer();
         _linearizer->runtime_(_runtime);
@@ -426,7 +427,8 @@ void Evaluator::visitOpReturn(SOpReturn *anSOpReturn)
 {
     this->popFrameAndPrepare();
 
-    _runtime->_heap->collectIfTime();
+    if (!_inCallback)
+        _runtime->_heap->collectIfTime();
 }
 
 void Evaluator::visitOpNonLocalReturn(SOpNonLocalReturn *anSOpNonLocalReturn)
@@ -595,7 +597,10 @@ void Evaluator::evaluateCallback_(void *ret, HeapObject *closure, int argc, void
         this->_context->regPC_(_work->size());
         _context->buildClosureFrameFor_code_environment_(receiver, block, closure);
     }
+    auto prev = _inCallback;
+    _inCallback = true;
     this->evaluate();
+    _inCallback = prev;
     this->_context->regPC_(prevPC);
     for (size_t i = 0; i < argc; ++i) {
         this->_context->pop();

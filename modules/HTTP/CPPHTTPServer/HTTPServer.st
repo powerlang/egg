@@ -6,42 +6,31 @@
 Class {
 	#name : #HTTPServer,
 	#superclass : #ExternalObject,
-	#instVars : [
-		'library'
-	],
-	#category : #'HTTPServer'
+	#category : #'CPPHTTPServer'
 }
 
-{ #category : #accessing }
-HTTPServer >> baseUri [
-	^baseUri
-]
-
-{ #category : #accessing }
-HTTPServer >> baseUri: aString [
-	baseUri := aString
-]
-
 { #category : #spec }
-HTTPServer >> handle: request with: handler into: response with: selector [
+HTTPServer >> handle: requestHandle with: handler into: responseHandle with: selector [
+	| request response |
+	request := HTTPRequest new handle: requestHandle.
+	response := HTTPResponse new handle: responseHandle.
 	handler handle: request into: response with: selector.
-	^ response
+	^responseHandle
 ]
 
 { #category : #spec }
 HTTPServer >> initialize [
-	library := HTTPServerLibrary new open.
-	self handle: library newServer.
+	self handle: self library newServer.
 ]
 
 { #category : #spec }
 HTTPServer >> library [
-	^library
+	^self class module library
 ]
 
 { #category : #spec }
 HTTPServer >> routeGET: uri to: selector with: handler [
-	library
+	self library
 		server: self asParameter
 		GET: uri externalCopy asParameter
 		callback: [ :request :response | self handle: request with: handler into: response with: selector ] asCallback
@@ -49,10 +38,10 @@ HTTPServer >> routeGET: uri to: selector with: handler [
 
 { #category : #spec }
 HTTPServer >> start [
-	library startServer: self asParameter
+	self library startServer: self asParameter
 ]
 
 { #category : #initializing }
 HTTPServer >> stop [
-	library stopServer: self asParameter
+	self library stopServer: self asParameter
 ]
