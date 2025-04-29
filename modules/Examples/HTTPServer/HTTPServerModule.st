@@ -10,22 +10,30 @@ Class {
 { #category : #spec }
 HTTPServerModule >> imports [
 	^{
-		#'HTTP.CPPHTTPServer' -> #(CPPHTTPServer).
+		#'HTTP.CPPHTTPServer' -> #(HTTPServer).
 		#FFI -> #(ExternalLibrary).
-
 	}
+]
+
+{ #category : #spec }
+HTTPServerModule >> handle: request into: response with: selector [
+	| api |
+	api := ExampleAPI new
+		       request: request;
+			   response: response.
+	api perform: selector.
+	"response headersAt: 'Access-Control-Allow-Origin' put: '*'."
 ]
 
 { #category : #services }
 HTTPServerModule >> main: arguments [
-	| server |
-	"Transcript show: 'starting server!'."
+	| server base |
 	ExternalLibrary module initializeForCurrentPlatform.
-
-	server := CPPHTTPServer new apiClass: ExampleAPI.
+	base := arguments at: 3 ifAbsent: ['/egg'].
+	server := HTTPServer new.
 	server
-		baseUri: '/egg';
-		routeGET: '/hello' to: #hello.
+		routeGET: base, '/hello/:name' to: #hello with: self.
+	Kernel log: 'server configured, starting!', String cr.
 	server start.
 	^0
 ]
