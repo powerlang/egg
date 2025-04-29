@@ -29,11 +29,17 @@ void Server_Delete(void *cserver) {
     delete server;
 }
 
+char* Request_ParamAt(void *creq, char *key, char *type)
+{
+    httplib::Request *req = reinterpret_cast<httplib::Request*>(creq);
+
+    return (char*)req->path_params.at(key).c_str();
+}
 
 void Response_SetContent(void *cres, char *content, char *type)
 {
-  httplib::Response *res = reinterpret_cast<httplib::Response*>(cres);
-  res->set_content(content, type);
+    httplib::Response *res = reinterpret_cast<httplib::Response*>(cres);
+    res->set_content(content, type);
 }
 
 }
