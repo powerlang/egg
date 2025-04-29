@@ -3,18 +3,17 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'request',
-		'response',
-		'server'
+		'response'
 	],
 	#category : #'Examples-HTTPServer'
 }
 
 { #category : #spec }
 ExampleAPI >> hello [
-	server library 
-		response: response asParameter
-		setContents: 'hello, world!' externalCopy asParameter
-		type: 'text/html' externalCopy asParameter
+	| name |
+	name := request paramAt: 'name'.
+	name isEmpty ifTrue: [name := 'world'].
+	response setContents: 'hello, ', name, '!' type: 'text/html'
 ]
 
 { #category : #spec }
@@ -25,10 +24,5 @@ ExampleAPI >> request: aRequest [
 { #category : #spec }
 ExampleAPI >> response: aResponse [
 	response := aResponse
-]
-
-{ #category : #spec }
-ExampleAPI >> server: aCPPHTTPServer [
-	server := aCPPHTTPServer
 ]
 

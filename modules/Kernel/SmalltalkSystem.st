@@ -8,16 +8,9 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'globals',
-		'memory',
-		'resources',
-		'properties',
-		'finalizer',
 		'eventHandlers',
 		'registeredEvents',
-		'externals',
-		'eventDispatcher',
-		'nativizer',
-		'session'
+		'eventDispatcher'
 	],
 	#classVars : [
 		'Implementors',
@@ -129,27 +122,9 @@ SmalltalkSystem >> classNamed: aString [
 	^global isSpecies ifTrue: [meta ifTrue: [global class] ifFalse: [global]]
 ]
 
-{ #category : #'startup/shutdown' }
-SmalltalkSystem >> closeExternalResources [
-	resources do: [:object | object sessionShutdown].
-	externals do: [:object | object sessionShutdown]
-]
-
 { #category : #services }
 SmalltalkSystem >> collectGarbage [
 	memory forceCompact
-]
-
-{ #category : #accessing }
-SmalltalkSystem >> ensurePropertyTableFor: anObject [
-	^properties at: anObject ifAbsentPut: [IdentityDictionary new]
-]
-
-{ #category : #'startup/shutdown' }
-SmalltalkSystem >> ephemeronsDo: aBlock [
-	resources ephemeronsDo: aBlock.
-	finalizer ephemeronsDo: aBlock.
-	properties ephemeronsDo: aBlock
 ]
 
 { #category : #accessing }
@@ -238,18 +213,8 @@ SmalltalkSystem >> includesKey: aSymbol [
 
 { #category : #initialization }
 SmalltalkSystem >> initialize [
-	finalizer := WeakIdentitySet new.
-	resources := WeakIdentitySet new.
-	properties := WeakIdentityDictionary new.
 	eventHandlers := WeakIdentityDictionary new.
-	registeredEvents := WeakIdentityDictionary new.
-	externals := OrderedCollection new
-]
-
-{ #category : #initialization }
-SmalltalkSystem >> initializeFinalizationBlocks [
-	finalizer finalizer: [:object | object finalize].
-	resources finalizer: [:object | object finalize]
+	registeredEvents := WeakIdentityDictionary new
 ]
 
 { #category : #testing }
@@ -305,21 +270,6 @@ SmalltalkSystem >> processAllMessages [
 ]
 
 { #category : #accessing }
-SmalltalkSystem >> properties [
-	^properties
-]
-
-{ #category : #accessing }
-SmalltalkSystem >> propertiesFor: anObject [
-	^properties at: anObject ifAbsent: nil
-]
-
-{ #category : #services }
-SmalltalkSystem >> recursiveBacktrace: aString [
-	Smalltalk exit
-]
-
-{ #category : #accessing }
 SmalltalkSystem >> register: aSet for: aClass [
 	registeredEvents at: aClass put: aSet
 ]
@@ -329,17 +279,10 @@ SmalltalkSystem >> registeredEventsFor: aClass [
 	^registeredEvents at: aClass ifAbsent: nil
 ]
 
-{ #category : #services }
-SmalltalkSystem >> registerExternal: externalObject [
-	externals add: externalObject
-]
 
 { #category : #initialization }
 SmalltalkSystem >> rehashWeakRegistries [
 	eventHandlers rehash.
-	resources rehash.
-	finalizer rehash.
-	properties rehash.
 	registeredEvents rehash
 ]
 
@@ -394,11 +337,6 @@ SmalltalkSystem >> renameClass: aClass to: aSymbol [
 	aClass name: symbol
 ]
 
-{ #category : #accessing }
-SmalltalkSystem >> resourceRegistry [
-	^resources
-]
-
 { #category : #'binding libraries' }
 SmalltalkSystem >> segmentLoaded: anImageSegment [
 	
@@ -433,14 +371,11 @@ SmalltalkSystem >> showBacktraceOf: aProcess label: aString [
 
 { #category : #'startup/shutdown' }
 SmalltalkSystem >> startUp [
-	self
-		initializeFinalizationBlocks;
-		ephemeronsDo: [:e | e activate].
-	resources do: [:object | object sessionStartup].
+	session startUp.
+	self ephemeronsDo: [:e | e activate].
 	Float startUp.
 	memory startUp.
 	"platform startUp."
-	session := SmalltalkSession new
 ]
 
 { #category : #accessing }

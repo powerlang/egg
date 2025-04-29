@@ -513,7 +513,7 @@ Float >> abs [
 
 { #category : #trigonometry }
 Float >> arcTan [
-	^Smalltalk os libc atan: self
+	^Kernel host libc atan: self
 ]
 
 { #category : #converting }
@@ -583,7 +583,7 @@ Float >> coerce: aNumber [
 
 { #category : #trigonometry }
 Float >> cos [
-	^Smalltalk os libc cos: self
+	^Kernel host libc cos: self
 ]
 
 { #category : #trigonometry }
@@ -598,7 +598,7 @@ Float >> errorOn: aSymbol status: anInteger [
 
 { #category : #logarithms }
 Float >> exp [
-	^Smalltalk os libc exp: self
+	^Kernel host libc exp: self
 ]
 
 { #category : #accessing }
@@ -707,7 +707,7 @@ Float >> isSpecialValue [
 Float >> ln [
 	self > 0
 		ifFalse: [^self error: 'ln is not defined for ' , self printString].
-	^Smalltalk os libc log: self
+	^Kernel host libc log: self
 ]
 
 { #category : #accessing }
@@ -868,7 +868,7 @@ Float >> significand [
 
 { #category : #trigonometry }
 Float >> sin [
-	^Smalltalk os libc sin: self
+	^Kernel host libc sin: self
 ]
 
 { #category : #accessing }
@@ -896,7 +896,7 @@ Float >> storeOn: aStream [
 
 { #category : #trigonometry }
 Float >> tan [
-	^Smalltalk os libc tan: self
+	^Kernel host libc tan: self
 ]
 
 { #category : #arithmetic }

@@ -54,7 +54,7 @@ ImageSegment::load(std::istream *data)
 void ImageSegment::fixPointerSlots(const std::vector<Object*>& imports)
 {
     intptr_t delta = this->_currentBase - this->header.baseAddress;
-    uintptr_t oldBehaviorBase = this->header.baseAddress & (((intptr_t)-1) << 32); // discards lower 32 bits
+    uintptr_t oldBehaviorBase = this->header.baseAddress & (((uintptr_t)-1) << 32); // discards lower 32 bits
     auto spaceStart = this->spaceStart();
     auto current = ((HeapObject::ObjectHeader*)spaceStart)->object();
     auto end = (HeapObject*)this->spaceEnd();

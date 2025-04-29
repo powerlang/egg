@@ -30,6 +30,11 @@ ExternalLibrary class >> linuxFilename [
 ]
 
 { #category : #accessing }
+ExternalLibrary class >> macFilename [
+	^'lib', self libname, '.dylib'
+]
+
+{ #category : #accessing }
 ExternalLibrary class >> windowsFilename [
 	^self libname, '.dll'
 ]

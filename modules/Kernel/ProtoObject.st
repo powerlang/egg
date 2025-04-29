@@ -61,6 +61,12 @@ ProtoObject >> _basicAt: anInteger [
 	^self errorVMSpecific
 ]
 
+{ #category : #underprimitives }
+ProtoObject >> _beSpecial [
+	#UnderBeSpecial. "hack to avoid missing symbol error during bootstrap"
+	^self errorVMSpecific
+]
+
 { #category : #'header access' }
 ProtoObject >> _copyBasicHeaderFrom: other [
 	self errorVMSpecific
@@ -249,7 +255,7 @@ ProtoObject >> errorVMSpecific [
 
 { #category : #finalization }
 ProtoObject >> finalizationRegistry [
-	^Smalltalk finalizer
+	^Kernel finalizer
 ]
 
 { #category : #finalization }

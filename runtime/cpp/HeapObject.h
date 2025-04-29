@@ -163,6 +163,7 @@ struct HeapObject
       void beLarge();
 
       void beNotSpecial();
+      void beSpecial();
       void beStrong();
 
       void beSeen();

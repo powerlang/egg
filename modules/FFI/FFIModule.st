@@ -35,7 +35,11 @@ FFIModule >> initializeFor: moduleName loader: loaderName [
 		at: #FFI put: self;
 		at: #OS put: module.
 	loaderType := module namespace at: loaderName.
-	loader := loaderType new.
+	loader := loaderType new
+]
+
+{ #category : #private }
+FFIModule >> initializeLibC [
 	libc := LibC new.
 	loader bootstrapOpen: libc.
 	defaultHeap := mallocHeap := MallocHeap new
@@ -52,18 +56,24 @@ FFIModule >> initializeForCurrentPlatform [
 ]
 
 { #category : #initialization }
-FFIModule >> initializeForMac [
-	self initializeFor: #'FFI.Mac' loader: #MacLibraryLoader
+FFIModule >> initializeForLinux [
+	self
+		initializeFor: #'FFI.Posix' loader: #PosixLibraryLoader;
+		initializeLibC
 ]
 
 { #category : #initialization }
-FFIModule >> initializeForLinux [
-	self initializeFor: #'FFI.Linux' loader: #LinuxLibraryLoader
+FFIModule >> initializeForMac [
+	self initializeFor: #'FFI.Posix' loader: #PosixLibraryLoader.
+	loader beMac.
+	self initializeLibC.
 ]
 
 { #category : #initialization }
 FFIModule >> initializeForWindows [
-	self initializeFor: #'FFI.Windows' loader: #WindowsLibraryLoader
+	self
+		initializeFor: #'FFI.Windows' loader: #WindowsLibraryLoader;
+		initializeLibC.
 ]
 
 { #category : #initialization }

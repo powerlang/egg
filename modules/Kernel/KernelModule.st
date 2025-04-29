@@ -15,6 +15,8 @@ Class {
 		'host',
 		'CRITICAL',
 		'unhandledErrorHandler',
+		'session',
+		'properties',
 		'utf8',
 		'utf16',
 		'utf32'
@@ -93,8 +95,25 @@ KernelModule >> critical: aBlock [
 	aBlock value
 ]
 
+{ #category : #accessing }
+KernelModule >> ensurePropertyTableFor: anObject [
+	^properties at: anObject ifAbsentPut: [IdentityDictionary new]
+]
+
+{ #category : #'startup/shutdown' }
+KernelModule >> ephemeronsDo: aBlock [
+	session ephemeronsDo: aBlock.
+	properties ephemeronsDo: aBlock
+]
+
+{ #category : #accessing }
 KernelModule >> exit [
 	host exit: 0
+]
+
+{ #category : #accessing }
+KernelModule >> finalizer [
+	^session finalizer
 ]
 
 { #category : #services }
@@ -122,7 +141,20 @@ KernelModule >> initialize [
 		keys do: [:symbol | | obj |
 			obj := namespace at: symbol.
 			obj isClass ifTrue: [classes add: obj].
-			exports add: symbol]
+			exports add: symbol].
+	session := SmalltalkSession new.
+	properties := WeakIdentityDictionary new.
+
+]
+
+{ #category : #accessing }
+KernelModule >> properties [
+	^properties
+]
+
+{ #category : #accessing }
+KernelModule >> propertiesFor: anObject [
+	^properties at: anObject ifAbsent: nil
 ]
 
 { #category : #services }
@@ -169,6 +201,12 @@ KernelModule >> prepareForExecution: aCompiledMethod [
 { #category : #accessing }
 KernelModule >> processor [
 	^Processor
+]
+
+{ #category : #initialization }
+KernelModule >> rehashWeakRegistries [
+	session rehashWeakRegistries.
+	properties rehash
 ]
 
 { #category : #removing }

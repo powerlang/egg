@@ -40,7 +40,8 @@ Evaluator::Evaluator(Runtime *runtime, HeapObject *falseObj, HeapObject *trueObj
         _runtime(runtime),
         _nilObj(nilObj),
         _trueObj(trueObj),
-        _falseObj(falseObj)
+        _falseObj(falseObj),
+        _inCallback(false)
     {
         _linearizer = new SExpressionLinearizer();
         _linearizer->runtime_(_runtime);
@@ -112,6 +113,7 @@ void Evaluator::initializePrimitives()
     this->addPrimitive("Behavior", &Evaluator::primitiveBehavior);
     this->addPrimitive("SetBehavior", &Evaluator::primitiveSetBehavior);
     this->addPrimitive("Class", &Evaluator::primitiveClass);
+    this->addPrimitive("UnderBeSpecial", &Evaluator::primitiveUnderBeSpecial);
     this->addPrimitive("UnderHash", &Evaluator::primitiveUnderHash);
     this->addPrimitive("UnderIsBytes", &Evaluator::primitiveUnderIsBytes);
     this->addPrimitive("UnderPointersSize", &Evaluator::primitiveUnderPointersSize);
@@ -425,7 +427,8 @@ void Evaluator::visitOpReturn(SOpReturn *anSOpReturn)
 {
     this->popFrameAndPrepare();
 
-    _runtime->_heap->collectIfTime();
+    if (!_inCallback)
+        _runtime->_heap->collectIfTime();
 }
 
 void Evaluator::visitOpNonLocalReturn(SOpNonLocalReturn *anSOpNonLocalReturn)
@@ -594,7 +597,10 @@ void Evaluator::evaluateCallback_(void *ret, HeapObject *closure, int argc, void
         this->_context->regPC_(_work->size());
         _context->buildClosureFrameFor_code_environment_(receiver, block, closure);
     }
+    auto prev = _inCallback;
+    _inCallback = true;
     this->evaluate();
+    _inCallback = prev;
     this->_context->regPC_(prevPC);
     for (size_t i = 0; i < argc; ++i) {
         this->_context->pop();
@@ -617,26 +623,29 @@ Object* Evaluator::primitiveClosureAsCallback() {
     }
 
     if (ffi_prep_cif(cif, FFI_DEFAULT_ABI, count, &ffi_type_pointer, argTypes) != FFI_OK) {
-        delete[] argTypes;
         delete cif;
-        return nullptr;
+        delete[] argTypes;
+        ffi_closure_free(closure);
+        return (Object*)_runtime->_nilObj;
     }
+
     auto self = this->_context->self()->asHeapObject();
-    auto lambda = new std::function<void(void*, int, void**)>(
-    [self, this](void *ret, int argc, void *args[]) {
-        this->evaluateCallback_(ret, self, argc, args);
-    }
-);
+    auto lambda = new std::function(
+        [self, this](void *ret, int argc, void *args[]) {
+            this->evaluateCallback_(ret, self, argc, args);
+        }
+    );
 
     // Bind the closure
-    if (ffi_prep_closure_loc(closure, cif, closureCallbackWrapper, (void*)lambda, closure) != FFI_OK) {
-        delete[] argTypes;
+    if (ffi_prep_closure_loc(closure, cif, closureCallbackWrapper, (void*)lambda, code_location) != FFI_OK) {
         delete cif;
+        delete[] argTypes;
         ffi_closure_free(closure);
-        return nullptr;
+        delete lambda;
+        return (Object*)_runtime->_nilObj;
     }
 
-    return (Object*)this->_runtime->newInteger_(reinterpret_cast<intptr_t>(closure));
+    return (Object*)this->_runtime->newInteger_(reinterpret_cast<intptr_t>(code_location));
 }
 
 Object* Evaluator::primitiveClosureValue() {
@@ -865,12 +874,45 @@ Object* Evaluator::primitiveSize() {
 }
 
 Object* Evaluator::primitiveStringReplaceFromToWithStartingAt() {
+    auto receiver = this->_context->self()->asHeapObject();
+    auto from = this->_context->firstArgument();
+    auto to = this->_context->secondArgument();
+    auto source = this->_context->thirdArgument();
+    auto starting = this->_context->fourthArgument();
+
+    if (!from->isSmallInteger() || !to->isSmallInteger() || !starting->isSmallInteger())
+        return this->failPrimitive();
+
+    if (source->isSmallInteger())
+        return this->failPrimitive();
+
+    if (_runtime->speciesOf_((Object*)receiver) != _runtime->speciesOf_(source))
+        return this->failPrimitive();
+
+    auto fromint = from->asSmallInteger()->asNative();
+    auto toint = to->asSmallInteger()->asNative();
+    auto startingint = starting->asSmallInteger()->asNative();
+
+    if (toint > receiver->size())
+        return this->failPrimitive();
+
+    auto len = to - from + 1;
+    auto last = startingint + len - 1;
+    auto hsource = source->asHeapObject();
+    if (last > hsource->size())
+        return this->failPrimitive();
+
+    receiver->replaceBytesFrom_to_with_startingAt_(
+        fromint, toint, hsource, startingint);
+
+    return (Object*)receiver;
+}
+
+Object* Evaluator::primitiveUnderBeSpecial() {
     auto receiver = this->_context->self();
-    receiver->asHeapObject()->replaceBytesFrom_to_with_startingAt_(
-        this->_context->firstArgument()->asSmallInteger()->asNative(),
-        this->_context->secondArgument()->asSmallInteger()->asNative(),
-        this->_context->thirdArgument()->asHeapObject(),
-        this->_context->fourthArgument()->asSmallInteger()->asNative());
+    if (!receiver->isSmallInteger())
+        receiver->asHeapObject()->beSpecial();
+
     return receiver;
 }
 
@@ -895,7 +937,7 @@ void Evaluator::initializeCIF(HeapObject *method, int argCount) {
     HeapObject *dll = this->_context->receiver()->asHeapObject();
     Object *handle = dll->slotAt_(1); // the handle
     if (handle->asHeapObject()->untypedSlot(0) == nullptr) {
-        error("trying to execute FFI method on closed library");
+        error_("trying to execute FFI method " + method->printString() + " on closed library");
     }
 
     HeapObject *fnName = _runtime->ffiMethodSymbol_(method);
@@ -1170,7 +1212,7 @@ Object* Evaluator::underprimitiveSmallSize(Object *receiver, std::vector<Object*
 }
 
 Object* Evaluator::underprimitiveULargeAtOffset(Object *receiver, std::vector<Object*> &args) {
-    auto result = receiver->asHeapObject()->uint64offset((args[1]->asSmallInteger()->asNative()));
+    auto result = receiver->asHeapObject()->uint64offset((args[0]->asSmallInteger()->asNative()));
     return newIntObject(result);
 }
 
@@ -1181,7 +1223,7 @@ Object* Evaluator::underprimitiveULargeAtOffsetPut(Object *receiver, std::vector
 }
 
 Object* Evaluator::underprimitiveULongAtOffset(Object *receiver, std::vector<Object*> &args) {
-    auto result = receiver->asHeapObject()->uint32offset((args[1]->asSmallInteger()->asNative()));
+    auto result = receiver->asHeapObject()->uint32offset((args[0]->asSmallInteger()->asNative()));
     return newIntObject(result);
 }
 
@@ -1192,7 +1234,7 @@ Object* Evaluator::underprimitiveULongAtOffsetPut(Object *receiver, std::vector<
 }
 
 Object* Evaluator::underprimitiveUShortAtOffset(Object *receiver, std::vector<Object*> &args) {
-    auto result = receiver->asHeapObject()->uint16offset((args[1]->asSmallInteger()->asNative()));
+    auto result = receiver->asHeapObject()->uint16offset((args[0]->asSmallInteger()->asNative()));
     return newIntObject(result);
 }
 

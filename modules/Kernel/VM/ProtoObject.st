@@ -6,6 +6,13 @@
 Extension { #name : #ProtoObject }
 
 { #category : '*Primitives' }
+ProtoObject >> _beSpecial [
+	<primitive: UnderBeSpecial>
+	self primitiveFailed.
+
+]
+
+{ #category : '*Primitives' }
 ProtoObject >> _hash [
 	<primitive: UnderHash>
 ]

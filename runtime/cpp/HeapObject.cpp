@@ -103,6 +103,10 @@ void Egg::HeapObject::beNotSpecial() {
 	this->unsetFlags(SmallHeader::Flags::IsSpecial);
 }
 
+void Egg::HeapObject::beSpecial() {
+	this->setFlags(SmallHeader::Flags::IsSpecial);
+}
+
 void HeapObject::beStrong() {
 	this->beNotSpecial();
 }

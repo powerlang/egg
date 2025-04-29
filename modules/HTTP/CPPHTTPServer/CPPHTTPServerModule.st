@@ -7,7 +7,7 @@ Class {
 	#name : #CPPHTTPServerModule,
 	#superclass : #Module,
 	#instVars : [
-		'server'
+		'library'
 	],
 	#category : #'CPPHTTPServer'
 }
@@ -17,4 +17,8 @@ CPPHTTPServerModule >> imports [
 	^{
 		#FFI -> #(ExternalLibrary ExternalObject).
 	}
+]
+
+CPPHTTPServerModule >> library [
+	^library ifNil: [library := HTTPServerLibrary new open]
 ]

@@ -227,6 +227,8 @@ HeapObject* Runtime::lookup_startingAt_(HeapObject *symbol, HeapObject *behavior
     }
     
     auto method = this->doLookup_startingAt_(symbol, behavior);
+    if (!method)
+        error_(this->behaviorClass_(behavior)->printString() + " does not understand " + symbol->printString());
     auto key = gced_global_cache_key(new GCedRef(symbol),new GCedRef(behavior));
     auto value = new GCedRef(method);
 	_globalCache.insert({key, value});

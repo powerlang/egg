@@ -1,0 +1,18 @@
+"
+    Copyright (c) 2024, Javier Pimás. 
+    See (MIT) license in root directory.
+"
+
+Class {
+	#name : #HTTPResponse,
+	#superclass : #ExternalObject,
+	#category : #'CPPHTTPServer'
+}
+
+{ #category : #spec }
+HTTPResponse >> setContents: aString type: anotherString [
+	self class module library 
+		response: handle asParameter
+		setContents: aString externalCopy asParameter
+		type: anotherString externalCopy asParameter
+]
