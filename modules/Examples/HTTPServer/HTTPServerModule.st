@@ -32,7 +32,7 @@ HTTPServerModule >> main: arguments [
 	base := arguments at: 3 ifAbsent: ['/egg'].
 	server := HTTPServer new.
 	server
-		routeGET: base, '/hello/:name' to: #hello with: self.
+		routeGET: base, '/hello/{name}' to: #hello with: self.
 	Kernel log: 'server configured, starting!', String cr.
 	server start.
 	^0
