@@ -38,7 +38,7 @@ public:
         _pragma = anSPragma;
     }
 
-    HeapObject* primitive() const;
+    const Object* primitive() const;
 
 };
 

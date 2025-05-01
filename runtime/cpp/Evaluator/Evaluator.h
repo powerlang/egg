@@ -39,16 +39,15 @@ private:
     Object *_regR;
 
     std::vector<SExpression*> *_work;
-
-	bool _inCallback;
+	friend class GarbageCollector;
 
 public:
     using PrimitivePointer = Object* (Evaluator::*)();
     using UndermessagePointer = Object* (Evaluator::*)(Object *, std::vector<Object*> &args);
 
 private:
-   	std::map<HeapObject*, PrimitivePointer> _primitives;
-    std::map<HeapObject*, UndermessagePointer> _undermessages;
+   	std::map<Object*, PrimitivePointer> _primitives;
+    std::map<Object*, UndermessagePointer> _undermessages;
 
 public:
     Evaluator(Runtime *runtime, HeapObject *falseObj, HeapObject *trueObj, HeapObject *nilObj);
@@ -123,7 +122,7 @@ public:
     	return _regR;
     }
 
-    void evaluatePerform_in_withArgs_(HeapObject *aSymbol, Object *receiver, Object *arguments);
+    void evaluatePerform_in_withArgs_(Object *aSymbol, Object *receiver, Object *arguments);
     SmallInteger* evaluatePrimitiveHash_(HeapObject *receiver);
 
     void evaluateCallback_(void *ret, HeapObject *self, int argc, void *args[]);
@@ -134,17 +133,15 @@ public:
         return this->_falseObj;
     }
 
-	bool isInCallback() { return _inCallback; }
-    
-	HeapObject* lookup_startingAt_sendSite_(HeapObject* symbol, HeapObject *behavior, SAbstractMessage *message);
+	Object* lookup_startingAt_sendSite_(Object* symbol, HeapObject *behavior, SAbstractMessage *message);
     Object* invoke_with_(HeapObject* method, Object *receiver);
     HeapObject* prepareForExecution_(HeapObject *method);
 
 
-    Object* send_to_with_(HeapObject *symbol, Object *receiver, std::vector<Object*> &args);
+    Object* send_to_with_(Object *symbol, Object *receiver, std::vector<Object*> &args);
 
 	void messageNotUnderstood_(SAbstractMessage *message);
-	void doesNotKnow(HeapObject *symbol);
+	void doesNotKnow(const Object *symbol);
     void visitIdentifier(SIdentifier* identifier) override;
     void visitLiteral(SLiteral* sLiteral) override;
     void visitBlock(SBlock* sBlock) override;
@@ -178,7 +175,7 @@ private:
     void addPrimitive(const std::string &name, PrimitivePointer primitive);
     void addUndermessage(const std::string &name, UndermessagePointer primitive);
 
-	PrimitivePointer primitiveFor_(HeapObject *symbol);
+	PrimitivePointer primitiveFor_(Object *symbol);
 
     Object* newDoubleObject(double aDouble);
     Object* newIntObject(auto anInteger);

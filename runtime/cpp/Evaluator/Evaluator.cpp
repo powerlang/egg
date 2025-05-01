@@ -59,12 +59,12 @@ void Evaluator::_halt()
 
 void Evaluator::addPrimitive(const std::string &name, Evaluator::PrimitivePointer primitive)
 {
-    HeapObject *symbol = _runtime->existingSymbolFrom_(name);
+    Object *symbol = _runtime->existingSymbolFrom_(name);
     _primitives[symbol] = primitive;
 }
 
 void Evaluator::addUndermessage(const std::string &name, UndermessagePointer primitive) {
-    HeapObject *symbol = _runtime->existingSymbolFrom_(name);
+    Object *symbol = _runtime->existingSymbolFrom_(name);
     _undermessages[symbol] = primitive;
 }
 
@@ -178,29 +178,29 @@ void Evaluator::initializePrimitives()
     _linearizer->primitives_(_primitives);
 }
 
-void Evaluator::evaluatePerform_in_withArgs_(HeapObject *aSymbol, Object *receiver, Object *arguments) {
+void Evaluator::evaluatePerform_in_withArgs_(Object *aSymbol, Object *receiver, Object *arguments) {
     HeapObject *behavior = this->_runtime->behaviorOf_(receiver);
     if (aSymbol->printString() == "#asBehavior") {
         int a = 0;
     }
-    HeapObject *method = this->_runtime->lookup_startingAt_(aSymbol, behavior);
+    Object *method = this->_runtime->lookup_startingAt_(aSymbol, behavior);
     if (!method)
         error_(std::string("cannot perform ") + aSymbol->printString() + " on " + receiver->printString());
     auto heapargs = arguments->asHeapObject();
     for (int i = 1; i <= heapargs->size(); i++) {
         this->_context->pushOperand_(heapargs->slotAt_(i));
     }
-    this->invoke_with_(method, receiver);
+    this->invoke_with_(method->asHeapObject(), receiver);
 }
 
-HeapObject*
-Evaluator::lookup_startingAt_sendSite_(HeapObject *symbol, HeapObject *behavior, SAbstractMessage *message)
+Object*
+Evaluator::lookup_startingAt_sendSite_(Object *symbol, HeapObject *behavior, SAbstractMessage *message)
 {
 	auto method = _runtime->lookup_startingAt_(symbol, behavior);
 	if (!method) return nullptr;
 
     message->registerCacheWith_(_runtime);
-    message->cache_when_(method, behavior);
+    message->cache_when_((Object*)method, (Object*)behavior);
     
     return method;
 }
@@ -254,7 +254,7 @@ void Egg::Evaluator::evaluateUndermessage_with_(SAbstractMessage * message, Unde
     _context->reserveStackSlots_(argcount);
 }
 
-Object* Evaluator::send_to_with_(HeapObject *symbol, Object *receiver, std::vector<Object*> &args) {
+Object* Evaluator::send_to_with_(Object *symbol, Object *receiver, std::vector<Object*> &args) {
     auto bytecodes = this->_context->buildLaunchFrame(symbol, args.size());
     auto prevRegE = this->_context->environment();
     this->_regR = receiver;
@@ -282,7 +282,7 @@ void Egg::Evaluator::messageNotUnderstood_(SAbstractMessage *message)
     error_(errmsg);
 }
 
-void Evaluator::doesNotKnow(HeapObject *symbol) { ASSERT(false); }
+void Evaluator::doesNotKnow(const Object *symbol) { ASSERT(false); }
 
 void Evaluator::visitIdentifier(SIdentifier *identifier)
 {
@@ -332,10 +332,10 @@ void Evaluator::visitOpDispatchMessage(SOpDispatchMessage *anSOpDispatchMessage)
             _runtime->superBehaviorOf_(_context->classBinding()) :
 		    _runtime->behaviorOf_(_regR);
 
-    auto method = message->methodFor_(behavior);
+    auto method = message->methodFor_((Object*)behavior);
 	if (method)
     {
-        this->invoke_with_(method, _regR);
+        this->invoke_with_(method->asHeapObject(), _regR);
         return;
     }
 	
@@ -354,7 +354,7 @@ void Evaluator::visitOpDispatchMessage(SOpDispatchMessage *anSOpDispatchMessage)
 	if (!method)
         return messageNotUnderstood_(message);
 
-	this->invoke_with_(method, _regR);
+	this->invoke_with_(method->asHeapObject(), _regR);
 }
 void Evaluator::visitOpDropToS(SOpDropToS *anSOpDropToS)
 {
@@ -667,7 +667,7 @@ Object* Evaluator::primitiveFloatNew() {
 }
 
 Object* Evaluator::primitiveFlushDispatchCaches() {
-    this->_runtime->flushDispatchCache_in_(this->_context->self()->asHeapObject(), this->_context->firstArgument()->asHeapObject());
+    this->_runtime->flushDispatchCache_in_(this->_context->self(), this->_context->firstArgument()->asHeapObject());
     return this->_context->self();
 }
 
@@ -676,7 +676,7 @@ Object* Evaluator::primitiveFlushFromCaches() {
     return this->_context->self();
 }
 
-Evaluator::PrimitivePointer Evaluator::primitiveFor_(HeapObject *aSymbol) {
+Evaluator::PrimitivePointer Evaluator::primitiveFor_(Object *aSymbol) {
     return this->_primitives[aSymbol];
 }
 
@@ -736,25 +736,25 @@ Object* Evaluator::primitiveHostLoadModule() {
 }
 
 Object* Evaluator::primitiveNew() {
-    GCSafepoint safepoint(this->_runtime->_heap);
+    auto guard = this->_runtime->_heap->atGCSafepoint();
     return (Object*)this->_runtime->newSlotsOf_(this->_context->self()->asHeapObject());
 }
 
 Object* Evaluator::primitiveNewBytes() {
-    GCSafepoint safepoint(this->_runtime->_heap);
+    auto guard = this->_runtime->_heap->atGCSafepoint();
     auto size = this->_context->firstArgument()->asSmallInteger()->asNative();
     return (Object*)this->_runtime->newBytes_size_(this->_context->self()->asHeapObject(), size);
 }
 
 Object* Evaluator::primitiveNewSized() {
-    GCSafepoint safepoint(this->_runtime->_heap);
+    auto guard = this->_runtime->_heap->atGCSafepoint();
     auto size = this->_context->firstArgument()->asSmallInteger()->asNative();
     return (Object*)this->_runtime->newOf_sized_(this->_context->self()->asHeapObject(), size);
 }
 
 Object* Evaluator::primitivePerformWithArguments() {
     this->evaluatePerform_in_withArgs_(
-        this->_context->firstArgument()->asHeapObject(),
+        this->_context->firstArgument(),
         this->_context->self(),
         this->_context->secondArgument());
     return this->_context->self();
