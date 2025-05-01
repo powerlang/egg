@@ -32,6 +32,8 @@ class EvaluationContext {
     const int FRAME_TO_FIRST_TEMP_DELTA = 5;
     const int FRAME_TO_FIRST_ARG_DELTA = 2;
 
+    friend class GarbageCollector;
+
 public:
     const int STACK_SIZE = 64 * 1024;
     EvaluationContext(Runtime *runtime) : 

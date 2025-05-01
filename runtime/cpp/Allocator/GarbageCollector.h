@@ -57,6 +57,7 @@ public:
 
     void nativeFramesStartingAt_bp_do_(uintptr_t **stack, uintptr_t sp, uintptr_t bp, std::function<void(uintptr_t*, uintptr_t)> block);
     void scanFirstStackChunk_(HeapObject * aProcessVMStack);
+    void scanPointer_(Object **pointer);
     void scanCurrentContext();
     void scanStack_(HeapObject *aProcessVMStack);
     void scanStacks();
