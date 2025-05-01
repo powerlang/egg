@@ -142,7 +142,7 @@ class Bootstrapper {
 		if (linker == "asSymbol") {
 			auto symbol = _runtime->symbolTableAt_(tokens[0]);
 			if (symbol == nullptr) {
-				symbol = _runtime->newString_(tokens[0]);
+				symbol = (Object*)_runtime->newString_(tokens[0]);
 				_runtime->addKnownSymbol_(tokens[0], symbol);
 			}
 			return (Object*)symbol;

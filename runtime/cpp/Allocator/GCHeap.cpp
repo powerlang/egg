@@ -11,9 +11,12 @@
 
 using namespace Egg;
 
-GCHeap::GCHeap(Runtime *runtime) : _runtime(runtime), _gcNeeded(false)
+GCHeap::GCHeap(Runtime *runtime) :
+    _runtime(runtime),
+    _gcNeeded(false),
+    _atGCSafepoint(false), // defaults to false, only particular points enable GC
+    _atGCUnsafepoint(false) // defaults to false, only particular points disable GC
 {
-    _atGCSafepoint = false; // defaults to false, only particular points enable GC
     _eden = this->addNewSpaceSized_(16*MB);
     _eden->_name = "Eden";
 
@@ -83,7 +86,7 @@ uintptr_t GCHeap::allocate_(uint32_t size) {
     if (size > LargeThreshold)
         return this->allocateLarge_(size);
 
-    if (this->isAtGCSafepoint() && !_runtime->_evaluator->isInCallback())
+    if (this->isGCAllowed())
         this->collectIfTime();
     else
         requestGC();
@@ -179,10 +182,6 @@ HeapObject* GCHeap::allocateBytes_(uint32_t size)
 }
 */
 
-bool GCHeap::isAtGCSafepoint()
-{
-    return _atGCSafepoint;
-}
 
 void GCHeap::collectIfTime()
 {

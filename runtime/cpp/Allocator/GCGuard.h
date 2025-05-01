@@ -1,13 +1,12 @@
 
-#ifndef _GCSAFEPOINT_H_
-#define _GCSAFEPOINT_H_
-
-#include "GCHeap.h"
+#ifndef _GCGUARD_H_
+#define _GCGUARD_H_
 
 namespace Egg {
 
 /**
- * My instances, on construction, allow the heap to be collected (i.e. to move objects).
+ * My instances, on construction, mantain a bool var to allow/disallow the heap to be
+ * collected (i.e. to move objects).
  * When destructed, we restore the previous state.
  *
  * Creating an instance does not automatically cause GC. Users should be aware of potentially
@@ -16,21 +15,23 @@ namespace Egg {
  * GCedRefs or dead.
  */
 
-class GCSafepoint {
-  GCHeap* _heap;
-  bool _prevState;
+class GCGuard {
+    bool &_var;
+    bool _prev;
 
   public:
-    GCSafepoint(GCHeap *heap) : _heap(heap) {
-      _prevState = _heap->isAtGCSafepoint();
-      _heap->beAtGCSafepoint(true);
+    GCGuard(bool &var, bool newValue) : _var(var), _prev(var) {
+      _var = newValue;
     }
 
-    ~GCSafepoint() {
-      _heap->beAtGCSafepoint(_prevState);
+    ~GCGuard() {
+      _var = _prev;
     }
+
+    GCGuard(const GCGuard&) = delete;
+    GCGuard& operator=(const GCGuard&) = delete;
 };
 
 }
 
-#endif // ~ _GCSAFEPOINT_H_
+#endif // ~ _GCGUARD_H_

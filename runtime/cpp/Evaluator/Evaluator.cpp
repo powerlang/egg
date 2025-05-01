@@ -1,7 +1,7 @@
 
 #include "Evaluator.h"
 #include "Runtime.h"
-#include "Allocator/GCSafepoint.h"
+#include "Allocator/GCHeap.h"
 #include "SExpressionLinearizer.h"
 #include "SOpAssign.h"
 #include "SOpDispatchMessage.h"
@@ -40,15 +40,14 @@ Evaluator::Evaluator(Runtime *runtime, HeapObject *falseObj, HeapObject *trueObj
         _runtime(runtime),
         _nilObj(nilObj),
         _trueObj(trueObj),
-        _falseObj(falseObj),
-        _inCallback(false)
+        _falseObj(falseObj)
     {
+        debugRuntime = _runtime;
         _linearizer = new SExpressionLinearizer();
         _linearizer->runtime_(_runtime);
         _context = new EvaluationContext(runtime);
         this->initializeUndermessages();
         this->initializePrimitives();
-        debugRuntime = _runtime;
     }
 
 
@@ -427,7 +426,7 @@ void Evaluator::visitOpReturn(SOpReturn *anSOpReturn)
 {
     this->popFrameAndPrepare();
 
-    if (!_inCallback)
+    if (!_runtime->_heap->isAtGCUnsafepoint())
         _runtime->_heap->collectIfTime();
 }
 
@@ -597,10 +596,8 @@ void Evaluator::evaluateCallback_(void *ret, HeapObject *closure, int argc, void
         this->_context->regPC_(_work->size());
         _context->buildClosureFrameFor_code_environment_(receiver, block, closure);
     }
-    auto prev = _inCallback;
-    _inCallback = true;
+    auto guard = _runtime->_heap->atGCUnsafepoint();
     this->evaluate();
-    _inCallback = prev;
     this->_context->regPC_(prevPC);
     for (size_t i = 0; i < argc; ++i) {
         this->_context->pop();
@@ -728,6 +725,7 @@ Object* Evaluator::primitiveHostInitializeFFI() {
     return (Object*)this->_context->self();
 }
 Object* Evaluator::primitiveHostLoadModule() {
+    auto guard = this->_runtime->_heap->atGCUnsafepoint();
     auto name = this->_context->firstArgument()->asHeapObject()->asLocalString();
     std::cout << "loading " << name << "..." << std::endl;
     auto module = (Object*)this->_runtime->loadModule_(this->_context->firstArgument()->asHeapObject());
