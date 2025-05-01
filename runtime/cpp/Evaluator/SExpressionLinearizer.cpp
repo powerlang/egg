@@ -543,8 +543,17 @@ void SExpressionLinearizer::visitMethod(SMethod *anSMethod, HeapObject *method) 
     this->reset();
     auto primitive = anSMethod->pragma();
     if (primitive != nullptr) {
-        auto name = (_runtime->methodIsFFI_(method)) ? _runtime->existingSymbolFrom_("FFICall") : anSMethod->primitive();
-        PrimitivePointer primitive = this->_primitives[name];
+        auto name = (_runtime->methodIsFFI_(method)) ? _runtime->existingSymbolFrom_("FFICall") : (Object*)anSMethod->primitive();
+
+        PrimitivePointer primitive;
+        auto it = this->_primitives.find(name);
+        if (it == this->_primitives.end()) {
+            error_("primitive " + name->printString() + "not found");
+        }
+        else {
+            primitive = it->second;
+        }
+
         this->primitive_(primitive);
         this->returnOp();
     }
