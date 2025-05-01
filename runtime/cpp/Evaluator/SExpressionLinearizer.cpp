@@ -451,7 +451,7 @@ void SExpressionLinearizer::visitBlock(SBlock *anSBlock) {
 
     if (!anSBlock->isInlined()) {
 
-        auto code = _runtime->newExecutableCodeFor_with_(anSBlock->_compiledCode, this->_operations);
+        auto code = _runtime->newExecutableCodeFor_with_(anSBlock->compiledCode(), this->_operations);
         _runtime->blockExecutableCode_put_(anSBlock->compiledCode(), code);
     }
 

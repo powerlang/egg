@@ -56,7 +56,7 @@ public:
     }
 
     bool isInlined() const {
-   		return _compiledCode == nullptr;
+   		return _compiledCode.get() == (Object*)KnownObjects::nil;
     }
 
     int offsetOfCurrentEnvironment() const {
