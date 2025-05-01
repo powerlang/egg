@@ -7,22 +7,20 @@ namespace Egg {
 
 class SPragma : public SExpression {
 public:
-    HeapObject * _name;
+    GCedRef _name;
 
-    SPragma(HeapObject *name) {
-        _name = name;
-    }
+    SPragma(Object *name) : _name(name) {}
 
     void acceptVisitor_(SExpressionVisitor* visitor) override {
         visitor->visitPragma(this);
     }
 
-    HeapObject* name() const {
-        return _name;
+    const Object* name() const {
+        return _name.get();
     }
 
-    void name(HeapObject *name) {
-        _name = name;
+    void name(Object *name) {
+        _name.set_(name);
 
     }
 

@@ -274,14 +274,14 @@ public:
 		return this->_runtime->newInteger_(value);
 	}
 
-	HeapObject* nextSymbol() {
+	Object* nextSymbol() {
 		auto index = this->nextInteger();
-		return this->literalAt_(index)->asHeapObject();
+		return this->literalAt_(index);
 	}
 
-	HeapObject* nextSymbolOrNil() {
+	Object* nextSymbolOrNil() {
 		auto index = this->nextInteger();
-		return index != 0 ? this->literalAt_(index)->asHeapObject() : KnownObjects::nil;
+		return index != 0 ? this->literalAt_(index) : (Object*)KnownObjects::nil;
 	}
 
 	uint64_t nextUnsignedInteger() {

@@ -100,8 +100,8 @@ public:
     HeapObject* newExecutableCodeFor_with_(HeapObject *compiledCode, PlatformCode *platformCode);
     HeapObject* newString_(const std::string &str);
     HeapObject* addSymbol_(const std::string &str);
-    void addKnownSymbol_(const std::string &str, HeapObject *symbol) {
-        _knownSymbols[str] = symbol;
+    void addKnownSymbol_(const std::string &str, Object *symbol) {
+        _knownSymbols[str] = new GCedRef(symbol);
     }
     HeapObject* loadModule_(HeapObject *name);
 	void addSegmentSpace_(ImageSegment *segment);
@@ -531,7 +531,7 @@ public:
 
 	uintptr_t assignGCedRefIndex();
 	void registerGCedRef_(GCedRef *gcedRef);
-	GCedRef* createGCedRef_(HeapObject * object);
+	GCedRef* createGCedRef_(Object * object);
 	void releaseGCedRef_(uintptr_t index);
 	void gcedRefsDo_(const std::function<void(GCedRef *)> &aBlock);
 

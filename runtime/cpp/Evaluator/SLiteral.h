@@ -8,7 +8,7 @@
 namespace Egg {
 
 class SLiteral : public SLiteralVar {
-    Object *_value;
+    GCedRef _value;
 public:
     SLiteral(int64_t index, Object *value) : SLiteralVar(index), _value(value) {}
 
@@ -20,12 +20,12 @@ public:
         return true;
     }
 
-    Object* value() const {
-        return _value;
+    Object* value() {
+        return _value.get();
     }
 
     void value_(Object* anObject) {
-        _value = anObject;
+        _value.set_(anObject);
     }
 
 };

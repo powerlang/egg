@@ -10,18 +10,17 @@ namespace Egg {
 class SScript : public SExpression {
 public:
     std::vector<SExpression*> _statements;
-    HeapObject* _compiledCode;
+    GCedRef _compiledCode;
 
-    SScript() {
-        _compiledCode = nullptr;
+    SScript() : _compiledCode((Object*)KnownObjects::nil) {
     }
 
     HeapObject* compiledCode() {
-        return _compiledCode;
+        return _compiledCode.get()->asHeapObject();
     }
 
     void compiledCode_(HeapObject* anObject) {
-        _compiledCode = anObject;
+        _compiledCode.set_((Object*)anObject);
     }
 
     std::vector<SExpression*>& statements() {
