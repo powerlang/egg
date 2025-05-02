@@ -39,7 +39,9 @@ char* Request_ParamAt(void *creq, char *key, char *type)
 {
     httplib::Request *req = reinterpret_cast<httplib::Request*>(creq);
 
-    return (char*)req->path_params.at(key).c_str();
+    auto &params = req->path_params;
+    auto it = params.find(key);
+    return it != params.end() ? (char*)it->second.c_str() : nullptr;
 }
 
 void Response_SetContent(void *cres, char *content, char *type)
