@@ -10,8 +10,8 @@ Class {
 { #category : #spec }
 HTTPServerModule >> imports [
 	^{
-		#'HTTP.CPPHTTPServer' -> #(HTTPServer).
 		#FFI -> #(ExternalLibrary).
+		#'HTTP.CPPHTTPServer' -> #(HTTPServer).
 	}
 ]
 
@@ -32,7 +32,7 @@ HTTPServerModule >> main: arguments [
 	base := arguments at: 3 ifAbsent: ['/egg'].
 	server := HTTPServer new.
 	server
-		routeGET: base, '/hello/{name}' to: #hello with: self.
+		routeGET: base, '/hello/{name}' to: [:req :res | self handle: req into: res with: #hello].
 	Kernel log: 'server configured, starting!', String cr.
 	server start.
 	^0
