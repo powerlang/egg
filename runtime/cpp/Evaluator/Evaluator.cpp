@@ -164,13 +164,16 @@ void Evaluator::initializePrimitives()
     this->addPrimitive("HostCurrentMilliseconds", &Evaluator::primitiveHostCurrentMilliseconds);
     this->addPrimitive("HostLog", &Evaluator::primitiveHostLog);
 
-    /*this->addPrimitive("PrepareForExecution", &Evaluator::primitivePrepareForExecution);
+    /*
+    this->addPrimitive("PrepareForExecution", &Evaluator::primitivePrepareForExecution);
     this->addPrimitive("ProcessVMStackInitialize", &Evaluator::primitiveProcessVMStackInitialize);
     this->addPrimitive("ProcessVMStackAt", &Evaluator::primitiveProcessVMStackAt);
     this->addPrimitive("ProcessVMStackAtPut", &Evaluator::primitiveProcessVMStackAtPut);
     this->addPrimitive("ProcessVMStackBpAtPut", &Evaluator::primitiveProcessVMStackBpAtPut);
     this->addPrimitive("ProcessVMStackPcAtPut", &Evaluator::primitiveProcessVMStackPcAtPut);
-    this->addPrimitive("ProcessVMStackBP", &Evaluator::primitiveProcessVMStackBP);
+    */
+    this->addPrimitive("ProcessVMStackBP", &Evaluator::primitiveProcessBP);
+    /*
     this->addPrimitive("ProcessVMStackBufferSize", &Evaluator::primitiveProcessVMStackBufferSize);
     this->addPrimitive("ProcessVMStackContextSwitchTo", &Evaluator::primitiveProcessVMStackContextSwitchTo);
     */
@@ -756,6 +759,11 @@ Object* Evaluator::primitivePerformWithArguments() {
         this->_context->self(),
         this->_context->secondArgument());
     return this->_context->self();
+}
+
+Object* Evaluator::primitiveProcessBP()
+{
+    return (Object*)this->_runtime->newInteger_(this->_context->framePointer());
 }
 
 Object* Evaluator::primitivePrimeFor() {

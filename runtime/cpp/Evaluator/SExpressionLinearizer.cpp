@@ -548,7 +548,7 @@ void SExpressionLinearizer::visitMethod(SMethod *anSMethod, HeapObject *method) 
         PrimitivePointer primitive;
         auto it = this->_primitives.find(name);
         if (it == this->_primitives.end()) {
-            error_("primitive " + name->printString() + "not found");
+            error_("primitive " + name->printString() + " not found");
         }
         else {
             primitive = it->second;

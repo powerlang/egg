@@ -214,6 +214,7 @@ private:
 	Object* primitiveNewObjectHeap();
 	Object* primitiveNewSized();
 	Object* primitivePerformWithArguments();
+	Object* primitiveProcessBP();
 	Object* primitivePrimeFor();
 	Object* primitivePrimeFor_(auto anInteger);
 	Object* primitiveSMIBitAnd();
