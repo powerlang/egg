@@ -30,9 +30,20 @@ HTTPServerLibrary >> newServer [
 ]
 
 { #category : #server }
+HTTPServerLibrary >> server: aServer DELETE: url callback: aCallback [
+	<cdecl: void Server_Delete(pointer, pointer, pointer)>
+]
+
+{ #category : #server }
 HTTPServerLibrary >> server: aServer GET: url callback: aCallback [
 	<cdecl: void Server_Get(pointer, pointer, pointer)>
 ]
+
+{ #category : #server }
+HTTPServerLibrary >> server: aServer POST: url callback: aCallback [
+	<cdecl: void Server_Post(pointer, pointer, pointer)>
+]
+
 
 { #category : #server }
 HTTPServerLibrary >> startServer: aServer [
