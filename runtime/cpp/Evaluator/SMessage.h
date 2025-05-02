@@ -13,7 +13,7 @@ class SMessage : public SAbstractMessage {
     bool _inlined;
 
     public:
-    SMessage(SExpression *receiver, HeapObject *selector, const std::vector<SExpression*>& arguments, bool inlined) :
+    SMessage(SExpression *receiver, Object *selector, const std::vector<SExpression*>& arguments, bool inlined) :
         SAbstractMessage(selector, arguments), _receiver(receiver), _inlined(inlined)
         { }
 

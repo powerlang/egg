@@ -204,7 +204,7 @@ std::string Runtime::printGlobalCache() {
 void Runtime::checkCache() {
     for (const auto& entry : _globalCache) {
         auto symbol = entry.first.first->get();
-        auto methodSelector = debugRuntime->methodSelector_(entry.second->get());
+        auto methodSelector = debugRuntime->methodSelector_(entry.second->get()->asHeapObject());
         ASSERT( symbol ==  methodSelector);
         if (symbol != methodSelector) {
             int a = 0;
@@ -212,16 +212,16 @@ void Runtime::checkCache() {
     }
 }
 
-HeapObject* Runtime::lookup_startingAt_(HeapObject *symbol, HeapObject *behavior)
+Object* Runtime::lookup_startingAt_(Object *symbol, HeapObject *behavior)
 {
     checkCache();
 
-    if (symbol->printString() == "#sizeInBytes") {
-        int a = 0;
-    }
-    auto iter = _globalCache.find(global_cache_key(symbol,behavior));
+    //if (symbol->printString() == "#sizeInBytes") {
+    //    int a = 0;
+    //}
+    auto iter = _globalCache.find(global_cache_key(symbol,(Object*)behavior));
     if (iter != _globalCache.end()) {
-        if (iter->second->get()->slotAt_(5)->printString() != symbol->printString())
+        if (iter->second->get()->asHeapObject()->slotAt_(5)->printString() != symbol->printString())
             int b = 1;
         return iter->second->get();
     }
@@ -229,14 +229,14 @@ HeapObject* Runtime::lookup_startingAt_(HeapObject *symbol, HeapObject *behavior
     auto method = this->doLookup_startingAt_(symbol, behavior);
     if (!method)
         error_(this->behaviorClass_(behavior)->printString() + " does not understand " + symbol->printString());
-    auto key = gced_global_cache_key(new GCedRef(symbol),new GCedRef(behavior));
-    auto value = new GCedRef(method);
+    auto key = gced_global_cache_key(new GCedRef(symbol),new GCedRef((Object*)behavior));
+    auto value = new GCedRef((Object*)method);
 	_globalCache.insert({key, value});
     checkCache();
     return method;
 }
 
-HeapObject* Runtime::doLookup_startingAt_(HeapObject *symbol, HeapObject *startBehavior)
+Object* Runtime::doLookup_startingAt_(Object *symbol, HeapObject *startBehavior)
 {
 	auto behavior = startBehavior;
 	do {
@@ -249,18 +249,18 @@ HeapObject* Runtime::doLookup_startingAt_(HeapObject *symbol, HeapObject *startB
 	return nullptr;
 }
 
-HeapObject* Runtime::methodFor_in_(HeapObject *symbol, HeapObject *behavior)
+Object* Runtime::methodFor_in_(Object *symbol, HeapObject *behavior)
 {
 	auto md = this->behaviorMethodDictionary_(behavior);
 	auto table = this->dictionaryTable_(md);
 	for (int index = 2; index < table->size(); index += 2) { 
-		if (table->slotAt_(index) == (Object*)symbol)
-			return table->slotAt_(index + 1)->asHeapObject();
+		if (table->slotAt_(index) == symbol)
+			return table->slotAt_(index + 1);
     }
 	return nullptr;
 }
 
-HeapObject* Runtime::existingSymbolFrom_(const std::string &selector) {
+Object* Runtime::existingSymbolFrom_(const std::string &selector) {
     auto result = this->symbolTableAt_(selector);
     if (result == nullptr) {
         std::string str = std::string("symbol #") + selector + " not found in image";
@@ -268,34 +268,34 @@ HeapObject* Runtime::existingSymbolFrom_(const std::string &selector) {
     }
     return result;
 }
-HeapObject* Runtime::symbolTableAt_(const std::string &selector)
+Object* Runtime::symbolTableAt_(const std::string &selector)
 {
     auto it = this->_knownSymbols.find(selector);
     if (it != this->_knownSymbols.end())
-        return it->second;
+        return it->second->get();
 
     if (selector == "linker:token:") {
         int a = 0;
     }
     HeapObject *table = this->_symbolTable->slotAt_(2)->asHeapObject();
     for (int i = 2; i < table->size(); i++){
-        auto symbol = table->slotAt_(i)->asHeapObject();
-        if (symbol != this->_nilObj){
+        auto symbol = table->slotAt_(i);
+        if (symbol != (Object*)this->_nilObj){
             //std::cout << "symbol" << symbol->printString() << " at: 0x" << i << std::endl;
-            if (symbol->sameBytesThan(selector))
-               return  symbol;
+            if (symbol->asHeapObject()->sameBytesThan(selector))
+               return symbol;
         }
     }
 
     return nullptr;
 }
 
-HeapObject* Runtime::lookupAssociationFor_in_(HeapObject *symbol, HeapObject *dictionary) {
+HeapObject* Runtime::lookupAssociationFor_in_(Object *symbol, HeapObject *dictionary) {
     auto table = this->dictionaryTable_(dictionary);
     for (int index = 2; index <= table->size(); index++) {
         auto assoc = table->slotAt_(index)->asHeapObject();
         if (assoc != this->_nilObj) {
-            auto key = assoc->slotAt_(1)->asHeapObject();
+            auto key = assoc->slotAt_(1);
            if (key == symbol)
                 return assoc;
         }
@@ -303,7 +303,7 @@ HeapObject* Runtime::lookupAssociationFor_in_(HeapObject *symbol, HeapObject *di
     return nullptr;
 }
 
-void Runtime::flushDispatchCache_(HeapObject *aSymbol) {
+void Runtime::flushDispatchCache_(Object *aSymbol) {
 
     auto iter = _inlineCaches.find(aSymbol);
     if (iter != _inlineCaches.end()) {
@@ -325,7 +325,7 @@ void Runtime::flushDispatchCache_(HeapObject *aSymbol) {
     }
 }
 
-void Runtime::flushDispatchCache_in_(HeapObject *aSymbol, HeapObject *klass) {
+void Runtime::flushDispatchCache_in_(Object *aSymbol, HeapObject *klass) {
 
     HeapObject *behavior = this->speciesInstanceBehavior_(klass);
 
@@ -338,7 +338,7 @@ void Runtime::flushDispatchCache_in_(HeapObject *aSymbol, HeapObject *klass) {
         }
     }
 
-    global_cache_key pair = std::make_pair(aSymbol, behavior);
+    global_cache_key pair = std::make_pair(aSymbol, (Object*)behavior);
     auto globalIter = _globalCache.find(pair);
     if (globalIter != _globalCache.end())
         _globalCache.erase(globalIter);
@@ -363,7 +363,7 @@ void Runtime::registerGCedRef_(GCedRef *gcedRef) {
     _gcedRefs[gcedRef->index()] = gcedRef;
 }
 
-GCedRef * Runtime::createGCedRef_(HeapObject *object) {
+GCedRef * Runtime::createGCedRef_(Object *object) {
 
     auto index = this->assignGCedRefIndex();
     GCedRef *result = new GCedRef(object, index);

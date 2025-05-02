@@ -13,7 +13,7 @@ namespace Egg {
 class Evaluator;
 
 class SExpressionLinearizer : public SExpressionVisitor {
-	HeapObject *_greaterThan, *_plus, *_not, *_equalsEquals, *_ifTrue, *_ifFalse, *_ifTrueIfFalse, *_ifFalseIfTrue, *_ifNil, *_ifNotNil, *_ifNilIfNotNil, *_ifNotNilIfNil, *_whileTrue, *_whileFalse, *_whileTrue_, *_whileFalse_, *_toDo, *_toByDo, *_repeat, *_timesRepeat, *_andNot, *_orNot;
+	Object *_greaterThan, *_plus, *_not, *_equalsEquals, *_ifTrue, *_ifFalse, *_ifTrueIfFalse, *_ifFalseIfTrue, *_ifNil, *_ifNotNil, *_ifNilIfNotNil, *_ifNotNilIfNil, *_whileTrue, *_whileFalse, *_whileTrue_, *_whileFalse_, *_toDo, *_toByDo, *_repeat, *_timesRepeat, *_andNot, *_orNot;
 	SLiteral *_one;
 	bool _inBlock;
 	bool _dropsArguments;
@@ -21,7 +21,7 @@ class SExpressionLinearizer : public SExpressionVisitor {
 	PlatformCode *_operations;
 	
 	using PrimitivePointer = Object* (Evaluator::*)();
-	std::map<HeapObject*, PrimitivePointer> _primitives;
+	std::map<Object*, PrimitivePointer> _primitives;
 	Runtime *_runtime;
 
 public: 
@@ -96,7 +96,7 @@ public:
 	void loadRwithSelf();
 	void popR();
 	void primitive_(PrimitivePointer aClosure);
-	void primitives_(std::map<HeapObject*, PrimitivePointer> &primitives) { _primitives = primitives; }
+	void primitives_(std::map<Object*, PrimitivePointer> &primitives) { _primitives = primitives; }
 	void pushR();
 	void reset();
 	void returnOp();

@@ -10,20 +10,20 @@ class HeapObject;
 
 class SAssociationBinding : public SBinding {
     int _index;
-    HeapObject *_association;
+    GCedRef _association;
 public:
-	SAssociationBinding(HeapObject *assoc) : _association(assoc) {}
+	SAssociationBinding(HeapObject *assoc) : _association((Object*)assoc) {}
 
 	void assign_within_(Object *value, EvaluationContext *anEvaluationContext) override {
-		anEvaluationContext->storeAssociation_value_(this->_association, value);
+		anEvaluationContext->storeAssociation_value_(this->association(), value);
 	}
 
 	HeapObject* association() {
-		return this->_association;
+		return this->_association.get()->asHeapObject();
 	}
 
 	void association_(HeapObject *anAssociation) {
-		this->_association = anAssociation;
+		this->_association.set_((Object*)anAssociation);
 	}
 
 	int index() {
@@ -43,7 +43,7 @@ public:
 	}
 
     Object* valueWithin_(EvaluationContext* anEvaluationContext) override {
-        return anEvaluationContext->loadAssociationValue_(this->_association);
+        return anEvaluationContext->loadAssociationValue_(this->association());
     }
 };
 

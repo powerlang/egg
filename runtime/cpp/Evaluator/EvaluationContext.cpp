@@ -66,7 +66,7 @@ std::vector<Object*> EvaluationContext::methodArguments() {
     return arguments;
 }
 
-PlatformCode* EvaluationContext::buildLaunchFrame(HeapObject *symbol, int argCount)
+PlatformCode* EvaluationContext::buildLaunchFrame(Object *symbol, int argCount)
 {
     auto launcher = _runtime->newCompiledMethod();
     auto bytecodes = newPlatformCode();
@@ -76,7 +76,7 @@ PlatformCode* EvaluationContext::buildLaunchFrame(HeapObject *symbol, int argCou
 
     auto literal = new SLiteral(0, (Object*)_runtime->_nilObj);
     std::vector<SExpression*> dummy(argCount, literal);
-    auto message = new SMessage(literal, symbol, dummy, false);
+    auto message = new SMessage(literal, (Object*)symbol, dummy, false);
     auto dispatch = new SOpDispatchMessage(message);
 
     bytecodes->push_back(dispatch);
@@ -222,7 +222,7 @@ void EvaluationContext::unwind()
 
 }
 
-SBinding* EvaluationContext::staticBindingFor_(HeapObject *symbol)
+SBinding* EvaluationContext::staticBindingFor_(Object *symbol)
 {
     auto b = this->staticBindingForIvar_(symbol);
     if (b != nullptr)
@@ -233,15 +233,15 @@ SBinding* EvaluationContext::staticBindingFor_(HeapObject *symbol)
     return this->staticBindingForMvar_(symbol);
 }
 
-SBinding* EvaluationContext::staticBindingFor_inModule_(HeapObject *symbol, HeapObject *module) {
+SBinding* EvaluationContext::staticBindingFor_inModule_(Object *symbol, HeapObject *module) {
     auto namespace_ = this->_runtime->moduleNamespace_(module);
     auto assoc = this->_runtime->lookupAssociationFor_in_(symbol, namespace_);
     if (assoc == nullptr)
-        error_(("unbound variable: " + symbol->asLocalString()));
+        error_(("unbound variable: " + symbol->printString()));
     return new SAssociationBinding(assoc);
 }
 
-SBinding* EvaluationContext::staticBindingForCvar_in_(HeapObject *aSymbol, HeapObject *species) {
+SBinding* EvaluationContext::staticBindingForCvar_in_(Object *aSymbol, HeapObject *species) {
     auto nilObj = this->_runtime->_nilObj;
     do {
         auto namespaces = this->_runtime->speciesNamespaces_(species);
@@ -259,12 +259,12 @@ SBinding* EvaluationContext::staticBindingForCvar_in_(HeapObject *aSymbol, HeapO
     return nullptr;
 }
 
-SBinding* EvaluationContext::staticBindingForCvar_(HeapObject *aSymbol) {
+SBinding* EvaluationContext::staticBindingForCvar_(Object *aSymbol) {
     auto species = this->_runtime->methodClassBinding_(this->method());
     return staticBindingForCvar_in_(aSymbol, species);
 }
 
-uint16_t EvaluationContext::ivarIndex_in_(HeapObject *symbol, Object *receiver) {
+uint16_t EvaluationContext::ivarIndex_in_(Object *symbol, Object *receiver) {
     auto species = this->_runtime->speciesOf_(receiver);
     
     while (species != this->_runtime->_nilObj)
@@ -274,7 +274,7 @@ uint16_t EvaluationContext::ivarIndex_in_(HeapObject *symbol, Object *receiver) 
         if (slots != this->_runtime->_nilObj) {
             for (int i = 1; i <= slots->size(); i++){
                 auto ivar = slots->slotAt_(i)->asHeapObject();
-                if (ivar->sameBytesThan(symbol))
+                if (ivar->sameBytesThan(symbol->asHeapObject()))
                 {
                     auto superspecies = this->_runtime->speciesSuperclass_(species);
                     auto size = (superspecies != this->_runtime->_nilObj) ? this->_runtime->speciesInstanceSize_(superspecies) : 0;
@@ -289,20 +289,20 @@ uint16_t EvaluationContext::ivarIndex_in_(HeapObject *symbol, Object *receiver) 
 }
 
 
-SBinding* EvaluationContext::staticBindingForIvar_(HeapObject *aSymbol) {
+SBinding* EvaluationContext::staticBindingForIvar_(Object *aSymbol) {
     auto ivar = this->ivarIndex_in_(aSymbol, this->_regS);
     return ivar > 0 ? new SInstVarBinding(ivar) : nullptr;
 }
 
-SBinding* EvaluationContext::staticBindingForMvar_(HeapObject *symbol) {
+SBinding* EvaluationContext::staticBindingForMvar_(Object *symbol) {
     auto module_ = this->_runtime->methodModule_(this->method());
     return this->staticBindingFor_inModule_(symbol, module_);
 }
 
-SBinding* EvaluationContext::staticBindingForNested_(HeapObject *name) {
-    auto binding = this->staticBindingFor_(name->slotAt_(1)->asHeapObject());
+SBinding* EvaluationContext::staticBindingForNested_(Object *name) {
+    auto binding = this->staticBindingFor_(name->asHeapObject()->slotAt_(1));
     auto module_ = binding->valueWithin_(this);
-    return this->staticBindingFor_inModule_(name->slotAt_(2)->asHeapObject(), module_->asHeapObject());
+    return this->staticBindingFor_inModule_(name->asHeapObject()->slotAt_(2), module_->asHeapObject());
 }
 
 HeapObject * EvaluationContext::codeOfFrameAt_(uintptr_t frame) {

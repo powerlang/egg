@@ -64,7 +64,7 @@ public:
         return false;
     }
 
-    virtual HeapObject* name() const {
+    virtual const Object* name() const {
         subclassResponsibility();
         return nullptr;
     }

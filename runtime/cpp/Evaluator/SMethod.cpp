@@ -4,6 +4,6 @@
 
 using namespace Egg;
 
-HeapObject* SMethod::primitive() const {
+const Object* SMethod::primitive() const {
     return _pragma ? _pragma->name() : nullptr;
 }

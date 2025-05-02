@@ -32,6 +32,8 @@ class EvaluationContext {
     const int FRAME_TO_FIRST_TEMP_DELTA = 5;
     const int FRAME_TO_FIRST_ARG_DELTA = 2;
 
+    friend class GarbageCollector;
+
 public:
     const int STACK_SIZE = 64 * 1024;
     EvaluationContext(Runtime *runtime) : 
@@ -95,7 +97,7 @@ public:
     std::vector<Object*> methodArguments();
 
 	void buildFrameFor_code_environment_temps_(Object *receiver, HeapObject *compiledCode, HeapObject *environment, uint32_t temps);
-    PlatformCode* buildLaunchFrame(HeapObject *symbol, int argCount);
+    PlatformCode* buildLaunchFrame(Object *symbol, int argCount);
     void buildClosureFrameFor_code_environment_(Object *receiver, HeapObject *compiledCode, HeapObject *environment);
     void buildMethodFrameFor_code_environment_(Object *receiver, HeapObject *compiledCode, HeapObject *environment);
     void popLaunchFrame(HeapObject *prevRegE);
@@ -244,15 +246,15 @@ public:
 
     HeapObject* captureClosure_(SBlock *anSBlock);
 
-    uint16_t ivarIndex_in_(HeapObject *symbol, Object *receiver);
+    uint16_t ivarIndex_in_(Object *symbol, Object *receiver);
 
-    SBinding* staticBindingFor_(HeapObject *aSymbol);
-    SBinding* staticBindingFor_inModule_(HeapObject *symbol, HeapObject *module);
-    SBinding* staticBindingForCvar_(HeapObject *aSymbol);
-    SBinding* staticBindingForCvar_in_(HeapObject *aSymbol, HeapObject *species);
-    SBinding* staticBindingForIvar_(HeapObject *aSymbol);
-    SBinding* staticBindingForMvar_(HeapObject *symbol);
-    SBinding* staticBindingForNested_(HeapObject *name);
+    SBinding* staticBindingFor_(Object *aSymbol);
+    SBinding* staticBindingFor_inModule_(Object *symbol, HeapObject *module);
+    SBinding* staticBindingForCvar_(Object *aSymbol);
+    SBinding* staticBindingForCvar_in_(Object *aSymbol, HeapObject *species);
+    SBinding* staticBindingForIvar_(Object *aSymbol);
+    SBinding* staticBindingForMvar_(Object *symbol);
+    SBinding* staticBindingForNested_(Object *name);
 
     HeapObject*  nil()   { return KnownObjects::nil; }
     HeapObject* _true()  { return KnownObjects::_true; }

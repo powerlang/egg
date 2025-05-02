@@ -217,11 +217,24 @@ void GarbageCollector::scanFirstStackChunk_(HeapObject *aProcessVMStack) {
 		});
 }
 
+void GarbageCollector::scanPointer_(Object** pointer)
+{
+	this->scan_from_to_((HeapObject*)pointer, 1, 1);
+}
+
 /* only for use until we have context switches */
 void GarbageCollector::scanCurrentContext() {
-	auto firstSP = _runtime->_evaluator->context()->stackPointer();
-	auto firstBP = _runtime->_evaluator->context()->framePointer();
-	auto stack = (uintptr_t**)_runtime->_evaluator->context()->stack();
+	auto evaluator = _runtime->_evaluator;
+	auto context = evaluator->context();
+	this->scanPointer_(&evaluator->_regR);
+	this->scanPointer_(&context->_regS);
+	this->scanPointer_((Object**)&context->_regE);
+	this->scanPointer_((Object**)&context->_regM);
+
+
+	auto firstSP = context->stackPointer();
+	auto firstBP = context->framePointer();
+	auto stack = (uintptr_t**)context->stack();
 	this->nativeFramesStartingAt_bp_do_(stack, firstSP, firstBP,
 		[this](uintptr_t *frame, uintptr_t size) {
 			this->scanNativeStackFrame_sized_(frame, size);

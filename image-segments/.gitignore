@@ -1,2 +1,6 @@
 *.json
 *.ems
+*.so
+*.dll
+*.dylib
+

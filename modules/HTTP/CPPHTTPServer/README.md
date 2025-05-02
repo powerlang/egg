@@ -23,9 +23,15 @@ egg/modules/HTTP/CPPHTTPServer/lib $
 cmake -S . -B build && cmake --build build
 ```
 
-The result should be a file called libhttpserver.so (linux), httpserver.dll (windows) or
-something similar for your platform. This file will go to the build dir, you'll have to
-copy it to some place in your egg's FFI path (simplest way: the place from where you run egg).
+The result should be a file called libhttpserver.so (linux), httpserver.dll (windows),
+httpserver.dylib or something similar for your platform. 
+This file will go to the build dir, you'll have to copy (or better, link) it to some
+place in your egg's FFI path (simplest way: the place from where you run egg).
+
+```
+egg/image-segments $
+ln -s ../modules/HTTP/CPPHTTPServer/lib/libhttpserver.so .
+```
 
 # Usage
 

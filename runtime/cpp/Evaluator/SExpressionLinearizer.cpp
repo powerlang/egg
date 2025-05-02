@@ -451,7 +451,7 @@ void SExpressionLinearizer::visitBlock(SBlock *anSBlock) {
 
     if (!anSBlock->isInlined()) {
 
-        auto code = _runtime->newExecutableCodeFor_with_(anSBlock->_compiledCode, this->_operations);
+        auto code = _runtime->newExecutableCodeFor_with_(anSBlock->compiledCode(), this->_operations);
         _runtime->blockExecutableCode_put_(anSBlock->compiledCode(), code);
     }
 
@@ -482,7 +482,7 @@ void SExpressionLinearizer::visitIdentifier(SIdentifier *anSIdentifier) {
 }
 
 void SExpressionLinearizer::visitInlinedMessage(SMessage *anSMessage) {
-    HeapObject *selector = anSMessage->selector();
+    Object *selector = anSMessage->selector();
 
     if (selector == this->_ifTrue) return this->inline_if_(anSMessage, true);
     if (selector == this->_ifFalse) return this->inline_if_(anSMessage, false);
@@ -504,8 +504,8 @@ void SExpressionLinearizer::visitInlinedMessage(SMessage *anSMessage) {
     if (selector == this->_orNot) return this->inlineOrNot_(anSMessage);
 
     // check if selector is or:or:or:... or and:and:and:...
-    if (selector->asLocalString().starts_with("or:")) return this->inlineOr_(anSMessage);
-    if (selector->asLocalString().starts_with("and:")) return this->inlineAnd_(anSMessage);
+    if (selector->asHeapObject()->asLocalString().starts_with("or:")) return this->inlineOr_(anSMessage);
+    if (selector->asHeapObject()->asLocalString().starts_with("and:")) return this->inlineAnd_(anSMessage);
 
     ASSERT(false);
 }
@@ -543,8 +543,17 @@ void SExpressionLinearizer::visitMethod(SMethod *anSMethod, HeapObject *method) 
     this->reset();
     auto primitive = anSMethod->pragma();
     if (primitive != nullptr) {
-        auto name = (_runtime->methodIsFFI_(method)) ? _runtime->existingSymbolFrom_("FFICall") : anSMethod->primitive();
-        PrimitivePointer primitive = this->_primitives[name];
+        auto name = (_runtime->methodIsFFI_(method)) ? _runtime->existingSymbolFrom_("FFICall") : (Object*)anSMethod->primitive();
+
+        PrimitivePointer primitive;
+        auto it = this->_primitives.find(name);
+        if (it == this->_primitives.end()) {
+            error_("primitive " + name->printString() + " not found");
+        }
+        else {
+            primitive = it->second;
+        }
+
         this->primitive_(primitive);
         this->returnOp();
     }

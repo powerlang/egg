@@ -3,6 +3,12 @@
 
 typedef void(*server_callback)(const void *, const void *);
 
+// in our uri convention we use {var} to denote a variable, but httplib uses :var
+static std::string translateUriFormat(const std::string& uri) {
+    static const std::regex varPattern(R"(\{([a-zA-Z_][a-zA-Z0-9_]*)\})");
+    return std::regex_replace(uri, varPattern, ":$1");
+}
+
 extern "C" {
 
 void* Server_New()
@@ -14,7 +20,7 @@ void Server_Get(void *cserver, char *url, void *ccallback)
 {
     httplib::Server *server = reinterpret_cast<httplib::Server*>(cserver);
     server_callback callback = reinterpret_cast<server_callback>(ccallback);
-    server->Get(url, [callback](const httplib::Request &req, httplib::Response &res) {
+    server->Get(translateUriFormat(url), [callback](const httplib::Request &req, httplib::Response &res) {
         callback(&req, &res);
     });
 }
@@ -33,7 +39,9 @@ char* Request_ParamAt(void *creq, char *key, char *type)
 {
     httplib::Request *req = reinterpret_cast<httplib::Request*>(creq);
 
-    return (char*)req->path_params.at(key).c_str();
+    auto &params = req->path_params;
+    auto it = params.find(key);
+    return it != params.end() ? (char*)it->second.c_str() : nullptr;
 }
 
 void Response_SetContent(void *cres, char *content, char *type)

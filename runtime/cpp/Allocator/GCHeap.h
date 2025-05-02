@@ -4,7 +4,7 @@
 #include <vector>
 #include <Evaluator/Runtime.h>
 
-#include "Memory.h"
+#include "GCGuard.h"
 #include "Egg.h"
 
 namespace Egg {
@@ -22,6 +22,7 @@ class GCHeap {
     AllocationZone *_oldZone;
     G1GC *_fullGC;
 
+    bool _atGCUnsafepoint; // when true, moving objects is explicitly forbiden
     bool _atGCSafepoint; // when true, it is allowed to start GC (specially, to move objects)
     bool _gcNeeded; // set when fast-path allocation fails, will be done later at GC safepoints
 
@@ -52,8 +53,14 @@ public:
     uintptr_t allocateLarge_(uint32_t size);
     uintptr_t allocateCommitting_(uint32_t size);
 
-    bool isAtGCSafepoint();
-    void beAtGCSafepoint(bool newState) { _atGCSafepoint = newState; }
+    bool isGCAllowed() { return _atGCSafepoint && !_atGCUnsafepoint; }
+    bool isAtGCSafepoint() { return _atGCSafepoint; }
+    bool isAtGCUnsafepoint() { return _atGCUnsafepoint; }
+
+    GCGuard atGCSafepoint() { return GCGuard(_atGCSafepoint, true); }
+    GCGuard atGCUnsafepoint() { return GCGuard(_atGCUnsafepoint, true); }
+
+
     void requestGC() { _gcNeeded = true; }
     void finishedGC() { _gcNeeded = false; }
 

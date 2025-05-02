@@ -8,7 +8,7 @@ namespace Egg {
 
 class SDynamicBinding : public SBinding {
 public:
-    SDynamicBinding(HeapObject *name) : _name(name), _cache(nullptr) {}
+    SDynamicBinding(Object *name) : _name(name), _cache(nullptr) {}
 
     void assign_within_(Object* value, EvaluationContext* anEvaluationContext) override {
         if (_cache == nullptr) {
@@ -22,15 +22,15 @@ public:
     }
 
     virtual void lookupWithin_(EvaluationContext* anEvaluationContext) {
-        _cache = anEvaluationContext->staticBindingFor_(this->_name);
+        _cache = anEvaluationContext->staticBindingFor_(this->_name.get());
     }
 
-    HeapObject* name() const override {
-        return this->_name;
+    const Object* name() const override {
+        return this->_name.get();
     }
 
-    SDynamicBinding* name_(HeapObject *aSymbol) {
-        _name = aSymbol;
+    SDynamicBinding* name_(Object *aSymbol) {
+        _name.set_(aSymbol);
         return this;
     }
 
@@ -42,7 +42,7 @@ public:
     }
 
 protected:
-    HeapObject *_name;
+    GCedRef _name;
     SBinding *_cache;
 };
 

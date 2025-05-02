@@ -27,7 +27,7 @@ class SAbstractMessage : public SExpression {
     };
 
 public:
-    SAbstractMessage(HeapObject *selector, const std::vector<SExpression*>& arguments) :
+    SAbstractMessage(Object *selector, const std::vector<SExpression*>& arguments) :
         _selector(selector), _arguments(arguments)
         { }
 
@@ -43,7 +43,7 @@ public:
         _arguments = aCollection;
     }
 
-    void cache_when_(HeapObject* anSCompiledMethod, HeapObject* type) {        
+    void cache_when_(Object* anSCompiledMethod, Object* type) {
         _cache.push_back(new GCedRef(type));
         _cache.push_back(new GCedRef(anSCompiledMethod));
     }
@@ -66,7 +66,7 @@ public:
         _cache.clear();
     }
 
-    HeapObject* methodFor_(HeapObject *behavior) const {
+    Object* methodFor_(Object *behavior) const {
         for (size_t i = 0; i < _cache.size(); i += 2) {
             GCedRef *cached = _cache[i];
             if (cached->get() == behavior) {
@@ -85,7 +85,7 @@ public:
         }
     }
 
-    HeapObject* selector() {
+    Object* selector() {
         return _selector.get();
     }
 

@@ -126,7 +126,11 @@ void Egg::CommitMemory(uintptr_t base, uintptr_t size)
 
 void Egg::DecommitMemory(uintptr_t base, uintptr_t size)
 {
-    if (madvise((void*)base, size, MADV_DONTNEED) != 0) {
+    // just to guarantee memory is wiped out
+    std::memset((char*)base, 0, size);
+
+    // if (madvise((void*)base, size, MADV_DONTNEED) != 0) {
+    if (mprotect((void*)base, size, PROT_NONE) != 0) {
         error("Failed to decommit memory.");
     }
 }

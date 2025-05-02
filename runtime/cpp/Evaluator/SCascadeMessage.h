@@ -12,7 +12,7 @@ class SCascadeMessage : public SAbstractMessage {
     SCascade* _cascade;
 
 public:
-    SCascadeMessage(HeapObject *selector, const std::vector<SExpression*>& arguments, SCascade *cascade) :
+    SCascadeMessage(Object *selector, const std::vector<SExpression*>& arguments, SCascade *cascade) :
         SAbstractMessage(selector, arguments), _cascade(cascade)
         { }
 

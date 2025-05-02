@@ -8,7 +8,6 @@ namespace Egg {
 
 class SLiteralBinding : public SBinding {
 public:
-    virtual HeapObject* value() const = 0;
 
     bool isLiteral() const override {
         return true;

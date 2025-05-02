@@ -8,10 +8,10 @@ namespace Egg {
 
 class SNestedDynamicBinding : public SDynamicBinding {
 public:
-    SNestedDynamicBinding(HeapObject *name) : SDynamicBinding(name) {}
+    SNestedDynamicBinding(Object *name) : SDynamicBinding(name) {}
 
     void lookupWithin_ (EvaluationContext* anEvaluationContext) override {
-        _cache = anEvaluationContext->staticBindingForNested_(this->_name);
+        _cache = anEvaluationContext->staticBindingForNested_(this->_name.get());
     }
 };
 

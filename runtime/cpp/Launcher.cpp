@@ -87,7 +87,7 @@ void runBareTests(Runtime *runtime, HeapObject *kernel, std::vector<Object*> &ar
     for (auto method : methods) {
        // auto result = runtime->_evaluator->invoke_with_(method, (Object*)runtime->_nilObj);
         //runtime->_evaluator->evaluate();
-        auto selector = runtime->methodSelector_(method)->asLocalString();
+        auto selector = runtime->methodSelector_(method)->printString();
        // if (selector == "test161CreateDictionary")
         {
             auto result = runtime->sendLocal_to_(selector, (Object*)module);

@@ -32,13 +32,13 @@ public:
     Evaluator *_evaluator;
     GCHeap *_heap;
 
-    std::map<std::string, HeapObject*> _knownSymbols;
+    std::map<std::string, GCedRef*> _knownSymbols;
 
     //typedef std::vector<SAbstractMessage*> inline_cache;
     std::map<GCedRef*, std::vector <SAbstractMessage *> *, GCedRef::Comparator > _inlineCaches;
 
     typedef std::pair<GCedRef*,GCedRef*> gced_global_cache_key;
-	typedef std::pair<HeapObject*,HeapObject*> global_cache_key;
+	typedef std::pair<Object*,Object*> global_cache_key;
 
     std::map<gced_global_cache_key, GCedRef*, GCedRef::Comparator> _globalCache;
     uint16_t _lastHash;
@@ -60,17 +60,17 @@ public:
     Object* sendLocal_to_with_(const std::string &selector, Object *receiver, Object *arg1);
     Object* sendLocal_to_with_with_(const std::string &selector, Object *receiver, Object *arg1, Object* arg2);
     
-    HeapObject* lookup_startingAt_(HeapObject *symbol, HeapObject *behavior);
-    HeapObject* doLookup_startingAt_(HeapObject *symbol, HeapObject *behavior);
-    HeapObject* methodFor_in_(HeapObject *symbol, HeapObject *behavior);
+    Object* lookup_startingAt_(Object *symbol, HeapObject *behavior);
+    Object* doLookup_startingAt_(Object *symbol, HeapObject *behavior);
+    Object* methodFor_in_(Object *symbol, HeapObject *behavior);
 
-    HeapObject* existingSymbolFrom_(const std::string &selector);
-    HeapObject* symbolTableAt_(const std::string &selector);
+    Object* existingSymbolFrom_(const std::string &selector);
+    Object* symbolTableAt_(const std::string &selector);
 
-    HeapObject* lookupAssociationFor_in_(HeapObject *symbol, HeapObject *dictionary);
+    HeapObject* lookupAssociationFor_in_(Object *symbol, HeapObject *dictionary);
 
-    void flushDispatchCache_(HeapObject *aSymbol);
-    void flushDispatchCache_in_(HeapObject *aSymbol, HeapObject *klass);
+    void flushDispatchCache_(Object *aSymbol);
+    void flushDispatchCache_in_(Object *aSymbol, HeapObject *klass);
 
     HeapObject* newDouble_(double value) {
         auto result = newBytes_size_(_floatClass, sizeof(double));
@@ -100,8 +100,8 @@ public:
     HeapObject* newExecutableCodeFor_with_(HeapObject *compiledCode, PlatformCode *platformCode);
     HeapObject* newString_(const std::string &str);
     HeapObject* addSymbol_(const std::string &str);
-    void addKnownSymbol_(const std::string &str, HeapObject *symbol) {
-        _knownSymbols[str] = symbol;
+    void addKnownSymbol_(const std::string &str, Object *symbol) {
+        _knownSymbols[str] = new GCedRef(symbol);
     }
     HeapObject* loadModule_(HeapObject *name);
 	void addSegmentSpace_(ImageSegment *segment);
@@ -118,7 +118,7 @@ public:
 			return this->_lastHash;
 	}
 
-    void registerCache_for_(SAbstractMessage *message, HeapObject *symbol) {
+    void registerCache_for_(SAbstractMessage *message, Object *symbol) {
         auto it = _inlineCaches.find(symbol);
         std::vector <SAbstractMessage*> *messages; 
         if (it == _inlineCaches.end())
@@ -352,8 +352,8 @@ public:
 	    }
 	}
 
-    HeapObject* methodSelector_(HeapObject *method) {
-        return method->slot(Offsets::MethodSelector)->asHeapObject();
+    Object* methodSelector_(HeapObject *method) {
+        return method->slot(Offsets::MethodSelector);
     }
 
     bool methodIsFFI_(HeapObject *method) {
@@ -531,7 +531,7 @@ public:
 
 	uintptr_t assignGCedRefIndex();
 	void registerGCedRef_(GCedRef *gcedRef);
-	GCedRef* createGCedRef_(HeapObject * object);
+	GCedRef* createGCedRef_(Object * object);
 	void releaseGCedRef_(uintptr_t index);
 	void gcedRefsDo_(const std::function<void(GCedRef *)> &aBlock);
 

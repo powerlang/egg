@@ -12,35 +12,40 @@ class GCedRef
 {
 public:
     /* Create a new NULL reference.  */
-    GCedRef(HeapObject *object, uintptr_t index);
-    GCedRef(HeapObject *object);
+    GCedRef(Object *object, uintptr_t index);
+    GCedRef(Object *object);
 
     /* Create a new reference from another reference */
     GCedRef(GCedRef &other);
 
+    // we allow moving ownership of one ref to another
+    //GCedRef(GCedRef &&other);
+    //GCedRef& operator=(GCedRef&& other);
+
     ~GCedRef();
 
-    HeapObject *get();
-    const HeapObject* get() const { return _object; };
+    Object *get();
+    const Object* get() const { return _object; };
+    void set_(Object *object) { _object = object; };
     uintptr_t index();
 
-    HeapObject **getRaw() { return &_object; }
+    Object **getRaw() { return &_object; }
 
     // Comparator for GCedRef* that allows comparisons with HeapObject*
     struct Comparator {
         using is_transparent = void;
         uintptr_t hash(const GCedRef *obj) const;
-        uintptr_t hash(const HeapObject *obj) const;
+        uintptr_t hash(const Object *obj) const;
 
         bool operator()(const GCedRef* lhs, const GCedRef* rhs) const {
             return hash(lhs) <= hash(rhs);
         }
 
-        bool operator()(const GCedRef* lhs, const HeapObject* rhs) const {
+        bool operator()(const GCedRef* lhs, const Object* rhs) const {
             return hash(lhs) <= hash(rhs);
         }
 
-        bool operator()(const HeapObject* lhs, const GCedRef* rhs) const {
+        bool operator()(const Object* lhs, const GCedRef* rhs) const {
             return hash(lhs) <= hash(rhs);
         }
 
@@ -52,7 +57,7 @@ public:
         }
 
         // Compare two std::pair<HeapObject*, HeapObject*>
-        bool operator()(const std::pair<HeapObject*, HeapObject*>& lhs, const std::pair<HeapObject*, HeapObject*>& rhs) const {
+        bool operator()(const std::pair<Object*, Object*>& lhs, const std::pair<Object*, Object*>& rhs) const {
             auto lhs1 = hash(lhs.first), lhs2 = hash(lhs.second);
             auto rhs1 = hash(rhs.first), rhs2 = hash(rhs.second);
             return std::tie(lhs1, lhs2) <= std::tie(rhs1, rhs2);
@@ -60,13 +65,13 @@ public:
 
         // Compare pairs of HeapObject with pairs of GCedRef
         bool operator()(const std::pair<GCedRef*, GCedRef*>& lhs,
-                        const std::pair<HeapObject*, HeapObject*>& rhs) const {
+                        const std::pair<Object*, Object*>& rhs) const {
             auto lhs1 = hash(lhs.first), lhs2 = hash(lhs.second);
             auto rhs1 = hash(rhs.first), rhs2 = hash(rhs.second);
             return std::tie(lhs1, lhs2) <= std::tie(rhs1, rhs2);
         }
 
-        bool operator()(const std::pair<HeapObject*, HeapObject*>& lhs,
+        bool operator()(const std::pair<Object*, Object*>& lhs,
                         const std::pair<GCedRef*, GCedRef*>& rhs) const {
             auto lhs1 = hash(lhs.first), lhs2 = hash(lhs.second);
             auto rhs1 = hash(rhs.first), rhs2 = hash(rhs.second);
@@ -78,7 +83,7 @@ private:
     GCedRef(const GCedRef &other) = delete; // not allowed, to prevent aliasing
     GCedRef& operator=(const GCedRef &other) = delete;
 
-    HeapObject *_object;
+    Object *_object;
     uintptr_t _index;
     //static Runtime *_runtime;
 };

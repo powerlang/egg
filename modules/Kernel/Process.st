@@ -61,6 +61,11 @@ Process >> evaluating: aMessageSend [
 	self notAllowed
 ]
 
+{ #category : #accessing }
+Process >> exceptionHandler [
+	^exceptionHandler
+]
+
 { #category : #initializing }
 Process >> initialize [
 	name := 'nameless process'.
