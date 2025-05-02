@@ -10,11 +10,11 @@ Class {
 }
 
 { #category : #spec }
-HTTPServer >> handle: requestHandle with: handler into: responseHandle with: selector [
+HTTPServer >> handle: requestHandle with: handler into: responseHandle [
 	| request response |
 	request := HTTPRequest new handle: requestHandle.
 	response := HTTPResponse new handle: responseHandle.
-	handler handle: request into: response with: selector.
+	handler evaluateWith: request with: response.
 	^responseHandle
 ]
 
@@ -29,11 +29,11 @@ HTTPServer >> library [
 ]
 
 { #category : #spec }
-HTTPServer >> routeGET: uri to: selector with: handler [
+HTTPServer >> routeGET: uri to: handler [
 	self library
 		server: self asParameter
 		GET: uri externalCopy asParameter
-		callback: [ :request :response | self handle: request with: handler into: response with: selector ] asCallback
+		callback: [ :request :response | self handle: request with: handler into: response ] asCallback
 ]
 
 { #category : #spec }
