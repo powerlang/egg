@@ -98,7 +98,7 @@ uintptr_t GCHeap::allocate_(uint32_t size) {
 
 uintptr_t GCHeap::allocateLarge_(uint32_t size) {
     auto space = this->addNewSpaceSized_(size);
-    return space->allocateIfPossible_(size);
+    return space->allocateCommittingIfNeeded_(size);
 }
 
 
