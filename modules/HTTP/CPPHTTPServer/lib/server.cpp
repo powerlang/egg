@@ -35,6 +35,16 @@ void Server_Delete(void *cserver) {
     delete server;
 }
 
+char* Request_HeadersAt(void *creq, char *key, char *type)
+{
+    httplib::Request *req = reinterpret_cast<httplib::Request*>(creq);
+
+    if (req->has_header(key))
+        return nullptr;
+
+    return req->get_header_value(key).c_str();
+}
+
 char* Request_ParamAt(void *creq, char *key, char *type)
 {
     httplib::Request *req = reinterpret_cast<httplib::Request*>(creq);
@@ -48,6 +58,12 @@ void Response_SetContent(void *cres, char *content, char *type)
 {
     httplib::Response *res = reinterpret_cast<httplib::Response*>(cres);
     res->set_content(content, type);
+}
+
+void Response_HeadersAtPut(void *cres, char *key, char *value)
+{
+    httplib::Response *res = reinterpret_cast<httplib::Response*>(cres);
+    res->set_header(key, value);
 }
 
 }

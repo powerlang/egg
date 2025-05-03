@@ -56,6 +56,11 @@ HTTPServerLibrary >> stopServer: aServer [
 ]
 
 { #category : #request }
+HTTPServerLibrary >> request: aRequest headersAt: aString [
+	<cdecl: pointer Request_HeadersAt(pointer, pointer)>
+]
+
+{ #category : #request }
 HTTPServerLibrary >> request: aRequest paramAt: aString [
 	<cdecl: pointer Request_ParamAt(pointer, pointer)>
 ]
@@ -63,4 +68,9 @@ HTTPServerLibrary >> request: aRequest paramAt: aString [
 { #category : #response }
 HTTPServerLibrary >> response: aResponse setContents: aString type: anotherString [
 	<cdecl: void Response_SetContent(pointer, pointer, pointer)>
+]
+
+{ #category : #response }
+HTTPServerLibrary >> response: aResponse headersAt: aString put: anotherString [
+	<cdecl: void Response_HeadersAtPut(pointer, pointer, pointer)>
 ]

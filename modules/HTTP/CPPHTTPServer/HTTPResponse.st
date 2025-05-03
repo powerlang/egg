@@ -16,3 +16,11 @@ HTTPResponse >> setContents: aString type: anotherString [
 		setContents: aString externalCopy asParameter
 		type: anotherString externalCopy asParameter
 ]
+
+{ #category : #spec }
+HTTPResponse >> headersAt: aString put: anotherString [
+	self class module library
+		response: handle asParameter
+		headersAt: aString externalCopy asParameter
+		put: anotherString externalCopy asParameter
+]

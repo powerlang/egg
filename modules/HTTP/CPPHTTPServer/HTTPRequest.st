@@ -21,3 +21,10 @@ HTTPRequest >> paramAt: aString [
 	"should do better and look at encoding"
 	^String fromMemory: addr pointedMemory
 ]
+
+{ #category : #spec }
+HTTPRequest >> headersAt: aString [
+	self class module library
+		request: handle asParameter
+		headersAt: aString externalCopy asParameter
+]
