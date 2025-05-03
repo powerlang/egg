@@ -86,9 +86,7 @@ WebsideAPI class >> addGeneralRoutesTo: aWebApplication [
 	aWebApplication
 		routeGET: '/dialect' to: #dialect;
 		routeGET: '/logo' to: #logo;
-		routeGET: '/colors' to: #colors;
-		routePOST: '/save' to: #saveImage;
-		routeGET: '/themes' to: #themes
+		routeGET: '/colors' to: #colors
 ]
 
 
@@ -132,8 +130,27 @@ WebsideAPI >> classNamed: aString [
 ]
 
 { #category : #spec }
+WebsideAPI >> colors [
+	^JsonObject new
+		at: 'primary' put: '#81C784';
+		at: 'secondary' put: '#2E7D32';
+		yourself
+]
+
+{ #category : #spec }
 WebsideAPI >> defaultRootClass [
 	^ProtoObject
+]
+
+{ #category : #spec }
+WebsideAPI >> dialect [
+	^'Egg'
+]
+
+{ #category : #spec }
+WebsideAPI >> logo [
+	response headersAt: 'Content-Type' put: 'application/json'.
+	^'"', EggLogo data, '"'
 ]
 
 { #category : #spec }

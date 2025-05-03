@@ -59,12 +59,16 @@ WebsideApplication >> configure: anHttpServer [
 
 {#category : #initialization}
 WebsideApplication >> handleGET: request into: response with: anEvaluable [
-	| api result |
+	| api result string |
 	api := WebsideAPI new
 		       request: request;
 			   response: response.
 	result := anEvaluable evaluateWith: api.
-	response setContents: result printString type: 'text/html'
+	string := result isString ifTrue: [result] ifFalse: [result printString].
+	response
+		setContents: string type: 'text/html';
+		headersAt: 'Access-Control-Allow-Origin' put: '*'.
+
 ]
 
 {#category : #initialization}
