@@ -71,9 +71,8 @@ WebsideApplication >> handleGET: request into: response with: anEvaluable [
 		ifFalse: [type := 'text/html'].
 
 	contents := result isString ifTrue: [result] ifFalse: [result printString].
-	response
-		setContents: contents type: type;
-		headersAt: 'Access-Control-Allow-Origin' put: '*'
+	result ifNotNil: [response setContents: contents type: type].
+	response headersAt: 'Access-Control-Allow-Origin' put: '*'
 ]
 
 {#category : #initialization}
