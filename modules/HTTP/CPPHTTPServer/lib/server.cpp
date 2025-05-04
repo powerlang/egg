@@ -27,6 +27,7 @@ void Server_Get(void *cserver, char *url, void *ccallback)
 
 void Server_Start(void *cserver) {
     httplib::Server *server = reinterpret_cast<httplib::Server*>(cserver);
+    server->new_task_queue = []() { return new httplib::ThreadPool(1); }; // assure no multithreading goes on, as egg does not support it
     server->listen("0.0.0.0", 8080);
 }
 
@@ -42,7 +43,7 @@ char* Request_HeadersAt(void *creq, char *key, char *type)
     if (req->has_header(key))
         return nullptr;
 
-    return req->get_header_value(key).c_str();
+    return (char*)req->get_header_value(key).c_str();
 }
 
 char* Request_ParamAt(void *creq, char *key, char *type)
