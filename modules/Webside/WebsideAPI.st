@@ -149,8 +149,7 @@ WebsideAPI >> dialect [
 
 { #category : #spec }
 WebsideAPI >> logo [
-	response headersAt: 'Content-Type' put: 'application/json'.
-	^'"', EggLogo data, '"'
+	^(Kernel host readFile: 'logo.png') asByteArray asBase64 -> 'image/png'
 ]
 
 { #category : #spec }
