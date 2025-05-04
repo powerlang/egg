@@ -55,17 +55,24 @@ char* Request_ParamAt(void *creq, char *key, char *type)
     return it != params.end() ? (char*)it->second.c_str() : nullptr;
 }
 
+void Response_HeadersAtPut(void *cres, char *key, char *value)
+{
+    httplib::Response *res = reinterpret_cast<httplib::Response*>(cres);
+    res->set_header(key, value);
+}
+
 void Response_SetContent(void *cres, char *content, char *type)
 {
     httplib::Response *res = reinterpret_cast<httplib::Response*>(cres);
     res->set_content(content, type);
 }
 
-void Response_HeadersAtPut(void *cres, char *key, char *value)
+void Response_SetStatus(void *cres, int status)
 {
     httplib::Response *res = reinterpret_cast<httplib::Response*>(cres);
-    res->set_header(key, value);
+    res->status = status;
 }
+
 
 }
 
