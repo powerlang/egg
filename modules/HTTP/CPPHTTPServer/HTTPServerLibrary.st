@@ -66,11 +66,16 @@ HTTPServerLibrary >> request: aRequest paramAt: aString [
 ]
 
 { #category : #response }
+HTTPServerLibrary >> response: aResponse headersAt: aString put: anotherString [
+	<cdecl: void Response_HeadersAtPut(pointer, pointer, pointer)>
+]
+
+{ #category : #response }
 HTTPServerLibrary >> response: aResponse setContents: aString type: anotherString [
 	<cdecl: void Response_SetContent(pointer, pointer, pointer)>
 ]
 
 { #category : #response }
-HTTPServerLibrary >> response: aResponse headersAt: aString put: anotherString [
-	<cdecl: void Response_HeadersAtPut(pointer, pointer, pointer)>
+HTTPServerLibrary >> response: aResponse status: anInteger [
+	<cdecl: void Response_SetStatus(pointer, pointer)>
 ]
