@@ -15,7 +15,7 @@ WebsideModule >> imports [
 		#FFI -> #(ExternalLibrary).
 		#'HTTP.CPPHTTPServer' -> #(HTTPServer).
 		#Json -> #(JsonObject).
-		#Kernel -> #(Error OrderedDictionary ProtoObject ReadStream Species)
+		#Kernel -> #(ByteArray Error OrderedDictionary ProtoObject ReadStream Species)
 	}
 ]
 
