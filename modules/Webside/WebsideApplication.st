@@ -57,6 +57,13 @@ WebsideApplication >> configure: anHttpServer [
 	WebsideAPI addRoutesTo: self
 ]
 
+{#category : #queries}
+WebsideApplication >> expectsJson: anHttpRequest [
+	| accept |
+	accept := anHttpRequest headersAt: 'Accept'.
+	^accept notNil and: [accept includesString: 'application/json']
+]
+
 {#category : #initialization}
 WebsideApplication >> handleGET: request into: response with: anEvaluable [
 	| api result type contents |
@@ -68,7 +75,12 @@ WebsideApplication >> handleGET: request into: response with: anEvaluable [
 		ifTrue: [
 			type := result value.
 			result := result key]
-		ifFalse: [type := 'text/html'].
+		ifFalse: [
+			(self expectsJson: request)
+				ifTrue: [
+					type := 'application/json'.
+					result := JsonWriter write: result]
+				ifFalse: [type := 'text/html']].
 
 	contents := result isString ifTrue: [result] ifFalse: [result printString].
 	result ifNotNil: [response setContents: contents type: type].
