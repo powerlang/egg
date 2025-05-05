@@ -964,7 +964,13 @@ void Evaluator::initializeCIF(HeapObject *method, int argCount) {
     FFIDescriptorImpl *descriptor_impl = new FFIDescriptorImpl;
     descriptor_impl->cif = new ffi_cif();
     descriptor_impl->argTypes = new ffi_type*[argCount + 1];
-    descriptor_impl->fnAddr = (void(*)())FindSymbol(*(uintptr_t*)handle, (char*)fnName);;
+    descriptor_impl->fnAddr = (void(*)())FindSymbol(*(uintptr_t*)handle, (char*)fnName);
+
+    if (descriptor_impl->fnAddr == nullptr)
+    {
+        delete descriptor_impl;
+        error_("could not find FFI method " + method->printString());
+    }
 
     HeapObject *descriptor = _runtime->ffiMethodDescriptor_(method);
 
