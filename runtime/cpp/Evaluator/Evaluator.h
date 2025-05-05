@@ -209,6 +209,7 @@ private:
 	Object* primitiveHostLoadModule();
 	Object* primitiveHostLog();
 	Object* primitiveHostPlatformName();
+	Object* primitiveHostReadFile();
 	Object* primitiveNew();
 	Object* primitiveNewBytes();
 	Object* primitiveNewObjectHeap();

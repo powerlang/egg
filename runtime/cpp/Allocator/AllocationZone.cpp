@@ -170,7 +170,7 @@ void AllocationZone::releaseEvacuated_(std::vector<bool> *evacuated)
 			space->_next = base;
 			space->_committedLimit = base;
 			space->_softLimit = base;
-			DecommitMemory(base, size * 2);
+			DecommitMemory(base, (*evacuated)[i-1] ? size * 2 : size);
 			this->recycleSpace_(space);
         }
     }

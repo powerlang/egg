@@ -12,10 +12,11 @@ Class {
 { #category : #spec }
 WebsideModule >> imports [
 	^{
+		#Development -> #(CodeSearch MethodSearch MethodSearchScope).
 		#FFI -> #(ExternalLibrary).
 		#'HTTP.CPPHTTPServer' -> #(HTTPServer).
-		#Json -> #(JsonObject).
-		#Kernel -> #(Error OrderedDictionary ProtoObject ReadStream Species)
+		#Json -> #(JsonObject JsonWriter).
+		#Kernel -> #(ByteArray Error IdentitySet OrderedDictionary ProtoObject ReadStream Species)
 	}
 ]
 

@@ -27,6 +27,7 @@ void Server_Get(void *cserver, char *url, void *ccallback)
 
 void Server_Start(void *cserver) {
     httplib::Server *server = reinterpret_cast<httplib::Server*>(cserver);
+    server->new_task_queue = []() { return new httplib::ThreadPool(1); }; // assure no multithreading goes on, as egg does not support it
     server->listen("0.0.0.0", 8080);
 }
 
@@ -35,13 +36,46 @@ void Server_Delete(void *cserver) {
     delete server;
 }
 
-char* Request_ParamAt(void *creq, char *key, char *type)
+char* Request_HeadersAt(void *creq, char *key, char *type)
 {
     httplib::Request *req = reinterpret_cast<httplib::Request*>(creq);
 
+    auto &headers = req->headers;
+    auto it = headers.find(key);
+    if (it == headers.end())
+        return nullptr;
+
+    return const_cast<char*>(it->second.c_str());
+}
+
+char* Request_ParamAt(void *creq, char *key, char *type)
+{
+    httplib::Request *req = reinterpret_cast<httplib::Request*>(creq);
     auto &params = req->path_params;
     auto it = params.find(key);
     return it != params.end() ? (char*)it->second.c_str() : nullptr;
+}
+
+char* Request_QueryAt(void *creq, char *key, char *type)
+{
+    httplib::Request *req = reinterpret_cast<httplib::Request*>(creq);
+    auto &params = req->params;
+    auto it = params.find(key);
+    return it != params.end() ? (char*)it->second.c_str() : nullptr;
+}
+
+char* Request_Path(void *creq)
+{
+    httplib::Request *req = reinterpret_cast<httplib::Request*>(creq);
+
+    return (char*)req->path.c_str();
+}
+
+
+void Response_HeadersAtPut(void *cres, char *key, char *value)
+{
+    httplib::Response *res = reinterpret_cast<httplib::Response*>(cres);
+    res->set_header(key, value);
 }
 
 void Response_SetContent(void *cres, char *content, char *type)
@@ -49,6 +83,13 @@ void Response_SetContent(void *cres, char *content, char *type)
     httplib::Response *res = reinterpret_cast<httplib::Response*>(cres);
     res->set_content(content, type);
 }
+
+void Response_SetStatus(void *cres, int status)
+{
+    httplib::Response *res = reinterpret_cast<httplib::Response*>(cres);
+    res->status = status;
+}
+
 
 }
 

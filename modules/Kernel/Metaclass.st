@@ -38,6 +38,11 @@ Metaclass >> classVarNames [
 	^class classVarNames
 ]
 
+{ #category : #accessing }
+Metaclass >> comment [
+	^class comment
+]
+
 { #category : #services }
 Metaclass >> duplicateHierarchyFrom: aClass with: aClassCopy [
 	^(class duplicateHierarchyFrom: aClass with: aClassCopy) class

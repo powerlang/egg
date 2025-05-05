@@ -22,11 +22,6 @@ Class {
 	#category : #Kernel
 }
 
-{ #category : #inspecting }
-CompiledMethod class >> aspects [
-	^#(#treecodeString #disassembledText)
-]
-
 { #category : #accessing }
 CompiledMethod >> author [
 	^'Unknown'

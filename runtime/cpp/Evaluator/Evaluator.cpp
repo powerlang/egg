@@ -27,6 +27,7 @@
 #include <cmath>
 #include <bit>
 #include <cstring>
+#include <fstream>
 
 using namespace Egg;
 
@@ -163,6 +164,7 @@ void Evaluator::initializePrimitives()
     this->addPrimitive("HostPlatformName", &Evaluator::primitiveHostPlatformName);
     this->addPrimitive("HostCurrentMilliseconds", &Evaluator::primitiveHostCurrentMilliseconds);
     this->addPrimitive("HostLog", &Evaluator::primitiveHostLog);
+    this->addPrimitive("HostReadFile", &Evaluator::primitiveHostReadFile);
 
     /*
     this->addPrimitive("PrepareForExecution", &Evaluator::primitivePrepareForExecution);
@@ -715,6 +717,17 @@ Object* Evaluator::primitiveHostLog() {
     return this->_regR;
 }
 
+Object* Evaluator::primitiveHostReadFile() {
+    auto filename = this->_context->firstArgument();
+    std::ifstream file(filename->asHeapObject()->asLocalString(), std::ios::binary);
+    if (!file)
+        return this->failPrimitive();
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+
+    return (Object*)this->_runtime->newString_(buffer.str());
+}
+
 Object* Evaluator::primitiveHostInitializeFFI() {
     auto library = this->_context->firstArgument()->asHeapObject();
     auto handle = library->slotAt_(1);
@@ -951,7 +964,13 @@ void Evaluator::initializeCIF(HeapObject *method, int argCount) {
     FFIDescriptorImpl *descriptor_impl = new FFIDescriptorImpl;
     descriptor_impl->cif = new ffi_cif();
     descriptor_impl->argTypes = new ffi_type*[argCount + 1];
-    descriptor_impl->fnAddr = (void(*)())FindSymbol(*(uintptr_t*)handle, (char*)fnName);;
+    descriptor_impl->fnAddr = (void(*)())FindSymbol(*(uintptr_t*)handle, (char*)fnName);
+
+    if (descriptor_impl->fnAddr == nullptr)
+    {
+        delete descriptor_impl;
+        error_("could not find FFI method " + method->printString());
+    }
 
     HeapObject *descriptor = _runtime->ffiMethodDescriptor_(method);
 
