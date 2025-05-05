@@ -51,11 +51,26 @@ char* Request_HeadersAt(void *creq, char *key, char *type)
 char* Request_ParamAt(void *creq, char *key, char *type)
 {
     httplib::Request *req = reinterpret_cast<httplib::Request*>(creq);
-
     auto &params = req->path_params;
     auto it = params.find(key);
     return it != params.end() ? (char*)it->second.c_str() : nullptr;
 }
+
+char* Request_QueryAt(void *creq, char *key, char *type)
+{
+    httplib::Request *req = reinterpret_cast<httplib::Request*>(creq);
+    auto &params = req->params;
+    auto it = params.find(key);
+    return it != params.end() ? (char*)it->second.c_str() : nullptr;
+}
+
+char* Request_Path(void *creq)
+{
+    httplib::Request *req = reinterpret_cast<httplib::Request*>(creq);
+
+    return (char*)req->path.c_str();
+}
+
 
 void Response_HeadersAtPut(void *cres, char *key, char *value)
 {
