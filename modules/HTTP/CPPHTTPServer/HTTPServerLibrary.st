@@ -65,6 +65,16 @@ HTTPServerLibrary >> request: aRequest paramAt: aString [
 	<cdecl: pointer Request_ParamAt(pointer, pointer)>
 ]
 
+{ #category : #request }
+HTTPServerLibrary >> request: aRequest queryAt: aString [
+	<cdecl: pointer Request_QueryAt(pointer, pointer)>
+]
+
+{ #category : #request }
+HTTPServerLibrary >> requestPath: aRequest [
+	<cdecl: pointer Request_Path(pointer)>
+]
+
 { #category : #response }
 HTTPServerLibrary >> response: aResponse headersAt: aString put: anotherString [
 	<cdecl: void Response_HeadersAtPut(pointer, pointer, pointer)>
