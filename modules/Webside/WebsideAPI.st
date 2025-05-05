@@ -100,6 +100,22 @@ WebsideAPI class >> addRoutesTo: aWebApplication [
 ]
 
 { #category : #spec }
+WebsideAPI >> categories [
+	| class |
+	class := self requestedClass.
+	class ifNil: [^self notFound].
+	^class categories
+]
+
+{ #category : #spec }
+WebsideAPI >> classDefinition [
+	| class |
+	class := self requestedClass.
+	class ifNil: [^self notFound].
+	^class asWebsideJson
+]
+
+{ #category : #spec }
 WebsideAPI >> classes [
 	| root tree classes names depth json |
 	root := self queryAt: 'root'.
@@ -124,9 +140,23 @@ WebsideAPI >> classNamed: aString [
 	name := aString.
 	metaclass := name endsWith: ' class'.
 	metaclass ifTrue: [name := name trimTail: ' class'].
-	class := Kernel at: name asSymbol ifAbsent: [^nil].
+	class := Kernel namespace at: name asSymbol ifAbsent: [^nil].
 	class isSpecies ifFalse: [^nil].
 	^metaclass ifTrue: [class class] ifFalse: [class]
+]
+
+{ #category : #spec }
+WebsideAPI >> classVariables [
+	| class |
+	class := self requestedClass.
+	class ifNil: [^self notFound].
+	^class withAllSuperclasses gather: [:c |
+		c classVarNames asaArray sort collect: [:v |
+			self newJsonObject
+				at: 'name' put: v;
+				at: 'class' put: c name , ' class';
+				at: 'type' put: 'class';
+				yourself]]
 ]
 
 { #category : #spec }
@@ -148,8 +178,30 @@ WebsideAPI >> dialect [
 ]
 
 { #category : #spec }
+WebsideAPI >> instanceVariables [
+	| class |
+	class := self requestedClass.
+	class isNil ifTrue: [^self notFound].
+	^class withAllSuperclasses
+		gather: [:c | 
+			c instVarNames collect: [:n | 
+				self newJsonObject
+					at: 'name' put: n;
+					at: 'class' put: c name;
+					at: 'type' put: 'instance';
+					yourself]]
+		in: OrderedCollection new
+]
+
+{ #category : #spec }
 WebsideAPI >> logo [
 	^(Kernel host readFile: 'logo.png') asByteArray asBase64 -> 'image/png'
+]
+
+{ #category : #spec }
+WebsideAPI >> notFound [
+	response notFound.
+	^nil
 ]
 
 { #category : #spec }
@@ -175,7 +227,21 @@ WebsideAPI >> request: aRequest [
 ]
 
 { #category : #spec }
+WebsideAPI >> requestedClass [
+	| name |
+	name := request paramAt: 'name'.
+	^name ifNotNil: [self classNamed: name]
+]
+
+{ #category : #spec }
 WebsideAPI >> response: aResponse [
 	response := aResponse
 ]
 
+{ #category : #spec }
+WebsideAPI >> variables [
+	| class |
+	class := self requestedClass.
+	class ifNil: [^self notFound].
+	^self instanceVariables , self classVariables
+]

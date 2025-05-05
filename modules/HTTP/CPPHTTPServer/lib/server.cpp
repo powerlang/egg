@@ -40,10 +40,12 @@ char* Request_HeadersAt(void *creq, char *key, char *type)
 {
     httplib::Request *req = reinterpret_cast<httplib::Request*>(creq);
 
-    if (req->has_header(key))
+    auto &headers = req->headers;
+    auto it = headers.find(key);
+    if (it == headers.end())
         return nullptr;
 
-    return (char*)req->get_header_value(key).c_str();
+    return const_cast<char*>(it->second.c_str());
 }
 
 char* Request_ParamAt(void *creq, char *key, char *type)
