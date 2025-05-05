@@ -119,9 +119,9 @@ void SExpressionLinearizer::inline_ifNil_(SMessage *anSMessage, bool aBoolean)
     auto branch = this->branchIf_(!aBoolean);
 
     if (arg->isBlock())
-	this->visitStatements(((SBlock*)arg)->statements());
+	    this->visitStatements(((SBlock*)arg)->statements());
     else
-	arg->acceptVisitor_(this);
+	    arg->acceptVisitor_(this);
 
     this->dropToS();
 
@@ -147,10 +147,19 @@ void SExpressionLinearizer::inline_ifNilIfNotNil_(SMessage *anSMessage, bool aBo
     auto message = new SMessage(new SOpLoadRfromStack(0), _equalsEquals, {nilObj}, false);
     this->visitMessage(message);
     auto branch = this->branchIf_(!aBoolean);
-    this->visitStatements(((SBlock*)arguments[0])->statements());
+    auto arg0 = arguments[0];
+    if (arg0->isBlock())
+        this->visitStatements(((SBlock*)arg0)->statements());
+    else
+        arg0->acceptVisitor_(this);
+
     auto end = this->jump();
     this->branchTargetOf_(branch);
-    this->visitStatements(((SBlock*)arguments[1])->statements());
+    auto arg1 = arguments[1];
+    if (arg1->isBlock())
+        this->visitStatements(((SBlock*)arg1)->statements());
+    else
+        arg1->acceptVisitor_(this);
     this->branchTargetOf_(end);
     this->dropToS();
 }
