@@ -194,6 +194,7 @@ EggEvaluator >> initializePrimitives [
 		at: #StringReplaceFromToWithStartingAt
 		put: self primitiveStringReplaceFromToWithStartingAt;
 		at: #FloatNew put: self primitiveFloatNew;
+		at: #FloatNewFromInteger put: self primitiveFloatFromInteger;
 		at: #DictionaryNew put: self primitiveBootstrapDictNew;
 		at: #FlushDispatchCaches put: self primitiveFlushDispatchCaches;
 		at: #BootstrapDictBeConstant
@@ -419,6 +420,12 @@ EggEvaluator >> primitiveClosureValueWithArgs [
 { #category : 'primitives' }
 EggEvaluator >> primitiveEqual [
 	^ [ runtime booleanFor: context self = context firstArgument ]
+]
+
+{ #category : 'primitives' }
+EggEvaluator >> primitiveFloatFromInteger [
+	^ [ runtime
+			newFloat: context firstArgument value asFloat ]
 ]
 
 { #category : 'primitives' }
