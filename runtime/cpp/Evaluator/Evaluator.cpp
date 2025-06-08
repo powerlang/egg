@@ -148,6 +148,20 @@ void Evaluator::initializePrimitives()
     this->addPrimitive("PerformWithArguments", &Evaluator::primitivePerformWithArguments);
     this->addPrimitive("StringReplaceFromToWithStartingAt", &Evaluator::primitiveStringReplaceFromToWithStartingAt);
     this->addPrimitive("FloatNew", &Evaluator::primitiveFloatNew);
+    this->addPrimitive("FloatNewFromInteger", &Evaluator::primitiveFloatNewFromInteger);
+    this->addPrimitive("FloatPlus", &Evaluator::primitiveFloatPlus);
+    this->addPrimitive("FloatMinus", &Evaluator::primitiveFloatMinus);
+    this->addPrimitive("FloatMultiply", &Evaluator::primitiveFloatMultiply);
+    this->addPrimitive("FloatDiv", &Evaluator::primitiveFloatDiv);
+    this->addPrimitive("FloatLess", &Evaluator::primitiveFloatLess);
+    this->addPrimitive("FloatEqual", &Evaluator::primitiveFloatEqual);
+
+    this->addPrimitive("FloatFractionPart", &Evaluator::primitiveFloatFractionPart);
+    this->addPrimitive("FloatSignificand", &Evaluator::primitiveFloatSignificand);
+    this->addPrimitive("FloatSqrt", &Evaluator::primitiveFloatSqrt);
+    this->addPrimitive("FloatTimesTwoPower", &Evaluator::primitiveFloatTimesTwoPower);
+    this->addPrimitive("FloatTruncated", &Evaluator::primitiveFloatTruncated);
+
     this->addPrimitive("FlushDispatchCaches", &Evaluator::primitiveFlushDispatchCaches);
     //this->addPrimitive("BootstrapDictBeConstant", &Evaluator::primitiveBootstrapDictBeConstant);
     //this->addPrimitive("BootstrapDictKeys", &Evaluator::primitiveBootstrapDictKeys);
@@ -667,6 +681,102 @@ Object* Evaluator::primitiveEqual() {
 Object* Evaluator::primitiveFloatNew() {
     return (Object*)this->_runtime->newBytes_size_(this->_context->self()->asHeapObject(), 8);
 }
+
+Object* Evaluator::primitiveFloatNewFromInteger() {
+    auto arg = this->_context->firstArgument();
+    if (!arg->isSmallInteger())
+        return this->failPrimitive();
+
+    return this->newDoubleObject((double)arg->asSmallInteger()->asNative());
+}
+
+Object* Evaluator::primitiveFloatPlus() {
+    auto arg = this->_context->firstArgument();
+    if (_runtime->speciesOf_(arg) != _runtime->_floatClass)
+        return this->failPrimitive();
+
+    auto self = this->_context->self();
+    return this->newDoubleObject(*(double*)self+*(double*)arg);
+}
+
+Object* Evaluator::primitiveFloatMinus() {
+    auto arg = this->_context->firstArgument();
+    if (_runtime->speciesOf_(arg) != _runtime->_floatClass)
+        return this->failPrimitive();
+
+    auto self = this->_context->self();
+    return this->newDoubleObject(*(double*)self-*(double*)arg);
+}
+
+Object* Evaluator::primitiveFloatMultiply () {
+    auto arg = this->_context->firstArgument();
+    if (_runtime->speciesOf_(arg) != _runtime->_floatClass)
+        return this->failPrimitive();
+
+    auto self = this->_context->self();
+    return this->newDoubleObject((*(double*)self) * (*(double*)arg));
+}
+
+Object* Evaluator::primitiveFloatDiv() {
+    auto arg = this->_context->firstArgument();
+    if (_runtime->speciesOf_(arg) != _runtime->_floatClass)
+        return this->failPrimitive();
+
+    auto self = this->_context->self();
+    return this->newDoubleObject(*(double*)self / *(double*)arg);
+}
+
+Object* Evaluator::primitiveFloatLess() {
+    auto arg = this->_context->firstArgument();
+    if (_runtime->speciesOf_(arg) != _runtime->_floatClass)
+        return this->failPrimitive();
+
+    auto self = this->_context->self();
+    return this->boolObject(*(double*)self < *(double*)arg);
+}
+
+Object* Evaluator::primitiveFloatEqual() {
+    auto arg = this->_context->firstArgument();
+    if (_runtime->speciesOf_(arg) != _runtime->_floatClass)
+        return this->failPrimitive();
+
+    auto self = this->_context->self();
+    return this->boolObject(*(double*)self == *(double*)arg);
+}
+
+Object* Evaluator::primitiveFloatFractionPart() {
+    auto self = this->_context->self();
+    double intPart;
+    return this->newDoubleObject(std::modf(*(double*)self, &intPart));
+}
+
+Object* Evaluator::primitiveFloatSignificand() {
+    error_("unimplemented");
+    return this->_context->self();
+}
+
+Object* Evaluator::primitiveFloatSqrt() {
+    auto self = this->_context->self();
+    double intPart;
+    return this->newDoubleObject(std::sqrt(*(double*)self));
+}
+
+Object* Evaluator::primitiveFloatTimesTwoPower() {
+    auto arg = this->_context->firstArgument();
+    if (_runtime->speciesOf_(arg) != _runtime->_floatClass)
+        return this->failPrimitive();
+
+    auto self = this->_context->self();
+    return this->boolObject(*(double*)self == *(double*)arg);
+}
+
+Object* Evaluator::primitiveFloatTruncated() {
+    auto self = this->_context->self();
+    double intPart;
+    std::modf(*(double*)self, &intPart);
+    return this->newIntObject(intPart);
+}
+
 
 Object* Evaluator::primitiveFlushDispatchCaches() {
     this->_runtime->flushDispatchCache_in_(this->_context->self(), this->_context->firstArgument()->asHeapObject());

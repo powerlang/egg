@@ -198,6 +198,20 @@ private:
 	Object* primitiveClosureValueWithArgs();
 	Object* primitiveEqual();
 	Object* primitiveFloatNew();
+	Object* primitiveFloatNewFromInteger();
+	Object* primitiveFloatPlus();
+	Object* primitiveFloatMinus();
+	Object* primitiveFloatMultiply();
+	Object* primitiveFloatDiv();
+	Object* primitiveFloatLess();
+	Object* primitiveFloatEqual();
+
+	Object* primitiveFloatFractionPart();
+	Object* primitiveFloatSignificand();
+	Object* primitiveFloatSqrt();
+	Object* primitiveFloatTimesTwoPower();
+	Object* primitiveFloatTruncated();
+
 	Object* primitiveFlushDispatchCaches();
 	Object* primitiveFlushFromCaches();
 
