@@ -20,7 +20,9 @@ Class {
 
 { #category : #private }
 Float class >> basicErrorOn: aSymbol status: status for: aNumber [
-	self error: 'Float error ' , aSymbol
+	self error: 'Float error ' , aSymbol.
+	#FloatPlus. #FloatMinus. #FloatMultiply. #FloatDiv. #FloatLess. #FloatEqual.
+	#FloatFractionPart. #FloatSignificand. #FloatSqrt. #FloatTimesTwoPower. #FloatTruncated "hack to get the symbols interned in kernel"
 ]
 
 { #category : #errors }
@@ -61,29 +63,21 @@ Float class >> from: aNumber [
 
 { #category : #'instance creation' }
 Float class >> fromByteArray: aByteArray [
-	| float size |
-	float := self new.
-	size := float size.
-	float
-		replaceBytesFrom: 1
-		to: size
-		with: aByteArray
-		startingAt: 1.
-	^float
+	^self new initializeWith: aByteArray
+]
+
+{ #category : #'instance creation' }
+Float class >> fromBytes: anObject [
+	| float |
+	^anObject isByteArray ifTrue: [self fromByteArray: anObject] ifFalse: [
+		float := self new.
+		float replaceBytesFrom: 1 to: 8 with: anObject startingAt: 1.
+		^float]
 ]
 
 { #category : #'instance creation' }
 Float class >> fromInteger: anInteger [
-	| result |
-	result := Float new.
-	anInteger _isSmallInteger ifTrue: [
-		Float clearStatusFlags.
-		anInteger _asNative _asFloatInto: result.
-		^result].
-	anInteger isInteger
-		ifTrue: [^(self fromInteger: (anInteger bitShift: -24)) * 16r1000000 asFloat
-			+ (self fromInteger: (anInteger bitAnd: 16rFFFFFF))]
-		ifFalse: [self error: 'number is not an integer']
+	^self errorVMSpecific
 ]
 
 { #category : #'instance creation' }
@@ -133,7 +127,7 @@ Float class >> hasDenormalizedOperandFlag: status [
 
 { #category : #testing }
 Float class >> hasErrorFlag: status [
-	^(status bitAnd: 0x1F) ~= 0
+	^(status bitAnd: 0x1F) != 0
 ]
 
 { #category : #testing }
@@ -357,7 +351,7 @@ Float class >> statusVar [
 
 { #category : #'instance creation' }
 Float class >> usingBytes: aByteArray [
-	^self fromByteArray: aByteArray
+	^self new initializeWith: aByteArray
 ]
 
 { #category : #constants }
@@ -367,44 +361,17 @@ Float class >> zero [
 
 { #category : #arithmetic }
 Float >> - aNumber [
-	| result status |
-	aNumber isFloat ifFalse: [^self - aNumber asFloat].
-	result := Float new.
-	Float clearStatusFlags.
-	self _floatMinus: aNumber into: result.
-	status := Float status.
-	(Float hasErrorFlag: status) ifFalse: [^result].
-	^(Float hasDenormalizedOperandFlag: status)
-		ifTrue: [self asNormalized - aNumber asNormalized]
-		ifFalse: [self errorOn: #'-' status: status]
+	^self errorVMSpecific
 ]
 
 { #category : #arithmetic }
 Float >> * aNumber [
-	| result status |
-	aNumber isFloat ifFalse: [^self * aNumber asFloat].
-	result := Float new.
-	Float clearStatusFlags.
-	self _floatMultiply: aNumber into: result.
-	status := Float status.
-	(Float hasErrorFlag: status) ifFalse: [^result].
-	^(Float hasDenormalizedOperandFlag: status)
-		ifTrue: [self asNormalized * aNumber asNormalized]
-		ifFalse: [self errorOn: #'*' status: status]
+	^self errorVMSpecific
 ]
 
 { #category : #arithmetic }
 Float >> / aNumber [
-	| result status |
-	aNumber isFloat ifFalse: [^self / aNumber asFloat].
-	result := Float new.
-	Float clearStatusFlags.
-	self _floatQuotient: aNumber into: result.
-	status := Float status.
-	(Float hasErrorFlag: status) ifFalse: [^result].
-	^(Float hasDenormalizedOperandFlag: status)
-		ifTrue: [self asNormalized / aNumber asNormalized]
-		ifFalse: [self errorOn: #'/' status: status]
+	^self errorVMSpecific
 ]
 
 { #category : #arithmetic }
@@ -432,29 +399,12 @@ Float >> ~ aFloat [
 
 { #category : #arithmetic }
 Float >> + aNumber [
-	| result status |
-	aNumber isFloat ifFalse: [^aNumber addTo: self].
-	result := Float new.
-	Float clearStatusFlags.
-	self _floatPlus: aNumber into: result.
-	status := Float status.
-	(Float hasErrorFlag: status) ifFalse: [^result].
-	^(Float hasDenormalizedOperandFlag: status)
-		ifTrue: [self asNormalized + aNumber asNormalized]
-		ifFalse: [self errorOn: #'+' status: status]
+	^self errorVMSpecific
 ]
 
 { #category : #comparing }
 Float >> < aNumber [
-	| result status |
-	aNumber isFloat ifFalse: [^self < aNumber asFloat].
-	Float clearStatusFlags.
-	result := 0 == (self _floatLessThan: aNumber).
-	status := Float status.
-	(Float hasErrorFlag: status) ifFalse: [^result].
-	(Float hasDenormalizedOperandFlag: status) ifTrue: [^result].
-	(self isSpecialValue or: [aNumber isSpecialValue]) ifTrue: [^result].
-	self errorOn: #'<' status: status
+	^self errorVMSpecific
 ]
 
 { #category : #comparing }
@@ -471,21 +421,7 @@ Float >> <= aNumber [
 
 { #category : #comparing }
 Float >> = aNumber [
-	| result status nan equal |
-	aNumber isFloat
-		ifFalse: [^aNumber isNumber
-			ifTrue: [self = aNumber asFloat]
-			ifFalse: [false]].
-	Float clearStatusFlags.
-	result := 0 == (self _floatEquals: aNumber).
-	status := Float status.
-	(Float hasErrorFlag: status) ifFalse: [^result].
-	(Float hasDenormalizedOperandFlag: status) ifTrue: [^result].
-	nan := self isNaN.
-	equal := nan == aNumber isNaN.
-	equal ifFalse: [^false].
-	nan ifTrue: [^true].
-	self errorOn: #'=' status: status
+	^self errorVMSpecific
 ]
 
 { #category : #comparing }
@@ -571,6 +507,16 @@ Float >> asTrueFraction [
 	^numerator / denominator
 ]
 
+{ #category : #testing }
+Float >> at: index [
+	^self errorVMSpecific
+]
+
+{ #category : #testing }
+Float >> basicAt: index [
+	^self errorVMSpecific
+]
+
 { #category : #arithmetic }
 Float >> ceiling [
 	^self isNaN ifTrue: [self] ifFalse: [super ceiling]
@@ -589,6 +535,11 @@ Float >> cos [
 { #category : #trigonometry }
 Float >> degreesToRadians [
 	^self * RadiansPerDegree
+]
+
+{ #category : #random }
+Float >> errorOn: aSymbol [
+	^self errorVMSpecific
 ]
 
 { #category : #errors }
@@ -618,15 +569,7 @@ Float >> floor [
 
 { #category : #random }
 Float >> fractionPart [
-	| fraction status |
-	fraction := Float new.
-	Float clearStatusFlags.
-	self _floatFractionPartInto: fraction.
-	status := Float status.
-	(Float hasErrorFlag: status) ifFalse: [^fraction].
-	^(Float hasDenormalizedOperandFlag: status)
-		ifTrue: [self asNormalized fractionPart]
-		ifFalse: [self errorOn: #fractionPart status: status]
+	^self errorVMSpecific
 ]
 
 { #category : #testing }
@@ -666,6 +609,11 @@ Float >> hasZeroMantissa [
 	(self at: 3) = 0 ifFalse: [^false].
 	(self at: 2) = 0 ifFalse: [^false].
 	^(self at: 1) = 0
+]
+
+{ #category : #random }
+Float >> initializeWith: bytes [
+	self errorVMSpecific
 ]
 
 { #category : #testing }
@@ -859,11 +807,7 @@ Float >> sign [
 
 { #category : #accessing }
 Float >> significand [
-	| status |
-	status := Float status.
-	^(Float hasDenormalizedOperandFlag: status)
-		ifTrue: [self asNormalized significand]
-		ifFalse: [self errorOn: #significand status: status]
+	^self errorVMSpecific
 ]
 
 { #category : #trigonometry }
@@ -878,15 +822,7 @@ Float >> sizeInBytes [
 
 { #category : #functions }
 Float >> sqrt [
-	| result status |
-	result := Float new.
-	Float clearStatusFlags.
-	self _floatSqrtInto: result.
-	status := Float status.
-	(Float hasErrorFlag: status) ifFalse: [^result].
-	^(Float hasDenormalizedOperandFlag: status)
-		ifTrue: [self asNormalized sqrt]
-		ifFalse: [self errorOn: #sqrt status: status]
+	^self errorVMSpecific
 ]
 
 { #category : #printing }
@@ -901,31 +837,12 @@ Float >> tan [
 
 { #category : #arithmetic }
 Float >> timesTwoPower: anInteger [
-	| result status |
-	result := self copy.
-	result _timesTwoPower: anInteger asFloat.
-	status := Float status.
-	(Float hasErrorFlag: status) ifFalse: [^result].
-	self errorOn: #timesTwoPower status: status
+	^self errorVMSpecific
 ]
 
 { #category : #arithmetic }
 Float >> truncated [
-	| result status |
-	Float clearStatusFlags.
-	result := self _floatTruncated.
-	status := Float status.
-	((Float hasErrorFlag: status) not
-		and: [result = 0 or: [result sign = self sign]])
-		ifTrue: [^result].
-	self isSpecialValue ifTrue: [^self].
-	^self abs < 2.0e16
-		ifTrue: [| q r |
-			q := self quo: 536870912.0.
-			"((SmallInteger largestPositive bitShift: -1) + 1) asFloat"
-			r := self - (q asFloat * 536870912.0).
-			q * 536870912 + r truncated]
-		ifFalse: [self asTrueFraction]
+	^self errorVMSpecific
 ]
 
 { #category : #private }
