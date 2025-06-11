@@ -56,9 +56,12 @@ public:
 
     uintptr_t stackPointer() { return _regSP; }
     uintptr_t framePointer() { return _regBP; }
+    void framePointer_(uintptr_t bp) { _regBP = bp; }
     Object** stack() { return _stack; }
 
     HeapObject* classBinding();
+
+    bool currentCodeIsBlock() { return _runtime->isBlock_(this->_regM); }
 
     int tempOffset() { return 4; }
 
@@ -223,8 +226,6 @@ public:
     {
         _regSP = _regSP - anInteger;
     }
-
-    void unwind();
 
     Object* temporaryAt_in_(int index, int environmentIndex){
         if (environmentIndex == INSTACK_ENVIRONMENT) { 

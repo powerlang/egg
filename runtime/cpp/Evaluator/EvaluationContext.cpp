@@ -126,6 +126,10 @@ void EvaluationContext::storeAssociation_value_(HeapObject *association, Object 
 HeapObject *EvaluationContext::captureClosure_(SBlock *anSBlock)
 {
 	auto closure = _runtime->newClosureFor_(anSBlock->compiledCode());
+    auto home = this->currentCodeIsBlock() ?
+        (Object*)_runtime->closureHome_(_regE):
+        (Object*)_runtime->newInteger_(_regBP);
+    _runtime->closureHome_put_(closure, home);
 	auto it = anSBlock->capturedVariables().begin();
 	auto i = 1;
 	while(it != anSBlock->capturedVariables().end()) {
@@ -198,28 +202,6 @@ void EvaluationContext::stackTemporaryAt_frameIndex_put_(int index, int anotherI
 {
     uintptr_t bp = this->bpForFrameAt_(anotherIndex);
     _stack[bp - this->tempOffset() - index - 1] = value;
-}
-
-void EvaluationContext::unwind()
-{
-    HeapObject* home = _runtime->closureHome_(this->environment());
-    if (home == _runtime->_nilObj)
-        error("cannot return because closure has no home");
-
-    uintptr_t bp = _regBP;
-    while (bp != 0) {
-        HeapObject* environment = _stack[bp - FRAME_TO_ENVIRONMENT_DELTA - 1]->asHeapObject();
-        if (environment == home) {
-            _regBP = bp;
-            this->popFrame();
-            return;
-        }
-
-        bp = (uintptr_t)_stack[bp - 1];
-    }
-
-    error("cannot return from this closure");
-
 }
 
 SBinding* EvaluationContext::staticBindingFor_(Object *symbol)

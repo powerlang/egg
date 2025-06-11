@@ -29,6 +29,8 @@ Runtime::Runtime(Bootstrapper* bootstrapper, ImageSegment* kernel):
 
 void Runtime::initializeEvaluator() {
     _evaluator = new Evaluator(this, _falseObj, _trueObj, _nilObj);
+    this->initializeClosureReturnMethod();
+
 }
 
 uintptr_t Runtime::arrayedSizeOf_(Object *anObject) {
