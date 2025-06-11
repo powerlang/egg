@@ -498,7 +498,7 @@ SExpressionLinearizer >> visitBlock: anSBlock [
 	statements := anSBlock statements.
 	statements do: [ :node | node acceptVisitor: self ].
 	statements isEmpty
-		ifTrue: [ self loadRwithNil ]
+		ifTrue: [ self loadRwithNil; return ]
 		ifFalse: [ statements last isReturn ifFalse: [ self return ] ].
 	anSBlock isInlined ifFalse: [ 
 		code := runtime newExecutableCodeFor: operations asArray.

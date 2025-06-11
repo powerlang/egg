@@ -3,6 +3,8 @@
     See (MIT) license in root directory.
  */
 
+#include <sstream>
+
 #include "HeapObject.h"
 #include "KnownObjects.h"
 #include "Evaluator/Runtime.h"
@@ -361,6 +363,20 @@ HeapObject* HeapObject::klass() {
 std::string Egg::HeapObject::printString()
 {
 	return debugRuntime->print_(this);
+}
+
+std::string Egg::HeapObject::printContents()
+{
+	auto size = this->size();
+	std::ostringstream result;
+	result << "object class: " << debugRuntime->speciesOf_((Object*)this)->printString() << std::endl;
+	result << "slots:" << std::endl;
+	for (size_t i = 1; i <= size; i++)
+	{
+		result << "slot " << i << ":\t" << this->slotAt_(i)->printString() << std::endl;
+	}
+
+	return result.str();
 }
 
 void HeapObject::copyFrom_headerSize_bodySize_(HeapObject *object, uintptr_t headerSize, uintptr_t bodySize)

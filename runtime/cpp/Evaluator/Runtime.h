@@ -221,6 +221,8 @@ public:
     }
 
     HeapObject* closureHome_(HeapObject *closure) {
+		return closure->slot(Offsets::ClosureHome)->asHeapObject();
+		/*
         auto block = this->closureBlock_(closure);
         if (!this->blockCapturesHome_(block))
 		    error("closure has no home");
@@ -228,7 +230,13 @@ public:
 	    return (this->blockCapturesSelf_(block)) ?
             closure->slotAt_(_closureInstSize + 2)->asHeapObject() :
 		    closure->slotAt_(_closureInstSize + 1)->asHeapObject();
+		    */
     }
+
+	void closureHome_put_(HeapObject *closure, Object *anObject)
+	{
+		closure->slot(Offsets::ClosureHome) = anObject;
+	}
 
     HeapObject::ObjectSlot& closureIndexedSlotAt_(HeapObject *closure, int index) {
 	    return closure->slotAt_(_closureInstSize + index);
@@ -504,6 +512,13 @@ public:
         this->_smallIntegerBehavior = this->speciesInstanceBehavior_(_smallIntegerClass);
 	}
 
+	void initializeClosureReturnMethod()
+	{
+		auto symbol = this->addSymbol_("return:");
+		auto behavior = this->speciesInstanceBehavior_(_closureClass);
+		this->_closureReturnMethod = this->lookup_startingAt_((Object*)symbol, behavior)->asHeapObject();
+	}
+
     HeapObject *_falseObj;
     HeapObject *_trueObj;
     HeapObject *_nilObj;
@@ -524,6 +539,7 @@ public:
 	HeapObject *_ephemeronClass;
 	HeapObject *_processStackClass;
     HeapObject *_symbolTable;
+	HeapObject *_closureReturnMethod;
 
     HeapObject *_smallIntegerBehavior;
 

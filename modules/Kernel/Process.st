@@ -109,6 +109,7 @@ Process >> name: aString [
 
 { #category : #accessing }
 Process >> nativeStack [
+	nativeStack ifNil: [self initializeStack].
 	^nativeStack
 ]
 

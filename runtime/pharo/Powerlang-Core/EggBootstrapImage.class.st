@@ -141,7 +141,7 @@ EggBootstrapImage >> newInteger: anInteger [
 		ifTrue: [ ^ self newLargePositiveInteger: anInteger ].
 	anInteger < minSMI
 		ifTrue: [ ^ self newLargeNegativeInteger: anInteger ].
-	^ ProtoeggSmallInteger new: smiSpec valued: anInteger
+	^ self newSmallInteger: anInteger
 ]
 
 { #category : 'initialization' }
@@ -167,6 +167,11 @@ EggBootstrapImage >> newLargePositiveInteger: anInteger [
 	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
 	bytes := anInteger asEggByteArrayOfSize: size.
 	^ self newBytes: #LargePositiveInteger contents: bytes
+]
+
+{ #category : 'initialization' }
+EggBootstrapImage >> newSmallInteger: anInteger [
+	^ProtoeggSmallInteger new: smiSpec valued: anInteger
 ]
 
 { #category : 'initialization' }

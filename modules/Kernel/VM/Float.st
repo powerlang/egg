@@ -66,9 +66,9 @@ Float >> < aNumber [
 Float >> = aNumber [
 	| nan status |
 	<primitive: FloatEqual>
-	status := Float status.
 	^aNumber isFloat
 		ifTrue: [
+			status := Float status.
 			nan := self isNaN.
 			(nan and: [aNumber isNaN]) ifTrue: [^true].
 			(nan or: [aNumber isNaN]) ifTrue: [^false].

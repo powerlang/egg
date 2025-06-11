@@ -90,6 +90,7 @@ EggIterativeStackedInterpreter >> initializePrimitives [
 { #category : 'initialization' }
 EggIterativeStackedInterpreter >> invoke: method with: receiver [
 	| size environment |
+
 	(runtime methodNeedsEnvironment: method) 
 		ifTrue: [ 
 			size := runtime methodEnvironmentSize: method.
@@ -246,10 +247,8 @@ EggIterativeStackedInterpreter >> visitOpJumpTrue: anSOpJumpTrue [
 { #category : 'initialization' }
 EggIterativeStackedInterpreter >> visitOpNonLocalReturn: anSOpReturn [
 
-	| code |
-	context unwind.
-	code := runtime methodExecutableCode: context regM.
-	work := runtime executableCodeWork: code
+	context push: regR.
+   self invoke: runtime closureReturnMethod with: context environment
 ]
 
 { #category : 'initialization' }

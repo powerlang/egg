@@ -9,7 +9,8 @@ Class {
 		'interpreter',
 		'overrides',
 		'symbolCache',
-		'doesNotUnderstandMethod'
+		'doesNotUnderstandMethod',
+		'closureReturnMethod'
 	],
 	#pools : [
 		'ClosureElementTypes'
@@ -45,6 +46,11 @@ EggRuntime >> booleanFrom: anObject [
 	anObject == trueObj
 		ifTrue: [ ^ true ].
 	self error: 'not a boolean'
+]
+
+{ #category : 'initialization' }
+EggRuntime >> closureReturnMethod [
+	^closureReturnMethod
 ]
 
 { #category : 'initialization' }

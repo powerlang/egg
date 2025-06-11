@@ -51,6 +51,7 @@ enum Offsets {
     BlockMethod = 2,
 
     ClosureBlock = 0,
+    ClosureHome = 1,
 
     DictionaryTally = 0,
     DictionaryTable = 1,

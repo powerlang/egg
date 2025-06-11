@@ -10,3 +10,10 @@ std::string Object::printString()
             this->asSmallInteger()->printString() :
             this->asHeapObject()->printString();
 }
+
+std::string Object::printContents()
+{
+    return this->isSmallInteger() ?
+        this->printString() :
+        this->asHeapObject()->printContents();
+}

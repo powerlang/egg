@@ -63,6 +63,7 @@ struct Object
 
     // debugging
     std::string printString();
+	std::string printContents();
 };
 
 } // namespace Egg

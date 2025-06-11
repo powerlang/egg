@@ -34,8 +34,13 @@ EvaluationContext >> backtrace [
 
 { #category : 'visiting' }
 EvaluationContext >> captureClosure: anSBlock [
-	| closure s i type env arg |
+	| closure home s i type env arg |
 	closure := runtime newClosureFor: anSBlock compiledCode.
+	home := self isBlock
+			ifTrue: [ runtime closureHomeFrame: self environment]
+			ifFalse: [ runtime newInteger: self regBP ].
+	runtime closureHomeFrame: closure put: home.
+
 	s := anSBlock capturedVariables readStream.
 	i := 1.
 	[ s atEnd ]

@@ -54,7 +54,7 @@ Evaluator::Evaluator(Runtime *runtime, HeapObject *falseObj, HeapObject *trueObj
 
 void Evaluator::_halt()
 {
-	error("_halt encountered");
+	warning("_halt encountered");
 }
 
 void Evaluator::addPrimitive(const std::string &name, Evaluator::PrimitivePointer primitive)
@@ -98,6 +98,7 @@ void Evaluator::initializeUndermessages() {
     this->addUndermessage("_smiEquals:", &Evaluator::underprimitiveSMIEquals);
     this->addUndermessage("_identityEquals:", &Evaluator::underprimitiveIdentityEquals);
     this->addUndermessage("_leadingZeroBitCount", &Evaluator::underprimitiveLeadingZeroBitCount);
+    this->addUndermessage("_returnTo:", &Evaluator::underprimitiveReturnTo);
     this->addUndermessage("_quotientTowardZero:", &Evaluator::underprimitiveSMIQuotientTowardZero);
     this->addUndermessage("_remainderTowardZero:", &Evaluator::underprimitiveSMIRemainderTowardZero);
     this->addUndermessage("_bitShiftLeft:", &Evaluator::underprimitiveSMIBitShiftLeft);
@@ -180,19 +181,16 @@ void Evaluator::initializePrimitives()
     this->addPrimitive("HostLog", &Evaluator::primitiveHostLog);
     this->addPrimitive("HostReadFile", &Evaluator::primitiveHostReadFile);
 
-    /*
-    this->addPrimitive("PrepareForExecution", &Evaluator::primitivePrepareForExecution);
-    this->addPrimitive("ProcessVMStackInitialize", &Evaluator::primitiveProcessVMStackInitialize);
-    this->addPrimitive("ProcessVMStackAt", &Evaluator::primitiveProcessVMStackAt);
-    this->addPrimitive("ProcessVMStackAtPut", &Evaluator::primitiveProcessVMStackAtPut);
-    this->addPrimitive("ProcessVMStackBpAtPut", &Evaluator::primitiveProcessVMStackBpAtPut);
-    this->addPrimitive("ProcessVMStackPcAtPut", &Evaluator::primitiveProcessVMStackPcAtPut);
-    */
+
+    //this->addPrimitive("PrepareForExecution", &Evaluator::primitivePrepareForExecution);
+    //this->addPrimitive("ProcessVMStackInitialize", &Evaluator::primitiveProcessVMStackInitialize);
+    this->addPrimitive("ProcessVMStackAt", &Evaluator::primitiveProcessStackAt);
+    //this->addPrimitive("ProcessVMStackAtPut", &Evaluator::primitiveProcessVMStackAtPut);
+    //this->addPrimitive("ProcessVMStackBpAtPut", &Evaluator::primitiveProcessVMStackBpAtPut);
+    //this->addPrimitive("ProcessVMStackPcAtPut", &Evaluator::primitiveProcessVMStackPcAtPut);
     this->addPrimitive("ProcessVMStackBP", &Evaluator::primitiveProcessBP);
-    /*
-    this->addPrimitive("ProcessVMStackBufferSize", &Evaluator::primitiveProcessVMStackBufferSize);
-    this->addPrimitive("ProcessVMStackContextSwitchTo", &Evaluator::primitiveProcessVMStackContextSwitchTo);
-    */
+    //this->addPrimitive("ProcessVMStackBufferSize", &Evaluator::primitiveProcessVMStackBufferSize);
+    //this->addPrimitive("ProcessVMStackContextSwitchTo", &Evaluator::primitiveProcessVMStackContextSwitchTo);
     _linearizer->primitives_(_primitives);
 }
 
@@ -293,11 +291,32 @@ Object* Evaluator::send_to_with_(Object *symbol, Object *receiver, std::vector<O
 
 void Egg::Evaluator::messageNotUnderstood_(SAbstractMessage *message)
 {
-    std::string errmsg = std::string("Message not understood!\n") +
-        this->_regR->printString() + " does not understand " + message->selector()->printString() +
-        "\ndnu recovery not implemented yet";
-    
-    error_(errmsg);
+/*
+	Having the adaptor causes argument popping work transparently. The adaptor frame's
+	PC is pointed to the instant after the send, so it just pops the message and continues
+*/
+	auto count = message->arguments().size();
+	std::vector<Object*> args;
+    for (size_t i = 1; i <= count; i++)
+    {
+        args.push_back(_context->operandAt_(count - i));
+    }
+	auto array = _runtime->newArray_(args);
+	_context->push_(message->selector());
+	_context->push_((Object*)array);
+    auto symbol = _runtime->addSymbol_("doesNotUnderstand:");
+    auto behavior = _runtime->behaviorOf_(_regR);
+	auto dnu = _runtime->lookup_startingAt_((Object*)symbol, behavior);
+    if (!dnu)
+    {
+        std::string errmsg = std::string("Message not understood!\n") +
+     this->_regR->printString() + " does not understand " + message->selector()->printString() +
+     "\nmethod #doesNotUnderstand: not found on receiver";
+        error_(errmsg);
+
+    }
+
+	this->invoke_with_(dnu->asHeapObject(), _regR);
 }
 
 void Evaluator::doesNotKnow(const Object *symbol) { ASSERT(false); }
@@ -451,9 +470,8 @@ void Evaluator::visitOpReturn(SOpReturn *anSOpReturn)
 
 void Evaluator::visitOpNonLocalReturn(SOpNonLocalReturn *anSOpNonLocalReturn)
 {
-    _context->unwind();
-	auto code = _runtime->methodExecutableCode_(_context->compiledCode());
-	_work = _runtime->executableCodeWork_(code);
+    _context->push_(_regR);
+    this->invoke_with_(_runtime->_closureReturnMethod, (Object*)_context->environment());
 }
 
 void Evaluator::evaluate() {
@@ -889,6 +907,11 @@ Object* Evaluator::primitiveProcessBP()
     return (Object*)this->_runtime->newInteger_(this->_context->framePointer());
 }
 
+Object* Evaluator::primitiveProcessStackAt()
+{
+    return _context->stackAt_(this->_context->firstArgument()->asSmallInteger()->asNative());
+}
+
 Object* Evaluator::primitivePrimeFor() {
     return this->primitivePrimeFor_(this->_context->firstArgument()->asSmallInteger()->asNative());
 }
@@ -1274,6 +1297,18 @@ Object* Evaluator::underprimitiveLeadingZeroBitCount(Object *receiver, std::vect
 intptr_t Evaluator::underprimitiveLeadingZeroBitCount_(uintptr_t anInteger) {
 
     return anInteger < 0 ? 0 : ( std::countl_zero(anInteger));
+}
+
+Object* Evaluator::underprimitiveReturnTo(Object* receiver, std::vector<Object*>& args)
+{
+    _context->framePointer_(args[0]->asSmallInteger()->asNative());
+    this->popFrameAndPrepare();
+    /* after returning from underprimitive evaluation, interpreter will try to restore
+     * stack pointer (args were popped), but in this case we must leave stack as is. To
+	 * avoid the problem, we move the sp further down
+	*/
+    _context->reserveStackSlots_(-1);
+    return receiver;
 }
 
 Object* Evaluator::underprimitiveSMIBitAnd(Object *receiver, std::vector<Object*> &args) {

@@ -230,6 +230,7 @@ private:
 	Object* primitiveNewSized();
 	Object* primitivePerformWithArguments();
 	Object* primitiveProcessBP();
+	Object* primitiveProcessStackAt();
 	Object* primitivePrimeFor();
 	Object* primitivePrimeFor_(auto anInteger);
 	Object* primitiveSMIBitAnd();
@@ -275,6 +276,7 @@ private:
 	Object* underprimitiveLargeSize(Object *receiver, std::vector<Object*> &args);
 	Object* underprimitiveLeadingZeroBitCount(Object *receiver, std::vector<Object*> &args);
 	intptr_t underprimitiveLeadingZeroBitCount_(uintptr_t anInteger);
+	Object* underprimitiveReturnTo(Object *receiver, std::vector<Object*> &args);
 	Object* underprimitiveSMIBitAnd(Object *receiver, std::vector<Object*> &args);
 	Object* underprimitiveSMIBitOr(Object *receiver, std::vector<Object*> &args);
 	Object* underprimitiveSMIBitShiftLeft(Object *receiver, std::vector<Object*> &args);

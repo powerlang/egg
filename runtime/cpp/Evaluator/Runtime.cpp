@@ -29,6 +29,8 @@ Runtime::Runtime(Bootstrapper* bootstrapper, ImageSegment* kernel):
 
 void Runtime::initializeEvaluator() {
     _evaluator = new Evaluator(this, _falseObj, _trueObj, _nilObj);
+    this->initializeClosureReturnMethod();
+
 }
 
 uintptr_t Runtime::arrayedSizeOf_(Object *anObject) {
@@ -228,7 +230,7 @@ Object* Runtime::lookup_startingAt_(Object *symbol, HeapObject *behavior)
     
     auto method = this->doLookup_startingAt_(symbol, behavior);
     if (!method)
-        error_(this->behaviorClass_(behavior)->printString() + " does not understand " + symbol->printString());
+        return nullptr;
     auto key = gced_global_cache_key(new GCedRef(symbol),new GCedRef((Object*)behavior));
     auto value = new GCedRef((Object*)method);
 	_globalCache.insert({key, value});

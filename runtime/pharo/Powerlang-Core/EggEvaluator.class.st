@@ -248,6 +248,7 @@ EggEvaluator >> initializeUndermessages [
 		at: #_byteAt:put: put: self underprimitiveByteAtPut;
 		at: #_basicHash put: self underprimitiveBasicHash;
 		at: #_basicHash: put: self underprimitiveBasicHashPut;
+		at: #_returnTo: put: self underprimitiveReturnTo;
 		at: #_smallIntegerByteAt:
 			put: self underprimitiveSmallIntegerByteAt;
 		at: #_bitShiftLeft: put: self underprimitiveBitShiftLeft;
@@ -585,7 +586,7 @@ EggEvaluator >> primitiveProcessVMStackInitialize [
 	  | new |
 	  new := stacks isEmpty
 		         ifTrue: [ context ]
-		         ifFalse: [ self newEvaluationContext ].
+		         ifFalse: [ self halt newEvaluationContext ].
 	  stacks at: context self put: new ]
 ]
 
@@ -910,6 +911,18 @@ EggEvaluator >> underprimitiveLeadingZeroBitCount: anInteger [
 	^ anInteger < 0
 		ifTrue: [ 0 ]
 		ifFalse: [ runtime wordSize * 8 - anInteger highBit ]
+]
+
+{ #category : 'accessing' }
+EggEvaluator >> underprimitiveReturnTo [
+	^ [ :receiver :arguments |
+			context regBP: arguments first value.
+			self popFrameAndPrepare.
+			"after returning from underprimitive evaluation, interpreter will try to restore
+			stack pointer (args were popped), but in this case we must leave stack as is. To
+			avoid the problem, we move the sp further down"
+			context reserveStackSlots: -1.
+			receiver]
 ]
 
 { #category : 'accessing' }

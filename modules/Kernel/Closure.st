@@ -41,12 +41,6 @@ Closure class >> receiverIndex [
 	^ReceiverIndex
 ]
 
-{ #category : #handling }
-Closure >> _return: result [
-	self canReturn ifFalse: [^self cannotReturn].
-	^Processor activeProcess returnTo: homeFrame methodFrame with: result
-]
-
 { #category : #accessing }
 Closure >> argumentCount [
 	^block argumentCount
@@ -91,17 +85,6 @@ Closure >> block [
 { #category : #accessing }
 Closure >> blockNumber [
 	^block blockNumber
-]
-
-{ #category : #converting }
-Closure >> canReturn [
-	| env |
-	homeFrame == nil ifTrue: [^false].
-	homeFrame stackPointer < self _thisContext ifTrue: [^false].
-	homeFrame hasBlocks ifFalse: [^false].
-	env := self methodEnvironment.
-	homeFrame environment == env ifTrue: [^true].
-	^homeFrame methodEnvironment == env
 ]
 
 { #category : #evaluating }
@@ -239,11 +222,6 @@ Closure >> methodEnvironment: environment [
 	self at: ParentEnvironmentIndex put: environment
 ]
 
-{ #category : #accessing }
-Closure >> methodFrame [
-	^homeFrame methodFrame
-]
-
 { #category : #handling }
 Closure >> needsArgument [
 	^self argumentCount > 0
@@ -319,6 +297,11 @@ Closure >> repeatUntil: aBlock [
 	[
 		self value.
 		aBlock value] whileFalse
+]
+
+{ #category : #private }
+Closure >> return: result [
+	^Processor activeProcess nonLocalReturn: result home: homeFrame
 ]
 
 { #category : #handling }
