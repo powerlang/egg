@@ -44,7 +44,8 @@ Class {
 		'compiledCodeExecutableCodeIndex',
 		'floatClass',
 		'processStackSPIndex',
-		'ffiMethodClass'
+		'ffiMethodClass',
+		'closureHomeFrameIndex'
 	],
 	#pools : [
 		'SCompiledBlockFlags',
@@ -257,6 +258,26 @@ EggMetacircularRuntime >> closureHome: closure [
 	^ (self blockCapturesSelf: block)
 		ifTrue: [ closure at: 2 ]
 		ifFalse: [ closure at: 1 ]
+]
+
+{ #category : 'initialization' }
+EggMetacircularRuntime >> closureHomeFrame: closure [
+	^closure slotAt: closureHomeFrameIndex
+]
+
+{ #category : 'initialization' }
+EggMetacircularRuntime >> closureHomeFrame: closure put: value [
+	closure slotAt: closureHomeFrameIndex put: value
+]
+
+{ #category : 'initialization' }
+EggMetacircularRuntime >> closureHomeFrameIndex: anInteger [
+	closureHomeFrameIndex := anInteger
+]
+
+{ #category : 'initialization' }
+EggMetacircularRuntime >> closureReturnMethod: anEggObject [
+	closureReturnMethod := anEggObject
 ]
 
 { #category : 'initialization' }

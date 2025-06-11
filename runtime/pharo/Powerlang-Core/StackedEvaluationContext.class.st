@@ -521,18 +521,3 @@ StackedEvaluationContext >> temporaryAt: index in: environmentIndex put: value [
 StackedEvaluationContext >> thirdArgument [
 	^ self argumentAt: 3
 ]
-
-{ #category : 'initialization' }
-StackedEvaluationContext >> unwind [
-	| home bp environment |
-	home := runtime closureHome: self environment.
-	home == runtime nil ifTrue: [ self error: 'cannot return because closure has no home' ].
-	bp := regBP.
-	[ bp != 0 ]
-		whileTrue: [ environment := stack at: bp - 4.
-			environment == home
-				ifTrue: [ regBP := bp.
-					^ self popFrame ].
-			bp := stack at: bp ].
-	self error: 'cannot return from this closure'
-]

@@ -409,6 +409,8 @@ Ring2MetacircularConverter >> image: aPowertalkRingImage [
 	dest dictionaryTableIndex: index.
 	index := (source => #Closure) allInstVarNames indexOf: 'block'.
 	dest closureBlockIndex: index.
+	index := (source => #Closure) allInstVarNames indexOf: 'homeFrame'.
+	dest closureHomeFrameIndex: index.
 	index := (source => #CompiledBlock) allInstVarNames indexOf: 'method'.
 	dest blockMethodIndex: index.
 	index := (source => #CompiledMethod) allInstVarNames indexOf:
@@ -474,7 +476,7 @@ Ring2MetacircularConverter >> initializeEmulationOverrides [
 { #category : 'initialization' }
 Ring2MetacircularConverter >> initializeRuntime [
 
-	| map symbols array method smi block metaclass kernel byteArray string closure behavior lpi lni float dnu |
+	| map symbols array method smi block metaclass kernel byteArray string closure behavior lpi lni float dnu return |
 	symbols := Dictionary new.
 	#( + - < > <= >= = == not ) do: [ :symbol | 
 		map := source newSymbol: symbol.
@@ -492,6 +494,7 @@ Ring2MetacircularConverter >> initializeRuntime [
 	string := mapping at: (source classNamed: #String).
 	metaclass := mapping at: (source classNamed: #Metaclass).
 	dnu := mapping at: source runtime doesNotUnderstandMethod.
+	return := mapping at: source runtime realClosureReturnMethod.
 	kernel := mapping at: source kernel.
 	dest
 		arrayClass: array;
@@ -508,6 +511,7 @@ Ring2MetacircularConverter >> initializeRuntime [
 		metaclassClass: metaclass;
 		knownSymbols: symbols;
 		doesNotUnderstandMethod: dnu;
+		closureReturnMethod: return;
 		wordSize: source wordSize;
 		initializeInterpreter;
 		kernel: kernel.

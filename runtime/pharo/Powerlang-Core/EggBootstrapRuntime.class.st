@@ -90,6 +90,28 @@ EggBootstrapRuntime >> closureHomeEnvironment: closure [
 	^ closure slotAt: 2
 ]
 
+{ #category : 'services' }
+EggBootstrapRuntime >> closureHomeFrame: closure [
+
+	^ closure homeFrame
+]
+
+{ #category : 'services' }
+EggBootstrapRuntime >> closureHomeFrame: closure put: anObject [
+
+	^ closure homeFrame: anObject
+]
+
+{ #category : 'accessing' }
+EggBootstrapRuntime >> closureReturnMethod [
+	| species smethod method |
+	^closureReturnMethod ifNil: [ 
+		species := image classNamed: #Closure.
+		smethod := species instanceSpec >> #return:.
+		method := self compile: smethod.
+		closureReturnMethod := self transferMethodLiterals: method]
+]
+
 { #category : 'accessing' }
 EggBootstrapRuntime >> compile: method [
 	| class |
@@ -347,6 +369,11 @@ EggBootstrapRuntime >> newSlotsOf: aProtoeggSpecies [
 	^image newSlotsOf: aProtoeggSpecies spec instanceSide sized: 0
 ]
 
+{ #category : 'accessing' }
+EggBootstrapRuntime >> newSmallInteger: anInteger [
+	^image newSmallInteger: anInteger
+]
+
 { #category : 'services' }
 EggBootstrapRuntime >> newSymbol: aSymbol [
 	^ image newSymbol: aSymbol
@@ -384,6 +411,15 @@ EggBootstrapRuntime >> override: assoc withPrimitive: primitive [
 	method := species methodNamed: selector.
 	override := method copy sourceCode: source.
 	overrides at: species -> selector put: override
+]
+
+{ #category : 'accessing' }
+EggBootstrapRuntime >> realClosureReturnMethod [
+	| species selector |
+	species := image classNamed: #Closure.
+	selector := image newSymbol: #return:.
+	^self sendLocal: #at: to: species instanceBehavior methods with: {selector}.
+
 ]
 
 { #category : 'accessing' }
