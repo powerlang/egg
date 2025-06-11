@@ -412,6 +412,9 @@ EggBootstrapRuntimeTest >> test164evaluateClosureWithArgsAndMultipleTemps [
 { #category : 'tests' }
 EggBootstrapRuntimeTest >> test165evaluateClosureNonLocalReturn [
 	| result |
+	"need to run bootstrap to be able to unwind, because it sends message to
+	Processor to check for ensured blocks"
+	image bootstrap.
 	self
 		compile:
 			'foo 
@@ -447,6 +450,7 @@ EggBootstrapRuntimeTest >> test167evaluateNestedClosureWithArgs [
 { #category : 'tests' }
 EggBootstrapRuntimeTest >> test168evaluateNestedClosureNonLocalReturn [
 	| result |
+	image bootstrap.
 	self
 		compile: 'foo [ [ ^7 ] value ] value'
 		in: #ProtoObject
