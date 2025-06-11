@@ -263,6 +263,7 @@ struct HeapObject
   	HeapObject* klass();
 
     std::string printString();
+    std::string printContents();
 
     std::string stringVal();
     std::string asLocalString();
