@@ -19,6 +19,20 @@ ActiveProcess >> beInactive [
 	self changeClassTo: SuspendedProcess
 ]
 
+{ #category : #converting }
+ActiveProcess >> canReturnTo: homeFrame [
+
+	| method env |
+	homeFrame == nil ifTrue: [^false].
+	homeFrame < self nativeStack bp ifTrue: [^false].
+	^true
+	"method := self codeAt: homeFrame.
+	homeFrame hasBlocks ifFalse: [^false].
+	env := self methodEnvironment.
+	homeFrame environment == env ifTrue: [^true].
+	^homeFrame methodEnvironment == env"
+]
+
 { #category : #private }
 ActiveProcess >> drop [
 	"
@@ -40,7 +54,7 @@ ActiveProcess >> evaluate: aClosure ensuring: ensuredClosure [
 	have to update the frame indices if the stack frames are changed.
 	"
 	| cursor result prev |
-	cursor := nativeStack bp.
+	cursor := self nativeStack bp.
 	protectedFrames push: cursor.
 	result := aClosure value.
 	prev := protectedFrames pop.
@@ -52,6 +66,24 @@ ActiveProcess >> evaluate: aClosure ensuring: ensuredClosure [
 ]
 
 { #category : #private }
+ActiveProcess >> evaluateEnsuredUpTo: framePointer [
+	"
+	Marked as atomic because the protected frames are removed on
+	denativization and recreated on nativization, so stepping through the
+	loop in this method could have undesired consequences.
+	Ensured closure is the argument to the evaluate:ensuring: method, which protectedFrames
+	point to.
+	"
+	| ensured |
+	#atomic.
+	[
+		protectedFrames notEmpty and: [protectedFrames last <= framePointer]]
+			whileTrue: [
+				ensured := self nativeStack lastArgumentOf: protectedFrames pop.
+				ensured value].
+]
+
+{ #category : #private }
 ActiveProcess >> launch: aMessage [
 	exceptionHandler := nil.
 	aMessage evaluate.
@@ -59,11 +91,30 @@ ActiveProcess >> launch: aMessage [
 ]
 
 { #category : #private }
+ActiveProcess >> nonLocalReturn: anObject home: framePointer [
+	"
+		The home frame of closure is the start of the chain (might be another
+		cloure). We look for the method frame, evaluate any protected blocks
+		in the way and return.
+
+		We assume homeFrame is a valid index, which is guaranteed because:
+		- it is captured in the active process
+		- it is niled out when putting the process to sleep
+		- it is refreshed when process is reactivated
+	"
+	(self canReturnTo: framePointer) 
+		ifFalse: [self error: 'cannot return to a frame outside current stack chunk'].
+
+	self evaluateEnsuredUpTo: framePointer.
+	^anObject _returnTo: framePointer
+]
+
+{ #category : #private }
 ActiveProcess >> snapshot [
 	"
 		Saves current state to allow resuming later
 	"
-	^nativeStack snapshot
+	^self nativeStack snapshot
 ]
 
 ActiveProcess >> useExceptionHandler: anExceptionHandler while: aBlock [

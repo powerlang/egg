@@ -20,10 +20,17 @@ ProcessStack class >> on: aProcess [
 ]
 
 { #category : #services }
+ProcessStack >> lastArgumentOf: frame [
+	"
+		Given the base index of a frame, then comes retaddr, then last argument passed in the invokation
+	"
+	^self at: frame + 2
+]
+
+{ #category : #services }
 ProcessStack >> contextSwitchTo: next [
 	self subclassResponsibility
 ]
-
 
 { #category : #services }
 ProcessStack >> fillFrom: aContext [

@@ -91,6 +91,22 @@ ExceptionHandler >> nextHandlerFor: anException [
 ]
 
 { #category : #handling }
+ExceptionHandler >> printOn: aStream [
+	aStream
+		nextPutAll: self class name withArticle; cr;
+		nextPutAll: ' for ';
+		nextPutAll: filter printString; cr;
+		nextPutAll: ' with handler '; cr;
+		nextPutAll: handlerBlock printString; cr;
+		nextPutAll: ' and protected block '; cr;
+		nextPutAll: protectedBlock printString; cr;
+		nextPutAll: ' returning ';
+		nextPutAll: return printString; cr;
+		nextPutAll: ' previous handler ';
+		nextPutAll: previous printString; cr
+]
+
+{ #category : #handling }
 ExceptionHandler >> retry [
 	self return: self retryToken
 ]
