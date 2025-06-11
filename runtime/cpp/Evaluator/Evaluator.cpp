@@ -291,11 +291,32 @@ Object* Evaluator::send_to_with_(Object *symbol, Object *receiver, std::vector<O
 
 void Egg::Evaluator::messageNotUnderstood_(SAbstractMessage *message)
 {
-    std::string errmsg = std::string("Message not understood!\n") +
-        this->_regR->printString() + " does not understand " + message->selector()->printString() +
-        "\ndnu recovery not implemented yet";
+/*
+	Having the adaptor causes argument popping work transparently. The adaptor frame's
+	PC is pointed to the instant after the send, so it just pops the message and continues
+*/
+	auto count = message->arguments().size();
+	std::vector<Object*> args;
+    for (size_t i = 1; i <= count; i++)
+    {
+        args.push_back(_context->operandAt_(count - i));
+    }
+	auto array = _runtime->newArray_(args);
+	_context->push_(message->selector());
+	_context->push_((Object*)array);
+    auto symbol = _runtime->addSymbol_("doesNotUnderstand:");
+    auto behavior = _runtime->behaviorOf_(_regR);
+	auto dnu = _runtime->lookup_startingAt_((Object*)symbol, behavior);
+    if (!dnu)
+    {
+        std::string errmsg = std::string("Message not understood!\n") +
+     this->_regR->printString() + " does not understand " + message->selector()->printString() +
+     "\nmethod #doesNotUnderstand: not found on receiver";
+        error_(errmsg);
 
-    error_(errmsg);
+    }
+
+	this->invoke_with_(dnu->asHeapObject(), _regR);
 }
 
 void Evaluator::doesNotKnow(const Object *symbol) { ASSERT(false); }
