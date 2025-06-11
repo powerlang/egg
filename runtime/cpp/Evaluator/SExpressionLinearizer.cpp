@@ -453,6 +453,7 @@ void SExpressionLinearizer::visitBlock(SBlock *anSBlock) {
 
     if (statements.empty()) {
         this->loadRwithNil();
+        this->returnOp();
     } else {
         if (!statements.back()->isReturn())
             this->returnOp();
