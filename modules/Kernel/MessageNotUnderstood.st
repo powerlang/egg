@@ -54,6 +54,18 @@ MessageNotUnderstood >> message: aMessage [
 ]
 
 { #category : #accessing }
+MessageNotUnderstood >> printOn: aStream [
+	aStream nextPutAll: self class name withArticle.
+	message ifNotNil: [
+		aStream
+			cr; nextPutAll: 'selector: '; print: message selector;
+			cr; nextPutAll: 'arguments: '; print: message arguments].
+	receiver ifNotNil: [
+		aStream cr; nextPutAll: 'receiver: '; print: receiver].
+	aStream cr.
+]
+
+{ #category : #accessing }
 MessageNotUnderstood >> receiver [
 	^receiver
 ]
