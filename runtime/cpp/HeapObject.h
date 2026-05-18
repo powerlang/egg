@@ -202,7 +202,8 @@ struct HeapObject
       uint32_t bodySizeInBytes() const; // the size in bytes of the buffer used for the body of this object (buffer sizes are aligned to pointer size)
       uint32_t bodySizeInSlots() const; // the size in slots of the buffer used for the body of this object (buffer sizes are aligned to pointer size)
       uint32_t headerSizeInBytes() const; // 8 or 16 depending if the object is small or large
-
+      uint32_t totalSizeInBytes() const { return this->headerSizeInBytes() + this->bodySizeInBytes(); };
+      
       uint32_t pointersSize() const ; // bodySizeInSlots if the object is marked as slots, 0 if marked as bytes
       uint32_t strongPointersSize() const;
 

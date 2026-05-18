@@ -201,7 +201,7 @@ HeapObject *AllocationZone::shallowCopyCommiting_(HeapObject *object)
     if (copy)
         return copy;
 
-    auto size = object->bodySizeInBytes();
+    auto size = object->totalSizeInBytes();
     if (size > GCHeap::LargeThreshold)
     {
         auto space = _heap->createLargeSpace_(size);
