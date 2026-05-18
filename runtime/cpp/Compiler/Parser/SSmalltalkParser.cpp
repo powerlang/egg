@@ -644,82 +644,106 @@ bool SSmalltalkParser::hasKeywordSelector() const {
 }
 
 SParseNode* SSmalltalkParser::literalArray() {
-    // Matches Smalltalk literalArray → arrayBody → arrayElement
-    uint32_t position = _token->position().start();
-    std::vector<LiteralValue> elements;
-    
-    // Step past #( (or ( for nested arrays)
+    auto* array = arrayBody();
     step();
-    while (_token && !_token->is(')') && !_token->isEnd()) {
-        // arrayElement
-        if (_token->isLiteral()) {
-            elements.push_back(parseLiteralValue());
-        } else if (_token->isName()) {
-            elements.push_back(pseudoLiteralValue());
-        } else if (_token->isKeyword()) {
-            // literalKeyword: collect multi-part keyword symbol
-            Egg::string keyword = _token->value();
-            step();
-            while (_token && _token->isKeyword()) {
-                keyword += _token->value();
-                step();
-            }
-            elements.push_back(LiteralValue::fromSymbol(keyword));
-            continue; // already stepped past last keyword
-        } else if (_token->is('-')) {
-            LiteralValue neg = negativeNumberOrBinary();
-            if (!neg.isNone()) {
-                elements.push_back(std::move(neg));
-            } else {
-                elements.push_back(LiteralValue::fromSymbol("-"));
-            }
-        } else if (_token->hasSymbol()) {
-            elements.push_back(LiteralValue::fromSymbol(_token->value()));
-        } else if (_token->is('(') || _token->is("#(")) {
-            // nested literal array
-            auto* nested = static_cast<SLiteralNode*>(literalArray());
-            elements.push_back(nested->literalValue());
-            continue; // literalArray already stepped past )
-        } else if (_token->is("#[")) {
-            auto* nested = static_cast<SLiteralNode*>(literalByteArray());
-            elements.push_back(nested->literalValue());
-            continue; // literalByteArray already stepped past ]
-        } else {
-            error_("invalid literal array element");
-        }
-        step();
-    }
-
-    if (_token && _token->isEnd()) missingToken_(")");
-
-    auto lit = new SLiteralNode(_compiler);
-    lit->literalValue_(LiteralValue::fromArray(std::move(elements)));
-    lit->position_(Stretch(position, _token ? _token->position().end() : position));
-    step(); // past )
-    return lit;
+    return array;
 }
 
 SParseNode* SSmalltalkParser::literalByteArray() {
-    uint32_t position = _token->position().start();
+    auto* node = byteArrayBody();
     step();
-    std::vector<uint8_t> bytes;
-    while (_token && !_token->is(']') && !_token->isEnd()) {
-        if (_token->isLiteral()) {
-            // Each element should be a number 0-255
-            std::string v = _token->value().toUtf8();
-            int val = static_cast<int>(std::stol(v, nullptr, 0));
-            bytes.push_back(static_cast<uint8_t>(val));
+    return node;
+}
+
+SLiteralNode* SSmalltalkParser::arrayBody() {
+    std::vector<LiteralValue> literals;
+    uint32_t position = _token->position().start();
+
+    while (true) {
+        step();
+        if (!_token || _token->is(')') || _token->isEnd()) {
+            break;
+        }
+        literals.push_back(arrayElement());
+    }
+
+    if (!_token || _token->isEnd()) {
+        missingToken_(")");
+    }
+
+    auto* node = new SLiteralNode(_compiler);
+    node->literalValue_(LiteralValue::fromArray(std::move(literals)));
+    node->position_(Stretch(position, _token->position().end()));
+    return node;
+}
+
+LiteralValue SSmalltalkParser::arrayElement() {
+    if (_token->isLiteral()) {
+        return parseLiteralValue();
+    }
+    if (_token->isName()) {
+        return pseudoLiteralValue();
+    }
+    if (_token->isKeyword()) {
+        return literalKeyword();
+    }
+    if (_token->is('-')) {
+        LiteralValue neg = negativeNumberOrBinary();
+        return neg.isNone() ? LiteralValue::fromSymbol("-") : std::move(neg);
+    }
+    if (_token->hasSymbol()) {
+        return LiteralValue::fromSymbol(_token->value());
+    }
+    if (_token->is('(') || _token->is("#(")) {
+        return arrayBody()->literalValue();
+    }
+    if (_token->is("#[")) {
+        return byteArrayBody()->literalValue();
+    }
+    error_("invalid literal array element");
+    return LiteralValue();
+}
+
+LiteralValue SSmalltalkParser::literalKeyword() {
+    Egg::string keyword = _token->value();
+    uint32_t prevEnd = _token->position().end();
+
+    while (true) {
+        auto* nextToken = peek();
+        if (!nextToken || !nextToken->isKeyword() || nextToken->position().start() != prevEnd) {
+            break;
         }
         step();
+        keyword += _token->value();
+        prevEnd = _token->position().end();
     }
+
+    return LiteralValue::fromSymbol(keyword);
+}
+
+SLiteralNode* SSmalltalkParser::byteArrayBody() {
+    std::vector<uint8_t> bytes;
+    uint32_t position = _token->position().start();
+
+    while (true) {
+        step();
+        if (!_token || !_token->isLiteral()) {
+            break;
+        }
+
+        std::string v = _token->value().toUtf8();
+        int val = static_cast<int>(std::stol(v, nullptr, 0));
+        bytes.push_back(static_cast<uint8_t>(val));
+    }
+
     if (!_token || !_token->is(']')) {
         missingToken_("]");
     }
-    auto lit = new SLiteralNode(_compiler);
-    lit->literalValue_(LiteralValue::fromByteArray(std::move(bytes)));
-    lit->position_(Stretch(position, _token->position().end()));
-    step();
-    return lit;
+
+    auto* node = new SLiteralNode(_compiler);
+    node->literalValue_(LiteralValue::fromByteArray(std::move(bytes)));
+    node->position_(Stretch(position, _token->position().end()));
+    return node;
 }
 
 SBraceNode* SSmalltalkParser::bracedArray() {

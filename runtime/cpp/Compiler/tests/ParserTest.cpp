@@ -423,6 +423,110 @@ TEST_CASE_METHOD(SSmalltalkParserTestFixture, "Parser: Literal string", "[parser
     tearDown();
 }
 
+TEST_CASE_METHOD(SSmalltalkParserTestFixture, "Parser: Literal array", "[parser]") {
+    setUp();
+
+    SMethodNode* method = parseExpression("#(16rFE $a 'hello' #s #(1 2))");
+
+    REQUIRE(method != nullptr);
+    REQUIRE(method->statements().size() == 1);
+
+    SParseNode* stmt = method->statements()[0];
+    REQUIRE(stmt->isLiteral());
+
+    SLiteralNode* lit = static_cast<SLiteralNode*>(stmt);
+    const LiteralValue& array = lit->literalValue();
+    REQUIRE(array.isArray());
+    REQUIRE(array.asArray().size() == 5);
+
+    REQUIRE(array.asArray()[0].isInteger());
+    REQUIRE(array.asArray()[0].asInteger() == 0xFE);
+    REQUIRE(array.asArray()[1].isCharacter());
+    REQUIRE(array.asArray()[1].asCharacter() == 'a');
+    REQUIRE(array.asArray()[2].isString());
+    REQUIRE(array.asArray()[2].asString() == "hello");
+    REQUIRE(array.asArray()[3].isSymbol());
+    REQUIRE(array.asArray()[3].asString() == "s");
+    REQUIRE(array.asArray()[4].isArray());
+    REQUIRE(array.asArray()[4].asArray().size() == 2);
+    REQUIRE(array.asArray()[4].asArray()[0].asInteger() == 1);
+    REQUIRE(array.asArray()[4].asArray()[1].asInteger() == 2);
+
+    tearDown();
+}
+
+TEST_CASE_METHOD(SSmalltalkParserTestFixture, "Parser: Literal keyword array symbols", "[parser]") {
+    setUp();
+
+    SMethodNode* method = parseExpression("#(a:b: c: d:)");
+
+    REQUIRE(method != nullptr);
+    REQUIRE(method->statements().size() == 1);
+
+    SParseNode* stmt = method->statements()[0];
+    REQUIRE(stmt->isLiteral());
+
+    SLiteralNode* lit = static_cast<SLiteralNode*>(stmt);
+    const LiteralValue& array = lit->literalValue();
+    REQUIRE(array.isArray());
+    REQUIRE(array.asArray().size() == 3);
+
+    REQUIRE(array.asArray()[0].isSymbol());
+    REQUIRE(array.asArray()[0].asString() == "a:b:");
+    REQUIRE(array.asArray()[1].isSymbol());
+    REQUIRE(array.asArray()[1].asString() == "c:");
+    REQUIRE(array.asArray()[2].isSymbol());
+    REQUIRE(array.asArray()[2].asString() == "d:");
+
+    tearDown();
+}
+
+TEST_CASE_METHOD(SSmalltalkParserTestFixture, "Parser: Negative elements in literal array", "[parser]") {
+    setUp();
+
+    SMethodNode* method = parseExpression("#(-21 1 -5 4)");
+
+    REQUIRE(method != nullptr);
+    REQUIRE(method->statements().size() == 1);
+
+    SParseNode* stmt = method->statements()[0];
+    REQUIRE(stmt->isLiteral());
+
+    SLiteralNode* lit = static_cast<SLiteralNode*>(stmt);
+    const LiteralValue& array = lit->literalValue();
+    REQUIRE(array.isArray());
+    REQUIRE(array.asArray().size() == 4);
+    REQUIRE(array.asArray()[0].asInteger() == -21);
+    REQUIRE(array.asArray()[1].asInteger() == 1);
+    REQUIRE(array.asArray()[2].asInteger() == -5);
+    REQUIRE(array.asArray()[3].asInteger() == 4);
+
+    tearDown();
+}
+
+TEST_CASE_METHOD(SSmalltalkParserTestFixture, "Parser: Dash-starting symbols in literal array", "[parser]") {
+    setUp();
+
+    SMethodNode* method = parseExpression("#(#++ #--)");
+
+    REQUIRE(method != nullptr);
+    REQUIRE(method->statements().size() == 1);
+
+    SParseNode* stmt = method->statements()[0];
+    REQUIRE(stmt->isLiteral());
+
+    SLiteralNode* lit = static_cast<SLiteralNode*>(stmt);
+    const LiteralValue& array = lit->literalValue();
+    REQUIRE(array.isArray());
+    REQUIRE(array.asArray().size() == 2);
+    REQUIRE(array.asArray()[0].isSymbol());
+    REQUIRE(array.asArray()[0].asString() == "++");
+    REQUIRE(array.asArray()[1].isSymbol());
+    REQUIRE(array.asArray()[1].asString() == "--");
+
+    tearDown();
+}
+
 TEST_CASE_METHOD(SSmalltalkParserTestFixture, "Parser: Complex expression", "[parser]") {
     setUp();
     
