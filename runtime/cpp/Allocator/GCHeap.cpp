@@ -50,11 +50,9 @@ GCSpace *Egg::GCHeap::createLargeSpace_(uintptr_t size)
 		error_(std::string("Not enough memory to allocate ") + std::to_string(size) + "bytes");
 
     auto limit = address + size;
-	auto space = GCSpace::allocatedAt_limit_(address, limit);
+    auto space = GCSpace::allocatedAt_limit_(address, limit, true);
 
 	space->_name = "Large";
-	space->_committedLimit = limit;
-	space->_softLimit = limit;
 	this->addSpace_(space);
 	_largeSpaces.push_back(space);
 	return space;

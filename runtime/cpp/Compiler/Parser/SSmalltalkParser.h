@@ -89,6 +89,10 @@ public:
     
     SParseNode* literalArray();
     SParseNode* literalByteArray();
+    SLiteralNode* arrayBody();
+    LiteralValue arrayElement();
+    LiteralValue literalKeyword();
+    SLiteralNode* byteArrayBody();
     SBraceNode* bracedArray();
     
     LiteralValue parseLiteralValue();

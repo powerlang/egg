@@ -110,15 +110,11 @@ public:
 
     uintptr_t hashFor_(Object *anObject);
 
-	int16_t nextHash() {
-		auto prev = this->_lastHash;
-			auto shifted = this->_lastHash >> 1;
-			this->_lastHash = (this->_lastHash & 1) == 0 ? shifted : shifted ^ 0xB9C8;
-		if (this->_lastHash == 0) {
-			return prev;
-		}
-			return this->_lastHash;
-	}
+    uint16_t nextHash() {
+        uint16_t shifted = _lastHash >> 1;
+        _lastHash = (_lastHash & 1) == 0 ? shifted : shifted ^ 0xB9C8;
+        return _lastHash;
+    }
 
     void registerCache_for_(SAbstractMessage *message, Object *symbol) {
         auto it = _inlineCaches.find(symbol);

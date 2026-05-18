@@ -614,6 +614,8 @@ void Bootstrapper::compileAndInstallMethod_(const Egg::string& source, HeapObjec
 
     // Transfer the compiled method to a heap object
     HeapObject* method = allocateSlots_(Offsets::MethodInstSize + literalCount);
+    method->beNamed();
+    method->beArrayed();
 
     // Set method's behavior to CompiledMethod's instance behavior
     Object* cmBehavior = _compiledMethodClass->slot(Offsets::SpeciesInstanceBehavior);
