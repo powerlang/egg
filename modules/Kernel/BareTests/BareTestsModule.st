@@ -10,6 +10,13 @@ Class {
 	#category : #'Powerlang-Core'
 }
 
+{ #category : #spec }
+BareTestsModule >> imports [
+	^{
+		#Kernel -> #(HashTable)
+	}
+]
+
 { #category : #tests }
 BareTestsModule >> test001SendYourself [
 	^true yourself
@@ -439,7 +446,8 @@ BareTestsModule >> main: anArray [
 		test220BitXorSmallIntegers test221BitXorSmallIntWithLargeInt
 		test222BitXorLargeIntWithSmallInt
 		test230BitShiftLeftOverflow test231BitShiftRightNegativeArg
-		test232BitShiftRightSelector).
+		test232BitShiftRightSelector
+		test240HashTablePrimeForReturnsNextGoodPrime).
 	tests do: [:sel |
 		(self runTest: sel)
 			ifTrue: [passed := passed + 1]
