@@ -128,7 +128,7 @@ LMRFloat >> basicAt: index [
 
 { #category : #random }
 LMRFloat >> fractionPart [
-	| new result |>
+	| new result |
 	new := Float new.
 	result := self _floatFractionPartInto: new.
 	result == new ifTrue: [^result].
