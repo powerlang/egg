@@ -91,7 +91,7 @@ HashTable class >> primeFor: size [
 	primes := self goodPrimes.
 	1 to: primes size do: [:i | | p |
 		p := primes at: i.
-		p > n ifTrue: [p]].
+		p > n ifTrue: [^p]].
 	^n
 ]
 

@@ -385,6 +385,11 @@ BareTestsModule >> test232BitShiftRightSelector [
 	^(16rAA00 bitShiftRight: 8) == 16rAA
 ]
 
+{ #category : #tests }
+BareTestsModule >> test240HashTablePrimeForReturnsNextGoodPrime [
+	^(HashTable primeFor: 300) == 359
+]
+
 { #category : #main }
 BareTestsModule >> runTest: selector [
 	| result |
