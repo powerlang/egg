@@ -20,7 +20,7 @@ Runtime::Runtime(Loader* loader, ImageSegment* kernel, SymbolProvider* symbolPro
     _loader(loader),
     _kernel(kernel),
     _symbolProvider(symbolProvider),
-    _lastHash(0)
+    _lastHash(1) // LFSR seed; must be non-zero (0 is a fixed point).
 {
     debugRuntime = this;
     this->initializeKernelObjects();
