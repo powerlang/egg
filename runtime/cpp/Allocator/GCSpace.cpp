@@ -93,12 +93,18 @@ uintptr_t GCSpace::allocateCommittingIfNeeded_(uint32_t size)
 {
 	auto answer = _next;
 	auto next = answer + size;
-	if (next <= _softLimit || this->commitMemoryUpTo_(next))
+	if (next <= _softLimit)
+	{
+		_next = next;
+		return answer;
+	}
+    if (this->commitMemoryUpTo_(next))
     {
+        _softLimit = _committedLimit;
         _next = next;
         return answer;
     }
-    else return 0;
+    return 0;
 }
 
 bool GCSpace::increaseSoftLimit_(uint32_t delta)
