@@ -952,11 +952,16 @@ Object* Evaluator::primitiveHostLoadModule() {
 
 Object* Evaluator::primitiveHostWriteFile() {
     auto filename = this->_context->firstArgument()->asHeapObject()->asLocalString();
-    auto contents = this->_context->secondArgument()->asHeapObject()->asLocalString();
+    auto contents = this->_context->secondArgument()->asHeapObject();
+    if (!contents->isBytes())
+        return this->failPrimitive();
+    bool isString = _runtime->speciesOf_((Object*)contents) == _runtime->_stringClass;
+    auto byteCount = contents->size();
+    if (isString && byteCount > 0) byteCount -= 1; // strip String null terminator
     std::ofstream file(filename, std::ios::binary);
     if (!file)
         return this->failPrimitive();
-    file.write(contents.data(), contents.size());
+    file.write((const char*)contents, byteCount);
     return (Object*)this->_context->self();
 }
 
