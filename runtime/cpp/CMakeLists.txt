@@ -62,6 +62,7 @@ include_directories(. ${PLATFORM})
 # Add compiler and tests
 add_subdirectory(Compiler)
 add_subdirectory(Bootstrap)
+add_subdirectory(Allocator/tests)
 
 
 include(CPack)
