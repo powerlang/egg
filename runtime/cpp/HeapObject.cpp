@@ -290,7 +290,7 @@ uint32_t&
 HeapObject::uint32offset(const uint32_t subscript)
 {
     ASSERT(this->isBytes());
-    ASSERT(subscript * 4 + 3 < this->size());
+    ASSERT(subscript + 3 < this->size());
 
     return *(uint32_t*)((uintptr_t)this + subscript);
 }
