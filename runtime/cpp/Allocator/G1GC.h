@@ -47,6 +47,10 @@ public:
 
     HeapObject* copyOf_(HeapObject *anObject);
     HeapObject* evacuate_(HeapObject *anObject);
+
+    HeapObject** forwarderOf_(HeapObject *anObject) const {
+        return (HeapObject**)((uintptr_t)anObject - sizeof(HeapObject::SmallHeader) + _forwarderOffset);
+    }
     bool hasReachedCountdown() { return _countdown <= 0; }
     bool hasToEvacuate_(HeapObject *anObject);
     virtual void initializeLocals();
