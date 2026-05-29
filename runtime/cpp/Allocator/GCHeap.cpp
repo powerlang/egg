@@ -84,9 +84,10 @@ uintptr_t GCHeap::allocate_(uint32_t size) {
     if (size > LargeThreshold)
         return this->allocateLarge_(size);
 
+
     if (this->isGCAllowed())
         this->collectIfTime();
-    else
+    else if (_fullGC->hasReachedCountdown())
         requestGC();
 
     _fullGC->tenured_(size);
