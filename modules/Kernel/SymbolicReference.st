@@ -106,7 +106,7 @@ SymbolicReference >> asSymbol [
 
 { #category : #services }
 SymbolicReference >> hasBeenLinked [
-	^object notNil or: [token == #nil]
+	^object notNil or: [linker == #nil]
 ]
 
 { #category : #services }
