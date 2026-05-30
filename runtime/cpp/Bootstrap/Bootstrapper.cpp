@@ -446,22 +446,8 @@ void Bootstrapper::createRuntimeWithBootstrappedKernel() {
     kernel->addExport("Kernel", _kernelModule);
     kernel->addExport("__module__", _kernelModule);
 
-    kernel->addExport("Array", _classes.at("Array"));
-    kernel->addExport("Metaclass", _metaclassClass);
-    kernel->addExport("CompiledMethod", _classes.at("CompiledMethod"));
-    kernel->addExport("SmallInteger", _classes.at("SmallInteger"));
-    kernel->addExport("LargePositiveInteger", _classes.at("LargePositiveInteger"));
-    kernel->addExport("LargeNegativeInteger", _classes.at("LargeNegativeInteger"));
-    kernel->addExport("Float", _classes.at("Float"));
-    kernel->addExport("CompiledBlock", _classes.at("CompiledBlock"));
-    kernel->addExport("ByteArray", _classes.at("ByteArray"));
-    kernel->addExport("String", _stringClass);
-    kernel->addExport("Closure", _classes.at("Closure"));
-    kernel->addExport("Behavior", _classes.at("Behavior"));
-    kernel->addExport("Ephemeron", _classes.at("Ephemeron"));
-    kernel->addExport("ProcessVMStack", _classes.at("ProcessVMStack"));
-    kernel->addExport("OpenHashTable", _classes.at("OpenHashTable"));
-    kernel->addExport("Character", _classes.at("Character"));
+    for (const auto& [name, cls] : _classes)
+        kernel->addExport(name.toUtf8(), cls);
 
     _loader->_runtime = new Runtime(_loader, kernel, _symbolProvider);
     _loader->_runtime->addSegmentSpace_(kernel);
