@@ -10,7 +10,8 @@ Class {
 		'process',
 		'sp',
 		'bp',
-		'env'
+		'env',
+		'pc'
 	],
 	#category : #Kernel
 }
@@ -34,10 +35,32 @@ ProcessStack >> contextSwitchTo: next [
 ]
 
 { #category : #services }
+ProcessStack >> copyFrom: first to: last [
+	| step |
+	step := first < last ifTrue: [1] ifFalse: [-1].
+	^(first to: last by: step) collect: [:i | self at: i].
+]
+
+{ #category : #services }
 ProcessStack >> fillFrom: aContext [
 	#CRITICAL.
 	sp := aContext copyAllTo: self.
 	env := aContext lastEnvironment
+]
+
+{ #category : #accessing }
+ProcessStack >> bp [
+	^bp
+]
+
+{ #category : #accessing }
+ProcessStack >> sp [
+	^sp
+]
+
+{ #category : #accessing }
+ProcessStack >> pc [
+	^pc
 ]
 
 { #category : #accessing }

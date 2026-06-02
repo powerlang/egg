@@ -28,6 +28,22 @@ Array >> canBePrintedAsLiteral [
 		onSignal: [false]
 ]
 
+{ #category : #printing }
+Array >> printOn: aStream [
+	self canBePrintedAsLiteral
+		ifTrue: [self printAsLiteralOn: aStream]
+		ifFalse: [super printOn: aStream]
+]
+
+{ #category : #printing }
+Array >> printAsLiteralOn: aStream [
+	aStream nextPutAll: '#('.
+	1 to: self size do: [:i |
+		i > 1 ifTrue: [aStream space].
+		(self at: i) printOn: aStream].
+	aStream nextPut: $)
+]
+
 { #category : #unclassified }
 Array >> crash [
 	| t |

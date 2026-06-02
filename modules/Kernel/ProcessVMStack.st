@@ -38,11 +38,6 @@ ProcessVMStack >> initializeWithActiveBuffer [
 	<primitive: ProcessVMStackInitializeWithActiveBuffer>
 ]
 
-{ #category : #primitives }
-ProcessVMStack >> bp [
-	<primitive: ProcessVMStackBP>
-]
-
 { #category : 'Primitives' }
 ProcessVMStack >> bpAt: anInteger [
 	<primitive: ProcessVMStackBpAt>
@@ -89,4 +84,9 @@ ProcessVMStack >> snapshot [
 { #category : #primitives }
 ProcessVMStack >> sp: anInteger [
 	<primitive: ProcessVMStackSPPut>
+]
+
+{ #category : #reifying }
+ProcessVMStack >> reify [
+	^Context fromStack: self
 ]

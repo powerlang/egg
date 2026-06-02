@@ -206,11 +206,14 @@ void Evaluator::initializePrimitives()
     this->addPrimitive("ProcessVMStackInitializeWithActiveBuffer", &Evaluator::primitiveProcessVMStackInitializeWithActiveBuffer);
     this->addPrimitive("ProcessVMStackAt", &Evaluator::primitiveProcessStackAt);
     this->addPrimitive("ProcessVMStackAtPut", &Evaluator::primitiveProcessVMStackAtPut);
+    this->addPrimitive("ProcessVMStackBpAt", &Evaluator::primitiveProcessVMStackBpAt);
     this->addPrimitive("ProcessVMStackBpAtPut", &Evaluator::primitiveProcessVMStackBpAtPut);
+    this->addPrimitive("ProcessVMStackPcAt", &Evaluator::primitiveProcessVMStackPcAt);
     this->addPrimitive("ProcessVMStackPcAtPut", &Evaluator::primitiveProcessVMStackPcAtPut);
     this->addPrimitive("ProcessVMStackBP", &Evaluator::primitiveProcessBP);
     this->addPrimitive("ProcessVMStackBufferSize", &Evaluator::primitiveProcessVMStackBufferSize);
     this->addPrimitive("ProcessVMStackContextSwitchTo", &Evaluator::primitiveProcessVMStackContextSwitchTo);
+    this->addPrimitive("ProcessVMStackSnapshot", &Evaluator::primitiveProcessVMStackSnapshot);
     _linearizer->primitives_(_primitives);
 }
 
@@ -296,7 +299,7 @@ Object* Evaluator::send_to_with_(Object *symbol, Object *receiver, std::vector<O
     this->_regR = receiver;
     if (!args.empty())
         this->_context->pushOperand_(receiver);
-    
+
     for (auto arg : args) {
         this->_context->pushOperand_(arg);
     }
@@ -1049,7 +1052,14 @@ Object* Evaluator::primitiveProcessBP()
 
 Object* Evaluator::primitiveProcessStackAt()
 {
-    return _context->stackAt_(this->_context->firstArgument()->asSmallInteger()->asNative());
+
+    auto receiver = this->_context->self()->asHeapObject();
+    auto buffer = this->_runtime->processVMStackBuffer_(receiver);
+    if (!buffer) return failPrimitive();
+    auto index = this->_context->firstArgument()->asSmallInteger()->asNative();
+    auto size = this->_runtime->processVMStackBufferSize_(receiver);
+    if (index < 1 || (uintptr_t)index > size) return failPrimitive();
+    return buffer[index - 1];
 }
 
 Object* Evaluator::primitiveProcessVMStackInitializeWithNewBuffer()
@@ -1095,7 +1105,6 @@ Object* Evaluator::primitiveProcessVMStackAtPut()
 {
     auto receiver = this->_context->self()->asHeapObject();
     auto buffer = this->_runtime->processVMStackBuffer_(receiver);
-    if (!buffer) return failPrimitive();
     auto index = this->_context->firstArgument()->asSmallInteger()->asNative();
     auto value = this->_context->secondArgument();
     auto size = this->_runtime->processVMStackBufferSize_(receiver);
@@ -1104,11 +1113,20 @@ Object* Evaluator::primitiveProcessVMStackAtPut()
     return value;
 }
 
+Object* Evaluator::primitiveProcessVMStackBpAt()
+{
+    auto receiver = this->_context->self()->asHeapObject();
+    auto buffer = this->_runtime->processVMStackBuffer_(receiver);
+    auto index = this->_context->firstArgument()->asSmallInteger()->asNative();
+    auto size = this->_runtime->processVMStackBufferSize_(receiver);
+    if (index < 1 || (uintptr_t)index > size) return failPrimitive();
+    return (Object*)this->_runtime->newInteger_((uintptr_t)buffer[index - 1]);
+}
+
 Object* Evaluator::primitiveProcessVMStackBpAtPut()
 {
     auto receiver = this->_context->self()->asHeapObject();
     auto buffer = this->_runtime->processVMStackBuffer_(receiver);
-    if (!buffer) return failPrimitive();
     auto index = this->_context->firstArgument()->asSmallInteger()->asNative();
     auto bp    = this->_context->secondArgument()->asSmallInteger()->asNative();
     auto size  = this->_runtime->processVMStackBufferSize_(receiver);
@@ -1117,11 +1135,22 @@ Object* Evaluator::primitiveProcessVMStackBpAtPut()
     return this->_context->secondArgument();
 }
 
+Object* Evaluator::primitiveProcessVMStackPcAt()
+{
+    // The saved program counter is a raw integer; read it from the receiver's
+    // own buffer and box it (same coordinate space as the #at: primitive).
+    auto receiver = this->_context->self()->asHeapObject();
+    auto buffer = this->_runtime->processVMStackBuffer_(receiver);
+    auto index = this->_context->firstArgument()->asSmallInteger()->asNative();
+    auto size = this->_runtime->processVMStackBufferSize_(receiver);
+    if (index < 1 || (uintptr_t)index > size) return failPrimitive();
+    return (Object*)this->_runtime->newInteger_((uintptr_t)buffer[index - 1]);
+}
+
 Object* Evaluator::primitiveProcessVMStackPcAtPut()
 {
     auto receiver = this->_context->self()->asHeapObject();
     auto buffer = this->_runtime->processVMStackBuffer_(receiver);
-    if (!buffer) return failPrimitive();
     auto index = this->_context->firstArgument()->asSmallInteger()->asNative();
     auto pc    = this->_context->secondArgument()->asSmallInteger()->asNative();
     // third argument is the code object; not stored at this slot in our model,
@@ -1132,37 +1161,57 @@ Object* Evaluator::primitiveProcessVMStackPcAtPut()
     return this->_context->secondArgument();
 }
 
+Object* Evaluator::primitiveProcessVMStackSnapshot()
+{
+    // We save the caller, not this primitive's own frame: ours is popped as the
+    // send returns and then overwritten by later sends. The caller must be the
+    // *persistent* frame that performs the switch/reify (no returning wrapper in
+    // between), so its header stays live.
+    auto snapshotted = this->_context->self()->asHeapObject();
+    auto bp = this->_context->framePointer();
+    auto callerBP = (uintptr_t)this->_context->stackAt_(bp);
+    auto callerPC = (uintptr_t)this->_context->stackAt_(bp + 1);
+    auto callerSP = bp + 2;
+    this->_runtime->processStackBP_put_(snapshotted, callerBP);
+    this->_runtime->processStackSP_put_(snapshotted, callerSP);
+    this->_runtime->processStackPC_put_(snapshotted, (Object*)this->_runtime->newInteger_(callerPC));
+    return (Object*)this->_runtime->_falseObj;
+}
+
 Object* Evaluator::primitiveProcessVMStackContextSwitchTo()
 {
-    auto outgoing = this->_context->self()->asHeapObject();      // current stack
     auto incoming = this->_context->firstArgument()->asHeapObject(); // target stack
 
-    // Snapshot live registers into the outgoing PVMStack ivars.
-    this->_runtime->processStackSP_put_(outgoing, this->_context->stackPointer());
-    this->_runtime->processStackBP_put_(outgoing, this->_context->framePointer());
-    this->_runtime->processStackEnv_put_(outgoing, (Object*)this->_context->environment());
 
     // Bind the evaluator buffer to the incoming stack's buffer.
     auto buffer = this->_runtime->processVMStackBuffer_(incoming);
     auto size   = this->_runtime->processVMStackBufferSize_(incoming);
     this->_context->bindToBuffer_size_(buffer, size);
 
-    // Restore SP from the incoming PVMStack.
-    // Just popFrame to load M/E/S/PC/BP from the topmost frame.
-    auto sp = this->_runtime->processStackSP_(incoming);
-    this->_context->stackPointer_(sp + 1);
-    this->_context->framePointer_(this->_context->stackPointer());
+    // state to be restored could be the stack ivars (lightweight) or in the top
+    // frame of the process. Check the saved PC slot to distinguish these cases.
+    auto savedPC = this->_runtime->processStackPC_(incoming);
+    if (savedPC == (Object*)this->_runtime->_nilObj) {
+        // Fresh process: its top frame was laid into the buffer by fillFrom:.
+        // Restore SP and popFrame to load M/E/S/PC/BP from that frame.
+        auto sp = this->_runtime->processStackSP_(incoming);
+        this->_context->stackPointer_(sp + 1);
+        this->_context->framePointer_(this->_context->stackPointer());
+        this->_context->popFrame();
+    } else {
+        auto bp = this->_runtime->processStackBP_(incoming);
+        auto sp = this->_runtime->processStackSP_(incoming);
+        auto pc = savedPC->asSmallInteger()->asNative();
+        this->_context->resumeFrame_pc_sp_(bp, pc, sp);
+        this->_runtime->processStackPC_put_(incoming, (Object*)this->_runtime->_nilObj);
+    }
 
-    // popFrame reads the method out of the buffer; ensure that method has
-    // its executable code prepared (the Smalltalk-level prepareForExecution
-    // primitive is a no-op so that may not yet have happened).
-    this->_context->popFrame();
+   
     auto method = this->_context->compiledCode();
     if (this->_runtime->methodExecutableCode_(method) == this->_runtime->_nilObj)
         this->prepareForExecution_(method);
     auto code = this->_runtime->methodExecutableCode_(method);
     _work = this->_runtime->executableCodeWork_(code);
-
 
     return (Object*)this->_runtime->_trueObj;
 }

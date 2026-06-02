@@ -19,6 +19,11 @@ ActiveProcess >> beInactive [
 	self changeClassTo: SuspendedProcess
 ]
 
+{ #category : #accessing }
+ActiveProcess >> bp [
+	<primitive: ProcessVMStackBP>
+]
+
 { #category : #testing }
 ActiveProcess >> isActive [
 	^true
@@ -29,7 +34,7 @@ ActiveProcess >> canReturnTo: homeFrame [
 
 	| method env |
 	homeFrame == nil ifTrue: [^false].
-	homeFrame < self nativeStack bp ifTrue: [^false].
+	homeFrame < self bp ifTrue: [^false].
 	^true
 	"method := self codeAt: homeFrame.
 	homeFrame hasBlocks ifFalse: [^false].
@@ -59,7 +64,7 @@ ActiveProcess >> evaluate: aClosure ensuring: ensuredClosure [
 	have to update the frame indices if the stack frames are changed.
 	"
 	| cursor result prev |
-	cursor := self nativeStack bp.
+	cursor := self bp.
 	protectedFrames push: cursor.
 	result := aClosure value.
 	prev := protectedFrames pop.
@@ -114,12 +119,15 @@ ActiveProcess >> nonLocalReturn: anObject home: framePointer [
 	^anObject _returnTo: framePointer
 ]
 
-{ #category : #private }
-ActiveProcess >> snapshot [
-	"
-		Saves current state to allow resuming later
-	"
-	^self nativeStack snapshot
+{ #category : #services }
+ActiveProcess >> reifiedCopy [
+	| stack |
+	stack := self nativeStack.
+	stack snapshot.
+	^SuspendedProcess new
+		name: name;
+		topContext: stack reify;
+		yourself
 ]
 
 ActiveProcess >> useExceptionHandler: anExceptionHandler while: aBlock [
