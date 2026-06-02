@@ -647,7 +647,7 @@ Object* Evaluator::primitiveClass() {
 }
 
 Object* Evaluator::primitiveDictionaryNew() {
-    auto guard = this->_runtime->_heap->atGCSafepoint();
+   
     // self is Namespace class (or any HashedCollection subclass metaclass).
     // Equivalent to: self basicNew initialize: (self sizeFor: 5)
     // sizeFor: 5 => 7 max: (5*3//2) = 7. primeFor: 7 => 7.
