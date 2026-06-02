@@ -89,19 +89,6 @@ CompiledBlock >> aspects [
 		#templateIndex)
 ]
 
-{ #category : #comparing }
-CompiledBlock >> basicPrintOn: aStream [
-	method printOn: aStream.
-	aStream
-		nextPutAll: '. Block number: ';
-		nextPutAll: self blockNumber printString;
-		nextPutAll: ', ';
-		nextPutAll: self argumentCount printString;
-		nextPutAll: ' args, ';
-		nextPutAll: self tempCount printString;
-		nextPutAll: ' temps. '
-]
-
 { #category : #accessing }
 CompiledBlock >> bindMethod: aCompiledMethod [
 	method := aCompiledMethod
@@ -145,6 +132,11 @@ CompiledBlock >> capturesHome: aBoolean [
 	format := aBoolean
 				ifTrue: [ format bitOr: CapturesHome ]
 				ifFalse: [ format bitClear: CapturesHome ]
+]
+
+{ #category : #accessing }
+CompiledBlock >> capturesSelf [
+	^(format bitAnd: CapturesSelf) != 0
 ]
 
 { #category : #accessing }
@@ -258,10 +250,8 @@ CompiledBlock >> optimizedCode: anObject [
 ]
 
 { #category : #comparing }
-CompiledBlock >> printOn: aStream [
-	self class printOn: aStream.
+CompiledBlock >> printCapturedVarsOn: aStream [
 	aStream nextPut: $(.
-	self basicPrintOn: aStream.
 	(1 to: self size)
 		do: [:i | | field tag rest |
 			field := self at: i.
@@ -275,7 +265,20 @@ CompiledBlock >> printOn: aStream [
 					nextPutAll: rest asString;
 					nextPut: $]]]
 		separatedBy: [aStream space].
-	aStream nextPut: $)
+	aStream nextPut: $)	
+]
+
+{ #category : #comparing }
+CompiledBlock >> printOn: aStream [
+	method printOn: aStream.
+	aStream
+		nextPutAll: ' [Block ';
+		nextPutAll: self blockNumber printString;
+		nextPutAll: ', ';
+		nextPutAll: self argumentCount printString;
+		nextPutAll: ' args, ';
+		nextPutAll: self tempCount printString;
+		nextPutAll: ' temps ]'
 ]
 
 { #category : #accessing }

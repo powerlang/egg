@@ -221,6 +221,16 @@ public:
         _regS  = _stack[_regBP - 1 - 1];
     }
 
+    void resumeFrame_pc_sp_(uintptr_t bp, uintptr_t pc, uintptr_t sp)
+    {
+        _regBP = bp;
+        _regPC = pc;
+        _regSP = sp;
+        _regE  = _stack[bp - 4 - 1]->asHeapObject();
+        _regM  = _stack[bp - 2 - 1]->asHeapObject();
+        _regS  = _stack[bp - 1 - 1];
+    }
+
     void reserveStackSlots_(int anInteger)
     {
         _regSP = _regSP - anInteger;

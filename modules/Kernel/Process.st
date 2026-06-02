@@ -36,6 +36,11 @@ Process class >> sending: aSymbol to: anObject with: arguments [
 	^SuspendedProcess sending: aSymbol to: anObject with: arguments
 ]
 
+{ #category : #accessing }
+Process >> backtrace [
+	^self subclassResponsibility
+]
+
 { #category : #services }
 Process >> beActive [
 	self notAllowed

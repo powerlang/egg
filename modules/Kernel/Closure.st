@@ -268,7 +268,7 @@ do: closure2 [
 Closure >> printOn: aStream [
 	self class printOn: aStream.
 	aStream nextPut: $(.
-	block basicPrintOn: aStream.
+	block printOn: aStream.
 	(1 to: self size)
 		do: [:i | | field |
 			field := self at: i.
