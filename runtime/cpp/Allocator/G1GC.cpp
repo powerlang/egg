@@ -389,8 +389,8 @@ void G1GC::sweepLargeSpaces()
 		GCSpace* s = large[i-1];
 		if (s->firstObject()->hasBeenSeen())
 		{
-			used = used + 1;
 			large[used] = s;
+			used = used + 1;
         }
 		else
         {
