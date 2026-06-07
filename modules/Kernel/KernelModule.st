@@ -196,8 +196,8 @@ KernelModule >> loadModuleFromPath: aString [
 KernelModule >> load: aSymbol [
 	| filename |
 	loadedModules at: aSymbol ifPresent: [:module | ^module].
-	moduleLoaders do: [:loader | 
-		(loader load: aSymbol) ifNotNil: [:module | 
+	moduleLoaders do: [:loader |
+		(loader load: aSymbol) ifNotNil: [:module |
 			loadedModules at: aSymbol put: module.
 			^module]].
 	^self error: 'module not found'

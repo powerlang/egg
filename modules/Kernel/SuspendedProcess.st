@@ -16,6 +16,13 @@ SuspendedProcess class >> sending: aSymbol to: anObject with: arguments [
 	^self new evaluating: message
 ]
 
+{ #category : #accessing }
+SuspendedProcess >> backtrace [
+	topContext ifNotNil: [^topContext backtrace].
+	nativeStack ifNotNil: [^nativeStack reify backtrace].
+	^'<dead process>'
+]
+
 { #category : #services }
 SuspendedProcess >> beActive [
 	self changeClassTo: ActiveProcess
