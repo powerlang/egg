@@ -230,8 +230,10 @@ SBinding* EvaluationContext::staticBindingFor_(Object *symbol)
 SBinding* EvaluationContext::staticBindingFor_inModule_(Object *symbol, HeapObject *module) {
     auto namespace_ = this->_runtime->moduleNamespace_(module);
     auto assoc = this->_runtime->lookupAssociationFor_in_(symbol, namespace_);
-    if (assoc == nullptr)
-        error_(("unbound variable: " + symbol->printString()));
+    if (assoc == nullptr) {
+        this->_runtime->sendLocal_to_with_("doesNotKnow:", this->_regS, symbol);
+        return nullptr;
+    }
     return new SAssociationBinding(assoc);
 }
 
