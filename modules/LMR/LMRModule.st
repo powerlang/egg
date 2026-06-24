@@ -43,7 +43,7 @@ LMRModule >> globals [
 LMRModule >> imports [
 	^{
 		#Kernel -> #(ProcessStack ProtoObject SequenceableCollection WordSize).
-		#Kernel.LMR -> #(LMRProtoObject)
+		#'Kernel.LMR' -> #(LMRProtoObject)
 	}
 ] 
 

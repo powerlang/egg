@@ -35,7 +35,7 @@ NativizerModule >> environment [
 NativizerModule >> imports [
 	^{
 		#Kernel -> #(Behavior CharacterArray Closure CompiledBlock CompiledMethod Float OrderedCollection ProtoObject Species String).
-		#Kernel.LMR -> #(LMRProtoObject LMRFloat LMRSpecies).
+		#'Kernel.LMR' -> #(LMRProtoObject LMRFloat LMRSpecies).
 		#LMR -> #(CriticalArray GCSpace GlobalDispatchCache Memory NativeCode SendSite Thread).
 	}
 ]
