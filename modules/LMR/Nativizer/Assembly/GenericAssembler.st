@@ -34,7 +34,7 @@ GenericAssembler >> addImm: imm to: dest [
 
 { #category : #arithmetic }
 GenericAssembler >> addRwithImmediate: imm [
-	codegen addImm: imm to: codegen regR 
+	codegen addImm: imm to: codegen regR
 ]
 
 { #category : #logic }
@@ -160,6 +160,11 @@ GenericAssembler >> compare: register withLiteral: anObject [
 ]
 
 { #category : #'operations - arithmetic' }
+GenericAssembler >> compare: register withPointer: anObject [
+	self compare: register withLiteral: anObject
+]
+
+{ #category : #'operations - arithmetic' }
 GenericAssembler >> compareAwithFalse [
 	codegen compare: codegen regA with: codegen regFalse
 ]
@@ -239,13 +244,13 @@ GenericAssembler >> compareWithTrue: register [
 { #category : #arithmetic }
 GenericAssembler >> convertAtoNativeInteger [
 	self convertToNativeInteger: codegen regA
-	
+
 ]
 
 { #category : #arithmetic }
 GenericAssembler >> convertRtoNativeInteger [
 	self convertToNativeInteger: codegen regR
-	
+
 ]
 
 { #category : #arithmetic }
@@ -255,7 +260,7 @@ GenericAssembler >> convertRtoSmallInteger [
 
 { #category : #arithmetic }
 GenericAssembler >> convertToNativeInteger: srcAndDstReg [
-	codegen shiftRightArithmetic: srcAndDstReg byImm: 1
+	codegen convertToNativeInteger: srcAndDstReg
 ]
 
 { #category : #arithmetic }
@@ -374,6 +379,11 @@ GenericAssembler >> jumpIfZeroTo: label [
 ]
 
 { #category : #accessing }
+GenericAssembler >> jumpToReg: aReg [
+	codegen jumpToReg: aReg
+]
+
+{ #category : #jumps }
 GenericAssembler >> jumpTo: label [
 	codegen jumpTo: label
 ]
@@ -441,6 +451,16 @@ GenericAssembler >> load: register withLiteral: anObject [
 ]
 
 { #category : #loading }
+GenericAssembler >> load: register withPointer: anObject [
+	self load: register withLiteral: anObject
+]
+
+{ #category : #loading }
+GenericAssembler >> loadVwithPointer: anObject [
+	self load: codegen regV withPointer: anObject
+]
+
+{ #category : #loading }
 GenericAssembler >> loadAwithAindex: index [
 	| memref |
 	memref := codegen memRef: codegen regA indexImm: index.
@@ -484,7 +504,7 @@ GenericAssembler >> loadAwithGindex: index [
 { #category : #loading }
 GenericAssembler >> loadAwithGlobal: aSymbol [
 	| index |
-	index := NativizationEnvironment indexOfGlobal: aSymbol.
+	index := LMRModule indexOfGlobal: aSymbol.
 	self loadAwithGindex: index
 ]
 
@@ -985,17 +1005,17 @@ GenericAssembler >> loadTwithTindex: index [
 ]
 
 { #category : #loading }
-GenericAssembler >> loadWithFalse: register [ 
+GenericAssembler >> loadWithFalse: register [
 	codegen move: codegen regFalse to: register
 ]
 
 { #category : #loading }
-GenericAssembler >> loadWithNil: register [ 
+GenericAssembler >> loadWithNil: register [
 	codegen move: codegen regNil to: register
 ]
 
 { #category : #loading }
-GenericAssembler >> loadWithTrue: register [ 
+GenericAssembler >> loadWithTrue: register [
 	codegen move: codegen regTrue to: register
 ]
 
@@ -1008,6 +1028,16 @@ GenericAssembler >> loadX0withRasDouble [
 GenericAssembler >> loadZeroExtendByte: dstReg from: srcBaseReg atIndexAt: srcIndexReg [
 	codegen loadZeroExtendByte: dstReg from: srcBaseReg atIndexAt: srcIndexReg
 
+]
+
+{ #category : #'to-cleanup' }
+GenericAssembler >> loadZeroExtendByte: dstReg from: srcBaseReg atIndex: indexOrReg [
+	indexOrReg isInteger
+		ifTrue: [^codegen
+			loadZeroExtendByte: dstReg
+			from: srcBaseReg
+			atIndexImm: indexOrReg].
+	codegen loadZeroExtendByte: dstReg from: srcBaseReg atIndexAt: indexOrReg
 ]
 
 { #category : #'to-cleanup' }
@@ -1103,7 +1133,6 @@ GenericAssembler >> loopTtimes: aBlock [
 
 { #category : #memory }
 GenericAssembler >> memRef [
-	"Return clean instance of pointer-sized memory reference"
 
 	^ codegen memRef
 
@@ -1116,7 +1145,6 @@ GenericAssembler >> memRef32: baseReg indexImm: indexImm [
 
 { #category : #memory }
 GenericAssembler >> memRef8 [
-	"Return clean instance of byte-sized memory reference"
 
 	^ codegen memRef8
 ]
@@ -1434,13 +1462,11 @@ GenericAssembler >> regV [
 
 { #category : #'registers - IR' }
 GenericAssembler >> regX0 [
-	"IEEE 754 double register"
 	^ codegen regX0
 ]
 
 { #category : #'registers - IR' }
 GenericAssembler >> regX1 [
-	"IEEE 754 double register"
 	^ codegen regX1
 ]
 
@@ -1462,7 +1488,7 @@ GenericAssembler >> reserveStackSlots: amount [
 { #category : #initialization }
 GenericAssembler >> reset [
 	super reset.
-	codegen reset
+	codegen ifNotNil: [codegen reset]
 ]
 
 { #category : #epilogue }
@@ -1510,6 +1536,38 @@ GenericAssembler >> shiftLeftRwithT [
 { #category : #arithmetic }
 GenericAssembler >> shiftLogicalRright: count [
 	codegen shiftRight: codegen regR byImm: count
+]
+
+{ #category : #'operations - logical' }
+GenericAssembler >> shiftRight: srcAndDst byImm: count [
+	codegen shiftRight: srcAndDst byImm: count
+]
+
+{ #category : #'memory - load / store' }
+GenericAssembler >> storeByte: byteReg in: baseReg offset: offset [
+	codegen storeByte: byteReg in: baseReg offset: offset
+]
+
+{ #category : #'memory - load / store' }
+GenericAssembler >> store: valueReg in: baseReg indexAt: indexReg [
+	codegen store: valueReg in: baseReg indexAt: indexReg
+]
+
+{ #category : #'memory - load / store' }
+GenericAssembler >> load: dstReg from: baseReg atIndexAt: indexReg [
+	| memref |
+	memref := codegen memRef: baseReg index: indexReg.
+	codegen load: dstReg fromMem: memref
+]
+
+{ #category : #'operations - arithmetic' }
+GenericAssembler >> subtract: src2 from: src1AndDst [
+	self sub: src2 from: src1AndDst
+]
+
+{ #category : #'operations - arithmetic' }
+GenericAssembler >> subtract: src2 from: src1AndDst withCarry: ignored [
+	self sub: src2 from: src1AndDst
 ]
 
 { #category : #'operations - logical' }
@@ -1584,6 +1642,20 @@ GenericAssembler >> sqrtDoubleX0 [
 { #category : #'memory - load / store' }
 GenericAssembler >> store: srcReg intoMem: dstMemRef [
 	^ codegen store: srcReg intoMem: dstMemRef
+]
+
+{ #category : #'memory - load / store' }
+GenericAssembler >> store: srcReg in: baseReg index: index [
+	| memref |
+	memref := codegen memRef: baseReg indexImm: index.
+	codegen store: srcReg intoMem: memref
+]
+
+{ #category : #'memory - load / store' }
+GenericAssembler >> load: dstReg from: baseReg atIndex: index [
+	| memref |
+	memref := codegen memRef: baseReg indexImm: index.
+	codegen load: dstReg fromMem: memref
 ]
 
 { #category : #'floting point' }
@@ -1775,7 +1847,7 @@ GenericAssembler >> subAfromR [
 
 { #category : #arithmetic }
 GenericAssembler >> subAfromT [
-	codegen sub: codegen regA from: codegen regT    
+	codegen sub: codegen regA from: codegen regT
 ]
 
 { #category : #'floting point' }

@@ -21,6 +21,16 @@ RelocatableBuffer >> addAbsoluteFixup: label [
 ]
 
 { #category : #fixups }
+RelocatableBuffer >> addFixup: aFixup [
+	fixups add: aFixup
+]
+
+{ #category : #fixups }
+RelocatableBuffer >> fixups [
+	^fixups
+]
+
+{ #category : #fixups }
 RelocatableBuffer >> addRelativeFixup: label size: n [
 	| fixup |
 	fixup := RelocationFixup relativeFrom: self currentAddress to: label.
@@ -159,6 +169,17 @@ RelocatableBuffer >> stream [
 { #category : #private }
 RelocatableBuffer >> stream: aStream [
 	stream := aStream
+]
+
+{ #category : #reading }
+RelocatableBuffer >> readLongAt: location [
+	| offset bytes |
+	offset := location - address.
+	bytes := stream contents.
+	^(bytes at: offset + 1)
+		+ ((bytes at: offset + 2) bitShift: 8)
+		+ ((bytes at: offset + 3) bitShift: 16)
+		+ ((bytes at: offset + 4) bitShift: 24)
 ]
 
 { #category : #writing }
