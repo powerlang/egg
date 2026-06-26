@@ -16,14 +16,37 @@ NativizationPlatform class >> host [
 
 	| host |
 
-	host := Kernel host.
+	host := Kernel host platformName.
 	host = 'x86_64-linux-gnu' ifTrue:[ ^ self x86_64_linux_gnu ].
 	host = 'x86_64-darwin' ifTrue:[ ^ self x86_64_darwin ].
 	host = 'x86_64-win32' ifTrue:[ ^self x86_64_win32 ].
 
 	host = 'riscv64-linux-gnu' ifTrue:[ ^ self riscv64_linux_gnu ].
 
-	self error:'Unssuported host: ', host.
+	host = 'aarch64-darwin' ifTrue:[ ^ self aarch64_darwin ].
+	host = 'aarch64-linux-gnu' ifTrue:[ ^ self aarch64_linux_gnu ].
+
+	self error:'Unsupported host: ', host.
+]
+
+{ #category : #accessing }
+NativizationPlatform class >> aarch64_darwin [
+	^ self new
+		name: 'aarch64-darwin';
+		wordSize: 8;
+		abi: AAPCS64ABI new;
+		codeGeneratorClass: ARM64CodeGenerator;
+		yourself
+]
+
+{ #category : #accessing }
+NativizationPlatform class >> aarch64_linux_gnu [
+	^ self new
+		name: 'aarch64-linux-gnu';
+		wordSize: 8;
+		abi: AAPCS64ABI new;
+		codeGeneratorClass: ARM64CodeGenerator;
+		yourself
 ]
 
 { #category : #accessing }
