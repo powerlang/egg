@@ -412,6 +412,11 @@ AMD64CodeGenerator >> jumpToMem: aMemRef [
 	self assemble: 'jmp' with: aMemRef
 ]
 
+{ #category : #loading }
+AMD64CodeGenerator >> jumpToReg: aReg [
+	self assemble: 'jmp' with: aReg
+]
+
 { #category : #basic }
 AMD64CodeGenerator >> lea: dstReg withMem: srcMemRef [
 	self assemble: 'lea' with: dstReg with: srcMemRef
@@ -719,8 +724,7 @@ AMD64CodeGenerator >> popIntoMem: dstMemRef [
 
 { #category : #'printing & storing' }
 AMD64CodeGenerator >> printOn: aStream [
-	aStream print: self class; cr; cr;
-		nextPutAll: memory bytes disassembledAmd64
+	aStream print: self class
 ]
 
 { #category : #'push/pop' }
@@ -857,6 +861,11 @@ AMD64CodeGenerator >> shiftRight: srcAndDst by: countReg [
 AMD64CodeGenerator >> shiftRight: srcAndDst byImm: count [
 	self ASSERT: (count between: 0 and: srcAndDst length - 1).
 	self assemble: 'shr' with: srcAndDst withImm: count
+]
+
+{ #category : #'operations - integers' }
+AMD64CodeGenerator >> convertToNativeInteger: srcAndDst [
+	^self shiftRightArithmetic: srcAndDst byImm: 1
 ]
 
 { #category : #'operations - logical' }

@@ -26,7 +26,7 @@ LegacyPrefix class >> initializeGroup1 [
 				group: 1;
 				value: pair first;
 				name: names first.
-			names do: [:aka | Prefixes at: aka put: prefix]]
+			names do: [:aka | Prefixes at: aka asSymbol put: prefix]]
 ]
 
 { #category : #initialization }
@@ -53,7 +53,7 @@ LegacyPrefix class >> initializeGroup3 [
 		group: 3;
 		value: 16r66;
 		name: 'OperandSize_Override'.
-	Prefixes at: prefix name put: prefix
+	Prefixes at: prefix name asSymbol put: prefix
 ]
 
 { #category : #initialization }
@@ -63,7 +63,7 @@ LegacyPrefix class >> initializeGroup4 [
 		group: 4;
 		value: 16r67;
 		name: 'AddressSize_Override'.
-	Prefixes at: prefix name put: prefix
+	Prefixes at: prefix name asSymbol put: prefix
 ]
 
 { #category : #initialization }

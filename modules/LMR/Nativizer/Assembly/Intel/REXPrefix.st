@@ -31,11 +31,10 @@ REXPrefix class >> fromString: aString [
 { #category : #initialization }
 REXPrefix class >> initializePrefixes [
 	#('REX' 'REX_W' 'REX_R')
-		do: [ :s | 
+		do: [ :s |
 			| rex |
 			rex := self new name: s.
-			Prefixes at: s put: rex ].
-
+			Prefixes at: s asSymbol put: rex ]
 ]
 
 { #category : #services }

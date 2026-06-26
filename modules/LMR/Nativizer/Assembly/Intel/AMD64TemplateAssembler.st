@@ -4,7 +4,7 @@ Copyright (c) 2020 Aucerna.
 "
 Class {
 	#name : #AMD64TemplateAssembler,
-	#superclass : #Assembler,
+	#superclass : #GenericAssembler,
 	#instVars : [
 		'wordSize',
 		'buffer'
@@ -71,6 +71,33 @@ AMD64TemplateAssembler >> andRwithImmediate: imm [
 { #category : #relocation }
 AMD64TemplateAssembler >> applyFixups [
 	buffer applyFixupsWith: self
+]
+
+{ #category : #initialization }
+AMD64TemplateAssembler >> initialize [
+	super initialize.
+	buffer := RelocatableBuffer new
+]
+
+{ #category : #initialization }
+AMD64TemplateAssembler >> platform: aNativizationPlatform [
+	super platform: aNativizationPlatform.
+	buffer := codegen memory
+]
+
+{ #category : #accessing }
+AMD64TemplateAssembler >> currentAddress [
+	^buffer currentAddress
+]
+
+{ #category : #accessing }
+AMD64TemplateAssembler >> wordSize [
+	^wordSize
+]
+
+{ #category : #accessing }
+AMD64TemplateAssembler >> wordSize: anInteger [
+	wordSize := anInteger
 ]
 
 { #category : #arithmetic }
@@ -906,6 +933,12 @@ AMD64TemplateAssembler >> pushImmediate: imm [
 AMD64TemplateAssembler >> pushIndirectR [
 	self assembleBytes: #[16rFF 16r30].
 	
+]
+
+{ #category : #'push/pop' }
+AMD64TemplateAssembler >> pushM [
+	self assembleBytes: #[16r53].
+
 ]
 
 { #category : #'push/pop' }
