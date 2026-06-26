@@ -37,6 +37,8 @@ NativizerModule >> imports [
 		#Kernel -> #(Behavior CharacterArray Closure CompiledBlock CompiledMethod Float OrderedCollection ProtoObject Species String).
 		#'Kernel.LMR' -> #(LMRProtoObject LMRFloat LMRSpecies).
 		#LMR -> #(CriticalArray GCSpace GlobalDispatchCache Memory NativeCode SendSite Thread).
+		#'LMR.Nativizer.Assembly.Intel' -> #(AMD64CodeGenerator AMD64TemplateAssembler SysVX64ABI WinX64ABI Register).
+		#'LMR.Nativizer.Assembly.Aarch64' -> #(ARM64CodeGenerator ARM64Register ARM64MemoryOperand ARM64BranchFixup AAPCS64ABI).
 	}
 ]
 
