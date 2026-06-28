@@ -57,14 +57,15 @@ OMessageSend >> basicAcceptVisitor: aVisitor [
 
 { #category : #unclassified }
 OMessageSend >> basicPrintString [
-	| string |
-	string := arguments size > 0
-		ifTrue: [' with: '
-			, (arguments gather: [:arg | arg primitivePrintString , ' '])]
-		ifFalse: [''].
-	^'[send #' , selector , ' to ' , receiver primitivePrintString
-		, string trimTrailingBlanks
-		, ']'
+	^String streamContents: [:s |
+		s nextPutAll: '[send #'; nextPutAll: selector;
+			nextPutAll: ' to '; nextPutAll: receiver primitivePrintString.
+		arguments notEmpty ifTrue: [
+			s nextPutAll: ' with: '.
+			arguments
+				do: [:arg | s nextPutAll: arg primitivePrintString]
+				separatedBy: [s nextPutAll: ', ']].
+		s nextPut: $]]
 ]
 
 { #category : #unclassified }
@@ -85,13 +86,14 @@ OMessageSend >> primitivePrintString [
 
 { #category : #unclassified }
 OMessageSend >> printStringUsing: names [
-	| string |
-	string := arguments size > 0
-		ifTrue: [' with: '
-			, (arguments gather: [:arg | (names at: arg ifAbsent: ['missing']) , ' '])]
-		ifFalse: [''].
-	^'send #' , selector , ' to ' , (names at: receiver ifAbsent: ['missing'])
-		, string trimTrailingBlanks
+	^String streamContents: [:s |
+		s nextPutAll: 'send #'; nextPutAll: selector;
+			nextPutAll: ' to '; nextPutAll: (names at: receiver ifAbsent: ['missing']).
+		arguments notEmpty ifTrue: [
+			s nextPutAll: ' with: '.
+			arguments
+				do: [:arg | s nextPutAll: (names at: arg ifAbsent: ['missing'])]
+				separatedBy: [s nextPutAll: ', ']]]
 ]
 
 { #category : #unclassified }
