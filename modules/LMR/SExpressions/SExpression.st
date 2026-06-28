@@ -45,7 +45,17 @@ SExpression >> isLiteral [
 ]
 
 { #category : #visiting }
+SExpression >> isInlined [
+	^false
+]
+
+{ #category : #visiting }
 SExpression >> isMessage [
+	^false
+]
+
+{ #category : #visiting }
+SExpression >> isOptimized [
 	^false
 ]
 

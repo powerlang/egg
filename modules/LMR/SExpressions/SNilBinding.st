@@ -18,5 +18,5 @@ SNilBinding >> value [
 
 { #category : #evaluating }
 SNilBinding >> valueWithin: anEvaluationContext [
-	^ anEvaluationContext nil
+	^ anEvaluationContext nilLiteral
 ]

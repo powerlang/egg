@@ -16,6 +16,14 @@ SDynamicBinding class >> decodeUsing: aTreecodeDecoder [
 ]
 
 { #category : #accessing }
+SDynamicBinding >> assign: value within: anEvaluationContext [
+	^self
+		assign: value
+		within: anEvaluationContext
+		ifUnbound: [self error: 'Unbound dynamic variable: ', name printString]
+]
+
+{ #category : #accessing }
 SDynamicBinding >> assign: value within: anEvaluationContext ifUnbound: aClosure [
 
 	cache ifNil: [ self lookupWithin: anEvaluationContext ].
@@ -48,6 +56,11 @@ SDynamicBinding >> printOn: aStream [
 	aStream
 		nextPutAll: 'DinamicVarId. ';
 		nextPutAll: name printString
+]
+
+{ #category : #accessing }
+SDynamicBinding >> valueWithin: anEvaluationContext [
+	^self valueWithin: anEvaluationContext ifUnbound: [anEvaluationContext nilLiteral]
 ]
 
 { #category : #accessing }
