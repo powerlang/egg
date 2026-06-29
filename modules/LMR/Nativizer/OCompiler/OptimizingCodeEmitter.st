@@ -28,8 +28,12 @@ OptimizingCodeEmitter class >> new [
 
 { #category : #accessing }
 OptimizingCodeEmitter >> abi: anAbi [
-	abi := anAbi.
-	assembler wordSize: anAbi wordSize
+	abi := anAbi
+]
+
+{ #category : #accessing }
+OptimizingCodeEmitter >> platform: aPlatform [
+	assembler := GenericAssembler new platform: aPlatform
 ]
 
 { #category : #unclassified }
@@ -224,7 +228,7 @@ OptimizingCodeEmitter >> assembleBitAndConstant: instruction [
 	| left value |
 	left := allocation at: instruction.
 	value := instruction right * 2 + 1.
-	assembler and: left with: value
+	assembler and: left withImm: value
 ]
 
 { #category : #unclassified }
@@ -245,13 +249,13 @@ OptimizingCodeEmitter >> assembleBitOrConstant: instruction [
 
 { #category : #unclassified }
 OptimizingCodeEmitter >> assembleBitShift: instruction [
-	| src offset |
+	| src offset right |
 	src := allocation at: instruction left.
-	instruction right isConstant
-		ifTrue: [self assembleBitShift: src by: instruction right value]
-		ifFalse: [
-			offset := allocation at: instruction right.
-			offset halt]
+	right := instruction right.
+	right isConstant
+		ifTrue: [^self assembleBitShift: src by: right value].
+	offset := allocation at: right.
+	offset halt
 ]
 
 { #category : #unclassified }
@@ -405,6 +409,14 @@ OptimizingCodeEmitter >> assembleExtendedSize: extendedSizeSend [
 		convertToSmallInteger: dst
 ]
 
+{ #category : #private }
+OptimizingCodeEmitter >> assembleExtendedSizePut: extendedSizePut [
+	| base value |
+	base := allocation at: extendedSizePut left.
+	value := allocation at: extendedSizePut right.
+	assembler store: value e in: base index: _ExtendedSize
+]
+
 { #category : #unclassified }
 OptimizingCodeEmitter >> assembleFrom: aBasicBlock [
 	firstBlock := aBasicBlock.
@@ -514,7 +526,6 @@ OptimizingCodeEmitter >> assembleLoadConstant: value to: register [
 
 { #category : #unclassified }
 OptimizingCodeEmitter >> assembleLookup: selector [
-	self haltWhen: selector = #'&'.
 	messageLinker emitSend: selector using: assembler
 ]
 
@@ -640,12 +651,22 @@ OptimizingCodeEmitter >> assembleTimesConstant: instruction [
 	| left value shift |
 	left := allocation at: instruction left.
 	value := instruction right.
-	self ASSERT: (value == 4 or: [value == 8]).
-	shift := value == 4 ifTrue: [2] ifFalse: [3].
+	shift := self equivalentShiftsToLowerMultiplyBy: value.
+	self ASSERT: shift notNil.
 	assembler
 		clearIntegerBit: left;
 		shiftLeft: left by: shift;
 		setIntegerBit: left
+]
+
+{ #category : #unclassified }
+OptimizingCodeEmitter >> equivalentShiftsToLowerMultiplyBy: anInteger [
+	| n v |
+	anInteger > 0 ifFalse: [^nil].
+	v := anInteger.
+	n := 0.
+	[(v & 1) = 0] whileTrue: [v := v >> 1. n := n + 1].
+	^v = 1 ifTrue: [n] ifFalse: [nil]
 ]
 
 { #category : #private }
