@@ -10,7 +10,8 @@ Class {
 		'writeBarrier',
 		'safepointCheck',
 		'cachedNativizer',
-		'busy'
+		'busy',
+		'lmrModule'
 	],
 	#category : #Nativization
 }
@@ -43,6 +44,7 @@ NativizationEnvironment >> initialize [
 { #category : #initialization }
 NativizationEnvironment >> initializeLinkersFor: anLMRModule [
 	| invoker dispatcher |
+	lmrModule := anLMRModule.
 	invoker := InvokeLinker new invoker: anLMRModule invokeStub; addMethods: invokedMethods.
 	dispatcher := LookupLinker new initializeFrom: anLMRModule.
 	self
@@ -80,7 +82,17 @@ NativizationEnvironment >> messageLinker [
 
 { #category : #accessing }
 NativizationEnvironment >> messageLinker: aLinker [
-	messageLinker := aLinker 
+	messageLinker := aLinker
+]
+
+{ #category : #accessing }
+NativizationEnvironment >> lmrModule [
+	^lmrModule
+]
+
+{ #category : #accessing }
+NativizationEnvironment >> lmrModule: anLMRModule [
+	lmrModule := anLMRModule
 ]
 
 { #category : #accessing }
@@ -97,9 +109,14 @@ NativizationEnvironment >> nativize: aCompiledMethod [
 
 { #category : #services }
 NativizationEnvironment >> nativizeOptimizing: aCompiledMethod [
-	self optimizingNativizer
-		method: aCompiledMethod;
-		nativize
+	| code on |
+	on := self optimizingNativizer.
+	on method: aCompiledMethod.
+	on messageLinker: messageLinker.
+	code := on nativize.
+	code method: aCompiledMethod.
+	aCompiledMethod executableCode: code.
+	^code
 ]
 
 { #category : #services }
