@@ -207,8 +207,8 @@ SendSite class >> useNextPICsWith: aNativeCode [
 SendSite >> _dispatchDebuggableOn: anObject [
 	| cm nativeCode invoked |
 	#specialABIBegin.
-	#anObject -> #regR.
-	#self -> #regA.
+	#(arg1 -> regR).
+	#(self -> regA).
 	#specialABIEnd.
 	LookupCount := LookupCount + 1.
 	cm := anObject _cachedLookup: token.
@@ -226,9 +226,9 @@ SendSite >> _dispatchDebuggableOn: anObject [
 SendSite >> _dispatchDebuggableOn: anObject startingAt: aBehavior [
 	| cm nativeCode invoked |
 	#specialABIBegin.
-	#anObject -> #regR.
-	#self -> #regA.
-	#aBehavior -> #regT.
+	#(arg1 -> regR).
+	#(self -> regA).
+	#(arg2 -> regT).
 	#specialABIEnd.
 	LookupCount := LookupCount + 1.
 	cm := anObject _cachedLookup: token in: aBehavior.
@@ -246,8 +246,8 @@ SendSite >> _dispatchDebuggableOn: anObject startingAt: aBehavior [
 SendSite >> _dispatchOn: anObject [
 	| cm nativeCode |
 	#specialABIBegin.
-	#anObject -> #regR.
-	#self -> #regA.
+	#(arg1 -> regR).
+	#(self -> regA).
 	#specialABIEnd.
 	LookupCount := LookupCount + 1.
 	cm := anObject _cachedLookup: token.
@@ -262,9 +262,9 @@ SendSite >> _dispatchOn: anObject [
 SendSite >> _dispatchOn: anObject startingAt: aBehavior [
 	| cm nativeCode |
 	#specialABIBegin.
-	#anObject -> #regR.
-	#self -> #regA.
-	#aBehavior -> #regT.
+	#(arg1 -> regR).
+	#(self -> regA).
+	#(arg2 -> regT).
 	#specialABIEnd.
 	LookupCount := LookupCount + 1.
 	cm := anObject _cachedLookup: token in: aBehavior.
@@ -279,8 +279,8 @@ SendSite >> _dispatchOn: anObject startingAt: aBehavior [
 SendSite >> _invokeOn: anObject [
 	#savePreviousSelf.
 	#specialABIBegin.
-	#anObject -> #regR.
-	#self -> #regA.
+	#(arg1 -> regR).
+	#(self -> regA).
 	#specialABIEnd.
 	^anObject _transferControlTo: cache nativeCode
 ]
