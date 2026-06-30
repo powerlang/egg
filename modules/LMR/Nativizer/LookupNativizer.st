@@ -3,7 +3,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'nativizer',
-		'methods'
+		'methods',
+		'originals'
 	],
 	#category : #'Powerlang-Core-Building'
 }
@@ -11,22 +12,22 @@ Class {
 { #category : #'as yet unclassified' }
 LookupNativizer >> closureMethods [
 	^ self selectorLookupMethods , self globalLookupMethods
-		, self otherLookupMethods , nativizer class undermethods
+		, self otherLookupMethods , self class module undermethods
 		, self sendSiteMethods
 ]
 
 { #category : #'as yet unclassified' }
 LookupNativizer >> globalLookupMethods [
-	| result out global |
+	| result rejected global |
 	result := OrderedCollection new.
 	result
 		add: ProtoObject >> #_cachedLookup:;
 		add: ProtoObject >> #_cachedLookup:in:;
-		add: Thread metaclass >> #currentGlobalLookup;
-		add: GlobalDispatchCache metaclass >> #current.
-	out := #(initialize flushAll: flush:forSpecies: flush:for: flush:for:startingAt:).
-	global := GlobalDispatchCache methods
-		reject: [ :m | out includes: m selector ].
+		add: Thread class >> #currentGlobalLookup;
+		add: GlobalDispatchCache class >> #current.
+	rejected := #(initialize flushAll: flush:forSpecies: flush:for: flush:for:startingAt:).
+	global := GlobalDispatchCache methodDictionary values
+		reject: [ :m | rejected includes: m selector ].
 	^ result
 		addAll: global;
 		yourself
@@ -34,8 +35,9 @@ LookupNativizer >> globalLookupMethods [
 
 { #category : #accessing }
 LookupNativizer >> methodFor: selector [
-	^methods detect: [:m | m selector == selector].
-
+	^methods
+		detect: [:m | m selector == selector]
+		ifNone: [self error: 'methodFor: not found ' , selector printString]
 ]
 
 { #category : #accessing }
@@ -44,9 +46,20 @@ LookupNativizer >> methods [
 ]
 
 { #category : #accessing }
+LookupNativizer >> originals [
+	^originals
+]
+
+{ #category : #accessing }
+LookupNativizer >> initializeMethods [
+	originals := self closureMethods select: [:m | m notNil].
+	methods := originals collect: [:m | m copy]
+]
+
+{ #category : #accessing }
 LookupNativizer >> nativizeMethods [
-	| environment | 
-	methods := self closureMethods collect: [:m | nativizer compile: m ].
+	| environment |
+	self initializeMethods.
 	environment := self newNativizationEnvironment.
 	methods do: [:m | environment nativize: m]
 ]
@@ -58,20 +71,17 @@ LookupNativizer >> nativizer: aNativizationEnvironment [
 
 { #category : #'instance creation' }
 LookupNativizer >> newNativizationEnvironment [
-	| environment ignored lookup invoke |
-	environment := NativizationEnvironment new 
+	| environment ignored lookup invoke lmr |
+	environment := NativizationEnvironment new
 		platform: nativizer platform;
-		globals: nativizer globals;
 		optimizedMethods: nativizer optimizedMethods.
 	ignored := HaltingSend new
 		filter: #(< <= = > + - * // bitAnd: bitOr: bitXor:).
-	lookup := LookupLinker new initializeFrom: environment.
-	lookup
-		filter:
-			#(debuggableCopy acquireReferences nativize refreshBlocks doesNotUnderstandSelector: mustBeBoolean class allocateMoreCaches).
+	lmr := SendSite module.
+	lookup := LookupLinker new initializeFrom: lmr.
 	invoke := InvokeLinker new
-		invoker: environment invokeStub;
-		addMethods: methods.
+		invoker: lmr invokeStub;
+		addMethods: originals.
 	^ environment
 		addLinker: invoke;
 		addLinker: ignored;
