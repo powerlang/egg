@@ -41,7 +41,8 @@ OptimizingPhiSimplification >> process: aBasicBlock [
 		vars := instruction variables.
 		vars size to: 1 by: -1 do: [:i | | var |
 			var := vars at: i.
-			(self isMarked: var) ifFalse: [instruction removeVariable: var]].
+			(self isMarked: var) ifFalse: [
+				instruction removeVariable: var at: i]].
 		instruction := next]
 ]
 
