@@ -319,7 +319,9 @@ OptimizingRegisterAllocator >> kill: range at: instruction [
 
 { #category : #unclassified }
 OptimizingRegisterAllocator >> liveRangeOf: value [
-	^liveRanges at: value
+	^liveRanges at: value ifAbsent: [
+		self error: 'liveRangeOf: missing for ', value primitivePrintString,
+			' (class ', value class name, ')']
 ]
 
 { #category : #unclassified }
