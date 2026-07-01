@@ -6,7 +6,7 @@
 Class {
 	#name : #JsonParserTest,
 	#superclass : #TestCase,
-	#category : #'JSON\Tests'
+	#category : #'JSON-Tests'
 }
 
 { #category : #private }

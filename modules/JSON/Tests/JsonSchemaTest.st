@@ -6,7 +6,7 @@
 Class {
 	#name : #JsonSchemaTest,
 	#superclass : #TestCase,
-	#category : #'JSON\Tests'
+	#category : #'JSON-Tests'
 }
 
 { #category : #validation }

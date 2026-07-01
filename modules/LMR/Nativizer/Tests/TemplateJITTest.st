@@ -3,7 +3,7 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'environment'
-	]
+	],
 	#category : #'Nativization-Tests'
 }
 

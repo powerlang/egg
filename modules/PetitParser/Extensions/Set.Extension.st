@@ -1,0 +1,9 @@
+'From Cuis7.9 [latest update: #7998] on 28 June 2026 at 1:27:39 pm'!
+
+
+!Set methodsFor:  '*Parsers' stamp: 'KenD 28/Jun/2026 13:27:39'!
+asParser
+	^ PPChoiceParser withAll: (self collect: [ :each | each asParser ])
+! !
+
+
