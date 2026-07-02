@@ -100,15 +100,6 @@ CompiledBlock >> blockCode [
 ]
 
 { #category : #accessing }
-CompiledBlock >> blockExecutableCode [
-	"
-	required to let the optimizing compiler inline this code
-	without confusing with CompiledMethod>>#executableCode
-	"
-	^optimizedCode
-]
-
-{ #category : #accessing }
 CompiledBlock >> blockOptimizedCode [
 	"
 	required to let the optimizing compiler inline this code
