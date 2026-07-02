@@ -27,7 +27,7 @@ ProtoObject class >> initializeBitMasks [
 		at: #HasBeenSeen put: 16r20.
 	ObjectBitsMasks keys
 		do: [:key | ObjectBitsMasks
-			at: key , 'Mask'
+			at: (key , 'Mask') asSymbol
 			put: 16rFF - (ObjectBitsMasks at: key)]
 ]
 
