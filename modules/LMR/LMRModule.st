@@ -5,7 +5,7 @@ Class {
 		'globals',
 		'memory'
 	],
-	#category : #'Powerlang-Core-LMR'
+	#category : #LMR
 }
 
 { #category : #accessing }
@@ -18,6 +18,11 @@ LMRModule class >> indexOfGlobal: aSymbol [
 	^self globalNames
 		indexOf: aSymbol
 		ifAbsent: [self error: 'global not found']
+]
+
+{ #category : #accessing }
+LMRModule >> indexOfGlobal: aSymbol [
+	^self class indexOfGlobal: aSymbol
 ]
 
 { #category : #accessing }
@@ -42,7 +47,7 @@ LMRModule >> globals [
 { #category : #spec }
 LMRModule >> imports [
 	^{
-		#Kernel -> #(ProcessStack ProtoObject SequenceableCollection WordSize).
+		#Kernel -> #(ProcessStack ProtoObject SequenceableCollection WordSize Processor).
 		#'Kernel.LMR' -> #(LMRProtoObject)
 	}
 ] 
@@ -130,9 +135,7 @@ LMRModule >> lookupSuperStub [
 
 { #category : #private }
 LMRModule >> mapGlobal: aSymbol to: nativeCode [
-	placeholder := self globalNamed: aSymbol.
-	placeholder code become: nativeCode code.
-	placeholder become: nativeCode.
+	self globalNamed: aSymbol put: nativeCode
 ]
 
 { #category : #accessing }
