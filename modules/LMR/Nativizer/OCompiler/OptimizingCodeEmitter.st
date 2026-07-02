@@ -708,7 +708,7 @@ OptimizingCodeEmitter >> doAssemble [
 { #category : #unclassified }
 OptimizingCodeEmitter >> initialize [
 	jumpDestinations := Dictionary new.
-	self initializeLowLevelAssembler; initializeAssemblers
+	self initializeAssemblers
 ]
 
 { #category : #unclassified }
@@ -754,11 +754,6 @@ OptimizingCodeEmitter >> initializeAssemblers [
 		at: #copy put: #Copy;
 		at: #copyResult put: #CopyResult;
 		yourself
-]
-
-{ #category : #unclassified }
-OptimizingCodeEmitter >> initializeLowLevelAssembler [
-	assembler := JITAssembler64 on: #[] writeStream
 ]
 
 { #category : #unclassified }
