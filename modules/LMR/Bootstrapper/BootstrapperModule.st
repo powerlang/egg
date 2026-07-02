@@ -59,7 +59,7 @@ BootstrapperModule >> recordNativizedOriginal: anOriginalMethod code: aNativeCod
 { #category : #bootstrapping }
 BootstrapperModule >> recordNativizationsFromLookupNativizer: aLookupNativizer [
 	aLookupNativizer originals withIndexDo: [:original :i |
-		self recordNativizedOriginal: original code: (aLookupNativizer methods at: i) executableCode]
+		self recordNativizedOriginal: original code: (aLookupNativizer methods at: i) optimizedCode]
 ]
 
 { #category : #bootstrapping }
@@ -82,8 +82,8 @@ BootstrapperModule >> nativizeLookupFor: anLMRModule env: env nativizer: aNativi
 	lookup := nativizer methodFor: #_dispatchOn:.
 	lookupSuper := nativizer methodFor: #_dispatchOn:startingAt:.
 	anLMRModule
-		mapGlobal: #Lookup to: lookup executableCode;
-		mapGlobal: #LookupSuper to: lookupSuper executableCode
+		mapGlobal: #Lookup to: lookup optimizedCode;
+		mapGlobal: #LookupSuper to: lookupSuper optimizedCode
 ]
 
 { #category : #bootstrapping }
@@ -109,8 +109,8 @@ BootstrapperModule >> nativizeWriteBarrierFor: anLMRModule env: env nativizer: a
 		lmrModule: anLMRModule;
 		completeInitialization;
 		nativizeOptimizing: barrier.
-	self recordNativizedOriginal: original code: barrier executableCode.
-	anLMRModule mapGlobal: #WriteBarrier to: barrier executableCode.
+	self recordNativizedOriginal: original code: barrier optimizedCode.
+	anLMRModule mapGlobal: #WriteBarrier to: barrier optimizedCode.
 ]
 
 { #category : #bootstrapping }
@@ -216,7 +216,7 @@ BootstrapperModule >> writeSegments [
 	}.
 	closure := self importsClosureFor: roots.
 	handler := [:original :copy |
-		copy executableCode: (nativizedCodes at: original ifAbsent: [nil])].
+		copy optimizedCode: (nativizedCodes at: original ifAbsent: [nil])].
 	closure do: [:m |
 		| filename |
 		filename := 'image-segments/lmr/' , m name , '.ems'.

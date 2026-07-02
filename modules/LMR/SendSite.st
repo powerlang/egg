@@ -78,6 +78,16 @@ SendSite class >> initializeFormatFlags [
 ]
 
 { #category : #initialization }
+SendSite class >> monomorphicCache: aByteArray [
+	MonomorphicStub := aByteArray
+]
+
+{ #category : #initialization }
+SendSite class >> polymorphicCache: aByteArray [
+	PolymorphicStub := aByteArray
+]
+
+{ #category : #initialization }
 SendSite class >> initializeFrom: aNativizationEnvironment [
 	self
 		reserveMoreMICs;
@@ -175,7 +185,8 @@ SendSite class >> sending: selector with: instructions [
 
 { #category : #private }
 SendSite class >> undermethods [
-	^LMRProtoObject methodDictionary values asArray select: [:m | m selector beginsWith: '_']
+	^LMRProtoObject methodDictionary values asArray select: [:m |
+		m category notNil and: [m category asString endsWith: 'header access']]
 ]
 
 { #category : #private }
@@ -205,7 +216,7 @@ SendSite class >> useNextPICsWith: aNativeCode [
 
 { #category : #'meta accessing' }
 SendSite >> _dispatchDebuggableOn: anObject [
-	| cm nativeCode invoked |
+	| cm optimizedCode invoked |
 	#specialABIBegin.
 	#(arg1 -> regR).
 	#(self -> regA).
@@ -217,14 +228,14 @@ SendSite >> _dispatchDebuggableOn: anObject [
 		ifTrue: [cm debuggableCopy]
 		ifFalse: [cm].
 	invoked prepareForExecution.
-	nativeCode := invoked nativeCode.
-	"self when: anObject behavior use: nativeCode code."
-	^anObject _transferControlTo: nativeCode
+	optimizedCode := invoked optimizedCode.
+	"self when: anObject behavior use: optimizedCode code."
+	^anObject _transferControlTo: optimizedCode
 ]
 
 { #category : #'meta accessing' }
 SendSite >> _dispatchDebuggableOn: anObject startingAt: aBehavior [
-	| cm nativeCode invoked |
+	| cm optimizedCode invoked |
 	#specialABIBegin.
 	#(arg1 -> regR).
 	#(self -> regA).
@@ -237,14 +248,14 @@ SendSite >> _dispatchDebuggableOn: anObject startingAt: aBehavior [
 		ifTrue: [cm debuggableCopy]
 		ifFalse: [cm].
 	invoked prepareForExecution.
-	nativeCode := invoked nativeCode.
-	"self when: aBehavior use: nativeCode code."
-	^anObject _transferControlTo: nativeCode
+	optimizedCode := invoked optimizedCode.
+	"self when: aBehavior use: optimizedCode code."
+	^anObject _transferControlTo: optimizedCode
 ]
 
 { #category : #'meta accessing' }
 SendSite >> _dispatchOn: anObject [
-	| cm nativeCode |
+	| cm optimizedCode |
 	#specialABIBegin.
 	#(arg1 -> regR).
 	#(self -> regA).
@@ -253,14 +264,14 @@ SendSite >> _dispatchOn: anObject [
 	cm := anObject _cachedLookup: token.
 	cm == nil ifTrue: [^anObject doesNotUnderstandSelector: token].
 	cm prepareForExecution.
-	nativeCode := cm nativeCode.
-	self when: anObject behavior use: nativeCode.
-	^anObject _transferControlTo: nativeCode
+	optimizedCode := cm optimizedCode.
+	self when: anObject behavior use: optimizedCode.
+	^anObject _transferControlTo: optimizedCode
 ]
 
 { #category : #'meta accessing' }
 SendSite >> _dispatchOn: anObject startingAt: aBehavior [
-	| cm nativeCode |
+	| cm optimizedCode |
 	#specialABIBegin.
 	#(arg1 -> regR).
 	#(self -> regA).
@@ -270,9 +281,9 @@ SendSite >> _dispatchOn: anObject startingAt: aBehavior [
 	cm := anObject _cachedLookup: token in: aBehavior.
 	cm == nil ifTrue: [^anObject doesNotUnderstandSelector: token].
 	cm prepareForExecution.
-	nativeCode := cm nativeCode.
+	optimizedCode := cm optimizedCode.
 	self beInvoke: cm using: Invoke.
-	^anObject _transferControlTo: nativeCode
+	^anObject _transferControlTo: optimizedCode
 ]
 
 { #category : #'meta accessing' }
@@ -282,7 +293,7 @@ SendSite >> _invokeOn: anObject [
 	#(arg1 -> regR).
 	#(self -> regA).
 	#specialABIEnd.
-	^anObject _transferControlTo: cache nativeCode
+	^anObject _transferControlTo: cache optimizedCode
 ]
 
 { #category : #private }
@@ -343,6 +354,13 @@ SendSite >> instructions [
 	^instructions
 ]
 
+{ #category : #'instance creation' }
+SendSite >> lookup: aSymbol using: lookupCode [
+	self
+		selector: aSymbol;
+		instructions: lookupCode
+]
+
 { #category : #private }
 SendSite >> instructions: aByteArray [
 	instructions := aByteArray
@@ -386,7 +404,7 @@ SendSite >> isStaticSelector [
 		#primitiveNewBytes: #primitiveNewPointers: #_return: #_returnTo: #zero:bytesOf:)
 		includes: token)
 		ifTrue: [^true].
-	^ProtoObject staticSelectors includes: token
+	^false
 ]
 
 { #category : #testing }
@@ -415,7 +433,7 @@ SendSite >> monomorphicMap: aBehavior to: code [
 
 { #category : #private }
 SendSite >> monomorphicStub [
-	^MonomorphicStub code
+	^MonomorphicStub
 ]
 
 { #category : #private }
@@ -437,7 +455,7 @@ SendSite >> polymorphicMap: aBehavior to: code [
 
 { #category : #private }
 SendSite >> polymorphicStub [
-	^PolymorphicStub code
+	^PolymorphicStub
 ]
 
 { #category : #printing }
@@ -484,12 +502,10 @@ SendSite >> printPolymorphicTypeOn: aStream [
 { #category : #printing }
 SendSite >> printTypeOn: aStream [
 	cache isCompiledMethod ifTrue: [^self printInvokeTypeOn: aStream].
-	instructions == MonomorphicStub code
+	instructions == MonomorphicStub
 		ifTrue: [^self printMonomorphicTypeOn: aStream].
-	instructions == PolymorphicStub code
+	instructions == PolymorphicStub
 		ifTrue: [^self printPolymorphicTypeOn: aStream].
-	instructions == (Smalltalk at: #Lookup ifAbsent: [''])
-		ifTrue: [^aStream nextPutAll: 'lookup'].
 	cache isCompiledMethod
 		ifTrue: [^aStream nextPutAll: 'dispatch ' , cache printString].
 	aStream nextPutAll: 'other '; print: cache
@@ -518,8 +534,7 @@ SendSite >> selector [
 { #category : #private }
 SendSite >> selector: aSymbol [
 	token := aSymbol.
-	self isStaticSelector ifTrue: [self beStaticSend].
-	Smalltalk isDMR ifTrue: [self register]
+	self isStaticSelector ifTrue: [self beStaticSend]
 ]
 
 { #category : #private }

@@ -105,7 +105,7 @@ OptimizingNativizer >> defaultInlinedMethods [
 		add: LMRProtoObject >> #_cachedLookup:in:;
 		add: CompiledMethod >> #prepareForExecution;
 		add: CompiledMethod >> #isNativized;
-		add: CompiledMethod >> #executableCode;
+		add: CompiledMethod >> #optimizedCode;
 		add: CompiledMethod >> #blockCount;
 		add: CompiledMethod >> #literalIndexFrom:;
 		add: CompiledBlock >> #argumentCount;

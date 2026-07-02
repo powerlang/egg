@@ -115,7 +115,7 @@ NativizationEnvironment >> nativizeOptimizing: aCompiledMethod [
 	on messageLinker: messageLinker.
 	code := on nativize.
 	code method: aCompiledMethod.
-	aCompiledMethod executableCode: code.
+	aCompiledMethod optimizedCode: code.
 	^code
 ]
 

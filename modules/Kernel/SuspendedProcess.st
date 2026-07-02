@@ -44,7 +44,7 @@ SuspendedProcess >> evaluating: aMessageSend [
 	method prepareForExecution.
 	topContext := LaunchContext new 
 		receiver: self;
-		code: method executableCode method: method;
+		code: method optimizedCode method: method;
 		arguments: { aMessageSend }.
 ]
 

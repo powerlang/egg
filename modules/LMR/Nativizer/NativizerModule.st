@@ -40,7 +40,7 @@ NativizerModule >> inlinedMethods [
 		(Object -> #(#byteAtValid: #byteAtValid:put: #at:put:)).
 		(Species -> #(#instSize #_instancesAreArrayed #_instancesHavePointers #instanceBehavior)).
 		(LMRSpecies -> #(#memory #primitiveNew #primitiveNew:)).
-		(CompiledMethod -> #(#prepareForExecution #isNativized #executableCode #blockCount #literalIndexFrom:)).
+		(CompiledMethod -> #(#prepareForExecution #isNativized #optimizedCode #blockCount #literalIndexFrom:)).
 		(CompiledBlock -> #(#argumentCount #blockNumber #blockCode #method)).
 		(NativeCode -> #(#code)).
 		(GCSpace -> #(#commitedLimit #nextFree #nextFree:)).
