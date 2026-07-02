@@ -119,6 +119,11 @@ CompiledBlock >> blockNumber: anInteger [
 ]
 
 { #category : #accessing }
+CompiledBlock >> capturesHome [
+	^(format bitAnd: CapturesHome) != 0
+]
+
+{ #category : #accessing }
 CompiledBlock >> capturesHome: aBoolean [
 	format := aBoolean
 				ifTrue: [ format bitOr: CapturesHome ]
