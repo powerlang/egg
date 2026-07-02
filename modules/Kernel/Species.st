@@ -384,6 +384,11 @@ Species >> methodDictionary [
 ]
 
 { #category : #queries }
+Species >> indexOfSlot: aString [
+	^self allInstVarNames indexOf: aString asString
+]
+
+{ #category : #queries }
 Species >> methodsReadingInstVar: aString [
 	| methods index |
 	methods := OrderedCollection new.
