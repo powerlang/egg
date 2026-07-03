@@ -95,6 +95,7 @@ LMRModule >> justLoaded [
 	self
 		initializeMemory;
 		initializeGlobalsWithStubs.
+	LMRProtoObject module namespace at: #Memory put: Memory
 ]
 
 { #category : #accessing }
