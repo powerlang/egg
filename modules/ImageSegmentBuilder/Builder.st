@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'module',
 		'closure',
-		'classes'
+		'classes',
+		'methodCopyHandler'
 	],
 	#category : #ImageSegmentBuilder
 }
@@ -80,12 +81,19 @@ Builder >> mapMethodsOf: aClass [
 Builder >> mapMethod: method [
 	| copy |
 	copy := method copy.
+	methodCopyHandler value: method value: copy.
 	closure map: method to: copy.
 	method hasBlocks ifFalse: [^self].
 	method withIndexDo: [:b :i | | bcopy |
 		b isBlock ifTrue: [
 			bcopy := copy at: i.
+			methodCopyHandler value: b value: bcopy.
 			closure map: b to: bcopy]]
+]
+
+{ #category : #accessing }
+Builder >> methodCopyHandler: aBlock [
+	methodCopyHandler := aBlock
 ]
 
 { #category : #private }
@@ -98,7 +106,8 @@ Builder >> mapSubclassesOf: aClass [
 
 { #category : #initializing }
 Builder >> initialize [
-	closure := ObjectClosure new builder: self
+	closure := ObjectClosure new builder: self.
+	methodCopyHandler := [:original :copy | copy optimizedCode: nil]
 ]
 
 { #category : #accessing }

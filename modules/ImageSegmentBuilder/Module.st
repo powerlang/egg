@@ -17,10 +17,17 @@ Module >> shouldBeStoredIn: anObjectClosure [
 
 { #category : #'*snapshotting' }
 Module >> writeImageSegmentUsing: aWriter [
+	^self writeImageSegmentUsing: aWriter methodCopyHandler: nil
+]
+
+{ #category : #'*snapshotting' }
+Module >> writeImageSegmentUsing: aWriter methodCopyHandler: aBlockOrNil [
+
 	| builder |
 	builder := Builder new.
+	aBlockOrNil ifNotNil: [builder methodCopyHandler: aBlockOrNil].
 	builder module: self; build.
-	^aWriter
+	aWriter
 		closure: builder closure;
 		objects: builder objects;
 		mapping: builder mapping;
