@@ -14,7 +14,7 @@ ImageSegmentBuilderModule >> imports [
 	^{
 		#Kernel -> {
 			#Behavior. #Boolean. #False. #HashTable. #IdentityDictionary. #IdentitySet. #KernelModule. 
-			#Module. #Symbol. #SymbolicReference. #True. #UndefinedObject
+			#Module. #ProcessorScheduler. #Symbol. #SymbolicReference. #True. #UndefinedObject
 		}
 	}
 ]
