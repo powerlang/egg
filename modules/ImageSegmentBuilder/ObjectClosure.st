@@ -54,6 +54,7 @@ ObjectClosure >> addBoundary: anObject as: aSymbolicReference [
 
 { #category : #closure }
 ObjectClosure >> addSlotsOf: anObject [
+	anObject _isSmallInteger ifTrue: [^self].
 	self analyze: anObject behavior from: anObject.
 	1 to: anObject _pointersSize do: [ :i | | slot |
 		slot := anObject _basicAt: i.

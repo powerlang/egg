@@ -7,7 +7,6 @@ Extension { #name : #Behavior }
 
 { #category : #'*snapshotting' }
 Behavior >> asSymbolicReference [
-	self DENY: self isInstanceBehavior.
 	^SymbolicReference forBehavior: self
 ]
 
