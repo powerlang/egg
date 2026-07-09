@@ -7,7 +7,7 @@ Extension { #name : #ProcessorScheduler }
 
 { #category : #'*snapshotting' }
 ProcessorScheduler >> asSymbolicReference [
-	^SymbolicReference forGlobalNamed: #Processor in: #Kernel
+	^SymbolicReference forMvarNamed: #Processor in: #Kernel
 ]
 
 { #category : #'*snapshotting' }

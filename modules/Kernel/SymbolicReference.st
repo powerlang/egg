@@ -28,6 +28,11 @@ SymbolicReference class >> forClass: aClass [
 ]
 
 { #category : #knownObjects }
+SymbolicReference class >> forMvarNamed: aName in: aModuleName [
+	^self new linker: #asMvar; token: {aModuleName. aName}
+]
+
+{ #category : #knownObjects }
 SymbolicReference class >> forMetaclass: aMetaclass [
 	^(self forClass: aMetaclass instanceClass) linker: #asMetaclass
 ]
@@ -79,6 +84,13 @@ SymbolicReference >> asCharacter [
 
 { #category : #linking }
 SymbolicReference >> asClass [
+	| module |
+	module := Kernel load: token first.
+	^module namespace at: token second
+]
+
+{ #category : #linking }
+SymbolicReference >> asMvar [
 	| module |
 	module := Kernel load: token first.
 	^module namespace at: token second
