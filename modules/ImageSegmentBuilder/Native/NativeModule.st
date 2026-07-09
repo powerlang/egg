@@ -19,7 +19,7 @@ Class {
 { #category : #spec }
 NativeModule >> imports [
 	^{
-		#Kernel -> #(Module HashTable IdentityDictionary ProtoObject).
+		#Kernel -> #(Module HashTable IdentityDictionary ProtoObject Error).
 		#ImageSegmentBuilder -> #Writer
 	}
 ] 

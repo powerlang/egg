@@ -34,6 +34,19 @@ Module >> prepareForSnapshot: aBuilder [
 		map: overriden to: Dictionary new
 ]
 
+{ #category : #'snapshotting' }
+Module >> writeCachedSegmentAt: filename [
+	^self writeCachedSegmentAt: filename methodCopyHandler: nil
+]
+
+{ #category : #'snapshotting' }
+Module >> writeCachedSegmentAt: filename methodCopyHandler: aBlockOrNil [
+	(Kernel loadedModules includesKey: #'ImageSegmentBuilder.Native')
+		ifTrue: [^self].
+	[Kernel load: #'ImageSegmentBuilder.Native'] on: Error do: [:e | ^self].
+	^self writeCachedSegmentAt: filename methodCopyHandler: aBlockOrNil
+]
+
 { #category : #services }
 Module >> addClass: aClass [
 	classes add: aClass.
