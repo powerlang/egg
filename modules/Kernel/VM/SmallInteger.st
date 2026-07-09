@@ -20,9 +20,11 @@ SmallInteger >> != aNumber [
 
 { #category : '*Primitives' }
 SmallInteger >> * aNumber [
+	| mult |
 	<primitive: SMITimes>
-	aNumber _isSmallInteger ifTrue: [^self asLargeInteger * aNumber].
-	^aNumber * self
+	aNumber _isSmallInteger ifFalse: [^aNumber * self].
+	mult := self abs asLargeInteger mult: aNumber abs.
+	^self positive = aNumber positive ifTrue: [mult] ifFalse: [mult negated]
 ]
 
 { #category : '*Primitives' }
