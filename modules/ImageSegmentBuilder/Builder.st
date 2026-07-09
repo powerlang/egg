@@ -107,7 +107,7 @@ Builder >> mapSubclassesOf: aClass [
 { #category : #initializing }
 Builder >> initialize [
 	closure := ObjectClosure new builder: self.
-	methodCopyHandler := [:original :copy | copy optimizedCode: nil]
+	methodCopyHandler := [:original :copy | copy invalidateOptimizedCode]
 ]
 
 { #category : #accessing }

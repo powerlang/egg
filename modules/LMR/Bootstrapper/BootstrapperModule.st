@@ -215,8 +215,11 @@ BootstrapperModule >> writeSegments [
 		self class module.             "LMR.Bootstrapper"
 	}.
 	closure := self importsClosureFor: roots.
-	handler := [:original :copy |
-		copy optimizedCode: (nativizedCodes at: original ifAbsent: [nil])].
+	handler := [:original :copy | | code |
+		code := nativizedCodes at: original ifAbsent: [nil].
+		code isNil
+			ifTrue: [copy invalidateOptimizedCode]
+			ifFalse: [copy optimizedCode: code]].
 	closure do: [:m |
 		| filename |
 		filename := 'image-segments/lmr/' , m name , '.ems'.
