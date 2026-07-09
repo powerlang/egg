@@ -95,7 +95,32 @@ ProtoObject >> _hash [
 ]
 
 { #category : #'header access' }
+ProtoObject >> _basicFlags [
+	^self errorVMSpecific
+]
+
+{ #category : #'header access' }
+ProtoObject >> _basicHash [
+	^self errorVMSpecific
+]
+
+{ #category : #'header access' }
 ProtoObject >> _isBytes [
+	^self errorVMSpecific
+]
+
+{ #category : #'header access' }
+ProtoObject >> _isLarge [
+	^self errorVMSpecific
+]
+
+{ #category : #'header access' }
+ProtoObject >> _isSmallInteger [
+	^self errorVMSpecific
+]
+
+{ #category : #'header access' }
+ProtoObject >> _largeSize [
 	^self errorVMSpecific
 ]
 
@@ -106,6 +131,11 @@ ProtoObject >> _pointersSize [
 
 { #category : #'header access' }
 ProtoObject >> _size [
+	^self errorVMSpecific
+]
+
+{ #category : #'header access' }
+ProtoObject >> _smallSize [
 	^self errorVMSpecific
 ]
 
