@@ -27,7 +27,7 @@ Module >> writeImageSegmentUsing: aWriter methodCopyHandler: aBlockOrNil [
 	builder := Builder new.
 	aBlockOrNil ifNotNil: [builder methodCopyHandler: aBlockOrNil].
 	builder module: self; build.
-	aWriter
+	^aWriter
 		closure: builder closure;
 		objects: builder objects;
 		mapping: builder mapping;
