@@ -21,8 +21,6 @@ Module >> writeCachedSegmentAt: filename methodCopyHandler: aBlockOrNil [
 		dir := filename copyFrom: 1 to: slash - 1.
 		host createDirectory: dir].
 	writer := NativeWriter new.
-	image := [self writeImageSegmentUsing: writer methodCopyHandler: aBlockOrNil]
-		on: Error
-		do: [:e | ^self].
+	image := self writeImageSegmentUsing: writer methodCopyHandler: aBlockOrNil.
 	host writeFile: filename contents: image
 ]

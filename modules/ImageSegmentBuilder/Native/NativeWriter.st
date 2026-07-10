@@ -154,13 +154,13 @@ NativeWriter >> layoutObjects [
 	offset := self objectsOffset.
 	objects
 		do: [ :obj |
-			obj _isSmallInteger ifFalse: [ 
+			obj _isSmallInteger ifFalse: [
 				offset := self layoutObject: obj at: offset]].
 	size := offset.
 	subscript := 0.
-	imports keysDo: [ :obj | self layoutImport: obj at: subscript. subscript := subscript + 1].	
+	imports keysDo: [ :obj | self layoutImport: obj at: subscript. subscript := subscript + 1].
 	mapping keysAndValuesDo: [:obj :surrogate |
-		offsets at: surrogate ifPresent: [:o | offsets at: obj put: o]].
+		offsets at: surrogate ifPresent: [:o | offsets at: obj put: o]]
 ]
 
 { #category : #accessing }
