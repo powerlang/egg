@@ -23,6 +23,9 @@ Runtime::Runtime(Loader* loader, ImageSegment* kernel, SymbolProvider* symbolPro
     _lastHash(1) // LFSR seed; must be non-zero (0 is a fixed point).
 {
     debugRuntime = this;
+    Egg::errorBacktrace = []() -> std::string {
+        return debugRuntime ? debugRuntime->_evaluator->context()->backtrace() : std::string();
+    };
     this->initializeKernelObjects();
     KnownObjects::initializeFrom(this);
     _heap = new GCHeap(this);
