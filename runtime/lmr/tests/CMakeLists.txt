@@ -5,6 +5,7 @@ find_package(Catch2 REQUIRED)
 add_executable(lmr_tests
     test_main.cpp
     test_01_load.cpp
+    test_02_tables.cpp
 )
 
 set_property(TARGET lmr_tests PROPERTY CXX_STANDARD 20)

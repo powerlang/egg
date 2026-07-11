@@ -12,18 +12,11 @@
 
 #include "Launcher.h"
 #include "ImageSegment.h"
-
-namespace
-{
-std::string segPath(const char* name)
-{
-    return std::string(LMR_SEG_DIR) + "/" + name;
-}
-} // namespace
+#include "SegmentPath.h"
 
 TEST_CASE("a produced .ems segment loads with a valid header", "[load]")
 {
-    const auto path = segPath("LMR.ems");
+    const auto path = lmr_test::segPath("LMR.ems");
     INFO("segment path: " << path);
 
     lmr::Launcher launcher(path);
