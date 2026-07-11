@@ -6,6 +6,9 @@ set(BUILD_SHARED_LIBS OFF)
 
 project(lmr_launcher VERSION 0.1.0)
 
+include(CTest)
+enable_testing()
+
 set(CPP ${CMAKE_CURRENT_SOURCE_DIR}/../cpp)
 
 if(WIN32 OR (${CMAKE_C_COMPILER} MATCHES "mingw"))
@@ -28,3 +31,5 @@ target_include_directories(lmr_egg PUBLIC ${CPP} ${CPP}/${PLATFORM} ${CMAKE_CURR
 add_library(lmr_launcher STATIC Launcher.cpp)
 target_link_libraries(lmr_launcher PUBLIC lmr_egg)
 target_include_directories(lmr_launcher PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+add_subdirectory(tests)
