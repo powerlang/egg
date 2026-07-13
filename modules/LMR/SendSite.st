@@ -16,16 +16,14 @@ Class {
 	],
 	#classVars : [
 		'Instances',
-		'Invoke',
+		'LMR',
 		'LookupCount',
 		'MICs',
-		'MonomorphicStub',
 		'NextMIC',
 		'NextMICs',
 		'NextPIC',
 		'NextPICs',
-		'PICs',
-		'PolymorphicStub'
+		'PICs'
 	],
 	#category : #Kernel
 }
@@ -78,25 +76,17 @@ SendSite class >> initializeFormatFlags [
 ]
 
 { #category : #initialization }
-SendSite class >> monomorphicCache: aByteArray [
-	MonomorphicStub := aByteArray
+SendSite class >> lmr: anLMRModule [
+	LMR := anLMRModule
 ]
 
 { #category : #initialization }
-SendSite class >> polymorphicCache: aByteArray [
-	PolymorphicStub := aByteArray
-]
-
-{ #category : #initialization }
-SendSite class >> initializeFrom: aNativizationEnvironment [
+SendSite class >> reserveCachesWith: aLookup [
 	self
 		reserveMoreMICs;
-		reserveMorePICsWith: aNativizationEnvironment lookup;
+		reserveMorePICsWith: aLookup;
 		useNextMICs;
-		useNextPICsWith: aNativizationEnvironment lookup;
-		initializeMICStubFor: aNativizationEnvironment abi;
-		initializePICStubFor: aNativizationEnvironment abi.
-	Invoke := aNativizationEnvironment invokeStub
+		useNextPICsWith: aLookup
 ]
 
 { #category : #accessing }
@@ -282,7 +272,7 @@ SendSite >> _dispatchOn: anObject startingAt: aBehavior [
 	cm == nil ifTrue: [^anObject doesNotUnderstandSelector: token].
 	cm prepareForExecution.
 	optimizedCode := cm optimizedCode.
-	self beInvoke: cm using: Invoke.
+	self beInvoke: cm using: LMR invokeStub.
 	^anObject _transferControlTo: optimizedCode
 ]
 
@@ -433,7 +423,7 @@ SendSite >> monomorphicMap: aBehavior to: code [
 
 { #category : #private }
 SendSite >> monomorphicStub [
-	^MonomorphicStub
+	^LMR micStub
 ]
 
 { #category : #private }
@@ -455,7 +445,7 @@ SendSite >> polymorphicMap: aBehavior to: code [
 
 { #category : #private }
 SendSite >> polymorphicStub [
-	^PolymorphicStub
+	^LMR picStub
 ]
 
 { #category : #printing }
@@ -502,9 +492,9 @@ SendSite >> printPolymorphicTypeOn: aStream [
 { #category : #printing }
 SendSite >> printTypeOn: aStream [
 	cache isCompiledMethod ifTrue: [^self printInvokeTypeOn: aStream].
-	instructions == MonomorphicStub
+	instructions == LMR micStub
 		ifTrue: [^self printMonomorphicTypeOn: aStream].
-	instructions == PolymorphicStub
+	instructions == LMR picStub
 		ifTrue: [^self printPolymorphicTypeOn: aStream].
 	cache isCompiledMethod
 		ifTrue: [^aStream nextPutAll: 'dispatch ' , cache printString].
@@ -573,7 +563,7 @@ SendSite >> when: aBehavior use: aNativeCode [
 		ifTrue: [
 			self isStaticSend
 				ifTrue: [
-					instructions := Invoke.
+					instructions := LMR invokeStub.
 					cache := aNativeCode compiledCode]
 				ifFalse: [self monomorphicMap: aBehavior to: aNativeCode]]
 		ifFalse: [self polymorphicMap: aBehavior to: aNativeCode]

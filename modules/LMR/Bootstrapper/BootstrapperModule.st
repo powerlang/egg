@@ -15,7 +15,7 @@ Class {
 { #category : #spec }
 BootstrapperModule >> imports [
 	^{
-		#Kernel -> #(OrderedCollection IdentityDictionary Object Magnitude ProtoObject).
+		#Kernel -> #(OrderedCollection IdentityDictionary Object Magnitude ProtoObject SmallInteger).
 		#'Kernel.LMR' -> #(LMRProtoObject).
 		#LMR -> #(Memory NativeCode SendSite GCSpace CriticalArray).
 		#'LMR.Nativizer' -> #(NativizerModule NativizationPlatform NativizationEnvironment LookupNativizer LookupLinker)
@@ -41,13 +41,25 @@ BootstrapperModule >> bootstrapLMR: anLMRModule nativizer: aNativizerModule plat
 	env := aNativizerModule newNativizationEnvironmentFor: aPlatform.
 	env lmrModule: anLMRModule.
 
+	SendSite lmr: anLMRModule.
 	self
+		initializeGlobalsFor: anLMRModule;
 		nativizeInvokeFor: anLMRModule env: env nativizer: aNativizerModule;
 		nativizeWriteBarrierFor: anLMRModule env: env nativizer: aNativizerModule;
 		nativizeLookupFor: anLMRModule env: env nativizer: aNativizerModule;
 		nativizeSendSiteStubs: env.
 
 	env initializeLinkersFor: anLMRModule; completeInitialization.
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> initializeGlobalsFor: anLMRModule [
+	| placeholders |
+	placeholders := anLMRModule class globalNames
+		collect: [:name | NativeCode new code: name , ' placeholder'].
+	anLMRModule
+		globals: placeholders;
+		globalNamed: #SmallIntegerBehavior put: SmallInteger instanceBehavior
 ]
 
 { #category : #bootstrapping }
@@ -115,9 +127,9 @@ BootstrapperModule >> nativizeWriteBarrierFor: anLMRModule env: env nativizer: a
 
 { #category : #bootstrapping }
 BootstrapperModule >> nativizeSendSiteStubs: env [
-	SendSite
-		monomorphicCache: (self nativizeMonomorphicCacheWith: env);
-		polymorphicCache: (self nativizePolymorphicCacheWith: env)
+	env lmrModule
+		micStub: (self nativizeMonomorphicCacheWith: env);
+		picStub: (self nativizePolymorphicCacheWith: env)
 ]
 
 { #category : #bootstrapping }
@@ -215,11 +227,9 @@ BootstrapperModule >> writeSegments [
 		self class module.             "LMR.Bootstrapper"
 	}.
 	closure := self importsClosureFor: roots.
-	handler := [:original :copy | | code |
-		code := nativizedCodes at: original ifAbsent: [nil].
-		code isNil
-			ifTrue: [copy invalidateOptimizedCode]
-			ifFalse: [copy optimizedCode: code]].
+	handler := [:original :copy |
+		(nativizedCodes at: original ifAbsent: [nil]) ifNotNil: [:code |
+			copy optimizedCode: code]].
 	closure do: [:m |
 		| filename |
 		filename := 'image-segments/lmr/' , m name , '.ems'.

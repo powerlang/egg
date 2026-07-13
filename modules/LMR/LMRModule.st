@@ -3,7 +3,9 @@ Class {
 	#superclass : #Module,
 	#instVars : [
 		'globals',
-		'memory'
+		'memory',
+		'micStub',
+		'picStub'
 	],
 	#category : #LMR
 }
@@ -52,23 +54,29 @@ LMRModule >> imports [
 	}
 ] 
 
-{ #category : #bootstrapping }
-LMRModule >> initializeGlobalsWithStubs [
-	| items |
-	globals := Array new: self class globalNames size.
+{ #category : #accessing }
+LMRModule >> globals: anArray [
+	globals := anArray
+]
 
-	self globalNamed: #SmallIntegerBehavior put: SmallInteger instanceBehavior.
+{ #category : #accessing }
+LMRModule >> micStub [
+	^micStub
+]
 
-	items := Dictionary withAll: {
-		#Lookup                -> (NativeCode new code: 'Lookup Placeholder').
-		#LookupSuper           -> (NativeCode new code: 'LookupSuper Placeholder').
-		#DebuggableLookup      -> (NativeCode new code: 'DebuggableLookup placeholder').
-		#DebuggableLookupSuper -> (NativeCode new code: 'DebuggableLookupSuper placholder').
-		#Invoke                -> (NativeCode new code: 'Invoke placeholder').
-		#Safepoint             -> (NativeCode new code: 'SafepointCheck placeholder').
-		#WriteBarrier          -> (NativeCode new code: 'Write Barrier placeholder')}.
-	items
-		keysAndValuesDo: [ :key :placeholder | self globalNamed: key put: placeholder ]
+{ #category : #accessing }
+LMRModule >> micStub: aByteArray [
+	micStub := aByteArray
+]
+
+{ #category : #accessing }
+LMRModule >> picStub [
+	^picStub
+]
+
+{ #category : #accessing }
+LMRModule >> picStub: aByteArray [
+	picStub := aByteArray
 ]
 
 { #category : #bootstrapping }
@@ -92,9 +100,7 @@ LMRModule >> justLoaded [
 	super justLoaded.
 	SendSite initializeFormatFlags.
 	GlobalDispatchCache initialize.
-	self
-		initializeMemory;
-		initializeGlobalsWithStubs.
+	self initializeMemory.
 	LMRProtoObject module namespace at: #Memory put: Memory
 ]
 
