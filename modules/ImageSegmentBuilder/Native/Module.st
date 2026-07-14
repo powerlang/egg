@@ -7,11 +7,6 @@ Extension { #name : #Module }
 
 { #category : #'*snapshotting' }
 Module >> writeCachedSegmentAt: filename [
-	^self writeCachedSegmentAt: filename methodCopyHandler: nil
-]
-
-{ #category : #'*snapshotting' }
-Module >> writeCachedSegmentAt: filename methodCopyHandler: aBlockOrNil [
 	| host writer image slash dir |
 	host := Kernel host.
 	slash := 0.
@@ -21,6 +16,6 @@ Module >> writeCachedSegmentAt: filename methodCopyHandler: aBlockOrNil [
 		dir := filename copyFrom: 1 to: slash - 1.
 		host createDirectory: dir].
 	writer := NativeWriter new.
-	image := self writeImageSegmentUsing: writer methodCopyHandler: aBlockOrNil.
+	image := self writeImageSegmentUsing: writer.
 	host writeFile: filename contents: image
 ]

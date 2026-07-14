@@ -6,9 +6,6 @@
 Class {
 	#name : #BootstrapperModule,
 	#superclass : #Module,
-	#instVars : [
-		'nativizedCodes'
-	],
 	#category : #'LMR-Bootstrapper'
 }
 
@@ -37,7 +34,6 @@ BootstrapperModule >> main: args [
 BootstrapperModule >> bootstrapLMR: anLMRModule nativizer: aNativizerModule platform: aPlatform [
 	| env |
 
-	nativizedCodes := IdentityDictionary new.
 	env := aNativizerModule newNativizationEnvironmentFor: aPlatform.
 	env lmrModule: anLMRModule.
 
@@ -63,24 +59,9 @@ BootstrapperModule >> initializeGlobalsFor: anLMRModule [
 ]
 
 { #category : #bootstrapping }
-BootstrapperModule >> recordNativizedOriginal: anOriginalMethod code: aNativeCode [
-	aNativeCode isNil ifTrue: [^self].
-	nativizedCodes at: anOriginalMethod put: aNativeCode
-]
-
-{ #category : #bootstrapping }
-BootstrapperModule >> recordNativizationsFromLookupNativizer: aLookupNativizer [
-	aLookupNativizer originals withIndexDo: [:original :i |
-		self recordNativizedOriginal: original code: (aLookupNativizer methods at: i) optimizedCode]
-]
-
-{ #category : #bootstrapping }
 BootstrapperModule >> nativizeInvokeFor: anLMRModule env: env nativizer: aNativizerModule [
-	| original invoke nativeCode |
-	original := SendSite >> #_invokeOn:.
-	invoke := original copy.
-	nativeCode := env nativizeOptimizing: invoke.
-	self recordNativizedOriginal: original code: nativeCode.
+	| nativeCode |
+	nativeCode := env nativizeOptimizing: (SendSite >> #_invokeOn:) copy.
 	anLMRModule mapGlobal: #Invoke to: nativeCode
 ]
 
@@ -90,7 +71,6 @@ BootstrapperModule >> nativizeLookupFor: anLMRModule env: env nativizer: aNativi
 	nativizer := LookupNativizer new
 		nativizer: env;
 		nativizeMethods.
-	self recordNativizationsFromLookupNativizer: nativizer.
 	lookup := nativizer methodFor: #_dispatchOn:.
 	lookupSuper := nativizer methodFor: #_dispatchOn:startingAt:.
 	anLMRModule
@@ -100,7 +80,7 @@ BootstrapperModule >> nativizeLookupFor: anLMRModule env: env nativizer: aNativi
 
 { #category : #bootstrapping }
 BootstrapperModule >> nativizeWriteBarrierFor: anLMRModule env: env nativizer: aNativizerModule [
-	| map inlined barrier original lookupNativizer dispatcher |
+	| map inlined barrier dispatcher |
 	map := {
 		(Memory class -> #(current)).
 		(Memory -> #(isYoung: isYoungSafe: remember:)).
@@ -109,10 +89,8 @@ BootstrapperModule >> nativizeWriteBarrierFor: anLMRModule env: env nativizer: a
 	}.
 	inlined := aNativizerModule methodSubset: map.
 	inlined addAll: aNativizerModule undermethods.
-	original := LMRProtoObject >> #holdRefererIfNeeded:.
-	barrier := original copy.
-	lookupNativizer := LookupNativizer new nativizer: env; nativizeMethods.
-	self recordNativizationsFromLookupNativizer: lookupNativizer.
+	barrier := (LMRProtoObject >> #holdRefererIfNeeded:) copy.
+	LookupNativizer new nativizer: env; nativizeMethods.
 	dispatcher := LookupLinker new initializeFrom: anLMRModule.
 	NativizationEnvironment new
 		platform: env platform;
@@ -121,7 +99,6 @@ BootstrapperModule >> nativizeWriteBarrierFor: anLMRModule env: env nativizer: a
 		lmrModule: anLMRModule;
 		completeInitialization;
 		nativizeOptimizing: barrier.
-	self recordNativizedOriginal: original code: barrier optimizedCode.
 	anLMRModule mapGlobal: #WriteBarrier to: barrier optimizedCode.
 ]
 
@@ -219,21 +196,17 @@ BootstrapperModule >> nativizePolymorphicCacheWith: env [
 
 { #category : #writing }
 BootstrapperModule >> writeSegments [
-	| host roots closure handler |
-	host := ProtoObject module host.   "Kernel module's host"
+	| roots closure |
 	roots := {
 		Memory module.                 "LMR"
 		NativizerModule module.        "LMR.Nativizer"
 		self class module.             "LMR.Bootstrapper"
 	}.
 	closure := self importsClosureFor: roots.
-	handler := [:original :copy |
-		(nativizedCodes at: original ifAbsent: [nil]) ifNotNil: [:code |
-			copy optimizedCode: code]].
 	closure do: [:m |
 		| filename |
 		filename := 'image-segments/lmr/' , m name , '.ems'.
-		m writeCachedSegmentAt: filename methodCopyHandler: handler].
+		m writeCachedSegmentAt: filename].
 ]
 
 { #category : #snapshotting }
