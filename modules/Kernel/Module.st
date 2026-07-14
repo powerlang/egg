@@ -34,16 +34,6 @@ Module >> prepareForSnapshot: aBuilder [
 		map: overriden to: Dictionary new
 ]
 
-{ #category : #snapshotting }
-Module >> requiresNativization [
-	^false
-]
-
-{ #category : #snapshotting }
-Module >> nativizerBlock [
-	^[:copy | ]
-]
-
 { #category : #'snapshotting' }
 Module >> writeCachedSegmentAt: filename [
 	(Kernel loadedModules includesKey: #'ImageSegmentBuilder.Native')

@@ -16,6 +16,16 @@ Module >> shouldBeStoredIn: anObjectClosure [
 ]
 
 { #category : #'*snapshotting' }
+Module >> requiresNativization [
+	^false
+]
+
+{ #category : #'*snapshotting' }
+Module >> nativizerBlock [
+	^[:copy | ]
+]
+
+{ #category : #'*snapshotting' }
 Module >> writeImageSegmentUsing: aWriter [
 	| builder |
 	builder := Builder new.
