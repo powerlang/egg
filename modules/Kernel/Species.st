@@ -385,7 +385,7 @@ Species >> methodDictionary [
 
 { #category : #queries }
 Species >> indexOfSlot: aString [
-	^self allInstVarNames indexOf: aString asString
+	^self allInstVarNames indexOf: aString asSymbol
 ]
 
 { #category : #queries }
