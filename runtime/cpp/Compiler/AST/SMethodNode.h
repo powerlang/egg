@@ -45,7 +45,7 @@ public:
     
     SCompiledMethod* buildMethod();
     std::vector<LiteralValue> literals();
-    SCompiledMethod* methodClass();
+    Egg::string methodClassname();
     bool needsEnvironment() const;
     bool needsFrame() const;
     Egg::string selectorString() const;

@@ -30,6 +30,7 @@ private:
     void* _classBinding;
     Egg::string _selector;
     Egg::string _source;
+    Egg::string _methodClassname = "CompiledMethod";
     
     // Format bit layout matching Smalltalk CompiledMethod>>initializeFormatFlags:
     // ArgCount:       bits 0-5   (6 bits)
@@ -113,7 +114,10 @@ public:
     std::vector<SCompiledBlock*> blocks() const;
     
     void pragma_(void* pragma) { /* TODO */ }
-    
+
+    Egg::string methodClassname() const { return _methodClassname; }
+    void methodClassname_(const Egg::string& name) { _methodClassname = name; }
+
     void* optimizedCode() const { return _optimizedCode; }
     void optimizedCode_(void* code) { _optimizedCode = code; }
     
