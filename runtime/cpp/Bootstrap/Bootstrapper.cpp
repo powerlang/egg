@@ -126,6 +126,19 @@ void Bootstrapper::loadKernelSpecs() {
             }
         }
     }
+
+    auto ffiPath = fs::path(_kernelPath).parent_path() / "FFI";
+    for (const std::string& className : {"CallbackMethod", "CallbackBehavior"}) {
+        auto classFile = ffiPath / (className + ".st");
+        if (!fs::exists(classFile)) {
+            std::cerr << "  Warning: cannot find " << classFile << std::endl;
+            continue;
+        }
+        std::ifstream file(classFile);
+        std::string source((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+        ClassSpec* spec = reader.parseFile(source, classFile.string());
+        _moduleSpec.addClass(spec);
+    }
 }
 
 std::string Bootstrapper::readSourceFile_(const std::string& className) {
