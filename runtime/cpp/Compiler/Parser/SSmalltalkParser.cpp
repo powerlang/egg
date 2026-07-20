@@ -788,6 +788,10 @@ bool SSmalltalkParser::attachPragmaTo_(SMethodNode* method) {
         Egg::string keyword = _token->value();
         if (keyword == "primitive:") {
             node = pragma();
+        } else if (keyword == "callback:") {
+            if (!method->arguments().empty())
+                error_("<callback> methods with arguments are not supported yet");
+            node = ffiCall_method_(false, method);
         } else {
             node = symbolicPragma();
         }
@@ -860,9 +864,53 @@ SPragmaNode* SSmalltalkParser::symbolicPragma() {
     SPragmaNode* pragma = new SPragmaNode(_compiler);
     pragma->beSymbolic_(symbol);
     pragma->position_(Stretch(position, _token->position().end()));
-    
+
     step();
     return pragma;
+}
+
+SPragmaNode* SSmalltalkParser::ffiCall_method_(bool aBoolean, SMethodNode* aMethodNode) {
+    ffiType();
+    Egg::string name;
+    if (aBoolean) {
+        step();
+        name = _token->value();
+    }
+    std::vector<Egg::string> args = ffiArguments();
+    if (args.size() != aMethodNode->arguments().size())
+        error_("method arity does not match with function arguments");
+    step();
+
+    SPragmaNode* pragma = new SPragmaNode(_compiler);
+    pragma->beFFI_(name, nullptr);
+    return pragma;
+}
+
+Egg::string SSmalltalkParser::ffiType() {
+    step();
+    if (!_token->isName()) error_("expected type name");
+    Egg::string type = _token->value();
+    if (type != "struct") return type;
+    step();
+    if (!_token->isName()) error_("expected type name");
+    return _token->value();
+}
+
+std::vector<Egg::string> SSmalltalkParser::ffiArguments() {
+    std::vector<Egg::string> args;
+    step();
+    if (!_token->is('(')) error_("expected \"(\"");
+    if (peek()->is(')')) {
+        step();
+        return args;
+    }
+    while (true) {
+        args.push_back(ffiType());
+        step();
+        if (!_token->is(',')) break;
+    }
+    if (!_token->is(')')) error_("expected \")\"");
+    return args;
 }
 
 SMethodNode* SSmalltalkParser::buildMethodNode_(SSelectorNode* selector, const std::vector<SIdentifierNode*>& arguments) {

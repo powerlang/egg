@@ -106,6 +106,9 @@ public:
     SPragmaNode* numberedPrimitive();
     SPragmaNode* namedPrimitive();
     SPragmaNode* symbolicPragma();
+    SPragmaNode* ffiCall_method_(bool aBoolean, SMethodNode* aMethodNode);
+    Egg::string ffiType();
+    std::vector<Egg::string> ffiArguments();
     
     SParseNode* parenthesizedExpression();
     bool hasUnarySelector() const;
