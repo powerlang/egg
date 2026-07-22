@@ -216,6 +216,14 @@ ARM64CodeGenerator >> or: source1AndDest withImm: imm [
 	self or: source1AndDest with: scratch
 ]
 
+{ #category : #'operations - logical' }
+ARM64CodeGenerator >> xor: source1AndDest with: source2 [
+	self emit: (16rCA000000
+		bitOr: (source2 index bitShift: 16))
+		+ (source1AndDest index bitShift: 5)
+		+ source1AndDest index
+]
+
 { #category : #'operations - moves' }
 ARM64CodeGenerator >> move: src to: dst [
 	(src index = 31 or: [dst index = 31])
@@ -645,6 +653,17 @@ ARM64CodeGenerator >> load: dstReg fromMem: srcMemRef [
 		ifTrue: [^self ldrFromBase: srcMemRef base index disp: srcMemRef displacement toReg: dstReg].
 	self emitEffectiveAddrToX16Of: srcMemRef.
 	^self ldrFromBase: 16 disp: srcMemRef displacement toReg: dstReg
+]
+
+{ #category : #'memory - load / store' }
+ARM64CodeGenerator >> lea: dstReg withMem: srcMemRef [
+	srcMemRef index isNil
+		ifTrue: [self move: srcMemRef base to: dstReg]
+		ifFalse: [
+			self emitEffectiveAddrToX16Of: srcMemRef.
+			self move: (ARM64Register name: 'x16' index: 16 length: 64) to: dstReg].
+	srcMemRef displacement = 0
+		ifFalse: [self addImm: srcMemRef displacement to: dstReg]
 ]
 
 { #category : #'memory - load / store' }
