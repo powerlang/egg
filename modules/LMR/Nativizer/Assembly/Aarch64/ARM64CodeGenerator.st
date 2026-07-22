@@ -667,6 +667,24 @@ ARM64CodeGenerator >> lea: dstReg withMem: srcMemRef [
 ]
 
 { #category : #'memory - load / store' }
+ARM64CodeGenerator >> loadLongMwithIPoffset: anInteger [
+	| imm19 scratch |
+	(anInteger bitAnd: 3) = 0
+		ifFalse: [^self error: 'ARM64 LDR literal needs a word-aligned offset'].
+	imm19 := anInteger // 4.
+	(imm19 >= -262144 and: [imm19 <= 262143])
+		ifFalse: [^self error: 'ARM64 LDR literal offset out of range'].
+	self emit: (16r18000000
+		bitOr: ((imm19 bitAnd: 16r7FFFF) bitShift: 5))
+		+ self regM index.
+	scratch := ARM64Register name: 'x16' index: 16 length: 64.
+	self emit: 16r10000000 + scratch index.
+	self shiftLogicalRight: scratch byImm: 32.
+	self shiftLeft: scratch byImm: 32.
+	self or: self regM with: scratch
+]
+
+{ #category : #'memory - load / store' }
 ARM64CodeGenerator >> ldrFromBase: baseIdx disp: disp toReg: dstReg [
 	(disp >= 0 and: [(disp bitAnd: 7) = 0 and: [disp <= (4095 * 8)]])
 		ifTrue: [
