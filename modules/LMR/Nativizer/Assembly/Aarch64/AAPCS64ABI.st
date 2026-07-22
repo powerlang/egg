@@ -32,7 +32,7 @@ Class {
 		'regR', 'regA', 'regS', 'regT', 'regV',
 		'regM', 'regE', 'regG',
 		'regNil', 'regTrue', 'regFalse',
-		'regFP', 'regSP', 'regIP',
+		'regFP', 'regSP', 'regIP', 'regL',
 		'regX0', 'regX1'
 	],
 	#category : #Aarch64
@@ -55,8 +55,52 @@ AAPCS64ABI >> initialize [
 	regFP    := ARM64Register name: 'x29' index: 29 length: 64.
 	regSP    := ARM64Register name: 'sp'  index: 31 length: 64.
 	regIP    := ARM64Register name: 'pc'  index: -1 length: 64.
+	regL    := ARM64Register name: 'x30' index: 30 length: 64.
 	regX0    := ARM64Register name: 'v0'  index: 0  length: 128.
 	regX1    := ARM64Register name: 'v1'  index: 1  length: 128
+]
+
+{ #category : #callbacks }
+AAPCS64ABI >> emitEntrypoint: anFFIDescriptor with: anAssembler [
+	anAssembler
+		push: self regL;
+		saveCallerFrame;
+		pushE;
+		pushG;
+		pushNil;
+		pushTrue;
+		pushFalse;
+		pushM.
+	self storeArgumentsInStack: anFFIDescriptor with: anAssembler
+]
+
+{ #category : #callbacks }
+AAPCS64ABI >> storeArgumentsInStack: anFFIDescriptor with: anAssembler [
+	anAssembler
+		pushS;
+		loadRwithArgPointer;
+		convertRtoSmallInteger;
+		pushR
+]
+
+{ #category : #callbacks }
+AAPCS64ABI >> popRetaddrAndArgs: anFFIDescriptor with: anAssembler [
+	anAssembler popA; popA; popA
+]
+
+{ #category : #callbacks }
+AAPCS64ABI >> restoreContext: anFFIDescriptor with: anAssembler [
+	self popRetaddrAndArgs: anFFIDescriptor with: anAssembler.
+	anAssembler
+		popM;
+		popFalse;
+		popTrue;
+		popNil;
+		popG;
+		popE;
+		popFP;
+		pop: self regL;
+		return
 ]
 
 { #category : #accessing }
@@ -97,6 +141,11 @@ AAPCS64ABI >> regG [
 { #category : #'registers - IR' }
 AAPCS64ABI >> regIP [
 	^regIP
+]
+
+{ #category : #'registers - IR' }
+AAPCS64ABI >> regL [
+	^regL
 ]
 
 { #category : #'registers - IR' }
