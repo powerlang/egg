@@ -159,3 +159,8 @@ NativizationPlatform >> wordSizeShift [
 	^ #(0 0 0 2 0 0 0 3) at: self wordSize
 ]
 
+{ #category : #accessing }
+NativizationPlatform >> behaviorOffset [
+	^-4
+]
+
