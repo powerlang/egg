@@ -13,7 +13,7 @@ Class {
 ImageSegmentBuilderModule >> imports [
 	^{
 		#Kernel -> {
-			#Behavior. #Boolean. #False. #HashTable. #IdentityDictionary. #IdentitySet. #KernelModule. 
+			#Behavior. #Boolean. #CallbackBehavior. #False. #HashTable. #IdentityDictionary. #IdentitySet. #KernelModule.
 			#MethodDictionary. #Module. #ProcessorScheduler. #Symbol. #SymbolicReference.
 			#True. #UndefinedObject
 		}
