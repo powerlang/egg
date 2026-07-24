@@ -182,15 +182,15 @@ TemplateJIT >> emitCallbackPrologue [
 	assembler
 		pushImm: retaddr;
 		xorFPwithFP;
-		loadLongMwithIPoffset: 0 - assembler currentAddress + ImageSegmentWriter behaviorOffset;
-		loadMwithMindex: SCallbackMethod behaviorNativeCodeSlot;
-		loadGwithLiteral: environment globals;
+		loadLongMwithIPoffset: 0 - assembler currentAddress + environment platform behaviorOffset;
+		loadMwithMindex: (CallbackBehavior indexOfSlot: 'nativeCode');
+		loadGwithLiteral: environment lmrModule globals;
 		loadNilWithLiteral: nil;
 		loadTrueWithLiteral: true;
 		loadFalseWithLiteral: false;
 		loadEwithNil;
 		loadRwithMindex: (NativeCode indexOfSlot: 'compiledCode');
-		loadRwithRindex: (SCallbackMethod indexOfSlot: 'receiver')
+		loadRwithRindex: (CallbackMethod indexOfSlot: 'receiver')
 ]
 
 { #category : #services }
