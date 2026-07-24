@@ -12,7 +12,7 @@ Class {
 { #category : #spec }
 BootstrapperModule >> imports [
 	^{
-		#Kernel -> #(OrderedCollection IdentityDictionary Object Magnitude ProtoObject SmallInteger).
+		#Kernel -> #(OrderedCollection IdentityDictionary Object Magnitude ProtoObject SmallInteger CallbackBehavior).
 		#'Kernel.LMR' -> #(LMRProtoObject).
 		#LMR -> #(Memory NativeCode SendSite GCSpace CriticalArray).
 		#'LMR.Nativizer' -> #(NativizerModule NativizationPlatform NativizationEnvironment LookupNativizer LookupLinker)
@@ -28,6 +28,12 @@ BootstrapperModule >> main: args [
 	self
 		bootstrapLMR: lmrModule nativizer: nativizer platform: platform;
 		writeSegments.
+]
+
+{ #category : #running }
+BootstrapperModule >> __start__ [
+	<callback: slong ()>
+	^42
 ]
 
 { #category : #bootstrapping }
@@ -46,6 +52,24 @@ BootstrapperModule >> bootstrapLMR: anLMRModule nativizer: aNativizerModule plat
 		nativizeSendSiteStubs: env.
 
 	env initializeLinkersFor: anLMRModule; completeInitialization.
+	self nativizeStartEntry: env.
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> nativizeStartEntry: env [
+	| code machineCode original behavior |
+	code := (BootstrapperModule >> #__start__) copy.
+	env nativize: code.
+	machineCode := code optimizedCode code.
+	original := machineCode behavior.
+	behavior := CallbackBehavior new
+		classBinding: original classBinding;
+		methods: original methods;
+		next: original next;
+		nativeCode: code optimizedCode;
+		yourself.
+	machineCode behavior: behavior.
+	self export: code optimizedCode as: #__start__
 ]
 
 { #category : #bootstrapping }
