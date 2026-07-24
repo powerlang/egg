@@ -10,6 +10,7 @@
 #ifndef LMR_LAUNCHER_H
 #define LMR_LAUNCHER_H
 
+#include <cstdint>
 #include <memory>
 #include <string>
 
@@ -25,6 +26,10 @@ class Launcher
 
     bool loaded() const { return _segment != nullptr; }
     Egg::FileImageSegment* segment() const { return _segment.get(); }
+
+    void relocate();
+    Egg::HeapObject* exported(const std::string& name);
+    uint64_t run(const std::string& name);
 
   private:
     std::unique_ptr<Egg::FileImageSegment> _segment;
