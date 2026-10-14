@@ -1,7 +1,8 @@
 # Egg.cpp - An Egg Smalltalk VM that is implemented in C++
 
 In a nutshell, here you get a simple interpreter that is able to load Egg modules and run them.
-It starts by loading an Egg kernel snapshot, then the module you specify, and finally sending it `#main:`
+It starts by bootstrapping the Egg kernel from its sources, then loads the module you specify, and
+finally sends it `#main:`
 
 *IMPORTANT NOTE* this is heavily w.i.p. and there are quite a few things that may not work.
 
@@ -12,15 +13,22 @@ section in github. Else you can build the whole thing yourself.
 
 # Running the code
 
-Once you have a VM and some .ems binaries, you can run them:
+Once you have built the VM, run a module by its name from the root repo dir:
 
 ```
-$> cd $root_dir/image-segments
-$> ../runtime/cpp/build/egg HelloWorld.ems
-Hello, world!
+$> cd $root_dir
+$> runtime/cpp/build/<OS>-<arch>-<BuildType>/egg Examples.HelloWorld
+Hello, World!
 ```
 
-`HelloWorld` is a module in `modules/Examples/HelloWorld` that shows the bare minimum of writing a module.
+`Examples.HelloWorld` is the module in `modules/Examples/HelloWorld`, which shows the bare minimum of
+writing a module: a dotted name is a path under `modules`.
+
+No prebuilt files are needed. The VM bootstraps the kernel from `modules/Kernel` (see
+[Bootstrap/README.md](Bootstrap/README.md)) and loads every other module from its sources, unless
+there is an Egg Module Snapshot for it in `image-segments` (`image-segments/<name>.ems`), which is
+loaded instead. The VM looks for `modules` in the current directory and up to four directories above
+it, so it can also be run from `image-segments` or from the build directory.
 
 ## Building the VM
 
@@ -71,10 +79,9 @@ The individual binaries also accept Catch2 tag filters, e.g.
 
 ## Building module snapshots
 
-As this cpp VM isn't yet capable of starting from just sources (i.e. to bootstrap itself), you
-have to build Egg Module Snapshots (ems files). For that we currently use the pharo runtime.
-
-Using the pharo runtime in ../pharo, open egg.image and run:
+Egg Module Snapshots (ems files) are optional: a module that has one loads faster than from its
+sources. They are built with the pharo runtime. Using the pharo runtime in ../pharo, open
+egg.image and run:
 
 ```
 builder := EggBuilder forNativePlatform.

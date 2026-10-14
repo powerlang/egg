@@ -59,7 +59,7 @@ uintptr_t Egg::allocalign(uintptr_t addr)
 uintptr_t Egg::ReserveMemory(uintptr_t base, uintptr_t size)
 {
     void* allocated = nullptr;
-    if (base == 0) base = Egg::nextFree;
+    if (base == 0 || base < BEHAVIOR_ADDRESS_SPACE || base >= Egg::limit) base = Egg::nextFree;
 
     while (base < Egg::limit) {
         // Attempt to allocate at the aligned base
