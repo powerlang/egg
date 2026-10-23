@@ -731,9 +731,12 @@ SLiteralNode* SSmalltalkParser::byteArrayBody() {
             break;
         }
 
-        std::string v = _token->value().toUtf8();
-        int val = static_cast<int>(std::stol(v, nullptr, 0));
-        bytes.push_back(static_cast<uint8_t>(val));
+        auto byte = parseLiteralValue();
+        if (!byte.isInteger())
+            error_("non-integer token");
+        if (byte.asInteger() < 0 || byte.asInteger() > 255)
+            error_("value not between 0 and 255");
+        bytes.push_back(static_cast<uint8_t>(byte.asInteger()));
     }
 
     if (!_token || !_token->is(']')) {

@@ -455,6 +455,24 @@ TEST_CASE_METHOD(SSmalltalkParserTestFixture, "Parser: Literal array", "[parser]
     tearDown();
 }
 
+TEST_CASE_METHOD(SSmalltalkParserTestFixture, "Parser: Literal byte array with radix numbers", "[parser]") {
+    setUp();
+
+    SMethodNode* method = parseExpression("#[16r29 5 16rF1 2r11]");
+
+    REQUIRE(method != nullptr);
+    REQUIRE(method->statements().size() == 1);
+
+    SParseNode* stmt = method->statements()[0];
+    REQUIRE(stmt->isLiteral());
+
+    SLiteralNode* lit = static_cast<SLiteralNode*>(stmt);
+    REQUIRE(lit->literalValue().isByteArray());
+    REQUIRE(lit->literalValue().asByteArray() == std::vector<uint8_t>{0x29, 5, 0xF1, 3});
+
+    tearDown();
+}
+
 TEST_CASE_METHOD(SSmalltalkParserTestFixture, "Parser: Literal keyword array symbols", "[parser]") {
     setUp();
 
