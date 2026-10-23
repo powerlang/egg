@@ -81,34 +81,16 @@ uintptr_t Egg::pagealign(uintptr_t addr)
     return align(addr, pagesize);
 }
 
-uintptr_t Egg::ReserveMemory(uintptr_t base, uintptr_t size)
+uintptr_t Egg::ReserveMemory(uintptr_t baseHint, uintptr_t size)
 {
-    void* allocated = nullptr;
-    if (base < Egg::nextFree || base > Egg::limit) base = Egg::nextFree;
-
-    while (true) {
-        // Attempt to allocate at the aligned base
-        allocated = mmap(reinterpret_cast<void*>(base), pagealign(size), PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
-        if (allocated != MAP_FAILED) {
-            // Check if the allocated memory is at the desired base address
-            if ((uintptr_t)allocated == base) {
-               Egg::nextFree = pagealign((uintptr_t)allocated + size);
-                return (uintptr_t)allocated;
-            }
-
-            // Free the memory and try next address
-            munmap((void*)allocated, size);
-            base += 0x10000;
-
-        } else {
-            base += 0x10000;
-        }
-
-        if (base >= Egg::limit) {
-            error("Memory allocation failed");
-            return 0;
-        }
+    auto base = (baseHint < Egg::nextFree || baseHint >= Egg::limit) ? Egg::nextFree : baseHint;
+    auto end = pagealign(base + size);
+    if (end > Egg::limit) {
+        error("Memory allocation failed");
+        return 0;
     }
+    Egg::nextFree = end;
+    return base;
 }
 
 void Egg::CommitMemory(uintptr_t base, uintptr_t size)

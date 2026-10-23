@@ -74,9 +74,9 @@ uintptr_t Egg::allocalign(uintptr_t addr)
 }
 
 // The block is reserved as a whole, so this only hands out its addresses, which CommitMemory backs
-uintptr_t Egg::ReserveMemory(uintptr_t base, uintptr_t size)
+uintptr_t Egg::ReserveMemory(uintptr_t baseHint, uintptr_t size)
 {
-    base = (base < Egg::nextFree || base >= Egg::limit) ? Egg::nextFree : allocalign(base);
+    auto base = (baseHint < Egg::nextFree || baseHint >= Egg::limit) ? Egg::nextFree : allocalign(baseHint);
     auto end = allocalign(base + size);
     if (end > Egg::limit) {
         error("Memory allocation failed");
