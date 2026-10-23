@@ -388,7 +388,8 @@ std::vector<uint8_t> TreecodeEncoder::encodeClosureElements_(SBlockNode* node) {
         if (env == parent) {
             result.push_back(ClosureEnvironment);
         } else {
-            int* idx = scope->environmentIndexOf_(dynamic_cast<SScriptNode*>(env));
+            // the closure is built in the parent's context, so use the parent's layout
+            int* idx = parent->scope()->environmentIndexOf_(dynamic_cast<SScriptNode*>(env));
             if (idx) {
                 result.push_back(ClosureEnvironmentValue);
                 result.push_back(static_cast<uint8_t>(*idx));

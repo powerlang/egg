@@ -12,6 +12,7 @@ add_executable(compiler_tests
     ParserTest.cpp
     MessageInlinerTest.cpp
     ScriptScopeTest.cpp
+    TreecodeEncoderTest.cpp
 )
 
 target_link_libraries(compiler_tests PRIVATE
