@@ -471,8 +471,6 @@ std::string Egg::Runtime::print_(HeapObject *obj) {
 
 void Runtime::log_code_(std::string &message, uintptr_t level)
 {
-    std::ofstream logFile("error-log.txt", std::ios_base::app); // Open log file in append mode
-
     CRLFStream lfout(std::cout);
 
     switch(level) {
@@ -499,6 +497,7 @@ void Runtime::log_code_(std::string &message, uintptr_t level)
 
     // Also write to file for all error levels
     if (level > 4) {
+        std::ofstream logFile("error-log.txt", std::ios_base::app);
         logFile << "[LEVEL " << level << "] " << message;
     }
 }
