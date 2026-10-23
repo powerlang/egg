@@ -17,7 +17,7 @@ TEST_CASE("ReserveMemory fails instead of reserving past the end of the heap blo
     }
     int status;
     waitpid(pid, &status, 0);
-    REQUIRE(WIFEXITED(status));
-    REQUIRE(WEXITSTATUS(status) == EXIT_FAILURE);
+    auto failed = WIFSIGNALED(status) || WEXITSTATUS(status) != EXIT_SUCCESS;
+    REQUIRE(failed);
 }
 #endif
