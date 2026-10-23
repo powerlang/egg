@@ -53,28 +53,30 @@ At entry the prologue reads `[entry-4]`, walks `behavior → nativeCode`, loads
 `regM`, then loads `regG`/`regNil`/`regTrue`/`regFalse` from the method
 literals and `regR` from the receiver.
 
-## macOS behavior-zone reconstruction
+## The heap block and behavior pointers
+
+All objects live in one block of `HeapBlockSize` (4 GB), aligned to its size,
+that `ReserveHeapBlock()` reserves at startup: `HEAP_ADDRESS_BLOCK` (see
+`Allocator/Memory.h`, `Posix/Memory.cpp` and `Windows/Memory.cpp`). Its address
+varies per run on every platform, e.g. `0x300000000`; the low 4 GB are seldom
+free on Linux and never on macOS.
+
+The first `MarkBitmapSize` (64 MB) of the block are the GC mark bitmap, a bit
+per 8 bytes of the block, so the marks of an object are found from its address
+alone. They take memory only where marks are written: Posix maps them lazily,
+Windows commits the slice of each range it commits. The heap starts after
+them, at `HEAP_BASE`.
 
 Object headers store the behavior as a **32-bit** field at `oop-4`, not a full
-pointer. The full behavior pointer is `field | BEHAVIOR_ADDRESS_SPACE`, where
-`BEHAVIOR_ADDRESS_SPACE` is the high half of the 4 GB region that holds all
-objects (see `HeapObject::behavior()` and `Posix/Memory.cpp`).
-
-- **Linux / non-Apple:** `BEHAVIOR_ADDRESS_SPACE == 0` (a compile-time
-  constant that optimizes away). The object space lives in the low 4 GB, so the
-  raw 32-bit field already *is* the pointer.
-- **macOS:** the kernel won't hand out low-4 GB mappings, so the object space
-  is reserved at a runtime 4 GB-aligned base (`ReserveAligned4GB()`), and
-  `BEHAVIOR_ADDRESS_SPACE` is that base (e.g. `0x300000000`). The 32-bit field
-  is only the low half.
+pointer. Behaviors are in the block too, so the full pointer is
+`field | BEHAVIOR_ADDRESS_BLOCK` (see `HeapObject::behavior()`), where
+`BEHAVIOR_ADDRESS_BLOCK` is `HEAP_ADDRESS_BLOCK`.
 
 Nativized code that dereferences a behavior therefore has to rebuild the high
-bits. It can't bake the base in (it varies per run), but every object —
-including the running code — lives in the same 4 GB-aligned zone, so the base
-is recoverable as `PC & ~0xFFFFFFFF`. On aarch64 `loadLongMwithIPoffset:`
-loads the 32-bit field, then `ADR`/`LSR #32`/`LSL #32` derives the zone base
-from PC and `ORR`s it in. On Linux the same code still works: the base is 0, so
-the `ORR` is a no-op.
+bits. It can't bake the base in, as it varies per run, but every object
+(the running code included) lives in the block, so the base is recoverable as
+`PC & ~0xFFFFFFFF`. On aarch64 `loadLongMwithIPoffset:` loads the 32-bit field,
+then `ADR`/`LSR #32`/`LSL #32` derives the block base from PC and `ORR`s it in.
 
 ## Building and testing
 

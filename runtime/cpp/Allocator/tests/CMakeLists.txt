@@ -5,6 +5,7 @@ find_package(Catch2 REQUIRED)
 add_executable(allocator_tests
     test_main.cpp
     G1GCForwarderTest.cpp
+    MarkBitmapTest.cpp
 )
 
 set_property(TARGET allocator_tests PROPERTY CXX_STANDARD 20)

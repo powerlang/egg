@@ -13,6 +13,7 @@
 
 using namespace Egg;
 
+uintptr_t HEAP_ADDRESS_BLOCK;
 
 namespace Egg {
     static uintptr_t nextFree = 0;
@@ -24,20 +25,36 @@ namespace Egg {
     uintptr_t allocalign(uintptr_t addr);
 }
 
+// Windows releases only whole reservations, so the probe can't be trimmed to the aligned block:
+// it is released and the block reserved again, which something else may take in between
+uintptr_t Egg::ReserveHeapBlock()
+{
+    uintptr_t size = HeapBlockSize;
+    for (int attempt = 0; attempt < 8; attempt++) {
+        auto probe = VirtualAlloc(nullptr, size * 2, MEM_RESERVE, PAGE_NOACCESS);
+        if (probe == nullptr)
+            break;
+        auto aligned = align((uintptr_t)probe, size);
+        if (!VirtualFree(probe, 0, MEM_RELEASE))
+            break;
+        if (VirtualAlloc((void*)aligned, size, MEM_RESERVE, PAGE_READWRITE) == (void*)aligned)
+            return aligned;
+    }
+    error("Couldn't reserve a 4GB block for the heap");
+    return 0;
+}
+
 void Egg::InitializeMemory()
 {
     SYSTEM_INFO si;
     GetSystemInfo(&si);
     Egg::page_alignment = si.dwPageSize;
     Egg::allocation_alignment = si.dwAllocationGranularity;
-    
-    Egg::nextFree = BEHAVIOR_ADDRESS_SPACE;
 
-    // avoid the zero address as mmap would confuse it with "allocate anywhere"
-    if (Egg::nextFree == 0)
-        Egg::nextFree = 0x100000;
+    HEAP_ADDRESS_BLOCK = ReserveHeapBlock();
 
-    Egg::limit = BEHAVIOR_ADDRESS_SPACE + (4LL * 1024 * 1024 * 1024);  // We are limiting to reserve up to 4gb for now
+    Egg::nextFree = HEAP_BASE;
+    Egg::limit = HEAP_ADDRESS_BLOCK + HeapBlockSize;
 }
 
 
@@ -56,30 +73,17 @@ uintptr_t Egg::allocalign(uintptr_t addr)
     return align(addr, Egg::allocation_alignment);
 }
 
+// The block is reserved as a whole, so this only hands out its addresses, which CommitMemory backs
 uintptr_t Egg::ReserveMemory(uintptr_t base, uintptr_t size)
 {
-    void* allocated = nullptr;
-    if (base == 0 || base < BEHAVIOR_ADDRESS_SPACE || base >= Egg::limit) base = Egg::nextFree;
-
-    while (base < Egg::limit) {
-        // Attempt to allocate at the aligned base
-        allocated = VirtualAlloc((void*)base, pagealign(size), MEM_RESERVE, PAGE_READWRITE);
-        
-        if (allocated != 0) {
-            if ((uintptr_t)allocated == base) {
-                Egg::nextFree = allocalign((uintptr_t)allocated + size);
-                return (uintptr_t)allocated;
-            }
-
-            // Free the memory and try next address
-            VirtualFree((void*)allocated, 0, MEM_RELEASE);
-        }
-        
-        base += Egg::allocation_alignment;
+    base = (base < Egg::nextFree || base >= Egg::limit) ? Egg::nextFree : allocalign(base);
+    auto end = allocalign(base + size);
+    if (end > Egg::limit) {
+        error("Memory allocation failed");
+        return 0;
     }
-
-    error("Memory allocation failed");
-    return 0;
+    Egg::nextFree = end;
+    return base;
 }
 
 void Egg::CommitMemory(uintptr_t base, uintptr_t size)
@@ -88,6 +92,12 @@ void Egg::CommitMemory(uintptr_t base, uintptr_t size)
         error("Failed to commit memory.");
     }
     std::memset((char*)base, 0, size);
+
+    // the marks of what gets committed: Windows doesn't back reserved pages on first use as mmap does
+    auto first = (HEAP_ADDRESS_BLOCK + ((base - HEAP_ADDRESS_BLOCK) >> 6)) & ~(Egg::page_alignment - 1);
+    auto last = pagealign(HEAP_ADDRESS_BLOCK + ((base + size - HEAP_ADDRESS_BLOCK + 63) >> 6));
+    if (VirtualAlloc((void*)first, last - first, MEM_COMMIT, PAGE_READWRITE) == 0)
+        error("Failed to commit GC marks.");
 }
 
 void Egg::DecommitMemory(uintptr_t base, uintptr_t size)
@@ -99,5 +109,7 @@ void Egg::DecommitMemory(uintptr_t base, uintptr_t size)
 
 void Egg::FreeMemory(uintptr_t base, uintptr_t size)
 {
-    VirtualFree((void*)base, 0, MEM_RELEASE);
+    // a part of the block can't be released, only decommitted
+    if (!VirtualFree((void*)base, size, MEM_DECOMMIT))
+        error("Failed to free memory.");
 }
