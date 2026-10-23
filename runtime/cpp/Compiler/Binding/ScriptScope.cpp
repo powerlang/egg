@@ -22,7 +22,6 @@ Binding* ScriptScope::defineArgument_(const Egg::string& identifier) {
     }
     auto binding = new ArgumentBinding(identifier, 0);
     _arguments[identifier] = binding;
-    _argumentOrder.push_back(identifier);
     addBinding_(binding);
     return binding;
 }
@@ -94,12 +93,9 @@ void ScriptScope::positionDefinedTemporariesIn_(ScriptScope* aScriptScope) {
 
 void ScriptScope::positionDefinedArguments_() {
     int index = 1;
-    for (auto& name : _argumentOrder) {
-        auto it = _arguments.find(name);
-        if (it != _arguments.end()) {
-            if (auto localBinding = dynamic_cast<LocalBinding*>(it->second)) {
-                localBinding->index_(index++);
-            }
+    for (auto& pair : _arguments) {
+        if (auto localBinding = dynamic_cast<LocalBinding*>(pair.second)) {
+            localBinding->index_(index++);
         }
     }
 }
