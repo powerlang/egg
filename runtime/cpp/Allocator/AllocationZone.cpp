@@ -222,7 +222,7 @@ void AllocationZone::updateRegionOccupancy_(HeapObject *object)
     if (index < 0) return;
 
     auto bytes = _occupancy[index - 1];
-    _occupancy[index-1] = bytes + object->bodySizeInBytes();
+    _occupancy[index-1] = bytes + object->totalSizeInBytes();
 }
 
 uintptr_t AllocationZone::usableBytes()

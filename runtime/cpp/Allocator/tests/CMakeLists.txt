@@ -7,6 +7,7 @@ add_executable(allocator_tests
     G1GCForwarderTest.cpp
     MarkBitmapTest.cpp
     MemoryTest.cpp
+    RegionOccupancyTest.cpp
 )
 
 set_property(TARGET allocator_tests PROPERTY CXX_STANDARD 20)
