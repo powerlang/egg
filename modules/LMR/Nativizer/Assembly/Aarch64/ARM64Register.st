@@ -22,6 +22,26 @@ ARM64Register class >> name: aString index: anInteger length: bits [
 	^self new name: aString; index: anInteger; length: bits; yourself
 ]
 
+{ #category : #testing }
+ARM64Register >> isGeneral [
+	^(name first = $x or: [name first = $w]) or: [name = 'sp' or: [name = 'wsp']]
+]
+
+{ #category : #testing }
+ARM64Register >> isFloat [
+	^self isGeneral not
+]
+
+{ #category : #testing }
+ARM64Register >> isSP [
+	^name = 'sp' or: [name = 'wsp']
+]
+
+{ #category : #testing }
+ARM64Register >> isZero [
+	^name = 'xzr' or: [name = 'wzr']
+]
+
 { #category : #accessing }
 ARM64Register >> index [
 	^index
