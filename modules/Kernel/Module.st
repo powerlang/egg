@@ -34,6 +34,14 @@ Module >> prepareForSnapshot: aBuilder [
 		map: overriden to: Dictionary new
 ]
 
+{ #category : #'snapshotting' }
+Module >> writeCachedSegmentAt: filename [
+	(Kernel loadedModules includesKey: #'ImageSegmentBuilder.Native')
+		ifTrue: [^self].
+	[Kernel load: #'ImageSegmentBuilder.Native'] on: Error do: [:e | ^self].
+	^self writeCachedSegmentAt: filename
+]
+
 { #category : #services }
 Module >> addClass: aClass [
 	classes add: aClass.

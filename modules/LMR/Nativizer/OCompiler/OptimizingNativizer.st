@@ -11,7 +11,8 @@ Class {
 		'firstBlock',
 		'messageLinker',
 		'inlinedMethods',
-		'abi'
+		'abi',
+		'environment'
 	],
 	#category : #OCompiler
 }
@@ -31,6 +32,13 @@ OptimizingNativizer >> abi: anAbi [
 	abi := anAbi
 ]
 
+{ #category : #accessing }
+OptimizingNativizer >> environment: aNativizationEnvironment [
+	environment := aNativizationEnvironment.
+	abi := aNativizationEnvironment abi.
+	inlinedMethods := aNativizationEnvironment inlinedMethods
+]
+
 { #category : #allocation }
 OptimizingNativizer >> allocate [
 	| allocator |
@@ -46,6 +54,7 @@ OptimizingNativizer >> assembleUsing: allocation [
 	assembler := OptimizingCodeEmitter new
 		method: method;
 		abi: abi;
+		platform: environment platform;
 		allocation: allocation;
 		messageLinker: messageLinker.
 	assembler assembleFrom: firstBlock.
@@ -55,7 +64,9 @@ OptimizingNativizer >> assembleUsing: allocation [
 { #category : #unclassified }
 OptimizingNativizer >> bindVariables [
 	| binder |
-	binder := OptimizingVariableBinder new abi: abi.
+	binder := OptimizingVariableBinder new
+		abi: abi;
+		method: method.
 	binder doBindingFrom: firstBlock
 ]
 
@@ -73,28 +84,28 @@ OptimizingNativizer >> decompose [
 
 { #category : #private }
 OptimizingNativizer >> defaultInlinedMethods [
-	^BeeNativizationEnvironment primitiveObjectMethods , ((OrderedCollection new
+	^OrderedCollection new
 		add: Object >> #byteAtValid:;
 		add: Object >> #byteAtValid:put:;
 		add: ProtoObject >> #objectAtValid:;
 		add: ProtoObject >> #objectAtValid:put:;
-		add: Object >> #basicObjectIndexOf:;
-		add: Object >> #primitiveAt:put:;
-		add: ProtoObject >> #behavior;
+		add: ProtoObject >> #basicObjectIndexOf:;
+		add: LMRProtoObject >> #primitiveAt:put:;
+		add: LMRProtoObject >> #behavior;
 		add: ProtoObject >> #class;
 		add: Species >> #instSize;
 		add: Species >> #_instancesAreArrayed;
 		add: Species >> #_instancesHavePointers;
-		add: Species >> #memory;
+		add: LMRSpecies >> #memory;
 		add: Species >> #instanceBehavior;
-		add: Species >> #primitiveNew;
-		add: Species >> #primitiveNew:;
-		add: ProtoObject >> #primitiveAt:;
-		add: ProtoObject >> #_cachedLookup:;
-		add: ProtoObject >> #_cachedLookup:in:;
+		add: LMRSpecies >> #primitiveNew;
+		add: LMRSpecies >> #primitiveNew:;
+		add: LMRProtoObject >> #primitiveAt:;
+		add: LMRProtoObject >> #_cachedLookup:;
+		add: LMRProtoObject >> #_cachedLookup:in:;
 		add: CompiledMethod >> #prepareForExecution;
 		add: CompiledMethod >> #isNativized;
-		add: CompiledMethod >> #nativeCode;
+		add: CompiledMethod >> #optimizedCode;
 		add: CompiledMethod >> #blockCount;
 		add: CompiledMethod >> #literalIndexFrom:;
 		add: CompiledBlock >> #argumentCount;
@@ -102,13 +113,11 @@ OptimizingNativizer >> defaultInlinedMethods [
 		add: CompiledBlock >> #blockCode;
 		add: CompiledBlock >> #method;
 		add: NativeCode >> #code;
-		add: NativeCode >> #isFresh;
 		add: CharacterArray >> #characterAtValid:;
 		add: GCSpace >> #commitedLimit;
 		add: GCSpace >> #nextFree;
 		add: GCSpace >> #nextFree:;
-		yourself)
-		collect: [:cm | cm dmrVersion ifNil: [cm]])
+		yourself
 ]
 
 { #category : #unclassified }
@@ -169,13 +178,12 @@ OptimizingNativizer >> inlineMethods [
 
 { #category : #unclassified }
 OptimizingNativizer >> irFor: aCompiledMethod [
-	| visitor ir cm |
+	| visitor cm |
 	visitor := OptimizingVisitor new.
 	cm := (SendSite isUndermethod: aCompiledMethod selector)
-		ifTrue: [ProtoObject >> aCompiledMethod selector]
+		ifTrue: [LMRProtoObject >> aCompiledMethod selector]
 		ifFalse: [aCompiledMethod].
-	ir := visitor visit: cm parseTree.
-	^ir
+	^visitor visit: cm sexpressions
 ]
 
 { #category : #unclassified }
@@ -197,19 +205,20 @@ OptimizingNativizer >> nativeCode [
 { #category : #nativizing }
 OptimizingNativizer >> nativize [
 	| allocation |
-	allocation := self
+	self
 		decompose;
 		fragmentInstructions;
 		simplifyCFG;
 		removeRedundantCode;
 		simplifyCFG;
+		eliminateDeadPhis;
 		splitCriticalEdges;
-		transformToCSSA;
-		allocate.
-	^self
+		transformToCSSA.
+	allocation := self allocate.
+	self
 		enforceTwoAddressCodeUsing: allocation;
-		simplifyCFG;
-		assembleUsing: allocation
+		simplifyCFG.
+	^self assembleUsing: allocation
 ]
 
 { #category : #unclassified }

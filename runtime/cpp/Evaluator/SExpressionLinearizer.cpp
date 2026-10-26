@@ -113,6 +113,7 @@ void SExpressionLinearizer::inline_ifNil_(SMessage *anSMessage, bool aBoolean)
     }
 
     this->pushR();
+    auto prevStackTop = _stackTop;
     auto nilObj = new SLiteral(0xFFFFFFFF, (Object*)_runtime->_nilObj);
     auto message = new SMessage(new SOpLoadRfromStack(0), _equalsEquals, {nilObj}, false);
     this->visitMessage(message);
@@ -128,6 +129,8 @@ void SExpressionLinearizer::inline_ifNil_(SMessage *anSMessage, bool aBoolean)
     auto end = this->jump();
 
     this->branchTargetOf_(branch);
+    // this branch also starts with the receiver pushed
+    _stackTop = prevStackTop;
     this->popR();
     this->branchTargetOf_(end);
 }

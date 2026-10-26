@@ -5,7 +5,7 @@
 
 Class {
 	#name : #OptimizingVisitor,
-	#superclass : #ParseTreeVisitor,
+	#superclass : #Object,
 	#instVars : [
 		'firstBlock',
 		'currentBlock',
@@ -68,7 +68,7 @@ OptimizingVisitor >> store: operation into: anIdentifierNode [
 
 { #category : #unclassified }
 OptimizingVisitor >> visit: aParseNode [
-	super visit: aParseNode.
+	aParseNode acceptVisitor: self.
 	^firstBlock
 ]
 
@@ -96,6 +96,11 @@ OptimizingVisitor >> visitCascade: aCascadeNode [
 	aCascadeNode receiver acceptVisitor: self.
 	aCascadeNode messages do: [:node | result := node acceptVisitor: self].
 	^result
+]
+
+{ #category : #unclassified }
+OptimizingVisitor >> visitCascadeMessage: aCascadeMessageNode [
+	^self visitMessage: aCascadeMessageNode
 ]
 
 { #category : #unclassified }
@@ -142,9 +147,8 @@ OptimizingVisitor >> visitMessage: aMessageNode [
 OptimizingVisitor >> visitMethod: aMethodNode [
 	| last |
 	self insertDefineArgument: #activationRecord; insertDefineArgument: #self.
-	aMethodNode arguments
-		do: [:node | self insertDefineArgument: node value asSymbol].
-	argumentsCount := aMethodNode arguments size.
+	argumentsCount := aMethodNode compiledCode argumentCount.
+	1 to: argumentsCount do: [:i | self insertDefineArgument: ('arg', i printString) asSymbol].
 	self visitScript: aMethodNode.
 	last := currentBlock lastValue.
 	last isReturn ifFalse: [self insertReturnSelf]

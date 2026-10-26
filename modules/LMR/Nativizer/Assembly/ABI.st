@@ -27,6 +27,14 @@ ABI >> is64bits [
 	^self bits = 64
 ]
 
+{ #category : #'compile-time constants' }
+ABI >> foldableConstants [
+	^Dictionary new
+		at: #WordSize put: self wordSize;
+		at: #WordSizeShift put: self wordSizeShift;
+		yourself
+]
+
 { #category : #'registers - IR' }
 ABI >> regA [
 	^self subclassResponsibility

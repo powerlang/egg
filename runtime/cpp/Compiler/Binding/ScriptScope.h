@@ -5,7 +5,7 @@
 #ifndef _SCRIPTSCOPE_H_
 #define _SCRIPTSCOPE_H_
 #include "Scope.h"
-#include <map>
+#include "Utils/egg_ordered_map.h"
 #include <string>
 #include <vector>
 
@@ -23,9 +23,8 @@ class TemporaryBinding;
 class ScriptScope : public Scope {
 protected:
     SScriptNode* _script;
-    std::map<Egg::string, Binding*> _arguments;
-    std::vector<Egg::string> _argumentOrder;
-    std::map<Egg::string, Binding*> _temporaries;
+    ordered_map<Egg::string, Binding*> _arguments;
+    ordered_map<Egg::string, Binding*> _temporaries;
     int _stackSize;
     int _envSize;
     bool _captureSelf;

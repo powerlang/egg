@@ -29,6 +29,11 @@ SArgumentBinding >> isInlined [
 	^ environment = -1
 ]
 
+{ #category : #accessing }
+SArgumentBinding >> name [
+	^'arg', position printString
+]
+
 { #category : #testing }
 SArgumentBinding >> printOn: aStream [
 	aStream

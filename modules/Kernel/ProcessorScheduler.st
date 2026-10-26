@@ -84,9 +84,9 @@ ProcessorScheduler >> nextReadyProcess [
 
 { #category : #private }
 ProcessorScheduler >> schedule: aProcess [
-	| process |
+	| queue prev |
 	prev := self enableInterrupts: false.
-	queue := scheduledProcesses at: aProcess priority.
+	queue := queues at: aProcess priority.
 	queue add: aProcess.
 	prev ifTrue: [self enableInterrupts: true]
 ]

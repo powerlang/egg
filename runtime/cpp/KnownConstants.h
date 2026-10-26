@@ -7,13 +7,6 @@
  */
 
 
-// We use the lowmost 4gb "page" for allocation, unless on MacOS which doesn't allow it
-#ifdef __APPLE__
-extern uintptr_t BEHAVIOR_ADDRESS_SPACE;
-#else
-#define BEHAVIOR_ADDRESS_SPACE 0
-#endif
-
 namespace Egg {
 
 
@@ -98,8 +91,9 @@ enum Offsets {
     ProcessStackSP = 1,
     ProcessStackBP = 2,
     ProcessStackEnv = 3,
-    ProcessVMStackBuffer = 4,
-    ProcessVMStackBufferSize = 5,
+    ProcessStackPC = 4,
+    ProcessVMStackBuffer = 5,
+    ProcessVMStackBufferSize = 6,
 
     FFI_uint8 = 0,
     FFI_sint8 = 1,

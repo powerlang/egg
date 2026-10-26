@@ -62,13 +62,25 @@ OptimizingValueNumbering >> resultOfBinaryWithConstants: aBinaryInstruction [
 	| operation left right |
 	operation := aBinaryInstruction name.
 	left := aBinaryInstruction left value.
-	right := aBinaryInstruction right value.
+	right := aBinaryInstruction right.
+	(left isNumber and: [right isNumber]) ifFalse: [^nil].
 	operation = #'+' ifTrue: [^left + right].
 	operation = #'-' ifTrue: [^left - right].
 	operation = #'*' ifTrue: [^left * right].
 	operation = #'//' ifTrue: [^left // right].
 	operation = #'=' ifTrue: [^left = right].
-	self halt
+	operation = #'==' ifTrue: [^left == right].
+	operation = #'!=' ifTrue: [^left != right].
+	operation = #'!==' ifTrue: [^left !== right].
+	operation = #'<' ifTrue: [^left < right].
+	operation = #'<=' ifTrue: [^left <= right].
+	operation = #'>' ifTrue: [^left > right].
+	operation = #'>=' ifTrue: [^left >= right].
+	operation = #bitAnd: ifTrue: [^left bitAnd: right].
+	operation = #bitOr: ifTrue: [^left bitOr: right].
+	operation = #bitXor: ifTrue: [^left bitXor: right].
+	operation = #bitShift: ifTrue: [^left bitShift: right].
+	^nil
 ]
 
 { #category : #unclassified }
@@ -135,18 +147,30 @@ OptimizingValueNumbering >> visitBinaryWithConstant: instruction [
 		ifFalse: [
 			(instruction left isConstant and: instruction name != #_basicAt:) ifTrue: [
 				value := self resultOfBinaryWithConstants: instruction.
-				replacement := OLoadConstant valued: value.
-				instruction dissolveReplacingWith: replacement.
-				^self
-					addNewName: replacement;
-					visitLoadConstant: replacement;
-					valueOf: hash be: replacement].
+				value ifNotNil: [
+					replacement := OLoadConstant valued: value.
+					instruction dissolveReplacingWith: replacement.
+					^self
+						addNewName: replacement;
+						visitLoadConstant: replacement;
+						valueOf: hash be: replacement]].
 			self valueOf: hash be: instruction]
 ]
 
 { #category : #unclassified }
 OptimizingValueNumbering >> visitBinaryWithVariable: instruction [
-	| left right hash selector load temp |
+	| left right hash selector load temp value replacement folded |
+	(instruction left isConstant and: [
+		instruction right isConstant and: [
+			instruction name != #_basicFlags: and: [
+				instruction name != #_extendedFlags:]]]) ifTrue: [
+		folded := self resultOfBinaryWithBothConstants: instruction.
+		folded ifNotNil: [
+			replacement := OLoadConstant valued: folded.
+			instruction dissolveReplacingWith: replacement.
+			^self
+				addNewName: replacement;
+				visitLoadConstant: replacement]].
 	left := self nameOf: instruction left.
 	right := self nameOf: instruction right.
 	(self isCommutative: instruction name) ifTrue: [
@@ -161,6 +185,33 @@ OptimizingValueNumbering >> visitBinaryWithVariable: instruction [
 			load := left , selector.
 			self processMemoryStore: instruction right as: hash andLoads: load]
 		ifFalse: [self valueOf: hash be: instruction]
+]
+
+{ #category : #unclassified }
+OptimizingValueNumbering >> resultOfBinaryWithBothConstants: aBinaryInstruction [
+	| op left right |
+	op := aBinaryInstruction name.
+	left := aBinaryInstruction left value.
+	right := aBinaryInstruction right value.
+	(left isNumber and: [right isNumber]) ifFalse: [^nil].
+	op = #'+' ifTrue: [^left + right].
+	op = #'-' ifTrue: [^left - right].
+	op = #'*' ifTrue: [^left * right].
+	op = #'//' ifTrue: [^left // right].
+	op = #'\\' ifTrue: [^left \\ right].
+	op = #'=' ifTrue: [^left = right].
+	op = #'==' ifTrue: [^left == right].
+	op = #'!=' ifTrue: [^left != right].
+	op = #'!==' ifTrue: [^left !== right].
+	op = #'<' ifTrue: [^left < right].
+	op = #'<=' ifTrue: [^left <= right].
+	op = #'>' ifTrue: [^left > right].
+	op = #'>=' ifTrue: [^left >= right].
+	op = #bitAnd: ifTrue: [^left bitAnd: right].
+	op = #bitOr: ifTrue: [^left bitOr: right].
+	op = #bitXor: ifTrue: [^left bitXor: right].
+	op = #bitShift: ifTrue: [^left bitShift: right].
+	^nil
 ]
 
 { #category : #unclassified }
@@ -204,7 +255,7 @@ OptimizingValueNumbering >> visitLoadImplicit: instruction [
 { #category : #unclassified }
 OptimizingValueNumbering >> visitMessageSend: instruction [
 	| loads |
-	loads := names keys select: [:instr | 
+	loads := names keys select: [:instr |
 		instr isPrimitiveOperation
 			and: [#(_basicAt: _byteAt: _basicFlags) includes: instr name]].
 	loads do: [:load | hashes removeAllSuchThat: [:value | value = load]]
@@ -259,7 +310,7 @@ OptimizingValueNumbering >> workFrom: aBasicBlock [
 	names := Dictionary new.
 	firstBlock := aBasicBlock.
 	count := 0.
-	aBasicBlock instructionsWithSuccessorsDo: [:inst | 
+	aBasicBlock instructionsWithSuccessorsDo: [:inst |
 		names at: inst put: '{v' , count printString , '}'.
 		count := count + 1].
 	aBasicBlock withSuccessorsPostOrder

@@ -1,15 +1,14 @@
 #include "Egg.h"
 #include "Allocator/Memory.h"
-#include "Evaluator/Runtime.h"
-#include "Evaluator/Evaluator.h"
-#include "Evaluator/EvaluationContext.h"
 
 #include <iostream>
 #include <cstdlib>
 
+std::string (*Egg::errorBacktrace)() = nullptr;
+
 void Egg::error(const char *message) {
-    if (debugRuntime)
-        std::cerr << debugRuntime->_evaluator->context()->backtrace() << std::endl << std::endl;
+    if (errorBacktrace)
+        std::cerr << errorBacktrace() << std::endl << std::endl;
     std::cerr << "Error: " << message << std::endl;
     std::exit(EXIT_FAILURE);  // or std::abort();
 }

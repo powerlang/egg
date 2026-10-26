@@ -23,6 +23,7 @@ LMRSmallInteger >> != aNumber [
 
 { #category : #arithmetic }
 SmallInteger >> * aNumber [
+	| size result |
 	aNumber _isSmallInteger ifFalse: [^aNumber * self].
 	(self _smiTimes: aNumber) ifNotNil: [:res | ^res].
 	
@@ -35,6 +36,7 @@ SmallInteger >> * aNumber [
 
 { #category : '*Primitives' }
 LMRSmallInteger >> // aNumber [
+	| result quotient answer |
 	aNumber == 0 ifTrue: [^self zeroDivisorOn: #'//'].
 	aNumber _isSmallInteger
 		ifTrue: [

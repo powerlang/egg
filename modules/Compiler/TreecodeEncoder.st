@@ -73,7 +73,8 @@ TreecodeEncoder >> encodeClosureElements: aBlockNode [
 		scope capturesSelf ifTrue: [ s nextPut: CaptureSelf ].
 		scope capturedEnvironments do: [:e | | index |
 			e == parent ifTrue: [s nextPut: CaptureEnvironment] ifFalse: [
-				index := aBlockNode environmentIndexOf: e.
+				"the closure is built in the parent's context, so use the parent's layout"
+				index := parent environmentIndexOf: e.
 				self ASSERT: index notNil.
 				s nextPut: CaptureEnvironmentValue; nextPut: index]].
 		scope capturedArguments do: [:a | | binding |

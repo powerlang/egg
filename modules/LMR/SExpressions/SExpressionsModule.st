@@ -1,11 +1,7 @@
 Class {
 	#name : #SExpressionsModule,
 	#superclass : #Module,
-	#instVars : [
-		'globals',
-		'memory'
-	],
-	#category : #'Powerlang-Core-LMR'
+	#category : #SExpressions
 }
 
 

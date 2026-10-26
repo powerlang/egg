@@ -97,12 +97,9 @@ InstructionSpec class >> fromString: aString [
 { #category : #initialization }
 InstructionSpec class >> initialize [
 	OperandEncoding initializeEncodings.
-	Prefixes initialize.
 	VEXPrefix initializeSignatures.
 	ISAOperandType initialize.
-	self initializeSpecs.
-	Smalltalk at: #Decoder64 ifPresent: [ :d | d initializeSpecs ]
-
+	self initializeSpecs
 ]
 
 { #category : #initialization }
@@ -3064,7 +3061,7 @@ InstructionSpec >> instruction [
 InstructionSpec >> instruction: aString [
 	| substrings |
 	instruction := aString asLowercase.
-	substrings := (instruction replaceAllSubstrings: ',' with: ' ') substrings.
+	substrings := (instruction replaceAll: ',' with: ' ') substrings.
 	mnemonic := substrings first.
 	self operandsFrom: substrings
 ]

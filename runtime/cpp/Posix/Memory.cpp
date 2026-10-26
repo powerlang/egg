@@ -17,22 +17,17 @@
 
 using namespace Egg;
 
-#ifdef __APPLE__
-uintptr_t BEHAVIOR_ADDRESS_SPACE; // in mac OS, this address can vary. Elsewhere it is a constant optimized away
-#define EGG_NOREPLACE MAP_FIXED
-#else
-#define EGG_NOREPLACE MAP_FIXED_NOREPLACE
-#endif
+uintptr_t HEAP_ADDRESS_BLOCK;
 
 namespace Egg {
     static uintptr_t nextFree = 0;
     static uintptr_t limit = 0;
 }
 
-uintptr_t Egg::ReserveAligned4GB() {
+uintptr_t Egg::ReserveHeapBlock() {
 
-    uintptr_t size = 4L * 1024 * 1024 * 1024; // 4GB
-    uintptr_t alignment = 4L * 1024 * 1024 * 1024; // 4GB alignment
+    uintptr_t size = HeapBlockSize;
+    uintptr_t alignment = HeapBlockSize;
     uintptr_t total_size = size + alignment;
     void* addr = NULL;
 
@@ -57,17 +52,17 @@ uintptr_t Egg::ReserveAligned4GB() {
 
 void Egg::InitializeMemory()
 {
-#ifdef __APPLE__
-    BEHAVIOR_ADDRESS_SPACE = ReserveAligned4GB();
-#endif
+    HEAP_ADDRESS_BLOCK = ReserveHeapBlock();
 
-    Egg::nextFree = BEHAVIOR_ADDRESS_SPACE;
+    // the bitmap's first 1/64 would mark the bitmap itself
+    auto marks = HEAP_ADDRESS_BLOCK + MarkBitmapSize / 64;
+    auto mapped = mmap((void*)marks, MarkBitmapSize - MarkBitmapSize / 64, PROT_READ | PROT_WRITE,
+                       MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE | MAP_FIXED, -1, 0);
+    if (mapped != (void*)marks)
+        error("Couldn't reserve the GC mark bitmap");
 
-    // avoid the zero address as mmap would confuse it with "allocate anywhere"
-    if (Egg::nextFree == 0)
-        Egg::nextFree = 0x100000;
-
-    Egg::limit = BEHAVIOR_ADDRESS_SPACE + (4L * 1024 * 1024 * 1024); // We are limiting to reserve up to 4gb for now
+    Egg::nextFree = HEAP_BASE;
+    Egg::limit = HEAP_ADDRESS_BLOCK + HeapBlockSize;
 
 }
 
@@ -86,34 +81,16 @@ uintptr_t Egg::pagealign(uintptr_t addr)
     return align(addr, pagesize);
 }
 
-uintptr_t Egg::ReserveMemory(uintptr_t base, uintptr_t size)
+uintptr_t Egg::ReserveMemory(uintptr_t baseHint, uintptr_t size)
 {
-    void* allocated = nullptr;
-    if (base == 0 || base < BEHAVIOR_ADDRESS_SPACE || base > Egg::limit) base = Egg::nextFree;
-
-    while (true) {
-        // Attempt to allocate at the aligned base
-        allocated = mmap(reinterpret_cast<void*>(base), pagealign(size), PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS | EGG_NOREPLACE, -1, 0);
-        if (allocated != MAP_FAILED) {
-            // Check if the allocated memory is at the desired base address
-            if ((uintptr_t)allocated == base) {
-               Egg::nextFree = pagealign((uintptr_t)allocated + size);
-                return (uintptr_t)allocated;
-            }
-
-            // Free the memory and try next address
-            munmap((void*)allocated, size);
-            base += 0x10000;
-
-        } else {
-            base += 0x10000;
-        }
-
-        if (base >= Egg::limit) {
-            error("Memory allocation failed");
-            return 0;
-        }
+    auto base = (baseHint < Egg::nextFree || baseHint >= Egg::limit) ? Egg::nextFree : baseHint;
+    auto end = pagealign(base + size);
+    if (end > Egg::limit) {
+        error("Memory allocation failed");
+        return 0;
     }
+    Egg::nextFree = end;
+    return base;
 }
 
 void Egg::CommitMemory(uintptr_t base, uintptr_t size)

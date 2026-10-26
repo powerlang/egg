@@ -14,7 +14,8 @@ Class {
 		'dominanceFrontiers',
 		'pendingReads',
 		'pendingPhis',
-		'abi'
+		'abi',
+		'method'
 	],
 	#category : #OCompiler
 }
@@ -27,6 +28,46 @@ OptimizingVariableBinder class >> new [
 { #category : #accessing }
 OptimizingVariableBinder >> abi: anAbi [
 	abi := anAbi
+]
+
+{ #category : #accessing }
+OptimizingVariableBinder >> method: aCompiledMethod [
+	method := aCompiledMethod
+]
+
+{ #category : #unclassified }
+OptimizingVariableBinder >> resolve: aReadVariable asDynamic: binding [
+	| name instVarIndex receiver load assoc global read folded |
+	name := binding name.
+	folded := self foldableConstantValueFor: name.
+	folded == self ifFalse: [
+		^aReadVariable dissolveReplacingWith: (OLoadConstant valued: folded)].
+	instVarIndex := method classBinding allInstVarNames indexOf: name.
+	instVarIndex > 0 ifTrue: [
+		receiver := self definitionOf: #self.
+		load := OBinaryConstantOperation left: receiver right: instVarIndex name: #_basicAt:.
+		receiver addUse: load at: #left.
+		^aReadVariable dissolveReplacingWith: load].
+	assoc := self associationFor: name.
+	assoc ifNotNil: [
+		global := OLoadConstant valued: assoc.
+		read := OBinaryConstantOperation left: global right: 1 name: #_basicAt:.
+		global addUse: read at: #left.
+		^aReadVariable beforeInsert: global; dissolveReplacingWith: read].
+	self error: 'unresolved dynamic binding read: ', name
+]
+
+{ #category : #private }
+OptimizingVariableBinder >> associationFor: name [
+	| current symbol assoc |
+	symbol := name asSymbol.
+	current := method classBinding.
+	[current notNil] whileTrue: [
+		current namespaces do: [:ns |
+			assoc := ns associationAt: symbol ifAbsent: [nil].
+			assoc ifNotNil: [^assoc]].
+		current := current superclass].
+	^method classBinding module namespace associationAt: symbol ifAbsent: [nil]
 ]
 
 { #category : #unclassified }
@@ -132,11 +173,40 @@ OptimizingVariableBinder >> instructionsForWriting: aWriteVariable [
 		ifTrue: [^self
 			instructionsForWriting: aWriteVariable
 			toInstanceVariable: binding].
-	binding refersToAssoc
+	binding isDynamic
 		ifTrue: [^self
 			instructionsForWriting: aWriteVariable
-			toAssociation: binding].
+			toDynamic: binding].
 	self halt
+]
+
+{ #category : #unclassified }
+OptimizingVariableBinder >> instructionsForWriting: aWriteVariable toDynamic: binding [
+	| name instVarIndex this write assoc global |
+	name := binding name.
+	instVarIndex := method classBinding allInstVarNames indexOf: name.
+	instVarIndex > 0 ifTrue: [
+		this := self definitionOf: #self.
+		write := OTernaryOperation
+			receiver: this
+			left: instVarIndex
+			right: aWriteVariable source
+			name: #_basicAt:put:.
+		this addUse: write at: #receiver.
+		aWriteVariable source addUse: write at: #right.
+		^aWriteVariable dissolveReplacingWith: write].
+	assoc := self associationFor: name.
+	assoc ifNotNil: [
+		global := OLoadConstant valued: assoc.
+		write := OTernaryOperation
+			receiver: global
+			left: 1
+			right: aWriteVariable source
+			name: #_basicAt:put:.
+		global addUse: write at: #receiver.
+		aWriteVariable source addUse: write at: #right.
+		^aWriteVariable beforeInsert: global; dissolveReplacingWith: write].
+	self error: 'unresolved dynamic binding write: ', name
 ]
 
 { #category : #unclassified }
@@ -203,6 +273,11 @@ OptimizingVariableBinder >> resolve: aReadVariable asAssociationValue: binding [
 			aReadVariable beforeInsert: global; dissolveReplacingWith: read]
 ]
 
+{ #category : #private }
+OptimizingVariableBinder >> foldableConstantValueFor: aName [
+	^abi foldableConstants at: aName asSymbol ifAbsent: [self]
+]
+
 { #category : #unclassified }
 OptimizingVariableBinder >> resolve: aReadVariable asInstanceVar: binding [
 	| receiver index load |
@@ -219,10 +294,8 @@ OptimizingVariableBinder >> resolve: aReadVariable asInstanceVar: binding [
 
 { #category : #unclassified }
 OptimizingVariableBinder >> resolve: aReadVariable asLiteral: binding [
-	| name value constant |
-	name := binding name asSymbol.
-	value := self valueOfSpecial: name.
-	constant := OLoadConstant valued: value.
+	| constant |
+	constant := OLoadConstant valued: binding value.
 	aReadVariable dissolveReplacingWith: constant
 ]
 
@@ -264,14 +337,6 @@ OptimizingVariableBinder >> rewritePhis [
 					phi variables at: i put: source.
 					source addUse: phi at: predecessor]]
 			ifFalse: [phi clearVariables; dissolve]]
-]
-
-{ #category : #unclassified }
-OptimizingVariableBinder >> valueOfSpecial: name [
-	name == #true ifTrue: [^true].
-	name == #false ifTrue: [^false].
-	name == #nil ifTrue: [^nil].
-	self halt
 ]
 
 { #category : #unclassified }
@@ -322,7 +387,6 @@ OptimizingVariableBinder >> visitPhi: aPhi [
 { #category : #unclassified }
 OptimizingVariableBinder >> visitReadVariable: aReadVariable [
 	| binding |
-	self ASSERT: (aReadVariable binding isKindOf: Binding).
 	binding := aReadVariable binding.
 	binding isTemporary
 		ifTrue: [^self resolve: aReadVariable asTemporary: binding].
@@ -332,9 +396,9 @@ OptimizingVariableBinder >> visitReadVariable: aReadVariable [
 	binding isLiteral ifTrue: [^self resolve: aReadVariable asLiteral: binding].
 	binding isInstVar
 		ifTrue: [^self resolve: aReadVariable asInstanceVar: binding].
-	binding refersToAssoc
-		ifTrue: [^self resolve: aReadVariable asAssociationValue: binding].
-	self ASSERT: false
+	binding isDynamic
+		ifTrue: [^self resolve: aReadVariable asDynamic: binding].
+	self error: 'unhandled binding type: ', binding printString
 ]
 
 { #category : #unclassified }
@@ -354,7 +418,6 @@ OptimizingVariableBinder >> visitUnary: instruction [
 
 { #category : #unclassified }
 OptimizingVariableBinder >> visitWriteVariable: aWriteVariable [
-	self ASSERT: (aWriteVariable binding isKindOf: Binding).
 	self instructionsForWriting: aWriteVariable
 ]
 

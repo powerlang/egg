@@ -349,8 +349,10 @@ void SourceModuleLoader::createNewMethod_(const Egg::string& source, Object* spe
     const auto& literals = smethod->literals();
     uint32_t literalCount = literals.size();
 
-    // Create compiled method: CompiledMethod new: literalCount
-    auto cmClass = lookupClass_("CompiledMethod");
+    Egg::string methodClassname = smethod->methodClassname();
+    uint32_t instBase = Offsets::MethodInstSize + (methodClassname == "CallbackMethod" ? 2 : 0);
+
+    auto cmClass = lookupClass_(methodClassname);
     auto size = (Object*)_runtime->newInteger_(literalCount);
     auto method = _runtime->sendLocal_to_with_("new:", cmClass, size);
     GCedRef methodRef(method);
@@ -376,7 +378,7 @@ void SourceModuleLoader::createNewMethod_(const Egg::string& source, Object* spe
     // Transfer literals
     for (uint32_t i = 0; i < literalCount; i++) {
         auto literal = transferLiteral_(literals[i], methodRef.get());
-        methodRef.get()->asHeapObject()->slot(Offsets::MethodInstSize + i) = literal;
+        methodRef.get()->asHeapObject()->slot(instBase + i) = literal;
     }
 
     // Install method via Smalltalk protocol (all method dicts are proper
@@ -405,7 +407,10 @@ Object* SourceModuleLoader::createExtensionMethod_(const Egg::string& source, Ob
     const auto& literals = smethod->literals();
     uint32_t literalCount = literals.size();
 
-    auto cmClass = lookupClass_("CompiledMethod");
+    Egg::string methodClassname = smethod->methodClassname();
+    uint32_t instBase = Offsets::MethodInstSize + (methodClassname == "CallbackMethod" ? 2 : 0);
+
+    auto cmClass = lookupClass_(methodClassname);
     auto size = (Object*)_runtime->newInteger_(literalCount);
     auto method = _runtime->sendLocal_to_with_("new:", cmClass, size);
     GCedRef methodRef(method);
@@ -428,7 +433,7 @@ Object* SourceModuleLoader::createExtensionMethod_(const Egg::string& source, Ob
 
     for (uint32_t i = 0; i < literalCount; i++) {
         auto literal = transferLiteral_(literals[i], methodRef.get());
-        methodRef.get()->asHeapObject()->slot(Offsets::MethodInstSize + i) = literal;
+        methodRef.get()->asHeapObject()->slot(instBase + i) = literal;
     }
 
     return methodRef.get();

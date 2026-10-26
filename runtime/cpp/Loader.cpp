@@ -115,11 +115,28 @@ HeapObject* Loader::loadModuleFromPath_(const std::string& path) {
     fs::path fsPath(path);
     HeapObject* module = nullptr;
 
-    // Determine the module name from the path
-    std::string name = fsPath.filename().string();
-    // Strip .ems extension if present
-    if (name.size() > 4 && name.substr(name.size() - 4) == ".ems")
-        name = name.substr(0, name.size() - 4);
+    // Derive a stable dotted module name from the path. For .ems we use the
+    // filename without extension (writer encodes dotted name in the filename).
+    // For a source directory we strip the modules-root prefix and replace
+    // path separators with dots, e.g. "modules/Kernel/LMR" -> "Kernel.LMR".
+    std::string name;
+    if (fsPath.extension() == ".ems") {
+        name = fsPath.stem().string();
+    } else {
+        auto modulesRoot = findModulesDir_();
+        std::string relative = path;
+        if (!modulesRoot.empty()) {
+            auto rootCanon = fs::weakly_canonical(modulesRoot).string();
+            auto pathCanon = fs::weakly_canonical(fsPath).string();
+            if (pathCanon.rfind(rootCanon, 0) == 0) {
+                relative = pathCanon.substr(rootCanon.size());
+                if (!relative.empty() && relative.front() == '/') relative.erase(0, 1);
+            }
+        }
+        name = relative;
+        std::replace(name.begin(), name.end(), '/', '.');
+        if (name.empty()) name = fsPath.filename().string();
+    }
 
     // Already loaded?
     auto it = _loadedModules.find(name);

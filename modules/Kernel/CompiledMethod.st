@@ -205,11 +205,6 @@ CompiledMethod >> environmentCount: anInteger [
 	format bitsAt: EnvCount put: anInteger
 ]
 
-{ #category : #accessing }
-CompiledMethod >> executableCode [
-	^optimizedCode
-]
-
 { #category : #evaluation }
 CompiledMethod >> executeOn: receiver withArguments: anArray [
 	| size |

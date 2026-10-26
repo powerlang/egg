@@ -559,6 +559,13 @@ SequenceableCollection >> last [
 	^self at: self size
 ]
 
+{ #category : #accessing }
+SequenceableCollection >> last: anInteger [
+	| size |
+	size := self size.
+	^self copyFrom: size - anInteger + 1 to: size
+]
+
 { #category : #inquiries }
 SequenceableCollection >> occurrencesOf: anObject [
 	| count |

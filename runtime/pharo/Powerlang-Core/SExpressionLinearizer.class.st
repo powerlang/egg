@@ -147,7 +147,7 @@ SExpressionLinearizer >> inline: anSMessage if: aBoolean [
 
 { #category : 'initialization' }
 SExpressionLinearizer >> inline: anSMessage ifNil: aBoolean [
-	| nilObj message branch end arg index |
+	| nilObj message branch end arg index prevStackTop |
 	anSMessage receiver acceptVisitor: self.
 	arg := anSMessage arguments first.
 	(arg isBlock and: [ arg inlinedArgs size = 1]) ifTrue: [ 
@@ -155,6 +155,7 @@ SExpressionLinearizer >> inline: anSMessage ifNil: aBoolean [
 		self storeRintoFrameAt: index
 		 ].
 	self pushR.
+	prevStackTop := stackTop.
 	nilObj := SLiteral new value: runtime nil.
 	message := SMessage new
 		receiver: (SOpLoadRfromStack new index: 0);
@@ -169,8 +170,10 @@ SExpressionLinearizer >> inline: anSMessage ifNil: aBoolean [
 	end := self
 		dropToS;
 		jump.
+	self branchTargetOf: branch.
+	"this branch also starts with the receiver pushed"
+	stackTop := prevStackTop.
 	self
-		branchTargetOf: branch;
 		popR;
 		branchTargetOf: end
 ]

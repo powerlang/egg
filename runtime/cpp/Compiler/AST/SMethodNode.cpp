@@ -61,7 +61,8 @@ SCompiledMethod* SMethodNode::buildMethod() {
     cm->classBinding_(_compiler->frontend() ? _compiler->frontend()->classBinding() : nullptr);
     
     cm->pragma_(_pragma);
-    
+    cm->methodClassname_(methodClassname());
+
     auto blocks = cm->blocks();
     for (auto block : blocks) {
         block->method_(cm);
@@ -164,10 +165,9 @@ std::vector<LiteralValue> SMethodNode::literals() {
     return lits;
 }
 
-SCompiledMethod* SMethodNode::methodClass() {
-    if (_pragma) {
-    }
-    return new SCompiledMethod();
+Egg::string SMethodNode::methodClassname() {
+    if (_pragma && _pragma->isFFI()) return "CallbackMethod";
+    return "CompiledMethod";
 }
 
 bool SMethodNode::needsEnvironment() const {

@@ -25,6 +25,11 @@ KeyNotFound >> defaultDescription [
 ]
 
 { #category : #accessing }
+KeyNotFound >> object [
+	^object
+]
+
+{ #category : #accessing }
 KeyNotFound >> object: anObject [
 	object := anObject
 ]

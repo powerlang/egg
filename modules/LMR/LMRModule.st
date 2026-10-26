@@ -3,9 +3,12 @@ Class {
 	#superclass : #Module,
 	#instVars : [
 		'globals',
-		'memory'
+		'memory',
+		'micStub',
+		'picStub',
+		'nativizerBlock'
 	],
-	#category : #'Powerlang-Core-LMR'
+	#category : #LMR
 }
 
 { #category : #accessing }
@@ -18,6 +21,11 @@ LMRModule class >> indexOfGlobal: aSymbol [
 	^self globalNames
 		indexOf: aSymbol
 		ifAbsent: [self error: 'global not found']
+]
+
+{ #category : #accessing }
+LMRModule >> indexOfGlobal: aSymbol [
+	^self class indexOfGlobal: aSymbol
 ]
 
 { #category : #accessing }
@@ -42,28 +50,49 @@ LMRModule >> globals [
 { #category : #spec }
 LMRModule >> imports [
 	^{
-		#Kernel -> #(ProcessStack ProtoObject SequenceableCollection WordSize).
-		#Kernel.LMR -> #(LMRProtoObject)
+		#Kernel -> #(ProcessStack ProtoObject SequenceableCollection WordSize Processor).
+		#'Kernel.LMR' -> #(LMRProtoObject)
 	}
 ] 
 
-{ #category : #bootstrapping }
-LMRModule >> initializeGlobalsWithStubs [
-	| items |
-	globals := Array new: self class globalNames size.
+{ #category : #accessing }
+LMRModule >> globals: anArray [
+	globals := anArray
+]
 
-	self globalNamed: #SmallIntegerBehavior put: SmallInteger instanceBehavior.
+{ #category : #snapshotting }
+LMRModule >> requiresNativization [
+	^false
+]
 
-	items := Dictionary withAll: {
-		#Lookup                -> (NativeCode new code: 'Lookup Placeholder').
-		#LookupSuper           -> (NativeCode new code: 'LookupSuper Placeholder').
-		#DebuggableLookup      -> (NativeCode new code: 'DebuggableLookup placeholder').
-		#DebuggableLookupSuper -> (NativeCode new code: 'DebuggableLookupSuper placholder').
-		#Invoke                -> (NativeCode new code: 'Invoke placeholder').
-		#Safepoint             -> (NativeCode new code: 'SafepointCheck placeholder').
-		#WriteBarrier          -> (NativeCode new code: 'Write Barrier placeholder')}.
-	items
-		keysAndValuesDo: [ :key :placeholder | self globalNamed: key put: placeholder ]
+{ #category : #snapshotting }
+LMRModule >> nativizerBlock [
+	^nativizerBlock
+]
+
+{ #category : #snapshotting }
+LMRModule >> nativizerBlock: aBlock [
+	nativizerBlock := aBlock
+]
+
+{ #category : #accessing }
+LMRModule >> micStub [
+	^micStub
+]
+
+{ #category : #accessing }
+LMRModule >> micStub: aByteArray [
+	micStub := aByteArray
+]
+
+{ #category : #accessing }
+LMRModule >> picStub [
+	^picStub
+]
+
+{ #category : #accessing }
+LMRModule >> picStub: aByteArray [
+	picStub := aByteArray
 ]
 
 { #category : #bootstrapping }
@@ -87,9 +116,8 @@ LMRModule >> justLoaded [
 	super justLoaded.
 	SendSite initializeFormatFlags.
 	GlobalDispatchCache initialize.
-	self
-		initializeMemory;
-		initializeGlobalsWithStubs.
+	self initializeMemory.
+	LMRProtoObject module namespace at: #Memory put: Memory
 ]
 
 { #category : #accessing }
@@ -130,9 +158,7 @@ LMRModule >> lookupSuperStub [
 
 { #category : #private }
 LMRModule >> mapGlobal: aSymbol to: nativeCode [
-	placeholder := self globalNamed: aSymbol.
-	placeholder code become: nativeCode code.
-	placeholder become: nativeCode.
+	self globalNamed: aSymbol put: nativeCode
 ]
 
 { #category : #accessing }

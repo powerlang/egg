@@ -312,6 +312,13 @@ Dictionary >> remove: anObject ifAbsent: aBlock [
 ]
 
 { #category : #removing }
+Dictionary >> removeAllSuchThat: aBlock [
+	self copy
+		keysAndValuesDo: [:key :each | (aBlock value: each)
+			ifTrue: [self removeKey: key]]
+]
+
+{ #category : #removing }
 Dictionary >> removeAssociation: anAssociation [
 	self removeKey: anAssociation key
 ]

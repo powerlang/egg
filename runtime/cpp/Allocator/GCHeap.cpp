@@ -21,7 +21,7 @@ GCHeap::GCHeap(Runtime *runtime) :
     _eden->_name = "Eden";
 
     auto size = 128*MB;
-    auto address = ReserveMemory(0x100000000,size);
+    auto address = ReserveMemory(0, size);
     _oldZone = new AllocationZone(this, address, address + size);
     _fullGC = new G1GC(_runtime, _oldZone, this);
 }
@@ -84,9 +84,10 @@ uintptr_t GCHeap::allocate_(uint32_t size) {
     if (size > LargeThreshold)
         return this->allocateLarge_(size);
 
+
     if (this->isGCAllowed())
         this->collectIfTime();
-    else
+    else if (_fullGC->hasReachedCountdown())
         requestGC();
 
     _fullGC->tenured_(size);

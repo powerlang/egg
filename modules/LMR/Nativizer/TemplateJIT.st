@@ -38,7 +38,7 @@ TemplateJIT >> argumentCount [
 
 { #category : #services }
 TemplateJIT >> argumentInEnvironmentAt: index [
-	assembler loadRwithEindex: index + SClosure instSize
+	assembler loadRwithEindex: index + Closure instSize
 ]
 
 { #category : #services }
@@ -75,7 +75,43 @@ TemplateJIT >> associationValueAt: anInteger put: dummy [
 		loadAwithLiteral: literal;
 		storeRinAindex: 2;
 		pushA.
-	self emitWriteBarrier 
+	self emitWriteBarrier
+]
+
+{ #category : #services }
+TemplateJIT >> loadAssociationValue: anAssociation [
+	assembler
+		loadRwithLiteral: anAssociation;
+		loadRwithRindex: 2
+]
+
+{ #category : #services }
+TemplateJIT >> storeAssociation: anAssociation value: dummy [
+	assembler
+		loadAwithLiteral: anAssociation;
+		storeRinAindex: 2;
+		pushA.
+	self emitWriteBarrier
+]
+
+{ #category : #services }
+TemplateJIT >> staticBindingFor: aSymbol [
+	| name instVarIndex current assoc module |
+	name := aSymbol asSymbol.
+	instVarIndex := method classBinding allInstVarNames indexOf: name.
+	instVarIndex > 0 ifTrue: [
+		^SInstVarBinding new index: instVarIndex].
+	current := method classBinding.
+	[current notNil] whileTrue: [
+		current namespaces do: [:ns |
+			assoc := ns associationAt: name ifAbsent: [nil].
+			assoc ifNotNil: [^SAssociationBinding new association: assoc]].
+		current := current superclass].
+	module := method classBinding module.
+	module ifNotNil: [
+		assoc := module namespace associationAt: name ifAbsent: [nil].
+		assoc ifNotNil: [^SAssociationBinding new association: assoc]].
+	^nil
 ]
 
 { #category : #services }
@@ -141,20 +177,20 @@ TemplateJIT >> emitCallbackEpilogue [
 { #category : #services }
 TemplateJIT >> emitCallbackPrologue [
 	| retaddr |
-	environment abi emitEntrypoint: method descriptor with: ir.
+	environment abi emitEntrypoint: method descriptor with: assembler.
 	retaddr := 0.
 	assembler
 		pushImm: retaddr;
 		xorFPwithFP;
-		loadLongMwithIPoffset: 0 - assembler currentAddress + ImageSegmentWriter behaviorOffset;
-		loadMwithMindex: SCallbackMethod behaviorNativeCodeSlot;
-		loadGwithLiteral: environment globals;
+		loadLongMwithIPoffset: 0 - assembler currentAddress + environment platform behaviorOffset;
+		loadMwithMindex: (CallbackBehavior indexOfSlot: 'nativeCode');
+		loadGwithLiteral: environment lmrModule globals;
 		loadNilWithLiteral: nil;
 		loadTrueWithLiteral: true;
 		loadFalseWithLiteral: false;
 		loadEwithNil;
 		loadRwithMindex: (NativeCode indexOfSlot: 'compiledCode');
-		loadRwithRindex: (SCallbackMethod indexOfSlot: 'receiver')
+		loadRwithRindex: (CallbackMethod indexOfSlot: 'receiver')
 ]
 
 { #category : #services }
@@ -240,7 +276,7 @@ TemplateJIT >> emitSend: selector super: aBoolean [
 	linker := environment messageLinker.
 	
 	method isDebuggable
-		ifTrue: [ aBoolean ifTrue: [linker emitSendSuperDebuggable: selector from: method classBinding using: ir] ifFalse: [linker emitSendDebuggable: selector using: assembler ]]
+		ifTrue: [ aBoolean ifTrue: [linker emitSendSuperDebuggable: selector from: method classBinding using: assembler] ifFalse: [linker emitSendDebuggable: selector using: assembler ]]
 		ifFalse: [ aBoolean ifTrue: [linker emitSendSuper: selector from: method classBinding using: assembler ] ifFalse: [linker emitSend: selector using: assembler ]]
 ]
 
@@ -327,10 +363,10 @@ TemplateJIT >> loadAwithArgument: index in: envIndex [
 TemplateJIT >> loadAwithArgumentInEnvironment: envIndex at: index [
 	| offset |
 	envIndex = 0
-		ifTrue: [ assembler loadAwithEindex: index + SClosure instSize ]
+		ifTrue: [ assembler loadAwithEindex: index + Closure instSize ]
 		ifFalse: [ offset := activeScript offsetOfEnvironment: envIndex.
 			assembler
-				loadAwithEindex: envIndex + SClosure instSize;
+				loadAwithEindex: envIndex + Closure instSize;
 				loadAwithAindex: index + offset ]
 ]
 
@@ -369,7 +405,7 @@ TemplateJIT >> loadAwithTemporaryInEnvironment: envIndex at: index [
 		ifTrue: [offset := activeScript offsetOfCurrentEnvironment. assembler loadAwithEindex: index + offset ]
 		ifFalse: [ offset := activeScript offsetOfEnvironment: envIndex.
 			assembler
-				loadAwithEindex: envIndex + SClosure instSize;
+				loadAwithEindex: envIndex + Closure instSize;
 				loadAwithAindex: index + offset ]
 ]
 
@@ -386,8 +422,8 @@ TemplateJIT >> loadAwithTemporaryInStackAt: index [
 { #category : #services }
 TemplateJIT >> loadBlockNativeCode [
 	| block nativeCode |
-	block := SClosure indexOfSlot: 'block'.
-	nativeCode := SCompiledBlock indexOfSlot: 'nativeCode'.
+	block := Closure indexOfSlot: 'block'.
+	nativeCode := CompiledBlock indexOfSlot: 'optimizedCode'.
 	assembler
 		loadMwithRindex: block;
 		loadMwithMindex: nativeCode
@@ -400,7 +436,7 @@ TemplateJIT >> loadBlockSelf: aCompiledBlock [
 		ifTrue: [ offset := aCompiledBlock capturesHome
 				ifTrue: [ 1 ]
 				ifFalse: [ 0 ].
-			assembler loadSwithRindex: SClosure instSize + 1 + offset ]
+			assembler loadSwithRindex: Closure instSize + 1 + offset ]
 		ifFalse: [ assembler loadSwithNil ].
 	assembler pushS
 ]
@@ -475,7 +511,7 @@ TemplateJIT >> nativizeBlock: anSBlock [
 	(statements isEmpty orNot: [statements last isReturn])
 		ifTrue: [self emitEpilogue].
 	self emitFallbacks.
-	anSBlock compiledCode nativeCode: assembler applyFixups nativeCode
+	anSBlock compiledCode optimizedCode: assembler applyFixups nativeCode
 ]
 
 { #category : #services }
@@ -541,7 +577,7 @@ TemplateJIT >> saveContextSwitchPoint [
 		pushA;
 		pushT;
 		pushR.
-	environment messageLinker emitSend: #signalStep using: ir.
+	environment messageLinker emitSend: #signalStep using: assembler.
 	assembler
 		popR;
 		popT;
@@ -585,7 +621,7 @@ TemplateJIT >> temporaryInEnvironment: envIndex at: index [
 		ifFalse: [ 
 			offset := activeScript offsetOfEnvironment: envIndex.
 			assembler
-				loadRwithEindex: envIndex + SClosure instSize ;
+				loadRwithEindex: envIndex + Closure instSize ;
 				loadRwithRindex: index + offset]
 ]
 
@@ -599,7 +635,7 @@ TemplateJIT >> temporaryInEnvironment: envIndex atPut: index [
 				pushE ]
 		ifFalse: [ offset := activeScript offsetOfEnvironment: envIndex.
 			assembler
-				loadTwithEindex: envIndex + SClosure instSize ;
+				loadTwithEindex: envIndex + Closure instSize ;
 				storeRinTindex: index + offset;
 				pushT ].
 	self emitWriteBarrier
@@ -680,7 +716,7 @@ TemplateJIT >> visitInlinedMessage: anSMessage [
 	| nativizer |
 	nativizer := InlinedMessageNativizer new
 		message: anSMessage;
-		assembler: ir;
+		assembler: assembler;
 		nativizer: self.
 	nativizer inlineMessage
 ]
@@ -738,7 +774,7 @@ TemplateJIT >> visitOptimizedMessage: anSMessage [
 	| nativizer |
 	nativizer := BinaryMessageNativizer new
 		message: anSMessage;
-		assembler: ir;
+		assembler: assembler;
 		nativizer: self.
 	nativizer inlineMessage
 ]

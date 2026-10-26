@@ -205,9 +205,10 @@ OptimizingInstructionFragmenter >> fragmentSpecialABIArgumentsIn: aBasicBlock [
 	(literals at: 1) == #specialABIBegin ifFalse: [^self].
 	i := 2.
 	[(literals at: i) == #specialABIEnd]
-		whileFalse: [| name register implicit argument receiver regname |
-			name := literals at: i.
-			regname := literals at: i + 1.
+		whileFalse: [| pair name regname register implicit argument receiver |
+			pair := literals at: i.
+			name := pair first.
+			regname := pair last.
 			register := self registerNamed: regname.
 			name = #self
 				ifTrue: [
@@ -221,7 +222,7 @@ OptimizingInstructionFragmenter >> fragmentSpecialABIArgumentsIn: aBasicBlock [
 						detect: [:instruction | instruction isDefineArgument
 							and: [instruction name = name]].
 					argument dissolveReplacingWith: implicit].
-			i := i + 2].
+			i := i + 1].
 	actual := aBasicBlock firstInstruction detect: [:inst | inst isConstant].
 	[
 		next := actual next.
@@ -279,6 +280,8 @@ OptimizingInstructionFragmenter >> initializeMessages [
 		at: #'+' put: #BinaryCommutative:;
 		at: #'-' put: #BinaryNonCommutative:;
 		at: #'*' put: #BinaryCommutative:;
+		at: #'//' put: #BinaryNonCommutative:;
+		at: #'\\' put: #BinaryNonCommutative:;
 		at: #'<' put: #BinaryCompare:;
 		at: #'<=' put: #BinaryCompare:;
 		at: #'=' put: #BinaryCompare:;

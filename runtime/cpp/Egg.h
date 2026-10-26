@@ -21,6 +21,8 @@ struct Object;
 struct HeapObject;
 struct SmallInteger;
 
+extern std::string (*errorBacktrace)();
+
 void Initialize();
 void osError();
 void error(const char *message);

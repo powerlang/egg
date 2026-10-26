@@ -20,9 +20,7 @@ G1GC::G1GC(Runtime *runtime, AllocationZone *oldZone, GCHeap *heap) :
 
 HeapObject *G1GC::copyOf_(HeapObject *anObject)
 {
-    auto forwarder = ((uintptr_t)anObject) + _forwarderOffset;
-	//printf("fetching forwarder of %#" PRIxPTR " -> %#" PRIxPTR "(orig: %s, copy: %s)\n", anObject, *(HeapObject**)forwarder, anObject->printString().c_str(), (*(HeapObject**)forwarder)->printString().c_str());
-	return (*(HeapObject**)forwarder);
+	return *this->forwarderOf_(anObject);
 }
 
 void G1GC::determineEvacuatedSpaces() {
@@ -66,12 +64,13 @@ void G1GC::determineEvacuatedSpaces() {
 HeapObject *G1GC::evacuate_(HeapObject *anObject)
 {
     auto copy = _oldZone->shallowCopyCommiting_(anObject);
+    if (!copy)
+        error((std::string("evacuate_: shallowCopyCommiting_ returned null for object of body size ")
+            + std::to_string(anObject->bodySizeInBytes())).c_str());
 	if (anObject->isRemembered())
         copy->beRemembered();
-	
-    auto forwarder = ((uintptr_t)anObject) + _forwarderOffset;
-	(*(HeapObject**)forwarder)= copy;
-	//printf("object %#" PRIxPTR " was forwarded to %#" PRIxPTR "(orig: %s, copy: %s)\n", anObject, copy, anObject->printString().c_str(), copy->printString().c_str());
+
+	*this->forwarderOf_(anObject) = copy;
 
 	return copy;
 }
@@ -84,6 +83,9 @@ bool G1GC::hasToEvacuate_(HeapObject *anObject)
 
 void G1GC::initializeLocals()
 {
+	//static int counter = 1;
+	//printf("going to do GC %d\n", counter++);
+
 	this->determineEvacuatedSpaces();
 	auto current = 0;
 	auto evac = 0;
@@ -99,7 +101,7 @@ void G1GC::initializeLocals()
 			evac+= _oldZone->spaces()[i]->reservedSize();
 	}
 
-	//printf("going to do GC - current old heap size: %d kb, going to free aprox %x\n", current / 1024, evac);
+	//printf("current old heap size: %d kb, going to free aprox %x\n", current / 1024, evac);
 
     _stack.reserve(64 * KB);
 	_largeSize = _heap->_largeSpaces.size();
@@ -115,6 +117,7 @@ void G1GC::releaseLocals()
 	_stack.clear();
 	_scanned = nullptr;
 	GarbageCollector::releaseLocals();
+	//printf("finished GC pass\n");
 }
 
 void G1GC::resetCountdown()
@@ -386,8 +389,8 @@ void G1GC::sweepLargeSpaces()
 		GCSpace* s = large[i-1];
 		if (s->firstObject()->hasBeenSeen())
 		{
-			used = used + 1;
 			large[used] = s;
+			used = used + 1;
         }
 		else
         {

@@ -27,7 +27,7 @@ ProtoObject class >> initializeBitMasks [
 		at: #HasBeenSeen put: 16r20.
 	ObjectBitsMasks keys
 		do: [:key | ObjectBitsMasks
-			at: key , 'Mask'
+			at: (key , 'Mask') asSymbol
 			put: 16rFF - (ObjectBitsMasks at: key)]
 ]
 
@@ -95,7 +95,32 @@ ProtoObject >> _hash [
 ]
 
 { #category : #'header access' }
+ProtoObject >> _basicFlags [
+	^self errorVMSpecific
+]
+
+{ #category : #'header access' }
+ProtoObject >> _basicHash [
+	^self errorVMSpecific
+]
+
+{ #category : #'header access' }
 ProtoObject >> _isBytes [
+	^self errorVMSpecific
+]
+
+{ #category : #'header access' }
+ProtoObject >> _isLarge [
+	^self errorVMSpecific
+]
+
+{ #category : #'header access' }
+ProtoObject >> _isSmallInteger [
+	^self errorVMSpecific
+]
+
+{ #category : #'header access' }
+ProtoObject >> _largeSize [
 	^self errorVMSpecific
 ]
 
@@ -106,6 +131,11 @@ ProtoObject >> _pointersSize [
 
 { #category : #'header access' }
 ProtoObject >> _size [
+	^self errorVMSpecific
+]
+
+{ #category : #'header access' }
+ProtoObject >> _smallSize [
 	^self errorVMSpecific
 ]
 

@@ -93,7 +93,7 @@ OperandEncoding class >> initializeEncodings [
 	self defs
 		do: [ :def | 
 			| oe n selectors |
-			n := def first replaceAllSubstrings: '-' with: ''.
+			n := def first replaceAll: '-' with: ''.
 			oe := self new.
 			selectors := (2 to: def size)
 				collect: [ :i | ('encode' , n , 'Operand' , (i - 1) asString , ':') asSymbol ].

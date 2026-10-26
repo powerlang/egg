@@ -26,7 +26,7 @@ Assembler class >> growIndexedLabelsTo: anInteger [
 { #category : #initialization }
 Assembler class >> initialize [
 	self initializeIndexedLabels
-	
+
 ]
 
 { #category : #initialization }
@@ -74,7 +74,7 @@ Assembler >> addLabel: label to: location [
 Assembler >> addLiteral: anObject [
 	| index |
 	index := literals
-		identityIndexOf: anObject
+		indexOfIdentical: anObject
 		ifAbsent: [ literals
 				add: anObject;
 				size ].
@@ -163,7 +163,7 @@ Assembler >> clearFPUFlags [
 
 { #category : #'operations - arithmetic' }
 Assembler >> clearIntegerBit: srcAndDstReg [
-	self subclassResponsibility
+	self clearSafeIntegerBit: srcAndDstReg
 ]
 
 { #category : #'push/pop' }
@@ -302,13 +302,13 @@ Assembler >> compareWithTrue: register [
 { #category : #arithmetic }
 Assembler >> convertAtoNativeInteger [
 	self subclassResponsibility
-	
+
 ]
 
 { #category : #arithmetic }
 Assembler >> convertRtoNativeInteger [
 	self subclassResponsibility
-	
+
 ]
 
 { #category : #arithmetic }
@@ -322,13 +322,13 @@ Assembler >> convertToNativeInteger: srcAndDstReg [
 ]
 
 { #category : #arithmetic }
-Assembler >> convertToSmallInteger: srcAndDstReg [ 
+Assembler >> convertToSmallInteger: srcAndDstReg [
 	self shiftLeft: srcAndDstReg byImm: 1; inc: srcAndDstReg
 ]
 
 { #category : #arithmetic }
 Assembler >> convertTtoNativeInteger [
-	self subclassResponsibility	
+	self subclassResponsibility
 ]
 
 { #category : #services }
@@ -560,7 +560,7 @@ Assembler >> loadAwithGindex: index [
 { #category : #loading }
 Assembler >> loadAwithGlobal: aSymbol [
 	| index |
-	index := NativizationEnvironment indexOfGlobal: aSymbol.
+	index := LMRModule indexOfGlobal: aSymbol.
 	self loadAwithGindex: index
 ]
 
@@ -725,7 +725,7 @@ Assembler >> loadMwithGindex: index [
 { #category : #loading }
 Assembler >> loadMwithGlobal: aSymbol [
 	| index |
-	index := NativizationEnvironment indexOfGlobal: aSymbol.
+	index := LMRModule indexOfGlobal: aSymbol.
 	self loadMwithGindex: index
 ]
 
@@ -970,17 +970,17 @@ Assembler >> loadTwithTindex: index [
 ]
 
 { #category : #loading }
-Assembler >> loadWithFalse: register [ 
+Assembler >> loadWithFalse: register [
 	self subclassResponsibility
 ]
 
 { #category : #loading }
-Assembler >> loadWithNil: register [ 
+Assembler >> loadWithNil: register [
 	self subclassResponsibility
 ]
 
 { #category : #loading }
-Assembler >> loadWithTrue: register [ 
+Assembler >> loadWithTrue: register [
 	self subclassResponsibility
 ]
 
@@ -1381,6 +1381,12 @@ Assembler >> reserveStackSlots: amount [
 ]
 
 { #category : #initialization }
+Assembler >> initialize [
+	super initialize.
+	self reset
+]
+
+{ #category : #initialization }
 Assembler >> reset [
 	labels := Dictionary new: 100.
 	literals := OrderedCollection new.
@@ -1452,7 +1458,9 @@ Assembler >> setSafeRintegerBit [
 ]
 
 { #category : #'operations - logical' }
-Assembler >> shiftLeft: srcAndDst by: countReg [
+Assembler >> shiftLeft: srcAndDst by: countOrImm [
+	countOrImm isInteger
+		ifTrue: [^self shiftLeft: srcAndDst byImm: countOrImm].
 	self subclassResponsibility
 ]
 
@@ -1472,7 +1480,9 @@ Assembler >> shiftLogicalRright: count [
 ]
 
 { #category : #'operations - logical' }
-Assembler >> shiftRight: srcAndDst by: countReg [
+Assembler >> shiftRight: srcAndDst by: countOrImm [
+	countOrImm isInteger
+		ifTrue: [^self shiftRight: srcAndDst byImm: countOrImm].
 	self subclassResponsibility
 ]
 
@@ -1593,7 +1603,7 @@ Assembler >> storeEinRindex: index [
 
 { #category : #storing }
 Assembler >> storeLargeX0inA [
-	self subclassResponsibility		
+	self subclassResponsibility
 ]
 
 { #category : #storing }

@@ -79,6 +79,7 @@ public:
     void encodeNestedDynamicVar_(const Egg::string& name);
     void encodeArgument_env_(int index, LocalEnvironment* environment);
     void encodeTemporary_env_(int index, LocalEnvironment* environment);
+    std::vector<uint8_t> encodeClosureElements_(SBlockNode* node);
     
 private:
     std::vector<uint8_t> stream_;  // Output stream for treecode bytes
@@ -97,7 +98,6 @@ private:
     int encodedEnvironment_(LocalEnvironment* environment);
     
     int compiledBlockIndexOf_(SBlockNode* node);
-    std::vector<uint8_t> encodeClosureElements_(SBlockNode* node);
     
     void visitStatements(const std::vector<SParseNode*>& statements);
     void visitScript_(SScriptNode* node);

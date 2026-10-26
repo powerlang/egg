@@ -18,5 +18,5 @@ STrueBinding >> value [
 
 { #category : #printing }
 STrueBinding >> valueWithin: anEvaluationContext [
-	^ anEvaluationContext true
+	^ anEvaluationContext trueLiteral
 ]

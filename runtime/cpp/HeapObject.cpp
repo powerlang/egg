@@ -7,6 +7,7 @@
 
 #include "HeapObject.h"
 #include "KnownObjects.h"
+#include "Allocator/Memory.h"
 #include "Evaluator/Runtime.h"
 
 using namespace Egg;
@@ -157,12 +158,12 @@ uint32_t HeapObject::basicBehavior()
 
 HeapObject* HeapObject::behavior()
 {
-    return reinterpret_cast<HeapObject*>(((uintptr_t)smallHeader()->behavior) | BEHAVIOR_ADDRESS_SPACE);
+    return reinterpret_cast<HeapObject*>(((uintptr_t)smallHeader()->behavior) | BEHAVIOR_ADDRESS_BLOCK);
 }
 
 void HeapObject::behavior(HeapObject *behavior)
 {
-	ASSERT((((uintptr_t)behavior) & 0xFFFFFFFF00000000) == BEHAVIOR_ADDRESS_SPACE);
+	ASSERT((((uintptr_t)behavior) & 0xFFFFFFFF00000000) == BEHAVIOR_ADDRESS_BLOCK);
     smallHeader()->behavior = (uint32_t)((uintptr_t)behavior);
 }
 
@@ -290,7 +291,7 @@ uint32_t&
 HeapObject::uint32offset(const uint32_t subscript)
 {
     ASSERT(this->isBytes());
-    ASSERT(subscript * 4 + 3 < this->size());
+    ASSERT(subscript + 3 < this->size());
 
     return *(uint32_t*)((uintptr_t)this + subscript);
 }

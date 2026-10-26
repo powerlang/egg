@@ -504,6 +504,14 @@ public:
 		processStack->slot(Offsets::ProcessStackEnv) = env;
 	}
 
+	Object* processStackPC_(HeapObject * processStack) {
+		return processStack->slot(Offsets::ProcessStackPC);
+	}
+
+	void processStackPC_put_(HeapObject * processStack, Object *pc) {
+		processStack->slot(Offsets::ProcessStackPC) = pc;
+	}
+
 	Object** processVMStackBuffer_(HeapObject * processVMStack) {
 		auto smi = processVMStack->slot(Offsets::ProcessVMStackBuffer);
 		if (smi == (Object*)_nilObj) return nullptr;

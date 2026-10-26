@@ -196,8 +196,8 @@ KernelModule >> loadModuleFromPath: aString [
 KernelModule >> load: aSymbol [
 	| filename |
 	loadedModules at: aSymbol ifPresent: [:module | ^module].
-	moduleLoaders do: [:loader | 
-		(loader load: aSymbol) ifNotNil: [:module | 
+	moduleLoaders do: [:loader |
+		(loader load: aSymbol) ifNotNil: [:module |
 			loadedModules at: aSymbol put: module.
 			^module]].
 	^self error: 'module not found'
@@ -253,10 +253,12 @@ KernelModule >> suspendOnUnhandledExceptions [
 
 { #category : #private }
 KernelModule >> suspendBecause: anException [
-	| active process |
+	| active process resuming stack |
 	active := Processor activeProcess.
 	process := Process sending: #suspended:because: to: host with: {active. anException}.
-	process takeControl
+	stack := active nativeStack.
+	resuming := stack snapshot.
+	resuming ifFalse: [process takeControl]
 ]
 
 { #category : #services }

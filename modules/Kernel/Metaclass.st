@@ -79,6 +79,11 @@ Metaclass >> namespace [
 ]
 
 { #category : #accessing }
+Metaclass >> namespaces [
+	^class namespaces
+]
+
+{ #category : #accessing }
 Metaclass >> module [
 	^class module
 ]
