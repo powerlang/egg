@@ -6,7 +6,7 @@
 Class {
 	#name : #JsonWriterTest,
 	#superclass : #TestCase,
-	#category : #'JSON\Tests'
+	#category : #'JSON-Tests'
 }
 
 { #category : #utf8 }
