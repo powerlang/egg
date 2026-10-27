@@ -13,14 +13,15 @@ Class {
 TestsModule >> imports [
 	^{
 		#Kernel -> #(Error).
-		#'LMR.Nativizer.Assembly.Aarch64' -> #(AAPCS64ABI ARM64InstructionSpec ARM64Register).
+		#'LMR.Nativizer' -> #(NativizationPlatform).
+		#'LMR.Nativizer.Assembly.Aarch64' -> #(AAPCS64ABI ARM64CodeGenerator ARM64InstructionSpec ARM64Register).
 		#SUnit -> #(TestCase TestResult)
 	}
 ]
 
 { #category : #main }
 TestsModule >> main: anArray [
-	{ARM64InstructionSpecTest. ARM64RegisterTest} do: [:test | | result |
+	{ARM64InstructionSpecTest. ARM64RegisterTest. ARM64CodeGeneratorTest} do: [:test | | result |
 		result := test buildTestSuite run.
 		Kernel log: test name , ': ' , result printString , String cr]
 ]

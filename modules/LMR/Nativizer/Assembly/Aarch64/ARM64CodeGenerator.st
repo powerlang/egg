@@ -595,3 +595,36 @@ ARM64CodeGenerator >> settingFlags: mnemonic unlessSp: registers [
 		ifTrue: [mnemonic]
 		ifFalse: [mnemonic , 's']
 ]
+
+{ #category : #'operations - arithmetic' }
+ARM64CodeGenerator >> leadingRzeroCount [
+	self assemble: 'clz' with: self regR with: self regR
+]
+
+{ #category : #'operations - arithmetic' }
+ARM64CodeGenerator >> shiftLeft: srcAndDstReg by: countReg [
+	self assemble: 'lslv' with: srcAndDstReg with: srcAndDstReg with: countReg
+]
+
+{ #category : #'operations - arithmetic' }
+ARM64CodeGenerator >> shiftRightArithmetic: srcAndDstReg by: countReg [
+	self assemble: 'asrv' with: srcAndDstReg with: srcAndDstReg with: countReg
+]
+
+{ #category : #'operations - arithmetic' }
+ARM64CodeGenerator >> multiply: src1AndDstLoReg by: src2reg wideningTo: dstHiReg [
+	self
+		assemble: 'smulh' with: self regV with: src1AndDstLoReg with: src2reg;
+		assemble: 'mul' with: src1AndDstLoReg with: src1AndDstLoReg with: src2reg;
+		move: self regV to: dstHiReg;
+		assemble: 'cmp' with: dstHiReg with: src1AndDstLoReg with: 63;
+		assemble: 'ccmp' with: xzr with: xzr with: 2r0001 with: #eq
+]
+
+{ #category : #'operations - arithmetic' }
+ARM64CodeGenerator >> divide: srcAndDstReg extendingTo: extReg by: divisorReg [
+	self
+		assemble: 'sdiv' with: self regV with: srcAndDstReg with: divisorReg;
+		assemble: 'msub' with: extReg with: self regV with: divisorReg with: srcAndDstReg;
+		move: self regV to: srcAndDstReg
+]
