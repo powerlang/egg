@@ -246,12 +246,14 @@ ARM64CodeGenerator >> shiftRight: srcAndDstReg byImm: imm [
 { #category : #'operations - integers' }
 ARM64CodeGenerator >> convertToNativeInteger: srcAndDstReg [
 	self
-		assemble: 'tst' with: srcAndDstReg with: 1;
+		assemble: 'and' with: self regV with: srcAndDstReg with: 1;
+		compare: self regV with: 1;
 		shiftRightArithmetic: srcAndDstReg byImm: 1
 ]
 
 { #category : #'operations - arithmetic' }
 ARM64CodeGenerator >> shiftLeft: srcAndDstReg byImm: imm [
+	imm = 1 ifTrue: [^self assemble: 'adds' with: srcAndDstReg with: srcAndDstReg with: srcAndDstReg].
 	self
 		assemble: 'ubfm'
 		with: srcAndDstReg
@@ -317,12 +319,12 @@ ARM64CodeGenerator >> shortJumpTo: label [
 
 { #category : #jumps }
 ARM64CodeGenerator >> shortJumpIfCarryTo: label [
-	self jumpIf: #ne to: label
+	self jumpIf: #cs to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> shortJumpIfNotCarryTo: label [
-	self jumpIf: #eq to: label
+	self jumpIf: #cc to: label
 ]
 
 { #category : #jumps }
@@ -352,12 +354,12 @@ ARM64CodeGenerator >> shortJumpIfSignTo: label [
 
 { #category : #jumps }
 ARM64CodeGenerator >> jumpIfCarryTo: label [
-	self jumpIf: #ne to: label
+	self jumpIf: #cs to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> jumpIfNotCarryTo: label [
-	self jumpIf: #eq to: label
+	self jumpIf: #cc to: label
 ]
 
 { #category : #jumps }
