@@ -471,7 +471,7 @@ ARM64CodeGenerator >> loadZeroExtendByte: dstReg from: baseReg atIndexImm: index
 ARM64CodeGenerator >> loadZeroExtendByte: dstReg from: baseReg atIndexAt: idxReg [
 	self
 		assemble: 'add' with: self regV with: baseReg with: idxReg;
-		assemble: 'ldurb' with: dstReg long with: self regV with: -1
+		assemble: 'ldrb' with: dstReg long with: self regV with: -1
 ]
 
 { #category : #'memory - load / store' }
@@ -565,30 +565,28 @@ ARM64CodeGenerator >> baseFor: aMemRef [
 
 { #category : #'memory - load / store' }
 ARM64CodeGenerator >> load: bits into: aRegister from: baseReg disp: disp [
-	self access: 'ldr' unscaled: 'ldur' bits: bits reg: aRegister base: baseReg disp: disp
+	self access: 'ldr' bits: bits reg: aRegister base: baseReg disp: disp
 ]
 
 { #category : #'memory - load / store' }
 ARM64CodeGenerator >> store: bits from: aRegister into: baseReg disp: disp [
-	self access: 'str' unscaled: 'stur' bits: bits reg: aRegister base: baseReg disp: disp
+	self access: 'str' bits: bits reg: aRegister base: baseReg disp: disp
 ]
 
 { #category : #'memory - load / store' }
-ARM64CodeGenerator >> access: scaled unscaled: unscaled bits: bits reg: aRegister base: baseReg disp: disp [
-	| bytes suffix reg |
-	bytes := bits // 8.
+ARM64CodeGenerator >> access: mnemonic bits: bits reg: aRegister base: baseReg disp: disp [
+	| suffix name reg |
 	suffix := bits = 8 ifTrue: ['b'] ifFalse: [bits = 16 ifTrue: ['h'] ifFalse: ['']].
+	name := mnemonic , suffix.
 	reg := (aRegister isFloat or: [bits = 64])
 		ifTrue: [aRegister]
 		ifFalse: [aRegister withLength: 32].
-	(disp >= 0 and: [disp \\ bytes = 0 and: [disp // bytes < 4096]])
-		ifTrue: [^self assemble: scaled , suffix with: reg with: baseReg with: disp].
-	(disp between: -256 and: 255)
-		ifTrue: [^self assemble: unscaled , suffix with: reg with: baseReg with: disp].
+	(ARM64InstructionSpec canEncode: name with: {reg. baseReg. disp})
+		ifTrue: [^self assemble: name with: reg with: baseReg with: disp].
 	self
 		moveImm: disp to: x17;
 		assemble: 'add' with: x17 with: baseReg with: x17;
-		assemble: scaled , suffix with: reg with: x17 with: 0
+		assemble: name with: reg with: x17 with: 0
 ]
 
 { #category : #private }

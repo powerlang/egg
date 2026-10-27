@@ -121,13 +121,13 @@ LDRH Wt, [Xn|SP, #imm12*2]	01 111 0 01 01 imm12:12 Rn:5 Rt:5
 LDR Wt, [Xn|SP, #imm12*4]	10 111 0 01 01 imm12:12 Rn:5 Rt:5
 LDR Xt, [Xn|SP, #imm12*8]	11 111 0 01 01 imm12:12 Rn:5 Rt:5
 LDR Dt, [Xn|SP, #imm12*8]	11 111 1 01 01 imm12:12 Rn:5 Rt:5
-LDURB Wt, [Xn|SP, #simm9]	00 111 0 00 01 0 imm9:9 00 Rn:5 Rt:5
-LDURH Wt, [Xn|SP, #simm9]	01 111 0 00 01 0 imm9:9 00 Rn:5 Rt:5
-LDUR Wt, [Xn|SP, #simm9]	10 111 0 00 01 0 imm9:9 00 Rn:5 Rt:5
-LDUR Xt, [Xn|SP, #simm9]	11 111 0 00 01 0 imm9:9 00 Rn:5 Rt:5
-LDUR Dt, [Xn|SP, #simm9]	11 111 1 00 01 0 imm9:9 00 Rn:5 Rt:5
+LDRB Wt, [Xn|SP, #simm9]	00 111 0 00 01 0 imm9:9 00 Rn:5 Rt:5
+LDRH Wt, [Xn|SP, #simm9]	01 111 0 00 01 0 imm9:9 00 Rn:5 Rt:5
+LDR Wt, [Xn|SP, #simm9]	10 111 0 00 01 0 imm9:9 00 Rn:5 Rt:5
+LDR Xt, [Xn|SP, #simm9]	11 111 0 00 01 0 imm9:9 00 Rn:5 Rt:5
+LDR Dt, [Xn|SP, #simm9]	11 111 1 00 01 0 imm9:9 00 Rn:5 Rt:5
 LDR St, [Xn|SP, #imm12*4]	10 111 1 01 01 imm12:12 Rn:5 Rt:5
-LDUR St, [Xn|SP, #simm9]	10 111 1 00 01 0 imm9:9 00 Rn:5 Rt:5
+LDR St, [Xn|SP, #simm9]	10 111 1 00 01 0 imm9:9 00 Rn:5 Rt:5
 LDRB Wt, [Xn|SP, Xm]	00 111 0 00 01 1 Rm:5 011 0 10 Rn:5 Rt:5
 LDR Xt, [Xn|SP, Xm, LSL #3]	11 111 0 00 01 1 Rm:5 011 1 10 Rn:5 Rt:5
 LDR.post Xt, [Xn|SP], #simm9	11 111 0 00 01 0 imm9:9 01 Rn:5 Rt:5
@@ -137,13 +137,13 @@ STRH Wt, [Xn|SP, #imm12*2]	01 111 0 01 00 imm12:12 Rn:5 Rt:5
 STR Wt, [Xn|SP, #imm12*4]	10 111 0 01 00 imm12:12 Rn:5 Rt:5
 STR Xt, [Xn|SP, #imm12*8]	11 111 0 01 00 imm12:12 Rn:5 Rt:5
 STR Dt, [Xn|SP, #imm12*8]	11 111 1 01 00 imm12:12 Rn:5 Rt:5
-STURB Wt, [Xn|SP, #simm9]	00 111 0 00 00 0 imm9:9 00 Rn:5 Rt:5
-STURH Wt, [Xn|SP, #simm9]	01 111 0 00 00 0 imm9:9 00 Rn:5 Rt:5
-STUR Wt, [Xn|SP, #simm9]	10 111 0 00 00 0 imm9:9 00 Rn:5 Rt:5
-STUR Xt, [Xn|SP, #simm9]	11 111 0 00 00 0 imm9:9 00 Rn:5 Rt:5
-STUR Dt, [Xn|SP, #simm9]	11 111 1 00 00 0 imm9:9 00 Rn:5 Rt:5
+STRB Wt, [Xn|SP, #simm9]	00 111 0 00 00 0 imm9:9 00 Rn:5 Rt:5
+STRH Wt, [Xn|SP, #simm9]	01 111 0 00 00 0 imm9:9 00 Rn:5 Rt:5
+STR Wt, [Xn|SP, #simm9]	10 111 0 00 00 0 imm9:9 00 Rn:5 Rt:5
+STR Xt, [Xn|SP, #simm9]	11 111 0 00 00 0 imm9:9 00 Rn:5 Rt:5
+STR Dt, [Xn|SP, #simm9]	11 111 1 00 00 0 imm9:9 00 Rn:5 Rt:5
 STR St, [Xn|SP, #imm12*4]	10 111 1 01 00 imm12:12 Rn:5 Rt:5
-STUR St, [Xn|SP, #simm9]	10 111 1 00 00 0 imm9:9 00 Rn:5 Rt:5
+STR St, [Xn|SP, #simm9]	10 111 1 00 00 0 imm9:9 00 Rn:5 Rt:5
 STR Xt, [Xn|SP, Xm, LSL #3]	11 111 0 00 00 1 Rm:5 011 1 10 Rn:5 Rt:5
 STR.post Xt, [Xn|SP], #simm9	11 111 0 00 00 0 imm9:9 01 Rn:5 Rt:5
 STR.pre Xt, [Xn|SP, #simm9]!	11 111 0 00 00 0 imm9:9 11 Rn:5 Rt:5

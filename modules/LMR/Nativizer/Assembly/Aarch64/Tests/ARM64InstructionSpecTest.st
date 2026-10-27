@@ -48,9 +48,9 @@ ARM64InstructionSpecTest >> testScaledOffset [
 { #category : #tests }
 ARM64InstructionSpecTest >> testSignedOffset [
 	self
-		assert: (self encode: 'ldur' with: {self x: 0. self x: 1. -8})
+		assert: (self encode: 'ldr' with: {self x: 0. self x: 1. -8})
 		equals: 16rF85F8020;
-		assert: (self encode: 'ldur' with: {self x: 0. self x: 1. 3})
+		assert: (self encode: 'ldr' with: {self x: 0. self x: 1. 3})
 		equals: 16rF8403020
 ]
 
@@ -139,6 +139,6 @@ ARM64InstructionSpecTest >> testAndImmediate [
 { #category : #tests }
 ARM64InstructionSpecTest >> testRejectsWhatDoesNotFit [
 	self
-		should: [self encode: 'ldr' with: {self x: 0. self x: 1. 3}] raise: Error;
+		should: [self encode: 'ldr' with: {self x: 0. self x: 1. 1001}] raise: Error;
 		should: [self encode: 'b.cond' with: #(13 8)] raise: Error
 ]

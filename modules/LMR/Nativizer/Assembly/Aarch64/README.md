@@ -78,11 +78,11 @@ that an operand fits its field.
   add with an immediate, 31 is `sp` for `add` but `xzr` for `adds`: `cmp x1, #1`
   is in fact `subs xzr, x1, #1`, a subtraction whose result is thrown away.
 - **Immediates don't always fit.** A field only has so many bits: `add` takes an
-  unsigned immediate of 12 bits (0 to 4095), `ldur` a signed offset of 9 bits
-  (-256 to 255). Some are scaled: `ldr x0, [x1, #imm]` encodes the offset
-  divided by 8, so it reaches further but only takes multiples of 8. An
-  instruction often has several encodings, and when one doesn't take an
-  operand another may.
+  unsigned immediate of 12 bits (0 to 4095). Some are scaled: `ldr x0, [x1, #imm]`
+  encodes the offset divided by 8, so it reaches further but only takes
+  multiples of 8. An instruction often has several encodings, and when one
+  doesn't take an operand another may: `ldr` with a negative or unaligned
+  offset uses its unscaled form, a signed offset of 9 bits (-256 to 255).
 - **Logical immediates.** `and`, `orr`, `eor` and `tst` can't hold an arbitrary
   64-bit constant. Their 13 bits describe a pattern instead: an element of 2, 4,
   8, 16, 32 or 64 bits holding a single run of ones, rotated, and copied across
