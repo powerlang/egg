@@ -52,11 +52,16 @@ ARM64CodeGenerator >> assemble: mnemonic with: op1 with: op2 with: op3 with: op4
 
 { #category : #emitting }
 ARM64CodeGenerator >> assemble: mnemonic with: registers withImm: imm [
+	self assemble: mnemonic with: registers withImm: imm using: self regV
+]
+
+{ #category : #emitting }
+ARM64CodeGenerator >> assemble: mnemonic with: registers withImm: imm using: scratch [
 	| operands word |
 	operands := registers copyWith: imm.
 	(ARM64InstructionSpec canEncode: mnemonic with: operands) ifFalse: [
-		self moveImm: imm to: self regV.
-		operands := registers copyWith: self regV].
+		self moveImm: imm to: scratch.
+		operands := registers copyWith: scratch].
 	word := ARM64InstructionSpec encode: mnemonic with: operands.
 	self emit: word
 ]
@@ -496,7 +501,7 @@ ARM64CodeGenerator >> lea: dstReg withMem: srcMemRef [
 			self emitEffectiveAddrToVOf: srcMemRef.
 			self move: self regV to: dstReg].
 	srcMemRef displacement = 0
-		ifFalse: [self assemble: 'add' with: {dstReg. dstReg} withImm: srcMemRef displacement]
+		ifFalse: [self assemble: 'add' with: {dstReg. dstReg} withImm: srcMemRef displacement using: x17]
 ]
 
 { #category : #'memory - load / store' }
@@ -743,4 +748,37 @@ ARM64CodeGenerator >> scaleFloatOnRWithA [
 		assemble: 'fmul' with: d16 with: d16 with: d17;
 		assemble: 'fmul' with: d16 with: d16 with: d18;
 		assemble: 'str' with: d16 with: self regR with: 0
+]
+
+{ #category : #'memory - load / store' }
+ARM64CodeGenerator >> exchange: srcAndDstReg withMem: aMemRef [
+	self
+		lea: self regV withMem: aMemRef;
+		assemble: 'swpal' with: srcAndDstReg with: srcAndDstReg with: self regV
+]
+
+{ #category : #'push/pop' }
+ARM64CodeGenerator >> pushMem: aMemRef [
+	self
+		load: self regV fromMem: aMemRef;
+		push: self regV
+]
+
+{ #category : #'memory - load / store' }
+ARM64CodeGenerator >> moveTslots [
+	self
+		assemble: 'cbz' with: self regT with: 20;
+		assemble: 'ldr.post' with: self regV with: self regS with: 8;
+		assemble: 'str.post' with: self regV with: self regE with: 8;
+		dec: self regT;
+		assemble: 'b.cond' with: #ne with: -12
+]
+
+{ #category : #'memory - load / store' }
+ARM64CodeGenerator >> writeTslots [
+	self
+		assemble: 'cbz' with: self regT with: 16;
+		assemble: 'str.post' with: self regR with: self regE with: 8;
+		dec: self regT;
+		assemble: 'b.cond' with: #ne with: -8
 ]

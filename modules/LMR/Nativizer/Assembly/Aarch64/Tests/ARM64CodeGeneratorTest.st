@@ -132,3 +132,45 @@ ARM64CodeGeneratorTest >> testLeaKeepsTheFlags [
 	codegen lea: (self x: 0) withMem: self x1Plus8.
 	self assert: self words asArray equals: #(16rAA0103E0 16r91002000)
 ]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testWriteTslots [
+	codegen writeTslots.
+	self
+		assert: self words asArray
+		equals: #(16rB4000083 16rF8008680 16rF1000463 16r54FFFFC1)
+]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testMoveTslots [
+	codegen moveTslots.
+	self
+		assert: self words asArray
+		equals: #(16rB40000A3 16rF8408450 16rF8008690 16rF1000463 16r54FFFFA1)
+]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testPushMem [
+	| memory |
+	memory := codegen memRef base: (self x: 1); displacement: 8; yourself.
+	codegen pushMem: memory.
+	self assert: self words asArray equals: #(16rF9400430 16rF81F0FF0)
+]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testExchange [
+	| memory |
+	memory := codegen memRef base: (self x: 1); displacement: 16; yourself.
+	codegen exchange: (self x: 3) withMem: memory.
+	self
+		assert: self words asArray
+		equals: #(16rAA0103F0 16r91004210 16rF8E38203)
+]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testLeaFarDisplacement [
+	| memory |
+	memory := codegen memRef base: (self x: 1); displacement: 5000; yourself.
+	codegen lea: (self x: 0) withMem: memory.
+	self assert: self words asArray equals: #(16rAA0103E0 16rD2827111 16r8B110000)
+]
