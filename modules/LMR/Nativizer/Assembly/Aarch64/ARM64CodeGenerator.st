@@ -61,11 +61,6 @@ ARM64CodeGenerator >> regG [
 ]
 
 { #category : #'registers - IR' }
-ARM64CodeGenerator >> regIP [
-	^abi regIP
-]
-
-{ #category : #'registers - IR' }
 ARM64CodeGenerator >> regM [
 	^abi regM
 ]

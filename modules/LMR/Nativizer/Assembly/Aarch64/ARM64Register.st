@@ -22,6 +22,34 @@ ARM64Register class >> name: aString index: anInteger length: bits [
 	^self new name: aString; index: anInteger; length: bits; yourself
 ]
 
+{ #category : #accessing }
+ARM64Register class >> registers [
+	| registers |
+	registers := Dictionary new.
+	0 to: 30 do: [:i |
+		self
+			add: 'x' , i printString index: i length: 64 to: registers;
+			add: 'w' , i printString index: i length: 32 to: registers].
+	self
+		add: 'sp' index: 31 length: 64 to: registers;
+		add: 'wsp' index: 31 length: 32 to: registers;
+		add: 'xzr' index: 31 length: 64 to: registers;
+		add: 'wzr' index: 31 length: 32 to: registers.
+	0 to: 31 do: [:i |
+		self
+			add: 's' , i printString index: i length: 32 to: registers;
+			add: 'd' , i printString index: i length: 64 to: registers;
+			add: 'v' , i printString index: i length: 128 to: registers].
+	^registers
+]
+
+{ #category : #private }
+ARM64Register class >> add: name index: anInteger length: bits to: aDictionary [
+	| register |
+	register := self name: name index: anInteger length: bits.
+	aDictionary at: name asSymbol put: register
+]
+
 { #category : #testing }
 ARM64Register >> isGeneral [
 	^(name first = $x or: [name first = $w]) or: [name = 'sp' or: [name = 'wsp']]

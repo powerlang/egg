@@ -20,5 +20,6 @@ Aarch64Module >> imports [
 { #category : #initialization }
 Aarch64Module >> justLoaded [
 	super justLoaded.
+	self bindAll: ARM64Register registers.
 	ARM64InstructionSpec initialize
 ]
