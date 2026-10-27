@@ -569,7 +569,7 @@ ARM64CodeGenerator >> loadZeroExtendByte: dstReg from: baseReg atOffset: offset 
 { #category : #'memory - load / store' }
 ARM64CodeGenerator >> load: dstReg fromMem: srcMemRef [
 	self
-		load: 64
+		load: srcMemRef length
 		into: dstReg
 		from: (self baseFor: srcMemRef)
 		disp: srcMemRef displacement
@@ -620,7 +620,7 @@ ARM64CodeGenerator >> storeByte: byteValueOrReg in: baseReg offset: offset [
 { #category : #'memory - load / store' }
 ARM64CodeGenerator >> store: srcReg intoMem: dstMemRef [
 	self
-		store: 64
+		store: dstMemRef length
 		from: srcReg
 		into: (self baseFor: dstMemRef)
 		disp: dstMemRef displacement
