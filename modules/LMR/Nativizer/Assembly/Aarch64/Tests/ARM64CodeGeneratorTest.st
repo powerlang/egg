@@ -59,3 +59,60 @@ ARM64CodeGeneratorTest >> testDivide [
 	codegen divide: (self x: 0) extendingTo: (self x: 1) by: (self x: 3).
 	self assert: self words asArray equals: #(16r9AC30C10 16r9B038201 16rAA1003E0)
 ]
+
+{ #category : #private }
+ARM64CodeGeneratorTest >> d: index [
+	^registers at: ('d' , index printString) asSymbol
+]
+
+{ #category : #private }
+ARM64CodeGeneratorTest >> x1Plus8 [
+	^codegen memRef base: (self x: 1); displacement: 8; yourself
+]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testDoubleArithmetic [
+	codegen
+		addDouble: (self d: 1) to: (self d: 0);
+		subDouble: (self d: 1) from: (self d: 0);
+		mulDouble: (self d: 0) by: (self d: 1);
+		divDouble: (self d: 0) by: (self d: 1);
+		sqrtDouble: (self d: 0) into: (self d: 1);
+		roundDouble: (self d: 1) into: (self d: 0).
+	self
+		assert: self words asArray
+		equals: #(16r1E612800 16r1E613800 16r1E610800 16r1E611800 16r1E61C020 16r1E65C020)
+]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testDoubleMoves [
+	codegen
+		convert: (self x: 1) toDouble: (self d: 0);
+		moveDouble: (self x: 1) into: (self d: 0);
+		moveDouble: (self d: 0) into: (self x: 1);
+		moveDouble: (self d: 1) into: (self d: 0).
+	self
+		assert: self words asArray
+		equals: #(16r9E620020 16r9E670020 16r9E660001 16r1E604020)
+]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testDoubleMemory [
+	codegen
+		loadDouble: (self d: 0) fromMem: self x1Plus8;
+		storeDouble: (self d: 0) intoMem: self x1Plus8;
+		load: (self x: 0) convertingDoubleToIntegerFromMem: self x1Plus8.
+	self
+		assert: self words asArray
+		equals: #(16rFD400420 16rFD000420 16rFD40043F 16r9E7803E0)
+]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testDoubleCompares [
+	codegen
+		compareEqualDoubleX0withAindirect;
+		compareLessThanDoubleX0withAindirect.
+	self
+		assert: self words asArray
+		equals: #(16rFD400030 16r5E70E400 16rFD400030 16r7EE0E600)
+]

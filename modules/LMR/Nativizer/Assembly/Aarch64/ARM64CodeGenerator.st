@@ -628,3 +628,83 @@ ARM64CodeGenerator >> divide: srcAndDstReg extendingTo: extReg by: divisorReg [
 		assemble: 'msub' with: extReg with: self regV with: divisorReg with: srcAndDstReg;
 		move: self regV to: srcAndDstReg
 ]
+
+{ #category : #'floating point' }
+ARM64CodeGenerator >> addDouble: source1 to: source2andDest [
+	self assemble: 'fadd' with: source2andDest with: source2andDest with: source1
+]
+
+{ #category : #'floating point' }
+ARM64CodeGenerator >> subDouble: src1 from: src2AndDst [
+	self assemble: 'fsub' with: src2AndDst with: src2AndDst with: src1
+]
+
+{ #category : #'floating point' }
+ARM64CodeGenerator >> mulDouble: src1andDstReg by: src2reg [
+	self assemble: 'fmul' with: src1andDstReg with: src1andDstReg with: src2reg
+]
+
+{ #category : #'floating point' }
+ARM64CodeGenerator >> divDouble: src1andDstReg by: src2reg [
+	self assemble: 'fdiv' with: src1andDstReg with: src1andDstReg with: src2reg
+]
+
+{ #category : #'floating point' }
+ARM64CodeGenerator >> sqrtDouble: srcReg into: dstReg [
+	self assemble: 'fsqrt' with: srcReg with: dstReg
+]
+
+{ #category : #'floating point' }
+ARM64CodeGenerator >> roundDouble: srcReg into: dstReg [
+	self assemble: 'frintz' with: dstReg with: srcReg
+]
+
+{ #category : #'floating point' }
+ARM64CodeGenerator >> convert: src toDouble: dst [
+	self assemble: 'scvtf' with: dst with: src
+]
+
+{ #category : #'floating point' }
+ARM64CodeGenerator >> moveDouble: srcReg into: dstReg [
+	self assemble: 'fmov' with: dstReg with: srcReg
+]
+
+{ #category : #'floating point' }
+ARM64CodeGenerator >> loadDouble: dstReg fromMem: srcMemRef [
+	| base |
+	base := self baseFor: srcMemRef.
+	self load: 64 into: dstReg from: base disp: srcMemRef displacement
+]
+
+{ #category : #'floating point' }
+ARM64CodeGenerator >> storeDouble: srcReg intoMem: dstMemRef [
+	| base |
+	base := self baseFor: dstMemRef.
+	self store: 64 from: srcReg into: base disp: dstMemRef displacement
+]
+
+{ #category : #'floating point' }
+ARM64CodeGenerator >> storeDoubleResultIntoMem: dstMemRef [
+	self storeDouble: self regX0 intoMem: dstMemRef
+]
+
+{ #category : #'floating point' }
+ARM64CodeGenerator >> load: dstReg convertingDoubleToIntegerFromMem: srcMemRef [
+	self
+		loadDouble: d31 fromMem: srcMemRef;
+		assemble: 'fcvtzs' with: dstReg with: d31
+]
+
+{ #category : #'floating point' }
+ARM64CodeGenerator >> compareEqualDoubleX0withAindirect [
+	self
+		assemble: 'ldr' with: d16 with: self regA with: 0;
+		assemble: 'fcmeq' with: self regX0 with: self regX0 with: d16
+]
+
+{ #category : #'floating point' }
+ARM64CodeGenerator >> compareLessThanDoubleX0withAindirect [
+	self
+		assemble: 'ldr' with: d16 with: self regA with: 0;
+		assemble: 'fcmgt' with: self regX0 with: d16 with: self regX0
+]
