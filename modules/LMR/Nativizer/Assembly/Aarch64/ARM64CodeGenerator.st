@@ -708,3 +708,39 @@ ARM64CodeGenerator >> compareLessThanDoubleX0withAindirect [
 		assemble: 'ldr' with: d16 with: self regA with: 0;
 		assemble: 'fcmgt' with: self regX0 with: d16 with: self regX0
 ]
+
+{ #category : #'floating point' }
+ARM64CodeGenerator >> scaleFloatOnRWithA [
+	"
+		R := R * 2 ^ int(A), as x86 fscale does. A64 has no such instruction,
+		so: clamp that exponent n to where the result can still be finite and
+		non-zero, split it as 3k + r with k = n // 4, build 2^k and 2^r from their
+		exponent bits (both are normal doubles), and multiply R by 2^k three times
+		and by 2^r once
+	"
+	self
+		assemble: 'ldr' with: d16 with: self regA with: 0;
+		assemble: 'fcvtzs' with: self regV with: d16;
+		assemble: 'movn' with: x17 with: 2099 with: 0;
+		assemble: 'cmp' with: self regV with: x17;
+		assemble: 'csel' with: self regV with: x17 with: self regV with: #lt;
+		assemble: 'movz' with: x17 with: 2100 with: 0;
+		assemble: 'cmp' with: self regV with: x17;
+		assemble: 'csel' with: self regV with: x17 with: self regV with: #gt;
+		assemble: 'sbfm' with: x17 with: self regV with: 2 with: 63;
+		assemble: 'sub' with: self regV with: self regV with: x17;
+		assemble: 'sub' with: self regV with: self regV with: x17;
+		assemble: 'sub' with: self regV with: self regV with: x17;
+		assemble: 'add' with: x17 with: x17 with: 1023;
+		shiftLeft: x17 byImm: 52;
+		assemble: 'fmov' with: d17 with: x17;
+		assemble: 'add' with: self regV with: self regV with: 1023;
+		shiftLeft: self regV byImm: 52;
+		assemble: 'fmov' with: d18 with: self regV;
+		assemble: 'ldr' with: d16 with: self regR with: 0;
+		assemble: 'fmul' with: d16 with: d16 with: d17;
+		assemble: 'fmul' with: d16 with: d16 with: d17;
+		assemble: 'fmul' with: d16 with: d16 with: d17;
+		assemble: 'fmul' with: d16 with: d16 with: d18;
+		assemble: 'str' with: d16 with: self regR with: 0
+]
