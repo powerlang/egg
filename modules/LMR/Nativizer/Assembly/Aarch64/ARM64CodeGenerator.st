@@ -2,17 +2,10 @@
 	Copyright (c) 2026, Javier Pimás.
 	See (MIT) license in root directory.
 
-	ARM64 (AArch64) code generator. Emits 32-bit fixed-width instructions
-	directly into the codegen's memory buffer. Methods follow the same
-	signatures GenericAssembler expects from CodeGenerator (e.g. add:to:,
-	compare:with:, push:, mov:to:, load:fromMem:, etc.) so the
-	architecture-agnostic JIT logic in GenericAssembler / OptimizingCodeEmitter
-	composes transparently.
-
-	NOTE: this implementation is intentionally minimal — only methods reached
-	during the LMR bootstrap are present. Calls into not-yet-implemented
-	opcodes fail with a clear error so we can spot and fix them one by one
-	rather than silently emitting wrong bytes.
+	ARM64 (AArch64) code generator. It implements the operations
+	GenericAssembler expects from a CodeGenerator (add:to:, compare:with:,
+	push:, load:fromMem:...) by assembling A64 instructions by mnemonic
+	through ARM64InstructionSpec.
 "
 Class {
 	#name : #ARM64CodeGenerator,
@@ -29,10 +22,7 @@ ARM64CodeGenerator >> platform: aNativizationPlatform [
 
 { #category : #emitting }
 ARM64CodeGenerator >> emit: aWordInteger [
-	memory nextBytePut: (aWordInteger bitAnd: 16rFF).
-	memory nextBytePut: ((aWordInteger bitShift: -8) bitAnd: 16rFF).
-	memory nextBytePut: ((aWordInteger bitShift: -16) bitAnd: 16rFF).
-	memory nextBytePut: ((aWordInteger bitShift: -24) bitAnd: 16rFF)
+	memory nextULongPut: aWordInteger
 ]
 
 { #category : #emitting }
@@ -58,81 +48,6 @@ ARM64CodeGenerator >> assemble: mnemonic with: op1 with: op2 with: op3 [
 { #category : #emitting }
 ARM64CodeGenerator >> assemble: mnemonic with: op1 with: op2 with: op3 with: op4 [
 	self emit: (ARM64InstructionSpec encode: mnemonic with: {op1. op2. op3. op4})
-]
-
-{ #category : #'registers - IR' }
-ARM64CodeGenerator >> regA [
-	^abi regA
-]
-
-{ #category : #'registers - IR' }
-ARM64CodeGenerator >> regE [
-	^abi regE
-]
-
-{ #category : #'registers - IR' }
-ARM64CodeGenerator >> regFP [
-	^abi regFP
-]
-
-{ #category : #'registers - IR' }
-ARM64CodeGenerator >> regFalse [
-	^abi regFalse
-]
-
-{ #category : #'registers - IR' }
-ARM64CodeGenerator >> regG [
-	^abi regG
-]
-
-{ #category : #'registers - IR' }
-ARM64CodeGenerator >> regM [
-	^abi regM
-]
-
-{ #category : #'registers - IR' }
-ARM64CodeGenerator >> regNil [
-	^abi regNil
-]
-
-{ #category : #'registers - IR' }
-ARM64CodeGenerator >> regR [
-	^abi regR
-]
-
-{ #category : #'registers - IR' }
-ARM64CodeGenerator >> regS [
-	^abi regS
-]
-
-{ #category : #'registers - IR' }
-ARM64CodeGenerator >> regSP [
-	^abi regSP
-]
-
-{ #category : #'registers - IR' }
-ARM64CodeGenerator >> regT [
-	^abi regT
-]
-
-{ #category : #'registers - IR' }
-ARM64CodeGenerator >> regTrue [
-	^abi regTrue
-]
-
-{ #category : #'registers - IR' }
-ARM64CodeGenerator >> regV [
-	^abi regV
-]
-
-{ #category : #'registers - IR' }
-ARM64CodeGenerator >> regX0 [
-	^abi regX0
-]
-
-{ #category : #'registers - IR' }
-ARM64CodeGenerator >> regX1 [
-	^abi regX1
 ]
 
 { #category : #'operations - arithmetic' }
@@ -378,15 +293,15 @@ ARM64CodeGenerator >> jumpIndirect: srcMemRef [
 ]
 
 { #category : #'private - jumps' }
-ARM64CodeGenerator >> condJump: condition to: label [
+ARM64CodeGenerator >> jumpIf: condition to: label [
 	| src |
 	src := memory currentAddress.
 	self assemble: 'b.cond' with: condition with: 0.
 	memory fixups add: (ARM64BranchFixup kind: #bcond from: src to: label)
 ]
 
-{ #category : #'private - jumps' }
-ARM64CodeGenerator >> uncondJumpTo: label [
+{ #category : #jumps }
+ARM64CodeGenerator >> jumpTo: label [
 	| src |
 	src := memory currentAddress.
 	self assemble: 'b' with: 0.
@@ -394,149 +309,143 @@ ARM64CodeGenerator >> uncondJumpTo: label [
 ]
 
 { #category : #jumps }
-ARM64CodeGenerator >> jumpTo: label [
-	self uncondJumpTo: label
-]
-
-{ #category : #jumps }
 ARM64CodeGenerator >> shortJumpTo: label [
-	self uncondJumpTo: label
+	self jumpTo: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> shortJumpIfCarryTo: label [
-	self condJump: #ne to: label
+	self jumpIf: #ne to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> shortJumpIfNotCarryTo: label [
-	self condJump: #eq to: label
+	self jumpIf: #eq to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> shortJumpIfEqualTo: label [
-	self condJump: #eq to: label
+	self jumpIf: #eq to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> shortJumpIfNotEqualTo: label [
-	self condJump: #ne to: label
+	self jumpIf: #ne to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> shortJumpIfZeroTo: label [
-	self condJump: #eq to: label
+	self jumpIf: #eq to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> shortJumpIfNotZeroTo: label [
-	self condJump: #ne to: label
+	self jumpIf: #ne to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> shortJumpIfSignTo: label [
-	self condJump: #mi to: label
+	self jumpIf: #mi to: label
 ]
-
 
 { #category : #jumps }
 ARM64CodeGenerator >> jumpIfCarryTo: label [
-	self shortJumpIfCarryTo: label
+	self jumpIf: #ne to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> jumpIfNotCarryTo: label [
-	self shortJumpIfNotCarryTo: label
+	self jumpIf: #eq to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> jumpIfEqualTo: label [
-	self shortJumpIfEqualTo: label
+	self jumpIf: #eq to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> jumpIfNotEqualTo: label [
-	self shortJumpIfNotEqualTo: label
+	self jumpIf: #ne to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> jumpIfZeroTo: label [
-	self shortJumpIfZeroTo: label
+	self jumpIf: #eq to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> jumpIfNotZeroTo: label [
-	self shortJumpIfNotZeroTo: label
+	self jumpIf: #ne to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> jumpIfSignTo: label [
-	self shortJumpIfSignTo: label
+	self jumpIf: #mi to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> jumpIfNoSignTo: label [
-	self condJump: #pl to: label
+	self jumpIf: #pl to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> jumpIfGreaterSignedTo: label [
-	self condJump: #gt to: label
+	self jumpIf: #gt to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> jumpIfGreaterOrEqualSignedTo: label [
-	self condJump: #ge to: label
+	self jumpIf: #ge to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> jumpIfLessSignedTo: label [
-	self condJump: #lt to: label
+	self jumpIf: #lt to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> jumpIfLessOrEqualSignedTo: label [
-	self condJump: #le to: label
+	self jumpIf: #le to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> jumpIfAboveTo: label [
-	self condJump: #hi to: label
+	self jumpIf: #hi to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> jumpIfAboveOrEqualTo: label [
-	self condJump: #cs to: label
+	self jumpIf: #cs to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> jumpIfBelowTo: label [
-	self condJump: #cc to: label
+	self jumpIf: #cc to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> jumpIfBelowOrEqualTo: label [
-	self condJump: #ls to: label
+	self jumpIf: #ls to: label
 ]
 
 { #category : #'jumps - conditional' }
 ARM64CodeGenerator >> jumpIfOverflowTo: label [
-	self condJump: #vs to: label
+	self jumpIf: #vs to: label
 ]
 
 { #category : #'jumps - conditional' }
 ARM64CodeGenerator >> jumpIfNoOverflowTo: label [
-	self condJump: #vc to: label
+	self jumpIf: #vc to: label
 ]
 
 { #category : #'jumps - conditional' }
 ARM64CodeGenerator >> shortJumpIfOverflowTo: label [
-	self condJump: #vs to: label
+	self jumpIf: #vs to: label
 ]
 
 { #category : #'jumps - conditional' }
 ARM64CodeGenerator >> shortJumpIfNoOverflowTo: label [
-	self condJump: #vc to: label
+	self jumpIf: #vc to: label
 ]
 
 { #category : #accessing }
