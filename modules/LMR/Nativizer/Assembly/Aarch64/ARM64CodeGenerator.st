@@ -137,29 +137,38 @@ ARM64CodeGenerator >> regX1 [
 
 { #category : #'operations - arithmetic' }
 ARM64CodeGenerator >> sub: src1 from: src2AndDst [
+	| mnemonic |
 	src1 isInteger ifTrue: [^self subImm: src1 from: src2AndDst].
-	self assemble: 'sub' with: src2AndDst with: src2AndDst with: src1
+	mnemonic := self settingFlags: 'sub' unlessSp: {src1. src2AndDst}.
+	self assemble: mnemonic with: src2AndDst with: src2AndDst with: src1
 ]
 
 { #category : #'operations - arithmetic' }
 ARM64CodeGenerator >> add: source1 to: source2andDest [
+	| mnemonic |
 	source1 isInteger ifTrue: [^self addImm: source1 to: source2andDest].
-	self assemble: 'add' with: source2andDest with: source2andDest with: source1
+	mnemonic := self settingFlags: 'add' unlessSp: {source1. source2andDest}.
+	self assemble: mnemonic with: source2andDest with: source2andDest with: source1
 ]
 
 { #category : #'operations - arithmetic' }
 ARM64CodeGenerator >> addImm: imm to: dest [
+	| mnemonic |
 	imm < 0 ifTrue: [^self subImm: imm negated to: dest].
-	imm < 4096 ifTrue: [^self assemble: 'add' with: dest with: dest with: imm].
-	self moveImm: imm to: self regV.
-	self add: self regV to: dest
+	imm < 4096 ifFalse: [
+		self moveImm: imm to: self regV.
+		^self add: self regV to: dest].
+	mnemonic := self settingFlags: 'add' unlessSp: {dest}.
+	self assemble: mnemonic with: dest with: dest with: imm
 ]
 
 { #category : #'operations - arithmetic' }
 ARM64CodeGenerator >> subImm: imm to: dest [
+	| mnemonic |
 	(imm between: 0 and: 4095)
 		ifFalse: [^self error: 'ARM64 subImm:to:: immediate ' , imm printString , ' too large'].
-	self assemble: 'sub' with: dest with: dest with: imm
+	mnemonic := self settingFlags: 'sub' unlessSp: {dest}.
+	self assemble: mnemonic with: dest with: dest with: imm
 ]
 
 { #category : #'operations - arithmetic' }
@@ -667,4 +676,11 @@ ARM64CodeGenerator >> access: scaled unscaled: unscaled bits: bits reg: aRegiste
 		moveImm: disp to: x17;
 		assemble: 'add' with: x17 with: baseReg with: x17;
 		assemble: scaled , suffix with: reg with: x17 with: 0
+]
+
+{ #category : #private }
+ARM64CodeGenerator >> settingFlags: mnemonic unlessSp: registers [
+	^(registers anySatisfy: [:register | register isSP])
+		ifTrue: [mnemonic]
+		ifFalse: [mnemonic , 's']
 ]
