@@ -126,3 +126,9 @@ ARM64CodeGeneratorTest >> testScaleFloat [
 			16r9342FE11 16rCB110210 16rCB110210 16rCB110210 16r910FFE31 16rD34C2E31 16r9E670231 16r910FFE10
 			16rD34C2E10 16r9E670212 16rFD400010 16r1E710A10 16r1E710A10 16r1E710A10 16r1E720A10 16rFD000010)
 ]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testLeaKeepsTheFlags [
+	codegen lea: (self x: 0) withMem: self x1Plus8.
+	self assert: self words asArray equals: #(16rAA0103E0 16r91002000)
+]

@@ -496,7 +496,7 @@ ARM64CodeGenerator >> lea: dstReg withMem: srcMemRef [
 			self emitEffectiveAddrToVOf: srcMemRef.
 			self move: self regV to: dstReg].
 	srcMemRef displacement = 0
-		ifFalse: [self addImm: srcMemRef displacement to: dstReg]
+		ifFalse: [self assemble: 'add' with: {dstReg. dstReg} withImm: srcMemRef displacement]
 ]
 
 { #category : #'memory - load / store' }
