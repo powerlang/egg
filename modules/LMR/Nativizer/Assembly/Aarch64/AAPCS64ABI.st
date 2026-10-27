@@ -10,7 +10,7 @@
 	  regA  (arg / scratch)               -> x1
 	  regS  (scratch)                     -> x2
 	  regT  (scratch)                     -> x3
-	  regV  (extra scratch)               -> x4
+	  regV  (scratch of the codegen)      -> x16
 	  regM  (current method, callee-save) -> x19
 	  regE  (current environment)         -> x20
 	  regG  (globals base)                -> x21
@@ -44,7 +44,7 @@ AAPCS64ABI >> initialize [
 	regA := x1.
 	regS := x2.
 	regT := x3.
-	regV := x4.
+	regV := x16.
 	regM := x19.
 	regE := x20.
 	regG := x21.

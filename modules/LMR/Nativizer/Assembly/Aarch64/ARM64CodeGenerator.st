@@ -133,9 +133,9 @@ ARM64CodeGenerator >> subImm: imm from: src2AndDst [
 				bitOr: ((imm bitShift: -12) bitShift: 10))
 				+ (src2AndDst index bitShift: 5)
 				+ src2AndDst index].
-	self moveImm: imm to: (ARM64Register name: 'x16' index: 16 length: 64).
+	self moveImm: imm to: self regV.
 	self emit: (16rCB000000
-		bitOr: (16 bitShift: 16))
+		bitOr: (self regV index bitShift: 16))
 		+ (src2AndDst index bitShift: 5)
 		+ src2AndDst index
 ]
@@ -159,7 +159,7 @@ ARM64CodeGenerator >> addImm: imm to: dest [
 			bitOr: (imm bitShift: 10))
 			+ (dest index bitShift: 5)
 			+ dest index].
-	scratch := ARM64Register name: 'x16' index: 16 length: 64.
+	scratch := self regV.
 	self moveImm: imm to: scratch.
 	self add: scratch to: dest
 ]
@@ -190,7 +190,7 @@ ARM64CodeGenerator >> and: source1AndDest with: source2 [
 { #category : #'operations - logical' }
 ARM64CodeGenerator >> and: source1AndDest withImm: imm [
 	| scratch |
-	scratch := ARM64Register name: 'x16' index: 16 length: 64.
+	scratch := self regV.
 	self moveImm: imm to: scratch.
 	self and: source1AndDest with: scratch
 ]
@@ -206,7 +206,7 @@ ARM64CodeGenerator >> or: source1AndDest with: source2 [
 { #category : #'operations - logical' }
 ARM64CodeGenerator >> or: source1AndDest withImm: imm [
 	| scratch |
-	scratch := ARM64Register name: 'x16' index: 16 length: 64.
+	scratch := self regV.
 	self moveImm: imm to: scratch.
 	self or: source1AndDest with: scratch
 ]
@@ -291,7 +291,7 @@ ARM64CodeGenerator >> push: reg [
 { #category : #'push/pop' }
 ARM64CodeGenerator >> popIntoMem: dstMemRef [
 	| scratch |
-	scratch := ARM64Register name: 'x16' index: 16 length: 64.
+	scratch := self regV.
 	self pop: scratch.
 	self store: scratch intoMem: dstMemRef
 ]
@@ -299,7 +299,7 @@ ARM64CodeGenerator >> popIntoMem: dstMemRef [
 { #category : #'push/pop' }
 ARM64CodeGenerator >> pushImm: imm [
 	| scratch |
-	scratch := ARM64Register name: 'x16' index: 16 length: 64.
+	scratch := self regV.
 	self moveImm: imm to: scratch.
 	self push: scratch
 ]
@@ -405,7 +405,7 @@ ARM64CodeGenerator >> jumpToReg: aReg [
 { #category : #branching }
 ARM64CodeGenerator >> jumpToMem: srcMemRef [
 	| scratch |
-	scratch := ARM64Register name: 'x16' index: 16 length: 64.
+	scratch := self regV.
 	self
 		load: scratch fromMem: srcMemRef;
 		jumpToReg: scratch
@@ -419,7 +419,7 @@ ARM64CodeGenerator >> callIndirectReg: aReg [
 { #category : #branching }
 ARM64CodeGenerator >> callIndirect: srcMemRef [
 	| scratch |
-	scratch := ARM64Register name: 'x16' index: 16 length: 64.
+	scratch := self regV.
 	self
 		load: scratch fromMem: srcMemRef;
 		callIndirectReg: scratch
@@ -428,7 +428,7 @@ ARM64CodeGenerator >> callIndirect: srcMemRef [
 { #category : #branching }
 ARM64CodeGenerator >> jumpIndirect: srcMemRef [
 	| scratch |
-	scratch := ARM64Register name: 'x16' index: 16 length: 64.
+	scratch := self regV.
 	self
 		load: scratch fromMem: srcMemRef;
 		jumpToReg: scratch
@@ -614,14 +614,14 @@ ARM64CodeGenerator >> loadZeroExtendByte: dstReg from: baseReg atIndexImm: index
 { #category : #'memory - load / store' }
 ARM64CodeGenerator >> loadZeroExtendByte: dstReg from: baseReg atIndexAt: idxReg [
 	| scratch |
-	scratch := ARM64Register name: 'x16' index: 16 length: 64.
+	scratch := self regV.
 	self emit: (16r8B000000
 		bitOr: (idxReg index bitShift: 16))
 		+ (baseReg index bitShift: 5)
-		+ 16.
+		+ scratch index.
 	^self emit: (16r38400000
 		bitOr: ((-1 bitAnd: 16r1FF) bitShift: 12))
-		+ (16 bitShift: 5)
+		+ (scratch index bitShift: 5)
 		+ dstReg index
 ]
 
@@ -646,8 +646,8 @@ ARM64CodeGenerator >> loadZeroExtendByte: dstReg from: baseReg atOffset: offset 
 ARM64CodeGenerator >> load: dstReg fromMem: srcMemRef [
 	srcMemRef index isNil
 		ifTrue: [^self ldrFromBase: srcMemRef base index disp: srcMemRef displacement toReg: dstReg].
-	self emitEffectiveAddrToX16Of: srcMemRef.
-	^self ldrFromBase: 16 disp: srcMemRef displacement toReg: dstReg
+	self emitEffectiveAddrToVOf: srcMemRef.
+	^self ldrFromBase: self regV index disp: srcMemRef displacement toReg: dstReg
 ]
 
 { #category : #'memory - load / store' }
@@ -655,8 +655,8 @@ ARM64CodeGenerator >> lea: dstReg withMem: srcMemRef [
 	srcMemRef index isNil
 		ifTrue: [self move: srcMemRef base to: dstReg]
 		ifFalse: [
-			self emitEffectiveAddrToX16Of: srcMemRef.
-			self move: (ARM64Register name: 'x16' index: 16 length: 64) to: dstReg].
+			self emitEffectiveAddrToVOf: srcMemRef.
+			self move: self regV to: dstReg].
 	srcMemRef displacement = 0
 		ifFalse: [self addImm: srcMemRef displacement to: dstReg]
 ]
@@ -672,7 +672,7 @@ ARM64CodeGenerator >> loadLongMwithIPoffset: anInteger [
 	self emit: (16r18000000
 		bitOr: ((imm19 bitAnd: 16r7FFFF) bitShift: 5))
 		+ self regM index.
-	scratch := ARM64Register name: 'x16' index: 16 length: 64.
+	scratch := self regV.
 	self emit: 16r10000000 + scratch index.
 	self shiftLogicalRight: scratch byImm: 32.
 	self shiftLeft: scratch byImm: 32.
@@ -697,7 +697,7 @@ ARM64CodeGenerator >> ldrFromBase: baseIdx disp: disp toReg: dstReg [
 ]
 
 { #category : #'memory - load / store' }
-ARM64CodeGenerator >> emitEffectiveAddrToX16Of: memRef [
+ARM64CodeGenerator >> emitEffectiveAddrToVOf: memRef [
 	| scale baseIdx idxIdx shiftAmt |
 	scale := memRef scale.
 	baseIdx := memRef base index.
@@ -710,7 +710,7 @@ ARM64CodeGenerator >> emitEffectiveAddrToX16Of: memRef [
 		bitOr: (idxIdx bitShift: 16))
 		+ (shiftAmt bitShift: 10)
 		+ (baseIdx bitShift: 5)
-		+ 16
+		+ self regV index
 ]
 
 { #category : #'memory - load / store' }
@@ -725,7 +725,7 @@ ARM64CodeGenerator >> store: valueReg in: baseReg indexAt: indexReg [
 ARM64CodeGenerator >> storeByte: byteValueOrReg in: baseReg offset: offset [
 	| byteReg |
 	byteValueOrReg isInteger ifTrue: [
-		byteReg := ARM64Register name: 'x16' index: 16 length: 64.
+		byteReg := self regV.
 		self moveImm: byteValueOrReg to: byteReg.
 		^self storeByte: byteReg in: baseReg offset: offset].
 	byteReg := byteValueOrReg.
@@ -748,8 +748,8 @@ ARM64CodeGenerator >> storeByte: byteValueOrReg in: baseReg offset: offset [
 ARM64CodeGenerator >> store: srcReg intoMem: dstMemRef [
 	dstMemRef index isNil
 		ifTrue: [^self strFromReg: srcReg toBase: dstMemRef base index disp: dstMemRef displacement].
-	self emitEffectiveAddrToX16Of: dstMemRef.
-	^self strFromReg: srcReg toBase: 16 disp: dstMemRef displacement
+	self emitEffectiveAddrToVOf: dstMemRef.
+	^self strFromReg: srcReg toBase: self regV index disp: dstMemRef displacement
 ]
 
 { #category : #'memory - load / store' }
@@ -796,7 +796,7 @@ ARM64CodeGenerator >> load: dstReg withThreadVariableAt: srcReg [
 { #category : #'memory - load / store' }
 ARM64CodeGenerator >> compare: reg withMem: srcMemRef [
 	| scratch |
-	scratch := ARM64Register name: 'x16' index: 16 length: 64.
+	scratch := self regV.
 	self
 		load: scratch fromMem: srcMemRef;
 		compare: reg with: scratch
