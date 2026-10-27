@@ -41,6 +41,11 @@ ARM64InstructionSpec class >> encode: mnemonic with: operands [
 	^spec encode: operands
 ]
 
+{ #category : #encoding }
+ARM64InstructionSpec class >> canEncode: mnemonic with: operands [
+	^(Specs at: mnemonic ifAbsent: [#()]) anySatisfy: [:spec | spec matches: operands]
+]
+
 { #category : #initialization }
 ARM64InstructionSpec class >> initialize [
 	Specs := Dictionary new.
@@ -79,6 +84,7 @@ CMP Xn|SP, #imm12	1 1 1 100010 0 imm12:12 Rn:5 11111
 CCMP Xn, Xm, #nzcv, cond	1 1 1 11010010 Rm:5 cond:4 0 0 Rn:5 0 nzcv:4
 CSEL Xd, Xn, Xm, cond	1 0 0 11010100 Rm:5 cond:4 0 0 Rn:5 Rd:5
 AND Xd, Xn, Xm	1 00 01010 00 0 Rm:5 000000 Rn:5 Rd:5
+AND Xd|SP, Xn, #bimm	1 00 100100 N:1 immr:6 imms:6 Rn:5 Rd:5
 ORR Xd, Xn, Xm	1 01 01010 00 0 Rm:5 000000 Rn:5 Rd:5
 ORR Xd, Xn, Xm, LSL #imm6	1 01 01010 00 0 Rm:5 imm6:6 Rn:5 Rd:5
 ORR Xd|SP, Xn, #bimm	1 01 100100 N:1 immr:6 imms:6 Rn:5 Rd:5

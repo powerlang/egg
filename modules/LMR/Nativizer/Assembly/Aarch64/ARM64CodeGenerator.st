@@ -50,6 +50,17 @@ ARM64CodeGenerator >> assemble: mnemonic with: op1 with: op2 with: op3 with: op4
 	self emit: (ARM64InstructionSpec encode: mnemonic with: {op1. op2. op3. op4})
 ]
 
+{ #category : #emitting }
+ARM64CodeGenerator >> assemble: mnemonic with: registers withImm: imm [
+	| operands word |
+	operands := registers copyWith: imm.
+	(ARM64InstructionSpec canEncode: mnemonic with: operands) ifFalse: [
+		self moveImm: imm to: self regV.
+		operands := registers copyWith: self regV].
+	word := ARM64InstructionSpec encode: mnemonic with: operands.
+	self emit: word
+]
+
 { #category : #'operations - arithmetic' }
 ARM64CodeGenerator >> sub: src1 from: src2AndDst [
 	| mnemonic |
@@ -70,20 +81,16 @@ ARM64CodeGenerator >> add: source1 to: source2andDest [
 ARM64CodeGenerator >> addImm: imm to: dest [
 	| mnemonic |
 	imm < 0 ifTrue: [^self subImm: imm negated to: dest].
-	imm < 4096 ifFalse: [
-		self moveImm: imm to: self regV.
-		^self add: self regV to: dest].
 	mnemonic := self settingFlags: 'add' unlessSp: {dest}.
-	self assemble: mnemonic with: dest with: dest with: imm
+	self assemble: mnemonic with: {dest. dest} withImm: imm
 ]
 
 { #category : #'operations - arithmetic' }
 ARM64CodeGenerator >> subImm: imm to: dest [
 	| mnemonic |
-	(imm between: 0 and: 4095)
-		ifFalse: [^self error: 'ARM64 subImm:to:: immediate ' , imm printString , ' too large'].
+	imm < 0 ifTrue: [^self addImm: imm negated to: dest].
 	mnemonic := self settingFlags: 'sub' unlessSp: {dest}.
-	self assemble: mnemonic with: dest with: dest with: imm
+	self assemble: mnemonic with: {dest. dest} withImm: imm
 ]
 
 { #category : #'operations - arithmetic' }
@@ -98,8 +105,7 @@ ARM64CodeGenerator >> and: source1AndDest with: source2 [
 
 { #category : #'operations - logical' }
 ARM64CodeGenerator >> and: source1AndDest withImm: imm [
-	self moveImm: imm to: self regV.
-	self and: source1AndDest with: self regV
+	self assemble: 'and' with: {source1AndDest. source1AndDest} withImm: imm
 ]
 
 { #category : #'operations - logical' }
@@ -109,8 +115,7 @@ ARM64CodeGenerator >> or: source1AndDest with: source2 [
 
 { #category : #'operations - logical' }
 ARM64CodeGenerator >> or: source1AndDest withImm: imm [
-	self moveImm: imm to: self regV.
-	self or: source1AndDest with: self regV
+	self assemble: 'orr' with: {source1AndDest. source1AndDest} withImm: imm
 ]
 
 { #category : #'operations - logical' }
@@ -150,8 +155,7 @@ ARM64CodeGenerator >> testIntegerBit: reg [
 
 { #category : #'operations - logical' }
 ARM64CodeGenerator >> test: reg withImm: imm [
-	imm = 1 ifFalse: [self error: 'TST imm only supports #1 for now'].
-	self assemble: 'tst' with: reg with: imm
+	self assemble: 'tst' with: {reg} withImm: imm
 ]
 
 { #category : #alignment }
@@ -199,9 +203,7 @@ ARM64CodeGenerator >> compare: reg1 with: regOrImm [
 
 { #category : #'operations - arithmetic' }
 ARM64CodeGenerator >> compare: reg withImm: imm [
-	(imm between: 0 and: 4095)
-		ifFalse: [^self error: 'ARM64 compare:withImm:: immediate ' , imm printString , ' too large'].
-	self assemble: 'cmp' with: reg with: imm
+	self assemble: 'cmp' with: {reg} withImm: imm
 ]
 
 { #category : #branching }

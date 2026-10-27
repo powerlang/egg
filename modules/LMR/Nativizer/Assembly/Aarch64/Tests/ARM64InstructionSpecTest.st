@@ -120,6 +120,23 @@ ARM64InstructionSpecTest >> testSymbolOperand [
 ]
 
 { #category : #tests }
+ARM64InstructionSpecTest >> testCanEncode [
+	self
+		assert: (ARM64InstructionSpec canEncode: 'add' with: {self x: 0. self x: 1. 4095});
+		deny: (ARM64InstructionSpec canEncode: 'add' with: {self x: 0. self x: 1. 4097});
+		assert: (ARM64InstructionSpec canEncode: 'and' with: {self x: 0. self x: 1. 16rFF});
+		deny: (ARM64InstructionSpec canEncode: 'and' with: {self x: 0. self x: 1. 16r12345});
+		deny: (ARM64InstructionSpec canEncode: 'nosuch' with: #())
+]
+
+{ #category : #tests }
+ARM64InstructionSpecTest >> testAndImmediate [
+	self
+		assert: (self encode: 'and' with: {self x: 0. self x: 1. 16rFF})
+		equals: 16r92401C20
+]
+
+{ #category : #tests }
 ARM64InstructionSpecTest >> testRejectsWhatDoesNotFit [
 	self
 		should: [self encode: 'ldr' with: {self x: 0. self x: 1. 3}] raise: Error;
