@@ -35,6 +35,31 @@ ARM64CodeGenerator >> emit: aWordInteger [
 	memory nextBytePut: ((aWordInteger bitShift: -24) bitAnd: 16rFF)
 ]
 
+{ #category : #emitting }
+ARM64CodeGenerator >> assemble: mnemonic [
+	self emit: (ARM64InstructionSpec encode: mnemonic with: #())
+]
+
+{ #category : #emitting }
+ARM64CodeGenerator >> assemble: mnemonic with: op1 [
+	self emit: (ARM64InstructionSpec encode: mnemonic with: {op1})
+]
+
+{ #category : #emitting }
+ARM64CodeGenerator >> assemble: mnemonic with: op1 with: op2 [
+	self emit: (ARM64InstructionSpec encode: mnemonic with: {op1. op2})
+]
+
+{ #category : #emitting }
+ARM64CodeGenerator >> assemble: mnemonic with: op1 with: op2 with: op3 [
+	self emit: (ARM64InstructionSpec encode: mnemonic with: {op1. op2. op3})
+]
+
+{ #category : #emitting }
+ARM64CodeGenerator >> assemble: mnemonic with: op1 with: op2 with: op3 with: op4 [
+	self emit: (ARM64InstructionSpec encode: mnemonic with: {op1. op2. op3. op4})
+]
+
 { #category : #'registers - IR' }
 ARM64CodeGenerator >> regA [
 	^abi regA
@@ -113,65 +138,28 @@ ARM64CodeGenerator >> regX1 [
 { #category : #'operations - arithmetic' }
 ARM64CodeGenerator >> sub: src1 from: src2AndDst [
 	src1 isInteger ifTrue: [^self subImm: src1 from: src2AndDst].
-	self emit: (16rCB000000
-		bitOr: (src1 index bitShift: 16))
-		+ (src2AndDst index bitShift: 5)
-		+ src2AndDst index
-]
-
-{ #category : #'operations - arithmetic' }
-ARM64CodeGenerator >> subImm: imm from: src2AndDst [
-	(imm >= 0 and: [imm <= 4095])
-		ifTrue: [
-			^self emit: (16rD1000000
-				bitOr: (imm bitShift: 10))
-				+ (src2AndDst index bitShift: 5)
-				+ src2AndDst index].
-	(imm >= 4096 and: [(imm bitAnd: 16rFFF) = 0 and: [imm <= 16773120]])
-		ifTrue: [
-			^self emit: (16rD1400000
-				bitOr: ((imm bitShift: -12) bitShift: 10))
-				+ (src2AndDst index bitShift: 5)
-				+ src2AndDst index].
-	self moveImm: imm to: self regV.
-	self emit: (16rCB000000
-		bitOr: (self regV index bitShift: 16))
-		+ (src2AndDst index bitShift: 5)
-		+ src2AndDst index
+	self assemble: 'sub' with: src2AndDst with: src2AndDst with: src1
 ]
 
 { #category : #'operations - arithmetic' }
 ARM64CodeGenerator >> add: source1 to: source2andDest [
 	source1 isInteger ifTrue: [^self addImm: source1 to: source2andDest].
-	self emit: (16r8B000000
-		bitOr: (source1 index bitShift: 16))
-		+ (source2andDest index bitShift: 5)
-		+ source2andDest index
+	self assemble: 'add' with: source2andDest with: source2andDest with: source1
 ]
 
 { #category : #'operations - arithmetic' }
 ARM64CodeGenerator >> addImm: imm to: dest [
-	| scratch |
-	imm < 0 ifTrue: [
-		^self subImm: imm negated to: dest].
-	(imm bitAnd: 16rFFFFF000) = 0 ifTrue: [
-		^self emit: (16r91000000
-			bitOr: (imm bitShift: 10))
-			+ (dest index bitShift: 5)
-			+ dest index].
-	scratch := self regV.
-	self moveImm: imm to: scratch.
-	self add: scratch to: dest
+	imm < 0 ifTrue: [^self subImm: imm negated to: dest].
+	imm < 4096 ifTrue: [^self assemble: 'add' with: dest with: dest with: imm].
+	self moveImm: imm to: self regV.
+	self add: self regV to: dest
 ]
 
 { #category : #'operations - arithmetic' }
 ARM64CodeGenerator >> subImm: imm to: dest [
-	(imm bitAnd: 16rFFFFF000) = 0
+	(imm between: 0 and: 4095)
 		ifFalse: [^self error: 'ARM64 subImm:to:: immediate ' , imm printString , ' too large'].
-	self emit: (16rD1000000
-		bitOr: (imm bitShift: 10))
-		+ (dest index bitShift: 5)
-		+ dest index
+	self assemble: 'sub' with: dest with: dest with: imm
 ]
 
 { #category : #'operations - arithmetic' }
@@ -181,73 +169,44 @@ ARM64CodeGenerator >> subImm: imm from: srcAndDst [
 
 { #category : #'operations - logical' }
 ARM64CodeGenerator >> and: source1AndDest with: source2 [
-	self emit: (16r8A000000
-		bitOr: (source2 index bitShift: 16))
-		+ (source1AndDest index bitShift: 5)
-		+ source1AndDest index
+	self assemble: 'and' with: source1AndDest with: source1AndDest with: source2
 ]
 
 { #category : #'operations - logical' }
 ARM64CodeGenerator >> and: source1AndDest withImm: imm [
-	| scratch |
-	scratch := self regV.
-	self moveImm: imm to: scratch.
-	self and: source1AndDest with: scratch
+	self moveImm: imm to: self regV.
+	self and: source1AndDest with: self regV
 ]
 
 { #category : #'operations - logical' }
 ARM64CodeGenerator >> or: source1AndDest with: source2 [
-	self emit: (16rAA000000
-		bitOr: (source2 index bitShift: 16))
-		+ (source1AndDest index bitShift: 5)
-		+ source1AndDest index
+	self assemble: 'orr' with: source1AndDest with: source1AndDest with: source2
 ]
 
 { #category : #'operations - logical' }
 ARM64CodeGenerator >> or: source1AndDest withImm: imm [
-	| scratch |
-	scratch := self regV.
-	self moveImm: imm to: scratch.
-	self or: source1AndDest with: scratch
+	self moveImm: imm to: self regV.
+	self or: source1AndDest with: self regV
 ]
 
 { #category : #'operations - logical' }
 ARM64CodeGenerator >> xor: source1AndDest with: source2 [
-	self emit: (16rCA000000
-		bitOr: (source2 index bitShift: 16))
-		+ (source1AndDest index bitShift: 5)
-		+ source1AndDest index
+	self assemble: 'eor' with: source1AndDest with: source1AndDest with: source2
 ]
 
 { #category : #'operations - moves' }
 ARM64CodeGenerator >> move: src to: dst [
-	(src index = 31 or: [dst index = 31])
-		ifTrue: [
-			^self emit: (16r91000000
-				bitOr: (src index bitShift: 5))
-				+ dst index].
-	self emit: (16rAA0003E0
-		bitOr: (src index bitShift: 16))
-		+ dst index
+	self assemble: 'mov' with: dst with: src
 ]
 
 { #category : #'operations - moves' }
 ARM64CodeGenerator >> moveImm: imm to: reg [
-	| value c0 c1 c2 c3 |
-	value := imm < 0
-		ifTrue: [(16r10000000000000000 + imm) bitAnd: 16rFFFFFFFFFFFFFFFF]
-		ifFalse: [imm].
-	c0 := value bitAnd: 16rFFFF.
-	c1 := (value bitShift: -16) bitAnd: 16rFFFF.
-	c2 := (value bitShift: -32) bitAnd: 16rFFFF.
-	c3 := (value bitShift: -48) bitAnd: 16rFFFF.
-	self emit: 16rD2800000 + (c0 bitShift: 5) + reg index.
-	c1 != 0 ifTrue: [
-		self emit: 16rF2A00000 + (c1 bitShift: 5) + reg index].
-	c2 != 0 ifTrue: [
-		self emit: 16rF2C00000 + (c2 bitShift: 5) + reg index].
-	c3 != 0 ifTrue: [
-		self emit: 16rF2E00000 + (c3 bitShift: 5) + reg index]
+	| value |
+	value := imm < 0 ifTrue: [16r10000000000000000 + imm] ifFalse: [imm].
+	self assemble: 'movz' with: reg with: (value bitAnd: 16rFFFF) with: 0.
+	#(16 32 48) do: [:shift | | chunk |
+		chunk := (value bitShift: shift negated) bitAnd: 16rFFFF.
+		chunk = 0 ifFalse: [self assemble: 'movk' with: reg with: chunk with: shift]]
 ]
 
 { #category : #'register renaming' }
@@ -262,18 +221,18 @@ ARM64CodeGenerator >> renameByteRegisterIfNeeded: register preserving: p1 preser
 
 { #category : #'operations - logical' }
 ARM64CodeGenerator >> testIntegerBit: reg [
-	self emit: (16rF240001F bitOr: (reg index bitShift: 5))
+	self assemble: 'tst' with: reg with: 1
 ]
 
 { #category : #'operations - logical' }
 ARM64CodeGenerator >> test: reg withImm: imm [
 	imm = 1 ifFalse: [self error: 'TST imm only supports #1 for now'].
-	self emit: (16rF240001F bitOr: (reg index bitShift: 5))
+	self assemble: 'tst' with: reg with: imm
 ]
 
 { #category : #alignment }
 ARM64CodeGenerator >> nop [
-	self emit: 16rD503201F
+	self assemble: 'nop'
 ]
 
 { #category : #alignment }
@@ -285,64 +244,57 @@ ARM64CodeGenerator >> nop: count [
 
 { #category : #'push/pop' }
 ARM64CodeGenerator >> push: reg [
-	self emit: (16rF81F0FE0 bitOr: reg index)
+	self assemble: 'str.pre' with: reg with: sp with: -16
 ]
 
 { #category : #'push/pop' }
 ARM64CodeGenerator >> popIntoMem: dstMemRef [
-	| scratch |
-	scratch := self regV.
-	self pop: scratch.
-	self store: scratch intoMem: dstMemRef
+	self
+		pop: self regV;
+		store: self regV intoMem: dstMemRef
 ]
 
 { #category : #'push/pop' }
 ARM64CodeGenerator >> pushImm: imm [
-	| scratch |
-	scratch := self regV.
-	self moveImm: imm to: scratch.
-	self push: scratch
+	self
+		moveImm: imm to: self regV;
+		push: self regV
 ]
 
 { #category : #'push/pop' }
 ARM64CodeGenerator >> pop: reg [
-	self emit: (16rF84107E0 bitOr: reg index)
+	self assemble: 'ldr.post' with: reg with: sp with: 16
 ]
 
 { #category : #'operations - arithmetic' }
 ARM64CodeGenerator >> compare: reg1 with: regOrImm [
 	regOrImm isInteger
 		ifTrue: [^self compare: reg1 withImm: regOrImm].
-	self emit: (16rEB00001F
-		bitOr: (regOrImm index bitShift: 16))
-		+ (reg1 index bitShift: 5)
+	self assemble: 'cmp' with: reg1 with: regOrImm
 ]
 
 { #category : #'operations - arithmetic' }
 ARM64CodeGenerator >> compare: reg withImm: imm [
-	(imm bitAnd: 16rFFFFF000) = 0
+	(imm between: 0 and: 4095)
 		ifFalse: [^self error: 'ARM64 compare:withImm:: immediate ' , imm printString , ' too large'].
-	self emit: (16rF100001F
-		bitOr: (imm bitShift: 10))
-		+ (reg index bitShift: 5)
+	self assemble: 'cmp' with: reg with: imm
 ]
 
 { #category : #branching }
 ARM64CodeGenerator >> breakpoint [
-	self emit: 16rD4200000
+	self assemble: 'brk' with: 0
 ]
 
 { #category : #branching }
 ARM64CodeGenerator >> return [
-	self emit: 16rD65F03C0
+	self assemble: 'ret' with: x30
 ]
 
 { #category : #branching }
 ARM64CodeGenerator >> return: anInteger [
-	(anInteger bitAnd: 16rFFFFF000) = 0
-		ifFalse: [^self error: 'ARM64 return:: imm too large'].
-	self emit: (16r910003FF bitOr: (anInteger bitShift: 10)).
-	self emit: 16rD65F03C0
+	self
+		assemble: 'add' with: sp with: sp with: anInteger;
+		return
 ]
 
 { #category : #'operations - arithmetic' }
@@ -357,88 +309,70 @@ ARM64CodeGenerator >> dec: reg [
 
 { #category : #'operations - arithmetic' }
 ARM64CodeGenerator >> shiftRightArithmetic: srcAndDstReg byImm: imm [
-	self emit: (16r9340FC00
-		bitOr: (imm bitShift: 16))
-		+ (srcAndDstReg index bitShift: 5)
-		+ srcAndDstReg index
+	self assemble: 'sbfm' with: srcAndDstReg with: srcAndDstReg with: imm with: 63
 ]
 
 { #category : #'operations - arithmetic' }
 ARM64CodeGenerator >> shiftRight: srcAndDstReg byImm: imm [
-	self emit: (16rD340FC00
-		bitOr: (imm bitShift: 16))
-		+ (srcAndDstReg index bitShift: 5)
-		+ srcAndDstReg index
+	self shiftLogicalRight: srcAndDstReg byImm: imm
 ]
 
 { #category : #'operations - integers' }
 ARM64CodeGenerator >> convertToNativeInteger: srcAndDstReg [
-	self emit: (16rF240001F bitOr: (srcAndDstReg index bitShift: 5)).
-	self shiftRightArithmetic: srcAndDstReg byImm: 1
+	self
+		assemble: 'tst' with: srcAndDstReg with: 1;
+		shiftRightArithmetic: srcAndDstReg byImm: 1
 ]
 
 { #category : #'operations - arithmetic' }
 ARM64CodeGenerator >> shiftLeft: srcAndDstReg byImm: imm [
-	| immr imms |
-	immr := 64 - imm bitAnd: 63.
-	imms := 63 - imm.
-	self emit: (16rD3400000
-		bitOr: (immr bitShift: 16))
-		+ (imms bitShift: 10)
-		+ (srcAndDstReg index bitShift: 5)
-		+ srcAndDstReg index
+	self
+		assemble: 'ubfm'
+		with: srcAndDstReg
+		with: srcAndDstReg
+		with: (64 - imm bitAnd: 63)
+		with: 63 - imm
 ]
 
 { #category : #'operations - arithmetic' }
 ARM64CodeGenerator >> shiftLogicalRight: srcAndDstReg byImm: imm [
-	self emit: (16rD340FC00
-		bitOr: (imm bitShift: 16))
-		+ (srcAndDstReg index bitShift: 5)
-		+ srcAndDstReg index
+	self assemble: 'ubfm' with: srcAndDstReg with: srcAndDstReg with: imm with: 63
 ]
 
 { #category : #branching }
 ARM64CodeGenerator >> jumpToReg: aReg [
-	self emit: (16rD61F0000 bitOr: (aReg index bitShift: 5))
+	self assemble: 'br' with: aReg
 ]
 
 { #category : #branching }
 ARM64CodeGenerator >> jumpToMem: srcMemRef [
-	| scratch |
-	scratch := self regV.
 	self
-		load: scratch fromMem: srcMemRef;
-		jumpToReg: scratch
+		load: self regV fromMem: srcMemRef;
+		jumpToReg: self regV
 ]
 
 { #category : #branching }
 ARM64CodeGenerator >> callIndirectReg: aReg [
-	self emit: (16rD63F0000 bitOr: (aReg index bitShift: 5))
+	self assemble: 'blr' with: aReg
 ]
 
 { #category : #branching }
 ARM64CodeGenerator >> callIndirect: srcMemRef [
-	| scratch |
-	scratch := self regV.
 	self
-		load: scratch fromMem: srcMemRef;
-		callIndirectReg: scratch
+		load: self regV fromMem: srcMemRef;
+		callIndirectReg: self regV
 ]
 
 { #category : #branching }
 ARM64CodeGenerator >> jumpIndirect: srcMemRef [
-	| scratch |
-	scratch := self regV.
-	self
-		load: scratch fromMem: srcMemRef;
-		jumpToReg: scratch
+	self jumpToMem: srcMemRef
 ]
 
 { #category : #'private - jumps' }
-ARM64CodeGenerator >> condJump: cond4 to: label [
+ARM64CodeGenerator >> condJump: condition to: label [
 	| src |
 	src := memory currentAddress.
-	self emit: (16r54000000 bitOr: cond4).
+	self assemble: 'b.cond' with: condition with: 0.
 	memory fixups add: (ARM64BranchFixup kind: #bcond from: src to: label)
 ]
 
@@ -446,7 +380,7 @@ ARM64CodeGenerator >> condJump: cond4 to: label [
 ARM64CodeGenerator >> uncondJumpTo: label [
 	| src |
 	src := memory currentAddress.
-	self emit: 16r14000000.
+	self assemble: 'b' with: 0.
 	memory fixups add: (ARM64BranchFixup kind: #b from: src to: label)
 ]
 
@@ -462,37 +396,37 @@ ARM64CodeGenerator >> shortJumpTo: label [
 
 { #category : #jumps }
 ARM64CodeGenerator >> shortJumpIfCarryTo: label [
-	self condJump: 16r1 to: label
+	self condJump: #ne to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> shortJumpIfNotCarryTo: label [
-	self condJump: 16r0 to: label
+	self condJump: #eq to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> shortJumpIfEqualTo: label [
-	self condJump: 16r0 to: label
+	self condJump: #eq to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> shortJumpIfNotEqualTo: label [
-	self condJump: 16r1 to: label
+	self condJump: #ne to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> shortJumpIfZeroTo: label [
-	self condJump: 16r0 to: label
+	self condJump: #eq to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> shortJumpIfNotZeroTo: label [
-	self condJump: 16r1 to: label
+	self condJump: #ne to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> shortJumpIfSignTo: label [
-	self condJump: 16r4 to: label
+	self condJump: #mi to: label
 ]
 
 
@@ -533,67 +467,67 @@ ARM64CodeGenerator >> jumpIfSignTo: label [
 
 { #category : #jumps }
 ARM64CodeGenerator >> jumpIfNoSignTo: label [
-	self condJump: 16r5 to: label
+	self condJump: #pl to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> jumpIfGreaterSignedTo: label [
-	self condJump: 16rC to: label
+	self condJump: #gt to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> jumpIfGreaterOrEqualSignedTo: label [
-	self condJump: 16rA to: label
+	self condJump: #ge to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> jumpIfLessSignedTo: label [
-	self condJump: 16rB to: label
+	self condJump: #lt to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> jumpIfLessOrEqualSignedTo: label [
-	self condJump: 16rD to: label
+	self condJump: #le to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> jumpIfAboveTo: label [
-	self condJump: 16r8 to: label
+	self condJump: #hi to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> jumpIfAboveOrEqualTo: label [
-	self condJump: 16r2 to: label
+	self condJump: #cs to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> jumpIfBelowTo: label [
-	self condJump: 16r3 to: label
+	self condJump: #cc to: label
 ]
 
 { #category : #jumps }
 ARM64CodeGenerator >> jumpIfBelowOrEqualTo: label [
-	self condJump: 16r9 to: label
+	self condJump: #ls to: label
 ]
 
 { #category : #'jumps - conditional' }
 ARM64CodeGenerator >> jumpIfOverflowTo: label [
-	self condJump: 16r6 to: label
+	self condJump: #vs to: label
 ]
 
 { #category : #'jumps - conditional' }
 ARM64CodeGenerator >> jumpIfNoOverflowTo: label [
-	self condJump: 16r7 to: label
+	self condJump: #vc to: label
 ]
 
 { #category : #'jumps - conditional' }
 ARM64CodeGenerator >> shortJumpIfOverflowTo: label [
-	self condJump: 16r6 to: label
+	self condJump: #vs to: label
 ]
 
 { #category : #'jumps - conditional' }
 ARM64CodeGenerator >> shortJumpIfNoOverflowTo: label [
-	self condJump: 16r7 to: label
+	self condJump: #vc to: label
 ]
 
 { #category : #accessing }
@@ -613,41 +547,23 @@ ARM64CodeGenerator >> loadZeroExtendByte: dstReg from: baseReg atIndexImm: index
 
 { #category : #'memory - load / store' }
 ARM64CodeGenerator >> loadZeroExtendByte: dstReg from: baseReg atIndexAt: idxReg [
-	| scratch |
-	scratch := self regV.
-	self emit: (16r8B000000
-		bitOr: (idxReg index bitShift: 16))
-		+ (baseReg index bitShift: 5)
-		+ scratch index.
-	^self emit: (16r38400000
-		bitOr: ((-1 bitAnd: 16r1FF) bitShift: 12))
-		+ (scratch index bitShift: 5)
-		+ dstReg index
+	self
+		assemble: 'add' with: self regV with: baseReg with: idxReg;
+		assemble: 'ldurb' with: dstReg long with: self regV with: -1
 ]
 
 { #category : #'memory - load / store' }
 ARM64CodeGenerator >> loadZeroExtendByte: dstReg from: baseReg atOffset: offset [
-	(offset >= 0 and: [offset <= 4095])
-		ifTrue: [
-			^self emit: (16r39400000
-				bitOr: (offset bitShift: 10))
-				+ (baseReg index bitShift: 5)
-				+ dstReg index].
-	(offset >= -256 and: [offset <= 255])
-		ifTrue: [
-			^self emit: (16r38400000
-				bitOr: ((offset bitAnd: 16r1FF) bitShift: 12))
-				+ (baseReg index bitShift: 5)
-				+ dstReg index].
-	^self error: 'ARM64 LDRB out-of-range offset ' , offset printString
+	self load: 8 into: dstReg from: baseReg disp: offset
 ]
 
 { #category : #'memory - load / store' }
 ARM64CodeGenerator >> load: dstReg fromMem: srcMemRef [
-	srcMemRef index isNil
-		ifTrue: [^self ldrFromBase: srcMemRef base index disp: srcMemRef displacement toReg: dstReg].
-	self emitEffectiveAddrToVOf: srcMemRef.
-	^self ldrFromBase: self regV index disp: srcMemRef displacement toReg: dstReg
+	self
+		load: 64
+		into: dstReg
+		from: (self baseFor: srcMemRef)
+		disp: srcMemRef displacement
 ]
 
 { #category : #'memory - load / store' }
@@ -663,141 +579,92 @@ ARM64CodeGenerator >> lea: dstReg withMem: srcMemRef [
 
 { #category : #'memory - load / store' }
 ARM64CodeGenerator >> loadLongMwithIPoffset: anInteger [
-	| imm19 scratch |
-	(anInteger bitAnd: 3) = 0
-		ifFalse: [^self error: 'ARM64 LDR literal needs a word-aligned offset'].
-	imm19 := anInteger // 4.
-	(imm19 >= -262144 and: [imm19 <= 262143])
-		ifFalse: [^self error: 'ARM64 LDR literal offset out of range'].
-	self emit: (16r18000000
-		bitOr: ((imm19 bitAnd: 16r7FFFF) bitShift: 5))
-		+ self regM index.
-	scratch := self regV.
-	self emit: 16r10000000 + scratch index.
-	self shiftLogicalRight: scratch byImm: 32.
-	self shiftLeft: scratch byImm: 32.
-	self or: self regM with: scratch
-]
-
-{ #category : #'memory - load / store' }
-ARM64CodeGenerator >> ldrFromBase: baseIdx disp: disp toReg: dstReg [
-	(disp >= 0 and: [(disp bitAnd: 7) = 0 and: [disp <= (4095 * 8)]])
-		ifTrue: [
-			^self emit: (16rF9400000
-				bitOr: ((disp bitShift: -3) bitShift: 10))
-				+ (baseIdx bitShift: 5)
-				+ dstReg index].
-	(disp >= -256 and: [disp <= 255])
-		ifTrue: [
-			^self emit: (16rF8400000
-				bitOr: ((disp bitAnd: 16r1FF) bitShift: 12))
-				+ (baseIdx bitShift: 5)
-				+ dstReg index].
-	^self error: 'ARM64 LDR/LDUR out-of-range displacement ' , disp printString
+	self
+		assemble: 'ldr' with: self regM long with: anInteger;
+		assemble: 'adr' with: self regV;
+		shiftLogicalRight: self regV byImm: 32;
+		shiftLeft: self regV byImm: 32;
+		or: self regM with: self regV
 ]
 
 { #category : #'memory - load / store' }
 ARM64CodeGenerator >> emitEffectiveAddrToVOf: memRef [
-	| scale baseIdx idxIdx shiftAmt |
-	scale := memRef scale.
-	baseIdx := memRef base index.
-	idxIdx := memRef index index.
-	scale = 8 ifTrue: [shiftAmt := 3]
-		ifFalse: [scale = 1
-			ifTrue: [shiftAmt := 0]
-			ifFalse: [^self error: 'ARM64 effective-address scale ', scale printString, ' NYI']].
-	^self emit: (16r8B000000
-		bitOr: (idxIdx bitShift: 16))
-		+ (shiftAmt bitShift: 10)
-		+ (baseIdx bitShift: 5)
-		+ self regV index
+	| shift |
+	shift := (#(1 2 4 8) indexOf: memRef scale) - 1.
+	shift < 0 ifTrue: [^self error: 'ARM64 effective-address scale ' , memRef scale printString , ' NYI'].
+	self assemble: 'add' with: self regV with: memRef base with: memRef index with: shift
 ]
 
 { #category : #'memory - load / store' }
 ARM64CodeGenerator >> store: valueReg in: baseReg indexAt: indexReg [
-	self emit: (16rF8207800
-		bitOr: (indexReg index bitShift: 16))
-		+ (baseReg index bitShift: 5)
-		+ valueReg index
+	self assemble: 'str' with: valueReg with: baseReg with: indexReg
 ]
 
 { #category : #'memory - load / store' }
 ARM64CodeGenerator >> storeByte: byteValueOrReg in: baseReg offset: offset [
-	| byteReg |
 	byteValueOrReg isInteger ifTrue: [
-		byteReg := self regV.
-		self moveImm: byteValueOrReg to: byteReg.
-		^self storeByte: byteReg in: baseReg offset: offset].
-	byteReg := byteValueOrReg.
-	(offset >= 0 and: [offset <= 4095])
-		ifTrue: [
-			^self emit: (16r39000000
-				bitOr: (offset bitShift: 10))
-				+ (baseReg index bitShift: 5)
-				+ byteReg index].
-	(offset >= -256 and: [offset <= 255])
-		ifTrue: [
-			^self emit: (16r38000000
-				bitOr: ((offset bitAnd: 16r1FF) bitShift: 12))
-				+ (baseReg index bitShift: 5)
-				+ byteReg index].
-	^self error: 'ARM64 STRB out-of-range offset ' , offset printString
+		self moveImm: byteValueOrReg to: self regV.
+		^self storeByte: self regV in: baseReg offset: offset].
+	self store: 8 from: byteValueOrReg into: baseReg disp: offset
 ]
 
 { #category : #'memory - load / store' }
 ARM64CodeGenerator >> store: srcReg intoMem: dstMemRef [
-	dstMemRef index isNil
-		ifTrue: [^self strFromReg: srcReg toBase: dstMemRef base index disp: dstMemRef displacement].
-	self emitEffectiveAddrToVOf: dstMemRef.
-	^self strFromReg: srcReg toBase: self regV index disp: dstMemRef displacement
-]
-
-{ #category : #'memory - load / store' }
-ARM64CodeGenerator >> strFromReg: srcReg toBase: baseIdx disp: disp [
-	(disp >= 0 and: [(disp bitAnd: 7) = 0 and: [disp <= (4095 * 8)]])
-		ifTrue: [
-			^self emit: (16rF9000000
-				bitOr: ((disp bitShift: -3) bitShift: 10))
-				+ (baseIdx bitShift: 5)
-				+ srcReg index].
-	(disp >= -256 and: [disp <= 255])
-		ifTrue: [
-			^self emit: (16rF8000000
-				bitOr: ((disp bitAnd: 16r1FF) bitShift: 12))
-				+ (baseIdx bitShift: 5)
-				+ srcReg index].
-	^self error: 'ARM64 STR/STUR out-of-range displacement ' , disp printString
+	self
+		store: 64
+		from: srcReg
+		into: (self baseFor: dstMemRef)
+		disp: dstMemRef displacement
 ]
 
 { #category : #'memory - load / store' }
 ARM64CodeGenerator >> loadZeroExtendShortRwithRoffset: offset [
-	| r |
-	r := self regR.
-	(offset >= 0 and: [(offset bitAnd: 1) = 0 and: [offset <= (4095 * 2)]])
-		ifTrue: [
-			^self emit: (16r79400000
-				bitOr: ((offset bitShift: -1) bitShift: 10))
-				+ (r index bitShift: 5)
-				+ r index].
-	(offset >= -256 and: [offset <= 255])
-		ifTrue: [
-			^self emit: (16r78400000
-				bitOr: ((offset bitAnd: 16r1FF) bitShift: 12))
-				+ (r index bitShift: 5)
-				+ r index].
-	^self error: 'ARM64 loadZeroExtendShortRwithRoffset:: bad offset ' , offset printString
+	self load: 16 into: self regR from: self regR disp: offset
 ]
 
 { #category : #'thread local' }
 ARM64CodeGenerator >> load: dstReg withThreadVariableAt: srcReg [
-	self emit: 16rD2800000 + dstReg index
+	self moveImm: 0 to: dstReg
 ]
 
 { #category : #'memory - load / store' }
 ARM64CodeGenerator >> compare: reg withMem: srcMemRef [
-	| scratch |
-	scratch := self regV.
 	self
-		load: scratch fromMem: srcMemRef;
-		compare: reg with: scratch
+		load: self regV fromMem: srcMemRef;
+		compare: reg with: self regV
+]
+
+{ #category : #'memory - load / store' }
+ARM64CodeGenerator >> baseFor: aMemRef [
+	aMemRef index isNil ifTrue: [^aMemRef base].
+	self emitEffectiveAddrToVOf: aMemRef.
+	^self regV
+]
+
+{ #category : #'memory - load / store' }
+ARM64CodeGenerator >> load: bits into: aRegister from: baseReg disp: disp [
+	self access: 'ldr' unscaled: 'ldur' bits: bits reg: aRegister base: baseReg disp: disp
+]
+
+{ #category : #'memory - load / store' }
+ARM64CodeGenerator >> store: bits from: aRegister into: baseReg disp: disp [
+	self access: 'str' unscaled: 'stur' bits: bits reg: aRegister base: baseReg disp: disp
+]
+
+{ #category : #'memory - load / store' }
+ARM64CodeGenerator >> access: scaled unscaled: unscaled bits: bits reg: aRegister base: baseReg disp: disp [
+	| bytes suffix reg |
+	bytes := bits // 8.
+	suffix := bits = 8 ifTrue: ['b'] ifFalse: [bits = 16 ifTrue: ['h'] ifFalse: ['']].
+	reg := (aRegister isFloat or: [bits = 64])
+		ifTrue: [aRegister]
+		ifFalse: [aRegister withLength: 32].
+	(disp >= 0 and: [disp \\ bytes = 0 and: [disp // bytes < 4096]])
+		ifTrue: [^self assemble: scaled , suffix with: reg with: baseReg with: disp].
+	(disp between: -256 and: 255)
+		ifTrue: [^self assemble: unscaled , suffix with: reg with: baseReg with: disp].
+	self
+		moveImm: disp to: x17;
+		assemble: 'add' with: x17 with: baseReg with: x17;
+		assemble: scaled , suffix with: reg with: x17 with: 0
 ]

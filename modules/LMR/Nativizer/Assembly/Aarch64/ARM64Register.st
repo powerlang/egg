@@ -111,6 +111,20 @@ ARM64Register >> byte [
 ]
 
 { #category : #accessing }
+ARM64Register >> long [
+	^self withLength: 32
+]
+
+{ #category : #accessing }
+ARM64Register >> withLength: bits [
+	| prefix |
+	bits = length ifTrue: [^self].
+	index = 31 ifTrue: [^self].
+	prefix := bits = 64 ifTrue: ['x'] ifFalse: ['w'].
+	^self class name: prefix , index printString index: index length: bits
+]
+
+{ #category : #accessing }
 ARM64Register >> word [
 	^self
 ]
