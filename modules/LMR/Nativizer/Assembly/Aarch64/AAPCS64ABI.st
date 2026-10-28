@@ -108,7 +108,7 @@ AAPCS64ABI >> bits [
 
 { #category : #accessing }
 AAPCS64ABI >> newAssembler [
-	^GenericAssembler new
+	^ARM64TemplateAssembler new
 ]
 
 { #category : #'registers - IR' }
