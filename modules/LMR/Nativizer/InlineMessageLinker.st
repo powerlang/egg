@@ -225,7 +225,7 @@ InlineMessageLinker >> assembleBitShiftRight [
 	assembler
 		move: assembler regA to: assembler regT;
 		convertToNativeInteger: assembler regT;
-		shiftRightArithmetic: assembler regR by: assembler regT b;
+		shiftRightArithmetic: assembler regR by: assembler regT;
 		setIntegerBit: assembler regR
 ]
 
@@ -589,6 +589,129 @@ InlineMessageLinker >> assembleObjectAtOffsetPut [
 InlineMessageLinker >> assembleOop [
 	#_oop.
 	^ assembler convertRtoSmallInteger
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleSmiPlus [
+	| done overflow |
+	#_smiPlus:.
+	done := assembler newLabel.
+	overflow := assembler newLabel.
+	assembler
+		clearRintegerBit;
+		addAtoR;
+		shortJumpIfOverflowTo: overflow;
+		shortJumpTo: done;
+		@ overflow;
+		loadRwithNil;
+		@ done
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleSmiMinus [
+	| done overflow |
+	#_smiMinus:.
+	done := assembler newLabel.
+	overflow := assembler newLabel.
+	assembler
+		subAfromR;
+		shortJumpIfOverflowTo: overflow;
+		setRintegerBit;
+		shortJumpTo: done;
+		@ overflow;
+		loadRwithNil;
+		@ done
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleSmiTimes [
+	| done overflow |
+	#_smiTimes:.
+	done := assembler newLabel.
+	overflow := assembler newLabel.
+	assembler
+		convertAtoNativeInteger;
+		clearRintegerBit;
+		multiplyRbyAwideningToA;
+		shortJumpIfOverflowTo: overflow;
+		setRintegerBit;
+		shortJumpTo: done;
+		@ overflow;
+		loadRwithNil;
+		@ done
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleSmiBitAnd [
+	#_smiBitAnd:.
+	assembler andRwithA
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleSmiBitOr [
+	#_smiBitOr:.
+	assembler orRwithA
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleSmiEquals [
+	| done |
+	#_smiEquals:.
+	done := self loadTrueComparingRwithA.
+	assembler shortJumpIfEqualTo: done.
+	self loadFalseUntil: done
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleSmiLowerThan [
+	| done |
+	#_smiLowerThan:.
+	done := self loadTrueComparingRwithA.
+	assembler shortJumpIfLessSignedTo: done.
+	self loadFalseUntil: done
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleSmiLowerEqualThan [
+	| done |
+	#_smiLowerEqualThan:.
+	done := self loadTrueComparingRwithA.
+	assembler shortJumpIfLessOrEqualSignedTo: done.
+	self loadFalseUntil: done
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleSmiGreaterThan [
+	| done |
+	#_smiGreaterThan:.
+	done := self loadTrueComparingRwithA.
+	assembler shortJumpIfGreaterSignedTo: done.
+	self loadFalseUntil: done
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleSmiGreaterEqualThan [
+	| done |
+	#_smiGreaterEqualThan:.
+	done := self loadTrueComparingRwithA.
+	assembler shortJumpIfGreaterOrEqualSignedTo: done.
+	self loadFalseUntil: done
+]
+
+{ #category : #'private - helpers' }
+InlineMessageLinker >> loadTrueComparingRwithA [
+	assembler
+		loadTwithR;
+		loadRwithTrue;
+		compareTwithA.
+	^assembler newLabel
+]
+
+{ #category : #'private - helpers' }
+InlineMessageLinker >> loadFalseUntil: done [
+	assembler
+		loadRwithFalse;
+		@ done
 ]
 
 { #category : #'private - assemble' }

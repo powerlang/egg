@@ -358,6 +358,26 @@ ARM64CodeGenerator >> shortJumpIfSignTo: label [
 ]
 
 { #category : #jumps }
+ARM64CodeGenerator >> shortJumpIfGreaterOrEqualSignedTo: label [
+	self jumpIf: #ge to: label
+]
+
+{ #category : #jumps }
+ARM64CodeGenerator >> shortJumpIfGreaterSignedTo: label [
+	self jumpIf: #gt to: label
+]
+
+{ #category : #jumps }
+ARM64CodeGenerator >> shortJumpIfLessOrEqualSignedTo: label [
+	self jumpIf: #le to: label
+]
+
+{ #category : #jumps }
+ARM64CodeGenerator >> shortJumpIfLessSignedTo: label [
+	self jumpIf: #lt to: label
+]
+
+{ #category : #jumps }
 ARM64CodeGenerator >> jumpIfCarryTo: label [
 	self jumpIf: #cs to: label
 ]

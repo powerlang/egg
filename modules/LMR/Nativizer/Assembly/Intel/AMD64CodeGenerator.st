@@ -896,6 +896,31 @@ AMD64CodeGenerator >> shortJumpIfEqualTo: label [
 ]
 
 { #category : #jumps }
+AMD64CodeGenerator >> shortJumpIfGreaterOrEqualSignedTo: label [
+	self shortJump: 'jge' to: label
+]
+
+{ #category : #jumps }
+AMD64CodeGenerator >> shortJumpIfGreaterSignedTo: label [
+	self shortJump: 'jg' to: label
+]
+
+{ #category : #jumps }
+AMD64CodeGenerator >> shortJumpIfLessOrEqualSignedTo: label [
+	self shortJump: 'jle' to: label
+]
+
+{ #category : #jumps }
+AMD64CodeGenerator >> shortJumpIfLessSignedTo: label [
+	self shortJump: 'jl' to: label
+]
+
+{ #category : #jumps }
+AMD64CodeGenerator >> shortJumpIfOverflowTo: label [
+	self shortJump: 'jo' to: label
+]
+
+{ #category : #jumps }
 AMD64CodeGenerator >> shortJumpIfNotCarryTo: label [
 	self shortJump: 'jnc' to: label
 ]

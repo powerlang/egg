@@ -1620,6 +1620,31 @@ GenericAssembler >> shortJumpIfEqualTo: label [
 ]
 
 { #category : #jumps }
+GenericAssembler >> shortJumpIfGreaterOrEqualSignedTo: label [
+	codegen shortJumpIfGreaterOrEqualSignedTo: label
+]
+
+{ #category : #jumps }
+GenericAssembler >> shortJumpIfGreaterSignedTo: label [
+	codegen shortJumpIfGreaterSignedTo: label
+]
+
+{ #category : #jumps }
+GenericAssembler >> shortJumpIfLessOrEqualSignedTo: label [
+	codegen shortJumpIfLessOrEqualSignedTo: label
+]
+
+{ #category : #jumps }
+GenericAssembler >> shortJumpIfLessSignedTo: label [
+	codegen shortJumpIfLessSignedTo: label
+]
+
+{ #category : #jumps }
+GenericAssembler >> shortJumpIfOverflowTo: label [
+	codegen shortJumpIfOverflowTo: label
+]
+
+{ #category : #jumps }
 GenericAssembler >> shortJumpIfNotCarryTo: label [
 	codegen shortJumpIfNotCarryTo: label
 ]
