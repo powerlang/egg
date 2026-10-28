@@ -1688,6 +1688,20 @@ GenericAssembler >> load: dstReg from: baseReg atIndex: index [
 	codegen load: dstReg fromMem: memref
 ]
 
+{ #category : #loading }
+GenericAssembler >> load: dstReg fromFrame: frameReg slot: index [
+	| memory |
+	memory := codegen memRef: frameReg stackIndexImm: index.
+	codegen load: dstReg fromMem: memory
+]
+
+{ #category : #storing }
+GenericAssembler >> store: srcReg inFrame: frameReg slot: index [
+	| memory |
+	memory := codegen memRef: frameReg stackIndexImm: index.
+	codegen store: srcReg intoMem: memory
+]
+
 { #category : #'floting point' }
 GenericAssembler >> storeAinThreadVariableAtIndexR [
 	codegen store: codegen regA intoThreadVariableAt: codegen regR

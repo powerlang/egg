@@ -56,3 +56,7 @@ OActivationContext >> temporaries: aNumber [
 	aNumber > 0 ifTrue: [self haveFrame]
 ]
 
+{ #category : #testing }
+OActivationContext >> isFrame [
+	^true
+]

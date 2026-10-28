@@ -270,6 +270,11 @@ OInstruction >> isEnd [
 ]
 
 { #category : #unclassified }
+OInstruction >> isFrame [
+	^false
+]
+
+{ #category : #unclassified }
 OInstruction >> isGenericMessage [
 	^false
 ]

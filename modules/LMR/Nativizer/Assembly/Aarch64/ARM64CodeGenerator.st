@@ -482,6 +482,11 @@ ARM64CodeGenerator >> addressSize [
 	^8
 ]
 
+{ #category : #accessing }
+ARM64CodeGenerator >> stackSlotSize [
+	^16
+]
+
 { #category : #memory }
 ARM64CodeGenerator >> memRef [
 	^ARM64MemoryOperand new
