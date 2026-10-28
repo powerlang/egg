@@ -11,6 +11,11 @@ Class {
 	#category : #'Powerlang-Core-Assembly'
 }
 
+{ #category : #accessing }
+GenericAssembler >> codegen [
+	^codegen
+]
+
 { #category : #'operations - arithmetic' }
 GenericAssembler >> add: source1 to: source2andDest [
 	codegen add: source1 to: source2andDest

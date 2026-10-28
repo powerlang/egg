@@ -11,8 +11,15 @@ Class {
 { #category : #initialization }
 Aarch64Module >> imports [
 	^{
-		#Kernel -> #(ByteArray Character ProtoObject).
+		#Kernel -> #(ByteArray Character Dictionary Integer OrderedCollection ProtoObject).
 		#LMR -> #(NativeCode).
 		#'LMR.Nativizer.Assembly' -> #(ABI Assembler GenericAssembler CodeGenerator RelocatableBuffer RelocationFixup)
 	}
+]
+
+{ #category : #initialization }
+Aarch64Module >> justLoaded [
+	super justLoaded.
+	self bindAll: ARM64Register registers.
+	ARM64InstructionSpec initialize
 ]

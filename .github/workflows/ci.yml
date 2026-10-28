@@ -14,8 +14,8 @@ permissions:
   checks: write
 
 jobs:
-  build:
-    name: Build and Test bootstrap - ${{matrix.go-version}} ${{matrix.os}}
+  pharo:
+    name: Pharo bootstrap tests - ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -29,37 +29,6 @@ jobs:
 
     - name: Build Egg/Pharo Virtual VM
       run: make -C runtime/pharo
-
-    - name: Change python version in mac as pip install can be broken
-      if: runner.os == 'macOS'
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
-
-    - name: Install Conan
-      id: conan
-      uses: turtlebrowser/get-conan@main
-
-    - name: Conan version
-      run: echo "${{ steps.conan.outputs.version }}"
-
-    - name: Cache Conan Dependencies
-      id: cache-conan
-      uses: actions/cache@v4
-      with:
-        path: ~/.conan2
-        key: ${{hashFiles('**/conanfile.txt')}}-${{ runner.os }}
-
-        
-    # if we did hit the cache, then we do not want to create a new default
-    # profile since we already have one
-    - name: Create default Conan profile
-      if: ${{steps.cache-conan.outputs.cache-hit != 'true'}}
-      run: conan profile detect -f
-
-    - name: Build CPP VM
-      run: |
-        make -C runtime/cpp
 
     - name: Run tests
       run: make -C runtime/pharo/ test-ci
@@ -80,3 +49,43 @@ jobs:
         reporter: java-junit        # Format of test results
         fail-on-error: true
 
+  cpp:
+    name: C++ VM build and tests - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Change python version in mac as pip install can be broken
+      if: runner.os == 'macOS'
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install Conan
+      id: conan
+      uses: turtlebrowser/get-conan@main
+
+    - name: Conan version
+      run: echo "${{ steps.conan.outputs.version }}"
+
+    - name: Cache Conan Dependencies
+      id: cache-conan
+      uses: actions/cache@v4
+      with:
+        path: ~/.conan2
+        key: ${{ hashFiles('runtime/cpp/conanfile.py') }}-${{ runner.os }}
+
+    # if we did hit the cache, then we do not want to create a new default
+    # profile since we already have one
+    - name: Create default Conan profile
+      if: ${{steps.cache-conan.outputs.cache-hit != 'true'}}
+      run: conan profile detect -f
+
+    - name: Build CPP VM
+      run: make -C runtime/cpp
+
+    - name: Run tests
+      run: make -C runtime/cpp test

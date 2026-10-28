@@ -10,7 +10,7 @@
 	  regA  (arg / scratch)               -> x1
 	  regS  (scratch)                     -> x2
 	  regT  (scratch)                     -> x3
-	  regV  (extra scratch)               -> x4
+	  regV  (scratch of the codegen)      -> x16
 	  regM  (current method, callee-save) -> x19
 	  regE  (current environment)         -> x20
 	  regG  (globals base)                -> x21
@@ -19,11 +19,10 @@
 	  regFalse                            -> x24
 	  regFP (frame pointer)               -> x29
 	  regSP (stack pointer)               -> sp (encoded as 31 in addressing)
-	  regIP (current PC)                  -> the special PC (read-only)
 	  regX0 / regX1 (xmm0/1 analogs)      -> v0 / v1 (FP/SIMD)
 
 	Register accessors return a stable instance (the allocator keys on
-	identity), so they are built once in #initialize.
+	identity): the ones the Aarch64 module binds from ARM64Register registers.
 "
 Class {
 	#name : #AAPCS64ABI,
@@ -32,7 +31,7 @@ Class {
 		'regR', 'regA', 'regS', 'regT', 'regV',
 		'regM', 'regE', 'regG',
 		'regNil', 'regTrue', 'regFalse',
-		'regFP', 'regSP', 'regIP', 'regL',
+		'regFP', 'regSP', 'regL',
 		'regX0', 'regX1'
 	],
 	#category : #Aarch64
@@ -41,23 +40,22 @@ Class {
 { #category : #initialization }
 AAPCS64ABI >> initialize [
 	super initialize.
-	regR     := ARM64Register name: 'x0'  index: 0  length: 64.
-	regA     := ARM64Register name: 'x1'  index: 1  length: 64.
-	regS     := ARM64Register name: 'x2'  index: 2  length: 64.
-	regT     := ARM64Register name: 'x3'  index: 3  length: 64.
-	regV     := ARM64Register name: 'x4'  index: 4  length: 64.
-	regM     := ARM64Register name: 'x19' index: 19 length: 64.
-	regE     := ARM64Register name: 'x20' index: 20 length: 64.
-	regG     := ARM64Register name: 'x21' index: 21 length: 64.
-	regNil   := ARM64Register name: 'x22' index: 22 length: 64.
-	regTrue  := ARM64Register name: 'x23' index: 23 length: 64.
-	regFalse := ARM64Register name: 'x24' index: 24 length: 64.
-	regFP    := ARM64Register name: 'x29' index: 29 length: 64.
-	regSP    := ARM64Register name: 'sp'  index: 31 length: 64.
-	regIP    := ARM64Register name: 'pc'  index: -1 length: 64.
-	regL    := ARM64Register name: 'x30' index: 30 length: 64.
-	regX0    := ARM64Register name: 'v0'  index: 0  length: 128.
-	regX1    := ARM64Register name: 'v1'  index: 1  length: 128
+	regR := x0.
+	regA := x1.
+	regS := x2.
+	regT := x3.
+	regV := x16.
+	regM := x19.
+	regE := x20.
+	regG := x21.
+	regNil := x22.
+	regTrue := x23.
+	regFalse := x24.
+	regFP := x29.
+	regSP := sp.
+	regL := x30.
+	regX0 := v0.
+	regX1 := v1
 ]
 
 { #category : #callbacks }
@@ -110,7 +108,7 @@ AAPCS64ABI >> bits [
 
 { #category : #accessing }
 AAPCS64ABI >> newAssembler [
-	^GenericAssembler new
+	^ARM64TemplateAssembler new
 ]
 
 { #category : #'registers - IR' }
@@ -136,11 +134,6 @@ AAPCS64ABI >> regFalse [
 { #category : #'registers - IR' }
 AAPCS64ABI >> regG [
 	^regG
-]
-
-{ #category : #'registers - IR' }
-AAPCS64ABI >> regIP [
-	^regIP
 ]
 
 { #category : #'registers - IR' }
