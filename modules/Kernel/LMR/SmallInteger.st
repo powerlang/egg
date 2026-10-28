@@ -69,9 +69,8 @@ LMRSmallInteger >> \\ aNumber [
 
 { #category : '*Primitives' }
 LMRSmallInteger >> + aNumber [
-	^aNumber _isSmallInteger
-		ifTrue: [self asLargeInteger + aNumber]
-		ifFalse: [aNumber + self]
+	aNumber _isSmallInteger ifFalse: [^aNumber + self].
+	^(self _smiPlus: aNumber) ifNil: [self asLargeInteger + aNumber]
 ]
 
 { #category : #comparing }
