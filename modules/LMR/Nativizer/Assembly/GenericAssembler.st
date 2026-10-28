@@ -896,6 +896,11 @@ GenericAssembler >> loadRwithTrue [
 ]
 
 { #category : #loading }
+GenericAssembler >> loadSwithRbehavior [
+	codegen loadBehavior: codegen regS of: codegen regR
+]
+
+{ #category : #loading }
 GenericAssembler >> loadSPwithFP [
 	codegen move: codegen regFP to: codegen regSP
 ]
@@ -1620,6 +1625,31 @@ GenericAssembler >> shortJumpIfEqualTo: label [
 ]
 
 { #category : #jumps }
+GenericAssembler >> shortJumpIfGreaterOrEqualSignedTo: label [
+	codegen shortJumpIfGreaterOrEqualSignedTo: label
+]
+
+{ #category : #jumps }
+GenericAssembler >> shortJumpIfGreaterSignedTo: label [
+	codegen shortJumpIfGreaterSignedTo: label
+]
+
+{ #category : #jumps }
+GenericAssembler >> shortJumpIfLessOrEqualSignedTo: label [
+	codegen shortJumpIfLessOrEqualSignedTo: label
+]
+
+{ #category : #jumps }
+GenericAssembler >> shortJumpIfLessSignedTo: label [
+	codegen shortJumpIfLessSignedTo: label
+]
+
+{ #category : #jumps }
+GenericAssembler >> shortJumpIfOverflowTo: label [
+	codegen shortJumpIfOverflowTo: label
+]
+
+{ #category : #jumps }
 GenericAssembler >> shortJumpIfNotCarryTo: label [
 	codegen shortJumpIfNotCarryTo: label
 ]
@@ -1661,6 +1691,20 @@ GenericAssembler >> load: dstReg from: baseReg atIndex: index [
 	| memref |
 	memref := codegen memRef: baseReg indexImm: index.
 	codegen load: dstReg fromMem: memref
+]
+
+{ #category : #loading }
+GenericAssembler >> load: dstReg fromFrame: frameReg slot: index [
+	| memory |
+	memory := codegen memRef: frameReg stackIndexImm: index.
+	codegen load: dstReg fromMem: memory
+]
+
+{ #category : #storing }
+GenericAssembler >> store: srcReg inFrame: frameReg slot: index [
+	| memory |
+	memory := codegen memRef: frameReg stackIndexImm: index.
+	codegen store: srcReg intoMem: memory
 ]
 
 { #category : #'floting point' }

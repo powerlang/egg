@@ -174,3 +174,23 @@ ARM64CodeGeneratorTest >> testLeaFarDisplacement [
 	codegen lea: (self x: 0) withMem: memory.
 	self assert: self words asArray equals: #(16rAA0103E0 16rD2827111 16r8B110000)
 ]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testFrameSlots [
+	| frame above below |
+	frame := self x: 29.
+	above := codegen memRef: frame stackIndexImm: 3.
+	below := codegen memRef: frame stackIndexImm: -2.
+	codegen
+		load: (self x: 0) fromMem: above;
+		store: (self x: 1) intoMem: below.
+	self assert: self words asArray equals: #(16rF94013A0 16rF81D03A1)
+]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testLoadBehavior [
+	codegen loadBehavior: (self x: 2) of: (self x: 0).
+	self
+		assert: self words asArray
+		equals: #(16rB85FC002 16rAA0003F0 16rD360FE10 16rD3607E10 16rAA100042)
+]

@@ -896,6 +896,31 @@ AMD64CodeGenerator >> shortJumpIfEqualTo: label [
 ]
 
 { #category : #jumps }
+AMD64CodeGenerator >> shortJumpIfGreaterOrEqualSignedTo: label [
+	self shortJump: 'jge' to: label
+]
+
+{ #category : #jumps }
+AMD64CodeGenerator >> shortJumpIfGreaterSignedTo: label [
+	self shortJump: 'jg' to: label
+]
+
+{ #category : #jumps }
+AMD64CodeGenerator >> shortJumpIfLessOrEqualSignedTo: label [
+	self shortJump: 'jle' to: label
+]
+
+{ #category : #jumps }
+AMD64CodeGenerator >> shortJumpIfLessSignedTo: label [
+	self shortJump: 'jl' to: label
+]
+
+{ #category : #jumps }
+AMD64CodeGenerator >> shortJumpIfOverflowTo: label [
+	self shortJump: 'jo' to: label
+]
+
+{ #category : #jumps }
 AMD64CodeGenerator >> shortJumpIfNotCarryTo: label [
 	self shortJump: 'jnc' to: label
 ]
@@ -1086,4 +1111,15 @@ AMD64CodeGenerator >> writeTslots [
 AMD64CodeGenerator >> xor: src1AndDst with: src2 [
 	self assemble: 'xor' with: src1AndDst with: src2
 
+]
+
+{ #category : #'memory - load / store' }
+AMD64CodeGenerator >> loadBehavior: dstReg of: objectReg [
+	self
+		load: dstReg fromMem: (self memRef32: objectReg indexImm: 0);
+		push: objectReg;
+		shiftRight: objectReg byImm: 32;
+		shiftLeft: objectReg byImm: 32;
+		or: dstReg with: objectReg;
+		pop: objectReg
 ]

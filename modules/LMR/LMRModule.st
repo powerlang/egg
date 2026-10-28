@@ -114,10 +114,13 @@ LMRModule >> invokeStub [
 { #category : #bootstrapping }
 LMRModule >> justLoaded [
 	super justLoaded.
+	namespace at: #CRITICAL put: false.
 	SendSite initializeFormatFlags.
 	GlobalDispatchCache initialize.
 	self initializeMemory.
-	LMRProtoObject module namespace at: #Memory put: Memory
+	LMRProtoObject module namespace
+		at: #Memory put: Memory;
+		at: #StackFrameCursor put: StackFrameCursor
 ]
 
 { #category : #accessing }

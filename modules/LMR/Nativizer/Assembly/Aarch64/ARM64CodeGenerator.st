@@ -358,6 +358,26 @@ ARM64CodeGenerator >> shortJumpIfSignTo: label [
 ]
 
 { #category : #jumps }
+ARM64CodeGenerator >> shortJumpIfGreaterOrEqualSignedTo: label [
+	self jumpIf: #ge to: label
+]
+
+{ #category : #jumps }
+ARM64CodeGenerator >> shortJumpIfGreaterSignedTo: label [
+	self jumpIf: #gt to: label
+]
+
+{ #category : #jumps }
+ARM64CodeGenerator >> shortJumpIfLessOrEqualSignedTo: label [
+	self jumpIf: #le to: label
+]
+
+{ #category : #jumps }
+ARM64CodeGenerator >> shortJumpIfLessSignedTo: label [
+	self jumpIf: #lt to: label
+]
+
+{ #category : #jumps }
 ARM64CodeGenerator >> jumpIfCarryTo: label [
 	self jumpIf: #cs to: label
 ]
@@ -460,6 +480,11 @@ ARM64CodeGenerator >> shortJumpIfNoOverflowTo: label [
 { #category : #accessing }
 ARM64CodeGenerator >> addressSize [
 	^8
+]
+
+{ #category : #accessing }
+ARM64CodeGenerator >> stackSlotSize [
+	^16
 ]
 
 { #category : #memory }
@@ -781,4 +806,14 @@ ARM64CodeGenerator >> writeTslots [
 		assemble: 'str.post' with: self regR with: self regE with: 8;
 		dec: self regT;
 		assemble: 'b.cond' with: #ne with: -8
+]
+
+{ #category : #'memory - load / store' }
+ARM64CodeGenerator >> loadBehavior: dstReg of: objectReg [
+	self
+		load: dstReg fromMem: (self memRef32: objectReg indexImm: 0);
+		move: objectReg to: self regV;
+		shiftRight: self regV byImm: 32;
+		shiftLeft: self regV byImm: 32;
+		or: dstReg with: self regV
 ]

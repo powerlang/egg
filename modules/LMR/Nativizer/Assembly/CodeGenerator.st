@@ -369,6 +369,20 @@ CodeGenerator >> memRef: baseReg indexImm: indexImm [
 ]
 
 { #category : #memory }
+CodeGenerator >> memRef: baseReg stackIndexImm: indexImm [
+	^self memRef
+		length: self addressLength;
+		base: baseReg;
+		displacement: (indexImm - 1) * self stackSlotSize;
+		yourself
+]
+
+{ #category : #accessing }
+CodeGenerator >> stackSlotSize [
+	^self addressSize
+]
+
+{ #category : #memory }
 CodeGenerator >> memRef: baseReg offset: indexReg [
 	^ self memRef
 		base: baseReg;

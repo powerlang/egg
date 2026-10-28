@@ -27,8 +27,7 @@ Class {
 	],
 	#classVars : [
 		'Current',
-		'LargeThreshold',
-		'CRITICAL'
+		'LargeThreshold'
 	],
 	#category : #Kernel
 }

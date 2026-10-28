@@ -1532,6 +1532,31 @@ Assembler >> shortJumpIfEqualTo: label [
 ]
 
 { #category : #jumps }
+Assembler >> shortJumpIfGreaterOrEqualSignedTo: label [
+	self subclassResponsibility
+]
+
+{ #category : #jumps }
+Assembler >> shortJumpIfGreaterSignedTo: label [
+	self subclassResponsibility
+]
+
+{ #category : #jumps }
+Assembler >> shortJumpIfLessOrEqualSignedTo: label [
+	self subclassResponsibility
+]
+
+{ #category : #jumps }
+Assembler >> shortJumpIfLessSignedTo: label [
+	self subclassResponsibility
+]
+
+{ #category : #jumps }
+Assembler >> shortJumpIfOverflowTo: label [
+	self subclassResponsibility
+]
+
+{ #category : #jumps }
 Assembler >> shortJumpIfNotCarryTo: label [
 	self subclassResponsibility
 ]
