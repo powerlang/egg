@@ -807,3 +807,13 @@ ARM64CodeGenerator >> writeTslots [
 		dec: self regT;
 		assemble: 'b.cond' with: #ne with: -8
 ]
+
+{ #category : #'memory - load / store' }
+ARM64CodeGenerator >> loadBehavior: dstReg of: objectReg [
+	self
+		load: dstReg fromMem: (self memRef32: objectReg indexImm: 0);
+		move: objectReg to: self regV;
+		shiftRight: self regV byImm: 32;
+		shiftLeft: self regV byImm: 32;
+		or: dstReg with: self regV
+]

@@ -186,3 +186,11 @@ ARM64CodeGeneratorTest >> testFrameSlots [
 		store: (self x: 1) intoMem: below.
 	self assert: self words asArray equals: #(16rF94013A0 16rF81D03A1)
 ]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testLoadBehavior [
+	codegen loadBehavior: (self x: 2) of: (self x: 0).
+	self
+		assert: self words asArray
+		equals: #(16rB85FC002 16rAA0003F0 16rD360FE10 16rD3607E10 16rAA100042)
+]

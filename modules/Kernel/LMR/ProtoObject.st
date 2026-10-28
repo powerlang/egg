@@ -339,9 +339,13 @@ LMRProtoObject >> become: anotherObject [
 
 { #category : #'*meta accessing' }
 LMRProtoObject >> behavior [
+	| low block |
 	^self _isSmallInteger
 		ifTrue: [SmallInteger instanceBehavior]
-		ifFalse: [self _basicULongAt: 0]
+		ifFalse: [
+			low := self _basicULongAt: 0.
+			block := self _asPointer bitAnd: -16r80000000.
+			(block + low _asPointer) _asObject]
 ]
 
 { #category : #'*meta accessing' }

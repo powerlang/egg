@@ -145,7 +145,7 @@ BootstrapperModule >> nativizeMonomorphicCacheWith: env [
 		loadSwithGindex: smiIndex.
 	next := asm labeledNonIntegerBitTestOfR.
 	asm
-		loadLongSwithRindex: 0;
+		loadSwithRbehavior;
 		@ next;
 		compareSwithTindex: 1;
 		shortJumpIfNotEqualTo: lookup;
@@ -173,7 +173,7 @@ BootstrapperModule >> nativizePolymorphicCacheWith: env [
 	asm loadTwithAindex: 3.
 	smi := asm labeledNonIntegerBitTestOfR.
 	asm
-		loadLongSwithRindex: 0;
+		loadSwithRbehavior;
 		compareSwithTindex: 1;
 		shortJumpIfNotEqualTo: case2;
 		loadMwithTindex: 2;

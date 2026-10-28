@@ -896,6 +896,11 @@ GenericAssembler >> loadRwithTrue [
 ]
 
 { #category : #loading }
+GenericAssembler >> loadSwithRbehavior [
+	codegen loadBehavior: codegen regS of: codegen regR
+]
+
+{ #category : #loading }
 GenericAssembler >> loadSPwithFP [
 	codegen move: codegen regFP to: codegen regSP
 ]

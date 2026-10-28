@@ -1112,3 +1112,14 @@ AMD64CodeGenerator >> xor: src1AndDst with: src2 [
 	self assemble: 'xor' with: src1AndDst with: src2
 
 ]
+
+{ #category : #'memory - load / store' }
+AMD64CodeGenerator >> loadBehavior: dstReg of: objectReg [
+	self
+		load: dstReg fromMem: (self memRef32: objectReg indexImm: 0);
+		push: objectReg;
+		shiftRight: objectReg byImm: 32;
+		shiftLeft: objectReg byImm: 32;
+		or: dstReg with: objectReg;
+		pop: objectReg
+]
