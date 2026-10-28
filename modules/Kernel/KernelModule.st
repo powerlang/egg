@@ -88,11 +88,12 @@ KernelModule >> addModuleLoader: aModuleLoader [
 KernelModule >> critical: aBlock [
 	"critical meaning is: run without GC and without interrupts. On unhandled errors, don't
 	try to halt this process and continue with others, just freeze this OS process or exit."
+	| prev result |
 	prev := CRITICAL.
 	CRITICAL := true.
 	result := aBlock value.
 	CRITICAL := prev.
-	aBlock value
+	^result
 ]
 
 { #category : #accessing }
