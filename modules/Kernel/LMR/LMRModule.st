@@ -10,6 +10,12 @@ Class {
 
 }
 
+{ #category : #initialization }
+LMRModule >> justLoaded [
+	super justLoaded.
+	namespace at: #LastHash put: 1
+]
+
 { #category : #spec }
 LMRModule >> imports [
 	^{
