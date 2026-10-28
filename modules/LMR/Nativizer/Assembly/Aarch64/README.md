@@ -140,11 +140,42 @@ first line of that mnemonic whose operands all accept the given ones, and ORs
 each operand's bits into the opcode. Operands are registers, integers, condition
 names (`#eq`, `#lt`, `#vs`...) and symbols.
 
+## The rest of the backend
+
+The nativizer was written for x86, so `GenericAssembler` asks its code
+generator for x86-shaped operations: two-operand `add:to:`, `push:`,
+`jumpIfCarryTo:`... `ARM64CodeGenerator` implements each one by assembling
+mnemonics through `ARM64InstructionSpec` (`self assemble: 'adds' with: ...`).
+
+- **Scratch registers.** `regV`, which the ABI maps to `x16`, is the
+  generator's scratch. `x17` is a second one, used where `regV` may hold an
+  operand (`lea:withMem:`, far offsets of loads and stores).
+- **Immediates.** `assemble:with:withImm:` uses the immediate form when the
+  table can encode the constant, and otherwise loads it into the scratch
+  register and uses the register form.
+- **Flags as on x86.** `add:to:`, `sub:from:`, `inc:` and `dec:` assemble as
+  `adds`/`subs`, which set the flags, except with `sp`, which only plain
+  `add`/`sub` can write. Carry jumps test the real carry flag (`cs`/`cc`), so
+  the integer tag test and shifts by one set it as x86 does.
+- **Registers.** `AAPCS64ABI` picks the registers the nativizer uses (`regR`,
+  `regA`...) from the pool `ARM64Register registers` builds, which the module
+  binds by name (`x0`, `sp`, `d16`...).
+- **Template assembler.** `ARM64TemplateAssembler`, which the ABI hands to the
+  nativizer, is generated: for each fixed `GenericAssembler` operation it holds
+  the instructions the code generator emits. Regenerate it from the repo root
+  after changing the code generator:
+
+```bash
+egg LMR.Nativizer.Assembly.Aarch64.TemplateGenerator
+```
+
 ## Testing
 
 ```bash
 egg LMR.Nativizer.Assembly.Aarch64.Tests
 ```
 
-The expected words in the tests come from `llvm-mc -triple=aarch64 -show-encoding`,
-LLVM's assembler, which prints the encoding of each instruction it assembles.
+`ARM64CodeGeneratorTest` checks the instructions the code generator emits for
+its operations. The expected instructions in the tests come from
+`llvm-mc -triple=aarch64 -show-encoding`, LLVM's assembler, which prints the
+encoding of each instruction it assembles.
