@@ -152,13 +152,14 @@ BootstrapperModule >> codeSegmentOf: aModule [
 
 { #category : #bootstrapping }
 BootstrapperModule >> nativizeMonomorphicCacheWith: env [
-	| asm lookup next smiIndex lookupIndex |
+	| asm lookup next smiIndex lookupIndex cacheIndex |
 	asm := env newAssembler.
 	lookup := asm newLabel.
 	smiIndex := env lmrModule indexOfGlobal: #SmallIntegerBehavior.
 	lookupIndex := env lmrModule indexOfGlobal: #Lookup.
+	cacheIndex := SendSite indexOfSlot: 'cache'.
 	asm
-		loadTwithAindex: 3;
+		loadTwithAindex: cacheIndex;
 		loadSwithGindex: smiIndex.
 	next := asm labeledNonIntegerBitTestOfR.
 	asm
@@ -177,7 +178,7 @@ BootstrapperModule >> nativizeMonomorphicCacheWith: env [
 
 { #category : #bootstrapping }
 BootstrapperModule >> nativizePolymorphicCacheWith: env [
-	| asm smi lookupIndex case2 case3 case4 case5 case6 case7 lookup |
+	| asm smi lookupIndex cacheIndex case2 case3 case4 case5 case6 case7 lookup |
 	asm := env newAssembler.
 	case2 := asm newLabel.
 	case3 := asm newLabel.
@@ -187,7 +188,8 @@ BootstrapperModule >> nativizePolymorphicCacheWith: env [
 	case7 := asm newLabel.
 	lookup := asm newLabel.
 	lookupIndex := env lmrModule indexOfGlobal: #Lookup.
-	asm loadTwithAindex: 3.
+	cacheIndex := SendSite indexOfSlot: 'cache'.
+	asm loadTwithAindex: cacheIndex.
 	smi := asm labeledNonIntegerBitTestOfR.
 	asm
 		loadSwithRbehavior;
