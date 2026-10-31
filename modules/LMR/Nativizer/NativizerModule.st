@@ -61,7 +61,8 @@ NativizerModule >> invokedMethods [
 
 { #category : #accessing }
 NativizerModule >> justLoaded [
-	InlineMessageLinker initializeInlineMessageLinkerFlags
+	InlineMessageLinker initializeInlineMessageLinkerFlags.
+	TemplateJIT initializeClosureElementTypes
 ]
 
 { #category : #accessing }

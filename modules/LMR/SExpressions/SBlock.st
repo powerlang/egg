@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'index',
 		'capturedVariables',
-		'inlinedArgs'
+		'inlinedArgs',
+		'parent'
 	],
 	#category : 'Powerlang-Core-SExpressions',
 	#package : 'Powerlang-Core',
@@ -69,6 +70,32 @@ SBlock >> isBlock [
 { #category : #initialization }
 SBlock >> isInlined [
 	^ compiledCode isNil
+]
+
+{ #category : #accessing }
+SBlock >> parent [
+	^parent
+]
+
+{ #category : #accessing }
+SBlock >> parent: anSScript [
+	parent := anSScript
+]
+
+{ #category : #accessing }
+SBlock >> offsetOfEnvironment: anInteger [
+	| stream count type position |
+	stream := capturedVariables readStream.
+	count := 0.
+	[stream atEnd] whileFalse: [
+		type := stream next.
+		position := (type = 0 or: [type = 2]) ifFalse: [stream next].
+		count := count + 1.
+		count = anInteger ifTrue: [
+			type = 2 ifTrue: [^parent offsetOfCurrentEnvironment].
+			type = 3 ifTrue: [^parent offsetOfEnvironment: position].
+			^self error: 'the closure keeps no environment there']].
+	^self error: 'the closure keeps no environment there'
 ]
 
 { #category : #accessing }

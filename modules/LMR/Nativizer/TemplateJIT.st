@@ -18,6 +18,17 @@ Class {
 	#category : #Nativization
 }
 
+{ #category : #'class initialization' }
+TemplateJIT class >> initializeClosureElementTypes [
+	self addNamespaceAs: #ClosureElementTypes.
+	ClosureElementTypes
+		at: #Self put: 0;
+		at: #LocalArgument put: 1;
+		at: #Environment put: 2;
+		at: #EnvironmentValue put: 3;
+		at: #InlinedArgument put: 4
+]
+
 { #category : #services }
 TemplateJIT >> addFallback: aBlock [
 	fallbacks add: aBlock

@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'method',
 		'stream',
-		'builder'
+		'builder',
+		'script'
 	],
 	#classVars : [
 		'BindingTypes',
@@ -110,18 +111,21 @@ TreecodeDecoder >> decodeBlock [
 	expression := SBlock new.
 	inlined := self nextBoolean.
 	inlined
-		ifTrue: [ expression inlinedArgs: self nextArray ]
-		ifFalse: [ 
-			index := self nextInteger.
-			block := self literalAt: index.
-			builder ifNotNil: [ 
-				code := builder newExecutableCodeFor: expression.
-				builder blockExecutableCode: block put: code ].
-			expression
-				compiledCode: block;
-				index: index;
-				capturedVariables: self nextArray ].
-	expression statements: self nextExpressionArray.
+		ifTrue: [
+			expression inlinedArgs: self nextArray.
+			expression statements: self nextExpressionArray.
+			^ expression ].
+	index := self nextInteger.
+	block := self literalAt: index.
+	builder ifNotNil: [
+		code := builder newExecutableCodeFor: expression.
+		builder blockExecutableCode: block put: code ].
+	expression
+		compiledCode: block;
+		index: index;
+		capturedVariables: self nextArray;
+		parent: script.
+	self decodeStatementsOf: expression.
 	^ expression
 ]
 
@@ -189,6 +193,14 @@ TreecodeDecoder >> decodeMessage [
 		inlined: inlined
 ]
 
+{ #category : #private }
+TreecodeDecoder >> decodeStatementsOf: anSScript [
+	| outer |
+	outer := script.
+	script := anSScript.
+	[ anSScript statements: self nextExpressionArray ] ensure: [ script := outer ]
+]
+
 { #category : #public }
 TreecodeDecoder >> decodeMethod [
 	| type node next pragma |
@@ -201,9 +213,8 @@ TreecodeDecoder >> decodeMethod [
 		ifTrue: [ stream next.
 			pragma := SPragma new name: self nextSymbolOrNil.
 			node pragma: pragma ].
-	node
-		compiledCode: method;
-		statements: self nextExpressionArray.
+	node compiledCode: method.
+	self decodeStatementsOf: node.
 	^ node
 ]
 
