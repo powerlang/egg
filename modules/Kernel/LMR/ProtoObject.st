@@ -436,3 +436,7 @@ LMRProtoObject >> smallOop [
 	^self _asPointer
 ]
 
+{ #category : #'*meta accessing' }
+LMRProtoObject >> class [
+	^self behavior classBinding
+]

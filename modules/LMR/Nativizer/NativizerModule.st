@@ -35,8 +35,8 @@ NativizerModule >> imports [
 NativizerModule >> inlinedMethods [
 	| map |
 	map := {
-		(ProtoObject -> #(#basicObjectIndexOf: #class #objectAtValid: #objectAtValid:put:)).
-		(LMRProtoObject -> #(#behavior #primitiveAt: #_cachedLookup: #_cachedLookup:in:)).
+		(ProtoObject -> #(#basicObjectIndexOf: #objectAtValid: #objectAtValid:put:)).
+		(LMRProtoObject -> #(#behavior #class #primitiveAt: #_cachedLookup: #_cachedLookup:in:)).
 		(Object -> #(#byteAtValid: #byteAtValid:put: #at:put:)).
 		(Species -> #(#instSize #_instancesAreArrayed #_instancesHavePointers #instanceBehavior)).
 		(LMRSpecies -> #(#memory #primitiveNew #primitiveNew:)).
@@ -52,8 +52,7 @@ NativizerModule >> inlinedMethods [
 NativizerModule >> invokedMethods [
 	| map |
 	map := {
-		(ProtoObject -> #(class)).
-		(LMRProtoObject -> #(behavior #initializeExtended:contentSize: primitiveAt:)).
+		(LMRProtoObject -> #(behavior class #initializeExtended:contentSize: primitiveAt:)).
 		(Object -> #(_replaceFrom:to:with:)).
 		(Species -> #(instanceBehavior _instancesAreArrayed _instancesHavePointers)).
 		(LMRSpecies -> #(allocate:size: nil:slotsOf: memory primitiveNewBytes: primitiveNewPointers: zero:bytesOf:))}.
