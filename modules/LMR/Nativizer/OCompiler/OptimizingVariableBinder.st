@@ -67,7 +67,7 @@ OptimizingVariableBinder >> associationFor: name [
 			assoc := ns associationAt: symbol ifAbsent: [nil].
 			assoc ifNotNil: [^assoc]].
 		current := current superclass].
-	^method classBinding module namespace associationAt: symbol ifAbsent: [nil]
+	^method module namespace associationAt: symbol ifAbsent: [nil]
 ]
 
 { #category : #unclassified }

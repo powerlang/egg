@@ -107,7 +107,7 @@ TemplateJIT >> staticBindingFor: aSymbol [
 			assoc := ns associationAt: name ifAbsent: [nil].
 			assoc ifNotNil: [^SAssociationBinding new association: assoc]].
 		current := current superclass].
-	module := method classBinding module.
+	module := method module.
 	module ifNotNil: [
 		assoc := module namespace associationAt: name ifAbsent: [nil].
 		assoc ifNotNil: [^SAssociationBinding new association: assoc]].
