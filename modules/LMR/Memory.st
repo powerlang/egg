@@ -877,7 +877,7 @@ Memory >> roots [
 { #category : #copying }
 Memory >> shallowCopy: object [
 	| headerSize answer size allocation objectPointer |
-	size := object _bodySizeInBytes.
+	size := object _sizeInBytes.
 	headerSize := object _headerSizeInBytes.
 	allocation := self allocate: headerSize + size.
 	objectPointer := allocation + headerSize _asPointer.

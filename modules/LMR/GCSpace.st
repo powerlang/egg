@@ -276,7 +276,7 @@ GCSpace >> histogram [
 { #category : #inquiries }
 GCSpace >> histogramInto: sizes [
 	self objectsDo: [:object | | size association |
-		size := object _bodySizeInBytes.
+		size := object _sizeInBytes.
 		association := sizes associationAt: object class ifAbsent: nil.
 		association
 			ifNil: [sizes at: object class put: size]
@@ -518,7 +518,7 @@ GCSpace >> resetSoftLimit: anInteger [
 { #category : #actions }
 GCSpace >> shallowCopy: object [
 	| size extra allocation oop copy |
-	size := object _bodySizeInBytes.
+	size := object _sizeInBytes.
 	extra := object _headerSizeInBytes.
 	allocation := self allocateIfPossible: extra + size.
 	allocation _isSmallInteger ifFalse: [^0].
@@ -534,7 +534,7 @@ GCSpace >> shallowCopy: object [
 { #category : #actions }
 GCSpace >> shallowCopyCommiting: object [
 	| size extra allocation oop copy |
-	size := object _bodySizeInBytes.
+	size := object _sizeInBytes.
 	extra := object _headerSizeInBytes.
 	allocation := self allocateCommittingIfNeeded: extra + size.
 	allocation _isSmallInteger ifFalse: [^nil].
