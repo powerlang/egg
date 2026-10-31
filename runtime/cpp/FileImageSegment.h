@@ -46,6 +46,7 @@ class FileImageSegment : public ImageSegment
 
    private:
     void load(std::istream* data);
+    void fixPointerSlotsFrom(uintptr_t start, uintptr_t limit, const std::vector<Object*>& imports);
     void readImportStrings(std::istream *data);
     void readImportDescriptors(std::istream *data);
     void readExports(std::istream *data);

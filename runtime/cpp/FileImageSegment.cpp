@@ -41,8 +41,9 @@ FileImageSegment::load(std::istream *data)
 
     _currentBase = this->alloc(header.baseAddress, header.reservedSize);
 
+    auto stored = header.codeSize == 0 ? header.size : this->codeEnd() - _currentBase;
     data->seekg(0, std::ios::beg);
-    data->read(reinterpret_cast<char*>(_currentBase), header.size);
+    data->read(reinterpret_cast<char*>(_currentBase), stored);
 
     if (data->fail())
         error("error reading image segment");
@@ -54,11 +55,18 @@ FileImageSegment::load(std::istream *data)
 
 void FileImageSegment::fixPointerSlots(const std::vector<Object*>& imports)
 {
+    this->fixPointerSlotsFrom(this->spaceStart(), this->spaceEnd(), imports);
+    if (header.codeSize != 0)
+        this->fixPointerSlotsFrom(this->codeStart(), this->codeEnd(), imports);
+    header.module = relocatedAddress_(header.module);
+}
+
+void FileImageSegment::fixPointerSlotsFrom(uintptr_t start, uintptr_t limit, const std::vector<Object*>& imports)
+{
     intptr_t delta = this->_currentBase - this->header.baseAddress;
     uintptr_t oldBehaviorBase = this->header.baseAddress & (((uintptr_t)-1) << 32); // discards lower 32 bits
-    auto spaceStart = this->spaceStart();
-    auto current = ((HeapObject::ObjectHeader*)spaceStart)->object();
-    auto end = (HeapObject*)this->spaceEnd();
+    auto current = ((HeapObject::ObjectHeader*)start)->object();
+    auto end = (HeapObject*)limit;
     while (current < end)
     {
         auto behavior = current->basicBehavior();
@@ -86,8 +94,6 @@ void FileImageSegment::fixPointerSlots(const std::vector<Object*>& imports)
         }
         current = current->nextObject();
     }
-
-    header.module = relocatedAddress_(header.module);
 }
 
 std::string& FileImageSegment::importStringAt_(uint32_t index)

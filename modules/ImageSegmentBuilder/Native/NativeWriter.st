@@ -11,7 +11,10 @@ Class {
 		'offsets',
 		'size',
 		'base',
-		'wordSize'
+		'wordSize',
+		'codeSize',
+		'dataObjects',
+		'codeObjects'
 	],
 	#category : #'Native'
 }
@@ -36,7 +39,13 @@ NativeWriter class >> objectsOffset [
 		The offset at which header terminates and objects are stored.
 		See ImageSegment.h in runtime/cpp for structure of a segment header
 	"
-	^40
+	^48
+]
+
+{ #category : #accessing }
+NativeWriter class >> codeAlignment [
+	"SegmentCodeAlignment in runtime/cpp/ImageSegment.h"
+	^16r10000
 ]
 
 
@@ -149,14 +158,34 @@ NativeWriter >> layoutObject: obj at: offset [
 ]
 
 { #category : #private }
+NativeWriter >> computeCode [
+	| code |
+	code := closure code.
+	dataObjects := OrderedCollection new.
+	codeObjects := OrderedCollection new.
+	objects do: [:obj |
+		obj _isSmallInteger ifFalse: [
+			(code includes: obj)
+				ifTrue: [codeObjects add: obj]
+				ifFalse: [dataObjects add: obj]]]
+]
+
+{ #category : #private }
+NativeWriter >> codeStart [
+	| alignment |
+	alignment := self class codeAlignment.
+	^size + alignment - 1 bitAnd: 0 - alignment
+]
+
+{ #category : #private }
 NativeWriter >> layoutObjects [
 	| offset subscript |
 	offset := self objectsOffset.
-	objects
-		do: [ :obj |
-			obj _isSmallInteger ifFalse: [
-				offset := self layoutObject: obj at: offset]].
+	dataObjects do: [:obj | offset := self layoutObject: obj at: offset].
 	size := offset.
+	offset := self codeStart.
+	codeObjects do: [:obj | offset := self layoutObject: obj at: offset].
+	codeSize := offset - self codeStart.
 	subscript := 0.
 	imports keysDo: [ :obj | self layoutImport: obj at: subscript. subscript := subscript + 1].
 	mapping keysAndValuesDo: [:obj :surrogate |
@@ -182,6 +211,7 @@ NativeWriter >> wordSize: anInteger [
 NativeWriter >> write [
 	self
 		computeImportStrings;
+		computeCode;
 		layoutObjects;
 		writeSignature;
 		writeHeader;
@@ -207,8 +237,11 @@ NativeWriter >> writeExports [
 { #category : #'own services' }
 NativeWriter >> writeHeader [
 	"See ImageSegment.h in runtimes/cpp for structure of a segment header"
-	stream nextULargePut: base; nextULargePut: size; nextULargePut: size + 16r20000.
-	self writeReferenceTo: closure module
+	| end |
+	end := codeSize = 0 ifTrue: [size] ifFalse: [self codeStart + codeSize].
+	stream nextULargePut: base; nextULargePut: size; nextULargePut: end + 16r20000.
+	self writeReferenceTo: closure module.
+	stream nextULargePut: codeSize
 ]
 
 { #category : #'*snapshotting' }
@@ -291,6 +324,20 @@ NativeWriter >> writeObjectBytes: obj [
 ]
 
 { #category : #accessing }
+NativeWriter >> hashOf: obj [
+	| hash |
+	hash := obj _basicHash.
+	hash = 0 ifFalse: [^hash].
+	^(closure code includes: obj) ifTrue: [self codeHashOf: obj] ifFalse: [0]
+]
+
+{ #category : #accessing }
+NativeWriter >> codeHashOf: obj [
+	"code is read-execute once loaded, so its hash can't be set lazily"
+	^(self offsetOf: obj) // 8 \\ 16rFFFF + 1
+]
+
+{ #category : #accessing }
 NativeWriter >> writeObjectHeader: obj [
 	| smallsize behavior |
 	obj _isLarge
@@ -303,7 +350,7 @@ NativeWriter >> writeObjectHeader: obj [
 			smallsize := obj _smallSize].
 	behavior := self encodedReferenceTo: obj behavior.
 	stream
-		nextUShortPut: obj _basicHash;
+		nextUShortPut: (self hashOf: obj);
 		nextPut: smallsize;
 		nextPut: obj _basicFlags;
 		nextULongPut: behavior.
@@ -318,8 +365,10 @@ NativeWriter >> writeObjectSlots: obj [
 { #category : #accessing }
 NativeWriter >> writeObjects [
 	self ASSERT: stream position == self objectsOffset.
-	objects do: [ :obj |
-		obj _isSmallInteger ifFalse: [ self writeObjectHeader: obj; writeObjectBody: obj ]]
+	dataObjects do: [:obj | self writeObjectHeader: obj; writeObjectBody: obj].
+	codeSize = 0 ifTrue: [^self].
+	self codeStart - stream position timesRepeat: [stream nextPut: 0].
+	codeObjects do: [:obj | self writeObjectHeader: obj; writeObjectBody: obj]
 ]
 
 { #category : #accessing }

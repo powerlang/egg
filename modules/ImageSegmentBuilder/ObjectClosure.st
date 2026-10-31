@@ -10,6 +10,7 @@ Class {
 		'queue',
 		'added',
 		'objects',
+		'code',
 		'mapping',
 		'boundary',
 		'scope',
@@ -75,6 +76,16 @@ ObjectClosure >> analyze: anObject from: source [
 ]
 
 { #category : #accessing }
+ObjectClosure >> addCode: aByteArray [
+	code add: aByteArray
+]
+
+{ #category : #accessing }
+ObjectClosure >> code [
+	^code
+]
+
+{ #category : #accessing }
 ObjectClosure >> boundary [
 	^boundary
 ]
@@ -100,6 +111,7 @@ ObjectClosure >> initialize [
 	queue := OrderedCollection new: 2000.
 	added := IdentitySet new: 2000.
 	objects := OrderedCollection new: 2000.
+	code := IdentitySet new.
 	boundary := IdentityDictionary new: 100.
 	nilToken := Object new.
 	scope := Set new.

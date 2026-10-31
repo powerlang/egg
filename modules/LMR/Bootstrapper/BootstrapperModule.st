@@ -6,6 +6,9 @@
 Class {
 	#name : #BootstrapperModule,
 	#superclass : #Module,
+	#instVars : [
+		'codeSegments'
+	],
 	#category : #'LMR-Bootstrapper'
 }
 
@@ -69,7 +72,8 @@ BootstrapperModule >> nativizeStartEntry: env [
 		nativeCode: code optimizedCode;
 		yourself.
 	machineCode behavior: behavior.
-	self export: code optimizedCode as: #__start__
+	self export: code optimizedCode as: #__start__.
+	(self codeSegmentOf: self) add: machineCode
 ]
 
 { #category : #bootstrapping }
@@ -128,9 +132,22 @@ BootstrapperModule >> nativizeWriteBarrierFor: anLMRModule env: env nativizer: a
 
 { #category : #bootstrapping }
 BootstrapperModule >> nativizeSendSiteStubs: env [
-	env lmrModule
-		micStub: (self nativizeMonomorphicCacheWith: env);
-		picStub: (self nativizePolymorphicCacheWith: env)
+	| mic pic |
+	mic := self nativizeMonomorphicCacheWith: env.
+	pic := self nativizePolymorphicCacheWith: env.
+	env lmrModule micStub: mic; picStub: pic.
+	(self codeSegmentOf: env lmrModule) add: mic; add: pic
+]
+
+{ #category : #initialization }
+BootstrapperModule >> justLoaded [
+	super justLoaded.
+	codeSegments := IdentityDictionary new
+]
+
+{ #category : #snapshotting }
+BootstrapperModule >> codeSegmentOf: aModule [
+	^codeSegments at: aModule ifAbsentPut: [OrderedCollection new]
 ]
 
 { #category : #bootstrapping }
@@ -227,10 +244,25 @@ BootstrapperModule >> writeSegments [
 		self class module.             "LMR.Bootstrapper"
 	}.
 	closure := self importsClosureFor: roots.
-	closure do: [:m |
-		| filename |
-		filename := 'image-segments/lmr/' , m name , '.ems'.
-		m writeCachedSegmentAt: filename].
+	Kernel load: #'ImageSegmentBuilder.Native'.
+	closure do: [:module | self writeSegmentOf: module].
+]
+
+{ #category : #snapshotting }
+BootstrapperModule >> writeSegmentOf: aModule [
+	| filename builder code |
+	filename := 'image-segments/lmr/' , aModule name , '.ems'.
+	builder := aModule newSegmentBuilder.
+	code := codeSegments at: aModule ifAbsent: [#()].
+	code do: [:bytes | builder addCode: bytes].
+	aModule writeCachedSegmentAt: filename with: builder
+]
+
+{ #category : #snapshotting }
+BootstrapperModule >> prepareForSnapshot: aBuilder [
+	"bootstrap state, not part of the segment"
+	super prepareForSnapshot: aBuilder.
+	aBuilder map: codeSegments to: nil
 ]
 
 { #category : #snapshotting }

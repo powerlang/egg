@@ -26,10 +26,18 @@ Module >> nativizerBlock [
 ]
 
 { #category : #'*snapshotting' }
+Module >> newSegmentBuilder [
+	^Builder new module: self; nativizerBlock: self nativizerBlock; yourself
+]
+
+{ #category : #'*snapshotting' }
 Module >> writeImageSegmentUsing: aWriter [
-	| builder |
-	builder := Builder new.
-	builder module: self; nativizerBlock: self nativizerBlock; build.
+	^self writeImageSegmentUsing: aWriter with: self newSegmentBuilder
+]
+
+{ #category : #'*snapshotting' }
+Module >> writeImageSegmentUsing: aWriter with: builder [
+	builder build.
 	^aWriter
 		closure: builder closure;
 		objects: builder objects;

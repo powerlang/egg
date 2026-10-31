@@ -1,12 +1,11 @@
 #include "Launcher.h"
 
 #include "Egg.h"
+#include "Allocator/Memory.h"
 
 #include <fstream>
 #include <vector>
 
-#include <sys/mman.h>
-#include <unistd.h>
 
 namespace lmr
 {
@@ -26,6 +25,16 @@ void Launcher::relocate()
     auto sentinel = reinterpret_cast<Egg::Object*>(_segment->spaceStart());
     std::vector<Egg::Object*> imports(_segment->_importDescriptors.size(), sentinel);
     _segment->fixPointerSlots(imports);
+    this->makeExecutable();
+}
+
+void Launcher::makeExecutable()
+{
+    if (_segment->header.codeSize == 0)
+        return;
+    auto start = _segment->codeStart();
+    auto end = Egg::pagealign(_segment->codeEnd());
+    Egg::MakeExecutable(start, end - start);
 }
 
 Egg::HeapObject* Launcher::exported(const std::string& name)
@@ -39,13 +48,6 @@ uint64_t Launcher::run(const std::string& name)
     auto nativeCode = exported(name);
     auto machineCode = reinterpret_cast<Egg::HeapObject*>(nativeCode->slot(0));
     auto code = reinterpret_cast<uint8_t*>(&machineCode->byte(0));
-    auto size = machineCode->size();
-
-    auto pageSize = static_cast<uintptr_t>(sysconf(_SC_PAGESIZE));
-    auto pageStart = reinterpret_cast<uintptr_t>(code) & ~(pageSize - 1);
-    auto pageEnd = reinterpret_cast<uintptr_t>(code) + size;
-    mprotect(reinterpret_cast<void*>(pageStart), pageEnd - pageStart, PROT_READ | PROT_EXEC);
-
     auto entry = reinterpret_cast<uint64_t (*)()>(code);
     return entry();
 }

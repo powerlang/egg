@@ -87,11 +87,23 @@ Builder >> mapMethod: method [
 	copy invalidateOptimizedCode.
 	module requiresNativization ifTrue: [nativizerBlock value: copy].
 	closure map: method to: copy.
+	self addNativeCodeOf: copy.
 	method hasBlocks ifFalse: [^self].
 	method withIndexDo: [:b :i | | bcopy |
 		b isBlock ifTrue: [
 			bcopy := copy at: i.
-			closure map: b to: bcopy]]
+			closure map: b to: bcopy.
+			self addNativeCodeOf: bcopy]]
+]
+
+{ #category : #accessing }
+Builder >> addCode: aByteArray [
+	closure addCode: aByteArray
+]
+
+{ #category : #private }
+Builder >> addNativeCodeOf: aCompiledCode [
+	aCompiledCode optimizedCode ifNotNil: [:native | closure addCode: native code]
 ]
 
 { #category : #private }

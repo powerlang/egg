@@ -32,6 +32,7 @@ class Launcher
     uint64_t run(const std::string& name);
 
   private:
+    void makeExecutable();
     std::unique_ptr<Egg::FileImageSegment> _segment;
 };
 
