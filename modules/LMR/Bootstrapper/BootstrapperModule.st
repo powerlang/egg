@@ -15,7 +15,7 @@ Class {
 { #category : #spec }
 BootstrapperModule >> imports [
 	^{
-		#Kernel -> #(OrderedCollection IdentityDictionary Object Magnitude ProtoObject SmallInteger CallbackBehavior).
+		#Kernel -> #(OrderedCollection IdentityDictionary Object Magnitude ProtoObject SmallInteger CallbackBehavior MethodDictionary).
 		#'Kernel.LMR' -> #(LMRProtoObject).
 		#LMR -> #(Memory NativeCode SendSite GCSpace CriticalArray).
 		#'LMR.Nativizer' -> #(NativizerModule NativizationPlatform NativizationEnvironment LookupNativizer LookupLinker)
@@ -67,8 +67,8 @@ BootstrapperModule >> nativizeStartEntry: env [
 	original := machineCode behavior.
 	behavior := CallbackBehavior new
 		classBinding: original classBinding;
-		methods: original methods;
-		next: original next;
+		methods: MethodDictionary new;
+		next: original;
 		nativeCode: code optimizedCode;
 		yourself.
 	machineCode behavior: behavior.

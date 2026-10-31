@@ -41,11 +41,12 @@ installed on the entry's machine-code bytes:
       callbackMethod.receiver → the callback receiver
 ```
 
-`BootstrapperModule>>nativizeStartEntry:` builds that `CallbackBehavior` by
-**mirroring** the machine-code object's real behavior (its `class`/`methods`/
-`next`, so the object stays a valid byte array) and adding the `nativeCode`
-back-pointer. Because the behavior is per-object rather than a shared class
-behavior, the segment writer would normally treat it as an import boundary —
+`BootstrapperModule>>nativizeStartEntry:` builds that `CallbackBehavior` with
+the machine-code object's class, no methods of its own and the object's real
+behavior as `next` (so the object stays a valid byte array without copying
+its methods), plus the `nativeCode` back-pointer. Because the behavior is
+per-object rather than a shared class behavior, the segment writer would
+normally treat it as an import boundary —
 `CallbackBehavior>>shouldBeStoredIn:` is overridden to `^true` so it travels
 inside the segment.
 
