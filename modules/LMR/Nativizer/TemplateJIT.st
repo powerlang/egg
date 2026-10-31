@@ -112,6 +112,9 @@ TemplateJIT >> staticBindingFor: aSymbol [
 	module ifNotNil: [
 		assoc := module namespace associationAt: name ifAbsent: [nil].
 		assoc ifNotNil: [^SAssociationBinding new association: assoc]].
+	assoc := LMRProtoObject module namespace associationAt: name ifAbsent: [nil].
+	assoc ifNotNil: [^SAssociationBinding new association: assoc].
+	Kernel host logWarning: 'undeclared ' , name , ' in ' , method classBinding name , '>>' , method selector.
 	^nil
 ]
 

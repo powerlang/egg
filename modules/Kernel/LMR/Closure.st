@@ -86,3 +86,13 @@ LMRClosure >> saveHomeFrame [
 LMRClosure >> _return: result [
 	^self return: result
 ]
+
+{ #category : #accessing }
+LMRClosure >> argumentCount [
+	^block argumentCount
+]
+
+{ #category : #ffi }
+LMRClosure >> asCallback [
+	^self errorVMSpecific
+]

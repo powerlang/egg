@@ -184,3 +184,7 @@ LMRFloat >> truncated [
 		ifFalse: [self asTrueFraction]
 ]
 
+{ #category : #errors }
+LMRFloat class >> status [
+	^Status uLongAtOffset: 0
+]

@@ -440,3 +440,15 @@ LMRProtoObject >> smallOop [
 LMRProtoObject >> class [
 	^self behavior classBinding
 ]
+
+{ #category : #'header access' }
+LMRProtoObject >> _longSlotAt: index [
+	^index = _Behavior
+		ifTrue: [self behavior]
+		ifFalse: [self _basicULongAt: index]
+]
+
+{ #category : #'header access' }
+LMRProtoObject >> _longSlotAt: index put: anObject [
+	^self _basicULongAt: index put: anObject
+]
