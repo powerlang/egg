@@ -207,3 +207,11 @@ ARM64CodeGeneratorTest >> testReturnAddress [
 	codegen saveReturnAddress; restoreReturnAddress.
 	self assert: self words asArray equals: #(16rF81F0FFE 16rF84107FE)
 ]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testStoreShort [
+	| memory |
+	memory := codegen memRef16: (self x: 2) offsetImm: 6.
+	codegen store: (self x: 1) intoMem: memory.
+	self assert: self words asArray equals: #(16r79000C41)
+]

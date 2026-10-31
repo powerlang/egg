@@ -1841,14 +1841,14 @@ GenericAssembler >> storeRinTindex: index [
 GenericAssembler >> storeShortAinRoffset: offset [
 	|  memref |
 	memref := codegen memRef16: codegen regR offsetImm: offset.
-	codegen store: codegen regA short intoMem: memref
+	codegen store: codegen regA intoMem: memref
 ]
 
 { #category : #storing }
 GenericAssembler >> storeShortTinRatOffsetA [
 	| memref |
 	memref := codegen memRef16: codegen regR offset: codegen regA.
-	codegen store: codegen regT short intoMem: memref
+	codegen store: codegen regT intoMem: memref
 ]
 
 { #category : #storing }
