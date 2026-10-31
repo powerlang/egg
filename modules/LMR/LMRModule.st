@@ -5,8 +5,7 @@ Class {
 		'globals',
 		'memory',
 		'micStub',
-		'picStub',
-		'nativizerBlock'
+		'picStub'
 	],
 	#category : #LMR
 }
@@ -58,21 +57,6 @@ LMRModule >> imports [
 { #category : #accessing }
 LMRModule >> globals: anArray [
 	globals := anArray
-]
-
-{ #category : #snapshotting }
-LMRModule >> requiresNativization [
-	^false
-]
-
-{ #category : #snapshotting }
-LMRModule >> nativizerBlock [
-	^nativizerBlock
-]
-
-{ #category : #snapshotting }
-LMRModule >> nativizerBlock: aBlock [
-	nativizerBlock := aBlock
 ]
 
 { #category : #accessing }
