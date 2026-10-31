@@ -264,8 +264,8 @@ ARM64TemplateAssembler >> loadAwithFalse [
 
 { #category : #templates }
 ARM64TemplateAssembler >> loadAwithFPindex: anInteger [
-	(anInteger between: 1 and: 4096) ifTrue: [^codegen emit: 16rF93FFFA1 + (anInteger * 1024)].
-	(anInteger between: -31 and: 0) ifTrue: [^codegen emit: 16rF85F83A1 + (anInteger * 32768)].
+	(anInteger between: 1 and: 2048) ifTrue: [^codegen emit: 16rF93FFBA1 + (anInteger * 2048)].
+	(anInteger between: -15 and: 0) ifTrue: [^codegen emit: 16rF85F03A1 + (anInteger * 65536)].
 	^super loadAwithFPindex: anInteger
 ]
 
@@ -342,8 +342,8 @@ ARM64TemplateAssembler >> loadEwithAddressOfRatA [
 
 { #category : #templates }
 ARM64TemplateAssembler >> loadEwithFPindex: anInteger [
-	(anInteger between: 1 and: 4096) ifTrue: [^codegen emit: 16rF93FFFB4 + (anInteger * 1024)].
-	(anInteger between: -31 and: 0) ifTrue: [^codegen emit: 16rF85F83B4 + (anInteger * 32768)].
+	(anInteger between: 1 and: 2048) ifTrue: [^codegen emit: 16rF93FFBB4 + (anInteger * 2048)].
+	(anInteger between: -15 and: 0) ifTrue: [^codegen emit: 16rF85F03B4 + (anInteger * 65536)].
 	^super loadEwithFPindex: anInteger
 ]
 
@@ -412,8 +412,8 @@ ARM64TemplateAssembler >> loadMwithA [
 
 { #category : #templates }
 ARM64TemplateAssembler >> loadMwithFPindex: anInteger [
-	(anInteger between: 1 and: 4096) ifTrue: [^codegen emit: 16rF93FFFB3 + (anInteger * 1024)].
-	(anInteger between: -31 and: 0) ifTrue: [^codegen emit: 16rF85F83B3 + (anInteger * 32768)].
+	(anInteger between: 1 and: 2048) ifTrue: [^codegen emit: 16rF93FFBB3 + (anInteger * 2048)].
+	(anInteger between: -15 and: 0) ifTrue: [^codegen emit: 16rF85F03B3 + (anInteger * 65536)].
 	^super loadMwithFPindex: anInteger
 ]
 
@@ -468,7 +468,7 @@ ARM64TemplateAssembler >> loadRwithA [
 ARM64TemplateAssembler >> loadRwithArgPointer [
 	codegen
 		emit: 16rAA1D03E0;
-		emit: 16r91004000
+		emit: 16r91008000
 ]
 
 { #category : #templates }
@@ -495,8 +495,8 @@ ARM64TemplateAssembler >> loadRwithFP [
 
 { #category : #templates }
 ARM64TemplateAssembler >> loadRwithFPindex: anInteger [
-	(anInteger between: 1 and: 4096) ifTrue: [^codegen emit: 16rF93FFFA0 + (anInteger * 1024)].
-	(anInteger between: -31 and: 0) ifTrue: [^codegen emit: 16rF85F83A0 + (anInteger * 32768)].
+	(anInteger between: 1 and: 2048) ifTrue: [^codegen emit: 16rF93FFBA0 + (anInteger * 2048)].
+	(anInteger between: -15 and: 0) ifTrue: [^codegen emit: 16rF85F03A0 + (anInteger * 65536)].
 	^super loadRwithFPindex: anInteger
 ]
 
@@ -563,8 +563,8 @@ ARM64TemplateAssembler >> loadRwithSindex: anInteger [
 
 { #category : #templates }
 ARM64TemplateAssembler >> loadRwithSPindex: anInteger [
-	(anInteger between: 1 and: 4096) ifTrue: [^codegen emit: 16rF93FFFE0 + (anInteger * 1024)].
-	(anInteger between: -31 and: 0) ifTrue: [^codegen emit: 16rF85F83E0 + (anInteger * 32768)].
+	(anInteger between: 1 and: 2048) ifTrue: [^codegen emit: 16rF93FFBE0 + (anInteger * 2048)].
+	(anInteger between: -15 and: 0) ifTrue: [^codegen emit: 16rF85F03E0 + (anInteger * 65536)].
 	^super loadRwithSPindex: anInteger
 ]
 
@@ -602,8 +602,8 @@ ARM64TemplateAssembler >> loadSwithAddressOfSatA [
 
 { #category : #templates }
 ARM64TemplateAssembler >> loadSwithFPindex: anInteger [
-	(anInteger between: 1 and: 4096) ifTrue: [^codegen emit: 16rF93FFFA2 + (anInteger * 1024)].
-	(anInteger between: -31 and: 0) ifTrue: [^codegen emit: 16rF85F83A2 + (anInteger * 32768)].
+	(anInteger between: 1 and: 2048) ifTrue: [^codegen emit: 16rF93FFBA2 + (anInteger * 2048)].
+	(anInteger between: -15 and: 0) ifTrue: [^codegen emit: 16rF85F03A2 + (anInteger * 65536)].
 	^super loadSwithFPindex: anInteger
 ]
 
@@ -617,6 +617,16 @@ ARM64TemplateAssembler >> loadSwithGindex: anInteger [
 { #category : #templates }
 ARM64TemplateAssembler >> loadSwithNil [
 	codegen emit: 16rAA1603E2
+]
+
+{ #category : #templates }
+ARM64TemplateAssembler >> loadSwithRbehavior [
+	codegen
+		emit: 16rB85FC002;
+		emit: 16rAA0003F0;
+		emit: 16rD360FE10;
+		emit: 16rD3607E10;
+		emit: 16rAA100042
 ]
 
 { #category : #templates }
@@ -654,8 +664,8 @@ ARM64TemplateAssembler >> loadTwithEindex: anInteger [
 
 { #category : #templates }
 ARM64TemplateAssembler >> loadTwithFPindex: anInteger [
-	(anInteger between: 1 and: 4096) ifTrue: [^codegen emit: 16rF93FFFA3 + (anInteger * 1024)].
-	(anInteger between: -31 and: 0) ifTrue: [^codegen emit: 16rF85F83A3 + (anInteger * 32768)].
+	(anInteger between: 1 and: 2048) ifTrue: [^codegen emit: 16rF93FFBA3 + (anInteger * 2048)].
+	(anInteger between: -15 and: 0) ifTrue: [^codegen emit: 16rF85F03A3 + (anInteger * 65536)].
 	^super loadTwithFPindex: anInteger
 ]
 
@@ -903,6 +913,11 @@ ARM64TemplateAssembler >> restoreCallerFrame [
 ]
 
 { #category : #templates }
+ARM64TemplateAssembler >> restoreReturnAddress [
+	codegen emit: 16rF84107FE
+]
+
+{ #category : #templates }
 ARM64TemplateAssembler >> return [
 	codegen emit: 16rD65F03C0
 ]
@@ -910,6 +925,11 @@ ARM64TemplateAssembler >> return [
 { #category : #templates }
 ARM64TemplateAssembler >> roundDoubleX0intoX1 [
 	codegen emit: 16r1E65C001
+]
+
+{ #category : #templates }
+ARM64TemplateAssembler >> saveReturnAddress [
+	codegen emit: 16rF81F0FFE
 ]
 
 { #category : #templates }
@@ -1039,8 +1059,8 @@ ARM64TemplateAssembler >> storeRinEindex: anInteger [
 
 { #category : #templates }
 ARM64TemplateAssembler >> storeRinFPindex: anInteger [
-	(anInteger between: 1 and: 4096) ifTrue: [^codegen emit: 16rF8FFFFA0 + (anInteger * 1024)].
-	(anInteger between: -31 and: 0) ifTrue: [^codegen emit: 16rF81F83A0 + (anInteger * 32768)].
+	(anInteger between: 1 and: 2048) ifTrue: [^codegen emit: 16rF8FFFBA0 + (anInteger * 2048)].
+	(anInteger between: -15 and: 0) ifTrue: [^codegen emit: 16rF81F03A0 + (anInteger * 65536)].
 	^super storeRinFPindex: anInteger
 ]
 
@@ -1104,6 +1124,11 @@ ARM64TemplateAssembler >> subDoubleX1fromX0 [
 { #category : #templates }
 ARM64TemplateAssembler >> testRintegerBit [
 	codegen emit: 16rF240001F
+]
+
+{ #category : #templates }
+ARM64TemplateAssembler >> testRwithR [
+	codegen emit: 16rEA00001F
 ]
 
 { #category : #templates }

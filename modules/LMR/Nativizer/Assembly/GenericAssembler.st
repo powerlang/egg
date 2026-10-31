@@ -293,7 +293,7 @@ GenericAssembler >> decRindirect [
 { #category : #private }
 GenericAssembler >> discardArguments: anInteger [
 	anInteger = 0 ifTrue: [^self].
-	codegen addImm: anInteger * codegen wordSize to: codegen regSP
+	codegen addImm: anInteger * codegen stackSlotSize to: codegen regSP
 ]
 
 { #category : #'floting point' }
@@ -308,7 +308,7 @@ GenericAssembler >> dropTopOfFPU [
 
 { #category : #'push/pop' }
 GenericAssembler >> dropTos: count [
-	codegen addImm: (count * codegen addressSize) to: codegen regSP
+	codegen addImm: (count * codegen stackSlotSize) to: codegen regSP
 ]
 
 { #category : #arithmetic }
@@ -486,7 +486,7 @@ GenericAssembler >> loadAwithEindex: index [
 { #category : #loading }
 GenericAssembler >> loadAwithFPindex: index [
 	| memref |
-	memref := codegen memRef: codegen regFP indexImm: index.
+	memref := codegen memRef: codegen regFP stackIndexImm: index.
 	codegen
 		load: codegen regA
 		fromMem: memref
@@ -600,7 +600,7 @@ GenericAssembler >> loadEwithAddressOfRatA [
 { #category : #loading }
 GenericAssembler >> loadEwithFPindex: index [
 	| memref |
-	memref := codegen memRef: codegen regFP indexImm: index.
+	memref := codegen memRef: codegen regFP stackIndexImm: index.
 	codegen
 		load: codegen regE
 		fromMem: memref
@@ -694,7 +694,7 @@ GenericAssembler >> loadMwithA [
 { #category : #loading }
 GenericAssembler >> loadMwithFPindex: index [
 	| memref |
-	memref := codegen memRef: codegen regFP indexImm: index.
+	memref := codegen memRef: codegen regFP stackIndexImm: index.
 	codegen
 		load: codegen regM
 		fromMem: memref
@@ -760,7 +760,7 @@ GenericAssembler >> loadRwithA [
 { #category : #'push/pop' }
 GenericAssembler >> loadRwithArgPointer [
 	| memref |
-	memref := codegen memRef: codegen regFP indexImm: 3.
+	memref := codegen memRef: codegen regFP stackIndexImm: 3.
 	codegen lea: codegen regR withMem: memref
 ]
 
@@ -786,7 +786,7 @@ GenericAssembler >> loadRwithFP [
 { #category : #loading }
 GenericAssembler >> loadRwithFPindex: index [
 	| memref |
-	memref := codegen memRef: codegen regFP indexImm: index.
+	memref := codegen memRef: codegen regFP stackIndexImm: index.
 	codegen
 		load: codegen regR
 		fromMem: memref
@@ -860,7 +860,7 @@ GenericAssembler >> loadRwithS [
 { #category : #loading }
 GenericAssembler >> loadRwithSPindex: index [
 	| memref |
-	memref := codegen memRef: codegen regSP indexImm: index.
+	memref := codegen memRef: codegen regSP stackIndexImm: index.
 	codegen
 		load: codegen regR
 		fromMem: memref
@@ -918,7 +918,7 @@ GenericAssembler >> loadSwithAddressOfSatA [
 { #category : #loading }
 GenericAssembler >> loadSwithFPindex: index [
 	| memref |
-	memref := codegen memRef: codegen regFP indexImm: index.
+	memref := codegen memRef: codegen regFP stackIndexImm: index.
 	codegen
 		load: codegen regS
 		fromMem: memref
@@ -982,7 +982,7 @@ GenericAssembler >> loadTwithEindex: index [
 { #category : #loading }
 GenericAssembler >> loadTwithFPindex: index [
 	| memref |
-	memref := codegen memRef: codegen regFP indexImm: index.
+	memref := codegen memRef: codegen regFP stackIndexImm: index.
 	codegen
 		load: codegen regT
 		fromMem: memref
@@ -1283,7 +1283,7 @@ GenericAssembler >> popS [
 { #category : #'operations - arithmetic' }
 GenericAssembler >> popSPindirect [
 	| memref |
-	memref := codegen memRef: codegen regSP indexImm: 1.
+	memref := codegen memRef: codegen regSP stackIndexImm: 1.
 	codegen popIntoMem: memref
 ]
 
@@ -1492,7 +1492,7 @@ GenericAssembler >> renameByteRegisterIfNeeded: register preserving: preserved1 
 
 { #category : #loading }
 GenericAssembler >> reserveStackSlots: amount [
-	codegen subImm: amount * codegen addressSize from: codegen regSP
+	codegen subImm: amount * codegen stackSlotSize from: codegen regSP
 ]
 
 { #category : #initialization }
@@ -1813,7 +1813,7 @@ GenericAssembler >> storeRinEindex: index [
 { #category : #storing }
 GenericAssembler >> storeRinFPindex: index [
 	| memref |
-	memref := codegen memRef: codegen regFP indexImm: index.
+	memref := codegen memRef: codegen regFP stackIndexImm: index.
 	codegen
 		store: codegen regR
 		intoMem: memref
