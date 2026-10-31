@@ -112,6 +112,13 @@ void Egg::DecommitMemory(uintptr_t base, uintptr_t size)
     }
 }
 
+void Egg::MakeWritable(uintptr_t base, uintptr_t size)
+{
+    if (mprotect((void*)base, size, PROT_READ | PROT_WRITE) != 0) {
+        error("Failed to make memory writable.");
+    }
+}
+
 void Egg::MakeExecutable(uintptr_t base, uintptr_t size)
 {
     __builtin___clear_cache((char*)base, (char*)(base + size));

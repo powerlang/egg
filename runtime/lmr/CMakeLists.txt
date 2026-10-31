@@ -28,7 +28,7 @@ add_library(lmr_egg STATIC
     ${CPP}/${PLATFORM}/Memory.cpp)
 target_include_directories(lmr_egg PUBLIC ${CPP} ${CPP}/${PLATFORM} ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_library(lmr_launcher STATIC Launcher.cpp)
+add_library(lmr_launcher STATIC Launcher.cpp CodeInstaller.cpp)
 target_link_libraries(lmr_launcher PUBLIC lmr_egg)
 target_include_directories(lmr_launcher PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

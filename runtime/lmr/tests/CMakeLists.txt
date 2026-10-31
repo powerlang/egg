@@ -9,6 +9,7 @@ add_executable(lmr_tests
     test_03_relocate.cpp
     test_04_run.cpp
     test_06_code.cpp
+    test_07_install.cpp
 )
 
 set_property(TARGET lmr_tests PROPERTY CXX_STANDARD 20)
