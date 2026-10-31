@@ -169,6 +169,16 @@ ReadStream >> nextByte [
 	^self next asInteger
 ]
 
+{ #category : #marshalling }
+ReadStream >> int64 [
+	| n |
+	n := 0.
+	8 timesRepeat: [n := (n bitShift: 8) bitOr: self next].
+	n >= 16r8000000000000000
+		ifTrue: [n := n - 16r10000000000000000].
+	^n
+]
+
 { #category : #parsing }
 ReadStream >> nextChunk [
 	| bulk index n m bytes cr chunk |
