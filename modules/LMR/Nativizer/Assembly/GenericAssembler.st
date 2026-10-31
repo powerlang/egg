@@ -1986,3 +1986,17 @@ GenericAssembler >> xorRwithA [
 	codegen xor: codegen regR with: codegen regA
 ]
 
+{ #category : #prologue }
+GenericAssembler >> callPushesReturnAddress [
+	^codegen callPushesReturnAddress
+]
+
+{ #category : #prologue }
+GenericAssembler >> saveReturnAddress [
+	codegen saveReturnAddress
+]
+
+{ #category : #prologue }
+GenericAssembler >> restoreReturnAddress [
+	codegen restoreReturnAddress
+]

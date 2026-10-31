@@ -200,3 +200,10 @@ ARM64CodeGeneratorTest >> testTestRegisters [
 	codegen test: (self x: 3) with: (self x: 2).
 	self assert: self words asArray equals: #(16rEA02007F)
 ]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testReturnAddress [
+	self deny: codegen callPushesReturnAddress.
+	codegen saveReturnAddress; restoreReturnAddress.
+	self assert: self words asArray equals: #(16rF81F0FFE 16rF84107FE)
+]

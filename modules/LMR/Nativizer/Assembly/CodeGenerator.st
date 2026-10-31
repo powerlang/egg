@@ -665,3 +665,15 @@ CodeGenerator >> wordSizeShift [
 	^wordSize = 8 ifTrue: [3] ifFalse: [2]
 ]
 
+{ #category : #prologue }
+CodeGenerator >> callPushesReturnAddress [
+	^true
+]
+
+{ #category : #prologue }
+CodeGenerator >> saveReturnAddress [
+]
+
+{ #category : #prologue }
+CodeGenerator >> restoreReturnAddress [
+]

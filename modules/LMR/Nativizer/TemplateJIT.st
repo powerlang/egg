@@ -48,8 +48,9 @@ TemplateJIT >> argumentInStackAt: index [
 	method hasFrame ifTrue: [ 
 		end := 3 + args.
 	assembler loadRwithFPindex: end - index ] ifFalse: [ 
-		end := 2 + args.
-		assembler  loadRwithSPindex: end - index
+		end := args + 1.
+		assembler callPushesReturnAddress ifTrue: [end := end + 1].
+		assembler loadRwithSPindex: end - index
 	 ]
 ]
 
@@ -282,10 +283,14 @@ TemplateJIT >> emitSend: selector super: aBoolean [
 
 { #category : #services }
 TemplateJIT >> emitWriteBarrier [
+	| saving |
+	saving := method isFrameless and: [assembler callPushesReturnAddress not].
+	saving ifTrue: [assembler popT; saveReturnAddress; pushT].
 	assembler
 		loadAwithGlobal: #WriteBarrier;
 		callIndirectA;
-		discardArguments: 1
+		discardArguments: 1.
+	saving ifTrue: [assembler restoreReturnAddress]
 ]
 
 { #category : #accessing }

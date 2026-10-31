@@ -822,3 +822,18 @@ ARM64CodeGenerator >> loadBehavior: dstReg of: objectReg [
 		shiftLeft: self regV byImm: 32;
 		or: dstReg with: self regV
 ]
+
+{ #category : #prologue }
+ARM64CodeGenerator >> callPushesReturnAddress [
+	^false
+]
+
+{ #category : #prologue }
+ARM64CodeGenerator >> saveReturnAddress [
+	self push: x30
+]
+
+{ #category : #prologue }
+ARM64CodeGenerator >> restoreReturnAddress [
+	self pop: x30
+]
