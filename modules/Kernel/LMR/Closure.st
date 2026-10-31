@@ -19,38 +19,38 @@ LMRClosure >> evaluateAtomically [
 { #category : '*handling' }
 LMRClosure >> evaluateWith: value [
 	block argumentCount = 1 ifFalse: [^self arityError: 1].
-	self _transferControlTo: block blockNativeCode
+	self _transferControlTo: block blockOptimizedCode
 ]
 
 { #category : '*handling' }
 LMRClosure >> evaluateWith: anObject with: anotherObject [
 	block argumentCount = 2
 		ifFalse: [^super evaluateWith: anObject with: anotherObject].
-	self _transferControlTo: block blockNativeCode
+	self _transferControlTo: block blockOptimizedCode
 ]
 
 { #category : '*handling' }
 LMRClosure >> value [
 	block argumentCount = 0 ifFalse: [^self arityError: 0].
-	self _transferControlTo: block blockNativeCode
+	self _transferControlTo: block blockOptimizedCode
 ]
 
 { #category : '*handling' }
 LMRClosure >> value: first [
 	block argumentCount = 1 ifFalse: [^self arityError: 1].
-	self _transferControlTo: block blockNativeCode
+	self _transferControlTo: block blockOptimizedCode
 ]
 
 { #category : '*handling' }
 LMRClosure >> value: first value: second [
 	block argumentCount = 2 ifFalse: [^self arityError: 2].
-	self _transferControlTo: block blockNativeCode
+	self _transferControlTo: block blockOptimizedCode
 ]
 
 { #category : '*handling' }
 LMRClosure >> value: first value: second value: third [
 	block argumentCount = 3 ifFalse: [^self arityError: 3].
-	self _transferControlTo: block blockNativeCode
+	self _transferControlTo: block blockOptimizedCode
 ]
 
 { #category : '*handling' }
@@ -59,7 +59,7 @@ LMRClosure >> valueWithArguments: arguments [
 	size := arguments basicSize.
 	block argumentCount = size ifFalse: [^self arityError: size].
 	arguments _expandInStackSized: size.
-	^self _invoke: block blockNativeCode
+	^self _invoke: block blockOptimizedCode
 ]
 
 { #category : '*handling' }
@@ -76,6 +76,13 @@ LMRClosure >> whileTrue: aBlock [
 	self _restart
 ]
 
+{ #category : '*handling' }
+LMRClosure >> saveHomeFrame [
+	"tagged as a SmallInteger so the GC doesn't take it for an object"
+	homeFrame := self _framePointer _asPointer
+]
 
-
-
+{ #category : '*handling' }
+LMRClosure >> _return: result [
+	^self return: result
+]

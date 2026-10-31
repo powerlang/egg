@@ -436,12 +436,8 @@ TemplateJIT >> loadBlockNativeCode [
 
 { #category : #services }
 TemplateJIT >> loadBlockSelf: aCompiledBlock [
-	| offset | 
 	aCompiledBlock capturesSelf
-		ifTrue: [ offset := aCompiledBlock capturesHome
-				ifTrue: [ 1 ]
-				ifFalse: [ 0 ].
-			assembler loadSwithRindex: Closure instSize + 1 + offset ]
+		ifTrue: [ assembler loadSwithRindex: Closure instSize + 1 ]
 		ifFalse: [ assembler loadSwithNil ].
 	assembler pushS
 ]
