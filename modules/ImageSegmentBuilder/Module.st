@@ -27,7 +27,11 @@ Module >> nativizerBlock [
 
 { #category : #'*snapshotting' }
 Module >> newSegmentBuilder [
-	^Builder new module: self; nativizerBlock: self nativizerBlock; yourself
+	| block |
+	block := self requiresNativization
+		ifTrue: [self nativizerBlock]
+		ifFalse: [[:copy | ]].
+	^Builder new module: self; nativizerBlock: block; yourself
 ]
 
 { #category : #'*snapshotting' }
