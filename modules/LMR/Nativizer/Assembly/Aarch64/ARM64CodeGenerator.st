@@ -159,6 +159,11 @@ ARM64CodeGenerator >> testIntegerBit: reg [
 ]
 
 { #category : #'operations - logical' }
+ARM64CodeGenerator >> test: reg1 with: reg2 [
+	self assemble: 'tst' with: reg1 with: reg2
+]
+
+{ #category : #'operations - logical' }
 ARM64CodeGenerator >> test: reg withImm: imm [
 	self assemble: 'tst' with: {reg} withImm: imm
 ]

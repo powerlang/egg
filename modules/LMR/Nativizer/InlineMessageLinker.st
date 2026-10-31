@@ -707,6 +707,56 @@ InlineMessageLinker >> loadTrueComparingRwithA [
 	^assembler newLabel
 ]
 
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleBeSeen [
+	#_beSeen.
+	self loadMarkOfR.
+	assembler
+		or: assembler regT with: assembler regS;
+		storeByte: assembler regT byte in: assembler regA offset: 0
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleBeUnseen [
+	#_beUnseen.
+	self loadMarkOfR.
+	assembler
+		or: assembler regT with: assembler regS;
+		xor: assembler regT with: assembler regS;
+		storeByte: assembler regT byte in: assembler regA offset: 0
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleHasBeenSeen [
+	| done |
+	#_hasBeenSeen.
+	self loadMarkOfR.
+	done := assembler newLabel.
+	assembler
+		test: assembler regT with: assembler regS;
+		loadRwithTrue;
+		shortJumpIfNotZeroTo: done.
+	self loadFalseUntil: done
+]
+
+{ #category : #'private - helpers' }
+InlineMessageLinker >> loadMarkOfR [
+	assembler
+		loadTwithR;
+		shiftRight: assembler regT byImm: 3;
+		and: assembler regT withImm: 7;
+		moveImm: 1 to: assembler regS;
+		shiftLeft: assembler regS by: assembler regT;
+		loadAwithR;
+		shiftLeft: assembler regA byImm: 32;
+		shiftRight: assembler regA byImm: 38;
+		loadTwithR;
+		shiftRight: assembler regT byImm: 32;
+		shiftLeft: assembler regT byImm: 32;
+		add: assembler regT to: assembler regA;
+		loadZeroExtendByte: assembler regT from: assembler regA atOffset: 0
+]
+
 { #category : #'private - helpers' }
 InlineMessageLinker >> loadFalseUntil: done [
 	assembler

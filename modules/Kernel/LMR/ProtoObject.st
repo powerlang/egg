@@ -65,11 +65,6 @@ LMRProtoObject >> _beSecondGeneration [
 ]
 
 { #category : #'*header access' }
-LMRProtoObject >> _beSeen [
-	self _flagsSet: HasBeenSeen
-]
-
-{ #category : #'*header access' }
 LMRProtoObject >> _beSmall [
 	self _flagsSet: IsSmall
 ]
@@ -77,11 +72,6 @@ LMRProtoObject >> _beSmall [
 { #category : #'*header access' }
 LMRProtoObject >> _beSpecial [
 	self _flagsSet: IsSpecial
-]
-
-{ #category : #'*header access' }
-LMRProtoObject >> _beUnseen [
-	self _flagsMask: HasBeenSeenMask
 ]
 
 { #category : #lookup }
@@ -98,7 +88,8 @@ LMRProtoObject >> _cachedLookup: aSymbol in: behavior [
 LMRProtoObject >> _copyBasicHeaderFrom: other [
 	self
 		_basicULongAt: -1 put: (other _basicULongAt: -1);
-		_basicULongAt: 0 put: (other _basicULongAt: 0)
+		_basicULongAt: 0 put: (other _basicULongAt: 0).
+	other _hasBeenSeen ifTrue: [self _beSeen] ifFalse: [self _beUnseen]
 ]
 
 { #category : #'*header access' }
@@ -109,7 +100,8 @@ LMRProtoObject >> _copyHeaderSized: byteSize from: anObject [
 			_basicULongAt: -2 put: (anObject _basicULongAt: -2)].
 	self
 		_basicULongAt: -1 put: (anObject _basicULongAt: -1);
-		_basicULongAt: 0 put: (anObject _basicULongAt: 0)
+		_basicULongAt: 0 put: (anObject _basicULongAt: 0).
+	anObject _hasBeenSeen ifTrue: [self _beSeen] ifFalse: [self _beUnseen]
 ]
 
 { #category : #'header access' }
@@ -120,11 +112,6 @@ LMRProtoObject >> _flagsMask: mask [
 { #category : #'header access' }
 LMRProtoObject >> _flagsSet: mask [
 	self _basicFlags: (self _basicFlags bitOr: mask)
-]
-
-{ #category : #'header access' }
-LMRProtoObject >> _hasBeenSeen [
-	^(self _basicFlags bitAnd: HasBeenSeen) == HasBeenSeen
 ]
 
 { #category : #'header access' }

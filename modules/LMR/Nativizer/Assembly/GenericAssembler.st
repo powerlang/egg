@@ -1534,6 +1534,12 @@ GenericAssembler >> setSafeRintegerBit [
 ]
 
 { #category : #'operations - logical' }
+GenericAssembler >> shiftLeft: srcAndDst by: countOrImm [
+	countOrImm isInteger ifTrue: [^self shiftLeft: srcAndDst byImm: countOrImm].
+	codegen shiftLeft: srcAndDst by: countOrImm
+]
+
+{ #category : #'operations - logical' }
 GenericAssembler >> shiftLeft: srcAndDst byImm: count [
 	codegen shiftLeft: srcAndDst byImm: count
 ]
@@ -1925,6 +1931,11 @@ GenericAssembler >> platform: aNativizationPlatform [
 	super platform: aNativizationPlatform.
 ]
 
+{ #category : #'operations - logical' }
+GenericAssembler >> test: reg1 with: reg2 [
+	codegen test: reg1 with: reg2
+]
+
 { #category : #loading }
 GenericAssembler >> testIntegerBit: aRegister [
 	codegen testIntegerBit: aRegister
@@ -1953,6 +1964,11 @@ GenericAssembler >> wordSize [
 { #category : #'to-cleanup' }
 GenericAssembler >> writeTslots [
 	codegen writeTslots
+]
+
+{ #category : #'operations - logical' }
+GenericAssembler >> xor: src1AndDst with: src2 [
+	codegen xor: src1AndDst with: src2
 ]
 
 { #category : #logic }

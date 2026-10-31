@@ -194,3 +194,9 @@ ARM64CodeGeneratorTest >> testLoadBehavior [
 		assert: self words asArray
 		equals: #(16rB85FC002 16rAA0003F0 16rD360FE10 16rD3607E10 16rAA100042)
 ]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testTestRegisters [
+	codegen test: (self x: 3) with: (self x: 2).
+	self assert: self words asArray equals: #(16rEA02007F)
+]
