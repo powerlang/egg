@@ -33,6 +33,7 @@ Closure class >> newFrom: aBlock [
 	closure _beNamed; _beArrayed.
 	self nil: size slotsOf: closure.
 	closure _basicAt: 1 put: aBlock.
+	self memory rememberIfNotYoung: closure.
 	^closure
 ]
 
