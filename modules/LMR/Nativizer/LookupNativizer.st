@@ -87,7 +87,7 @@ LookupNativizer >> newNativizationEnvironment [
 	lookup := LookupLinker new initializeFrom: lmr.
 	invoke := InvokeLinker new
 		invoker: lmr invokeStub;
-		addMethods: originals.
+		addMethods: methods.
 	^ environment
 		addLinker: invoke;
 		addLinker: ignored;
