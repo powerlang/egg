@@ -61,7 +61,6 @@ AAPCS64ABI >> initialize [
 { #category : #callbacks }
 AAPCS64ABI >> emitEntrypoint: anFFIDescriptor with: anAssembler [
 	anAssembler
-		push: self regL;
 		saveCallerFrame;
 		pushE;
 		pushG;

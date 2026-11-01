@@ -649,6 +649,20 @@ CodeGenerator >> test: srcReg withImm: imm [
 	self subclassResponsibility
 ]
 
+{ #category : #epilogue }
+CodeGenerator >> restoreCallerFrame [
+	self
+		move: self regFP to: self regSP;
+		pop: self regFP
+]
+
+{ #category : #prologue }
+CodeGenerator >> saveCallerFrame [
+	self
+		push: self regFP;
+		move: self regSP to: self regFP
+]
+
 { #category : #accessing }
 CodeGenerator >> wordSize [
 	^wordSize

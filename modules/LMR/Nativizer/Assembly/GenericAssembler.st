@@ -105,9 +105,7 @@ GenericAssembler >> breakpoint [
 
 { #category : #private }
 GenericAssembler >> buildFrame [
-	self
-		push: codegen regFP;
-		move: codegen regSP to: codegen regFP
+	codegen saveCallerFrame
 ]
 
 { #category : #private }
@@ -1514,9 +1512,12 @@ GenericAssembler >> reset [
 
 { #category : #epilogue }
 GenericAssembler >> restoreCallerFrame [
-	codegen
-		move: codegen regFP to: codegen regSP;
-		pop: codegen regFP
+	codegen restoreCallerFrame
+]
+
+{ #category : #prologue }
+GenericAssembler >> saveCallerFrame [
+	codegen saveCallerFrame
 ]
 
 { #category : #jumps }
