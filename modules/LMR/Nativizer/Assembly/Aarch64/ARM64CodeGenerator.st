@@ -22,7 +22,7 @@ ARM64CodeGenerator >> clearFPUFlags [
 ARM64CodeGenerator >> floatStatusMaskFor: aSymbol [
 	| masks index |
 	masks := #(#invalidOperation 1 #zeroDivisor 2 #overflow 4 #underflow 8
-		#inexact 16 #denormalizedOperand 128 #coprocessorMissing 0 #error 16r8F).
+		#inexact 16 #denormalizedOperand 128 #coprocessorMissing 0 #error 16r8F #all 16r9F).
 	index := masks indexOf: aSymbol.
 	^masks at: index + 1
 ]

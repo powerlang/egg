@@ -324,7 +324,7 @@ AMD64CodeGenerator >> exchange: srcAndDstReg withMem: aMemRef [
 AMD64CodeGenerator >> floatStatusMaskFor: aSymbol [
 	| masks index |
 	masks := #(#invalidOperation 1 #denormalizedOperand 2 #zeroDivisor 4 #overflow 8
-		#underflow 16 #inexact 32 #coprocessorMissing 128 #error 16r1F).
+		#underflow 16 #inexact 32 #coprocessorMissing 128 #error 16r1F #all 16r3F).
 	index := masks indexOf: aSymbol.
 	^masks at: index + 1
 ]

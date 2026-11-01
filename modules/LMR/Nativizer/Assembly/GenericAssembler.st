@@ -11,6 +11,17 @@ Class {
 	#category : #'Powerlang-Core-Assembly'
 }
 
+{ #category : #'floting point' }
+GenericAssembler >> clearFloatStatusFlagsOfR [
+	| mask memref |
+	mask := codegen floatStatusMaskFor: #all.
+	memref := codegen memRef32: codegen regR indexImm: 1.
+	codegen
+		load: codegen regT fromMem: memref;
+		and: codegen regT withImm: mask bitInvert;
+		store: codegen regT intoMem: memref
+]
+
 { #category : #accessing }
 GenericAssembler >> codegen [
 	^codegen

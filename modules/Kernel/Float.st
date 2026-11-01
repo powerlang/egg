@@ -27,7 +27,7 @@ Float class >> basicErrorOn: aSymbol status: status for: aNumber [
 
 { #category : #errors }
 Float class >> clearStatusFlags [
-	Status at: 1 put: ((Status at: 1) bitAnd: 0xC0).
+	Status _clearFloatStatusFlags.
 	self _status: Status
 ]
 

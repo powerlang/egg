@@ -303,6 +303,12 @@ InlineMessageLinker >> assembleCallWithArguments [
 ]
 
 { #category : #'private - assemble' }
+InlineMessageLinker >> assembleClearFloatStatusFlags [
+	#_clearFloatStatusFlags.
+	assembler clearFloatStatusFlagsOfR
+]
+
+{ #category : #'private - assemble' }
 InlineMessageLinker >> assembleEnvironment [
 	#_environment.
 	assembler loadRwithE
