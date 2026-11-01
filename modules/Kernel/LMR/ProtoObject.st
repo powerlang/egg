@@ -356,6 +356,7 @@ LMRProtoObject >> doesNotUnderstandSelector: selector [
 { #category : #private }
 LMRProtoObject >> holdRefererIfNeeded: referent [
 	| memory |
+	#loadsOwnNativeCode.
 	#savePreviousSelf.
 	self _isSmallInteger ifTrue: [^self].
 	referent _isRemembered ifTrue: [^self].

@@ -197,8 +197,7 @@ TemplateJIT >> emitCallbackPrologue [
 	assembler
 		pushImm: retaddr;
 		xorFPwithFP;
-		loadLongMwithIPoffset: 0 - assembler currentAddress + environment platform behaviorOffset;
-		loadMwithMindex: (CallbackBehavior indexOfSlot: 'nativeCode');
+		loadMwithOwnNativeCode: environment platform behaviorOffset;
 		loadGwithLiteral: environment lmrModule globals;
 		loadNilWithLiteral: nil;
 		loadTrueWithLiteral: true;

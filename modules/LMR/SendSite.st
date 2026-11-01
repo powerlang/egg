@@ -207,6 +207,7 @@ SendSite class >> useNextPICsWith: aNativeCode [
 { #category : #'meta accessing' }
 SendSite >> _dispatchDebuggableOn: anObject [
 	| cm optimizedCode invoked |
+	#loadsOwnNativeCode.
 	#specialABIBegin.
 	#(arg1 -> regR).
 	#(self -> regA).
@@ -226,6 +227,7 @@ SendSite >> _dispatchDebuggableOn: anObject [
 { #category : #'meta accessing' }
 SendSite >> _dispatchDebuggableOn: anObject startingAt: aBehavior [
 	| cm optimizedCode invoked |
+	#loadsOwnNativeCode.
 	#specialABIBegin.
 	#(arg1 -> regR).
 	#(self -> regA).
@@ -246,6 +248,7 @@ SendSite >> _dispatchDebuggableOn: anObject startingAt: aBehavior [
 { #category : #'meta accessing' }
 SendSite >> _dispatchOn: anObject [
 	| cm optimizedCode |
+	#loadsOwnNativeCode.
 	#specialABIBegin.
 	#(arg1 -> regR).
 	#(self -> regA).
@@ -262,6 +265,7 @@ SendSite >> _dispatchOn: anObject [
 { #category : #'meta accessing' }
 SendSite >> _dispatchOn: anObject startingAt: aBehavior [
 	| cm optimizedCode |
+	#loadsOwnNativeCode.
 	#specialABIBegin.
 	#(arg1 -> regR).
 	#(self -> regA).
@@ -278,6 +282,7 @@ SendSite >> _dispatchOn: anObject startingAt: aBehavior [
 
 { #category : #'meta accessing' }
 SendSite >> _invokeOn: anObject [
+	#loadsOwnNativeCode.
 	#savePreviousSelf.
 	#specialABIBegin.
 	#(arg1 -> regR).

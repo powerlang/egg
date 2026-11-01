@@ -728,6 +728,13 @@ GenericAssembler >> loadMwithMindex: index [
 ]
 
 { #category : #loading }
+GenericAssembler >> loadMwithOwnNativeCode: behaviorOffset [
+	self
+		loadLongMwithIPoffset: 0 - self currentAddress + behaviorOffset;
+		loadMwithMindex: (CallbackBehavior indexOfSlot: 'nativeCode')
+]
+
+{ #category : #loading }
 GenericAssembler >> loadMwithRindex: index [
 	| memref |
 	memref := codegen memRef: codegen regR indexImm: index.

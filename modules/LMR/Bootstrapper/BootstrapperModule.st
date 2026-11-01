@@ -75,21 +75,27 @@ BootstrapperModule >> nativizeEntriesOf: aModule with: env [
 
 { #category : #bootstrapping }
 BootstrapperModule >> nativizeEntry: aCompiledMethod of: aModule with: env [
-	| code machineCode original behavior |
+	| code |
 	code := aCompiledMethod copy.
 	code receiver: aModule.
 	env nativize: code.
-	machineCode := code optimizedCode code.
+	self installSelfReferenceOn: code optimizedCode.
+	aModule export: code optimizedCode as: aCompiledMethod selector.
+	(self codeSegmentOf: aModule) add: code optimizedCode code
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> installSelfReferenceOn: aNativeCode [
+	| machineCode original behavior |
+	machineCode := aNativeCode code.
 	original := machineCode behavior.
 	behavior := CallbackBehavior new
 		classBinding: original classBinding;
 		methods: MethodDictionary new;
 		next: original;
-		nativeCode: code optimizedCode;
+		nativeCode: aNativeCode;
 		yourself.
-	machineCode behavior: behavior.
-	aModule export: code optimizedCode as: aCompiledMethod selector.
-	(self codeSegmentOf: aModule) add: machineCode
+	machineCode behavior: behavior
 ]
 
 { #category : #bootstrapping }
@@ -106,6 +112,7 @@ BootstrapperModule >> initializeGlobalsFor: anLMRModule [
 BootstrapperModule >> nativizeInvokeFor: anLMRModule env: env nativizer: aNativizerModule [
 	| nativeCode |
 	nativeCode := env nativizeOptimizing: (SendSite >> #_invokeOn:) copy.
+	self installSelfReferenceOn: nativeCode.
 	(self codeSegmentOf: anLMRModule) add: nativeCode code.
 	anLMRModule mapGlobal: #Invoke to: nativeCode
 ]
@@ -118,6 +125,9 @@ BootstrapperModule >> nativizeLookupFor: anLMRModule env: env nativizer: aNativi
 		nativizeMethods.
 	lookup := nativizer methodFor: #_dispatchOn:.
 	lookupSuper := nativizer methodFor: #_dispatchOn:startingAt:.
+	#(_dispatchOn: _dispatchOn:startingAt: _dispatchDebuggableOn: _dispatchDebuggableOn:startingAt:) do: [:selector | | method |
+		method := nativizer methodFor: selector.
+		self installSelfReferenceOn: method optimizedCode].
 	nativizer methods do: [:m | self addCodeOf: m to: anLMRModule].
 	anLMRModule
 		mapGlobal: #Lookup to: lookup optimizedCode;
@@ -145,6 +155,7 @@ BootstrapperModule >> nativizeWriteBarrierFor: anLMRModule env: env nativizer: a
 		lmrModule: anLMRModule;
 		completeInitialization;
 		nativizeOptimizing: barrier.
+	self installSelfReferenceOn: barrier optimizedCode.
 	self addCodeOf: barrier to: anLMRModule.
 	anLMRModule mapGlobal: #WriteBarrier to: barrier optimizedCode.
 ]
