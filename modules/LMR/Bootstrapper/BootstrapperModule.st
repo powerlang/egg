@@ -106,6 +106,7 @@ BootstrapperModule >> initializeGlobalsFor: anLMRModule [
 BootstrapperModule >> nativizeInvokeFor: anLMRModule env: env nativizer: aNativizerModule [
 	| nativeCode |
 	nativeCode := env nativizeOptimizing: (SendSite >> #_invokeOn:) copy.
+	(self codeSegmentOf: anLMRModule) add: nativeCode code.
 	anLMRModule mapGlobal: #Invoke to: nativeCode
 ]
 
@@ -117,6 +118,7 @@ BootstrapperModule >> nativizeLookupFor: anLMRModule env: env nativizer: aNativi
 		nativizeMethods.
 	lookup := nativizer methodFor: #_dispatchOn:.
 	lookupSuper := nativizer methodFor: #_dispatchOn:startingAt:.
+	nativizer methods do: [:m | self addCodeOf: m to: anLMRModule].
 	anLMRModule
 		mapGlobal: #Lookup to: lookup optimizedCode;
 		mapGlobal: #LookupSuper to: lookupSuper optimizedCode
@@ -143,6 +145,7 @@ BootstrapperModule >> nativizeWriteBarrierFor: anLMRModule env: env nativizer: a
 		lmrModule: anLMRModule;
 		completeInitialization;
 		nativizeOptimizing: barrier.
+	self addCodeOf: barrier to: anLMRModule.
 	anLMRModule mapGlobal: #WriteBarrier to: barrier optimizedCode.
 ]
 
@@ -165,6 +168,15 @@ BootstrapperModule >> justLoaded [
 { #category : #snapshotting }
 BootstrapperModule >> codeSegmentOf: aModule [
 	^codeSegments at: aModule ifAbsentPut: [OrderedCollection new]
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> addCodeOf: aCompiledMethod to: aModule [
+	| code |
+	code := self codeSegmentOf: aModule.
+	code add: aCompiledMethod optimizedCode code.
+	aCompiledMethod hasBlocks ifFalse: [^self].
+	aCompiledMethod do: [:b | (b isBlock and: [b optimizedCode notNil]) ifTrue: [code add: b optimizedCode code]]
 ]
 
 { #category : #bootstrapping }
