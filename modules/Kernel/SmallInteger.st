@@ -97,11 +97,6 @@ SmallInteger >> | anInteger [
 	^self bitOr: anInteger
 ]
 
-{ #category : #comparing }
-SmallInteger >> ~= aNumber [
-	^aNumber ~= self
-]
-
 { #category : #arithmetic }
 SmallInteger >> + aNumber [
 	self errorVMSpecific
