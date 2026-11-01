@@ -524,7 +524,7 @@ InlineMessageLinker >> assembleLeadingZeroBitCount [
 { #category : #'private - assemble' }
 InlineMessageLinker >> assembleLoadFloatStatusFrom [
 	#_status:.
-	assembler loadMXCSRfromA
+	assembler loadFloatStatusFromA
 ]
 
 { #category : #'private - assemble' }
@@ -897,7 +897,7 @@ InlineMessageLinker >> assembleStoreDoubleResult [
 { #category : #'private - assemble' }
 InlineMessageLinker >> assembleStoreFloatStatusInto [
 	#_readStatusOn:.
-	assembler storeMXCSRintoA
+	assembler storeFloatStatusIntoA
 ]
 
 { #category : #'private - assemble' }
@@ -1145,5 +1145,5 @@ InlineMessageLinker >> readFPUStatus [
 InlineMessageLinker >> readFloatStatus [
 	assembler
 		loadAwithKnown: #FloatStatus;
-		storeMXCSRintoA
+		storeFloatStatusIntoA
 ]

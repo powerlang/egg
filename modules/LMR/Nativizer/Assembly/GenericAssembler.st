@@ -460,6 +460,11 @@ GenericAssembler >> load: register withPointer: anObject [
 	self load: register withLiteral: anObject
 ]
 
+{ #category : #'to-cleanup' }
+GenericAssembler >> loadFloatStatusFromA [
+	codegen loadFloatStatusFromA
+]
+
 { #category : #loading }
 GenericAssembler >> loadVwithPointer: anObject [
 	self load: codegen regV withPointer: anObject
@@ -679,11 +684,6 @@ GenericAssembler >> loadLongSwithRindex: index [
 	memref := codegen memRef32: codegen regR indexImm: index.
 	codegen load: codegen regS fromMem: memref
 
-]
-
-{ #category : #'to-cleanup' }
-GenericAssembler >> loadMXCSRfromA [
-	codegen loadMXCSRfromA
 ]
 
 { #category : #'push/pop' }
@@ -1576,6 +1576,11 @@ GenericAssembler >> load: dstReg from: baseReg atIndexAt: indexReg [
 	codegen load: dstReg fromMem: memref
 ]
 
+{ #category : #'to-cleanup' }
+GenericAssembler >> storeFloatStatusIntoA [
+	codegen storeFloatStatusIntoA
+]
+
 { #category : #'operations - arithmetic' }
 GenericAssembler >> subtract: src2 from: src1AndDst [
 	self sub: src2 from: src1AndDst
@@ -1785,11 +1790,6 @@ GenericAssembler >> storeLongTinRatOffsetA [
 	| memref |
 	memref := codegen memRef32: codegen regR offset: codegen regA.
 	codegen store: codegen regT long intoMem: memref
-]
-
-{ #category : #'to-cleanup' }
-GenericAssembler >> storeMXCSRintoA [
-	codegen storeMXCSRintoA
 ]
 
 { #category : #storing }

@@ -84,6 +84,16 @@ AMD64TemplateAssembler >> currentAddress [
 	^buffer currentAddress
 ]
 
+{ #category : #loading }
+AMD64TemplateAssembler >> loadFloatStatusFromA [
+	self assembleBytes: #[16rF 16rAE 16r12]
+]
+
+{ #category : #loading }
+AMD64TemplateAssembler >> storeFloatStatusIntoA [
+	self assembleBytes: #[16rF 16rAE 16r1A]
+]
+
 { #category : #accessing }
 AMD64TemplateAssembler >> wordSize [
 	^wordSize
@@ -439,12 +449,6 @@ AMD64TemplateAssembler >> loadLargeX1withAindirect [
 { #category : #loading }
 AMD64TemplateAssembler >> loadLongRwithRatOffsetA [
 	self assembleBytes: #[16r8B 16r4 16r10].
-	
-]
-
-{ #category : #loading }
-AMD64TemplateAssembler >> loadMXCSRfromA [
-	self assembleBytes: #[16rF 16rAE 16r12].
 	
 ]
 
@@ -1107,12 +1111,6 @@ AMD64TemplateAssembler >> storeLongTinRatA [
 { #category : #storing }
 AMD64TemplateAssembler >> storeLongTinRatOffsetA [
 	self assembleBytes: #[16r89 16rC 16r10].
-	
-]
-
-{ #category : #loading }
-AMD64TemplateAssembler >> storeMXCSRintoA [
-	self assembleBytes: #[16rF 16rAE 16r1A].
 	
 ]
 

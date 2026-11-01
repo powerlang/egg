@@ -496,6 +496,15 @@ AMD64CodeGenerator >> loadDouble: dstReg fromMem: srcMemRef [
 ]
 
 { #category : #accessing }
+AMD64CodeGenerator >> loadFloatStatusFromA [
+	pointer
+		reset;
+		length: 32;
+		base: self regA.
+	self assemble: 'ldmxcsr' with: pointer
+]
+
+{ #category : #accessing }
 AMD64CodeGenerator >> loadLongMwithIPoffset: anInteger [
 	| instsize |
 	#dontOptimize.
@@ -506,15 +515,6 @@ AMD64CodeGenerator >> loadLongMwithIPoffset: anInteger [
 		base: self regIP;
 		displacement: anInteger - instsize.
 	self assemble: 'mov' with: self regM e with: pointer
-]
-
-{ #category : #accessing }
-AMD64CodeGenerator >> loadMXCSRfromA [
-	pointer
-		reset;
-		length: 32;
-		base: self regA.
-	self assemble: 'ldmxcsr' with: pointer
 ]
 
 { #category : #storing }
@@ -1018,6 +1018,15 @@ AMD64CodeGenerator >> storeDoubleResultIntoMem: dstMemRef [
 		ifFalse: [ self assemble: 'fstp' with: dstMemRef ]
 ]
 
+{ #category : #accessing }
+AMD64CodeGenerator >> storeFloatStatusIntoA [
+	pointer
+		reset;
+		length: 32;
+		base: self regA.
+	self assemble: 'stmxcsr' with: pointer
+]
+
 { #category : #'memory - load / store' }
 AMD64CodeGenerator >> storeImm: imm intoMem: dstMemRef [
 	self
@@ -1025,15 +1034,6 @@ AMD64CodeGenerator >> storeImm: imm intoMem: dstMemRef [
 		with: dstMemRef
 		withImm: imm
 
-]
-
-{ #category : #accessing }
-AMD64CodeGenerator >> storeMXCSRintoA [
-	pointer
-		reset;
-		length: 32;
-		base: self regA.
-	self assemble: 'stmxcsr' with: pointer
 ]
 
 { #category : #'operations - arithmetic' }

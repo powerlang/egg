@@ -643,6 +643,11 @@ Assembler >> loadEwithR [
 	self subclassResponsibility
 ]
 
+{ #category : #'to-cleanup' }
+Assembler >> loadFloatStatusFromA [
+	self subclassResponsibility
+]
+
 { #category : #loading }
 Assembler >> loadFPwithR [
 	self subclassResponsibility
@@ -699,11 +704,6 @@ Assembler >> loadLongRwithRatOffsetA [
 
 { #category : #'push/pop' }
 Assembler >> loadLongSwithRindex: index [
-	self subclassResponsibility
-]
-
-{ #category : #'to-cleanup' }
-Assembler >> loadMXCSRfromA [
 	self subclassResponsibility
 ]
 
@@ -1617,6 +1617,11 @@ Assembler >> storeEinRindex: index [
 	self subclassResponsibility
 ]
 
+{ #category : #'to-cleanup' }
+Assembler >> storeFloatStatusIntoA [
+	self subclassResponsibility
+]
+
 { #category : #storing }
 Assembler >> storeLargeX0inA [
 	self subclassResponsibility
@@ -1634,11 +1639,6 @@ Assembler >> storeLongTinRatA [
 
 { #category : #storing }
 Assembler >> storeLongTinRatOffsetA [
-	self subclassResponsibility
-]
-
-{ #category : #'to-cleanup' }
-Assembler >> storeMXCSRintoA [
 	self subclassResponsibility
 ]
 
