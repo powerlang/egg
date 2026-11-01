@@ -31,6 +31,17 @@ ARM64CodeGeneratorTest >> testClearFloatStatusFlags [
 ]
 
 { #category : #tests }
+ARM64CodeGeneratorTest >> testClearFloatStatusFlagsInR [
+	| assembler |
+	assembler := NativizationPlatform aarch64_darwin newAssembler.
+	assembler clearFloatStatusFlagsInR; loadAwithSP.
+	codegen := assembler codegen.
+	self
+		assert: self words asArray
+		equals: #(16rD29FEC10 16rF2BFFFF0 16rF2DFFFF0 16rF2FFFFF0 16r8A100000 16r910003E1)
+]
+
+{ #category : #tests }
 ARM64CodeGeneratorTest >> testFloatStatus [
 	codegen storeFloatStatusIntoA; loadFloatStatusFromA.
 	self

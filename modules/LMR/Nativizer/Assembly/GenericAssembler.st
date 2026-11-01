@@ -11,6 +11,13 @@ Class {
 	#category : #'Powerlang-Core-Assembly'
 }
 
+{ #category : #private }
+GenericAssembler >> clearFloatStatusFlagsInR [
+	| mask |
+	mask := codegen floatStatusMaskFor: #all.
+	codegen and: codegen regR withImm: mask bitInvert
+]
+
 { #category : #'floting point' }
 GenericAssembler >> clearFloatStatusFlagsOfR [
 	| mask memref |
@@ -578,6 +585,11 @@ GenericAssembler >> loadAwithRoffsetAtA [
 { #category : #loading }
 GenericAssembler >> loadAwithS [
 	codegen move: codegen regS to: codegen regA
+]
+
+{ #category : #loading }
+GenericAssembler >> loadAwithSP [
+	codegen move: codegen regSP to: codegen regA
 ]
 
 { #category : #loading }
@@ -1392,11 +1404,6 @@ GenericAssembler >> pushT [
 { #category : #'push/pop' }
 GenericAssembler >> pushTrue [
 	codegen push: codegen regTrue
-]
-
-{ #category : #'to-cleanup' }
-GenericAssembler >> readFPUStatusOnA [
-	codegen readFPUStatusOnA
 ]
 
 { #category : #'registers - IR' }

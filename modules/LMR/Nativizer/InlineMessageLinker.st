@@ -40,8 +40,7 @@ InlineMessageLinker >> assembleAsFloatInto [
 	#_asFloatInto:.
 	assembler
 		loadX0withRasDouble;
-		storeLargeX0inA.
-	self readFloatStatus
+		storeLargeX0inA
 ]
 
 { #category : #'private - assemble' }
@@ -335,98 +334,99 @@ InlineMessageLinker >> assembleExtendedSize [
 
 { #category : #'private - assemble' }
 InlineMessageLinker >> assembleFloatEquals [
-	"
-	first compare magnitudes to set error bit if NaN
-	"
 	#_floatEquals:.
-	assembler
-		pushR;
-		loadLargeX0withRindirect;
-		compareLessThanDoubleX0withAindirect;
-		popR;
-		loadLargeX0withRindirect;
-		compareEqualDoubleX0withAindirect;
-		moveX0toR;
-		addRwithImmediate: 1;
-		convertRtoSmallInteger.
-	self readFloatStatus
+	self
+		assembleFloat: [
+			assembler
+				pushR;
+				loadLargeX0withRindirect;
+				compareLessThanDoubleX0withAindirect;
+				popR;
+				loadLargeX0withRindirect;
+				compareEqualDoubleX0withAindirect]
+		answering: [self loadBooleanFromX0]
 ]
 
 { #category : #'private - assemble' }
 InlineMessageLinker >> assembleFloatFractionPartInto [
 	#_floatFractionPartInto:.
-	assembler
-		loadLargeX0withRindirect;
-		roundDoubleX0intoX1;
-		subDoubleX1fromX0;
-		storeLargeX0inA.
-	self readFloatStatus
+	self
+		assembleFloat: [
+			assembler
+				loadLargeX0withRindirect;
+				roundDoubleX0intoX1;
+				subDoubleX1fromX0]
+		answering: [assembler storeLargeX0inA; loadRwithA]
 ]
 
 { #category : #'private - assemble' }
 InlineMessageLinker >> assembleFloatLessThan [
 	#_floatLessThan:.
-	assembler
-		loadLargeX0withRindirect;
-		compareLessThanDoubleX0withAindirect;
-		moveX0toR;
-		addRwithImmediate: 1;
-		convertRtoSmallInteger.
-	self readFloatStatus
+	self
+		assembleFloat: [
+			assembler
+				loadLargeX0withRindirect;
+				compareLessThanDoubleX0withAindirect]
+		answering: [self loadBooleanFromX0]
 ]
 
 { #category : #'private - assemble' }
 InlineMessageLinker >> assembleFloatMinusInto [
 	#_floatMinus:into:.
-	assembler
-		loadLargeX0withRindirect;
-		loadLargeX1withAindirect;
-		subDoubleX1fromX0;
-		storeLargeX0inT.
-	self readFloatStatus
+	self
+		assembleFloat: [
+			assembler
+				loadLargeX0withRindirect;
+				loadLargeX1withAindirect;
+				subDoubleX1fromX0]
+		answering: [assembler storeLargeX0inT; loadRwithT]
 ]
 
 { #category : #'private - assemble' }
 InlineMessageLinker >> assembleFloatMultiplyInto [
 	#_floatMultiply:into:.
-	assembler
-		loadLargeX0withRindirect;
-		loadLargeX1withAindirect;
-		multiplyDoubleX0byX1;
-		storeLargeX0inT.
-	self readFloatStatus
+	self
+		assembleFloat: [
+			assembler
+				loadLargeX0withRindirect;
+				loadLargeX1withAindirect;
+				multiplyDoubleX0byX1]
+		answering: [assembler storeLargeX0inT; loadRwithT]
 ]
 
 { #category : #'private - assemble' }
 InlineMessageLinker >> assembleFloatPlusInto [
 	#_floatPlus:into:.
-	assembler
-		loadLargeX0withRindirect;
-		loadLargeX1withAindirect;
-		addDoubleX1toX0;
-		storeLargeX0inT.
-	self readFloatStatus
+	self
+		assembleFloat: [
+			assembler
+				loadLargeX0withRindirect;
+				loadLargeX1withAindirect;
+				addDoubleX1toX0]
+		answering: [assembler storeLargeX0inT; loadRwithT]
 ]
 
 { #category : #'private - assemble' }
 InlineMessageLinker >> assembleFloatQuotientInto [
 	#_floatQuotient:into:.
-	assembler
-		loadLargeX0withRindirect;
-		loadLargeX1withAindirect;
-		divideDoubleX0byX1;
-		storeLargeX0inT.
-	self readFloatStatus
+	self
+		assembleFloat: [
+			assembler
+				loadLargeX0withRindirect;
+				loadLargeX1withAindirect;
+				divideDoubleX0byX1]
+		answering: [assembler storeLargeX0inT; loadRwithT]
 ]
 
 { #category : #'private - assemble' }
 InlineMessageLinker >> assembleFloatSqrtInto [
 	#_floatSqrtInto:.
-	assembler
-		loadLargeX0withRindirect;
-		sqrtDoubleX0;
-		storeLargeX0inA.
-	self readFloatStatus
+	self
+		assembleFloat: [
+			assembler
+				loadLargeX0withRindirect;
+				sqrtDoubleX0]
+		answering: [assembler storeLargeX0inA; loadRwithA]
 ]
 
 { #category : #'private - helpers' }
@@ -492,9 +492,9 @@ InlineMessageLinker >> assembleFloatStatusHasZeroDivisor [
 { #category : #'private - assemble' }
 InlineMessageLinker >> assembleFloatTruncated [
 	#_floatTruncated.
-	assembler loadRconvertingDoublePointedByR.
-	self readFloatStatus.
-	assembler convertRtoSmallInteger
+	assembler
+		loadRconvertingDoublePointedByR;
+		convertRtoSmallInteger
 ]
 
 { #category : #'private - assemble' }
@@ -724,8 +724,10 @@ InlineMessageLinker >> assembleSmiEquals [
 	| done |
 	#_smiEquals:.
 	done := self loadTrueComparingRwithA.
-	assembler shortJumpIfEqualTo: done.
-	self loadFalseUntil: done
+	assembler
+		shortJumpIfEqualTo: done;
+		loadRwithFalse;
+		@ done
 ]
 
 { #category : #'private - assemble' }
@@ -733,8 +735,10 @@ InlineMessageLinker >> assembleSmiLowerThan [
 	| done |
 	#_smiLowerThan:.
 	done := self loadTrueComparingRwithA.
-	assembler shortJumpIfLessSignedTo: done.
-	self loadFalseUntil: done
+	assembler
+		shortJumpIfLessSignedTo: done;
+		loadRwithFalse;
+		@ done
 ]
 
 { #category : #'private - assemble' }
@@ -742,8 +746,10 @@ InlineMessageLinker >> assembleSmiLowerEqualThan [
 	| done |
 	#_smiLowerEqualThan:.
 	done := self loadTrueComparingRwithA.
-	assembler shortJumpIfLessOrEqualSignedTo: done.
-	self loadFalseUntil: done
+	assembler
+		shortJumpIfLessOrEqualSignedTo: done;
+		loadRwithFalse;
+		@ done
 ]
 
 { #category : #'private - assemble' }
@@ -751,8 +757,10 @@ InlineMessageLinker >> assembleSmiGreaterThan [
 	| done |
 	#_smiGreaterThan:.
 	done := self loadTrueComparingRwithA.
-	assembler shortJumpIfGreaterSignedTo: done.
-	self loadFalseUntil: done
+	assembler
+		shortJumpIfGreaterSignedTo: done;
+		loadRwithFalse;
+		@ done
 ]
 
 { #category : #'private - assemble' }
@@ -760,8 +768,10 @@ InlineMessageLinker >> assembleSmiGreaterEqualThan [
 	| done |
 	#_smiGreaterEqualThan:.
 	done := self loadTrueComparingRwithA.
-	assembler shortJumpIfGreaterOrEqualSignedTo: done.
-	self loadFalseUntil: done
+	assembler
+		shortJumpIfGreaterOrEqualSignedTo: done;
+		loadRwithFalse;
+		@ done
 ]
 
 { #category : #'private - helpers' }
@@ -801,8 +811,74 @@ InlineMessageLinker >> assembleHasBeenSeen [
 	assembler
 		test: assembler regT with: assembler regS;
 		loadRwithTrue;
-		shortJumpIfNotZeroTo: done.
-	self loadFalseUntil: done
+		shortJumpIfNotZeroTo: done;
+		loadRwithFalse;
+		@ done
+]
+
+{ #category : #'private - helpers' }
+InlineMessageLinker >> assembleFloat: aBlock answering: anotherBlock [
+	| success end |
+	success := assembler newLabel.
+	end := assembler newLabel.
+	aBlock value.
+	assembler pushR.
+	self loadRwithFloatStatus.
+	assembler
+		testRwithFloatStatusFlag: #error;
+		jumpIfZeroTo: success;
+		convertRtoNativeInteger;
+		clearFloatStatusFlagsInR.
+	self storeRinFloatStatus.
+	assembler popR.
+	aBlock value.
+	assembler pushR.
+	self loadRwithFloatStatus.
+	assembler
+		testRwithFloatStatusFlag: #error;
+		jumpIfZeroTo: success;
+		dropTos: 1;
+		jumpTo: end;
+		@ success;
+		popR.
+	anotherBlock value.
+	assembler @ end
+]
+
+{ #category : #'private - helpers' }
+InlineMessageLinker >> loadBooleanFromX0 [
+	| done |
+	done := assembler newLabel.
+	assembler
+		moveX0toR;
+		testRwithR;
+		loadRwithTrue;
+		jumpIfNotZeroTo: done;
+		loadRwithFalse;
+		@ done
+]
+
+{ #category : #'private - helpers' }
+InlineMessageLinker >> loadRwithFloatStatus [
+	assembler
+		pushA;
+		pushImm: 0;
+		loadAwithSP;
+		storeFloatStatusIntoA;
+		popR;
+		popA;
+		convertRtoSmallInteger
+]
+
+{ #category : #'private - helpers' }
+InlineMessageLinker >> storeRinFloatStatus [
+	assembler
+		pushA;
+		pushR;
+		loadAwithSP;
+		loadFloatStatusFromA;
+		popR;
+		popA
 ]
 
 { #category : #'private - helpers' }
@@ -821,13 +897,6 @@ InlineMessageLinker >> loadMarkOfR [
 		shiftLeft: assembler regT byImm: 32;
 		add: assembler regT to: assembler regA;
 		loadZeroExtendByte: assembler regT from: assembler regA atOffset: 0
-]
-
-{ #category : #'private - helpers' }
-InlineMessageLinker >> loadFalseUntil: done [
-	assembler
-		loadRwithFalse;
-		@ done
 ]
 
 { #category : #'private - assemble' }
@@ -1198,18 +1267,4 @@ InlineMessageLinker >> loadArgumentsIntoRegisters [
 		assemble: 'movq' with: xmm1 with: rdx;
 		assemble: 'movq' with: xmm2 with: r8;
 		assemble: 'movq' with: xmm3 with: r9
-]
-
-{ #category : #'private - helpers' }
-InlineMessageLinker >> readFPUStatus [
-	assembler
-		loadAwithKnown: #FloatStatus;
-		readFPUStatusOnA
-]
-
-{ #category : #'private - helpers' }
-InlineMessageLinker >> readFloatStatus [
-	assembler
-		loadAwithKnown: #FloatStatus;
-		storeFloatStatusIntoA
 ]

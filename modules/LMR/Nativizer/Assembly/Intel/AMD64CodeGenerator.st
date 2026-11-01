@@ -777,15 +777,6 @@ AMD64CodeGenerator >> pushROnFPUStack [
 ]
 
 { #category : #accessing }
-AMD64CodeGenerator >> readFPUStatusOnA [
-	pointer
-		reset;
-		length: 16;
-		base: self regA.
-	self assemble: 'fstsw' with: pointer
-]
-
-{ #category : #accessing }
 AMD64CodeGenerator >> renameByteRegisterIfNeeded: register preserving: preserved during: aBlock [
 	self
 		renameByteRegisterIfNeeded: register

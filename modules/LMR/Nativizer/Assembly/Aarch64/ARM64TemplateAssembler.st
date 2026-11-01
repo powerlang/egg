@@ -79,6 +79,16 @@ ARM64TemplateAssembler >> callIndirectM [
 ]
 
 { #category : #templates }
+ARM64TemplateAssembler >> clearFloatStatusFlagsInR [
+	codegen
+		emit: 16rD29FEC10;
+		emit: 16rF2BFFFF0;
+		emit: 16rF2DFFFF0;
+		emit: 16rF2FFFFF0;
+		emit: 16r8A100000
+]
+
+{ #category : #templates }
 ARM64TemplateAssembler >> clearFloatStatusFlagsOfR [
 	codegen
 		emit: 16rB9400003;
@@ -334,6 +344,11 @@ ARM64TemplateAssembler >> loadAwithSindex: anInteger [
 	(anInteger between: 1 and: 4096) ifTrue: [^codegen emit: 16rF93FFC41 + (anInteger * 1024)].
 	(anInteger between: -31 and: 0) ifTrue: [^codegen emit: 16rF85F8041 + (anInteger * 32768)].
 	^super loadAwithSindex: anInteger
+]
+
+{ #category : #templates }
+ARM64TemplateAssembler >> loadAwithSP [
+	codegen emit: 16r910003E1
 ]
 
 { #category : #templates }
