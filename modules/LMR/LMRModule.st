@@ -99,7 +99,7 @@ LMRModule >> invokeStub [
 LMRModule >> justLoaded [
 	super justLoaded.
 	namespace at: #CRITICAL put: false.
-	SendSite initializeFormatFlags.
+	SendSite initialize.
 	GlobalDispatchCache initialize.
 	self initializeMemory.
 	LMRProtoObject module namespace

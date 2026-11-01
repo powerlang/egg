@@ -31,6 +31,11 @@ GlobalDispatchCache class >> globalLookupCount [
 	^GlobalLookupCount
 ]
 
+{ #category : #initialization }
+GlobalDispatchCache class >> initialize [
+	GlobalLookupCount := 0
+]
+
 { #category : #accessing }
 GlobalDispatchCache >> at: selector for: aBehavior [
 	| index |

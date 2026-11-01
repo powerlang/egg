@@ -66,6 +66,12 @@ SendSite class >> flushInstances [
 ]
 
 { #category : #initialization }
+SendSite class >> initialize [
+	self initializeFormatFlags.
+	LookupCount := 0
+]
+
+{ #category : #initialization }
 SendSite class >> initializeFormatFlags [
 	self addNamespaceAs: #FormatFlags.
 	FormatFlags
