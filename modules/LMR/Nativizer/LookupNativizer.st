@@ -21,10 +21,10 @@ LookupNativizer >> globalLookupMethods [
 	| result rejected global |
 	result := OrderedCollection new.
 	result
-		add: ProtoObject >> #_cachedLookup:;
-		add: ProtoObject >> #_cachedLookup:in:;
-		add: Thread class >> #currentGlobalLookup;
-		add: GlobalDispatchCache class >> #current.
+		add: (self method: #_cachedLookup: of: LMRProtoObject);
+		add: (self method: #_cachedLookup:in: of: LMRProtoObject);
+		add: (self method: #currentGlobalLookup of: Thread class);
+		add: (self method: #current of: GlobalDispatchCache class).
 	rejected := #(initialize flushAll: flush:forSpecies: flush:for: flush:for:startingAt:).
 	global := GlobalDispatchCache methodDictionary values
 		reject: [ :m | rejected includes: m selector ].
@@ -41,6 +41,12 @@ LookupNativizer >> methodFor: selector [
 ]
 
 { #category : #accessing }
+LookupNativizer >> method: aSymbol of: aSpecies [
+	^(aSpecies >> aSymbol)
+		ifNil: [self error: 'the lookup needs ' , aSpecies name , '>>' , aSymbol]
+]
+
+{ #category : #accessing }
 LookupNativizer >> methods [
 	^methods
 ]
@@ -52,7 +58,7 @@ LookupNativizer >> originals [
 
 { #category : #accessing }
 LookupNativizer >> initializeMethods [
-	originals := self closureMethods select: [:m | m notNil].
+	originals := self closureMethods.
 	methods := originals collect: [:m | m copy]
 ]
 
@@ -92,32 +98,37 @@ LookupNativizer >> newNativizationEnvironment [
 { #category : #'as yet unclassified' }
 LookupNativizer >> otherLookupMethods [
 	^ OrderedCollection new
-		add: ProtoObject >> #objectAtValid:put:;
-		add: ProtoObject >> #behavior;
-		add: CompiledMethod >> #prepareForExecution;
-		add: CompiledMethod >> #isNativized;
-		add: CompiledMethod >> #validNativeCodeAddress;
-		add: CompiledMethod >> #nativeCode;
-		add: CompiledMethod >> #selector;
-		add: NativeCode >> #code;
-		add: NativeCode >> #compiledCode;
-		add: Species >> #instanceBehavior;
-		add: Process >> #wantsToStepInto;
+		add: (self method: #objectAtValid:put: of: ProtoObject);
+		add: (self method: #!== of: ProtoObject);
+		add: (self method: #behavior of: LMRProtoObject);
+		add: (self method: #hasInstanceBehavior of: Object);
+		add: (self method: #isInstanceBehavior of: Behavior);
+		add: (self method: #hasBeenFlushed of: CompiledMethod);
+		add: (self method: #micStub of: LMRModule);
+		add: (self method: #picStub of: LMRModule);
+		add: (self method: #prepareForExecution of: CompiledMethod);
+		add: (self method: #isNativized of: CompiledMethod);
+		add: (self method: #optimizedCode of: CompiledMethod);
+		add: (self method: #selector of: CompiledMethod);
+		add: (self method: #code of: NativeCode);
+		add: (self method: #compiledCode of: NativeCode);
+		add: (self method: #instanceBehavior of: Species);
+		add: (self method: #wantsToStepInto of: Process);
 		yourself
 ]
 
 { #category : #'as yet unclassified' }
 LookupNativizer >> selectorLookupMethods [
 	^ OrderedCollection new
-		add: SendSite >> #_lookup:;
-		add: SendSite >> #_lookup:in:;
-		add: SendSite >> #_lookup:inDictionary:;
+		add: (self method: #_lookup: of: LMRProtoObject);
+		add: (self method: #_lookup:in: of: LMRProtoObject);
+		add: (self method: #_lookup:inDictionary: of: LMRProtoObject);
 		yourself
 ]
 
 { #category : #'as yet unclassified' }
 LookupNativizer >> sendSiteMethods [
 	| sendsite |
-	^ #(_dispatchOn: _dispatchOn:startingAt: _dispatchDebuggableOn: _dispatchDebuggableOn:startingAt: sentSelector when:use: beInvoke:using: bePolymorphic isStaticSend monomorphicMap:to: polymorphicMap:to: maxSize reset takeNextFreeMIC takeNextFreePIC)
-		collect: [ :s | SendSite >> s ]
+	^ #(_dispatchOn: _dispatchOn:startingAt: _dispatchDebuggableOn: _dispatchDebuggableOn:startingAt: sentSelector when:use: beInvoke:using: bePolymorphic isStaticSend monomorphicMap:to: monomorphicStub polymorphicMap:to: polymorphicStub maxSize reset takeNextFreeMIC takeNextFreePIC)
+		collect: [ :s | self method: s of: SendSite ]
 ]

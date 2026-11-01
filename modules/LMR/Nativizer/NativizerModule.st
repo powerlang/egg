@@ -21,9 +21,9 @@ NativizerModule >> environment [
 { #category : #spec }
 NativizerModule >> imports [
 	^{
-		#Kernel -> #(Behavior CallbackBehavior CallbackMethod CharacterArray Closure CompiledBlock CompiledMethod Error Float OrderedCollection Process ProtoObject Species String).
+		#Kernel -> #(Behavior CallbackBehavior CallbackMethod CharacterArray Closure CompiledBlock CompiledMethod Error Float Object OrderedCollection Process ProtoObject Species String).
 		#'Kernel.LMR' -> #(LMRCompiledMethod LMRProtoObject LMRFloat LMRSpecies).
-		#LMR -> #(CriticalArray GCSpace GlobalDispatchCache Memory NativeCode SendSite Thread).
+		#LMR -> #(CriticalArray GCSpace GlobalDispatchCache LMRModule Memory NativeCode SendSite Thread).
 		#'LMR.SExpressions' -> #(SExpression SMethod SBlock SBinding SInstVarBinding SLocalBinding SArgumentBinding STemporaryBinding SDynamicBinding SAssociationBinding SLiteral SIdentifier SReturn SAssignment SCascade SMessage SPragma TreecodeDecoder).
 		#'LMR.Nativizer.Assembly.Intel' -> #(AMD64CodeGenerator AMD64TemplateAssembler SysVX64ABI WinX64ABI Register).
 		#'LMR.Nativizer.Assembly.Aarch64' -> #(ARM64CodeGenerator ARM64Register ARM64MemoryOperand ARM64BranchFixup AAPCS64ABI).
