@@ -152,7 +152,7 @@ SendSite class >> reserveMoreMICs [
 	but will raise errors because memory hasn't been initialized yet
 	"
 	| memory amount array mic |
-	memory := Smalltalk memory.
+	memory := Memory current.
 	amount := 2000.
 	array := memory newLargeArray: amount.
 	mic := Array new: 2.
@@ -163,10 +163,10 @@ SendSite class >> reserveMoreMICs [
 { #category : #private }
 SendSite class >> reserveMorePICsWith: aNativeCode [
 	| memory amount array lookup pic |
-	memory := Smalltalk memory.
+	memory := Memory current.
 	amount := 1000.
 	array := memory newLargeArray: amount.
-	lookup := aNativeCode ifNil: [Smalltalk at: #Lookup].
+	lookup := aNativeCode ifNil: [LMR lookup].
 	pic := (Array new: 15)
 		at: 15 put: lookup;
 		yourself.
@@ -328,8 +328,8 @@ SendSite >> cache [
 SendSite >> flush [
 	self isStaticSend ifTrue: [^self].
 	instructions := self isSuperSend
-		ifTrue: [Smalltalk at: #LookupSuperCode]
-		ifFalse: [Smalltalk at: #LookupCode].
+		ifTrue: [LMR lookupSuperStub]
+		ifFalse: [LMR lookupStub].
 	cache := nil.
 	tally := 0
 ]
