@@ -9,7 +9,7 @@
 
 TEST_CASE("nativized code is in a page-aligned space of its own", "[code]")
 {
-    lmr::Launcher launcher(lmr_test::segPath("Bootstrapper.ems"));
+    lmr::Launcher launcher(lmr_test::segPath("LMR.Bootstrapper.ems"));
     REQUIRE(launcher.loaded());
     launcher.relocate();
 

@@ -15,7 +15,7 @@
 
 TEST_CASE("relocating a segment rebases its module pointer in range", "[relocate]")
 {
-    lmr::Launcher launcher(lmr_test::segPath("Bootstrapper.ems"));
+    lmr::Launcher launcher(lmr_test::segPath("LMR.Bootstrapper.ems"));
     REQUIRE(launcher.loaded());
 
     launcher.relocate();
