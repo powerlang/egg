@@ -19,7 +19,7 @@ Class {
 { #category : #spec }
 BootstrapperModule >> imports [
 	^{
-		#Kernel -> #(OrderedCollection IdentityDictionary Object Magnitude ProtoObject SmallInteger CallbackBehavior MethodDictionary).
+		#Kernel -> #(OrderedCollection IdentityDictionary Object Magnitude ProcessLMRStack ProtoObject SmallInteger CallbackBehavior MethodDictionary).
 		#'Kernel.LMR' -> #(LMRProtoObject).
 		#LMR -> #(Memory NativeCode SendSite GCSpace CriticalArray).
 		#'LMR.Nativizer' -> #(NativizerModule NativizationPlatform NativizationEnvironment LookupNativizer LookupLinker)
@@ -51,6 +51,9 @@ BootstrapperModule >> bootstrapLMR: anLMRModule nativizer: aNativizerModule plat
 
 	env := aNativizerModule newNativizationEnvironmentFor: aPlatform.
 	env lmrModule: anLMRModule.
+	ProcessLMRStack
+		initializeInstances;
+		slotSize: env newAssembler codegen stackSlotSize.
 
 	SendSite lmr: anLMRModule.
 	self

@@ -49,7 +49,7 @@ LMRModule >> globals [
 { #category : #spec }
 LMRModule >> imports [
 	^{
-		#Kernel -> #(ByteArray Ephemeron IdentityDictionary IdentitySet LinkedCollection ProcessStack ProtoObject SequenceableCollection WeakArray WeakIdentitySet WordSize WordSizeShift Processor).
+		#Kernel -> #(ByteArray Ephemeron IdentityDictionary IdentitySet LinkedCollection ProcessLMRStack ProcessStack ProtoObject SequenceableCollection WeakArray WeakIdentitySet WordSize WordSizeShift Processor).
 		#'Kernel.LMR' -> #(LMRProtoObject)
 	}
 ] 
