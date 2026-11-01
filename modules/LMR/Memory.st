@@ -72,13 +72,6 @@ Memory >> addKernelSpace: aSpace [
 	pinnedSpace := aSpace
 ]
 
-{ #category : #'adding / removing' }
-Memory >> addKernelSpace: aSpace [
-	spaces size: 1.
-	spaces contents at: 1 put: aSpace.
-	pinnedSpace := aSpace
-]
-
 { #category : #allocation }
 Memory >> addMarkedInstancesOf: aSpecies into: aCollection [
 	| searched |

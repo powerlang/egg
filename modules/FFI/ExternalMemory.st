@@ -499,20 +499,6 @@ ExternalMemory >> smallPointerAtOffset: offset put: anInteger [
 ]
 
 { #category : #accessing }
-ExternalMemory >> uLargeAtOffset: offset [
-	| low hi |
-	low := self uLongAtOffset: offset.
-	hi := self uLongAtOffset: offset + 4.
-	^(hi bitShift: 32) + low
-]
-
-{ #category : #accessing }
-ExternalMemory >> uLargeAtOffset: offset put: value [
-	self uLongAtOffset: offset put: (value bitAnd: 16rFFFFFFFF).
-	self uLongAtOffset: offset + 4 put: (value bitShift: -32)
-]
-
-{ #category : #accessing }
 ExternalMemory >> uLongAtOffset: offset [
 	| ulong |
 	ulong := 0.

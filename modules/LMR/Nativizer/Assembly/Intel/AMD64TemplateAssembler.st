@@ -79,12 +79,6 @@ AMD64TemplateAssembler >> initialize [
 	buffer := RelocatableBuffer new
 ]
 
-{ #category : #initialization }
-AMD64TemplateAssembler >> platform: aNativizationPlatform [
-	super platform: aNativizationPlatform.
-	buffer := codegen memory
-]
-
 { #category : #accessing }
 AMD64TemplateAssembler >> currentAddress [
 	^buffer currentAddress
