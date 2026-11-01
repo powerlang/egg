@@ -22,7 +22,7 @@ NativizerModule >> environment [
 NativizerModule >> imports [
 	^{
 		#Kernel -> #(Behavior CallbackBehavior CallbackMethod CharacterArray Closure CompiledBlock CompiledMethod Error Float OrderedCollection Process ProtoObject Species String).
-		#'Kernel.LMR' -> #(LMRProtoObject LMRFloat LMRSpecies).
+		#'Kernel.LMR' -> #(LMRCompiledMethod LMRProtoObject LMRFloat LMRSpecies).
 		#LMR -> #(CriticalArray GCSpace GlobalDispatchCache Memory NativeCode SendSite Thread).
 		#'LMR.SExpressions' -> #(SExpression SMethod SBlock SBinding SInstVarBinding SLocalBinding SArgumentBinding STemporaryBinding SDynamicBinding SAssociationBinding SLiteral SIdentifier SReturn SAssignment SCascade SMessage SPragma TreecodeDecoder).
 		#'LMR.Nativizer.Assembly.Intel' -> #(AMD64CodeGenerator AMD64TemplateAssembler SysVX64ABI WinX64ABI Register).
@@ -40,7 +40,8 @@ NativizerModule >> inlinedMethods [
 		(Object -> #(#byteAtValid: #byteAtValid:put: #at:put:)).
 		(Species -> #(#instSize #_instancesAreArrayed #_instancesHavePointers #instanceBehavior)).
 		(LMRSpecies -> #(#memory #primitiveNew #primitiveNew:)).
-		(CompiledMethod -> #(#prepareForExecution #isNativized #optimizedCode #blockCount #literalIndexFrom:)).
+		(CompiledMethod -> #(#isNativized #optimizedCode #blockCount #literalIndexFrom:)).
+		(LMRCompiledMethod -> #(#prepareForExecution)).
 		(CompiledBlock -> #(#argumentCount #blockNumber #blockCode #method)).
 		(NativeCode -> #(#code)).
 		(GCSpace -> #(#commitedLimit #nextFree #nextFree:)).
