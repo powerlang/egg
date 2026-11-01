@@ -312,7 +312,7 @@ OBasicBlock >> inline: inlined replacing: aMessageSend [
 		join := self splitAfter: aMessageSend.
 		join addPredecessor: last.
 		last endWithJumpTo: join].
-	aMessageSend dissolveReplacingWithAll: inlined firstInstruction.
+	inlined firstInstruction spliceReplacing: aMessageSend.
 	self replaceAsPredecessor: inlined.
 	^join ifNil: [self]
 ]

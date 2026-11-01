@@ -178,7 +178,7 @@ OInstruction >> dissolveReplacingWith: anInstruction [
 ]
 
 { #category : #unclassified }
-OInstruction >> dissolveReplacingWithAll: instructions [
+OInstruction >> dissolveSplicing: instructions [
 	| last |
 	last := instructions last.
 	prev next: instructions.
@@ -186,8 +186,7 @@ OInstruction >> dissolveReplacingWithAll: instructions [
 	last next: next.
 	next prev: last.
 	prev := next := nil.
-	self operandsDo: [:instruction | instruction removeUse: self].
-	self replaceAllUsesWith: last
+	self operandsDo: [:instruction | instruction removeUse: self]
 ]
 
 { #category : #unclassified }
@@ -540,6 +539,11 @@ OInstruction >> reverseDo: aBlock [
 	prev
 		ifNil: [following reverseDo: aBlock]
 		ifNotNil: [prev reverseDo: aBlock]
+]
+
+{ #category : #unclassified }
+OInstruction >> spliceReplacing: anInstruction [
+	anInstruction dissolveSplicing: self
 ]
 
 { #category : #unclassified }
