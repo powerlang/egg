@@ -13,6 +13,18 @@ Class {
 	#category : #Aarch64
 }
 
+{ #category : #'floating point' }
+ARM64CodeGenerator >> clearFPUFlags [
+	"x86 clears the x87 flags fscale leaves; scaleFloatOnRWithA has no x87 unit"
+]
+
+{ #category : #'floating point' }
+ARM64CodeGenerator >> loadFloatStatusFromA [
+	self
+		load: 32 into: self regV from: self regA disp: 0;
+		assemble: 'msr' with: #FPSR with: self regV
+]
+
 { #category : #initialization }
 ARM64CodeGenerator >> platform: aNativizationPlatform [
 	abi := aNativizationPlatform abi.
@@ -64,6 +76,13 @@ ARM64CodeGenerator >> assemble: mnemonic with: registers withImm: imm using: scr
 		operands := registers copyWith: scratch].
 	word := ARM64InstructionSpec encode: mnemonic with: operands.
 	self emit: word
+]
+
+{ #category : #'floating point' }
+ARM64CodeGenerator >> storeFloatStatusIntoA [
+	self
+		assemble: 'mrs' with: self regV with: #FPSR;
+		store: 32 from: self regV into: self regA disp: 0
 ]
 
 { #category : #'operations - arithmetic' }

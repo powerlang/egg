@@ -19,6 +19,14 @@ ARM64CodeGeneratorTest >> setUp [
 	registers := ARM64Register registers
 ]
 
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testFloatStatus [
+	codegen storeFloatStatusIntoA; loadFloatStatusFromA.
+	self
+		assert: self words asArray
+		equals: #(16rD53B4430 16rB9000030 16rB9400030 16rD51B4430)
+]
+
 { #category : #private }
 ARM64CodeGeneratorTest >> x: index [
 	^registers at: ('x' , index printString) asSymbol
