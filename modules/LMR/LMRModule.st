@@ -104,6 +104,8 @@ LMRModule >> justLoaded [
 	self initializeMemory.
 	LMRProtoObject module namespace
 		at: #Memory put: Memory;
+		at: #GlobalDispatchCache put: GlobalDispatchCache;
+		at: #SendSite put: SendSite;
 		at: #StackFrameCursor put: StackFrameCursor
 ]
 
