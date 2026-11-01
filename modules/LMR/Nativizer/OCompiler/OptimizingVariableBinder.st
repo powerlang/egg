@@ -51,7 +51,7 @@ OptimizingVariableBinder >> resolve: aReadVariable asDynamic: binding [
 	assoc := self associationFor: name.
 	assoc ifNotNil: [
 		global := OLoadConstant valued: assoc.
-		read := OBinaryConstantOperation left: global right: 1 name: #_basicAt:.
+		read := OBinaryConstantOperation left: global right: self associationValueIndex name: #_basicAt:.
 		global addUse: read at: #left.
 		^aReadVariable beforeInsert: global; dissolveReplacingWith: read].
 	self error: 'unresolved dynamic binding read: ', name
@@ -200,7 +200,7 @@ OptimizingVariableBinder >> instructionsForWriting: aWriteVariable toDynamic: bi
 		global := OLoadConstant valued: assoc.
 		write := OTernaryOperation
 			receiver: global
-			left: 1
+			left: self associationValueIndex
 			right: aWriteVariable source
 			name: #_basicAt:put:.
 		global addUse: write at: #receiver.
@@ -215,7 +215,7 @@ OptimizingVariableBinder >> instructionsForWriting: aWriteVariable toAssociation
 	global := OLoadConstant valued: binding association.
 	write := OTernaryOperation
 		receiver: global
-		left: 1
+		left: self associationValueIndex
 		right: aWriteVariable source
 		name: #_basicAt:put:.
 	global addUse: write at: #receiver.
@@ -253,6 +253,11 @@ OptimizingVariableBinder >> resolve: aReadVariable asArgument: binding [
 ]
 
 { #category : #private }
+OptimizingVariableBinder >> associationValueIndex [
+	^Association indexOfSlot: 'value'
+]
+
+{ #category : #private }
 OptimizingVariableBinder >> resolve: aReadVariable asAssociationValue: binding [
 	| global read value name load |
 	name := binding association key.
@@ -268,7 +273,7 @@ OptimizingVariableBinder >> resolve: aReadVariable asAssociationValue: binding [
 			aReadVariable dissolveReplacingWith: load]
 		ifFalse: [
 			global := OLoadConstant valued: binding association.
-			read := OBinaryConstantOperation left: global right: 1 name: #_basicAt:.
+			read := OBinaryConstantOperation left: global right: self associationValueIndex name: #_basicAt:.
 			global addUse: read at: #left.
 			aReadVariable beforeInsert: global; dissolveReplacingWith: read]
 ]
