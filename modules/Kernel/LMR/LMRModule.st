@@ -19,7 +19,7 @@ LMRModule >> justLoaded [
 { #category : #spec }
 LMRModule >> imports [
 	^{
-		#Kernel -> #(ArrayedCollection CharacterArray Closure CompiledMethod Float HashTable Namespace ProtoObject Species Symbol WordSize WordSizeShift)
+		#Kernel -> #(ArrayedCollection CharacterArray Closure CompiledMethod Float HashTable Namespace ProcessLMRStack ProcessStack ProtoObject Species Symbol WordSize WordSizeShift)
 	}
 ] 
 

@@ -89,7 +89,7 @@ Process >> findHandlerFor: anException [
 
 { #category : #private }
 Process >> initializeStack [
-	nativeStack := ProcessVMStack on: self
+	nativeStack := ProcessStack on: self
 ]
 
 { #category : #testing }
