@@ -31,50 +31,53 @@ public:
 
     Object **getRaw() { return &_object; }
 
-    // Comparator for GCedRef* that allows comparisons with HeapObject*
-    struct Comparator {
+    // Orders keys by selector, then by the other half of pairs; allows
+    // comparisons with HeapObject*
+    struct SelectorComparator {
         using is_transparent = void;
         uintptr_t hash(const GCedRef *obj) const;
         uintptr_t hash(const Object *obj) const;
+        uintptr_t selectorHash(const GCedRef *obj) const;
+        uintptr_t selectorHash(const Object *obj) const;
 
         bool operator()(const GCedRef* lhs, const GCedRef* rhs) const {
-            return hash(lhs) <= hash(rhs);
+            return selectorHash(lhs) <= selectorHash(rhs);
         }
 
         bool operator()(const GCedRef* lhs, const Object* rhs) const {
-            return hash(lhs) <= hash(rhs);
+            return selectorHash(lhs) <= selectorHash(rhs);
         }
 
         bool operator()(const Object* lhs, const GCedRef* rhs) const {
-            return hash(lhs) <= hash(rhs);
+            return selectorHash(lhs) <= selectorHash(rhs);
         }
 
         // comparisons for pairs of GCedRef*
         bool operator()(const std::pair<GCedRef*, GCedRef*>& lhs, const std::pair<GCedRef*, GCedRef*>& rhs) const {
-            auto lhs1 = hash(lhs.first), lhs2 = hash(lhs.second);
-            auto rhs1 = hash(rhs.first), rhs2 = hash(rhs.second);
+            auto lhs1 = selectorHash(lhs.first), lhs2 = hash(lhs.second);
+            auto rhs1 = selectorHash(rhs.first), rhs2 = hash(rhs.second);
             return std::tie(lhs1, lhs2) <= std::tie(rhs1, rhs2);
         }
 
         // Compare two std::pair<HeapObject*, HeapObject*>
         bool operator()(const std::pair<Object*, Object*>& lhs, const std::pair<Object*, Object*>& rhs) const {
-            auto lhs1 = hash(lhs.first), lhs2 = hash(lhs.second);
-            auto rhs1 = hash(rhs.first), rhs2 = hash(rhs.second);
+            auto lhs1 = selectorHash(lhs.first), lhs2 = hash(lhs.second);
+            auto rhs1 = selectorHash(rhs.first), rhs2 = hash(rhs.second);
             return std::tie(lhs1, lhs2) <= std::tie(rhs1, rhs2);
         }
 
         // Compare pairs of HeapObject with pairs of GCedRef
         bool operator()(const std::pair<GCedRef*, GCedRef*>& lhs,
                         const std::pair<Object*, Object*>& rhs) const {
-            auto lhs1 = hash(lhs.first), lhs2 = hash(lhs.second);
-            auto rhs1 = hash(rhs.first), rhs2 = hash(rhs.second);
+            auto lhs1 = selectorHash(lhs.first), lhs2 = hash(lhs.second);
+            auto rhs1 = selectorHash(rhs.first), rhs2 = hash(rhs.second);
             return std::tie(lhs1, lhs2) <= std::tie(rhs1, rhs2);
         }
 
         bool operator()(const std::pair<Object*, Object*>& lhs,
                         const std::pair<GCedRef*, GCedRef*>& rhs) const {
-            auto lhs1 = hash(lhs.first), lhs2 = hash(lhs.second);
-            auto rhs1 = hash(rhs.first), rhs2 = hash(rhs.second);
+            auto lhs1 = selectorHash(lhs.first), lhs2 = hash(lhs.second);
+            auto rhs1 = selectorHash(rhs.first), rhs2 = hash(rhs.second);
             return std::tie(lhs1, lhs2) <= std::tie(rhs1, rhs2);
         }
     };

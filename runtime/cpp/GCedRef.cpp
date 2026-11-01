@@ -41,12 +41,20 @@ GCedRef::~GCedRef() {
         debugRuntime->releaseGCedRef_(_index);
 }
 
-uintptr_t GCedRef::Comparator::hash(const GCedRef *obj) const {
+uintptr_t GCedRef::SelectorComparator::hash(const GCedRef *obj) const {
     return debugRuntime->hashFor_((Object*)obj->get());
 }
 
-uintptr_t GCedRef::Comparator::hash(const Object *obj) const {
+uintptr_t GCedRef::SelectorComparator::hash(const Object *obj) const {
     return debugRuntime->hashFor_((Object*)obj);
+}
+
+uintptr_t GCedRef::SelectorComparator::selectorHash(const GCedRef *obj) const {
+    return debugRuntime->symbolHashFor_((Object*)obj->get());
+}
+
+uintptr_t GCedRef::SelectorComparator::selectorHash(const Object *obj) const {
+    return debugRuntime->symbolHashFor_((Object*)obj);
 }
 
 Object* GCedRef::get()

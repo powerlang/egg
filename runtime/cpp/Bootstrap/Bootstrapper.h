@@ -127,7 +127,7 @@ namespace Egg
         HeapObject *newAssociation_value_(Object *key, Object *value);
         Object *internSymbol_(const Egg::string &str);
         Object *newSymbol_(const Egg::string &str);
-        void computeSymbolHash_(HeapObject *symbol);
+        void computeSymbolHash_(HeapObject *symbol, bool isWide);
         HeapObject *newString_(const Egg::string &str);
         HeapObject *newArray_(uint32_t size);
         HeapObject *newByteArray_(const std::vector<uint8_t> &bytes);
