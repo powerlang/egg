@@ -16,22 +16,8 @@ Module >> shouldBeStoredIn: anObjectClosure [
 ]
 
 { #category : #'*snapshotting' }
-Module >> requiresNativization [
-	^false
-]
-
-{ #category : #'*snapshotting' }
-Module >> nativizerBlock [
-	^[:copy | ]
-]
-
-{ #category : #'*snapshotting' }
 Module >> newSegmentBuilder [
-	| block |
-	block := self requiresNativization
-		ifTrue: [self nativizerBlock]
-		ifFalse: [[:copy | ]].
-	^Builder new module: self; nativizerBlock: block; yourself
+	^Builder new module: self; yourself
 ]
 
 { #category : #'*snapshotting' }

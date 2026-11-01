@@ -5,7 +5,7 @@ Class {
 		'module',
 		'closure',
 		'classes',
-		'nativizerBlock',
+		'nativizer',
 		'overrides'
 	],
 	#category : #ImageSegmentBuilder
@@ -99,7 +99,7 @@ Builder >> mapMethod: method [
 	| copy |
 	copy := method copy.
 	copy invalidateOptimizedCode.
-	nativizerBlock value: copy.
+	nativizer ifNotNil: [nativizer nativize: copy].
 	closure map: method to: copy.
 	self addNativeCodeOf: copy.
 	method hasBlocks ifFalse: [^self].
@@ -140,13 +140,12 @@ Builder >> mapSubclassesOf: aClass [
 { #category : #initializing }
 Builder >> initialize [
 	closure := ObjectClosure new builder: self.
-	nativizerBlock := [:copy | ].
 	overrides := IdentityDictionary new
 ]
 
 { #category : #accessing }
-Builder >> nativizerBlock: aBlock [
-	nativizerBlock := aBlock
+Builder >> nativizer: aNativizationEnvironment [
+	nativizer := aNativizationEnvironment
 ]
 
 { #category : #accessing }
