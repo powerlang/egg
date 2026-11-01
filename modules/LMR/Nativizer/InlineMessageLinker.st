@@ -423,6 +423,66 @@ InlineMessageLinker >> assembleFloatSqrtInto [
 	self readFloatStatus
 ]
 
+{ #category : #'private - helpers' }
+InlineMessageLinker >> assembleFloatStatusHas: aSymbol [
+	| set |
+	set := assembler newLabel.
+	assembler
+		testRwithFloatStatusFlag: aSymbol;
+		loadRwithTrue;
+		shortJumpIfNotZeroTo: set;
+		loadRwithFalse;
+		@ set
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleFloatStatusHasCoprocessorMissing [
+	#_floatStatusHasCoprocessorMissing.
+	self assembleFloatStatusHas: #coprocessorMissing
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleFloatStatusHasDenormalizedOperand [
+	#_floatStatusHasDenormalizedOperand.
+	self assembleFloatStatusHas: #denormalizedOperand
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleFloatStatusHasError [
+	#_floatStatusHasError.
+	self assembleFloatStatusHas: #error
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleFloatStatusHasInexact [
+	#_floatStatusHasInexact.
+	self assembleFloatStatusHas: #inexact
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleFloatStatusHasInvalidOperation [
+	#_floatStatusHasInvalidOperation.
+	self assembleFloatStatusHas: #invalidOperation
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleFloatStatusHasOverflow [
+	#_floatStatusHasOverflow.
+	self assembleFloatStatusHas: #overflow
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleFloatStatusHasUnderflow [
+	#_floatStatusHasUnderflow.
+	self assembleFloatStatusHas: #underflow
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleFloatStatusHasZeroDivisor [
+	#_floatStatusHasZeroDivisor.
+	self assembleFloatStatusHas: #zeroDivisor
+]
+
 { #category : #'private - assemble' }
 InlineMessageLinker >> assembleFloatTruncated [
 	#_floatTruncated.

@@ -19,6 +19,15 @@ ARM64CodeGenerator >> clearFPUFlags [
 ]
 
 { #category : #'floating point' }
+ARM64CodeGenerator >> floatStatusMaskFor: aSymbol [
+	| masks index |
+	masks := #(#invalidOperation 1 #zeroDivisor 2 #overflow 4 #underflow 8
+		#inexact 16 #denormalizedOperand 128 #coprocessorMissing 0 #error 16r8F).
+	index := masks indexOf: aSymbol.
+	^masks at: index + 1
+]
+
+{ #category : #'floating point' }
 ARM64CodeGenerator >> loadFloatStatusFromA [
 	self
 		load: 32 into: self regV from: self regA disp: 0;

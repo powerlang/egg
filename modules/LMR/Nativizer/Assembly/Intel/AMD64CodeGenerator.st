@@ -320,6 +320,15 @@ AMD64CodeGenerator >> exchange: srcAndDstReg withMem: aMemRef [
 	self assemble: 'xchg' with: aMemRef with: srcAndDstReg
 ]
 
+{ #category : #'floating point' }
+AMD64CodeGenerator >> floatStatusMaskFor: aSymbol [
+	| masks index |
+	masks := #(#invalidOperation 1 #denormalizedOperand 2 #zeroDivisor 4 #overflow 8
+		#underflow 16 #inexact 32 #coprocessorMissing 128 #error 16r1F).
+	index := masks indexOf: aSymbol.
+	^masks at: index + 1
+]
+
 { #category : #basic }
 AMD64CodeGenerator >> inc: srcAndDstReg [
 	self assemble: 'inc' with: srcAndDstReg

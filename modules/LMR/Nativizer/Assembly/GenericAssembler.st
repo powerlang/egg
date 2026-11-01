@@ -1951,6 +1951,14 @@ GenericAssembler >> testRintegerBit [
 	codegen test: codegen regR byte withImm: 1
 ]
 
+{ #category : #'floting point' }
+GenericAssembler >> testRwithFloatStatusFlag: aSymbol [
+	"R is the status as a SmallInteger, so its flags are one bit up"
+	| mask |
+	mask := codegen floatStatusMaskFor: aSymbol.
+	codegen test: codegen regR withImm: mask * 2
+]
+
 { #category : #loading }
 GenericAssembler >> testRwithR [
 	codegen test: codegen regR with: codegen regR

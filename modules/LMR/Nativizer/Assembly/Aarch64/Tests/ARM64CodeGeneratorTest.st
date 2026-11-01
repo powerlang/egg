@@ -27,6 +27,17 @@ ARM64CodeGeneratorTest >> testFloatStatus [
 		equals: #(16rD53B4430 16rB9000030 16rB9400030 16rD51B4430)
 ]
 
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testFloatStatusFlag [
+	| assembler |
+	assembler := NativizationPlatform aarch64_darwin newAssembler.
+	assembler testRwithFloatStatusFlag: #overflow; testRwithFloatStatusFlag: #error.
+	codegen := assembler codegen.
+	self
+		assert: self words asArray
+		equals: #(16rF27D001F 16rD28023D0 16rEA10001F)
+]
+
 { #category : #private }
 ARM64CodeGeneratorTest >> x: index [
 	^registers at: ('x' , index printString) asSymbol
