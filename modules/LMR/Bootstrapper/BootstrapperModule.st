@@ -7,7 +7,8 @@ Class {
 	#name : #BootstrapperModule,
 	#superclass : #Module,
 	#instVars : [
-		'codeSegments'
+		'codeSegments',
+		'environment'
 	],
 	#category : #'LMR-Bootstrapper'
 }
@@ -55,6 +56,7 @@ BootstrapperModule >> bootstrapLMR: anLMRModule nativizer: aNativizerModule plat
 		nativizeSendSiteStubs: env.
 
 	env initializeLinkersFor: anLMRModule; completeInitialization.
+	environment := env.
 	self nativizeStartEntry: env.
 ]
 
@@ -254,7 +256,7 @@ BootstrapperModule >> writeSegments [
 BootstrapperModule >> writeSegmentOf: aModule [
 	| filename builder code |
 	filename := 'image-segments/lmr/' , aModule name , '.ems'.
-	builder := aModule newSegmentBuilder.
+	builder := self segmentBuilderFor: aModule.
 	code := codeSegments at: aModule ifAbsent: [#()].
 	code do: [:bytes | builder addCode: bytes].
 	aModule writeCachedSegmentAt: filename with: builder
@@ -264,7 +266,9 @@ BootstrapperModule >> writeSegmentOf: aModule [
 BootstrapperModule >> prepareForSnapshot: aBuilder [
 	"bootstrap state, not part of the segment"
 	super prepareForSnapshot: aBuilder.
-	aBuilder map: codeSegments to: nil
+	aBuilder
+		map: codeSegments to: nil;
+		map: environment to: nil
 ]
 
 { #category : #snapshotting }
@@ -287,4 +291,17 @@ BootstrapperModule >> importsClosureFor: roots [
 				dep := kernel loadedModuleNamed: descriptor key.
 				dep isNil ifFalse: [pending add: dep]]]].
 	^result
+]
+
+{ #category : #writing }
+BootstrapperModule >> segmentBuilderFor: aModule [
+	| builder |
+	builder := aModule newSegmentBuilder.
+	(self requiresNativization: aModule) ifTrue: [builder nativizer: environment].
+	^builder
+]
+
+{ #category : #writing }
+BootstrapperModule >> requiresNativization: aModule [
+	^{ProtoObject module. LMRProtoObject module. Memory module} includes: aModule
 ]
