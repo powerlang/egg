@@ -10,7 +10,8 @@ Class {
 		'codeSegments',
 		'environment',
 		'kernelOverrides',
-		'replacements'
+		'replacements',
+		'roots'
 	],
 	#category : #'LMR-Bootstrapper'
 }
@@ -27,7 +28,9 @@ BootstrapperModule >> imports [
 
 { #category : #running }
 BootstrapperModule >> main: args [
-	| lmrModule nativizer platform |
+	| lmrModule nativizer platform names |
+	names := args allButFirst: 2.
+	roots := names collect: [:name | Kernel load: name asSymbol].
 	lmrModule := Memory module.
 	nativizer := NativizerModule module.
 	platform := NativizationPlatform host.
@@ -60,13 +63,21 @@ BootstrapperModule >> bootstrapLMR: anLMRModule nativizer: aNativizerModule plat
 	env initializeLinkersFor: anLMRModule; completeInitialization.
 	environment := env.
 	kernelOverrides := self kernelOverrides.
-	self nativizeStartEntry: env.
+	self nativizeEntriesOf: self with: env.
+	roots do: [:module | self nativizeEntriesOf: module with: env]
 ]
 
 { #category : #bootstrapping }
-BootstrapperModule >> nativizeStartEntry: env [
+BootstrapperModule >> nativizeEntriesOf: aModule with: env [
+	aModule class methodDictionary do: [:method |
+		method isCallback ifTrue: [self nativizeEntry: method of: aModule with: env]]
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> nativizeEntry: aCompiledMethod of: aModule with: env [
 	| code machineCode original behavior |
-	code := (BootstrapperModule >> #__start__) copy.
+	code := aCompiledMethod copy.
+	code receiver: aModule.
 	env nativize: code.
 	machineCode := code optimizedCode code.
 	original := machineCode behavior.
@@ -77,8 +88,8 @@ BootstrapperModule >> nativizeStartEntry: env [
 		nativeCode: code optimizedCode;
 		yourself.
 	machineCode behavior: behavior.
-	self export: code optimizedCode as: #__start__.
-	(self codeSegmentOf: self) add: machineCode
+	aModule export: code optimizedCode as: aCompiledMethod selector.
+	(self codeSegmentOf: aModule) add: machineCode
 ]
 
 { #category : #bootstrapping }
@@ -147,7 +158,8 @@ BootstrapperModule >> nativizeSendSiteStubs: env [
 { #category : #initialization }
 BootstrapperModule >> justLoaded [
 	super justLoaded.
-	codeSegments := IdentityDictionary new
+	codeSegments := IdentityDictionary new.
+	roots := #()
 ]
 
 { #category : #snapshotting }
@@ -244,13 +256,13 @@ BootstrapperModule >> nativizePolymorphicCacheWith: env [
 
 { #category : #writing }
 BootstrapperModule >> writeSegments [
-	| roots closure |
-	roots := {
+	| all closure |
+	all := {
 		Memory module.                 "LMR"
 		NativizerModule module.        "LMR.Nativizer"
 		self class module.             "LMR.Bootstrapper"
-	}.
-	closure := self importsClosureFor: roots.
+	} , roots.
+	closure := self importsClosureFor: all.
 	Kernel load: #'ImageSegmentBuilder.Native'.
 	closure do: [:module | self writeSegmentOf: module].
 ]
@@ -273,7 +285,8 @@ BootstrapperModule >> prepareForSnapshot: aBuilder [
 		map: codeSegments to: nil;
 		map: environment to: nil;
 		map: kernelOverrides to: nil;
-		map: replacements to: nil
+		map: replacements to: nil;
+		map: roots to: nil
 ]
 
 { #category : #snapshotting }
@@ -309,7 +322,7 @@ BootstrapperModule >> segmentBuilderFor: aModule [
 
 { #category : #writing }
 BootstrapperModule >> requiresNativization: aModule [
-	^{Kernel. LMRProtoObject module. Memory module} includes: aModule
+	^({Kernel. LMRProtoObject module. Memory module} includes: aModule) or: [roots includes: aModule]
 ]
 
 { #category : #writing }

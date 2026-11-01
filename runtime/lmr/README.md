@@ -41,7 +41,7 @@ installed on the entry's machine-code bytes:
       callbackMethod.receiver → the callback receiver
 ```
 
-`BootstrapperModule>>nativizeStartEntry:` builds that `CallbackBehavior` with
+`BootstrapperModule>>nativizeEntry:of:with:` builds that `CallbackBehavior` with
 the machine-code object's class, no methods of its own and the object's real
 behavior as `next` (so the object stays a valid byte array without copying
 its methods), plus the `nativeCode` back-pointer. Because the behavior is
@@ -89,5 +89,7 @@ ctest --test-dir build/<OS>-<arch>-<BuildType> --output-on-failure
 
 `test_03_relocate` checks in-segment relocation; `test_04_run` runs the
 nativized `__start__` (which is `^42`) and asserts the tagged result 85. The
-tests read segments from `image-segments/lmr/`, so run `egg LMR.Bootstrapper`
-first to (re)generate them.
+tests read segments from `image-segments/lmr/`, so run
+`egg LMR.Bootstrapper LMR.LauncherTests` first to (re)generate them; the
+modules named after the bootstrapper are nativized and their entries
+exported.
