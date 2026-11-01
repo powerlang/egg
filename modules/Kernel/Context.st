@@ -51,6 +51,7 @@ Context class >> fromStack: aStack frameAt: bp pc: pc top: top callee: callee [
 Context >> arguments [
 	| size |
 	caller isNil ifTrue: [^#()].
+	code hasSpecialABI ifTrue: [^#()].
 	size := code argumentCount.
 	size = 0 ifTrue: [^#()].
 	^caller stackTop: size

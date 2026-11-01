@@ -269,6 +269,13 @@ CompiledMethod >> hasOptimizedCode [
 	^optimizedCode != nil
 ]
 
+{ #category : #testing }
+CompiledMethod >> hasSpecialABI [
+	"Methods like SendSite>>_dispatchOn: take their arguments in registers, not
+	from the caller's stack. Their frames show up in doesNotUnderstand: backtraces"
+	^self literals includes: #specialABIBegin
+]
+
 { #category : #initialization }
 CompiledMethod >> initialize [
 	super initialize.
