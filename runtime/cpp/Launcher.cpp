@@ -18,8 +18,8 @@ using namespace Egg;
 int
 Launcher::main(const int argc, const char** argv)
 {
-    if (argc != 2) {
-        printf("Usage: %s <module name>\n", argv[0]);
+    if (argc < 2) {
+        printf("Usage: %s <module name> [arguments]\n", argv[0]);
         return 1;
     }
 
