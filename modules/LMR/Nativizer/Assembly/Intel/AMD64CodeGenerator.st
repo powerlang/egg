@@ -523,7 +523,17 @@ AMD64CodeGenerator >> loadLongMwithIPoffset: anInteger [
 		length: 32;
 		base: self regIP;
 		displacement: anInteger - instsize.
-	self assemble: 'mov' with: self regM e with: pointer
+	self assemble: 'mov' with: self regM e with: pointer.
+	pointer
+		reset;
+		length: 64;
+		base: self regIP;
+		displacement: 0.
+	self
+		assemble: 'lea' with: self regV with: pointer;
+		assemble: 'shr' with: self regV with: 32;
+		assemble: 'shl' with: self regV with: 32;
+		assemble: 'or' with: self regM with: self regV
 ]
 
 { #category : #storing }

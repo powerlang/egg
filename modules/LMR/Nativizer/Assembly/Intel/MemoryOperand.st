@@ -100,6 +100,7 @@ MemoryOperand >> displacementBytes [
 
 { #category : #encoding }
 MemoryOperand >> displacementLength [
+	base == rip ifTrue: [^4].
 	displacement = 0 ifTrue: [^0].
 	^(base notNil and: [displacement between: -128 and: 127])
 		ifTrue: [1]
@@ -132,7 +133,7 @@ MemoryOperand >> encodeSib: aSIB [
 { #category : #testing }
 MemoryOperand >> hasDisplacement [
 	^self hasExplicitDisplacement
-		or: [base isNil]
+		or: [base isNil or: [base == rip]]
 		or: [self requiresSpecialCaseDisplacement]
 ]
 
