@@ -8,7 +8,9 @@ Class {
 	#superclass : #Module,
 	#instVars : [
 		'codeSegments',
-		'environment'
+		'environment',
+		'kernelOverrides',
+		'replacements'
 	],
 	#category : #'LMR-Bootstrapper'
 }
@@ -57,6 +59,7 @@ BootstrapperModule >> bootstrapLMR: anLMRModule nativizer: aNativizerModule plat
 
 	env initializeLinkersFor: anLMRModule; completeInitialization.
 	environment := env.
+	kernelOverrides := self kernelOverrides.
 	self nativizeStartEntry: env.
 ]
 
@@ -268,7 +271,9 @@ BootstrapperModule >> prepareForSnapshot: aBuilder [
 	super prepareForSnapshot: aBuilder.
 	aBuilder
 		map: codeSegments to: nil;
-		map: environment to: nil
+		map: environment to: nil;
+		map: kernelOverrides to: nil;
+		map: replacements to: nil
 ]
 
 { #category : #snapshotting }
@@ -298,10 +303,65 @@ BootstrapperModule >> segmentBuilderFor: aModule [
 	| builder |
 	builder := aModule newSegmentBuilder.
 	(self requiresNativization: aModule) ifTrue: [builder nativizer: environment].
+	aModule == Kernel ifTrue: [self addKernelOverridesTo: builder].
 	^builder
 ]
 
 { #category : #writing }
 BootstrapperModule >> requiresNativization: aModule [
-	^{ProtoObject module. LMRProtoObject module. Memory module} includes: aModule
+	^{Kernel. LMRProtoObject module. Memory module} includes: aModule
+]
+
+{ #category : #writing }
+BootstrapperModule >> addKernelOverridesTo: aBuilder [
+	kernelOverrides do: [:each | aBuilder override: each key with: each value].
+	replacements keysAndValuesDo: [:method :copy | aBuilder map: method to: copy]
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> kernelOverrides [
+	| overrides lmr |
+	overrides := OrderedCollection new.
+	replacements := IdentityDictionary new.
+	lmr := LMRProtoObject module.
+	lmr classes do: [:replacement | | target |
+		target := replacement superclass.
+		(replacement !== lmr class and: [target module == Kernel])
+			ifTrue: [
+				self addOverridesFrom: replacement to: target into: overrides.
+				self addOverridesFrom: replacement class to: target class into: overrides]].
+	self addExtensionsOf: Memory module into: overrides.
+	^overrides
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> addExtensionsOf: aModule into: aCollection [
+	aModule extensions keysAndValuesDo: [:key :methods | | meta name class target |
+		meta := key endsWith: ' class'.
+		name := meta ifTrue: [(key trimTail: ' class') asSymbol] ifFalse: [key].
+		class := aModule namespace at: name.
+		target := meta ifTrue: [class class] ifFalse: [class].
+		self addExtensions: methods of: target into: aCollection]
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> addExtensions: aCollection of: aClass into: anOrderedCollection [
+	aCollection do: [:method | | copy |
+		copy := (aClass compiledMethodAt: method selector) copy.
+		self add: copy replacing: method into: anOrderedCollection]
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> addOverridesFrom: aClass to: anotherClass into: aCollection [
+	aClass methodDictionary do: [:method | | copy |
+		copy := method copy.
+		copy classBinding: anotherClass.
+		self add: copy replacing: method into: aCollection]
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> add: aCompiledMethod replacing: anotherMethod into: aCollection [
+	environment nativize: aCompiledMethod.
+	replacements at: anotherMethod put: aCompiledMethod.
+	aCollection add: aCompiledMethod classBinding -> aCompiledMethod
 ]
