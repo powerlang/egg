@@ -112,7 +112,7 @@ Float class >> hasCoprocessorMissingFlag [
 
 { #category : #testing }
 Float class >> hasCoprocessorMissingFlag: status [
-	^(status bitAnd: 128) ~= 0
+	^status _floatStatusHasCoprocessorMissing
 ]
 
 { #category : #testing }
@@ -122,12 +122,12 @@ Float class >> hasDenormalizedOperandFlag [
 
 { #category : #testing }
 Float class >> hasDenormalizedOperandFlag: status [
-	^(status bitAnd: 2) != 0
+	^status _floatStatusHasDenormalizedOperand
 ]
 
 { #category : #testing }
 Float class >> hasErrorFlag: status [
-	^(status bitAnd: 0x1F) != 0
+	^status _floatStatusHasError
 ]
 
 { #category : #testing }
@@ -142,7 +142,7 @@ Float class >> hasInexactFlag [
 
 { #category : #testing }
 Float class >> hasInexactFlag: status [
-	^(status bitAnd: 32) ~= 0
+	^status _floatStatusHasInexact
 ]
 
 { #category : #testing }
@@ -152,7 +152,7 @@ Float class >> hasInvalidOperationFlag [
 
 { #category : #testing }
 Float class >> hasInvalidOperationFlag: status [
-	^(status bitAnd: 1) ~= 0
+	^status _floatStatusHasInvalidOperation
 ]
 
 { #category : #testing }
@@ -162,7 +162,7 @@ Float class >> hasOverflowFlag [
 
 { #category : #testing }
 Float class >> hasOverflowFlag: status [
-	^(status bitAnd: 8) ~= 0
+	^status _floatStatusHasOverflow
 ]
 
 { #category : #testing }
@@ -172,7 +172,7 @@ Float class >> hasUnderflowFlag [
 
 { #category : #testing }
 Float class >> hasUnderflowFlag: status [
-	^(status bitAnd: 16) ~= 0
+	^status _floatStatusHasUnderflow
 ]
 
 { #category : #testing }
@@ -187,7 +187,7 @@ Float class >> hasZeroDivisorFlag [
 
 { #category : #testing }
 Float class >> hasZeroDivisorFlag: status [
-	^(status bitAnd: 4) ~= 0
+	^status _floatStatusHasZeroDivisor
 ]
 
 { #category : #constants }
