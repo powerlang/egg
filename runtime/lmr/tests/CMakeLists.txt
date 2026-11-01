@@ -8,6 +8,7 @@ add_executable(lmr_tests
     test_02_tables.cpp
     test_03_relocate.cpp
     test_04_run.cpp
+    test_05_link.cpp
     test_06_code.cpp
     test_07_install.cpp
 )
