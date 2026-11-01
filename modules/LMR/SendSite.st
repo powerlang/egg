@@ -133,7 +133,7 @@ SendSite class >> optimizedStaticSelectors [
 		 #memory #instanceBehavior
 		#_instancesAreArrayed #_instancesHavePointers #nil:slotsOf:
 		#initializeExtended:contentSize: #primitiveNew
-		#primitiveNewBytes: #primitiveNewPointers: #_return: #_returnTo: #zero:bytesOf:)
+		#primitiveNewBytes: #primitiveNewPointers: #primitiveNewPointers:arrayed: #_return: #_returnTo: #zero:bytesOf:)
 ]
 
 { #category : #private }
@@ -391,7 +391,7 @@ SendSite >> isStaticSelector [
 		 #memory #instanceBehavior
 		#_instancesAreArrayed #_instancesHavePointers #nil:slotsOf:
 		#initializeExtended:contentSize: #primitiveNew
-		#primitiveNewBytes: #primitiveNewPointers: #_return: #_returnTo: #zero:bytesOf:)
+		#primitiveNewBytes: #primitiveNewPointers: #primitiveNewPointers:arrayed: #_return: #_returnTo: #zero:bytesOf:)
 		includes: token)
 		ifTrue: [^true].
 	^false

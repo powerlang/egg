@@ -5,7 +5,7 @@
 
 Class {
 	#name : #LMRSpecies,
-	#superclass : #ProtoObject,
+	#superclass : #Species,
 	#category : #Kernel
 }
 
@@ -58,7 +58,7 @@ LMRSpecies >> nil: size slotsOf: object [
 
 { #category : 'Primitives' }
 LMRSpecies >> primitiveNew [
-	^self memory newPointers: instanceBehavior size: self instSize
+	^self primitiveNewPointers: self instSize arrayed: false
 ]
 
 { #category : 'Primitives' }
@@ -72,15 +72,28 @@ LMRSpecies >> primitiveNew: size [
 
 { #category : 'Primitives' }
 LMRSpecies >> primitiveNewBytes: size [
-	^self memory newArrayedBytes: instanceBehavior size: size
+	| byteSize object |
+	byteSize := size + WordSize - 1 bitAnd: 0 - WordSize.
+	object := self allocate: byteSize size: size.
+	self zero: byteSize bytesOf: object.
+	object _beBytes; _beArrayed.
+	^object
 ]
 
 { #category : 'Primitives' }
 LMRSpecies >> primitiveNewPointers: size [
-	^self memory
-		newArrayedPointers: instanceBehavior
-		size: size
-		named: self instSize > 0
+	"size counts the named slots too"
+	^self primitiveNewPointers: size arrayed: true
+]
+
+{ #category : 'Primitives' }
+LMRSpecies >> primitiveNewPointers: size arrayed: aBoolean [
+	| object |
+	object := self allocate: size * WordSize size: size.
+	self nil: size slotsOf: object.
+	aBoolean ifTrue: [object _beArrayed].
+	self instSize > 0 ifTrue: [object _beNamed].
+	^object
 ]
 
 { #category : #'instance creation' }

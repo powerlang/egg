@@ -55,7 +55,7 @@ NativizerModule >> invokedMethods [
 		(LMRProtoObject -> #(behavior class #initializeExtended:contentSize: primitiveAt:)).
 		(Object -> #(_replaceFrom:to:with:)).
 		(Species -> #(instanceBehavior _instancesAreArrayed _instancesHavePointers)).
-		(LMRSpecies -> #(allocate:size: nil:slotsOf: memory primitiveNewBytes: primitiveNewPointers: zero:bytesOf:))}.
+		(LMRSpecies -> #(allocate:size: nil:slotsOf: memory primitiveNewBytes: primitiveNewPointers: primitiveNewPointers:arrayed: zero:bytesOf:))}.
 	^self undermethods , (self methodSubset: map)
 ]
 
