@@ -179,7 +179,6 @@ InlineMessageLinker >> assembleBasicULongAtPut [
 InlineMessageLinker >> assembleBeCurrent [
 	#_beCurrent.
 	assembler
-		loadRwithRindex: 1;
 		clearSafeRintegerBit;
 		loadFPwithR
 ]

@@ -80,6 +80,11 @@ ProcessLMRStack >> isValid [
 ]
 
 { #category : #services }
+ProcessLMRStack >> lastArgumentOf: frame [
+	^(frame + (SlotSize * 2) _asPointer) _asObject _basicAt: 1
+]
+
+{ #category : #services }
 ProcessLMRStack >> lock [
 	locked := true
 ]
