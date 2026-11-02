@@ -115,7 +115,7 @@ Float >> significand [
 { #category : #functions }
 Float >> sqrt [
 	<primitive: FloatSqrt>
-	^self errorOn: #sqrt status: status
+	^self errorOn: #sqrt status: 0
 ]
 
 { #category : #arithmetic }
