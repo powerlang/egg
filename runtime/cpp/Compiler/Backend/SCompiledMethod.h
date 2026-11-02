@@ -123,6 +123,7 @@ public:
     Egg::string ffiName() const { return _ffiName; }
     void ffiName_(const Egg::string& name) { _ffiName = name; }
     const std::vector<uint8_t>& ffiDescriptor() const { return _ffiDescriptor; }
+    bool isCallout() const { return !_ffiName.empty(); }
     void ffiDescriptor_(const std::vector<uint8_t>& bytes) { _ffiDescriptor = bytes; }
 
     void* optimizedCode() const { return _optimizedCode; }

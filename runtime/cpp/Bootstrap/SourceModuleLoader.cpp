@@ -108,6 +108,7 @@ HeapObject* SourceModuleLoader::loadModuleFromSource(const std::string& modulePa
 
     auto moduleInstance = _runtime->sendLocal_to_("new", moduleClassRef.get());
     GCedRef moduleRef(moduleInstance);
+    _module = std::make_unique<GCedRef>(moduleRef.get());
     auto nameObj = (Object*)_runtime->newString_(name);
     _runtime->sendLocal_to_with_("name:", moduleRef.get(), nameObj);
 
@@ -161,18 +162,20 @@ HeapObject* SourceModuleLoader::loadModuleFromSource(const std::string& modulePa
         }
     }
 
+    std::vector<std::pair<std::unique_ptr<GCedRef>, ClassSpec*>> classes;
     for (const auto& name : sorted) {
         ClassSpec* spec = _moduleSpec.resolveClass(name);
         auto cls = createNewClassFrom_(spec, moduleRef.get());
-        GCedRef clsRef(cls);
-        createMethodsOf_(clsRef.get(), spec);
+        classes.emplace_back(std::make_unique<GCedRef>(cls), spec);
 
         // Set class comment if the .st file had a header comment
         if (!spec->comment().empty()) {
             auto commentObj = (Object*)_runtime->newString_(spec->comment().toUtf8());
-            _runtime->sendLocal_to_with_("comment:", clsRef.get(), commentObj);
+            _runtime->sendLocal_to_with_("comment:", classes.back().first->get(), commentObj);
         }
     }
+    for (const auto& [cls, spec] : classes)
+        createMethodsOf_(cls->get(), spec);
 
     // Phase 6: Finalize module
     // (importRequiredModules was already called in Phase 4)
@@ -343,18 +346,34 @@ void SourceModuleLoader::createNewMethod_(const Egg::string& source, Object* spe
     }
 
     GCedRef speciesRef(species);
+    GCedRef methodRef(newMethodFrom_(smethod, source, speciesRef.get()));
+
+    // Install method via Smalltalk protocol (all method dicts are proper
+    // MethodDictionary objects after bootstrap conversion)
+    auto selector = (Object*)_runtime->addSymbol_(smethod->selector().toUtf8());
+    _runtime->sendLocal_to_with_with_("addSelector:withMethod:", speciesRef.get(), selector, methodRef.get());
+
+    // Set method category if provided
+    if (!category.empty()) {
+        auto catObj = (Object*)_runtime->addSymbol_(category.toUtf8());
+        _runtime->sendLocal_to_with_("category:", methodRef.get(), catObj);
+    }
+}
+
+Object* SourceModuleLoader::newMethodFrom_(SCompiledMethod* smethod, const Egg::string& source, Object* species) {
+    GCedRef speciesRef(species);
 
     const auto& treecodes = smethod->treecodes();
     const auto& literals = smethod->literals();
     uint32_t literalCount = literals.size();
 
-    Egg::string methodClassname = smethod->methodClassname();
-    uint32_t instBase = Offsets::MethodInstSize + (methodClassname == "CallbackMethod" ? 2 : 0);
-
-    auto cmClass = lookupClass_(methodClassname);
+    auto cmClass = smethod->isCallout() ? ffiMethodClass_() : lookupClass_(smethod->methodClassname());
+    uint32_t instBase = _runtime->speciesInstanceSize_(cmClass->asHeapObject());
     auto size = (Object*)_runtime->newInteger_(literalCount);
     auto method = _runtime->sendLocal_to_with_("new:", cmClass, size);
     GCedRef methodRef(method);
+    if (smethod->isCallout())
+        initializeFFIMethod_(methodRef.get(), smethod);
 
     // Set method fields
     auto format = (Object*)_runtime->newInteger_(smethod->format());
@@ -379,16 +398,28 @@ void SourceModuleLoader::createNewMethod_(const Egg::string& source, Object* spe
         auto literal = transferLiteral_(literals[i], methodRef.get());
         methodRef.get()->asHeapObject()->slot(instBase + i) = literal;
     }
+    return methodRef.get();
+}
 
-    // Install method via Smalltalk protocol (all method dicts are proper
-    // MethodDictionary objects after bootstrap conversion)
-    _runtime->sendLocal_to_with_with_("addSelector:withMethod:", speciesRef.get(), selector, methodRef.get());
-
-    // Set method category if provided
-    if (!category.empty()) {
-        auto catObj = (Object*)_runtime->addSymbol_(category.toUtf8());
-        _runtime->sendLocal_to_with_("category:", methodRef.get(), catObj);
+Object* SourceModuleLoader::ffiMethodClass_() {
+    auto symbol = (Object*)_runtime->addSymbol_("FFIMethod");
+    auto namespace_ = _runtime->sendLocal_to_("namespace", _module->get());
+    if (_runtime->sendLocal_to_with_("includesKey:", namespace_, symbol) != (Object*)_runtime->_trueObj) {
+        auto kernel = (Object*)_runtime->_kernel->_exports["__module__"];
+        auto ffi = _runtime->sendLocal_to_with_("loadedModuleNamed:", kernel, (Object*)_runtime->addSymbol_("FFI"));
+        namespace_ = _runtime->sendLocal_to_("namespace", ffi);
     }
+    return _runtime->sendLocal_to_with_("at:", namespace_, symbol);
+}
+
+void SourceModuleLoader::initializeFFIMethod_(Object* method, SCompiledMethod* smethod) {
+    GCedRef methodRef(method);
+    const auto& bytes = smethod->ffiDescriptor();
+    auto descriptor = _runtime->newBytes_size_(_runtime->_kernel->_exports["ByteArray"], bytes.size());
+    std::memcpy((void*)descriptor, bytes.data(), bytes.size());
+    _runtime->sendLocal_to_with_("descriptorBytes:", methodRef.get(), (Object*)descriptor);
+    auto symbol = (Object*)_runtime->newString_(smethod->ffiName().toUtf8());
+    methodRef.get()->asHeapObject()->slot(Offsets::FFIMethodSymbol) = symbol;
 }
 
 Object* SourceModuleLoader::createExtensionMethod_(const Egg::string& source, Object* species) {
@@ -399,43 +430,7 @@ Object* SourceModuleLoader::createExtensionMethod_(const Egg::string& source, Ob
                   << source.substr(0, std::min(source.length(), size_t(60))) << "...'" << std::endl;
         return nullptr;
     }
-
-    GCedRef speciesRef(species);
-
-    const auto& treecodes = smethod->treecodes();
-    const auto& literals = smethod->literals();
-    uint32_t literalCount = literals.size();
-
-    Egg::string methodClassname = smethod->methodClassname();
-    uint32_t instBase = Offsets::MethodInstSize + (methodClassname == "CallbackMethod" ? 2 : 0);
-
-    auto cmClass = lookupClass_(methodClassname);
-    auto size = (Object*)_runtime->newInteger_(literalCount);
-    auto method = _runtime->sendLocal_to_with_("new:", cmClass, size);
-    GCedRef methodRef(method);
-
-    auto format = (Object*)_runtime->newInteger_(smethod->format());
-    _runtime->sendLocal_to_with_("format:", methodRef.get(), format);
-
-    auto selector = (Object*)_runtime->addSymbol_(smethod->selector().toUtf8());
-    _runtime->sendLocal_to_with_("selector:", methodRef.get(), selector);
-
-    auto baClass = _runtime->_kernel->_exports["ByteArray"];
-    auto ba = _runtime->newBytes_size_(baClass, treecodes.size());
-    std::memcpy((void*)ba, treecodes.data(), treecodes.size());
-    _runtime->sendLocal_to_with_("treecodes:", methodRef.get(), (Object*)ba);
-
-    _runtime->sendLocal_to_with_("classBinding:", methodRef.get(), speciesRef.get());
-
-    auto sourceObj = (Object*)_runtime->newString_(source.toUtf8());
-    _runtime->sendLocal_to_with_("sourceObject:", methodRef.get(), sourceObj);
-
-    for (uint32_t i = 0; i < literalCount; i++) {
-        auto literal = transferLiteral_(literals[i], methodRef.get());
-        methodRef.get()->asHeapObject()->slot(instBase + i) = literal;
-    }
-
-    return methodRef.get();
+    return newMethodFrom_(smethod, source, species);
 }
 
 Object* SourceModuleLoader::transferLiteral_(const LiteralValue& lit, Object* method) {
