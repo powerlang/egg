@@ -6,6 +6,7 @@
 #ifndef _PRAGMA_NODE_H_
 #define _PRAGMA_NODE_H_
 
+#include <vector>
 #include "SParseNode.h"
 #include <string>
 
@@ -29,6 +30,7 @@ private:
     Egg::string _name;
     int _primitiveNumber; // For primitive pragmas
     void* _info; // For FFI descriptors (placeholder for now)
+    std::vector<uint8_t> _ffiDescriptor;
     
 public:
     SPragmaNode(SSmalltalkCompiler* compiler) 
@@ -67,6 +69,9 @@ public:
         _info = descriptor;
     }
     
+    const std::vector<uint8_t>& ffiDescriptor() const { return _ffiDescriptor; }
+    void ffiDescriptor_(const std::vector<uint8_t>& bytes) { _ffiDescriptor = bytes; }
+
     void beSymbolic_(const Egg::string& symbol) {
         _type = Type::Symbolic;
         _name = symbol;

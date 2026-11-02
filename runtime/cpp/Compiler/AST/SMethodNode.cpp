@@ -62,6 +62,10 @@ SCompiledMethod* SMethodNode::buildMethod() {
     
     cm->pragma_(_pragma);
     cm->methodClassname_(methodClassname());
+    if (_pragma && _pragma->isFFI()) {
+        cm->ffiName_(_pragma->name());
+        cm->ffiDescriptor_(_pragma->ffiDescriptor());
+    }
 
     auto blocks = cm->blocks();
     for (auto block : blocks) {
@@ -166,7 +170,8 @@ std::vector<LiteralValue> SMethodNode::literals() {
 }
 
 Egg::string SMethodNode::methodClassname() {
-    if (_pragma && _pragma->isFFI()) return "CallbackMethod";
+    if (_pragma && _pragma->isFFI())
+        return _pragma->name().empty() ? "CallbackMethod" : "FFIMethod";
     return "CompiledMethod";
 }
 
