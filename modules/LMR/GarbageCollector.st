@@ -159,7 +159,7 @@ GarbageCollector >> releaseLocals [
 	memory queueEphemerons: rescuedEphemerons.
 	weakContainers := uncheckedEphemerons := unreachedEphemerons := rescuedEphemerons := nil.
 	stacks := nil.
-	Processor activeProcess stack unlock
+	Processor activeProcess nativeStack unlock
 ]
 
 { #category : #ephemerons }
@@ -202,18 +202,10 @@ GarbageCollector >> scan: current from: start to: limit [
 
 { #category : #cleaning }
 GarbageCollector >> scanFirstStackChunk: aProcessStack [
-	| start end |
 	aProcessStack isActive
 		ifTrue: [self updateStackPointer: aProcessStack]
 		ifFalse: [self scanTopSlot: aProcessStack].
-	start := aProcessStack sp + (WordSize * 2) _asPointer.
-	end := aProcessStack bp.
-	aProcessStack
-		nativeFramesDo: [:frame :size | self
-			scanNativeStackFrame: frame
-			sized: size]
-		startingAt: start
-		base: end
+	aProcessStack framesDo: [:frame :size | self scanNativeStackFrame: frame sized: size]
 ]
 
 { #category : #cleaning }
@@ -233,11 +225,7 @@ GarbageCollector >> scanSpecialSlots: special [
 { #category : #cleaning }
 GarbageCollector >> scanStack: aProcessStack [
 	aProcessStack isValid ifFalse: [^self].
-	aProcessStack isNative ifTrue: [self scanFirstStackChunk: aProcessStack].
-	aProcessStack
-		framesBeneathCallbackDo: [:frame :nativeSize | self
-			scanNativeStackFrame: frame
-			sized: nativeSize]
+	aProcessStack isNative ifTrue: [self scanFirstStackChunk: aProcessStack]
 ]
 
 { #category : #cleaning }
@@ -313,7 +301,7 @@ GarbageCollector >> updateActiveStack [
 	it while collecting
 	"
 	| stack |
-	stack := ActiveProcess stack lock; updateBack: 1.
+	stack := Processor activeProcess nativeStack lock; updateBack: 1.
 	currentSP := stack sp
 ]
 

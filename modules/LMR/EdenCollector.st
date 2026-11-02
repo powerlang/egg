@@ -244,7 +244,7 @@ EdenCollector >> remember: anObject [
 
 { #category : #cleaning }
 EdenCollector >> rememberOldStacks [
-	ProcessStack registeredInstances
+	ProcessLMRStack registeredInstances
 		do: [:stack | self rememberStackIfNeeded: stack]
 ]
 
