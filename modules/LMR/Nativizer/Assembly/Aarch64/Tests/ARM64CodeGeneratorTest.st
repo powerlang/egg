@@ -269,3 +269,18 @@ ARM64CodeGeneratorTest >> testCallout [
 	codegen := assembler codegen.
 	self assert: self words asArray equals: #(16rAA0003E9 16rD2800040 16r9E670000 16rD2800020 16rD63F0120)
 ]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testCalloutStackArguments [
+	| platform assembler |
+	platform := NativizationPlatform aarch64_darwin.
+	assembler := platform newAssembler.
+	platform abi
+		emitCallout: #(sint64 sint64 sint64 sint64 sint64 sint64 sint64 sint64 sint32 float)
+		with: assembler
+		loading: [:i | assembler codegen moveImm: i to: assembler codegen regR].
+	codegen := assembler codegen.
+	self
+		assert: self words asArray
+		equals: #(16rAA0003E9 16rD10043FF 16rD2800040 16rAA0003E1 16rD2800060 16rAA0003E2 16rD2800080 16rAA0003E3 16rD28000A0 16rAA0003E4 16rD28000C0 16rAA0003E5 16rD28000E0 16rAA0003E6 16rD2800100 16rAA0003E7 16rD2800120 16rB90003E0 16rD2800140 16r9E670010 16r1E624200 16rD2800020 16rD63F0120 16r910043FF)
+]

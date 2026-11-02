@@ -91,6 +91,11 @@ TemplateJIT >> associationValueAt: anInteger put: dummy [
 ]
 
 { #category : #services }
+TemplateJIT >> isFloat: type [
+	^#(float double) includes: type
+]
+
+{ #category : #services }
 TemplateJIT >> loadAssociationValue: anAssociation [
 	assembler
 		loadRwithLiteral: anAssociation;
@@ -216,7 +221,7 @@ TemplateJIT >> emitCallout [
 	index := method class indexOfSlot: 'address'.
 	lookup := assembler newLabel.
 	resolved := assembler newLabel.
-	return == #double ifTrue: [
+	(self isFloat: return) ifTrue: [
 		self loadObject: Float; emitSend: #new.
 		assembler pushR].
 	assembler @ resolved.
@@ -249,7 +254,7 @@ TemplateJIT >> emitCalloutArgument: index type: aSymbol [
 		convertRtoNativeInteger;
 		jumpTo: done;
 		@ nonInteger.
-	aSymbol == #double ifTrue: [assembler loadRwithRindex: 1].
+	(self isFloat: aSymbol) ifTrue: [assembler loadRwithRindex: 1].
 	assembler @ done
 ]
 
@@ -257,7 +262,7 @@ TemplateJIT >> emitCalloutArgument: index type: aSymbol [
 TemplateJIT >> emitCalloutResult: type [
 	type == #void ifTrue: [^assembler loadRwithImmediate: 1].
 	environment abi extendResult: type with: assembler.
-	type == #double ifTrue: [^assembler popA; moveX0toR; storeRinAindex: 1; loadRwithA].
+	(self isFloat: type) ifTrue: [^assembler popA; moveX0toR; storeRinAindex: 1; loadRwithA].
 	assembler convertRtoSmallInteger
 ]
 
