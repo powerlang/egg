@@ -626,7 +626,7 @@ Memory >> objectsReferencing: targetSpace [
 Memory >> objectsSurviving: aBlock [
 	| set finalizable |
 	set := WeakIdentitySet new: 1000.
-	finalizable := Smalltalk finalizer copy.
+	finalizable := Kernel finalizer copy.
 	self collectYoung; collectYoung.
 	self ASSERT: CRITICAL == false.
 	CRITICAL := true.

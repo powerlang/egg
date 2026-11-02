@@ -122,11 +122,6 @@ SmalltalkSystem >> classNamed: aString [
 	^global isSpecies ifTrue: [meta ifTrue: [global class] ifFalse: [global]]
 ]
 
-{ #category : #services }
-SmalltalkSystem >> collectGarbage [
-	memory forceCompact
-]
-
 { #category : #accessing }
 SmalltalkSystem >> eventDispatcher [
 	^eventDispatcher
@@ -140,16 +135,6 @@ SmalltalkSystem >> eventDispatcher: anEventDispatcher [
 { #category : #services }
 SmalltalkSystem >> eventTableFor: anObject [
 	^eventHandlers at: anObject ifAbsent: nil
-]
-
-{ #category : #'startup/shutdown' }
-SmalltalkSystem >> exit [
-	session exit
-]
-
-{ #category : #accessing }
-SmalltalkSystem >> finalizer [
-	^finalizer
 ]
 
 { #category : #services }
@@ -340,32 +325,6 @@ SmalltalkSystem >> segmentUnloaded: anImageSegment [
 { #category : #enumerating }
 SmalltalkSystem >> select: aBlock thenDo: anotherBlock [
 	globals select: aBlock thenDo: anotherBlock
-]
-
-{ #category : #services }
-SmalltalkSystem >> showBacktraceOf: aProcess label: aString [
-	| writer logger |
-	writer := '' writeStream.
-	aProcess
-		backtraceOn: writer
-		maxLevels: 100
-		stopWhen: [:cm | cm isDoit]
-		filtered: false
-		arguments: false.
-	logger := self at: #Transcript ifAbsent: nil.
-	logger isNil
-		ifTrue: [session logError: writer contents]
-		ifFalse: [logger nextPutAll: aString; cr; nextPutAll: writer contents].
-	aProcess isResumable ifTrue: [aProcess performDeferred: #resume]
-]
-
-{ #category : #'startup/shutdown' }
-SmalltalkSystem >> startUp [
-	session startUp.
-	self ephemeronsDo: [:e | e activate].
-	Float startUp.
-	memory startUp.
-	"platform startUp."
 ]
 
 { #category : #accessing }
