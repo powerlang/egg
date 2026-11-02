@@ -13,9 +13,6 @@ Class {
 		'command',
 		'options'
 	],
-	#pools : [
-		'CharacterConstants'
-	],
 	#category : #Kernel
 }
 
@@ -96,7 +93,7 @@ CommandLine >> command: aString [
 
 { #category : #private }
 CommandLine >> formatArgument: argument [
-	^(argument includes: Space)
+	^(argument includes: Character space)
 		ifTrue: [argument doubleQuoted]
 		ifFalse: [argument]
 ]
@@ -105,7 +102,7 @@ CommandLine >> formatArgument: argument [
 CommandLine >> formatOption: option [
 	| prefix string |
 	prefix := option size = 1 ifTrue: ['-'] ifFalse: ['--'].
-	string := (option includes: Space)
+	string := (option includes: Character space)
 		ifTrue: [option doubleQuoted]
 		ifFalse: [option].
 	^prefix , string
@@ -216,7 +213,7 @@ CommandLine >> readTokenFrom: aStream [
 		next := aStream next.
 		end := next = $" ifTrue: [$"] ifFalse: [
 			strm nextPut: next.
-			Space].
+			Character space].
 		t := aStream upTo: end.
 		strm nextPutAll: t]
 ]
