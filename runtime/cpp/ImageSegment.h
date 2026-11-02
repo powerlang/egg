@@ -42,11 +42,20 @@ typedef struct _ImageSegmentHeader
      * A reference to Module instance describing this image segment
      */
     HeapObject* module;
+    /**
+     * Size of the space of native code, which follows the objects (`size`)
+     * at the next multiple of SegmentCodeAlignment. Zero when there is no code.
+     */
+    uint64_t codeSize;
 
 } ImageSegmentHeader;
 
-static_assert(sizeof(ImageSegmentHeader) == 40 /*bytes*/,
-              "segment_header size not 40 bytes");
+static_assert(sizeof(ImageSegmentHeader) == 48 /*bytes*/,
+              "segment_header size not 48 bytes");
+
+// a multiple of the page sizes a code space can be mapped executable with,
+// and NativeWriter class>>codeAlignment in modules/ImageSegmentBuilder
+constexpr uint64_t SegmentCodeAlignment = 0x10000;
 
 /**
  * Base class for memory segments containing Egg objects.
@@ -63,6 +72,8 @@ class ImageSegment
 
     uintptr_t spaceStart() { return _currentBase + sizeof(ImageSegmentHeader); }
     uintptr_t spaceEnd() { return _currentBase + header.size; }
+    uintptr_t codeStart() { return _currentBase + align(header.size, SegmentCodeAlignment); }
+    uintptr_t codeEnd() { return this->codeStart() + header.codeSize; }
 
     void dumpObjects();
 };

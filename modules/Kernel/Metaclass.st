@@ -69,11 +69,6 @@ Metaclass >> isMetaclass [
 ]
 
 { #category : #accessing }
-Metaclass >> name [
-	^class name , ' class'
-]
-
-{ #category : #accessing }
 Metaclass >> namespace [
 	^class namespace
 ]

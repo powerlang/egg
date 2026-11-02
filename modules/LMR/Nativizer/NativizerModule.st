@@ -22,7 +22,7 @@ NativizerModule >> environment [
 NativizerModule >> imports [
 	^{
 		#Kernel -> #(Behavior CallbackBehavior CallbackMethod CharacterArray Closure CompiledBlock CompiledMethod Error Float OrderedCollection Process ProtoObject Species String).
-		#'Kernel.LMR' -> #(LMRProtoObject LMRFloat LMRSpecies).
+		#'Kernel.LMR' -> #(LMRCompiledMethod LMRProtoObject LMRFloat LMRSpecies).
 		#LMR -> #(CriticalArray GCSpace GlobalDispatchCache Memory NativeCode SendSite Thread).
 		#'LMR.SExpressions' -> #(SExpression SMethod SBlock SBinding SInstVarBinding SLocalBinding SArgumentBinding STemporaryBinding SDynamicBinding SAssociationBinding SLiteral SIdentifier SReturn SAssignment SCascade SMessage SPragma TreecodeDecoder).
 		#'LMR.Nativizer.Assembly.Intel' -> #(AMD64CodeGenerator AMD64TemplateAssembler SysVX64ABI WinX64ABI Register).
@@ -35,12 +35,13 @@ NativizerModule >> imports [
 NativizerModule >> inlinedMethods [
 	| map |
 	map := {
-		(ProtoObject -> #(#basicObjectIndexOf: #class #objectAtValid: #objectAtValid:put:)).
-		(LMRProtoObject -> #(#behavior #primitiveAt: #_cachedLookup: #_cachedLookup:in:)).
+		(ProtoObject -> #(#basicObjectIndexOf: #objectAtValid: #objectAtValid:put:)).
+		(LMRProtoObject -> #(#behavior #class #primitiveAt: #_cachedLookup: #_cachedLookup:in:)).
 		(Object -> #(#byteAtValid: #byteAtValid:put: #at:put:)).
 		(Species -> #(#instSize #_instancesAreArrayed #_instancesHavePointers #instanceBehavior)).
 		(LMRSpecies -> #(#memory #primitiveNew #primitiveNew:)).
-		(CompiledMethod -> #(#prepareForExecution #isNativized #optimizedCode #blockCount #literalIndexFrom:)).
+		(CompiledMethod -> #(#isNativized #optimizedCode #blockCount #literalIndexFrom:)).
+		(LMRCompiledMethod -> #(#prepareForExecution)).
 		(CompiledBlock -> #(#argumentCount #blockNumber #blockCode #method)).
 		(NativeCode -> #(#code)).
 		(GCSpace -> #(#commitedLimit #nextFree #nextFree:)).
@@ -52,17 +53,17 @@ NativizerModule >> inlinedMethods [
 NativizerModule >> invokedMethods [
 	| map |
 	map := {
-		(ProtoObject -> #(class)).
-		(LMRProtoObject -> #(behavior #initializeExtended:contentSize: primitiveAt:)).
+		(LMRProtoObject -> #(behavior class #initializeExtended:contentSize: primitiveAt:)).
 		(Object -> #(_replaceFrom:to:with:)).
 		(Species -> #(instanceBehavior _instancesAreArrayed _instancesHavePointers)).
-		(LMRSpecies -> #(allocate:size: nil:slotsOf: memory primitiveNewBytes: primitiveNewPointers: zero:bytesOf:))}.
+		(LMRSpecies -> #(allocate:size: nil:slotsOf: memory primitiveNewBytes: primitiveNewPointers: primitiveNewPointers:arrayed: zero:bytesOf:))}.
 	^self undermethods , (self methodSubset: map)
 ]
 
 { #category : #accessing }
 NativizerModule >> justLoaded [
-	InlineMessageLinker initializeInlineMessageLinkerFlags
+	InlineMessageLinker initializeInlineMessageLinkerFlags.
+	TemplateJIT initializeClosureElementTypes
 ]
 
 { #category : #accessing }

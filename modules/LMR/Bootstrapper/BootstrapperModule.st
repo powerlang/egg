@@ -6,13 +6,20 @@
 Class {
 	#name : #BootstrapperModule,
 	#superclass : #Module,
+	#instVars : [
+		'codeSegments',
+		'environment',
+		'kernelOverrides',
+		'replacements',
+		'roots'
+	],
 	#category : #'LMR-Bootstrapper'
 }
 
 { #category : #spec }
 BootstrapperModule >> imports [
 	^{
-		#Kernel -> #(OrderedCollection IdentityDictionary Object Magnitude ProtoObject SmallInteger CallbackBehavior).
+		#Kernel -> #(OrderedCollection IdentityDictionary Object Magnitude ProtoObject SmallInteger CallbackBehavior MethodDictionary).
 		#'Kernel.LMR' -> #(LMRProtoObject).
 		#LMR -> #(Memory NativeCode SendSite GCSpace CriticalArray).
 		#'LMR.Nativizer' -> #(NativizerModule NativizationPlatform NativizationEnvironment LookupNativizer LookupLinker)
@@ -21,7 +28,9 @@ BootstrapperModule >> imports [
 
 { #category : #running }
 BootstrapperModule >> main: args [
-	| lmrModule nativizer platform |
+	| lmrModule nativizer platform names |
+	names := args allButFirst: 2.
+	roots := names collect: [:name | Kernel load: name asSymbol].
 	lmrModule := Memory module.
 	nativizer := NativizerModule module.
 	platform := NativizationPlatform host.
@@ -52,24 +61,35 @@ BootstrapperModule >> bootstrapLMR: anLMRModule nativizer: aNativizerModule plat
 		nativizeSendSiteStubs: env.
 
 	env initializeLinkersFor: anLMRModule; completeInitialization.
-	self nativizeStartEntry: env.
+	environment := env.
+	kernelOverrides := self kernelOverrides.
+	self nativizeEntriesOf: self with: env.
+	roots do: [:module | self nativizeEntriesOf: module with: env]
 ]
 
 { #category : #bootstrapping }
-BootstrapperModule >> nativizeStartEntry: env [
+BootstrapperModule >> nativizeEntriesOf: aModule with: env [
+	aModule class methodDictionary do: [:method |
+		method isCallback ifTrue: [self nativizeEntry: method of: aModule with: env]]
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> nativizeEntry: aCompiledMethod of: aModule with: env [
 	| code machineCode original behavior |
-	code := (BootstrapperModule >> #__start__) copy.
+	code := aCompiledMethod copy.
+	code receiver: aModule.
 	env nativize: code.
 	machineCode := code optimizedCode code.
 	original := machineCode behavior.
 	behavior := CallbackBehavior new
 		classBinding: original classBinding;
-		methods: original methods;
-		next: original next;
+		methods: MethodDictionary new;
+		next: original;
 		nativeCode: code optimizedCode;
 		yourself.
 	machineCode behavior: behavior.
-	self export: code optimizedCode as: #__start__
+	aModule export: code optimizedCode as: aCompiledMethod selector.
+	(self codeSegmentOf: aModule) add: machineCode
 ]
 
 { #category : #bootstrapping }
@@ -128,24 +148,39 @@ BootstrapperModule >> nativizeWriteBarrierFor: anLMRModule env: env nativizer: a
 
 { #category : #bootstrapping }
 BootstrapperModule >> nativizeSendSiteStubs: env [
-	env lmrModule
-		micStub: (self nativizeMonomorphicCacheWith: env);
-		picStub: (self nativizePolymorphicCacheWith: env)
+	| mic pic |
+	mic := self nativizeMonomorphicCacheWith: env.
+	pic := self nativizePolymorphicCacheWith: env.
+	env lmrModule micStub: mic; picStub: pic.
+	(self codeSegmentOf: env lmrModule) add: mic; add: pic
+]
+
+{ #category : #initialization }
+BootstrapperModule >> justLoaded [
+	super justLoaded.
+	codeSegments := IdentityDictionary new.
+	roots := #()
+]
+
+{ #category : #snapshotting }
+BootstrapperModule >> codeSegmentOf: aModule [
+	^codeSegments at: aModule ifAbsentPut: [OrderedCollection new]
 ]
 
 { #category : #bootstrapping }
 BootstrapperModule >> nativizeMonomorphicCacheWith: env [
-	| asm lookup next smiIndex lookupIndex |
+	| asm lookup next smiIndex lookupIndex cacheIndex |
 	asm := env newAssembler.
 	lookup := asm newLabel.
 	smiIndex := env lmrModule indexOfGlobal: #SmallIntegerBehavior.
 	lookupIndex := env lmrModule indexOfGlobal: #Lookup.
+	cacheIndex := SendSite indexOfSlot: 'cache'.
 	asm
-		loadTwithAindex: 3;
+		loadTwithAindex: cacheIndex;
 		loadSwithGindex: smiIndex.
 	next := asm labeledNonIntegerBitTestOfR.
 	asm
-		loadLongSwithRindex: 0;
+		loadSwithRbehavior;
 		@ next;
 		compareSwithTindex: 1;
 		shortJumpIfNotEqualTo: lookup;
@@ -160,7 +195,7 @@ BootstrapperModule >> nativizeMonomorphicCacheWith: env [
 
 { #category : #bootstrapping }
 BootstrapperModule >> nativizePolymorphicCacheWith: env [
-	| asm smi lookupIndex case2 case3 case4 case5 case6 case7 lookup |
+	| asm smi lookupIndex cacheIndex case2 case3 case4 case5 case6 case7 lookup |
 	asm := env newAssembler.
 	case2 := asm newLabel.
 	case3 := asm newLabel.
@@ -170,10 +205,11 @@ BootstrapperModule >> nativizePolymorphicCacheWith: env [
 	case7 := asm newLabel.
 	lookup := asm newLabel.
 	lookupIndex := env lmrModule indexOfGlobal: #Lookup.
-	asm loadTwithAindex: 3.
+	cacheIndex := SendSite indexOfSlot: 'cache'.
+	asm loadTwithAindex: cacheIndex.
 	smi := asm labeledNonIntegerBitTestOfR.
 	asm
-		loadLongSwithRindex: 0;
+		loadSwithRbehavior;
 		compareSwithTindex: 1;
 		shortJumpIfNotEqualTo: case2;
 		loadMwithTindex: 2;
@@ -220,17 +256,37 @@ BootstrapperModule >> nativizePolymorphicCacheWith: env [
 
 { #category : #writing }
 BootstrapperModule >> writeSegments [
-	| roots closure |
-	roots := {
+	| all closure |
+	all := {
 		Memory module.                 "LMR"
 		NativizerModule module.        "LMR.Nativizer"
 		self class module.             "LMR.Bootstrapper"
-	}.
-	closure := self importsClosureFor: roots.
-	closure do: [:m |
-		| filename |
-		filename := 'image-segments/lmr/' , m name , '.ems'.
-		m writeCachedSegmentAt: filename].
+	} , roots.
+	closure := self importsClosureFor: all.
+	Kernel load: #'ImageSegmentBuilder.Native'.
+	closure do: [:module | self writeSegmentOf: module].
+]
+
+{ #category : #snapshotting }
+BootstrapperModule >> writeSegmentOf: aModule [
+	| filename builder code |
+	filename := 'image-segments/lmr/' , aModule name , '.ems'.
+	builder := self segmentBuilderFor: aModule.
+	code := codeSegments at: aModule ifAbsent: [#()].
+	code do: [:bytes | builder addCode: bytes].
+	aModule writeCachedSegmentAt: filename with: builder
+]
+
+{ #category : #snapshotting }
+BootstrapperModule >> prepareForSnapshot: aBuilder [
+	"bootstrap state, not part of the segment"
+	super prepareForSnapshot: aBuilder.
+	aBuilder
+		map: codeSegments to: nil;
+		map: environment to: nil;
+		map: kernelOverrides to: nil;
+		map: replacements to: nil;
+		map: roots to: nil
 ]
 
 { #category : #snapshotting }
@@ -253,4 +309,72 @@ BootstrapperModule >> importsClosureFor: roots [
 				dep := kernel loadedModuleNamed: descriptor key.
 				dep isNil ifFalse: [pending add: dep]]]].
 	^result
+]
+
+{ #category : #writing }
+BootstrapperModule >> segmentBuilderFor: aModule [
+	| builder |
+	builder := aModule newSegmentBuilder.
+	(self requiresNativization: aModule) ifTrue: [builder nativizer: environment].
+	aModule == Kernel ifTrue: [self addKernelOverridesTo: builder].
+	^builder
+]
+
+{ #category : #writing }
+BootstrapperModule >> requiresNativization: aModule [
+	^({Kernel. LMRProtoObject module. Memory module} includes: aModule) or: [roots includes: aModule]
+]
+
+{ #category : #writing }
+BootstrapperModule >> addKernelOverridesTo: aBuilder [
+	kernelOverrides do: [:each | aBuilder override: each key with: each value].
+	replacements keysAndValuesDo: [:method :copy | aBuilder map: method to: copy]
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> kernelOverrides [
+	| overrides lmr |
+	overrides := OrderedCollection new.
+	replacements := IdentityDictionary new.
+	lmr := LMRProtoObject module.
+	lmr classes do: [:replacement | | target |
+		target := replacement superclass.
+		(replacement !== lmr class and: [target module == Kernel])
+			ifTrue: [
+				self addOverridesFrom: replacement to: target into: overrides.
+				self addOverridesFrom: replacement class to: target class into: overrides]].
+	self addExtensionsOf: Memory module into: overrides.
+	^overrides
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> addExtensionsOf: aModule into: aCollection [
+	aModule extensions keysAndValuesDo: [:key :methods | | meta name class target |
+		meta := key endsWith: ' class'.
+		name := meta ifTrue: [(key trimTail: ' class') asSymbol] ifFalse: [key].
+		class := aModule namespace at: name.
+		target := meta ifTrue: [class class] ifFalse: [class].
+		self addExtensions: methods of: target into: aCollection]
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> addExtensions: aCollection of: aClass into: anOrderedCollection [
+	aCollection do: [:method | | copy |
+		copy := (aClass compiledMethodAt: method selector) copy.
+		self add: copy replacing: method into: anOrderedCollection]
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> addOverridesFrom: aClass to: anotherClass into: aCollection [
+	aClass methodDictionary do: [:method | | copy |
+		copy := method copy.
+		copy classBinding: anotherClass.
+		self add: copy replacing: method into: aCollection]
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> add: aCompiledMethod replacing: anotherMethod into: aCollection [
+	environment nativize: aCompiledMethod.
+	replacements at: anotherMethod put: aCompiledMethod.
+	aCollection add: aCompiledMethod classBinding -> aCompiledMethod
 ]

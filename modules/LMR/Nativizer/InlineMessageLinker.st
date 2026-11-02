@@ -225,7 +225,7 @@ InlineMessageLinker >> assembleBitShiftRight [
 	assembler
 		move: assembler regA to: assembler regT;
 		convertToNativeInteger: assembler regT;
-		shiftRightArithmetic: assembler regR by: assembler regT b;
+		shiftRightArithmetic: assembler regR by: assembler regT;
 		setIntegerBit: assembler regR
 ]
 
@@ -300,6 +300,12 @@ InlineMessageLinker >> assembleCallWithArguments [
 	assembler addressSize = 8
 		ifTrue: [ self loadArgumentsIntoRegisters ].
 	assembler callR
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleClearFloatStatusFlags [
+	#_clearFloatStatusFlags.
+	assembler clearFloatStatusFlagsOfR
 ]
 
 { #category : #'private - assemble' }
@@ -423,6 +429,66 @@ InlineMessageLinker >> assembleFloatSqrtInto [
 	self readFloatStatus
 ]
 
+{ #category : #'private - helpers' }
+InlineMessageLinker >> assembleFloatStatusHas: aSymbol [
+	| set |
+	set := assembler newLabel.
+	assembler
+		testRwithFloatStatusFlag: aSymbol;
+		loadRwithTrue;
+		shortJumpIfNotZeroTo: set;
+		loadRwithFalse;
+		@ set
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleFloatStatusHasCoprocessorMissing [
+	#_floatStatusHasCoprocessorMissing.
+	self assembleFloatStatusHas: #coprocessorMissing
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleFloatStatusHasDenormalizedOperand [
+	#_floatStatusHasDenormalizedOperand.
+	self assembleFloatStatusHas: #denormalizedOperand
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleFloatStatusHasError [
+	#_floatStatusHasError.
+	self assembleFloatStatusHas: #error
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleFloatStatusHasInexact [
+	#_floatStatusHasInexact.
+	self assembleFloatStatusHas: #inexact
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleFloatStatusHasInvalidOperation [
+	#_floatStatusHasInvalidOperation.
+	self assembleFloatStatusHas: #invalidOperation
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleFloatStatusHasOverflow [
+	#_floatStatusHasOverflow.
+	self assembleFloatStatusHas: #overflow
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleFloatStatusHasUnderflow [
+	#_floatStatusHasUnderflow.
+	self assembleFloatStatusHas: #underflow
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleFloatStatusHasZeroDivisor [
+	#_floatStatusHasZeroDivisor.
+	self assembleFloatStatusHas: #zeroDivisor
+]
+
 { #category : #'private - assemble' }
 InlineMessageLinker >> assembleFloatTruncated [
 	#_floatTruncated.
@@ -524,7 +590,7 @@ InlineMessageLinker >> assembleLeadingZeroBitCount [
 { #category : #'private - assemble' }
 InlineMessageLinker >> assembleLoadFloatStatusFrom [
 	#_status:.
-	assembler loadMXCSRfromA
+	assembler loadFloatStatusFromA
 ]
 
 { #category : #'private - assemble' }
@@ -589,6 +655,179 @@ InlineMessageLinker >> assembleObjectAtOffsetPut [
 InlineMessageLinker >> assembleOop [
 	#_oop.
 	^ assembler convertRtoSmallInteger
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleSmiPlus [
+	| done overflow |
+	#_smiPlus:.
+	done := assembler newLabel.
+	overflow := assembler newLabel.
+	assembler
+		clearRintegerBit;
+		addAtoR;
+		shortJumpIfOverflowTo: overflow;
+		shortJumpTo: done;
+		@ overflow;
+		loadRwithNil;
+		@ done
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleSmiMinus [
+	| done overflow |
+	#_smiMinus:.
+	done := assembler newLabel.
+	overflow := assembler newLabel.
+	assembler
+		subAfromR;
+		shortJumpIfOverflowTo: overflow;
+		setRintegerBit;
+		shortJumpTo: done;
+		@ overflow;
+		loadRwithNil;
+		@ done
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleSmiTimes [
+	| done overflow |
+	#_smiTimes:.
+	done := assembler newLabel.
+	overflow := assembler newLabel.
+	assembler
+		convertAtoNativeInteger;
+		clearRintegerBit;
+		multiplyRbyAwideningToA;
+		shortJumpIfOverflowTo: overflow;
+		setRintegerBit;
+		shortJumpTo: done;
+		@ overflow;
+		loadRwithNil;
+		@ done
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleSmiBitAnd [
+	#_smiBitAnd:.
+	assembler andRwithA
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleSmiBitOr [
+	#_smiBitOr:.
+	assembler orRwithA
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleSmiEquals [
+	| done |
+	#_smiEquals:.
+	done := self loadTrueComparingRwithA.
+	assembler shortJumpIfEqualTo: done.
+	self loadFalseUntil: done
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleSmiLowerThan [
+	| done |
+	#_smiLowerThan:.
+	done := self loadTrueComparingRwithA.
+	assembler shortJumpIfLessSignedTo: done.
+	self loadFalseUntil: done
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleSmiLowerEqualThan [
+	| done |
+	#_smiLowerEqualThan:.
+	done := self loadTrueComparingRwithA.
+	assembler shortJumpIfLessOrEqualSignedTo: done.
+	self loadFalseUntil: done
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleSmiGreaterThan [
+	| done |
+	#_smiGreaterThan:.
+	done := self loadTrueComparingRwithA.
+	assembler shortJumpIfGreaterSignedTo: done.
+	self loadFalseUntil: done
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleSmiGreaterEqualThan [
+	| done |
+	#_smiGreaterEqualThan:.
+	done := self loadTrueComparingRwithA.
+	assembler shortJumpIfGreaterOrEqualSignedTo: done.
+	self loadFalseUntil: done
+]
+
+{ #category : #'private - helpers' }
+InlineMessageLinker >> loadTrueComparingRwithA [
+	assembler
+		loadTwithR;
+		loadRwithTrue;
+		compareTwithA.
+	^assembler newLabel
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleBeSeen [
+	#_beSeen.
+	self loadMarkOfR.
+	assembler
+		or: assembler regT with: assembler regS;
+		storeByte: assembler regT byte in: assembler regA offset: 0
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleBeUnseen [
+	#_beUnseen.
+	self loadMarkOfR.
+	assembler
+		or: assembler regT with: assembler regS;
+		xor: assembler regT with: assembler regS;
+		storeByte: assembler regT byte in: assembler regA offset: 0
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleHasBeenSeen [
+	| done |
+	#_hasBeenSeen.
+	self loadMarkOfR.
+	done := assembler newLabel.
+	assembler
+		test: assembler regT with: assembler regS;
+		loadRwithTrue;
+		shortJumpIfNotZeroTo: done.
+	self loadFalseUntil: done
+]
+
+{ #category : #'private - helpers' }
+InlineMessageLinker >> loadMarkOfR [
+	assembler
+		loadTwithR;
+		shiftRight: assembler regT byImm: 3;
+		and: assembler regT withImm: 7;
+		moveImm: 1 to: assembler regS;
+		shiftLeft: assembler regS by: assembler regT;
+		loadAwithR;
+		shiftLeft: assembler regA byImm: 32;
+		shiftRight: assembler regA byImm: 38;
+		loadTwithR;
+		shiftRight: assembler regT byImm: 32;
+		shiftLeft: assembler regT byImm: 32;
+		add: assembler regT to: assembler regA;
+		loadZeroExtendByte: assembler regT from: assembler regA atOffset: 0
+]
+
+{ #category : #'private - helpers' }
+InlineMessageLinker >> loadFalseUntil: done [
+	assembler
+		loadRwithFalse;
+		@ done
 ]
 
 { #category : #'private - assemble' }
@@ -724,7 +963,7 @@ InlineMessageLinker >> assembleStoreDoubleResult [
 { #category : #'private - assemble' }
 InlineMessageLinker >> assembleStoreFloatStatusInto [
 	#_readStatusOn:.
-	assembler storeMXCSRintoA
+	assembler storeFloatStatusIntoA
 ]
 
 { #category : #'private - assemble' }
@@ -972,5 +1211,5 @@ InlineMessageLinker >> readFPUStatus [
 InlineMessageLinker >> readFloatStatus [
 	assembler
 		loadAwithKnown: #FloatStatus;
-		storeMXCSRintoA
+		storeFloatStatusIntoA
 ]

@@ -94,7 +94,7 @@ HeapObject* Loader::loadModule_(const std::string& name) {
         auto modulesRoot = findModulesDir_();
         auto modPath = (fs::path(modulesRoot) / modulePath_(name)).string();
         SourceModuleLoader sourceLoader(_runtime);
-        module = sourceLoader.loadModuleFromSource(modPath);
+        module = sourceLoader.loadModuleFromSource(modPath, name);
     }
     else {
         throw std::runtime_error("Module not found: " + name);
@@ -157,7 +157,7 @@ HeapObject* Loader::loadModuleFromPath_(const std::string& path) {
     // If path is a directory, load from source
     else if (fs::is_directory(fsPath)) {
         SourceModuleLoader sourceLoader(_runtime);
-        module = sourceLoader.loadModuleFromSource(path);
+        module = sourceLoader.loadModuleFromSource(path, name);
     }
     else {
         throw std::runtime_error("Module not found at path: " + path);

@@ -107,6 +107,23 @@ void Egg::DecommitMemory(uintptr_t base, uintptr_t size)
     }
 }
 
+void Egg::MakeWritable(uintptr_t base, uintptr_t size)
+{
+    DWORD previous;
+    if (!VirtualProtect((void*)base, size, PAGE_READWRITE, &previous)) {
+        error("Failed to make memory writable.");
+    }
+}
+
+void Egg::MakeExecutable(uintptr_t base, uintptr_t size)
+{
+    DWORD previous;
+    if (!VirtualProtect((void*)base, size, PAGE_EXECUTE_READ, &previous)) {
+        error("Failed to make memory executable.");
+    }
+    FlushInstructionCache(GetCurrentProcess(), (void*)base, size);
+}
+
 void Egg::FreeMemory(uintptr_t base, uintptr_t size)
 {
     // a part of the block can't be released, only decommitted

@@ -276,7 +276,7 @@ GCSpace >> histogram [
 { #category : #inquiries }
 GCSpace >> histogramInto: sizes [
 	self objectsDo: [:object | | size association |
-		size := object _bodySizeInBytes.
+		size := object _sizeInBytes.
 		association := sizes associationAt: object class ifAbsent: nil.
 		association
 			ifNil: [sizes at: object class put: size]
@@ -518,7 +518,7 @@ GCSpace >> resetSoftLimit: anInteger [
 { #category : #actions }
 GCSpace >> shallowCopy: object [
 	| size extra allocation oop copy |
-	size := object _bodySizeInBytes.
+	size := object _sizeInBytes.
 	extra := object _headerSizeInBytes.
 	allocation := self allocateIfPossible: extra + size.
 	allocation _isSmallInteger ifFalse: [^0].
@@ -534,7 +534,7 @@ GCSpace >> shallowCopy: object [
 { #category : #actions }
 GCSpace >> shallowCopyCommiting: object [
 	| size extra allocation oop copy |
-	size := object _bodySizeInBytes.
+	size := object _sizeInBytes.
 	extra := object _headerSizeInBytes.
 	allocation := self allocateCommittingIfNeeded: extra + size.
 	allocation _isSmallInteger ifFalse: [^nil].
@@ -567,9 +567,22 @@ GCSpace >> softLimit: ptr [
 	softLimit := ptr
 ]
 
+{ #category : #private }
+GCSpace >> markWordOf: pointer [
+	| block offset |
+	block := (pointer bitShift: -31) bitShift: 31.
+	offset := (pointer bitAnd: 16r7FFFFFFF) bitShift: -8.
+	^block + (offset bitShift: 2)
+]
+
 { #category : #enumeration }
 GCSpace >> unmarkAll [
-	self objectsDo: [:object | object _beUnseen]
+	"spaces are page aligned, so whole bitmap words hold only marks of this space"
+	| first last words |
+	first := self markWordOf: base.
+	last := self markWordOf: nextFree.
+	words := (last - first bitShift: -2) + 1.
+	first _asObject _zeroSlots: words
 ]
 
 { #category : #enumeration }
@@ -595,6 +608,7 @@ GCSpace >> usedBytes: used [
 
 { #category : #actions }
 GCSpace >> wipeOut [
+	self unmarkAll.
 	base _asObject _zeroSlots: (self used bitShift: 0 - WordSizeShift + 1)
 ]
 

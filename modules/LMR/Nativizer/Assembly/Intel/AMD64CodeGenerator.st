@@ -320,6 +320,15 @@ AMD64CodeGenerator >> exchange: srcAndDstReg withMem: aMemRef [
 	self assemble: 'xchg' with: aMemRef with: srcAndDstReg
 ]
 
+{ #category : #'floating point' }
+AMD64CodeGenerator >> floatStatusMaskFor: aSymbol [
+	| masks index |
+	masks := #(#invalidOperation 1 #denormalizedOperand 2 #zeroDivisor 4 #overflow 8
+		#underflow 16 #inexact 32 #coprocessorMissing 128 #error 16r1F #all 16r3F).
+	index := masks indexOf: aSymbol.
+	^masks at: index + 1
+]
+
 { #category : #basic }
 AMD64CodeGenerator >> inc: srcAndDstReg [
 	self assemble: 'inc' with: srcAndDstReg
@@ -496,6 +505,15 @@ AMD64CodeGenerator >> loadDouble: dstReg fromMem: srcMemRef [
 ]
 
 { #category : #accessing }
+AMD64CodeGenerator >> loadFloatStatusFromA [
+	pointer
+		reset;
+		length: 32;
+		base: self regA.
+	self assemble: 'ldmxcsr' with: pointer
+]
+
+{ #category : #accessing }
 AMD64CodeGenerator >> loadLongMwithIPoffset: anInteger [
 	| instsize |
 	#dontOptimize.
@@ -506,15 +524,6 @@ AMD64CodeGenerator >> loadLongMwithIPoffset: anInteger [
 		base: self regIP;
 		displacement: anInteger - instsize.
 	self assemble: 'mov' with: self regM e with: pointer
-]
-
-{ #category : #accessing }
-AMD64CodeGenerator >> loadMXCSRfromA [
-	pointer
-		reset;
-		length: 32;
-		base: self regA.
-	self assemble: 'ldmxcsr' with: pointer
 ]
 
 { #category : #storing }
@@ -896,6 +905,31 @@ AMD64CodeGenerator >> shortJumpIfEqualTo: label [
 ]
 
 { #category : #jumps }
+AMD64CodeGenerator >> shortJumpIfGreaterOrEqualSignedTo: label [
+	self shortJump: 'jge' to: label
+]
+
+{ #category : #jumps }
+AMD64CodeGenerator >> shortJumpIfGreaterSignedTo: label [
+	self shortJump: 'jg' to: label
+]
+
+{ #category : #jumps }
+AMD64CodeGenerator >> shortJumpIfLessOrEqualSignedTo: label [
+	self shortJump: 'jle' to: label
+]
+
+{ #category : #jumps }
+AMD64CodeGenerator >> shortJumpIfLessSignedTo: label [
+	self shortJump: 'jl' to: label
+]
+
+{ #category : #jumps }
+AMD64CodeGenerator >> shortJumpIfOverflowTo: label [
+	self shortJump: 'jo' to: label
+]
+
+{ #category : #jumps }
 AMD64CodeGenerator >> shortJumpIfNotCarryTo: label [
 	self shortJump: 'jnc' to: label
 ]
@@ -993,6 +1027,15 @@ AMD64CodeGenerator >> storeDoubleResultIntoMem: dstMemRef [
 		ifFalse: [ self assemble: 'fstp' with: dstMemRef ]
 ]
 
+{ #category : #accessing }
+AMD64CodeGenerator >> storeFloatStatusIntoA [
+	pointer
+		reset;
+		length: 32;
+		base: self regA.
+	self assemble: 'stmxcsr' with: pointer
+]
+
 { #category : #'memory - load / store' }
 AMD64CodeGenerator >> storeImm: imm intoMem: dstMemRef [
 	self
@@ -1000,15 +1043,6 @@ AMD64CodeGenerator >> storeImm: imm intoMem: dstMemRef [
 		with: dstMemRef
 		withImm: imm
 
-]
-
-{ #category : #accessing }
-AMD64CodeGenerator >> storeMXCSRintoA [
-	pointer
-		reset;
-		length: 32;
-		base: self regA.
-	self assemble: 'stmxcsr' with: pointer
 ]
 
 { #category : #'operations - arithmetic' }
@@ -1086,4 +1120,15 @@ AMD64CodeGenerator >> writeTslots [
 AMD64CodeGenerator >> xor: src1AndDst with: src2 [
 	self assemble: 'xor' with: src1AndDst with: src2
 
+]
+
+{ #category : #'memory - load / store' }
+AMD64CodeGenerator >> loadBehavior: dstReg of: objectReg [
+	self
+		load: dstReg fromMem: (self memRef32: objectReg indexImm: 0);
+		push: objectReg;
+		shiftRight: objectReg byImm: 32;
+		shiftLeft: objectReg byImm: 32;
+		or: dstReg with: objectReg;
+		pop: objectReg
 ]

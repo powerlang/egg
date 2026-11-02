@@ -27,8 +27,7 @@ Class {
 	],
 	#classVars : [
 		'Current',
-		'LargeThreshold',
-		'CRITICAL'
+		'LargeThreshold'
 	],
 	#category : #Kernel
 }
@@ -64,13 +63,6 @@ Memory class >> nativeAllocate: size [
 { #category : #copying }
 Memory class >> shallowCopy: anObject [
 	^Current shallowCopy: anObject
-]
-
-{ #category : #'adding / removing' }
-Memory >> addKernelSpace: aSpace [
-	spaces size: 1.
-	spaces contents at: 1 put: aSpace.
-	pinnedSpace := aSpace
 ]
 
 { #category : #'adding / removing' }
@@ -878,7 +870,7 @@ Memory >> roots [
 { #category : #copying }
 Memory >> shallowCopy: object [
 	| headerSize answer size allocation objectPointer |
-	size := object _bodySizeInBytes.
+	size := object _sizeInBytes.
 	headerSize := object _headerSizeInBytes.
 	allocation := self allocate: headerSize + size.
 	objectPointer := allocation + headerSize _asPointer.

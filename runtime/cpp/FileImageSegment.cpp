@@ -41,8 +41,9 @@ FileImageSegment::load(std::istream *data)
 
     _currentBase = this->alloc(header.baseAddress, header.reservedSize);
 
+    auto stored = header.codeSize == 0 ? header.size : this->codeEnd() - _currentBase;
     data->seekg(0, std::ios::beg);
-    data->read(reinterpret_cast<char*>(_currentBase), header.size);
+    data->read(reinterpret_cast<char*>(_currentBase), stored);
 
     if (data->fail())
         error("error reading image segment");
@@ -54,40 +55,85 @@ FileImageSegment::load(std::istream *data)
 
 void FileImageSegment::fixPointerSlots(const std::vector<Object*>& imports)
 {
+    this->relocate();
+    this->bindImports(imports);
+}
+
+void FileImageSegment::relocate()
+{
+    this->relocateObjects(this->spaceStart(), this->spaceEnd());
+    if (header.codeSize != 0)
+        this->relocateObjects(this->codeStart(), this->codeEnd());
+    header.module = relocatedAddress_(header.module);
+}
+
+void FileImageSegment::bindImports(const std::vector<Object*>& imports)
+{
+    this->bindImportsOf(this->spaceStart(), this->spaceEnd(), imports);
+    if (header.codeSize != 0)
+        this->bindImportsOf(this->codeStart(), this->codeEnd(), imports);
+}
+
+static constexpr uintptr_t ReferenceTagMask = 0x3;
+static constexpr uintptr_t InternalTag = 0x0;
+static constexpr uintptr_t ExternalTag = 0x2;
+
+bool FileImageSegment::isInternalReference(uintptr_t reference)
+{
+    return (reference & ReferenceTagMask) == InternalTag;
+}
+
+bool FileImageSegment::isExternalReference(uintptr_t reference)
+{
+    return (reference & ReferenceTagMask) == ExternalTag;
+}
+
+uint32_t FileImageSegment::externalIndexOf(uintptr_t reference)
+{
+    return (uint32_t)(reference >> 2);
+}
+
+void FileImageSegment::relocateObjects(uintptr_t start, uintptr_t limit)
+{
     intptr_t delta = this->_currentBase - this->header.baseAddress;
     uintptr_t oldBehaviorBase = this->header.baseAddress & (((uintptr_t)-1) << 32); // discards lower 32 bits
-    auto spaceStart = this->spaceStart();
-    auto current = ((HeapObject::ObjectHeader*)spaceStart)->object();
-    auto end = (HeapObject*)this->spaceEnd();
+    auto current = ((HeapObject::ObjectHeader*)start)->object();
+    auto end = (HeapObject*)limit;
     while (current < end)
     {
         auto behavior = current->basicBehavior();
-        if (((uintptr_t)behavior & 0x3) == 0x0) // if an oop
+        if (isInternalReference((uintptr_t)behavior))
         {
             auto newBehavior = oldBehaviorBase + (intptr_t)behavior + delta;
             current->behavior((HeapObject*)newBehavior);
         }
-        else if (((uintptr_t)behavior & 0x3) == 0x2) // if an import
-        {
-            current->behavior(imports[((uintptr_t)behavior)>>2]->asHeapObject());
-        }
-
         for (uintptr_t i = 0; i < current->pointersSize(); i++)
         {
             auto &slot = current->slot(i);
-            if (((uintptr_t)slot & 0x3) == 0x0)
-            {
+            if (isInternalReference((uintptr_t)slot))
                 slot = (Object*)(((intptr_t)slot) + delta);
-            }
-            else if (((uintptr_t)slot & 0x3) == 0x2)
-            {
-                slot = imports[((uintptr_t)slot)>>2];
-            }
         }
         current = current->nextObject();
     }
+}
 
-    header.module = relocatedAddress_(header.module);
+void FileImageSegment::bindImportsOf(uintptr_t start, uintptr_t limit, const std::vector<Object*>& imports)
+{
+    auto current = ((HeapObject::ObjectHeader*)start)->object();
+    auto end = (HeapObject*)limit;
+    while (current < end)
+    {
+        auto behavior = current->basicBehavior();
+        if (isExternalReference((uintptr_t)behavior))
+            current->behavior(imports[externalIndexOf((uintptr_t)behavior)]->asHeapObject());
+        for (uintptr_t i = 0; i < current->pointersSize(); i++)
+        {
+            auto &slot = current->slot(i);
+            if (isExternalReference((uintptr_t)slot))
+                slot = imports[externalIndexOf((uintptr_t)slot)];
+        }
+        current = current->nextObject();
+    }
 }
 
 std::string& FileImageSegment::importStringAt_(uint32_t index)

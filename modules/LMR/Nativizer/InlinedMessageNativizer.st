@@ -127,26 +127,42 @@ InlinedMessageNativizer >> inlineBranchIfNil: aBoolean [
 		compareRwithNil.
 	aBoolean
 		ifTrue: [ assembler jumpIfNotEqualTo: end ]
-		ifFalse: [ assembler jumpIfEqualTo: end ].
+		ifFalse: [
+			assembler jumpIfEqualTo: end.
+			self bindArgumentOf: message arguments first ].
 	message arguments first acceptVisitor: nativizer.
 	assembler @ end
 ]
 
 { #category : #nativizing }
+InlinedMessageNativizer >> bindArgumentOf: anSExpression [
+	| arguments |
+	anSExpression isBlock ifFalse: [ ^self ].
+	arguments := anSExpression inlinedArgs.
+	(arguments isNil or: [ arguments isEmpty ]) ifTrue: [ ^self ].
+	nativizer temporaryInStackAtPut: arguments first
+]
+
+{ #category : #nativizing }
 InlinedMessageNativizer >> inlineBranchIfNilIfNotNil: aBoolean [
-	| second |
+	| second first other |
 	second := assembler newLabel.
 	end := assembler newLabel.
+	first := message arguments first.
+	other := message arguments second.
 	message receiver acceptVisitor: nativizer.
 	assembler compareRwithNil.
 	aBoolean
 		ifTrue: [ assembler jumpIfNotEqualTo: second ]
-		ifFalse: [ assembler jumpIfEqualTo: second ].
-	message arguments first acceptVisitor: nativizer.
+		ifFalse: [
+			assembler jumpIfEqualTo: second.
+			self bindArgumentOf: first ].
+	first acceptVisitor: nativizer.
 	assembler
 		jumpTo: end;
 		@ second.
-	message arguments first acceptVisitor: nativizer.
+	aBoolean ifTrue: [ self bindArgumentOf: other ].
+	other acceptVisitor: nativizer.
 	assembler @ end
 ]
 
@@ -194,7 +210,7 @@ InlinedMessageNativizer >> inlineMessage [
 		ifTrue: [ ^ self inlineBranchIfNil: false ].
 	selector = #ifNil:ifNotNil:
 		ifTrue: [ ^ self inlineBranchIfNilIfNotNil: true ].
-	selector = #ifNil:ifNotNil:
+	selector = #ifNotNil:ifNil:
 		ifTrue: [ ^ self inlineBranchIfNilIfNotNil: false ].
 	selector = #ifTrue:ifFalse:
 		ifTrue: [ ^ self inlineIfTrueIfFalse: true ].

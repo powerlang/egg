@@ -13,6 +13,27 @@ Class {
 	#category : #Aarch64
 }
 
+{ #category : #'floating point' }
+ARM64CodeGenerator >> clearFPUFlags [
+	"x86 clears the x87 flags fscale leaves; scaleFloatOnRWithA has no x87 unit"
+]
+
+{ #category : #'floating point' }
+ARM64CodeGenerator >> floatStatusMaskFor: aSymbol [
+	| masks index |
+	masks := #(#invalidOperation 1 #zeroDivisor 2 #overflow 4 #underflow 8
+		#inexact 16 #denormalizedOperand 128 #coprocessorMissing 0 #error 16r8F #all 16r9F).
+	index := masks indexOf: aSymbol.
+	^masks at: index + 1
+]
+
+{ #category : #'floating point' }
+ARM64CodeGenerator >> loadFloatStatusFromA [
+	self
+		load: 32 into: self regV from: self regA disp: 0;
+		assemble: 'msr' with: #FPSR with: self regV
+]
+
 { #category : #initialization }
 ARM64CodeGenerator >> platform: aNativizationPlatform [
 	abi := aNativizationPlatform abi.
@@ -64,6 +85,13 @@ ARM64CodeGenerator >> assemble: mnemonic with: registers withImm: imm using: scr
 		operands := registers copyWith: scratch].
 	word := ARM64InstructionSpec encode: mnemonic with: operands.
 	self emit: word
+]
+
+{ #category : #'floating point' }
+ARM64CodeGenerator >> storeFloatStatusIntoA [
+	self
+		assemble: 'mrs' with: self regV with: #FPSR;
+		store: 32 from: self regV into: self regA disp: 0
 ]
 
 { #category : #'operations - arithmetic' }
@@ -156,6 +184,11 @@ ARM64CodeGenerator >> renameByteRegisterIfNeeded: register preserving: p1 preser
 { #category : #'operations - logical' }
 ARM64CodeGenerator >> testIntegerBit: reg [
 	self assemble: 'tst' with: reg with: 1
+]
+
+{ #category : #'operations - logical' }
+ARM64CodeGenerator >> test: reg1 with: reg2 [
+	self assemble: 'tst' with: reg1 with: reg2
 ]
 
 { #category : #'operations - logical' }
@@ -358,6 +391,26 @@ ARM64CodeGenerator >> shortJumpIfSignTo: label [
 ]
 
 { #category : #jumps }
+ARM64CodeGenerator >> shortJumpIfGreaterOrEqualSignedTo: label [
+	self jumpIf: #ge to: label
+]
+
+{ #category : #jumps }
+ARM64CodeGenerator >> shortJumpIfGreaterSignedTo: label [
+	self jumpIf: #gt to: label
+]
+
+{ #category : #jumps }
+ARM64CodeGenerator >> shortJumpIfLessOrEqualSignedTo: label [
+	self jumpIf: #le to: label
+]
+
+{ #category : #jumps }
+ARM64CodeGenerator >> shortJumpIfLessSignedTo: label [
+	self jumpIf: #lt to: label
+]
+
+{ #category : #jumps }
 ARM64CodeGenerator >> jumpIfCarryTo: label [
 	self jumpIf: #cs to: label
 ]
@@ -460,6 +513,11 @@ ARM64CodeGenerator >> shortJumpIfNoOverflowTo: label [
 { #category : #accessing }
 ARM64CodeGenerator >> addressSize [
 	^8
+]
+
+{ #category : #accessing }
+ARM64CodeGenerator >> stackSlotSize [
+	^16
 ]
 
 { #category : #memory }
@@ -781,4 +839,29 @@ ARM64CodeGenerator >> writeTslots [
 		assemble: 'str.post' with: self regR with: self regE with: 8;
 		dec: self regT;
 		assemble: 'b.cond' with: #ne with: -8
+]
+
+{ #category : #'memory - load / store' }
+ARM64CodeGenerator >> loadBehavior: dstReg of: objectReg [
+	self
+		load: dstReg fromMem: (self memRef32: objectReg indexImm: 0);
+		move: objectReg to: self regV;
+		shiftRight: self regV byImm: 32;
+		shiftLeft: self regV byImm: 32;
+		or: dstReg with: self regV
+]
+
+{ #category : #prologue }
+ARM64CodeGenerator >> callPushesReturnAddress [
+	^false
+]
+
+{ #category : #prologue }
+ARM64CodeGenerator >> saveReturnAddress [
+	self push: x30
+]
+
+{ #category : #prologue }
+ARM64CodeGenerator >> restoreReturnAddress [
+	self pop: x30
 ]

@@ -43,7 +43,7 @@ Object* SourceModuleLoader::lookupClass_(const Egg::string& name) {
     return _runtime->sendLocal_to_with_("at:", namespace_, symbol);
 }
 
-HeapObject* SourceModuleLoader::loadModuleFromSource(const std::string& modulePath) {
+HeapObject* SourceModuleLoader::loadModuleFromSource(const std::string& modulePath, const std::string& name) {
     namespace fs = std::filesystem;
     TonelReader reader;
 
@@ -108,8 +108,7 @@ HeapObject* SourceModuleLoader::loadModuleFromSource(const std::string& modulePa
 
     auto moduleInstance = _runtime->sendLocal_to_("new", moduleClassRef.get());
     GCedRef moduleRef(moduleInstance);
-    std::string modName = fs::path(modulePath).filename().string();
-    auto nameObj = (Object*)_runtime->newString_(modName);
+    auto nameObj = (Object*)_runtime->newString_(name);
     _runtime->sendLocal_to_with_("name:", moduleRef.get(), nameObj);
 
     // Now set the module class's module to the new instance

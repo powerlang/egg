@@ -14,12 +14,22 @@
 
 TEST_CASE("running the nativized __start__ returns 42", "[run]")
 {
-    lmr::Launcher launcher(lmr_test::segPath("Bootstrapper.ems"));
+    lmr::Launcher launcher(lmr_test::segPath("LMR.Bootstrapper.ems"));
     REQUIRE(launcher.loaded());
 
     launcher.relocate();
 
     auto result = launcher.run("__start__");
     REQUIRE(result == 85);
+    REQUIRE((result >> 1) == 42);
+}
+
+TEST_CASE("the launcher tests module exports its entries", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    REQUIRE(launcher.loaded());
+    launcher.relocate();
+
+    auto result = launcher.run("__start__");
     REQUIRE((result >> 1) == 42);
 }

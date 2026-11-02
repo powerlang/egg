@@ -106,6 +106,8 @@ OptimizingCodeEmitter >> assembleBasicAtConstant: instruction [
 	src := allocation at: instruction left.
 	dst := allocation at: instruction ifAbsent: [^self].
 	index := instruction right.
+	instruction left isFrame
+		ifTrue: [^assembler load: dst fromFrame: src slot: index].
 	assembler load: dst from: src atIndex: index
 ]
 
@@ -129,6 +131,8 @@ OptimizingCodeEmitter >> assembleBasicAtPutConstant: instruction [
 	base := allocation at: instruction receiver.
 	value := allocation at: instruction right.
 	position := instruction left value.
+	instruction receiver isFrame
+		ifTrue: [^assembler store: value inFrame: base slot: position].
 	assembler store: value in: base index: position
 ]
 

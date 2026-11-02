@@ -11,6 +11,17 @@ Class {
 	#category : #'Powerlang-Core-Assembly'
 }
 
+{ #category : #'floting point' }
+GenericAssembler >> clearFloatStatusFlagsOfR [
+	| mask memref |
+	mask := codegen floatStatusMaskFor: #all.
+	memref := codegen memRef32: codegen regR indexImm: 1.
+	codegen
+		load: codegen regT fromMem: memref;
+		and: codegen regT withImm: mask bitInvert;
+		store: codegen regT intoMem: memref
+]
+
 { #category : #accessing }
 GenericAssembler >> codegen [
 	^codegen
@@ -293,7 +304,7 @@ GenericAssembler >> decRindirect [
 { #category : #private }
 GenericAssembler >> discardArguments: anInteger [
 	anInteger = 0 ifTrue: [^self].
-	codegen addImm: anInteger * codegen wordSize to: codegen regSP
+	codegen addImm: anInteger * codegen stackSlotSize to: codegen regSP
 ]
 
 { #category : #'floting point' }
@@ -308,7 +319,7 @@ GenericAssembler >> dropTopOfFPU [
 
 { #category : #'push/pop' }
 GenericAssembler >> dropTos: count [
-	codegen addImm: (count * codegen addressSize) to: codegen regSP
+	codegen addImm: (count * codegen stackSlotSize) to: codegen regSP
 ]
 
 { #category : #arithmetic }
@@ -460,6 +471,11 @@ GenericAssembler >> load: register withPointer: anObject [
 	self load: register withLiteral: anObject
 ]
 
+{ #category : #'to-cleanup' }
+GenericAssembler >> loadFloatStatusFromA [
+	codegen loadFloatStatusFromA
+]
+
 { #category : #loading }
 GenericAssembler >> loadVwithPointer: anObject [
 	self load: codegen regV withPointer: anObject
@@ -486,7 +502,7 @@ GenericAssembler >> loadAwithEindex: index [
 { #category : #loading }
 GenericAssembler >> loadAwithFPindex: index [
 	| memref |
-	memref := codegen memRef: codegen regFP indexImm: index.
+	memref := codegen memRef: codegen regFP stackIndexImm: index.
 	codegen
 		load: codegen regA
 		fromMem: memref
@@ -600,7 +616,7 @@ GenericAssembler >> loadEwithAddressOfRatA [
 { #category : #loading }
 GenericAssembler >> loadEwithFPindex: index [
 	| memref |
-	memref := codegen memRef: codegen regFP indexImm: index.
+	memref := codegen memRef: codegen regFP stackIndexImm: index.
 	codegen
 		load: codegen regE
 		fromMem: memref
@@ -681,11 +697,6 @@ GenericAssembler >> loadLongSwithRindex: index [
 
 ]
 
-{ #category : #'to-cleanup' }
-GenericAssembler >> loadMXCSRfromA [
-	codegen loadMXCSRfromA
-]
-
 { #category : #'push/pop' }
 GenericAssembler >> loadMwithA [
 	codegen move: codegen regA to: codegen regM
@@ -694,7 +705,7 @@ GenericAssembler >> loadMwithA [
 { #category : #loading }
 GenericAssembler >> loadMwithFPindex: index [
 	| memref |
-	memref := codegen memRef: codegen regFP indexImm: index.
+	memref := codegen memRef: codegen regFP stackIndexImm: index.
 	codegen
 		load: codegen regM
 		fromMem: memref
@@ -760,7 +771,7 @@ GenericAssembler >> loadRwithA [
 { #category : #'push/pop' }
 GenericAssembler >> loadRwithArgPointer [
 	| memref |
-	memref := codegen memRef: codegen regFP indexImm: 3.
+	memref := codegen memRef: codegen regFP stackIndexImm: 3.
 	codegen lea: codegen regR withMem: memref
 ]
 
@@ -786,7 +797,7 @@ GenericAssembler >> loadRwithFP [
 { #category : #loading }
 GenericAssembler >> loadRwithFPindex: index [
 	| memref |
-	memref := codegen memRef: codegen regFP indexImm: index.
+	memref := codegen memRef: codegen regFP stackIndexImm: index.
 	codegen
 		load: codegen regR
 		fromMem: memref
@@ -860,7 +871,7 @@ GenericAssembler >> loadRwithS [
 { #category : #loading }
 GenericAssembler >> loadRwithSPindex: index [
 	| memref |
-	memref := codegen memRef: codegen regSP indexImm: index.
+	memref := codegen memRef: codegen regSP stackIndexImm: index.
 	codegen
 		load: codegen regR
 		fromMem: memref
@@ -896,6 +907,11 @@ GenericAssembler >> loadRwithTrue [
 ]
 
 { #category : #loading }
+GenericAssembler >> loadSwithRbehavior [
+	codegen loadBehavior: codegen regS of: codegen regR
+]
+
+{ #category : #loading }
 GenericAssembler >> loadSPwithFP [
 	codegen move: codegen regFP to: codegen regSP
 ]
@@ -913,7 +929,7 @@ GenericAssembler >> loadSwithAddressOfSatA [
 { #category : #loading }
 GenericAssembler >> loadSwithFPindex: index [
 	| memref |
-	memref := codegen memRef: codegen regFP indexImm: index.
+	memref := codegen memRef: codegen regFP stackIndexImm: index.
 	codegen
 		load: codegen regS
 		fromMem: memref
@@ -977,7 +993,7 @@ GenericAssembler >> loadTwithEindex: index [
 { #category : #loading }
 GenericAssembler >> loadTwithFPindex: index [
 	| memref |
-	memref := codegen memRef: codegen regFP indexImm: index.
+	memref := codegen memRef: codegen regFP stackIndexImm: index.
 	codegen
 		load: codegen regT
 		fromMem: memref
@@ -1278,7 +1294,7 @@ GenericAssembler >> popS [
 { #category : #'operations - arithmetic' }
 GenericAssembler >> popSPindirect [
 	| memref |
-	memref := codegen memRef: codegen regSP indexImm: 1.
+	memref := codegen memRef: codegen regSP stackIndexImm: 1.
 	codegen popIntoMem: memref
 ]
 
@@ -1487,7 +1503,7 @@ GenericAssembler >> renameByteRegisterIfNeeded: register preserving: preserved1 
 
 { #category : #loading }
 GenericAssembler >> reserveStackSlots: amount [
-	codegen subImm: amount * codegen addressSize from: codegen regSP
+	codegen subImm: amount * codegen stackSlotSize from: codegen regSP
 ]
 
 { #category : #initialization }
@@ -1529,6 +1545,12 @@ GenericAssembler >> setSafeRintegerBit [
 ]
 
 { #category : #'operations - logical' }
+GenericAssembler >> shiftLeft: srcAndDst by: countOrImm [
+	countOrImm isInteger ifTrue: [^self shiftLeft: srcAndDst byImm: countOrImm].
+	codegen shiftLeft: srcAndDst by: countOrImm
+]
+
+{ #category : #'operations - logical' }
 GenericAssembler >> shiftLeft: srcAndDst byImm: count [
 	codegen shiftLeft: srcAndDst byImm: count
 ]
@@ -1563,6 +1585,11 @@ GenericAssembler >> load: dstReg from: baseReg atIndexAt: indexReg [
 	| memref |
 	memref := codegen memRef: baseReg index: indexReg.
 	codegen load: dstReg fromMem: memref
+]
+
+{ #category : #'to-cleanup' }
+GenericAssembler >> storeFloatStatusIntoA [
+	codegen storeFloatStatusIntoA
 ]
 
 { #category : #'operations - arithmetic' }
@@ -1620,6 +1647,31 @@ GenericAssembler >> shortJumpIfEqualTo: label [
 ]
 
 { #category : #jumps }
+GenericAssembler >> shortJumpIfGreaterOrEqualSignedTo: label [
+	codegen shortJumpIfGreaterOrEqualSignedTo: label
+]
+
+{ #category : #jumps }
+GenericAssembler >> shortJumpIfGreaterSignedTo: label [
+	codegen shortJumpIfGreaterSignedTo: label
+]
+
+{ #category : #jumps }
+GenericAssembler >> shortJumpIfLessOrEqualSignedTo: label [
+	codegen shortJumpIfLessOrEqualSignedTo: label
+]
+
+{ #category : #jumps }
+GenericAssembler >> shortJumpIfLessSignedTo: label [
+	codegen shortJumpIfLessSignedTo: label
+]
+
+{ #category : #jumps }
+GenericAssembler >> shortJumpIfOverflowTo: label [
+	codegen shortJumpIfOverflowTo: label
+]
+
+{ #category : #jumps }
 GenericAssembler >> shortJumpIfNotCarryTo: label [
 	codegen shortJumpIfNotCarryTo: label
 ]
@@ -1661,6 +1713,20 @@ GenericAssembler >> load: dstReg from: baseReg atIndex: index [
 	| memref |
 	memref := codegen memRef: baseReg indexImm: index.
 	codegen load: dstReg fromMem: memref
+]
+
+{ #category : #loading }
+GenericAssembler >> load: dstReg fromFrame: frameReg slot: index [
+	| memory |
+	memory := codegen memRef: frameReg stackIndexImm: index.
+	codegen load: dstReg fromMem: memory
+]
+
+{ #category : #storing }
+GenericAssembler >> store: srcReg inFrame: frameReg slot: index [
+	| memory |
+	memory := codegen memRef: frameReg stackIndexImm: index.
+	codegen store: srcReg intoMem: memory
 ]
 
 { #category : #'floting point' }
@@ -1737,11 +1803,6 @@ GenericAssembler >> storeLongTinRatOffsetA [
 	codegen store: codegen regT long intoMem: memref
 ]
 
-{ #category : #'to-cleanup' }
-GenericAssembler >> storeMXCSRintoA [
-	codegen storeMXCSRintoA
-]
-
 { #category : #storing }
 GenericAssembler >> storeRinAindex: index [
 	| memref |
@@ -1763,7 +1824,7 @@ GenericAssembler >> storeRinEindex: index [
 { #category : #storing }
 GenericAssembler >> storeRinFPindex: index [
 	| memref |
-	memref := codegen memRef: codegen regFP indexImm: index.
+	memref := codegen memRef: codegen regFP stackIndexImm: index.
 	codegen
 		store: codegen regR
 		intoMem: memref
@@ -1791,14 +1852,14 @@ GenericAssembler >> storeRinTindex: index [
 GenericAssembler >> storeShortAinRoffset: offset [
 	|  memref |
 	memref := codegen memRef16: codegen regR offsetImm: offset.
-	codegen store: codegen regA short intoMem: memref
+	codegen store: codegen regA intoMem: memref
 ]
 
 { #category : #storing }
 GenericAssembler >> storeShortTinRatOffsetA [
 	| memref |
 	memref := codegen memRef16: codegen regR offset: codegen regA.
-	codegen store: codegen regT short intoMem: memref
+	codegen store: codegen regT intoMem: memref
 ]
 
 { #category : #storing }
@@ -1881,6 +1942,11 @@ GenericAssembler >> platform: aNativizationPlatform [
 	super platform: aNativizationPlatform.
 ]
 
+{ #category : #'operations - logical' }
+GenericAssembler >> test: reg1 with: reg2 [
+	codegen test: reg1 with: reg2
+]
+
 { #category : #loading }
 GenericAssembler >> testIntegerBit: aRegister [
 	codegen testIntegerBit: aRegister
@@ -1894,6 +1960,14 @@ GenericAssembler >> testIntegerBitOf: aRegister [
 { #category : #loading }
 GenericAssembler >> testRintegerBit [
 	codegen test: codegen regR byte withImm: 1
+]
+
+{ #category : #'floting point' }
+GenericAssembler >> testRwithFloatStatusFlag: aSymbol [
+	"R is the status as a SmallInteger, so its flags are one bit up"
+	| mask |
+	mask := codegen floatStatusMaskFor: aSymbol.
+	codegen test: codegen regR withImm: mask * 2
 ]
 
 { #category : #loading }
@@ -1911,6 +1985,11 @@ GenericAssembler >> writeTslots [
 	codegen writeTslots
 ]
 
+{ #category : #'operations - logical' }
+GenericAssembler >> xor: src1AndDst with: src2 [
+	codegen xor: src1AndDst with: src2
+]
+
 { #category : #logic }
 GenericAssembler >> xorAwithR [
 	codegen xor: codegen regA with: codegen regR
@@ -1926,3 +2005,17 @@ GenericAssembler >> xorRwithA [
 	codegen xor: codegen regR with: codegen regA
 ]
 
+{ #category : #prologue }
+GenericAssembler >> callPushesReturnAddress [
+	^codegen callPushesReturnAddress
+]
+
+{ #category : #prologue }
+GenericAssembler >> saveReturnAddress [
+	codegen saveReturnAddress
+]
+
+{ #category : #prologue }
+GenericAssembler >> restoreReturnAddress [
+	codegen restoreReturnAddress
+]

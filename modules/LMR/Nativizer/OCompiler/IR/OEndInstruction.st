@@ -75,3 +75,7 @@ OEndInstruction >> reverseDo: aBlock [
 	prev reverseDo: aBlock
 ]
 
+{ #category : #unclassified }
+OEndInstruction >> spliceReplacing: anInstruction [
+	anInstruction dissolve
+]

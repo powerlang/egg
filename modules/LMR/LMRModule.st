@@ -5,8 +5,7 @@ Class {
 		'globals',
 		'memory',
 		'micStub',
-		'picStub',
-		'nativizerBlock'
+		'picStub'
 	],
 	#category : #LMR
 }
@@ -60,21 +59,6 @@ LMRModule >> globals: anArray [
 	globals := anArray
 ]
 
-{ #category : #snapshotting }
-LMRModule >> requiresNativization [
-	^false
-]
-
-{ #category : #snapshotting }
-LMRModule >> nativizerBlock [
-	^nativizerBlock
-]
-
-{ #category : #snapshotting }
-LMRModule >> nativizerBlock: aBlock [
-	nativizerBlock := aBlock
-]
-
 { #category : #accessing }
 LMRModule >> micStub [
 	^micStub
@@ -114,10 +98,15 @@ LMRModule >> invokeStub [
 { #category : #bootstrapping }
 LMRModule >> justLoaded [
 	super justLoaded.
+	namespace at: #CRITICAL put: false.
 	SendSite initializeFormatFlags.
 	GlobalDispatchCache initialize.
 	self initializeMemory.
-	LMRProtoObject module namespace at: #Memory put: Memory
+	LMRProtoObject module namespace
+		at: #Memory put: Memory;
+		at: #GlobalDispatchCache put: GlobalDispatchCache;
+		at: #SendSite put: SendSite;
+		at: #StackFrameCursor put: StackFrameCursor
 ]
 
 { #category : #accessing }

@@ -19,6 +19,36 @@ ARM64CodeGeneratorTest >> setUp [
 	registers := ARM64Register registers
 ]
 
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testClearFloatStatusFlags [
+	| assembler |
+	assembler := NativizationPlatform aarch64_darwin newAssembler.
+	assembler clearFloatStatusFlagsOfR.
+	codegen := assembler codegen.
+	self
+		assert: self words asArray
+		equals: #(16rB9400003 16rD29FEC10 16rF2BFFFF0 16rF2DFFFF0 16rF2FFFFF0 16r8A100063 16rB9000003)
+]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testFloatStatus [
+	codegen storeFloatStatusIntoA; loadFloatStatusFromA.
+	self
+		assert: self words asArray
+		equals: #(16rD53B4430 16rB9000030 16rB9400030 16rD51B4430)
+]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testFloatStatusFlag [
+	| assembler |
+	assembler := NativizationPlatform aarch64_darwin newAssembler.
+	assembler testRwithFloatStatusFlag: #overflow; testRwithFloatStatusFlag: #error.
+	codegen := assembler codegen.
+	self
+		assert: self words asArray
+		equals: #(16rF27D001F 16rD28023D0 16rEA10001F)
+]
+
 { #category : #private }
 ARM64CodeGeneratorTest >> x: index [
 	^registers at: ('x' , index printString) asSymbol
@@ -173,4 +203,45 @@ ARM64CodeGeneratorTest >> testLeaFarDisplacement [
 	memory := codegen memRef base: (self x: 1); displacement: 5000; yourself.
 	codegen lea: (self x: 0) withMem: memory.
 	self assert: self words asArray equals: #(16rAA0103E0 16rD2827111 16r8B110000)
+]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testFrameSlots [
+	| frame above below |
+	frame := self x: 29.
+	above := codegen memRef: frame stackIndexImm: 3.
+	below := codegen memRef: frame stackIndexImm: -2.
+	codegen
+		load: (self x: 0) fromMem: above;
+		store: (self x: 1) intoMem: below.
+	self assert: self words asArray equals: #(16rF94013A0 16rF81D03A1)
+]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testLoadBehavior [
+	codegen loadBehavior: (self x: 2) of: (self x: 0).
+	self
+		assert: self words asArray
+		equals: #(16rB85FC002 16rAA0003F0 16rD360FE10 16rD3607E10 16rAA100042)
+]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testTestRegisters [
+	codegen test: (self x: 3) with: (self x: 2).
+	self assert: self words asArray equals: #(16rEA02007F)
+]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testReturnAddress [
+	self deny: codegen callPushesReturnAddress.
+	codegen saveReturnAddress; restoreReturnAddress.
+	self assert: self words asArray equals: #(16rF81F0FFE 16rF84107FE)
+]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testStoreShort [
+	| memory |
+	memory := codegen memRef16: (self x: 2) offsetImm: 6.
+	codegen store: (self x: 1) intoMem: memory.
+	self assert: self words asArray equals: #(16r79000C41)
 ]

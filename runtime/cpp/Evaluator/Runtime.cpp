@@ -195,6 +195,11 @@ void Runtime::addSegmentSpace_(ImageSegment* segment)
         space->_name = "BootstrappedKernel";
     }
     this->_heap->addSpace_(space);
+    if (segment->header.codeSize == 0)
+        return;
+    GCSpace *code = GCSpace::allocatedAt_limit_(segment->codeStart(), segment->codeEnd(), false);
+    code->_name = space->_name + " code";
+    this->_heap->addSpace_(code);
 }
 
 uintptr_t Runtime::hashFor_(Object *anObject)

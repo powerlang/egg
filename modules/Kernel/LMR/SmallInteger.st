@@ -21,6 +21,12 @@ LMRSmallInteger >> != aNumber [
 	^(self == aNumber) not
 ]
 
+{ #category : '*Primitives' }
+LMRSmallInteger >> ~= aNumber [
+	aNumber _isSmallInteger ifFalse: [^aNumber ~= self].
+	^(self == aNumber) not
+]
+
 { #category : #arithmetic }
 SmallInteger >> * aNumber [
 	| size result |
@@ -69,9 +75,8 @@ LMRSmallInteger >> \\ aNumber [
 
 { #category : '*Primitives' }
 LMRSmallInteger >> + aNumber [
-	^aNumber _isSmallInteger
-		ifTrue: [self asLargeInteger + aNumber]
-		ifFalse: [aNumber + self]
+	aNumber _isSmallInteger ifFalse: [^aNumber + self].
+	^(self _smiPlus: aNumber) ifNil: [self asLargeInteger + aNumber]
 ]
 
 { #category : #comparing }
@@ -102,3 +107,29 @@ LMRSmallInteger >> sizeInBytes [
 		ifFalse: [WordSize - (self _leadingZeroBitCount _bitShiftRight: 3)]
 ]
 
+{ #category : #'bit operations' }
+LMRSmallInteger >> bitAnd: anInteger [
+	anInteger _isSmallInteger ifFalse: [^anInteger bitAnd: self].
+	^self _smiBitAnd: anInteger
+]
+
+{ #category : #'bit operations' }
+LMRSmallInteger >> bitOr: anInteger [
+	anInteger _isSmallInteger ifFalse: [^anInteger bitOr: self].
+	^self _smiBitOr: anInteger
+]
+
+{ #category : #'bit operations' }
+LMRSmallInteger >> bitXor: anInteger [
+	| both either |
+	anInteger _isSmallInteger ifFalse: [^anInteger bitXor: self].
+	either := self _smiBitOr: anInteger.
+	both := self _smiBitAnd: anInteger.
+	^either - both
+]
+
+{ #category : #'bit operations' }
+LMRSmallInteger >> highBit [
+	self < 0 ifTrue: [^self error: 'not valid for negative numbers'].
+	^(WordSize _bitShiftLeft: 3) - self _leadingZeroBitCount
+]

@@ -18,6 +18,17 @@ Class {
 	#category : #Nativization
 }
 
+{ #category : #'class initialization' }
+TemplateJIT class >> initializeClosureElementTypes [
+	self addNamespaceAs: #ClosureElementTypes.
+	ClosureElementTypes
+		at: #Self put: 0;
+		at: #LocalArgument put: 1;
+		at: #Environment put: 2;
+		at: #EnvironmentValue put: 3;
+		at: #InlinedArgument put: 4
+]
+
 { #category : #services }
 TemplateJIT >> addFallback: aBlock [
 	fallbacks add: aBlock
@@ -48,8 +59,9 @@ TemplateJIT >> argumentInStackAt: index [
 	method hasFrame ifTrue: [ 
 		end := 3 + args.
 	assembler loadRwithFPindex: end - index ] ifFalse: [ 
-		end := 2 + args.
-		assembler  loadRwithSPindex: end - index
+		end := args + 1.
+		assembler callPushesReturnAddress ifTrue: [end := end + 1].
+		assembler loadRwithSPindex: end - index
 	 ]
 ]
 
@@ -107,10 +119,13 @@ TemplateJIT >> staticBindingFor: aSymbol [
 			assoc := ns associationAt: name ifAbsent: [nil].
 			assoc ifNotNil: [^SAssociationBinding new association: assoc]].
 		current := current superclass].
-	module := method classBinding module.
+	module := method module.
 	module ifNotNil: [
 		assoc := module namespace associationAt: name ifAbsent: [nil].
 		assoc ifNotNil: [^SAssociationBinding new association: assoc]].
+	assoc := LMRProtoObject module namespace associationAt: name ifAbsent: [nil].
+	assoc ifNotNil: [^SAssociationBinding new association: assoc].
+	Kernel host logWarning: 'undeclared ' , name , ' in ' , method classBinding name , '>>' , method selector.
 	^nil
 ]
 
@@ -282,10 +297,14 @@ TemplateJIT >> emitSend: selector super: aBoolean [
 
 { #category : #services }
 TemplateJIT >> emitWriteBarrier [
+	| saving |
+	saving := method isFrameless and: [assembler callPushesReturnAddress not].
+	saving ifTrue: [assembler popT; saveReturnAddress; pushT].
 	assembler
 		loadAwithGlobal: #WriteBarrier;
 		callIndirectA;
-		discardArguments: 1
+		discardArguments: 1.
+	saving ifTrue: [assembler restoreReturnAddress]
 ]
 
 { #category : #accessing }
@@ -431,12 +450,8 @@ TemplateJIT >> loadBlockNativeCode [
 
 { #category : #services }
 TemplateJIT >> loadBlockSelf: aCompiledBlock [
-	| offset | 
 	aCompiledBlock capturesSelf
-		ifTrue: [ offset := aCompiledBlock capturesHome
-				ifTrue: [ 1 ]
-				ifFalse: [ 0 ].
-			assembler loadSwithRindex: Closure instSize + 1 + offset ]
+		ifTrue: [ assembler loadSwithRindex: Closure instSize + 1 ]
 		ifFalse: [ assembler loadSwithNil ].
 	assembler pushS
 ]

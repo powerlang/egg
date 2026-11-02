@@ -5,7 +5,8 @@ Class {
 		'module',
 		'closure',
 		'classes',
-		'nativizerBlock'
+		'nativizer',
+		'overrides'
 	],
 	#category : #ImageSegmentBuilder
 }
@@ -77,7 +78,20 @@ Builder >> mapMethodsOf: aClass [
         mapped := module originalMethodFor: method.
         mapped ifNotNil: [saved at: selector put: mapped]].
 	saved do: [:method | self mapMethod: method].
+	self addOverridesOf: aClass to: saved.
     closure map: original to: saved
+]
+
+{ #category : #private }
+Builder >> addOverridesOf: aClass to: aMethodDictionary [
+	(overrides at: aClass ifAbsent: [^self]) do: [:method |
+		aMethodDictionary at: method selector put: method.
+		self addNativeCodeOfMethod: method]
+]
+
+{ #category : #accessing }
+Builder >> override: aClass with: aCompiledMethod [
+	(overrides at: aClass ifAbsentPut: [OrderedCollection new]) add: aCompiledMethod
 ]
 
 { #category : #private }
@@ -85,13 +99,34 @@ Builder >> mapMethod: method [
 	| copy |
 	copy := method copy.
 	copy invalidateOptimizedCode.
-	module requiresNativization ifTrue: [nativizerBlock value: copy].
+	nativizer ifNotNil: [nativizer nativize: copy].
 	closure map: method to: copy.
+	self addNativeCodeOf: copy.
 	method hasBlocks ifFalse: [^self].
 	method withIndexDo: [:b :i | | bcopy |
 		b isBlock ifTrue: [
 			bcopy := copy at: i.
-			closure map: b to: bcopy]]
+			closure map: b to: bcopy.
+			self addNativeCodeOf: bcopy]]
+]
+
+{ #category : #accessing }
+Builder >> addCode: aByteArray [
+	closure addCode: aByteArray
+]
+
+{ #category : #private }
+Builder >> addNativeCodeOf: aCompiledCode [
+	aCompiledCode optimizedCode ifNotNil: [:native | closure addCode: native code]
+]
+
+{ #category : #private }
+Builder >> addNativeCodeOfMethod: aCompiledMethod [
+	| blocks |
+	self addNativeCodeOf: aCompiledMethod.
+	aCompiledMethod hasBlocks ifFalse: [^self].
+	blocks := aCompiledMethod select: [:literal | literal isBlock].
+	blocks do: [:block | self addNativeCodeOf: block]
 ]
 
 { #category : #private }
@@ -105,12 +140,12 @@ Builder >> mapSubclassesOf: aClass [
 { #category : #initializing }
 Builder >> initialize [
 	closure := ObjectClosure new builder: self.
-	nativizerBlock := [:copy | ]
+	overrides := IdentityDictionary new
 ]
 
 { #category : #accessing }
-Builder >> nativizerBlock: aBlock [
-	nativizerBlock := aBlock
+Builder >> nativizer: aNativizationEnvironment [
+	nativizer := aNativizationEnvironment
 ]
 
 { #category : #accessing }

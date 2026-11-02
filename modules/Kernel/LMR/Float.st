@@ -48,7 +48,7 @@ LMRFloat class >> initializeStatus [
 
 { #category : #'*instance creation' }
 LMRFloat class >> new [
-	^self memory newArrayedBytes: instanceBehavior size: 8.
+	^self primitiveNewBytes: 8
 ]
 
 { #category : #arithmetic }
@@ -184,3 +184,7 @@ LMRFloat >> truncated [
 		ifFalse: [self asTrueFraction]
 ]
 
+{ #category : #errors }
+LMRFloat class >> status [
+	^Status uLongAtOffset: 0
+]

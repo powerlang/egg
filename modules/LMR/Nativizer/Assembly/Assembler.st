@@ -643,6 +643,11 @@ Assembler >> loadEwithR [
 	self subclassResponsibility
 ]
 
+{ #category : #'to-cleanup' }
+Assembler >> loadFloatStatusFromA [
+	self subclassResponsibility
+]
+
 { #category : #loading }
 Assembler >> loadFPwithR [
 	self subclassResponsibility
@@ -699,11 +704,6 @@ Assembler >> loadLongRwithRatOffsetA [
 
 { #category : #'push/pop' }
 Assembler >> loadLongSwithRindex: index [
-	self subclassResponsibility
-]
-
-{ #category : #'to-cleanup' }
-Assembler >> loadMXCSRfromA [
 	self subclassResponsibility
 ]
 
@@ -1111,15 +1111,6 @@ Assembler >> or: source1andDest withImm: imm [
 
 { #category : #logic }
 Assembler >> orRwithA [
-	self subclassResponsibility
-]
-
-{ #category : #initialization }
-Assembler >> platform: aNativizationPlatform [
-]
-
-{ #category : #private }
-Assembler >> pop: dstReg [
 	self subclassResponsibility
 ]
 
@@ -1532,6 +1523,31 @@ Assembler >> shortJumpIfEqualTo: label [
 ]
 
 { #category : #jumps }
+Assembler >> shortJumpIfGreaterOrEqualSignedTo: label [
+	self subclassResponsibility
+]
+
+{ #category : #jumps }
+Assembler >> shortJumpIfGreaterSignedTo: label [
+	self subclassResponsibility
+]
+
+{ #category : #jumps }
+Assembler >> shortJumpIfLessOrEqualSignedTo: label [
+	self subclassResponsibility
+]
+
+{ #category : #jumps }
+Assembler >> shortJumpIfLessSignedTo: label [
+	self subclassResponsibility
+]
+
+{ #category : #jumps }
+Assembler >> shortJumpIfOverflowTo: label [
+	self subclassResponsibility
+]
+
+{ #category : #jumps }
 Assembler >> shortJumpIfNotCarryTo: label [
 	self subclassResponsibility
 ]
@@ -1601,6 +1617,11 @@ Assembler >> storeEinRindex: index [
 	self subclassResponsibility
 ]
 
+{ #category : #'to-cleanup' }
+Assembler >> storeFloatStatusIntoA [
+	self subclassResponsibility
+]
+
 { #category : #storing }
 Assembler >> storeLargeX0inA [
 	self subclassResponsibility
@@ -1618,11 +1639,6 @@ Assembler >> storeLongTinRatA [
 
 { #category : #storing }
 Assembler >> storeLongTinRatOffsetA [
-	self subclassResponsibility
-]
-
-{ #category : #'to-cleanup' }
-Assembler >> storeMXCSRintoA [
 	self subclassResponsibility
 ]
 

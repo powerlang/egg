@@ -19,7 +19,7 @@ Class {
 { #category : #spec }
 NativeModule >> imports [
 	^{
-		#Kernel -> #(CallbackBehavior Module HashTable IdentityDictionary ProtoObject).
+		#Kernel -> #(CallbackBehavior Module HashTable IdentityDictionary OrderedCollection ProtoObject).
 		#ImageSegmentBuilder -> #Writer
 	}
 ] 

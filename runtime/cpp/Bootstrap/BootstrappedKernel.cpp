@@ -17,6 +17,7 @@ BootstrappedKernel::BootstrappedKernel(uintptr_t base, uintptr_t size, uintptr_t
     header.size = objectsEnd - _currentBase;
     header.reservedSize = size + sizeof(ImageSegmentHeader);
     header.module = nullptr;
+    header.codeSize = 0;
 }
 
 } // namespace Egg

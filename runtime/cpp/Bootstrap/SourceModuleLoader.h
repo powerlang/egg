@@ -28,7 +28,7 @@ public:
     SourceModuleLoader(Runtime* runtime);
     ~SourceModuleLoader();
 
-    HeapObject* loadModuleFromSource(const std::string& modulePath);
+    HeapObject* loadModuleFromSource(const std::string& modulePath, const std::string& name);
 
 private:
     // Class creation via runtime messages

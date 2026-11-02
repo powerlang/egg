@@ -242,16 +242,6 @@ SmalltalkSystem >> nameOfGlobal: anObject [
 	^globals keyAtValue: anObject
 ]
 
-{ #category : #accessing }
-SmalltalkSystem >> nativizer [
-	^nativizer
-]
-
-{ #category : #accessing }
-SmalltalkSystem >> nativizer: anObject [
-	nativizer := anObject
-]
-
 { #category : #services }
 SmalltalkSystem >> primitiveNamed: aString [
 	^NamedPrimitives at: aString ifAbsent: nil
