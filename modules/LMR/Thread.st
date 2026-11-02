@@ -17,3 +17,10 @@ Thread class >> currentGlobalLookup [
 	^tlsGlobalDispatchCacheIndex _getThreadValue
 ]
 
+{ #category : #accessing }
+Thread class >> registeredInstances [
+	"shortcut: no Thread objects yet, so the GC scans no thread-local storage;
+	register threads once the launcher runs more than one, or keeps objects in TLS"
+	^#()
+]
+
