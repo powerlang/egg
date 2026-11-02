@@ -31,6 +31,8 @@ private:
     Egg::string _selector;
     Egg::string _source;
     Egg::string _methodClassname = "CompiledMethod";
+    Egg::string _ffiName;
+    std::vector<uint8_t> _ffiDescriptor;
     
     // Format bit layout matching Smalltalk CompiledMethod>>initializeFormatFlags:
     // ArgCount:       bits 0-5   (6 bits)
@@ -117,6 +119,12 @@ public:
 
     Egg::string methodClassname() const { return _methodClassname; }
     void methodClassname_(const Egg::string& name) { _methodClassname = name; }
+
+    Egg::string ffiName() const { return _ffiName; }
+    void ffiName_(const Egg::string& name) { _ffiName = name; }
+    const std::vector<uint8_t>& ffiDescriptor() const { return _ffiDescriptor; }
+    bool isCallout() const { return !_ffiName.empty(); }
+    void ffiDescriptor_(const std::vector<uint8_t>& bytes) { _ffiDescriptor = bytes; }
 
     void* optimizedCode() const { return _optimizedCode; }
     void optimizedCode_(void* code) { _optimizedCode = code; }

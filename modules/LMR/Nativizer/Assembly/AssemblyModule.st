@@ -12,7 +12,7 @@ Class {
 { #category : #spec }
 AssemblyModule >> imports [
 	^{
-		#Kernel -> #(ByteArray OrderedCollection).
+		#Kernel -> #(ByteArray CallbackBehavior OrderedCollection).
 		#LMR -> #(NativeCode LMRModule)
 	}
 ]

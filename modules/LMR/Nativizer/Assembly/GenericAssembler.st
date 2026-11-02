@@ -11,6 +11,13 @@ Class {
 	#category : #'Powerlang-Core-Assembly'
 }
 
+{ #category : #private }
+GenericAssembler >> clearFloatStatusFlagsInR [
+	| mask |
+	mask := codegen floatStatusMaskFor: #all.
+	codegen and: codegen regR withImm: mask bitInvert
+]
+
 { #category : #'floting point' }
 GenericAssembler >> clearFloatStatusFlagsOfR [
 	| mask memref |
@@ -105,9 +112,7 @@ GenericAssembler >> breakpoint [
 
 { #category : #private }
 GenericAssembler >> buildFrame [
-	self
-		push: codegen regFP;
-		move: codegen regSP to: codegen regFP
+	codegen saveCallerFrame
 ]
 
 { #category : #private }
@@ -583,6 +588,11 @@ GenericAssembler >> loadAwithS [
 ]
 
 { #category : #loading }
+GenericAssembler >> loadAwithSP [
+	codegen move: codegen regSP to: codegen regA
+]
+
+{ #category : #loading }
 GenericAssembler >> loadAwithSindex: index [
 	| memref |
 	memref := codegen memRef: codegen regS indexImm: index.
@@ -727,6 +737,13 @@ GenericAssembler >> loadMwithMindex: index [
 	codegen
 		load: codegen regM
 		fromMem: memref
+]
+
+{ #category : #loading }
+GenericAssembler >> loadMwithOwnNativeCode: behaviorOffset [
+	self
+		loadLongMwithIPoffset: 0 - self currentAddress + behaviorOffset;
+		loadMwithMindex: (CallbackBehavior indexOfSlot: 'nativeCode')
 ]
 
 { #category : #loading }
@@ -1389,11 +1406,6 @@ GenericAssembler >> pushTrue [
 	codegen push: codegen regTrue
 ]
 
-{ #category : #'to-cleanup' }
-GenericAssembler >> readFPUStatusOnA [
-	codegen readFPUStatusOnA
-]
-
 { #category : #'registers - IR' }
 GenericAssembler >> regA [
 	^codegen regA
@@ -1514,9 +1526,12 @@ GenericAssembler >> reset [
 
 { #category : #epilogue }
 GenericAssembler >> restoreCallerFrame [
-	codegen
-		move: codegen regFP to: codegen regSP;
-		pop: codegen regFP
+	codegen restoreCallerFrame
+]
+
+{ #category : #prologue }
+GenericAssembler >> saveCallerFrame [
+	codegen saveCallerFrame
 ]
 
 { #category : #jumps }

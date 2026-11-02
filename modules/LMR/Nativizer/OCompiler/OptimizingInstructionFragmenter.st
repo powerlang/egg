@@ -196,6 +196,12 @@ OptimizingInstructionFragmenter >> fragmentSpecialABIArgumentsIn: aBasicBlock [
 	| literals i actual next load |
 	literals := method literals.
 	literals size = 0 ifTrue: [^self].
+	(literals at: 1) == #loadsOwnNativeCode ifTrue: [
+		aBasicBlock activationRecord doLoadOwnNativeCode.
+		load := aBasicBlock firstInstruction detect: [:inst | inst isConstant].
+		load dissolve.
+		literals := literals copyFrom: 2].
+	literals size = 0 ifTrue: [^self].
 	(literals at: 1) == #savePreviousSelf ifTrue: [
 		aBasicBlock activationRecord doSavePreviousSelf.
 		load := aBasicBlock firstInstruction detect: [:inst | inst isConstant].

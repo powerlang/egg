@@ -3,6 +3,7 @@
     See (MIT) license in root directory.
  */
 
+#include <map>
 #include "SSmalltalkParser.h"
 #include "../SSmalltalkCompiler.h"
 #include "../LiteralValue.h"
@@ -795,6 +796,8 @@ bool SSmalltalkParser::attachPragmaTo_(SMethodNode* method) {
             if (!method->arguments().empty())
                 error_("<callback> methods with arguments are not supported yet");
             node = ffiCall_method_(false, method);
+        } else if (keyword == "cdecl:" || keyword == "callout:") {
+            node = ffiCall_method_(true, method);
         } else {
             node = symbolicPragma();
         }
@@ -872,8 +875,29 @@ SPragmaNode* SSmalltalkParser::symbolicPragma() {
     return pragma;
 }
 
+static const std::map<std::string, uint8_t> FFITypeCodes = {
+    {"uint8", 0}, {"sint8", 1}, {"uint16", 2}, {"sint16", 3},
+    {"uint32", 4}, {"sint32", 5}, {"uint64", 6}, {"sint64", 7},
+    {"float", 8}, {"double", 9},
+    {"uchar", 10}, {"schar", 11}, {"ushort", 12}, {"sshort", 13},
+    {"uint", 14}, {"sint", 15}, {"ulong", 16}, {"slong", 17},
+    {"longdouble", 18}, {"pointer", 19},
+    {"complex-float", 20}, {"complex-double", 21}, {"complex-longdouble", 22},
+    {"void", 23}};
+
+static const std::map<std::string, uint8_t> FFICallingConventions = {
+    {"cdecl:", 20}, {"callout:", 20}, {"com:", 21}, {"callback:", 22}};
+
+uint8_t SSmalltalkParser::ffiCode_in_(const Egg::string& name, const std::map<std::string, uint8_t>& codes) {
+    auto it = codes.find(name.toUtf8());
+    if (it == codes.end())
+        error_("unknown FFI type or calling convention " + name.toUtf8());
+    return it->second;
+}
+
 SPragmaNode* SSmalltalkParser::ffiCall_method_(bool aBoolean, SMethodNode* aMethodNode) {
-    ffiType();
+    uint8_t convention = ffiCode_in_(_token->value(), FFICallingConventions);
+    Egg::string returned = ffiType();
     Egg::string name;
     if (aBoolean) {
         step();
@@ -884,8 +908,15 @@ SPragmaNode* SSmalltalkParser::ffiCall_method_(bool aBoolean, SMethodNode* aMeth
         error_("method arity does not match with function arguments");
     step();
 
+    std::vector<uint8_t> descriptor;
+    for (auto& arg : args)
+        descriptor.push_back(ffiCode_in_(arg, FFITypeCodes));
+    descriptor.push_back(ffiCode_in_(returned, FFITypeCodes));
+    descriptor.push_back(convention);
+
     SPragmaNode* pragma = new SPragmaNode(_compiler);
     pragma->beFFI_(name, nullptr);
+    pragma->ffiDescriptor_(descriptor);
     return pragma;
 }
 

@@ -2,6 +2,7 @@
 #include <sstream>
 
 #include "Runtime.h"
+#include "SymbolHash.h"
 #include "Loader.h"
 #include "Evaluator.h"
 #include "Allocator/GCHeap.h"
@@ -219,6 +220,14 @@ uintptr_t Runtime::hashFor_(Object *anObject)
 Object* Runtime::sendLocal_to_withArgs_(const std::string &selector, Object *receiver, std::vector<Object*> &arguments) {
     auto symbol = (Object*)this->addSymbol_(selector);
     return this->_evaluator->send_to_with_(symbol, receiver, arguments);
+}
+
+uintptr_t Runtime::symbolHashFor_(Object *aSymbol)
+{
+    auto symbol = aSymbol->asHeapObject();
+    if (symbol->hash() == 0)
+        symbol->hash(symbolHash(symbol));
+    return symbol->hash();
 }
 
 Object* Runtime::sendLocal_to_with_(const std::string &selector, Object *receiver, Object* arg1) {

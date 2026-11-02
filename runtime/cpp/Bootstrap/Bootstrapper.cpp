@@ -4,6 +4,7 @@
  */
 
 #include "Bootstrapper.h"
+#include "../SymbolHash.h"
 #include "../Loader.h"
 #include "BootstrappedKernel.h"
 #include "TonelReader.h"
@@ -788,39 +789,12 @@ Object* Bootstrapper::newSymbol_(const Egg::string& str) {
         for (uint32_t i = 0; i < len; i++)
             ((uint32_t*)symbol)[i] = (uint32_t)str[i];
     }
-    computeSymbolHash_(symbol);
+    computeSymbolHash_(symbol, isWide);
     return (Object*)symbol;
 }
 
-void Bootstrapper::computeSymbolHash_(HeapObject* symbol) {
-    uint32_t basicSize = symbol->size();
-    int32_t pseudoindex = (int32_t)basicSize - 1;
-    if (pseudoindex < 0) return;
-
-    uint32_t begin = 0;
-    uint32_t middle = (pseudoindex & 0xFFFF) / 2;
-    uint32_t end = middle * 2;
-
-    uint8_t* bytes = (uint8_t*)symbol;
-
-    // uShortAtOffset reads LE 16-bit at byte offset, with out-of-bounds bytes = 0
-    auto uShortAtOffset = [&](uint32_t offset) -> uint32_t {
-        uint32_t index = offset; // 0-based byte index
-        uint32_t lo = (index < basicSize) ? bytes[index] : 0;
-        uint32_t hi = (index + 1 < basicSize) ? bytes[index + 1] : 0;
-        return (hi << 8) + lo;
-    };
-    auto shortAtOffset = [&](uint32_t offset) -> int32_t {
-        uint32_t u = uShortAtOffset(offset);
-        return (u > 0x7FFF) ? (int32_t)(u - 0x10000) : (int32_t)u;
-    };
-
-    int32_t first = shortAtOffset(begin) + 256 * (pseudoindex & 0xFF);
-    int32_t second = shortAtOffset(end);
-    int32_t third = shortAtOffset(middle);
-    uint16_t hash = (first + second * 4 + third * 4) & 0x7FFF;
-
-    symbol->hash(hash);
+void Bootstrapper::computeSymbolHash_(HeapObject* symbol, bool isWide) {
+    symbol->hash(isWide ? wideSymbolHash(symbol) : symbolHash(symbol));
 }
 
 HeapObject* Bootstrapper::newString_(const Egg::string& str) {

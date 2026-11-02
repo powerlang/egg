@@ -133,7 +133,7 @@ BinaryMessageNativizer >> inlineGreaterEqualThan [
 		addFallback: [ assembler
 				@ failed;
 				pushA.
-			nativizer emitSend: #<.
+			nativizer emitSend: #>=.
 			assembler jumpTo: done ]
 ]
 
@@ -154,7 +154,7 @@ BinaryMessageNativizer >> inlineGreaterThan [
 		addFallback: [ assembler
 				@ failed;
 				pushA.
-			nativizer emitSend: #<.
+			nativizer emitSend: #>.
 			assembler jumpTo: done ]
 ]
 
@@ -184,7 +184,7 @@ BinaryMessageNativizer >> inlineLessEqualThan [
 		addFallback: [ assembler
 				@ failed;
 				pushA.
-			nativizer emitSend: #<.
+			nativizer emitSend: #<=.
 			assembler jumpTo: done ]
 ]
 
@@ -375,7 +375,7 @@ BinaryMessageNativizer >> inlineRemainder [
 		addFallback: [ assembler
 				@ failed;
 				pushA.
-			nativizer emitSend: #//.
+			nativizer emitSend: #\\.
 			assembler jumpTo: done ]
 ]
 

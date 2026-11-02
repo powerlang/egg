@@ -34,7 +34,7 @@ NativizationPlatform class >> aarch64_darwin [
 	^ self new
 		name: 'aarch64-darwin';
 		wordSize: 8;
-		abi: AAPCS64ABI new;
+		abi: (AAPCS64ABI new packsStackArguments: true);
 		codeGeneratorClass: ARM64CodeGenerator;
 		yourself
 ]

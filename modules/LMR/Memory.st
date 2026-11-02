@@ -96,7 +96,7 @@ Memory >> addSpace: aSpace [
 { #category : #private }
 Memory >> adjustSpaces [
 	| stats rate committed limit delta |
-	stats := meter runs last.
+	stats := meter lastPass.
 	rate := stats survivalRate.
 	committed := edenSpace commitedSize.
 	limit := edenSpace commitedLimit.
@@ -291,7 +291,7 @@ Memory >> collectYoungMeasuring [
 			self verifyMemory.
 			genCollector collect.
 			self verifyMemory] evaluateAtomically].
-	fullCollector tenured: meter runs last tenured
+	fullCollector tenured: meter lastPass tenured
 ]
 
 { #category : #inquiries }
@@ -626,7 +626,7 @@ Memory >> objectsReferencing: targetSpace [
 Memory >> objectsSurviving: aBlock [
 	| set finalizable |
 	set := WeakIdentitySet new: 1000.
-	finalizable := Smalltalk finalizer copy.
+	finalizable := Kernel finalizer copy.
 	self collectYoung; collectYoung.
 	self ASSERT: CRITICAL == false.
 	CRITICAL := true.

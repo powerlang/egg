@@ -9,7 +9,8 @@ Class {
 	#instVars : [
 		'hasFrame',
 		'temporaries',
-		'storesPreviousSelf'
+		'storesPreviousSelf',
+		'loadsOwnNativeCode'
 	],
 	#category : #IR
 }
@@ -25,6 +26,16 @@ OActivationContext >> doSavePreviousSelf [
 ]
 
 { #category : #accessing }
+OActivationContext >> doLoadOwnNativeCode [
+	loadsOwnNativeCode := true
+]
+
+{ #category : #accessing }
+OActivationContext >> loadsOwnNativeCode [
+	^loadsOwnNativeCode
+]
+
+{ #category : #accessing }
 OActivationContext >> hasFrame [
 	^hasFrame
 ]
@@ -37,7 +48,8 @@ OActivationContext >> haveFrame [
 { #category : #accessing }
 OActivationContext >> initialize [
 	hasFrame := false.
-	storesPreviousSelf := false
+	storesPreviousSelf := false.
+	loadsOwnNativeCode := false
 ]
 
 { #category : #accessing }

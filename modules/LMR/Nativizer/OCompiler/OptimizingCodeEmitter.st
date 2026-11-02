@@ -16,7 +16,8 @@ Class {
 		'firstBlock',
 		'currentBlockIndex',
 		'blocks',
-		'messageLinker'
+		'messageLinker',
+		'platform'
 	],
 	#category : #OCompiler
 }
@@ -33,6 +34,7 @@ OptimizingCodeEmitter >> abi: anAbi [
 
 { #category : #accessing }
 OptimizingCodeEmitter >> platform: aPlatform [
+	platform := aPlatform.
 	assembler := GenericAssembler new platform: aPlatform
 ]
 
@@ -868,7 +870,10 @@ OptimizingCodeEmitter >> visitLoadConstant: aLoadConstant [
 { #category : #visiting }
 OptimizingCodeEmitter >> visitLoadImplicit: instruction [
 	| frame |
-	instruction name == #activationRecord ifTrue: [^assembler buildFrame].
+	instruction name == #activationRecord ifTrue: [
+		instruction loadsOwnNativeCode
+			ifTrue: [assembler loadMwithOwnNativeCode: platform behaviorOffset].
+		^assembler buildFrame].
 	instruction name == #self ifTrue: [
 		frame := instruction prev.
 		^frame hasFrame ifTrue: [

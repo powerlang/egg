@@ -31,6 +31,17 @@ ARM64CodeGeneratorTest >> testClearFloatStatusFlags [
 ]
 
 { #category : #tests }
+ARM64CodeGeneratorTest >> testClearFloatStatusFlagsInR [
+	| assembler |
+	assembler := NativizationPlatform aarch64_darwin newAssembler.
+	assembler clearFloatStatusFlagsInR; loadAwithSP.
+	codegen := assembler codegen.
+	self
+		assert: self words asArray
+		equals: #(16rD29FEC10 16rF2BFFFF0 16rF2DFFFF0 16rF2FFFFF0 16r8A100000 16r910003E1)
+]
+
+{ #category : #tests }
 ARM64CodeGeneratorTest >> testFloatStatus [
 	codegen storeFloatStatusIntoA; loadFloatStatusFromA.
 	self
@@ -244,4 +255,32 @@ ARM64CodeGeneratorTest >> testStoreShort [
 	memory := codegen memRef16: (self x: 2) offsetImm: 6.
 	codegen store: (self x: 1) intoMem: memory.
 	self assert: self words asArray equals: #(16r79000C41)
+]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testCallout [
+	| platform assembler |
+	platform := NativizationPlatform aarch64_darwin.
+	assembler := platform newAssembler.
+	platform abi
+		emitCallout: #(sint64 double)
+		with: assembler
+		loading: [:i | assembler codegen moveImm: i to: assembler codegen regR].
+	codegen := assembler codegen.
+	self assert: self words asArray equals: #(16rAA0003E9 16rD2800040 16r9E670000 16rD2800020 16rD63F0120)
+]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testCalloutStackArguments [
+	| platform assembler |
+	platform := NativizationPlatform aarch64_darwin.
+	assembler := platform newAssembler.
+	platform abi
+		emitCallout: #(sint64 sint64 sint64 sint64 sint64 sint64 sint64 sint64 sint32 float)
+		with: assembler
+		loading: [:i | assembler codegen moveImm: i to: assembler codegen regR].
+	codegen := assembler codegen.
+	self
+		assert: self words asArray
+		equals: #(16rAA0003E9 16rD10043FF 16rD2800040 16rAA0003E1 16rD2800060 16rAA0003E2 16rD2800080 16rAA0003E3 16rD28000A0 16rAA0003E4 16rD28000C0 16rAA0003E5 16rD28000E0 16rAA0003E6 16rD2800100 16rAA0003E7 16rD2800120 16rB90003E0 16rD2800140 16r9E670010 16r1E624200 16rD2800020 16rD63F0120 16r910043FF)
 ]

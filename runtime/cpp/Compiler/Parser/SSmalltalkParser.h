@@ -6,6 +6,7 @@
 #ifndef _SSMALLTALKPARSER_H_
 #define _SSMALLTALKPARSER_H_
 
+#include <map>
 #include <string>
 #include <memory>
 #include <vector>
@@ -108,6 +109,7 @@ public:
     SPragmaNode* symbolicPragma();
     SPragmaNode* ffiCall_method_(bool aBoolean, SMethodNode* aMethodNode);
     Egg::string ffiType();
+    uint8_t ffiCode_in_(const Egg::string& name, const std::map<std::string, uint8_t>& codes);
     std::vector<Egg::string> ffiArguments();
     
     SParseNode* parenthesizedExpression();

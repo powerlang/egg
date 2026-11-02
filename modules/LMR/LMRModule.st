@@ -49,7 +49,7 @@ LMRModule >> globals [
 { #category : #spec }
 LMRModule >> imports [
 	^{
-		#Kernel -> #(ProcessStack ProtoObject SequenceableCollection WordSize Processor).
+		#Kernel -> #(ByteArray Ephemeron IdentityDictionary IdentitySet LinkedCollection ProcessLMRStack ProcessStack ProtoObject SequenceableCollection WeakArray WeakIdentitySet WordSize WordSizeShift Processor).
 		#'Kernel.LMR' -> #(LMRProtoObject)
 	}
 ] 
@@ -99,7 +99,7 @@ LMRModule >> invokeStub [
 LMRModule >> justLoaded [
 	super justLoaded.
 	namespace at: #CRITICAL put: false.
-	SendSite initializeFormatFlags.
+	SendSite initialize.
 	GlobalDispatchCache initialize.
 	self initializeMemory.
 	LMRProtoObject module namespace

@@ -12,7 +12,7 @@ Class {
 { #category : #spec }
 OCompilerModule >> imports [
 	^{
-		#Kernel -> #(Array ByteArray CharacterArray CompiledBlock CompiledMethod Error Object OrderedCollection Dictionary IdentityDictionary ProtoObject Species String).
+		#Kernel -> #(Array Association ByteArray CharacterArray CompiledBlock CompiledMethod Error Object OrderedCollection Dictionary IdentityDictionary ProtoObject Species String).
 		#'Kernel.LMR' -> #(LMRProtoObject LMRSpecies).
 		#LMR -> #(GCSpace NativeCode SendSite).
 		#'LMR.Nativizer.Assembly.Intel' -> #(AMD64CodeGenerator AMD64TemplateAssembler Register).

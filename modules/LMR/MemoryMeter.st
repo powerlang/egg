@@ -15,7 +15,8 @@ Class {
 		'oldGrown',
 		'grows',
 		'shrinks',
-		'rescued'
+		'rescued',
+		'lastPass'
 	],
 	#category : #Kernel
 }
@@ -36,7 +37,13 @@ MemoryMeter >> initialize [
 	oldGrown := 0.
 	grows := 0.
 	shrinks := 0.
-	rescued := 0
+	rescued := 0.
+	lastPass := GenGCPass new
+]
+
+{ #category : #accessing }
+MemoryMeter >> lastPass [
+	^lastPass
 ]
 
 { #category : #accessing }
@@ -51,7 +58,11 @@ MemoryMeter >> measure: aBlock [
 	runs := runs + 1.
 	time := time + milliseconds.
 	maxPause := milliseconds max: maxPause.
-	rescued := memory rescuedEphemerons size
+	rescued := memory unreachableEphemerons size.
+	lastPass
+		youngSize: eden + from;
+		cradled: memory from usedBytes;
+		tenured: oldGrown
 ]
 
 { #category : #accessing }

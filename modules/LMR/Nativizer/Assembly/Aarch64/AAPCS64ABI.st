@@ -32,7 +32,8 @@ Class {
 		'regM', 'regE', 'regG',
 		'regNil', 'regTrue', 'regFalse',
 		'regFP', 'regSP', 'regL',
-		'regX0', 'regX1'
+		'regX0', 'regX1',
+		'packsStackArguments'
 	],
 	#category : #Aarch64
 }
@@ -40,6 +41,7 @@ Class {
 { #category : #initialization }
 AAPCS64ABI >> initialize [
 	super initialize.
+	packsStackArguments := false.
 	regR := x0.
 	regA := x1.
 	regS := x2.
@@ -61,7 +63,6 @@ AAPCS64ABI >> initialize [
 { #category : #callbacks }
 AAPCS64ABI >> emitEntrypoint: anFFIDescriptor with: anAssembler [
 	anAssembler
-		push: self regL;
 		saveCallerFrame;
 		pushE;
 		pushG;
@@ -70,6 +71,20 @@ AAPCS64ABI >> emitEntrypoint: anFFIDescriptor with: anAssembler [
 		pushFalse;
 		pushM.
 	self storeArgumentsInStack: anFFIDescriptor with: anAssembler
+]
+
+{ #category : #callouts }
+AAPCS64ABI >> stackAreaOf: places types: types [
+	| end |
+	end := 0.
+	places with: types do: [:place :type |
+		place isInteger ifTrue: [end := end max: place + (self stackBytesOf: type)]].
+	^end alignedTo: 16
+]
+
+{ #category : #callouts }
+AAPCS64ABI >> stackBytesOf: type [
+	^packsStackArguments ifTrue: [(self bitsOf: type) // 8] ifFalse: [8]
 ]
 
 { #category : #callbacks }
@@ -101,9 +116,85 @@ AAPCS64ABI >> restoreContext: anFFIDescriptor with: anAssembler [
 		return
 ]
 
+
 { #category : #accessing }
 AAPCS64ABI >> bits [
 	^64
+]
+
+{ #category : #callouts }
+AAPCS64ABI >> bitsOf: type [
+	(#(uint8 sint8 uchar schar) includes: type) ifTrue: [^8].
+	(#(uint16 sint16 ushort sshort) includes: type) ifTrue: [^16].
+	(#(uint32 sint32 uint sint float) includes: type) ifTrue: [^32].
+	^64
+]
+
+{ #category : #callouts }
+AAPCS64ABI >> emitCallout: types with: anAssembler loading: aBlock [
+	| codegen places area order |
+	codegen := anAssembler codegen.
+	places := self placesOf: types.
+	area := self stackAreaOf: places types: types.
+	codegen move: self regR to: self regCallout.
+	area > 0 ifTrue: [codegen subImm: area from: sp].
+	order := self indexesLeavingX0Last: places.
+	order do: [:i | | place type |
+		place := places at: i.
+		type := types at: i.
+		aBlock value: i.
+		place isInteger
+			ifTrue: [self emitStackArgument: type at: place with: codegen]
+			ifFalse: [self moveArgumentTo: place with: codegen]].
+	codegen callIndirectReg: self regCallout.
+	area > 0 ifTrue: [codegen addImm: area to: sp]
+]
+
+{ #category : #callouts }
+AAPCS64ABI >> floatRegistersFor: type [
+	type == #float ifTrue: [^{s0. s1. s2. s3. s4. s5. s6. s7}].
+	^{d0. d1. d2. d3. d4. d5. d6. d7}
+]
+
+{ #category : #callouts }
+AAPCS64ABI >> indexesLeavingX0Last: places [
+	| indexes |
+	indexes := 1 to: places size.
+	^(indexes reject: [:i | (places at: i) == x0]) , (indexes select: [:i | (places at: i) == x0])
+]
+
+{ #category : #callouts }
+AAPCS64ABI >> emitStackArgument: type at: offset with: codegen [
+	| bits |
+	type == #float ifTrue: [
+		self moveSingleTo: s16 with: codegen.
+		^codegen store: 32 from: s16 into: sp disp: offset].
+	bits := packsStackArguments ifTrue: [self bitsOf: type] ifFalse: [64].
+	codegen store: bits from: x0 into: sp disp: offset
+]
+
+{ #category : #callouts }
+AAPCS64ABI >> extendResult: type with: anAssembler [
+	| bits opcode |
+	type == #float ifTrue: [^anAssembler codegen assemble: 'fcvt' with: d0 with: s0].
+	type == #double ifTrue: [^self].
+	bits := self bitsOf: type.
+	bits = 64 ifTrue: [^self].
+	opcode := type first = $s ifTrue: ['sbfm'] ifFalse: ['ubfm'].
+	anAssembler codegen assemble: opcode with: self regR with: self regR with: 0 with: bits - 1
+]
+
+{ #category : #callouts }
+AAPCS64ABI >> isFloat: type [
+	^#(float double) includes: type
+]
+
+{ #category : #callouts }
+AAPCS64ABI >> moveArgumentTo: aRegister with: codegen [
+	aRegister == x0 ifTrue: [^self].
+	aRegister isFloat ifFalse: [^codegen move: x0 to: aRegister].
+	aRegister length = 64 ifTrue: [^codegen moveDouble: x0 into: aRegister].
+	self moveSingleTo: aRegister with: codegen
 ]
 
 { #category : #accessing }
@@ -111,9 +202,49 @@ AAPCS64ABI >> newAssembler [
 	^ARM64TemplateAssembler new
 ]
 
+{ #category : #callouts }
+AAPCS64ABI >> moveSingleTo: aRegister with: codegen [
+	codegen moveDouble: x0 into: d16.
+	codegen assemble: 'fcvt' with: aRegister with: d16
+]
+
+{ #category : #accessing }
+AAPCS64ABI >> packsStackArguments: aBoolean [
+	packsStackArguments := aBoolean
+]
+
+{ #category : #callouts }
+AAPCS64ABI >> placesOf: types [
+	| ints floats offset |
+	ints := 0.
+	floats := 0.
+	offset := 0.
+	^types collect: [:type | | place bytes |
+		(#(longdouble complexFloat complexDouble complexLongdouble) includes: type)
+			ifTrue: [^self error: 'FFI type ' , type , ' not supported natively yet'].
+		(self isFloat: type)
+			ifTrue: [
+				floats := floats + 1.
+				floats <= 8 ifTrue: [place := (self floatRegistersFor: type) at: floats]]
+			ifFalse: [
+				ints := ints + 1.
+				ints <= 8 ifTrue: [place := {x0. x1. x2. x3. x4. x5. x6. x7} at: ints]].
+		place ifNil: [
+			bytes := self stackBytesOf: type.
+			offset := offset alignedTo: bytes.
+			place := offset.
+			offset := offset + bytes].
+		place]
+]
+
 { #category : #'registers - IR' }
 AAPCS64ABI >> regA [
 	^regA
+]
+
+{ #category : #accessing }
+AAPCS64ABI >> regCallout [
+	^x9
 ]
 
 { #category : #'registers - IR' }

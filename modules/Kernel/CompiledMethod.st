@@ -39,7 +39,8 @@ CompiledMethod class >> initializeFormatFlags [
 		at: #HasFrame put: (1 bitShift: 24 - 1);
 		at: #Debuggable put: (1 bitShift: 25 - 1);
 		at: #EnvCount put: (26 thru: 31);
-		at: #IsExtension put: (1 bitShift: 32 - 1)
+		at: #IsExtension put: (1 bitShift: 32 - 1);
+		at: #HasBeenFlushed put: (1 bitShift: 33 - 1)
 ]
 
 { #category : #initialization }
@@ -117,6 +118,16 @@ CompiledMethod >> asOverridden [
 { #category : #accessing }
 CompiledMethod >> beExtension [
 	format := format bitOr: IsExtension
+]
+
+{ #category : #accessing }
+CompiledMethod >> beFlushed [
+	format := format bitOr: HasBeenFlushed
+]
+
+{ #category : #accessing }
+CompiledMethod >> beNotFlushed [
+	format := format bitClear: HasBeenFlushed
 ]
 
 { #category : #accessing }
@@ -231,6 +242,11 @@ CompiledMethod >> format: anInteger [
 ]
 
 { #category : #testing }
+CompiledMethod >> hasBeenFlushed [
+	^format isOnBit: HasBeenFlushed
+]
+
+{ #category : #testing }
 CompiledMethod >> hasBlocks [
 	^self blockCount > 0
 ]
@@ -267,6 +283,13 @@ CompiledMethod >> hash [
 { #category : #accessing }
 CompiledMethod >> hasOptimizedCode [
 	^optimizedCode != nil
+]
+
+{ #category : #testing }
+CompiledMethod >> hasSpecialABI [
+	"Methods like SendSite>>_dispatchOn: take their arguments in registers, not
+	from the caller's stack. Their frames show up in doesNotUnderstand: backtraces"
+	^self literals includes: #specialABIBegin
 ]
 
 { #category : #initialization }

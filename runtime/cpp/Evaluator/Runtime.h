@@ -35,12 +35,12 @@ public:
     SymbolProvider *_symbolProvider;
 
     //typedef std::vector<SAbstractMessage*> inline_cache;
-    std::map<GCedRef*, std::vector <SAbstractMessage *> *, GCedRef::Comparator > _inlineCaches;
+    std::map<GCedRef*, std::vector <SAbstractMessage *> *, GCedRef::SelectorComparator > _inlineCaches;
 
     typedef std::pair<GCedRef*,GCedRef*> gced_global_cache_key;
 	typedef std::pair<Object*,Object*> global_cache_key;
 
-    std::map<gced_global_cache_key, GCedRef*, GCedRef::Comparator> _globalCache;
+    std::map<gced_global_cache_key, GCedRef*, GCedRef::SelectorComparator> _globalCache;
     uint16_t _lastHash;
 
 public:
@@ -109,6 +109,7 @@ public:
 	void addSegmentSpace_(ImageSegment *segment);
 
     uintptr_t hashFor_(Object *anObject);
+    uintptr_t symbolHashFor_(Object *aSymbol);
 
     uint16_t nextHash() {
         uint16_t shifted = _lastHash >> 1;

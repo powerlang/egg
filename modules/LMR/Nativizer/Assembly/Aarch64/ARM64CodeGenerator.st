@@ -856,6 +856,22 @@ ARM64CodeGenerator >> callPushesReturnAddress [
 	^false
 ]
 
+{ #category : #epilogue }
+ARM64CodeGenerator >> restoreCallerFrame [
+	self
+		move: self regFP to: self regSP;
+		pop: self regFP;
+		pop: x30
+]
+
+{ #category : #prologue }
+ARM64CodeGenerator >> saveCallerFrame [
+	self
+		push: x30;
+		push: self regFP;
+		move: self regSP to: self regFP
+]
+
 { #category : #prologue }
 ARM64CodeGenerator >> saveReturnAddress [
 	self push: x30

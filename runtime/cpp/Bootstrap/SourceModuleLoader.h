@@ -18,11 +18,14 @@ namespace Egg {
 
 class Runtime;
 class SSmalltalkCompiler;
+class GCedRef;
+class SCompiledMethod;
 
 class SourceModuleLoader {
     Runtime* _runtime;
     ModuleSpec _moduleSpec;
     std::unique_ptr<SSmalltalkCompiler> _compiler;
+    std::unique_ptr<GCedRef> _module;
 
 public:
     SourceModuleLoader(Runtime* runtime);
@@ -35,6 +38,9 @@ private:
     Object* createNewClassFrom_(ClassSpec* spec, Object* module);
     void createMethodsOf_(Object* cls, ClassSpec* spec);
     void createNewMethod_(const Egg::string& source, Object* species, const Egg::string& category = Egg::string(""));
+    Object* newMethodFrom_(SCompiledMethod* smethod, const Egg::string& source, Object* species);
+    Object* ffiMethodClass_();
+    void initializeFFIMethod_(Object* method, SCompiledMethod* smethod);
     [[noreturn]] static void rethrowWithContext_(const std::exception& e,
                                                 const Egg::string& className,
                                                 const std::string& side,

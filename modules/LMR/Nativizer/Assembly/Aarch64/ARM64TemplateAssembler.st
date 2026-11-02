@@ -59,6 +59,7 @@ ARM64TemplateAssembler >> breakpoint [
 { #category : #templates }
 ARM64TemplateAssembler >> buildFrame [
 	codegen
+		emit: 16rF81F0FFE;
 		emit: 16rF81F0FFD;
 		emit: 16r910003FD
 ]
@@ -75,6 +76,28 @@ ARM64TemplateAssembler >> callIndirectM [
 	codegen
 		emit: 16rF9400270;
 		emit: 16rD63F0200
+]
+
+{ #category : #templates }
+ARM64TemplateAssembler >> clearFloatStatusFlagsInR [
+	codegen
+		emit: 16rD29FEC10;
+		emit: 16rF2BFFFF0;
+		emit: 16rF2DFFFF0;
+		emit: 16rF2FFFFF0;
+		emit: 16r8A100000
+]
+
+{ #category : #templates }
+ARM64TemplateAssembler >> clearFloatStatusFlagsOfR [
+	codegen
+		emit: 16rB9400003;
+		emit: 16rD29FEC10;
+		emit: 16rF2BFFFF0;
+		emit: 16rF2DFFFF0;
+		emit: 16rF2FFFFF0;
+		emit: 16r8A100063;
+		emit: 16rB9000003
 ]
 
 { #category : #templates }
@@ -324,6 +347,11 @@ ARM64TemplateAssembler >> loadAwithSindex: anInteger [
 ]
 
 { #category : #templates }
+ARM64TemplateAssembler >> loadAwithSP [
+	codegen emit: 16r910003E1
+]
+
+{ #category : #templates }
 ARM64TemplateAssembler >> loadAwithTrue [
 	codegen emit: 16rAA1703E1
 ]
@@ -362,6 +390,13 @@ ARM64TemplateAssembler >> loadFalseWithMindex: anInteger [
 	(anInteger between: 1 and: 4096) ifTrue: [^codegen emit: 16rF93FFE78 + (anInteger * 1024)].
 	(anInteger between: -31 and: 0) ifTrue: [^codegen emit: 16rF85F8278 + (anInteger * 32768)].
 	^super loadFalseWithMindex: anInteger
+]
+
+{ #category : #templates }
+ARM64TemplateAssembler >> loadFloatStatusFromA [
+	codegen
+		emit: 16rB9400030;
+		emit: 16rD51B4430
 ]
 
 { #category : #templates }
@@ -909,7 +944,8 @@ ARM64TemplateAssembler >> pushTrue [
 ARM64TemplateAssembler >> restoreCallerFrame [
 	codegen
 		emit: 16r910003BF;
-		emit: 16rF84107FD
+		emit: 16rF84107FD;
+		emit: 16rF84107FE
 ]
 
 { #category : #templates }
@@ -925,6 +961,14 @@ ARM64TemplateAssembler >> return [
 { #category : #templates }
 ARM64TemplateAssembler >> roundDoubleX0intoX1 [
 	codegen emit: 16r1E65C001
+]
+
+{ #category : #templates }
+ARM64TemplateAssembler >> saveCallerFrame [
+	codegen
+		emit: 16rF81F0FFE;
+		emit: 16rF81F0FFD;
+		emit: 16r910003FD
 ]
 
 { #category : #templates }
@@ -1020,6 +1064,13 @@ ARM64TemplateAssembler >> storeEinRindex: anInteger [
 ]
 
 { #category : #templates }
+ARM64TemplateAssembler >> storeFloatStatusIntoA [
+	codegen
+		emit: 16rD53B4430;
+		emit: 16rB9000030
+]
+
+{ #category : #templates }
 ARM64TemplateAssembler >> storeLargeX0inA [
 	codegen emit: 16rFD000020
 ]
@@ -1076,6 +1127,13 @@ ARM64TemplateAssembler >> storeRinTindex: anInteger [
 	(anInteger between: 1 and: 4096) ifTrue: [^codegen emit: 16rF8FFFC60 + (anInteger * 1024)].
 	(anInteger between: -31 and: 0) ifTrue: [^codegen emit: 16rF81F8060 + (anInteger * 32768)].
 	^super storeRinTindex: anInteger
+]
+
+{ #category : #templates }
+ARM64TemplateAssembler >> storeShortTinRatOffsetA [
+	codegen
+		emit: 16r8B010010;
+		emit: 16r79000203
 ]
 
 { #category : #templates }

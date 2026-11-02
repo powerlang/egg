@@ -69,7 +69,8 @@ CopyingCollector >> forwardingIndexOf: anObject [
 
 { #category : #cleaning }
 CopyingCollector >> initialContainerCapacity [
-	^(10 raisedTo: (self movableBytes log: 1000)) asInteger
+	"about the cube root of movableBytes, with integers only"
+	^1 bitShift: self movableBytes highBit + 2 // 3
 ]
 
 { #category : #cleaning }

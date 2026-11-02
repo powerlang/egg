@@ -91,6 +91,11 @@ TemplateJIT >> associationValueAt: anInteger put: dummy [
 ]
 
 { #category : #services }
+TemplateJIT >> isFloat: type [
+	^#(float double) includes: type
+]
+
+{ #category : #services }
 TemplateJIT >> loadAssociationValue: anAssociation [
 	assembler
 		loadRwithLiteral: anAssociation;
@@ -197,8 +202,7 @@ TemplateJIT >> emitCallbackPrologue [
 	assembler
 		pushImm: retaddr;
 		xorFPwithFP;
-		loadLongMwithIPoffset: 0 - assembler currentAddress + environment platform behaviorOffset;
-		loadMwithMindex: (CallbackBehavior indexOfSlot: 'nativeCode');
+		loadMwithOwnNativeCode: environment platform behaviorOffset;
 		loadGwithLiteral: environment lmrModule globals;
 		loadNilWithLiteral: nil;
 		loadTrueWithLiteral: true;
@@ -206,6 +210,60 @@ TemplateJIT >> emitCallbackPrologue [
 		loadEwithNil;
 		loadRwithMindex: (NativeCode indexOfSlot: 'compiledCode');
 		loadRwithRindex: (CallbackMethod indexOfSlot: 'receiver')
+]
+
+{ #category : #services }
+TemplateJIT >> emitCallout [
+	| descriptor types return index lookup resolved |
+	descriptor := method descriptor.
+	types := descriptor argumentTypeNames.
+	return := descriptor returnTypeName.
+	index := method class indexOfSlot: 'address'.
+	lookup := assembler newLabel.
+	resolved := assembler newLabel.
+	(self isFloat: return) ifTrue: [
+		self loadObject: Float; emitSend: #new.
+		assembler pushR].
+	assembler @ resolved.
+	self loadObject: method.
+	assembler
+		loadRwithRindex: index;
+		compareRwithNil;
+		jumpIfEqualTo: lookup;
+		convertRtoNativeInteger.
+	self addFallback: [
+		assembler @ lookup; pushS.
+		self loadObject: method; emitSend: #lookupFor:.
+		assembler jumpTo: resolved].
+	environment abi
+		emitCallout: types
+		with: assembler
+		loading: [:i | | type |
+			type := types at: i.
+			self emitCalloutArgument: i type: type].
+	self emitCalloutResult: return
+]
+
+{ #category : #services }
+TemplateJIT >> emitCalloutArgument: index type: aSymbol [
+	| nonInteger done |
+	self argumentInStackAt: index.
+	nonInteger := assembler labeledIntegerBitTestOfR.
+	done := assembler newLabel.
+	assembler
+		convertRtoNativeInteger;
+		jumpTo: done;
+		@ nonInteger.
+	(self isFloat: aSymbol) ifTrue: [assembler loadRwithRindex: 1].
+	assembler @ done
+]
+
+{ #category : #services }
+TemplateJIT >> emitCalloutResult: type [
+	type == #void ifTrue: [^assembler loadRwithImmediate: 1].
+	environment abi extendResult: type with: assembler.
+	(self isFloat: type) ifTrue: [^assembler popA; moveX0toR; storeRinAindex: 1; loadRwithA].
+	assembler convertRtoSmallInteger
 ]
 
 { #category : #services }
@@ -223,18 +281,6 @@ TemplateJIT >> emitEpilogue [
 ]
 
 { #category : #services }
-TemplateJIT >> emitFFICall [
-	self loadObject: method.
-	assembler pushR; pushS.
-	self emitSend: #_ffiCall:.
-	assembler
-		restoreCallerFrame;
-		restoreCallerSelf;
-		restoreCallerM;
-		return
-]
-
-{ #category : #services }
 TemplateJIT >> emitFallbacks [
 	fallbacks do: [:block | block value]
 ]
@@ -245,13 +291,11 @@ TemplateJIT >> emitFramedMethodPrologue [
 		saveCallerFrame;
 		pushR;
 		initializeS.
-	method isCalloutMethod
-		ifTrue: [ self emitFFICall ]
-		ifFalse: [ self
-				pushNativeCode;
-				initializeMethodEnvironment;
-				initializeMethodTemporaries;
-				emitSafepointCheck ]
+	self
+		pushNativeCode;
+		initializeMethodEnvironment;
+		initializeMethodTemporaries;
+		emitSafepointCheck
 ]
 
 { #category : #services }
@@ -772,6 +816,9 @@ TemplateJIT >> visitMethod: anSMethod [
 	| statements returned |
 	activeScript := anSMethod.
 	self emitMethodPrologue.
+	method isCalloutMethod ifTrue: [
+		self emitCallout; emitEpilogue; emitFallbacks; saveMethodCode.
+		^self].
 	statements := anSMethod statements.
 	statements do: [ :s | s acceptVisitor: self ].
 	(statements notEmpty andNot: [ statements last isReturn ])

@@ -12,7 +12,7 @@ Class {
 
 { #category : #services }
 LMRCompiledMethod >> flushFromCaches [
-	self errorVMSpecific
+	self beFlushed
 ]
 
 { #category : #services }

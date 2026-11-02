@@ -1256,11 +1256,6 @@ Assembler >> pushTrue [
 	self subclassResponsibility
 ]
 
-{ #category : #'to-cleanup' }
-Assembler >> readFPUStatusOnA [
-	self subclassResponsibility
-]
-
 { #category : #'registers - IR' }
 Assembler >> regA [
 	self subclassResponsibility
@@ -1791,4 +1786,3 @@ Assembler >> xorFPwithFP [
 Assembler >> xorRwithA [
 	self subclassResponsibility
 ]
-

@@ -20,8 +20,8 @@ Class {
 { #category : #initialization }
 Closure class >> initializeIndexes [
 	Indexes := self addNamespace
-		at: 'ReceiverIndex' put: 1;
-		at: 'ParentEnvironmentIndex' put: 2;
+		at: #ReceiverIndex put: 1;
+		at: #ParentEnvironmentIndex put: 2;
 		yourself
 ]
 
@@ -33,6 +33,7 @@ Closure class >> newFrom: aBlock [
 	closure _beNamed; _beArrayed.
 	self nil: size slotsOf: closure.
 	closure _basicAt: 1 put: aBlock.
+	self memory rememberIfNotYoung: closure.
 	^closure
 ]
 

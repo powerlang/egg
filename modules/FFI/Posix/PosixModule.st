@@ -16,5 +16,8 @@ PosixModule >> externalCopyOfString: aString [
 
 { #category : #services }
 PosixModule >> imports [
-	^{ #FFI -> #(ExternalLibrary ExternalMemory LibraryLoader) }
+	^{
+		#Kernel -> #(Error).
+		#FFI -> #(ExternalLibrary ExternalMemory LibraryLoader)
+	}
 ]

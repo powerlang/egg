@@ -19,7 +19,7 @@ Class {
 { #category : #spec }
 BootstrapperModule >> imports [
 	^{
-		#Kernel -> #(OrderedCollection IdentityDictionary Object Magnitude ProtoObject SmallInteger CallbackBehavior MethodDictionary).
+		#Kernel -> #(OrderedCollection IdentityDictionary Object Magnitude ProcessLMRStack ProtoObject SmallInteger CallbackBehavior MethodDictionary).
 		#'Kernel.LMR' -> #(LMRProtoObject).
 		#LMR -> #(Memory NativeCode SendSite GCSpace CriticalArray).
 		#'LMR.Nativizer' -> #(NativizerModule NativizationPlatform NativizationEnvironment LookupNativizer LookupLinker)
@@ -51,6 +51,9 @@ BootstrapperModule >> bootstrapLMR: anLMRModule nativizer: aNativizerModule plat
 
 	env := aNativizerModule newNativizationEnvironmentFor: aPlatform.
 	env lmrModule: anLMRModule.
+	ProcessLMRStack
+		initializeInstances;
+		slotSize: env newAssembler codegen stackSlotSize.
 
 	SendSite lmr: anLMRModule.
 	self
@@ -75,21 +78,27 @@ BootstrapperModule >> nativizeEntriesOf: aModule with: env [
 
 { #category : #bootstrapping }
 BootstrapperModule >> nativizeEntry: aCompiledMethod of: aModule with: env [
-	| code machineCode original behavior |
+	| code |
 	code := aCompiledMethod copy.
 	code receiver: aModule.
 	env nativize: code.
-	machineCode := code optimizedCode code.
+	self installSelfReferenceOn: code optimizedCode.
+	aModule export: code optimizedCode as: aCompiledMethod selector.
+	(self codeSegmentOf: aModule) add: code optimizedCode code
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> installSelfReferenceOn: aNativeCode [
+	| machineCode original behavior |
+	machineCode := aNativeCode code.
 	original := machineCode behavior.
 	behavior := CallbackBehavior new
 		classBinding: original classBinding;
 		methods: MethodDictionary new;
 		next: original;
-		nativeCode: code optimizedCode;
+		nativeCode: aNativeCode;
 		yourself.
-	machineCode behavior: behavior.
-	aModule export: code optimizedCode as: aCompiledMethod selector.
-	(self codeSegmentOf: aModule) add: machineCode
+	machineCode behavior: behavior
 ]
 
 { #category : #bootstrapping }
@@ -106,6 +115,8 @@ BootstrapperModule >> initializeGlobalsFor: anLMRModule [
 BootstrapperModule >> nativizeInvokeFor: anLMRModule env: env nativizer: aNativizerModule [
 	| nativeCode |
 	nativeCode := env nativizeOptimizing: (SendSite >> #_invokeOn:) copy.
+	self installSelfReferenceOn: nativeCode.
+	(self codeSegmentOf: anLMRModule) add: nativeCode code.
 	anLMRModule mapGlobal: #Invoke to: nativeCode
 ]
 
@@ -117,6 +128,10 @@ BootstrapperModule >> nativizeLookupFor: anLMRModule env: env nativizer: aNativi
 		nativizeMethods.
 	lookup := nativizer methodFor: #_dispatchOn:.
 	lookupSuper := nativizer methodFor: #_dispatchOn:startingAt:.
+	#(_dispatchOn: _dispatchOn:startingAt: _dispatchDebuggableOn: _dispatchDebuggableOn:startingAt:) do: [:selector | | method |
+		method := nativizer methodFor: selector.
+		self installSelfReferenceOn: method optimizedCode].
+	nativizer methods do: [:m | self addCodeOf: m to: anLMRModule].
 	anLMRModule
 		mapGlobal: #Lookup to: lookup optimizedCode;
 		mapGlobal: #LookupSuper to: lookupSuper optimizedCode
@@ -143,6 +158,8 @@ BootstrapperModule >> nativizeWriteBarrierFor: anLMRModule env: env nativizer: a
 		lmrModule: anLMRModule;
 		completeInitialization;
 		nativizeOptimizing: barrier.
+	self installSelfReferenceOn: barrier optimizedCode.
+	self addCodeOf: barrier to: anLMRModule.
 	anLMRModule mapGlobal: #WriteBarrier to: barrier optimizedCode.
 ]
 
@@ -165,6 +182,15 @@ BootstrapperModule >> justLoaded [
 { #category : #snapshotting }
 BootstrapperModule >> codeSegmentOf: aModule [
 	^codeSegments at: aModule ifAbsentPut: [OrderedCollection new]
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> addCodeOf: aCompiledMethod to: aModule [
+	| code |
+	code := self codeSegmentOf: aModule.
+	code add: aCompiledMethod optimizedCode code.
+	aCompiledMethod hasBlocks ifFalse: [^self].
+	aCompiledMethod do: [:b | (b isBlock and: [b optimizedCode notNil]) ifTrue: [code add: b optimizedCode code]]
 ]
 
 { #category : #bootstrapping }
