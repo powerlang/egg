@@ -208,6 +208,60 @@ TemplateJIT >> emitCallbackPrologue [
 ]
 
 { #category : #services }
+TemplateJIT >> emitCallout [
+	| descriptor types return index lookup resolved |
+	descriptor := method descriptor.
+	types := descriptor argumentTypeNames.
+	return := descriptor returnTypeName.
+	index := method class indexOfSlot: 'address'.
+	lookup := assembler newLabel.
+	resolved := assembler newLabel.
+	return == #double ifTrue: [
+		self loadObject: Float; emitSend: #new.
+		assembler pushR].
+	assembler @ resolved.
+	self loadObject: method.
+	assembler
+		loadRwithRindex: index;
+		compareRwithNil;
+		jumpIfEqualTo: lookup;
+		convertRtoNativeInteger.
+	self addFallback: [
+		assembler @ lookup; pushS.
+		self loadObject: method; emitSend: #lookupFor:.
+		assembler jumpTo: resolved].
+	environment abi
+		emitCallout: types
+		with: assembler
+		loading: [:i | | type |
+			type := types at: i.
+			self emitCalloutArgument: i type: type].
+	self emitCalloutResult: return
+]
+
+{ #category : #services }
+TemplateJIT >> emitCalloutArgument: index type: aSymbol [
+	| nonInteger done |
+	self argumentInStackAt: index.
+	nonInteger := assembler labeledIntegerBitTestOfR.
+	done := assembler newLabel.
+	assembler
+		convertRtoNativeInteger;
+		jumpTo: done;
+		@ nonInteger.
+	aSymbol == #double ifTrue: [assembler loadRwithRindex: 1].
+	assembler @ done
+]
+
+{ #category : #services }
+TemplateJIT >> emitCalloutResult: type [
+	type == #void ifTrue: [^assembler loadRwithImmediate: 1].
+	environment abi extendResult: type with: assembler.
+	type == #double ifTrue: [^assembler popA; moveX0toR; storeRinAindex: 1; loadRwithA].
+	assembler convertRtoSmallInteger
+]
+
+{ #category : #services }
 TemplateJIT >> emitEpilogue [
 	method hasBlocks
 		ifTrue: [ assembler restoreCallerEnvironment ].
@@ -216,18 +270,6 @@ TemplateJIT >> emitEpilogue [
 	method isFrameless
 		ifFalse: [ assembler restoreCallerFrame ].
 	assembler
-		restoreCallerSelf;
-		restoreCallerM;
-		return
-]
-
-{ #category : #services }
-TemplateJIT >> emitFFICall [
-	self loadObject: method.
-	assembler pushR; pushS.
-	self emitSend: #_ffiCall:.
-	assembler
-		restoreCallerFrame;
 		restoreCallerSelf;
 		restoreCallerM;
 		return
@@ -244,13 +286,11 @@ TemplateJIT >> emitFramedMethodPrologue [
 		saveCallerFrame;
 		pushR;
 		initializeS.
-	method isCalloutMethod
-		ifTrue: [ self emitFFICall ]
-		ifFalse: [ self
-				pushNativeCode;
-				initializeMethodEnvironment;
-				initializeMethodTemporaries;
-				emitSafepointCheck ]
+	self
+		pushNativeCode;
+		initializeMethodEnvironment;
+		initializeMethodTemporaries;
+		emitSafepointCheck
 ]
 
 { #category : #services }
@@ -771,6 +811,9 @@ TemplateJIT >> visitMethod: anSMethod [
 	| statements returned |
 	activeScript := anSMethod.
 	self emitMethodPrologue.
+	method isCalloutMethod ifTrue: [
+		self emitCallout; emitEpilogue; emitFallbacks; saveMethodCode.
+		^self].
 	statements := anSMethod statements.
 	statements do: [ :s | s acceptVisitor: self ].
 	(statements notEmpty andNot: [ statements last isReturn ])

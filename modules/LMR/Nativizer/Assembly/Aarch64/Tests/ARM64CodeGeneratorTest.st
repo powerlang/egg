@@ -256,3 +256,16 @@ ARM64CodeGeneratorTest >> testStoreShort [
 	codegen store: (self x: 1) intoMem: memory.
 	self assert: self words asArray equals: #(16r79000C41)
 ]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testCallout [
+	| platform assembler |
+	platform := NativizationPlatform aarch64_darwin.
+	assembler := platform newAssembler.
+	platform abi
+		emitCallout: #(sint64 double)
+		with: assembler
+		loading: [:i | assembler codegen moveImm: i to: assembler codegen regR].
+	codegen := assembler codegen.
+	self assert: self words asArray equals: #(16rAA0003E9 16rD2800040 16r9E670000 16rD2800020 16rD63F0120)
+]

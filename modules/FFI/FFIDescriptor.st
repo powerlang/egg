@@ -11,6 +11,11 @@ Class {
 }
 
 
+{ #category : #types }
+FFIDescriptor class >> typeNames [
+	^#(uint8 sint8 uint16 sint16 uint32 sint32 uint64 sint64 float double uchar schar ushort sshort uint sint ulong slong longdouble pointer complexFloat complexDouble complexLongdouble void)
+]
+
 { #category : #accessing }
 FFIDescriptor >> argumentCount [
 	^self size - 2
@@ -32,6 +37,11 @@ FFIDescriptor >> argumentTypes [
 ]
 
 { #category : #accessing }
+FFIDescriptor >> argumentTypeNames [
+	^self argumentTypes collect: [:type | self class typeNames at: type + 1]
+]
+
+{ #category : #accessing }
 FFIDescriptor >> argumentTypes: types [
 	types withIndexDo: [:code :i | self argumentTypeAt: i put: code]
 ]
@@ -49,6 +59,11 @@ FFIDescriptor >> callingConvention: ccCode [
 { #category : #accessing }
 FFIDescriptor >>returnType [
 	^self at: self size - 1
+]
+
+{ #category : #accessing }
+FFIDescriptor >> returnTypeName [
+	^self class typeNames at: self returnType + 1
 ]
 
 { #category : #accessing }

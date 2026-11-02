@@ -100,14 +100,82 @@ AAPCS64ABI >> restoreContext: anFFIDescriptor with: anAssembler [
 		return
 ]
 
+{ #category : #callouts }
+AAPCS64ABI >> argumentRegister: anInteger in: anArray [
+	anInteger > anArray size ifTrue: [^self error: 'callout arguments on the stack not supported natively yet'].
+	^anArray at: anInteger
+]
+
 { #category : #accessing }
 AAPCS64ABI >> bits [
 	^64
 ]
 
+{ #category : #callouts }
+AAPCS64ABI >> bitsOf: type [
+	(#(uint8 sint8 uchar schar) includes: type) ifTrue: [^8].
+	(#(uint16 sint16 ushort sshort) includes: type) ifTrue: [^16].
+	(#(uint32 sint32 uint sint) includes: type) ifTrue: [^32].
+	^64
+]
+
+{ #category : #callouts }
+AAPCS64ABI >> emitCallout: types with: anAssembler loading: aBlock [
+	| codegen places order |
+	codegen := anAssembler codegen.
+	places := self placesOf: types.
+	codegen move: self regR to: x9.
+	order := self indexesLeavingX0Last: places.
+	order do: [:i | | place |
+		place := places at: i.
+		aBlock value: i.
+		self moveArgumentTo: place with: codegen].
+	codegen callIndirectReg: x9
+]
+
+{ #category : #callouts }
+AAPCS64ABI >> indexesLeavingX0Last: places [
+	| indexes |
+	indexes := 1 to: places size.
+	^(indexes reject: [:i | (places at: i) == x0]) , (indexes select: [:i | (places at: i) == x0])
+]
+
+{ #category : #callouts }
+AAPCS64ABI >> extendResult: type with: anAssembler [
+	| bits opcode |
+	type == #double ifTrue: [^self].
+	bits := self bitsOf: type.
+	bits = 64 ifTrue: [^self].
+	opcode := type first = $s ifTrue: ['sbfm'] ifFalse: ['ubfm'].
+	anAssembler codegen assemble: opcode with: self regR with: self regR with: 0 with: bits - 1
+]
+
+{ #category : #callouts }
+AAPCS64ABI >> moveArgumentTo: aRegister with: codegen [
+	aRegister isFloat ifTrue: [^codegen moveDouble: x0 into: aRegister].
+	aRegister == x0 ifFalse: [codegen move: x0 to: aRegister]
+]
+
 { #category : #accessing }
 AAPCS64ABI >> newAssembler [
 	^ARM64TemplateAssembler new
+]
+
+{ #category : #callouts }
+AAPCS64ABI >> placesOf: types [
+	| ints floats |
+	ints := 0.
+	floats := 0.
+	^types collect: [:type |
+		(#(float longdouble complexFloat complexDouble complexLongdouble) includes: type)
+			ifTrue: [^self error: 'FFI type ' , type , ' not supported natively yet'].
+		type == #double
+			ifTrue: [
+				floats := floats + 1.
+				self argumentRegister: floats in: {d0. d1. d2. d3. d4. d5. d6. d7}]
+			ifFalse: [
+				ints := ints + 1.
+				self argumentRegister: ints in: {x0. x1. x2. x3. x4. x5. x6. x7}]]
 ]
 
 { #category : #'registers - IR' }

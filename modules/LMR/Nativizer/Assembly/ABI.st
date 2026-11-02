@@ -27,6 +27,16 @@ ABI >> is64bits [
 	^self bits = 64
 ]
 
+{ #category : #callouts }
+ABI >> emitCallout: types with: anAssembler loading: aBlock [
+	self subclassResponsibility
+]
+
+{ #category : #callouts }
+ABI >> extendResult: type with: anAssembler [
+	self subclassResponsibility
+]
+
 { #category : #'compile-time constants' }
 ABI >> foldableConstants [
 	^Dictionary new
