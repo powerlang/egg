@@ -78,8 +78,7 @@ LMRClosure >> whileTrue: aBlock [
 
 { #category : '*handling' }
 LMRClosure >> saveHomeFrame [
-	"tagged as a SmallInteger so the GC doesn't take it for an object"
-	homeFrame := self _framePointer _asPointer
+	homeFrame := (self _framePointer _basicAt: 1) _asPointer
 ]
 
 { #category : '*handling' }
