@@ -290,3 +290,17 @@ ARM64CodeGeneratorTest >> testStoreAtIndex [
 	codegen store: (self x: 0) in: (self x: 1) indexAt: (self x: 2).
 	self assert: self words asArray equals: #(16r8B020C30 16rF81F8200)
 ]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testStoreByteAtIndex [
+	codegen store: (self x: 0) byte in: (self x: 1) indexAt: (self x: 2).
+	self assert: self words asArray equals: #(16r8B020030 16r381FF200)
+]
+
+{ #category : #tests }
+ARM64CodeGeneratorTest >> testLoadLongAtIndex [
+	| memref |
+	memref := codegen memRef: (self x: 1) indexImm: 0 sizedAs: (self x: 0) e.
+	codegen load: (self x: 0) e fromMem: memref.
+	self assert: self words asArray equals: #(16rB85FC020)
+]

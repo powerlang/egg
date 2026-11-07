@@ -1598,7 +1598,7 @@ GenericAssembler >> store: valueReg in: baseReg indexAt: indexReg [
 { #category : #'memory - load / store' }
 GenericAssembler >> load: dstReg from: baseReg atIndexAt: indexReg [
 	| memref |
-	memref := codegen memRef: baseReg index: indexReg.
+	memref := codegen memRef: baseReg index: indexReg sizedAs: dstReg.
 	codegen load: dstReg fromMem: memref
 ]
 
@@ -1719,14 +1719,14 @@ GenericAssembler >> store: srcReg intoMem: dstMemRef [
 { #category : #'memory - load / store' }
 GenericAssembler >> store: srcReg in: baseReg index: index [
 	| memref |
-	memref := codegen memRef: baseReg indexImm: index.
+	memref := codegen memRef: baseReg indexImm: index sizedAs: srcReg.
 	codegen store: srcReg intoMem: memref
 ]
 
 { #category : #'memory - load / store' }
 GenericAssembler >> load: dstReg from: baseReg atIndex: index [
 	| memref |
-	memref := codegen memRef: baseReg indexImm: index.
+	memref := codegen memRef: baseReg indexImm: index sizedAs: dstReg.
 	codegen load: dstReg fromMem: memref
 ]
 

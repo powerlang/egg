@@ -107,7 +107,7 @@ ARM64Register >> printOn: aStream [
 
 { #category : #accessing }
 ARM64Register >> byte [
-	^self
+	^self withLength: 8
 ]
 
 { #category : #accessing }
@@ -131,12 +131,12 @@ ARM64Register >> word [
 
 { #category : #accessing }
 ARM64Register >> e [
-	^self
+	^self withLength: 32
 ]
 
 { #category : #accessing }
 ARM64Register >> r [
-	^self
+	^self withLength: 64
 ]
 
 
