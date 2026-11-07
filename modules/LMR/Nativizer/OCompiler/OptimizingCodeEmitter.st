@@ -692,7 +692,7 @@ OptimizingCodeEmitter >> assembleTransferControlTo: instruction [
 	self assembleCopyIfNeeded: receiver to: assembler regR.
 	self activationRecord savesPreviousSelf
 		ifTrue: [assembler pop: assembler regS].
-	assembler restoreCallerFrame; jumpToReg: assembler regA
+	assembler restoreCallerFrame; loadMwithA; jumpToMindex: 1
 ]
 
 { #category : #unclassified }
