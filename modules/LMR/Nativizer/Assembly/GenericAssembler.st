@@ -1837,6 +1837,13 @@ GenericAssembler >> storeRinEindex: index [
 ]
 
 { #category : #storing }
+GenericAssembler >> storeMinFPindex: index [
+	| memref |
+	memref := codegen memRef: codegen regFP stackIndexImm: index.
+	codegen store: codegen regM intoMem: memref
+]
+
+{ #category : #storing }
 GenericAssembler >> storeRinFPindex: index [
 	| memref |
 	memref := codegen memRef: codegen regFP stackIndexImm: index.
