@@ -70,6 +70,7 @@ BootstrapperModule >> bootstrapLMR: anLMRModule nativizer: aNativizerModule plat
 
 	env initializeLinkersFor: anLMRModule; completeInitialization.
 	environment := env.
+	Memory current: memory.
 	kernelOverrides := self kernelOverrides.
 	self nativizeEntriesOf: self with: env.
 	roots do: [:module | self nativizeEntriesOf: module with: env]
