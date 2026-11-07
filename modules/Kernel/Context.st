@@ -181,10 +181,14 @@ Context >> frameDescription [
 	^String streamContents: [:s |
 		s nextPutAll: ([self frameHeader] on: Error do: ['<bad frame>']).
 		code isBlock ifTrue: [
-			s crtab; nextPutAll: 'args: '; nextPutAll: ([self arguments printString] on: Error do: ['<?>'])].
-		s crtab; nextPutAll: 'receiver: '; nextPutAll: ([receiver printString] on: Error do: ['<?>']).
-		s crtab; nextPutAll: 'temps: '; nextPutAll: ([self temps printString] on: Error do: ['<?>']).
-		s crtab; nextPutAll: 'env: '; nextPutAll: ([environment printString] on: Error do: ['<?>']).
+			s crtab; nextPutAll: 'args: '.
+			self print: [self arguments] limitedOn: s].
+		s crtab; nextPutAll: 'receiver: '.
+		self print: [receiver] limitedOn: s.
+		s crtab; nextPutAll: 'temps: '.
+		self print: [self temps] limitedOn: s.
+		s crtab; nextPutAll: 'env: '.
+		self print: [environment] limitedOn: s.
 		s cr]
 ]
 
@@ -205,6 +209,14 @@ Context >> lastEnvironment [
 { #category : #private }
 Context >> previousEnvironment [
 	^caller lastEnvironment
+]
+
+{ #category : #printing }
+Context >> print: aBlock limitedOn: aStream [
+	| string |
+	string := [aBlock value printString] on: Error do: ['<?>'].
+	string size > 200 ifTrue: [string := (string copyFrom: 1 to: 200) , '...'].
+	aStream nextPutAll: string
 ]
 
 { #category : #accessing }
