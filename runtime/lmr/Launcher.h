@@ -37,12 +37,12 @@ class Launcher
     Egg::FileImageSegment* segmentNamed(const std::string& module) const;
 
     /**
-     * Rebases every loaded segment and binds Kernel's imports, which name
-     * classes, behaviors and modules exported by the other segments. The
+     * Rebases every loaded segment and binds the imports of the runtime
+     * core (Kernel, Kernel.LMR and LMR) by name, without running code. The
      * imports of the other segments are left unresolved (a sentinel).
      */
     void relocate();
-    std::vector<Egg::Object*> kernelImports();
+    std::vector<Egg::Object*> importsOf(const std::string& module);
     Egg::HeapObject* exported(const std::string& name);
     void* entry(const std::string& name);
     uint64_t run(const std::string& name);
@@ -51,10 +51,13 @@ class Launcher
     std::string _directory;
     std::map<std::string, std::unique_ptr<Egg::FileImageSegment>> _segments;
     Egg::FileImageSegment* _segment = nullptr;
+    std::map<std::string, Egg::Object*> _symbols;
 
     Egg::FileImageSegment* load(const std::string& module, const std::string& file);
     void loadImportsOf(Egg::FileImageSegment* segment);
-    Egg::Object* bindKernelImport(const std::vector<std::string>& tokens);
+    void collectSymbols();
+    Egg::Object* kernelExport(const std::string& name);
+    Egg::Object* bindImport(const std::vector<std::string>& tokens);
     void makeExecutable();
 };
 

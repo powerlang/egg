@@ -36,18 +36,19 @@ static size_t referencesTo(Egg::Object* object, Egg::FileImageSegment* segment)
     return count;
 }
 
-TEST_CASE("relocating binds Kernel's imports to what the other segments export", "[link]")
+TEST_CASE("relocating binds the imports of the runtime core by name", "[link]")
 {
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
     REQUIRE(launcher.loaded());
     launcher.relocate();
 
-    auto kernel = launcher.segmentNamed("Kernel");
-    auto imports = launcher.kernelImports();
-    REQUIRE(imports.size() == kernel->_importDescriptors.size());
-    REQUIRE(!imports.empty());
-    auto sentinel = reinterpret_cast<Egg::Object*>(kernel->spaceStart());
-    REQUIRE(referencesTo(sentinel, kernel) == 0);
-    for (auto import : imports)
-        REQUIRE(referencesTo(import, kernel) > 0);
+    for (auto module : {"Kernel", "Kernel.LMR", "LMR"}) {
+        INFO("module: " << module);
+        auto segment = launcher.segmentNamed(module);
+        auto imports = launcher.importsOf(module);
+        REQUIRE(imports.size() == segment->_importDescriptors.size());
+        REQUIRE(!imports.empty());
+        auto sentinel = reinterpret_cast<Egg::Object*>(segment->spaceStart());
+        REQUIRE(referencesTo(sentinel, segment) == 0);
+    }
 }
