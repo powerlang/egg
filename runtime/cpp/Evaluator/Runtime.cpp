@@ -263,21 +263,8 @@ std::string Runtime::printGlobalCache() {
     return stream.str();
 }
 
-void Runtime::checkCache() {
-    for (const auto& entry : _globalCache) {
-        auto symbol = entry.first.first->get();
-        auto methodSelector = debugRuntime->methodSelector_(entry.second->get()->asHeapObject());
-        ASSERT( symbol ==  methodSelector);
-        if (symbol != methodSelector) {
-            int a = 0;
-        }
-    }
-}
-
 Object* Runtime::lookup_startingAt_(Object *symbol, HeapObject *behavior)
 {
-    checkCache();
-
     auto iter = _globalCache.find(global_cache_key(symbol,(Object*)behavior));
     if (iter != _globalCache.end()) {
         auto result = iter->second->get();
@@ -290,7 +277,6 @@ Object* Runtime::lookup_startingAt_(Object *symbol, HeapObject *behavior)
     auto key = gced_global_cache_key(new GCedRef(symbol),new GCedRef((Object*)behavior));
     auto value = new GCedRef((Object*)method);
 	_globalCache.insert({key, value});
-    checkCache();
     return method;
 }
 

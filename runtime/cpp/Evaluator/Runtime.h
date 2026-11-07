@@ -27,7 +27,6 @@ extern Runtime *debugRuntime;
 class Runtime {
 	std::string printGlobalCache();
 public:
-	void checkCache();
     Loader *_loader;
     ImageSegment *_kernel;
     Evaluator *_evaluator;
