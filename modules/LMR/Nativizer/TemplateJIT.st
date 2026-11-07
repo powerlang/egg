@@ -340,6 +340,16 @@ TemplateJIT >> emitSend: selector super: aBoolean [
 ]
 
 { #category : #services }
+TemplateJIT >> inlinesBinary: anSMessage [
+	| selector |
+	anSMessage receiver isSuper ifTrue: [ ^ false ].
+	anSMessage arguments size = 1 ifFalse: [ ^ false ].
+	selector := anSMessage selector.
+	selector isSymbol ifFalse: [ selector := method at: selector ].
+	^ BinaryMessageNativizer inlinedSelectors includes: selector
+]
+
+{ #category : #services }
 TemplateJIT >> emitWriteBarrier [
 	| saving |
 	saving := method isFrameless and: [assembler callPushesReturnAddress not].
@@ -794,7 +804,7 @@ TemplateJIT >> visitMessage: anSMessage [
 	| arguments index |
 	anSMessage isInlined
 		ifTrue: [ ^ self visitInlinedMessage: anSMessage ].
-	anSMessage isOptimized
+	(anSMessage isOptimized or: [ self inlinesBinary: anSMessage ])
 		ifTrue: [ ^ self visitOptimizedMessage: anSMessage ].
 	anSMessage receiver acceptVisitor: self.
 	arguments := anSMessage arguments.

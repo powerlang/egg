@@ -209,6 +209,11 @@ BinaryMessageNativizer >> inlineLessThan [
 			assembler jumpTo: done ]
 ]
 
+{ #category : #accessing }
+BinaryMessageNativizer class >> inlinedSelectors [
+	^ #(== = + - < <= > >= bitAnd: bitOr: bitXor: & |)
+]
+
 { #category : #private }
 BinaryMessageNativizer >> inlineMessage [
 	| selector s |
@@ -391,8 +396,17 @@ BinaryMessageNativizer >> loadAwithTemporary: index in: environment [
 
 { #category : #private }
 BinaryMessageNativizer >> loadOperands [
-	message opcodes
-		do: [:hintcode | hintcode nativizeUsing: assembler for: self] 
+	message receiver acceptVisitor: nativizer.
+	nativizer pushR.
+	message arguments first acceptVisitor: nativizer.
+	assembler loadAwithR.
+	nativizer popR.
+	failed ifNil: [ ^ self ].
+	assembler
+		testIntegerBitOf: assembler regR;
+		jumpIfZeroTo: failed;
+		testIntegerBitOf: assembler regA;
+		jumpIfZeroTo: failed
 ]
 
 { #category : #private }
