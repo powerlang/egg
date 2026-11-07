@@ -114,6 +114,15 @@ WriteStream >> nextInt64Put: anInteger [
 
 
 { #category : #marshalling }
+WriteStream >> nextLargePut: anInteger [
+	| unsigned |
+	unsigned := anInteger < 0
+		ifTrue: [anInteger + 16r10000000000000000]
+		ifFalse: [anInteger].
+	self nextULargePut: unsigned
+]
+
+{ #category : #marshalling }
 WriteStream >> nextLongPut: anInteger [
 	| bytes |
 	bytes := ByteArray new: 4.
