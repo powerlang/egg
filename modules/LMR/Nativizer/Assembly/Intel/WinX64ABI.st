@@ -18,6 +18,18 @@ WinX64ABI >> emitEntrypoint: anFFIDescriptor with: anAssembler [
 	
 ]
 
+{ #category : #callouts }
+WinX64ABI >> placesOf: types [
+	^types withIndexCollect: [:type :i |
+		self ensureSupported: type.
+		i > 4
+			ifTrue: [i - 1 * 8]
+			ifFalse: [
+				(self isFloat: type)
+					ifTrue: [{xmm0. xmm1. xmm2. xmm3} at: i]
+					ifFalse: [{rcx. rdx. r8. r9} at: i]]]
+]
+
 { #category : #services }
 WinX64ABI >> popRetaddrAndArgs: anFFIDescriptor with: anAssembler [
 	anAssembler
@@ -39,6 +51,11 @@ WinX64ABI >> restoreContext: anFFIDescriptor with: anAssembler [
 		popG;
 		popFP;
 		return
+]
+
+{ #category : #callouts }
+WinX64ABI >> stackEndOf: places types: types [
+	^(super stackEndOf: places types: types) max: 32
 ]
 
 { #category : #services }

@@ -92,7 +92,7 @@ TemplateJIT >> associationValueAt: anInteger put: dummy [
 
 { #category : #services }
 TemplateJIT >> isFloat: type [
-	^#(float double) includes: type
+	^environment abi isFloat: type
 ]
 
 { #category : #services }

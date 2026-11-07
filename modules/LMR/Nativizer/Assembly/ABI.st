@@ -28,13 +28,52 @@ ABI >> is64bits [
 ]
 
 { #category : #callouts }
+ABI >> bitsOf: type [
+	(#(uint8 sint8 uchar schar) includes: type) ifTrue: [^8].
+	(#(uint16 sint16 ushort sshort) includes: type) ifTrue: [^16].
+	(#(uint32 sint32 uint sint float) includes: type) ifTrue: [^32].
+	^64
+]
+
+{ #category : #callouts }
 ABI >> emitCallout: types with: anAssembler loading: aBlock [
 	self subclassResponsibility
 ]
 
 { #category : #callouts }
+ABI >> ensureSupported: type [
+	(#(longdouble complexFloat complexDouble complexLongdouble) includes: type)
+		ifTrue: [self error: 'FFI type ' , type , ' not supported natively yet']
+]
+
+{ #category : #callouts }
 ABI >> extendResult: type with: anAssembler [
 	self subclassResponsibility
+]
+
+{ #category : #callouts }
+ABI >> isFloat: type [
+	^#(float double) includes: type
+]
+
+{ #category : #callouts }
+ABI >> stackAreaOf: places types: types [
+	^(self stackEndOf: places types: types) alignedTo: 16
+]
+
+{ #category : #callouts }
+ABI >> stackBytesOf: type [
+	^8
+]
+
+{ #category : #callouts }
+ABI >> stackEndOf: places types: types [
+	| end |
+	end := 0.
+	places with: types do: [:place :type | | bytes |
+		bytes := self stackBytesOf: type.
+		place isInteger ifTrue: [end := end max: place + bytes]].
+	^end
 ]
 
 { #category : #'compile-time constants' }
