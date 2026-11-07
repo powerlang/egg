@@ -60,6 +60,16 @@ LMRModule >> globals: anArray [
 ]
 
 { #category : #accessing }
+LMRModule >> memory [
+	^memory
+]
+
+{ #category : #accessing }
+LMRModule >> memory: aMemory [
+	memory := aMemory
+]
+
+{ #category : #accessing }
 LMRModule >> micStub [
 	^micStub
 ]

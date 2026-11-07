@@ -10,6 +10,7 @@ Class {
 		'codeSegments',
 		'environment',
 		'kernelOverrides',
+		'memory',
 		'placeholders',
 		'replacements',
 		'roots'
@@ -62,6 +63,8 @@ BootstrapperModule >> bootstrapLMR: anLMRModule nativizer: aNativizerModule plat
 		nativizeInvokeFor: anLMRModule env: env nativizer: aNativizerModule;
 		nativizeWriteBarrierFor: anLMRModule env: env nativizer: aNativizerModule;
 		nativizeLookupFor: anLMRModule env: env nativizer: aNativizerModule;
+		useBootstrapMemoryFor: anLMRModule;
+		reserveSendSiteCachesFor: anLMRModule;
 		initializeDispatchCache;
 		nativizeSendSiteStubs: env.
 
@@ -110,6 +113,17 @@ BootstrapperModule >> initializeGlobalsFor: anLMRModule [
 	anLMRModule
 		globals: placeholders copy;
 		globalNamed: #SmallIntegerBehavior put: SmallInteger instanceBehavior
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> useBootstrapMemoryFor: anLMRModule [
+	memory := anLMRModule memory.
+	anLMRModule memory: BootstrapMemory new
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> reserveSendSiteCachesFor: anLMRModule [
+	SendSite reserveCachesWith: anLMRModule lookup
 ]
 
 { #category : #bootstrapping }
@@ -350,6 +364,7 @@ BootstrapperModule >> segmentBuilderFor: aModule [
 	(self requiresNativization: aModule) ifTrue: [builder nativizer: environment].
 	aModule == Kernel ifTrue: [self addKernelOverridesTo: builder].
 	self mapPlaceholdersIn: builder.
+	builder map: Memory module memory to: memory.
 	^builder
 ]
 
