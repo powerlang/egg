@@ -59,8 +59,8 @@ MessageInliner >> inline: aMessageNode [
 		ifTrue: [ ^ self inlineRepeat ].
 	s == #to:do:
 		ifTrue: [ ^ self inlineToDo ].
-	"s == #to:by:do:
-		ifTrue: [ ^ self inlineToByDo ]."
+	s == #to:by:do:
+		ifTrue: [ ^ self inlineToByDo ].
 	keywords := $: split: s.
 	keywords last = ''
 		ifTrue: [ keywords := keywords allButLast ].
@@ -149,7 +149,7 @@ MessageInliner >> inlineToByDo [
 	arg isBlockNode ifFalse: [^self].
 	arg arguments size = 1 ifFalse: [^self].
 	step := arguments at: 2.
-	(step isNumberNode and: [step value isSmallInteger]) ifFalse: [^self].
+	(step isNumberNode and: [step value isSmallInteger and: [step value !== 0]]) ifFalse: [^self].
 	message beInlined.
 	arg beInlined
 ]
