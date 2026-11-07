@@ -59,16 +59,32 @@ Context >> arguments [
 
 { #category : #printing }
 Context >> backtrace [
-	| result context depth |
-	result := ''.
+	^String streamContents: [:s |
+		(self frameDescriptions: 64) do: [:description | s nextPutAll: description; nextPutAll: String cr]]
+]
+
+{ #category : #accessing }
+Context >> below: anObject [
+	| top context |
+	top := self.
 	context := self.
-	depth := 0.
-	[context notNil and: [depth < 64]] whileTrue: [
-		result := result, context frameDescription, String cr.
-		context := context caller.
-		depth := depth + 1].
-	context notNil ifTrue: [result := result, '... (truncated)', String cr].
-	^result
+	[context notNil] whileTrue: [
+		context receiver == anObject ifTrue: [top := context caller].
+		context := context caller].
+	^top
+]
+
+{ #category : #printing }
+Context >> frameDescriptions: maxFrames [
+	| limit descriptions context |
+	limit := maxFrames ifNil: [SmallInteger maximum].
+	descriptions := OrderedCollection new.
+	context := self.
+	[context notNil and: [descriptions size < limit]] whileTrue: [
+		descriptions add: context frameDescription.
+		context := context caller].
+	context notNil ifTrue: [descriptions add: '... (truncated)', String cr].
+	^descriptions
 ]
 
 { #category : #accessing }

@@ -264,12 +264,16 @@ KernelModule >> suspendBecause: anException [
 
 { #category : #services }
 KernelModule >> terminateOnUnhandledExceptions [
-	unhandledErrorHandler := [:exception | self terminateSessionBecause: exception description]
+	unhandledErrorHandler := [:exception | self terminateSessionFor: exception]
 ]
 
 { #category : #services }
-KernelModule >> terminateSessionBecause: aString [
-	host logError: aString; logError: Processor activeProcess backtrace; exit: -1
+KernelModule >> terminateSessionFor: anException [
+	| top descriptions |
+	top := Processor activeProcess reifiedCopy topContext below: anException.
+	descriptions := top frameDescriptions: 64.
+	descriptions reverseDo: [:description | host logError: description].
+	host logError: anException description; exit: -1
 ]
 
 { #category : #services }
