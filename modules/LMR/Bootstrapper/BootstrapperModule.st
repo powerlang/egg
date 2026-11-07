@@ -10,6 +10,7 @@ Class {
 		'codeSegments',
 		'environment',
 		'kernelOverrides',
+		'placeholders',
 		'replacements',
 		'roots'
 	],
@@ -21,7 +22,7 @@ BootstrapperModule >> imports [
 	^{
 		#Kernel -> #(OrderedCollection IdentityDictionary Object Magnitude ProcessLMRStack ProtoObject SmallInteger CallbackBehavior MethodDictionary).
 		#'Kernel.LMR' -> #(LMRProtoObject).
-		#LMR -> #(Memory NativeCode SendSite GCSpace CriticalArray).
+		#LMR -> #(Memory NativeCode SendSite GCSpace CriticalArray GlobalDispatchCache).
 		#'LMR.Nativizer' -> #(NativizerModule NativizationPlatform NativizationEnvironment LookupNativizer LookupLinker)
 	}
 ]
@@ -61,6 +62,7 @@ BootstrapperModule >> bootstrapLMR: anLMRModule nativizer: aNativizerModule plat
 		nativizeInvokeFor: anLMRModule env: env nativizer: aNativizerModule;
 		nativizeWriteBarrierFor: anLMRModule env: env nativizer: aNativizerModule;
 		nativizeLookupFor: anLMRModule env: env nativizer: aNativizerModule;
+		initializeDispatchCache;
 		nativizeSendSiteStubs: env.
 
 	env initializeLinkersFor: anLMRModule; completeInitialization.
@@ -103,12 +105,16 @@ BootstrapperModule >> installSelfReferenceOn: aNativeCode [
 
 { #category : #bootstrapping }
 BootstrapperModule >> initializeGlobalsFor: anLMRModule [
-	| placeholders |
 	placeholders := anLMRModule class globalNames
 		collect: [:name | NativeCode new code: name , ' placeholder'].
 	anLMRModule
-		globals: placeholders;
+		globals: placeholders copy;
 		globalNamed: #SmallIntegerBehavior put: SmallInteger instanceBehavior
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> initializeDispatchCache [
+	GlobalDispatchCache current: GlobalDispatchCache new
 ]
 
 { #category : #bootstrapping }
@@ -343,7 +349,17 @@ BootstrapperModule >> segmentBuilderFor: aModule [
 	builder := aModule newSegmentBuilder.
 	(self requiresNativization: aModule) ifTrue: [builder nativizer: environment].
 	aModule == Kernel ifTrue: [self addKernelOverridesTo: builder].
+	self mapPlaceholdersIn: builder.
 	^builder
+]
+
+{ #category : #writing }
+BootstrapperModule >> mapPlaceholdersIn: aBuilder [
+	| globals |
+	globals := Memory module globals.
+	placeholders withIndexDo: [:placeholder :i | | global |
+		global := globals at: i.
+		global isNativeCode ifTrue: [aBuilder map: placeholder code to: global code]]
 ]
 
 { #category : #writing }
