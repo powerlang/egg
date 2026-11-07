@@ -57,7 +57,7 @@ FFIDescriptor >> callingConvention: ccCode [
 ]
 
 { #category : #accessing }
-FFIDescriptor >>returnType [
+FFIDescriptor >> returnType [
 	^self at: self size - 1
 ]
 
