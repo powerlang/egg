@@ -68,7 +68,10 @@ KernelModule >> bootstrap [
 	utf16 := UTF16 new.
 	utf32 := UTF32 new.
 	Symbol initializeSymbolTable.
-	namespace at: #SymbolTable put: Symbol symbolTable.
+	namespace
+		at: #SymbolTable put: Symbol symbolTable;
+		at: #NilToken put: HashTable nilToken;
+		at: #ByteCharacters put: Character byteCharacters.
 	Stream initializePools.
 	CharacterArray initializePools.
 	ProtoObject initializeConstants; initializeBitMasks.

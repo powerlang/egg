@@ -45,6 +45,11 @@ Character class >> bullet [
 	^Character value: 8226
 ]
 
+{ #category : #accessing }
+Character class >> byteCharacters [
+	^ByteCharacters
+]
+
 { #category : #'named characters' }
 Character class >> comma [
 	^$,
