@@ -2,6 +2,7 @@
 
 #include "Egg.h"
 #include "Allocator/Memory.h"
+#include "KnownConstants.h"
 
 #include <filesystem>
 #include <fstream>
@@ -67,12 +68,51 @@ void Launcher::loadImportsOf(Egg::FileImageSegment* segment)
 
 void Launcher::relocate()
 {
+    for (auto& [name, segment] : _segments)
+        segment->relocate();
     for (auto& [name, segment] : _segments) {
         auto sentinel = reinterpret_cast<Egg::Object*>(segment->spaceStart());
         std::vector<Egg::Object*> imports(segment->_importDescriptors.size(), sentinel);
-        segment->fixPointerSlots(imports);
+        if (name == "Kernel")
+            imports = this->kernelImports();
+        segment->bindImports(imports);
     }
     this->makeExecutable();
+}
+
+std::vector<Egg::Object*> Launcher::kernelImports()
+{
+    auto kernel = this->segmentNamed("Kernel");
+    std::vector<Egg::Object*> imports;
+    for (auto& descriptor : kernel->_importDescriptors) {
+        std::vector<std::string> tokens;
+        for (auto index : descriptor)
+            tokens.push_back(kernel->importStringAt_(index));
+        imports.push_back(this->bindKernelImport(tokens));
+    }
+    return imports;
+}
+
+Egg::Object* Launcher::bindKernelImport(const std::vector<std::string>& tokens)
+{
+    auto& linker = tokens[0];
+    auto segment = tokens.size() > 1 ? this->segmentNamed(tokens[1]) : nullptr;
+    if (segment && linker == "asModule" && tokens.size() == 2)
+        return (Egg::Object*)segment->header.module;
+    if (segment && (linker == "asClass" || linker == "asBehavior") && tokens.size() == 3) {
+        auto it = segment->_exports.find(tokens[2]);
+        if (it != segment->_exports.end()) {
+            if (linker == "asClass")
+                return (Egg::Object*)it->second;
+            Egg::Object* behavior = it->second->slot(Egg::Offsets::SpeciesInstanceBehavior);
+            if (Egg::FileImageSegment::isInternalReference(reinterpret_cast<uintptr_t>(behavior)))
+                return behavior;
+        }
+    }
+    std::string import;
+    for (auto& token : tokens)
+        import += " " + token;
+    throw std::runtime_error("the launcher cannot bind Kernel's import" + import);
 }
 
 void Launcher::makeExecutable()

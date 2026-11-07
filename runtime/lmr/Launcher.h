@@ -14,6 +14,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "FileImageSegment.h"
 
@@ -36,9 +37,12 @@ class Launcher
     Egg::FileImageSegment* segmentNamed(const std::string& module) const;
 
     /**
-     * Rebases every loaded segment. Imports are left unresolved (a sentinel).
+     * Rebases every loaded segment and binds Kernel's imports, which name
+     * classes, behaviors and modules exported by the other segments. The
+     * imports of the other segments are left unresolved (a sentinel).
      */
     void relocate();
+    std::vector<Egg::Object*> kernelImports();
     Egg::HeapObject* exported(const std::string& name);
     uint64_t run(const std::string& name);
 
@@ -49,6 +53,7 @@ class Launcher
 
     Egg::FileImageSegment* load(const std::string& module, const std::string& file);
     void loadImportsOf(Egg::FileImageSegment* segment);
+    Egg::Object* bindKernelImport(const std::vector<std::string>& tokens);
     void makeExecutable();
 };
 
