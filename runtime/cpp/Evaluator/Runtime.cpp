@@ -267,10 +267,12 @@ Object* Runtime::lookup_startingAt_(Object *symbol, HeapObject *behavior)
 {
     auto iter = _globalCache.find(global_cache_key(symbol,(Object*)behavior));
     if (iter != _globalCache.end()) {
-        auto result = iter->second->get();
-        return result;
+        auto& key = iter->first;
+        if (key.first->get() == symbol && key.second->get() == (Object*)behavior)
+            return iter->second->get();
+        return this->doLookup_startingAt_(symbol, behavior);
     }
-    
+
     auto method = this->doLookup_startingAt_(symbol, behavior);
     if (!method)
         return nullptr;
