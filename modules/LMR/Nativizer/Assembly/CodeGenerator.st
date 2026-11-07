@@ -601,6 +601,13 @@ CodeGenerator >> sqrtDouble: srcReg into: dstReg [
 ]
 
 { #category : #memory }
+CodeGenerator >> store: valueReg in: baseReg indexAt: indexReg [
+	| memref |
+	memref := self memRef: baseReg index: indexReg.
+	self store: valueReg intoMem: memref
+]
+
+{ #category : #memory }
 CodeGenerator >> store: srcReg intoMem: dstMemRef [
 	"Store `srcReg` into memory location `dstMemRef`. 
 
