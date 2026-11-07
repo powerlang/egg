@@ -40,7 +40,7 @@ FFIModule >> initializeFor: moduleName loader: loaderName [
 
 { #category : #private }
 FFIModule >> initializeLibC [
-	libc := LibC new.
+	libc := loader libcClass new.
 	loader bootstrapOpen: libc.
 	defaultHeap := mallocHeap := MallocHeap new
 ]

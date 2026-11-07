@@ -48,3 +48,8 @@ WindowsLibraryLoader >> open: anExternalLibrary [
 	handle := kernel32 LoadLibraryW: path externalCopy asParameter.
 	anExternalLibrary address: handle.
 ]
+
+{ #category : #accessing }
+WindowsLibraryLoader >> libcClass [
+	^WindowsLibC
+]

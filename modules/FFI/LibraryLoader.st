@@ -25,3 +25,7 @@ LibraryLoader >> findSymbol: aSymbol in: anExternalLibrary [
 	^self subclassResponsibility
 ]
 
+{ #category : #accessing }
+LibraryLoader >> libcClass [
+	^LibC
+]

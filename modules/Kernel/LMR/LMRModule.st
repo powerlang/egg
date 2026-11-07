@@ -19,7 +19,8 @@ LMRModule >> justLoaded [
 { #category : #spec }
 LMRModule >> imports [
 	^{
-		#Kernel -> #(ActiveProcess ArrayedCollection ByteArray CharacterArray Closure CompiledMethod Float HashTable LargeNegativeInteger LargePositiveInteger Message Namespace ProcessLMRStack ProcessStack Processor ProtoObject Species Symbol WordSize WordSizeShift)
+		#Kernel -> #(ActiveProcess ArrayedCollection ByteArray Character CharacterArray Closure CompiledMethod Float HashTable HostSystem LargeNegativeInteger LargePositiveInteger Message Namespace ProcessLMRStack ProcessStack Processor ProtoObject Species String Symbol WordSize WordSizeShift).
+		#FFI -> #(LibC)
 	}
 ] 
 

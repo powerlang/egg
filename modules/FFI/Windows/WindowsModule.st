@@ -17,5 +17,5 @@ WindowsModule >> externalCopyOfString: aString [
 
 { #category : #services }
 WindowsModule >> imports [
-	^{ #FFI -> #(ExternalLibrary LibraryLoader) }
+	^{ #FFI -> #(ExternalLibrary LibC LibraryLoader) }
 ]

@@ -20,8 +20,18 @@ LibC class >> linuxFilename [
 ]
 
 { #category : #accessing }
+LibC class >> windowsFilename [
+	^'ucrtbase.dll'
+]
+
+{ #category : #accessing }
 LibC >> calloc: anInteger size: size [
 	<cdecl: pointer calloc(pointer, pointer)>
+]
+
+{ #category : #accessing }
+LibC >> exit: anInteger [
+	<cdecl: void exit(sint32)>
 ]
 
 { #category : #accessing }
@@ -32,4 +42,14 @@ LibC >> free: address [
 { #category : #accessing }
 LibC >> malloc: anInteger [
 	<cdecl: pointer malloc(pointer)>
+]
+
+{ #category : #accessing }
+LibC >> timespecGet: aByteArray base: anInteger [
+	<cdecl: sint32 timespec_get(pointer, sint32)>
+]
+
+{ #category : #accessing }
+LibC >> write: anInteger address: aByteArray size: anotherInteger [
+	<cdecl: sint64 write(sint32, pointer, uint64)>
 ]
