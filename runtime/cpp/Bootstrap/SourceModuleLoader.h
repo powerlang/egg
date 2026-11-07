@@ -39,8 +39,9 @@ private:
     void createMethodsOf_(Object* cls, ClassSpec* spec);
     void createNewMethod_(const Egg::string& source, Object* species, const Egg::string& category = Egg::string(""));
     Object* newMethodFrom_(SCompiledMethod* smethod, const Egg::string& source, Object* species);
-    Object* ffiMethodClass_();
+    Object* ffiClassNamed_(const std::string& name);
     void initializeFFIMethod_(Object* method, SCompiledMethod* smethod);
+    void initializeDescriptor_(Object* method, SCompiledMethod* smethod);
     [[noreturn]] static void rethrowWithContext_(const std::exception& e,
                                                 const Egg::string& className,
                                                 const std::string& side,

@@ -44,6 +44,7 @@ class Launcher
     void relocate();
     std::vector<Egg::Object*> kernelImports();
     Egg::HeapObject* exported(const std::string& name);
+    void* entry(const std::string& name);
     uint64_t run(const std::string& name);
 
   private:

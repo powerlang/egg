@@ -25,6 +25,11 @@ CallbackMethod >> descriptor: anFFIDescriptor [
 	descriptor := anFFIDescriptor
 ]
 
+{ #category : #testing }
+CallbackMethod >> hasFrame [
+	^true
+]
+
 { #category : #accessing }
 CallbackMethod >> isCallback [
 	^true

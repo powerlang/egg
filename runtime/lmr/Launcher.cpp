@@ -132,13 +132,16 @@ Egg::HeapObject* Launcher::exported(const std::string& name)
     return it == _segment->_exports.end() ? nullptr : it->second;
 }
 
-uint64_t Launcher::run(const std::string& name)
+void* Launcher::entry(const std::string& name)
 {
     auto nativeCode = exported(name);
     auto machineCode = reinterpret_cast<Egg::HeapObject*>(nativeCode->slot(0));
-    auto code = reinterpret_cast<uint8_t*>(&machineCode->byte(0));
-    auto entry = reinterpret_cast<uint64_t (*)()>(code);
-    return entry();
+    return &machineCode->byte(0);
+}
+
+uint64_t Launcher::run(const std::string& name)
+{
+    return reinterpret_cast<uint64_t (*)()>(this->entry(name))();
 }
 
 } // namespace lmr
