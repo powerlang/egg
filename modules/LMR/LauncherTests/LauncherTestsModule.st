@@ -12,7 +12,7 @@ Class {
 { #category : #spec }
 LauncherTestsModule >> imports [
 	^{
-		#Kernel -> #(ActiveProcess ImageSegment).
+		#Kernel -> #(ActiveProcess ImageSegment MessageNotUnderstood).
 		#FFI -> #(ExternalLibrary ExternalMemory).
 		#LMR -> #(Memory).
 		#'FFI.Posix' -> #(DLLibrary).
@@ -258,6 +258,18 @@ LauncherTestsModule >> hashFor [
 LauncherTestsModule >> atIfAbsent [
 	<callback: slong ()>
 	^(ActiveProcess methodDictionary at: #launch: ifAbsent: [nil]) isNil ifTrue: [0] ifFalse: [1]
+]
+
+{ #category : #entries }
+LauncherTestsModule >> findFirst [
+	<callback: slong ()>
+	^ActiveProcess methodDictionary contents findFirst: [:each | each == #launch:] startingAt: 9
+]
+
+{ #category : #entries }
+LauncherTestsModule >> handlesDnu [
+	<callback: slong ()>
+	^[self zork. 0] on: MessageNotUnderstood do: [:e | e message selector size]
 ]
 
 { #category : #entries }

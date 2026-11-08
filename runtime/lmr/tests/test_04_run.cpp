@@ -192,7 +192,8 @@ TEST_CASE("native code looks up method dictionaries and symbol hashes", "[run]")
         {"valueAt", 1},
         {"lookupKey", 1},
         {"hashFor", 30916},
-        {"atIfAbsent", 1}};
+        {"atIfAbsent", 1},
+        {"findFirst", 9}};
     for (auto& [entry, value] : expected) {
         INFO("entry: " << entry);
         lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
@@ -320,4 +321,12 @@ TEST_CASE("the native host makes memory executable", "[run]")
     launcher.bind("LMR.LauncherTests");
     launcher.relocate();
     REQUIRE((launcher.run("makesExecutable") >> 1) == 42);
+}
+
+TEST_CASE("native code handles a message not understood", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+    REQUIRE((launcher.run("handlesDnu") >> 1) == 4);
 }
