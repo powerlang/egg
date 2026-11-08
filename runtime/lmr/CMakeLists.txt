@@ -52,5 +52,7 @@ lmr_executable(lmr)
 
 add_test(NAME LmrHelloWorld COMMAND lmr ${CMAKE_CURRENT_SOURCE_DIR}/../../image-segments/lmr Examples.HelloWorld)
 set_tests_properties(LmrHelloWorld PROPERTIES PASS_REGULAR_EXPRESSION "Hello, World!")
+add_test(NAME LmrUnhandledError COMMAND lmr ${CMAKE_CURRENT_SOURCE_DIR}/../../image-segments/lmr NoSuchModule)
+set_tests_properties(LmrUnhandledError PROPERTIES PASS_REGULAR_EXPRESSION "cannot open .*NoSuchModule.ems")
 
 add_subdirectory(tests)
