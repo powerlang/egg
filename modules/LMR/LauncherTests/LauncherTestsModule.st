@@ -37,3 +37,16 @@ LauncherTestsModule >> allocation [
 	<callback: slong ()>
 	^(ByteArray new: 3) size
 ]
+
+{ #category : #entries }
+LauncherTestsModule >> capture [
+	<callback: slong ()>
+	^self capture: 3 and: 4
+]
+
+{ #category : #testing }
+LauncherTestsModule >> capture: anInteger and: anotherInteger [
+	| block |
+	block := [anInteger].
+	^block value
+]

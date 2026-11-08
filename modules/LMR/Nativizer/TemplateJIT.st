@@ -157,7 +157,7 @@ TemplateJIT >> captureVariable: stream index: anInteger [
 	pos := stream next.
 	type = LocalArgument ifTrue: [
 		assembler
-			loadTwithFPindex: pos + 2;
+			loadTwithFPindex: 3 + self argumentCount - pos;
 			storeTinRindex: anInteger].
 	type = EnvironmentValue
 		ifTrue: [assembler loadTwithEindex: pos; storeTinRindex: anInteger]

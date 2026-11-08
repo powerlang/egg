@@ -66,3 +66,14 @@ TEST_CASE("native code allocates in the Kernel space before startUp", "[run]")
     auto result = launcher.run("allocation");
     REQUIRE((result >> 1) == 3);
 }
+
+TEST_CASE("a closure captures the method argument it names", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    REQUIRE(launcher.loaded());
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+
+    auto result = launcher.run("capture");
+    REQUIRE((result >> 1) == 3);
+}
