@@ -417,19 +417,9 @@ BootstrapperModule >> kernelOverrides [
 
 { #category : #bootstrapping }
 BootstrapperModule >> addExtensionsOf: aModule into: aCollection [
-	aModule extensions keysAndValuesDo: [:key :methods | | meta name class target |
-		meta := key endsWith: ' class'.
-		name := meta ifTrue: [(key trimTail: ' class') asSymbol] ifFalse: [key].
-		class := aModule namespace at: name.
-		target := meta ifTrue: [class class] ifFalse: [class].
-		self addExtensions: methods of: target into: aCollection]
-]
-
-{ #category : #bootstrapping }
-BootstrapperModule >> addExtensions: aCollection of: aClass into: anOrderedCollection [
-	aCollection do: [:method | | copy |
-		copy := (aClass compiledMethodAt: method selector) copy.
-		self add: copy replacing: method into: anOrderedCollection]
+	aModule extensionsDo: [:target :method | | copy |
+		copy := method copy.
+		self add: copy replacing: method into: aCollection]
 ]
 
 { #category : #bootstrapping }

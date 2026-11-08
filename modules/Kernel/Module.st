@@ -50,9 +50,10 @@ Module >> addClass: aClass [
 
 { #category : #services }
 Module >> addExtension: aCompiledMethod [
-	| collection | 
+	| collection extension |
 	collection := extensions at: aCompiledMethod classBinding symbol ifAbsentPut: [OrderedCollection new].
-	collection add: aCompiledMethod.
+	extension := aCompiledMethod asExtensionFor: self.
+	collection add: extension
 ]
 
 { #category : #services }
@@ -77,17 +78,10 @@ Module >> bind [
 	classes
 		reject: [:c | classes includes: c superclass]
 		thenDo: [:c | c superclass addSubclass: c].
-	extensions keysAndValuesDo: [:s :methods | | meta key target |
-		meta := s endsWith: ' class'.
-		key := meta ifTrue: [(s trimTail: ' class') asSymbol] ifFalse: [s].
-		target := namespace at: key ifAbsent: [self _halt].
-		meta ifTrue: [target := target class].
-		methods do: [:m | | current extension |
-			current := target compiledMethodAt: m selector.
-			extension := m asExtensionFor: self.
-			target addSelector: m selector withMethod: extension.
-			current notNil ifTrue: [current module addOverride: current]]
-	]
+	self extensionsDo: [:target :m | | current |
+		current := target compiledMethodAt: m selector.
+		target addSelector: m selector withMethod: m.
+		current notNil ifTrue: [current module addOverride: current]]
 ]
 
 { #category : #services }
@@ -179,6 +173,27 @@ Module >> exportClass: aClass [
 { #category : #accessing }
 Module >> extensions [
 	^extensions
+]
+
+{ #category : #enumerating }
+Module >> extensions: aCollection of: aString do: aBlock [
+	| target |
+	target := self extensionTarget: aString.
+	aCollection do: [:m | aBlock value: target value: m]
+]
+
+{ #category : #enumerating }
+Module >> extensionsDo: aBlock [
+	extensions keysAndValuesDo: [:s :methods | self extensions: methods of: s do: aBlock]
+]
+
+{ #category : #private }
+Module >> extensionTarget: aString [
+	| meta key target |
+	meta := aString endsWith: ' class'.
+	key := meta ifTrue: [(aString trimTail: ' class') asSymbol] ifFalse: [aString].
+	target := namespace at: key ifAbsent: [self _halt].
+	^meta ifTrue: [target class] ifFalse: [target]
 ]
 
 { #category : #inquiries }

@@ -450,6 +450,13 @@ LauncherTestsModule >> passesFloatArguments [
 		floatArguments: 1.5 d2: 2.5 d3: 3.5 d4: 4.5 d5: 5.5 d6: 6.5 d7: 7.5 d8: 8.5 f9: 9.5 d10: 10.5 f11: 11.5) truncated
 ]
 
+{ #category : #entries }
+LauncherTestsModule >> sendsBoundExtension [
+	<callback: slong ()>
+	self startFFI.
+	^#[7 8 9] externalCopy at: 2
+]
+
 { #category : #services }
 LauncherTestsModule >> testLibrary [
 	| library |

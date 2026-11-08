@@ -93,7 +93,18 @@ LMRHostSystem >> stringAt: address [
 { #category : #services }
 LMRHostSystem >> startUp [
 	self registerBoundModules.
-	LibC module initializeForCurrentPlatform
+	LibC module initializeForCurrentPlatform.
+	self installExtensions
+]
+
+{ #category : #services }
+LMRHostSystem >> installExtensions [
+	self boundModules do: [:module | module ifNotNil: [self installExtensionsOf: module]]
+]
+
+{ #category : #services }
+LMRHostSystem >> installExtensionsOf: aModule [
+	aModule extensionsDo: [:target :method | target methodDictionary at: method selector putWithoutFlushing: method]
 ]
 
 { #category : #services }

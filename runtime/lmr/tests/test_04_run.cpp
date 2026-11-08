@@ -375,6 +375,15 @@ TEST_CASE("native callouts pass integers, floats and stack arguments", "[run]")
     }
 }
 
+TEST_CASE("bound modules' extension methods run natively", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    launcher.bindFFI();
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+    REQUIRE(launcher.run("sendsBoundExtension") == 8);
+}
+
 TEST_CASE("a nativized callback receives its C arguments", "[run]")
 {
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
