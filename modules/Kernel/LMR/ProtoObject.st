@@ -262,7 +262,7 @@ LMRProtoObject >> _pointersSize [
 { #category : #'raw access' }
 LMRProtoObject >> _uLongAtValidOffset: offset put: anInteger [
 	anInteger size > 4 ifTrue: [self error: 'does not fit in 32 bits'].
-	self _primitiveULongAtOffset: offset put: anInteger.
+	self _uLongAtOffset: offset put: anInteger.
 	^anInteger
 ]
 

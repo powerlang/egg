@@ -291,6 +291,15 @@ LauncherTestsModule >> readsFile [
 ]
 
 { #category : #entries }
+LauncherTestsModule >> writesLongs [
+	| bytes |
+	<callback: slong ()>
+	bytes := ByteArray new: 8.
+	bytes uLongAtOffset: 4 put: 16rF0000000 + 42.
+	^(bytes uLongAtOffset: 4) - 16rF0000000
+]
+
+{ #category : #entries }
 LauncherTestsModule >> allocatesHeap [
 	| address memory |
 	<callback: slong ()>

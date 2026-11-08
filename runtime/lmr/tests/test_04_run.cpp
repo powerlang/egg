@@ -250,6 +250,14 @@ TEST_CASE("the native host reserves commits and releases memory", "[run]")
     REQUIRE((launcher.run("reservesMemory") >> 1) == 42);
 }
 
+TEST_CASE("native code writes 32-bit integers into bytes", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+    REQUIRE((launcher.run("writesLongs") >> 1) == 42);
+}
+
 TEST_CASE("the native host allocates in the heap block", "[run]")
 {
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
