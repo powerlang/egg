@@ -65,3 +65,15 @@ LauncherTestsModule >> negations [
 	second := (false orNot: [true]) ifTrue: [0] ifFalse: [2].
 	^first + second
 ]
+
+{ #category : #entries }
+LauncherTestsModule >> nonLocalReturn [
+	<callback: slong ()>
+	^self firstEven + 10
+]
+
+{ #category : #testing }
+LauncherTestsModule >> firstEven [
+	#(1 2 3) do: [:each | each even ifTrue: [^each]].
+	^0
+]

@@ -99,3 +99,14 @@ TEST_CASE("inlined andNot: and orNot: negate their last condition", "[run]")
     auto result = launcher.run("negations");
     REQUIRE((result >> 1) == 3);
 }
+
+TEST_CASE("a non-local return returns from the closure's home method", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    REQUIRE(launcher.loaded());
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+
+    auto result = launcher.run("nonLocalReturn");
+    REQUIRE((result >> 1) == 12);
+}
