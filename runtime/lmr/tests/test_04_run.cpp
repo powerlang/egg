@@ -33,3 +33,25 @@ TEST_CASE("the launcher tests module exports its entries", "[run]")
     auto result = launcher.run("start");
     REQUIRE((result >> 1) == 42);
 }
+
+TEST_CASE("a native send runs once its segment is bound", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    REQUIRE(launcher.loaded());
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+
+    auto result = launcher.run("send");
+    REQUIRE((result >> 1) == 42);
+}
+
+TEST_CASE("a static send runs a Kernel.LMR replacement", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    REQUIRE(launcher.loaded());
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+
+    auto result = launcher.run("sendsToReplacement");
+    REQUIRE((result >> 1) == 1);
+}

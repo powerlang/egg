@@ -43,6 +43,16 @@ SymbolicReference class >> forCharacter: aCharacter [
 ]
 
 { #category : #knownObjects }
+SymbolicReference class >> forMethod: aCompiledMethod [
+	| species linker |
+	species := aCompiledMethod classBinding.
+	linker := species isMetaclass ifTrue: [#asMetaclassMethod] ifFalse: [#asMethod].
+	^self new
+		linker: linker;
+		token: {aCompiledMethod module name. species instanceClass name. aCompiledMethod selector}
+]
+
+{ #category : #knownObjects }
 SymbolicReference class >> forModule: aModule [
 	^self new linker: #asModule; token: aModule name
 ]
@@ -99,6 +109,16 @@ SymbolicReference >> asMvar [
 { #category : #linking }
 SymbolicReference >> asMetaclass [
 	^self asClass class
+]
+
+{ #category : #linking }
+SymbolicReference >> asMethod [
+	^self asClass >> token third asSymbol
+]
+
+{ #category : #linking }
+SymbolicReference >> asMetaclassMethod [
+	^self asClass class >> token third asSymbol
 ]
 
 { #category : #linking }

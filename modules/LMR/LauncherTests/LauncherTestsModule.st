@@ -14,3 +14,20 @@ LauncherTestsModule >> start [
 	<callback: slong ()>
 	^42
 ]
+
+{ #category : #entries }
+LauncherTestsModule >> sendsToReplacement [
+	<callback: slong ()>
+	^self class == LauncherTestsModule ifTrue: [1] ifFalse: [0]
+]
+
+{ #category : #entries }
+LauncherTestsModule >> send [
+	<callback: slong ()>
+	^self answer
+]
+
+{ #category : #sending }
+LauncherTestsModule >> answer [
+	^42
+]

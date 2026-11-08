@@ -62,6 +62,7 @@ class Launcher
     void collectSymbols();
     Egg::Object* kernelExport(const std::string& name);
     Egg::Object* bindImport(const std::vector<std::string>& tokens);
+    Egg::Object* methodIn(Egg::HeapObject* behavior, Egg::Object* selector);
     void makeExecutable();
 };
 

@@ -163,10 +163,33 @@ Egg::Object* Launcher::bindImport(const std::vector<std::string>& tokens)
                 return object;
         }
     }
+    if (segment && tokens.size() == 4 && (linker == "asMethod" || linker == "asMetaclassMethod")) {
+        auto it = segment->_exports.find(tokens[2]);
+        auto selector = _symbols.find(tokens[3]);
+        if (it != segment->_exports.end() && selector != _symbols.end()) {
+            auto species = it->second;
+            auto behavior = linker == "asMethod"
+                ? species->slot(Egg::Offsets::SpeciesInstanceBehavior)->asHeapObject()
+                : species->behavior();
+            auto method = this->methodIn(behavior, selector->second);
+            if (method)
+                return method;
+        }
+    }
     std::string import;
     for (auto& token : tokens)
         import += " " + token;
     throw std::runtime_error("the launcher cannot bind the import" + import);
+}
+
+Egg::Object* Launcher::methodIn(Egg::HeapObject* behavior, Egg::Object* selector)
+{
+    auto dictionary = behavior->slot(Egg::Offsets::BehaviorMethodDictionary)->asHeapObject();
+    auto table = dictionary->slot(Egg::Offsets::DictionaryTable)->asHeapObject();
+    for (uintptr_t i = 1; i + 1 < table->size(); i += 2)
+        if (table->slot(i) == selector)
+            return table->slot(i + 1);
+    return nullptr;
 }
 
 void Launcher::makeExecutable()
