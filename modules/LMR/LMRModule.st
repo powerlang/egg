@@ -60,7 +60,7 @@ LMRModule >> globals [
 LMRModule >> imports [
 	^{
 		#Kernel -> #(ByteArray Ephemeron IdentityDictionary IdentitySet KernelModule LinkedCollection ProcessLMRStack ProcessStack ProtoObject SequenceableCollection WeakArray WeakIdentitySet WordSize WordSizeShift Processor).
-		#'Kernel.LMR' -> #(HostLinkage LMRProtoObject)
+		#'Kernel.LMR' -> #(LMRProtoObject)
 	}
 ] 
 

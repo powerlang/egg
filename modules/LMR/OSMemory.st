@@ -110,11 +110,12 @@ OSMemory >> sizeAt: address [
 
 { #category : #private }
 OSMemory >> takeFree: bytes [
-	| address next |
-	address := (HostLinkage at: 4) alignedTo: self reservationAlignment.
+	| host address next |
+	host := Kernel host.
+	address := host heapNext alignedTo: self reservationAlignment.
 	next := address + bytes.
-	next > (HostLinkage at: 5) ifTrue: [^0].
-	HostLinkage at: 4 put: next.
+	next > host heapLimit ifTrue: [^0].
+	host heapNext: next.
 	^address
 ]
 

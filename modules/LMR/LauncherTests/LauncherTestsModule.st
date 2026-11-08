@@ -14,7 +14,6 @@ LauncherTestsModule >> imports [
 	^{
 		#Kernel -> #(ActiveProcess ImageSegment MessageNotUnderstood).
 		#FFI -> #(ExternalLibrary ExternalMemory).
-		#'Kernel.LMR' -> #(HostLinkage).
 		#LMR -> #(Memory).
 		#'FFI.Posix' -> #(DLLibrary).
 		#'FFI.Windows' -> #(KernelDLL).
@@ -456,7 +455,7 @@ LauncherTestsModule >> testLibrary [
 	| library |
 	self startFFI.
 	library := LauncherTestsLibrary new initialize.
-	library address: (HostLinkage at: 2).
+	library address: Kernel host loaderHandle.
 	^library
 ]
 

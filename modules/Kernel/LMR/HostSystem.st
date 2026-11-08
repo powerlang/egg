@@ -61,15 +61,17 @@ LMRHostSystem >> write: aString to: anInteger [
 
 { #category : #services }
 LMRHostSystem >> initializeFFI: anExternalLibrary symbolFinder: anFFIMethod [
-	anExternalLibrary address: (HostLinkage at: 2).
-	anFFIMethod address: (HostLinkage at: 1)
+	anExternalLibrary address: self loaderHandle.
+	anFFIMethod address: self symbolFinder
 ]
 
 { #category : #services }
 LMRHostSystem >> arguments [
 	| argv |
-	argv := HostLinkage at: 8.
-	^(0 to: (HostLinkage at: 7) - 1) collect: [:i | self stringAt: (self pointerAt: argv + (i * WordSize))]
+	argv := self argumentVector.
+	^(0 to: self argumentCount - 1) collect: [:i | | address |
+		address := self pointerAt: argv + (i * WordSize).
+		self stringAt: address]
 ]
 
 { #category : #private }
@@ -96,14 +98,14 @@ LMRHostSystem >> startUp [
 
 { #category : #services }
 LMRHostSystem >> registerBoundModules [
-	(HostLinkage at: 6) do: [:module |
+	self boundModules do: [:module |
 		module ifNotNil: [Kernel loadedModules at: module name asSymbol put: module]]
 ]
 
 { #category : #services }
 LMRHostSystem >> platformName [
 	| rawName |
-	rawName := HostLinkage at: 3.
+	rawName := self rawPlatformName.
 	^rawName upTo: Character null
 ]
 
@@ -145,4 +147,49 @@ LMRHostSystem >> reserve: size [
 { #category : #memory }
 LMRHostSystem >> makeExecutable: address size: size [
 	^LibC module os makeExecutable: address size: size
+]
+
+{ #category : #linkage }
+LMRHostSystem >> symbolFinder [
+	^HostLinkage at: 1
+]
+
+{ #category : #linkage }
+LMRHostSystem >> loaderHandle [
+	^HostLinkage at: 2
+]
+
+{ #category : #linkage }
+LMRHostSystem >> rawPlatformName [
+	^HostLinkage at: 3
+]
+
+{ #category : #linkage }
+LMRHostSystem >> heapNext [
+	^HostLinkage at: 4
+]
+
+{ #category : #linkage }
+LMRHostSystem >> heapNext: anInteger [
+	HostLinkage at: 4 put: anInteger
+]
+
+{ #category : #linkage }
+LMRHostSystem >> heapLimit [
+	^HostLinkage at: 5
+]
+
+{ #category : #linkage }
+LMRHostSystem >> boundModules [
+	^HostLinkage at: 6
+]
+
+{ #category : #linkage }
+LMRHostSystem >> argumentCount [
+	^HostLinkage at: 7
+]
+
+{ #category : #linkage }
+LMRHostSystem >> argumentVector [
+	^HostLinkage at: 8
 ]
