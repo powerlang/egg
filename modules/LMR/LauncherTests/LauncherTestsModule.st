@@ -562,6 +562,23 @@ LauncherTestsModule >> reifiesStack [
 ]
 
 { #category : #entries }
+LauncherTestsModule >> keepsYoungImports [
+	| contents segment strings index module selector |
+	<callback: slong ()>
+	self startFFI.
+	Memory current startUp.
+	contents := Kernel host readFile: 'launcher-tests-segment.ems'.
+	segment := ImageSegment on: contents.
+	strings := segment importStrings.
+	index := strings indexOf: 'main:'.
+	strings at: index put: 'launcherTestsFresh:'.
+	module := segment install.
+	1 to: 300 do: [:i | (Array new: 8190) atAllPut: true].
+	selector := module class methodDictionary keys detect: [:s | s size = 19] ifNone: [^1].
+	^selector asString = 'launcherTestsFresh:' ifTrue: [42] ifFalse: [2]
+]
+
+{ #category : #entries }
 LauncherTestsModule >> keepsSymbolIdentity [
 	| module |
 	<callback: slong ()>

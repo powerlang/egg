@@ -391,6 +391,19 @@ ImageSegment >> importIndexOf: anInteger [
 ]
 
 { #category : #installing }
+ImageSegment >> holdReferencesAt: address [
+	self objectsDo: [:object | self holdReferencesOf: object at: address]
+]
+
+{ #category : #installing }
+ImageSegment >> holdReferencesOf: anInteger at: address [
+	| oop object |
+	oop := address + anInteger.
+	object := (oop // 2) _asObject.
+	1 to: object _pointersSize do: [:i | (object _basicAt: i) _holdRefererIfNeeded: object]
+]
+
+{ #category : #installing }
 ImageSegment >> install [
 	| host address |
 	host := Kernel host.
@@ -400,6 +413,7 @@ ImageSegment >> install [
 		linkImports;
 		bindImports: imports.
 	host libc memcpy: address from: bytes size: self storedSize.
+	self holdReferencesAt: address.
 	codeSize = 0 ifFalse: [host makeExecutable: address + self codeStart size: codeSize].
 	^(self module // 2) _asObject
 ]
