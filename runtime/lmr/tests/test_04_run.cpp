@@ -13,6 +13,7 @@
 #include "SegmentPath.h"
 #include "FFIGlue.h"
 
+#include <cmath>
 #include <cstdio>
 #include <cstring>
 #include <filesystem>
@@ -405,6 +406,21 @@ TEST_CASE("native code copies a string out to C memory", "[run]")
     launcher.bind("LMR.LauncherTests");
     launcher.relocate();
     REQUIRE(launcher.run("copiesStringOut") == 'g');
+}
+
+TEST_CASE("native floats compute logarithms and trigonometry through libm", "[run]")
+{
+    const std::pair<const char*, int64_t> expected[] = {
+        {"logarithm", (int64_t)(std::log(1000.0) * 100)},
+        {"trigonometry", (int64_t)((std::sin(0.5) + std::cos(0.5) + std::tan(0.5) + std::atan(1.0) + std::exp(1.0)) * 1000)}};
+    for (auto& [entry, value] : expected) {
+        INFO("entry: " << entry);
+        lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+        launcher.bindFFI();
+        launcher.bind("LMR.LauncherTests");
+        launcher.relocate();
+        REQUIRE(launcher.run(entry) == value);
+    }
 }
 
 TEST_CASE("a nativized callback receives its C arguments", "[run]")

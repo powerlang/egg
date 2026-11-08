@@ -40,6 +40,11 @@ LMRHostSystem >> libc [
 	^LibC module libc
 ]
 
+{ #category : #accessing }
+LMRHostSystem >> libm [
+	^LibC module libm
+]
+
 { #category : #logging }
 LMRHostSystem >> log: aString level: anInteger [
 	| fd prefix text newline |

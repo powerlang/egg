@@ -10,7 +10,8 @@ Class {
 		'loader',
 		'mallocHeap',
 		'defaultHeap',
-		'libc'
+		'libc',
+		'libm'
 	],
 	#category : #FFI
 }
@@ -90,6 +91,12 @@ FFIModule >> initialize [
 { #category : #accessing }
 FFIModule >> libc [
 	^libc
+]
+
+{ #category : #accessing }
+FFIModule >> libm [
+	libm ifNil: [libm := LibM new initialize; open; yourself].
+	^libm
 ]
 
 { #category : #accessing }

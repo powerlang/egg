@@ -496,6 +496,20 @@ LauncherTestsModule >> copiesStringOut [
 	^(copy at: 2) + (copy at: 4)
 ]
 
+{ #category : #entries }
+LauncherTestsModule >> logarithm [
+	<callback: slong ()>
+	self startFFI.
+	^(1000.0 ln * 100) truncated
+]
+
+{ #category : #entries }
+LauncherTestsModule >> trigonometry [
+	<callback: slong ()>
+	self startFFI.
+	^(0.5 sin + 0.5 cos + 0.5 tan + 1.0 arcTan + 1.0 exp * 1000) truncated
+]
+
 { #category : #services }
 LauncherTestsModule >> testLibrary [
 	| library |

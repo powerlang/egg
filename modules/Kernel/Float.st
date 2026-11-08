@@ -449,7 +449,7 @@ Float >> abs [
 
 { #category : #trigonometry }
 Float >> arcTan [
-	^Kernel host libc atan: self
+	^Kernel host libm atan: self
 ]
 
 { #category : #converting }
@@ -529,7 +529,7 @@ Float >> coerce: aNumber [
 
 { #category : #trigonometry }
 Float >> cos [
-	^Kernel host libc cos: self
+	^Kernel host libm cos: self
 ]
 
 { #category : #trigonometry }
@@ -549,7 +549,7 @@ Float >> errorOn: aSymbol status: anInteger [
 
 { #category : #logarithms }
 Float >> exp [
-	^Kernel host libc exp: self
+	^Kernel host libm exp: self
 ]
 
 { #category : #accessing }
@@ -655,7 +655,7 @@ Float >> isSpecialValue [
 Float >> ln [
 	self > 0
 		ifFalse: [^self error: 'ln is not defined for ' , self printString].
-	^Kernel host libc log: self
+	^Kernel host libm log: self
 ]
 
 { #category : #accessing }
@@ -812,7 +812,7 @@ Float >> significand [
 
 { #category : #trigonometry }
 Float >> sin [
-	^Kernel host libc sin: self
+	^Kernel host libm sin: self
 ]
 
 { #category : #accessing }
@@ -832,7 +832,7 @@ Float >> storeOn: aStream [
 
 { #category : #trigonometry }
 Float >> tan [
-	^Kernel host libc tan: self
+	^Kernel host libm tan: self
 ]
 
 { #category : #arithmetic }
