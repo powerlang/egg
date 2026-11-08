@@ -30,7 +30,7 @@ PosixLibraryLoader >> bootstrapOpen: anExternalLibrary [
 	| filename path parameter handle |
 	filename := self libraryFilename: anExternalLibrary class.
 	path := anExternalLibrary class libpath, filename.
-	parameter := Array with: path.
+	parameter := path nullTerminated.
 	handle := filename = 'libc.dylib'
 		ifTrue: [dl handle asInteger]
 		ifFalse: [dl dlopen: parameter flags: 1. "RTLD_LAZY"].
@@ -40,12 +40,12 @@ PosixLibraryLoader >> bootstrapOpen: anExternalLibrary [
 
 { #category : #accessing }
 PosixLibraryLoader >> close: anExternalLibrary [
-	dl dlclose: anExternalLibrary asParameter
+	dl dlclose: anExternalLibrary
 ]
 
 { #category : #accessing }
 PosixLibraryLoader >> findSymbol: aSymbol in: anExternalLibrary [
-	^dl dlsym: anExternalLibrary asParameter symbol: aSymbol externalCopy asParameter
+	^dl dlsym: anExternalLibrary symbol: aSymbol nullTerminated
 ]
 
 { #category : #accessing }

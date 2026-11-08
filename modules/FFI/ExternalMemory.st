@@ -100,7 +100,7 @@ ExternalMemory >> asInteger [
 
 { #category : #converting }
 ExternalMemory >> asParameter [
-	^address
+	^self
 ]
 
 { #category : #converting }
@@ -550,3 +550,7 @@ ExternalMemory >> writeStream [
 	^writer
 ]
 
+{ #category : #marshalling }
+ExternalMemory >> marshalOn: aStream [
+	aStream putBytesFrom: address from: 1 to: WordSize
+]

@@ -33,3 +33,8 @@ ExternalHandle >> initialize [
 { #category : #'testing' }
 ExternalHandle >> release [
 ]
+
+{ #category : #marshalling }
+ExternalHandle >> marshalOn: aStream [
+	aStream putBytesFrom: self from: 1 to: WordSize
+]

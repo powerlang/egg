@@ -70,3 +70,26 @@ FFIDescriptor >> returnTypeName [
 FFIDescriptor >> returnType: anInteger [
 	self at: self size - 1 put: anInteger
 ]
+
+{ #category : #marshalling }
+FFIDescriptor >> marshalArguments: anArray [
+	| buffer stream |
+	buffer := ByteArray new: (anArray size max: 1) * WordSize.
+	stream := buffer writeStream.
+	anArray do: [:argument | argument marshalOn: stream].
+	^buffer
+]
+
+{ #category : #marshalling }
+FFIDescriptor >> resultFrom: aByteArray [
+	| type float |
+	type := self returnTypeName.
+	type == #void ifTrue: [^0].
+	(type == #float or: [type == #double]) ifTrue: [
+		float := Float new.
+		float replaceBytesFrom: 1 to: 8 with: aByteArray startingAt: 1.
+		^float].
+	^type first = $s
+		ifTrue: [aByteArray largeAtOffset: 0]
+		ifFalse: [aByteArray pointerAtOffset: 0]
+]

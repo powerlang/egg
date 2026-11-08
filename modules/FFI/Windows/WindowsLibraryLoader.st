@@ -20,14 +20,14 @@ Class {
 WindowsLibraryLoader >> bootstrapOpen: anExternalLibrary [
 	| path parameter handle |
 	path := anExternalLibrary class libpath, anExternalLibrary class windowsFilename.
-	parameter := Array with: path.
+	parameter := path nullTerminated.
 	handle := kernel32 LoadLibraryW: parameter.
 	anExternalLibrary handle: handle.
 ]
 
 { #category : #accessing }
 WindowsLibraryLoader >> findSymbol: aSymbol in: anExternalLibrary [
-	^kernel32 GetProcAddressW: anExternalLibrary asParameter lpProcName: aSymbol externalCopy asParameter.
+	^kernel32 GetProcAddressW: anExternalLibrary lpProcName: aSymbol nullTerminated
 ]
 
 { #category : #accessing }

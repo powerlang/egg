@@ -68,3 +68,8 @@ ExternalLibrary >> initialize [
 ExternalLibrary >> open [
 	self loader open: self
 ]
+
+{ #category : #marshalling }
+ExternalLibrary >> marshalOn: aStream [
+	handle marshalOn: aStream
+]
