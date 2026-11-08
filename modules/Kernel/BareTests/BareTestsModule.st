@@ -404,6 +404,22 @@ BareTestsModule >> test250RequireBindsSubmodule [
 ]
 
 { #category : #tests }
+BareTestsModule >> test280ImageSegmentRelocatesItsReferences [
+	| contents original segment base module offset first |
+	contents := Kernel host readFile: 'image-segments/lmr/LMR.LauncherTests.ems'.
+	original := contents copy.
+	segment := ImageSegment on: contents.
+	base := segment baseAddress.
+	module := segment module.
+	offset := module - base.
+	first := original pointerAtOffset: offset.
+	segment relocateTo: base + 16r100000.
+	^segment module = (module + 16r100000)
+		and: [segment baseAddress = (base + 16r100000)
+		and: [(first bitAnd: 3) != 0 or: [(contents pointerAtOffset: offset) = (first + 16r100000)]]]
+]
+
+{ #category : #tests }
 BareTestsModule >> test270ImageSegmentLinksItsImports [
 	| contents segment strings symbols classes |
 	contents := Kernel host readFile: 'image-segments/lmr/LMR.LauncherTests.ems'.
@@ -483,7 +499,8 @@ BareTestsModule >> main: anArray [
 		test240HashTablePrimeForReturnsNextGoodPrime
 		test250RequireBindsSubmodule
 		test260ImageSegmentParsesAnEmsFile
-		test270ImageSegmentLinksItsImports).
+		test270ImageSegmentLinksItsImports
+		test280ImageSegmentRelocatesItsReferences).
 	tests do: [:sel |
 		(self runTest: sel)
 			ifTrue: [passed := passed + 1]

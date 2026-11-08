@@ -66,8 +66,8 @@ ImageSegment >> parse: aString [
 	bytes := aString.
 	(bytes copyFrom: 1 to: 7) = 'EGG_IS
 ' ifFalse: [^self error: 'wrong image segment signature'].
-	segmentSize := bytes pointerAtOffset: 16.
-	codeSize := bytes pointerAtOffset: 40.
+	segmentSize := bytes pointerAtOffset: self sizeOffset.
+	codeSize := bytes pointerAtOffset: self codeSizeOffset.
 	offset := self readImportStringsAt: self storedSize.
 	offset := self readImportDescriptorsAt: offset.
 	self readExportsAt: offset
@@ -77,25 +77,25 @@ ImageSegment >> parse: aString [
 ImageSegment >> readExportsAt: anInteger [
 	| count offset |
 	count := bytes uLongAtOffset: anInteger.
-	offset := anInteger + 4.
+	offset := anInteger + self countSize.
 	exports := Dictionary new.
 	count timesRepeat: [| address length export |
 		address := bytes pointerAtOffset: offset.
-		length := bytes pointerAtOffset: offset + 8.
-		export := bytes copyFrom: offset + 17 to: offset + 16 + length.
+		length := bytes pointerAtOffset: offset + self exportFieldSize.
+		export := bytes copyFrom: offset + self exportHeaderSize + 1 to: offset + self exportHeaderSize + length.
 		exports at: export put: address.
-		offset := offset + 16 + length]
+		offset := offset + self exportHeaderSize + length]
 ]
 
 { #category : #parsing }
 ImageSegment >> readImportDescriptorsAt: anInteger [
 	| count offset |
 	count := bytes uLongAtOffset: anInteger.
-	offset := anInteger + 4.
+	offset := anInteger + self countSize.
 	importDescriptors := (1 to: count) collect: [:i | | length descriptor |
 		length := bytes uLongAtOffset: offset.
-		descriptor := (1 to: length) collect: [:j | bytes uLongAtOffset: offset + (j * 4)].
-		offset := offset + 4 + (length * 4).
+		descriptor := (1 to: length) collect: [:j | bytes uLongAtOffset: offset + (j * self countSize)].
+		offset := offset + self countSize + (length * self countSize).
 		descriptor].
 	^offset
 ]
@@ -104,11 +104,11 @@ ImageSegment >> readImportDescriptorsAt: anInteger [
 ImageSegment >> readImportStringsAt: anInteger [
 	| count offset |
 	count := bytes uLongAtOffset: anInteger.
-	offset := anInteger + 4.
+	offset := anInteger + self countSize.
 	importStrings := (1 to: count) collect: [:i | | length string |
 		length := bytes uLongAtOffset: offset.
-		string := bytes copyFrom: offset + 5 to: offset + 4 + length.
-		offset := offset + 4 + length.
+		string := bytes copyFrom: offset + self countSize + 1 to: offset + self countSize + length.
+		offset := offset + self countSize + length.
 		string].
 	^offset
 ]
@@ -121,7 +121,7 @@ ImageSegment >> segmentSize [
 { #category : #parsing }
 ImageSegment >> storedSize [
 	codeSize = 0 ifTrue: [^segmentSize].
-	^(segmentSize alignedTo: 16r10000) + codeSize
+	^self codeStart + codeSize
 ]
 
 { #category : #accessing }
@@ -143,4 +143,202 @@ ImageSegment >> link: anArray [
 ImageSegment >> linkImports [
 	imports := importDescriptors collect: [:descriptor | self link: descriptor].
 	^imports
+]
+
+{ #category : #accessing }
+ImageSegment >> baseAddress [
+	^bytes pointerAtOffset: self baseOffset
+]
+
+{ #category : #accessing }
+ImageSegment >> module [
+	^bytes pointerAtOffset: self moduleOffset
+]
+
+{ #category : #accessing }
+ImageSegment >> codeStart [
+	^segmentSize alignedTo: self codeAlignment
+]
+
+{ #category : #objects }
+ImageSegment >> objectsDo: aBlock [
+	self objectsFrom: self headerSize to: segmentSize do: aBlock.
+	codeSize = 0 ifFalse: [self objectsFrom: self codeStart to: self codeStart + codeSize do: aBlock]
+]
+
+{ #category : #objects }
+ImageSegment >> objectsFrom: anInteger to: anotherInteger do: aBlock [
+	| offset object |
+	offset := anInteger.
+	[offset < anotherInteger] whileTrue: [
+		object := self objectAt: offset.
+		aBlock value: object.
+		offset := object + (self bodySizeOf: object)]
+]
+
+{ #category : #objects }
+ImageSegment >> objectAt: anInteger [
+	| flags |
+	flags := bytes byteAt: anInteger + self flagsPosition.
+	^(flags bitAnd: self smallFlag) = 0
+		ifTrue: [anInteger + self largeHeaderSize]
+		ifFalse: [anInteger + self smallHeaderSize]
+]
+
+{ #category : #objects }
+ImageSegment >> flagsOf: anInteger [
+	^bytes byteAt: anInteger - self flagsPosition
+]
+
+{ #category : #objects }
+ImageSegment >> sizeOf: anInteger [
+	((self flagsOf: anInteger) bitAnd: self smallFlag) = 0
+		ifTrue: [^bytes uLongAtOffset: anInteger - self largeHeaderSize].
+	^bytes byteAt: anInteger - self smallSizePosition
+]
+
+{ #category : #objects }
+ImageSegment >> isBytes: anInteger [
+	^((self flagsOf: anInteger) bitAnd: self bytesFlag) = self bytesFlag
+]
+
+{ #category : #objects }
+ImageSegment >> bodySizeOf: anInteger [
+	| size |
+	size := self sizeOf: anInteger.
+	^(self isBytes: anInteger)
+		ifTrue: [size alignedTo: WordSize]
+		ifFalse: [size * WordSize]
+]
+
+{ #category : #objects }
+ImageSegment >> behaviorOf: anInteger [
+	^bytes uLongAtOffset: anInteger - self behaviorPosition
+]
+
+{ #category : #objects }
+ImageSegment >> behaviorOf: anInteger put: anotherInteger [
+	bytes uLongAtOffset: anInteger - self behaviorPosition put: anotherInteger
+]
+
+{ #category : #objects }
+ImageSegment >> slotsOf: anInteger do: aBlock [
+	| size |
+	(self isBytes: anInteger) ifTrue: [^self].
+	size := self sizeOf: anInteger.
+	0 to: size - 1 do: [:index | aBlock value: anInteger + (index * WordSize)]
+]
+
+{ #category : #relocation }
+ImageSegment >> relocateTo: anInteger [
+	| base delta block |
+	base := self baseAddress.
+	delta := anInteger - base.
+	block := base - (base bitAnd: self behaviorMask).
+	self objectsDo: [:object | self relocate: object by: delta behaviorBlock: block].
+	bytes
+		pointerAtOffset: self moduleOffset put: self module + delta;
+		pointerAtOffset: self baseOffset put: anInteger
+]
+
+{ #category : #relocation }
+ImageSegment >> relocate: anInteger by: aDelta behaviorBlock: anAddress [
+	| behavior relocated |
+	behavior := self behaviorOf: anInteger.
+	(self isReference: behavior) ifTrue: [
+		relocated := anAddress + behavior + aDelta bitAnd: self behaviorMask.
+		self behaviorOf: anInteger put: relocated].
+	self slotsOf: anInteger do: [:slot | | reference |
+		reference := bytes pointerAtOffset: slot.
+		(self isReference: reference) ifTrue: [bytes pointerAtOffset: slot put: reference + aDelta]]
+]
+
+{ #category : #layout }
+ImageSegment >> baseOffset [
+	^8
+]
+
+{ #category : #layout }
+ImageSegment >> sizeOffset [
+	^16
+]
+
+{ #category : #layout }
+ImageSegment >> moduleOffset [
+	^32
+]
+
+{ #category : #layout }
+ImageSegment >> codeSizeOffset [
+	^40
+]
+
+{ #category : #layout }
+ImageSegment >> headerSize [
+	^48
+]
+
+{ #category : #layout }
+ImageSegment >> codeAlignment [
+	^16r10000
+]
+
+{ #category : #layout }
+ImageSegment >> smallHeaderSize [
+	^8
+]
+
+{ #category : #layout }
+ImageSegment >> largeHeaderSize [
+	^16
+]
+
+{ #category : #layout }
+ImageSegment >> flagsPosition [
+	^4
+]
+
+{ #category : #layout }
+ImageSegment >> behaviorPosition [
+	^4
+]
+
+{ #category : #layout }
+ImageSegment >> smallSizePosition [
+	^5
+]
+
+{ #category : #layout }
+ImageSegment >> smallFlag [
+	^16r80
+]
+
+{ #category : #layout }
+ImageSegment >> bytesFlag [
+	^1
+]
+
+{ #category : #layout }
+ImageSegment >> behaviorMask [
+	^16rFFFFFFFF
+]
+
+{ #category : #layout }
+ImageSegment >> isReference: anInteger [
+	^(anInteger bitAnd: 3) = 0
+]
+
+{ #category : #layout }
+ImageSegment >> countSize [
+	^4
+]
+
+{ #category : #layout }
+ImageSegment >> exportFieldSize [
+	^8
+]
+
+{ #category : #layout }
+ImageSegment >> exportHeaderSize [
+	^16
 ]
