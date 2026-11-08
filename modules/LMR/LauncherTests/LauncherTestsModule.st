@@ -10,7 +10,7 @@ Class {
 }
 
 { #category : #entries }
-LauncherTestsModule >> __start__ [
+LauncherTestsModule >> start [
 	<callback: slong ()>
 	^42
 ]

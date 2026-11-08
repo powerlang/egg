@@ -30,6 +30,6 @@ TEST_CASE("the launcher tests module exports its entries", "[run]")
     REQUIRE(launcher.loaded());
     launcher.relocate();
 
-    auto result = launcher.run("__start__");
+    auto result = launcher.run("start");
     REQUIRE((result >> 1) == 42);
 }

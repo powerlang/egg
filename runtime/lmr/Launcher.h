@@ -12,6 +12,7 @@
 
 #include <cstdint>
 #include <map>
+#include <set>
 #include <memory>
 #include <string>
 #include <vector>
@@ -38,10 +39,12 @@ class Launcher
 
     /**
      * Rebases every loaded segment and binds the imports of the runtime
-     * core (Kernel, Kernel.LMR and LMR) by name, without running code. The
-     * imports of the other segments are left unresolved (a sentinel).
+     * core (Kernel, Kernel.LMR and LMR), and of the modules given to
+     * bind(), by name, without running code. The imports of the other
+     * segments are left unresolved (a sentinel).
      */
     void relocate();
+    void bind(const std::string& module);
     std::vector<Egg::Object*> importsOf(const std::string& module);
     Egg::HeapObject* exported(const std::string& name);
     void* entry(const std::string& name);
@@ -52,6 +55,7 @@ class Launcher
     std::map<std::string, std::unique_ptr<Egg::FileImageSegment>> _segments;
     Egg::FileImageSegment* _segment = nullptr;
     std::map<std::string, Egg::Object*> _symbols;
+    std::set<std::string> _bound = {"Kernel", "Kernel.LMR", "LMR"};
 
     Egg::FileImageSegment* load(const std::string& module, const std::string& file);
     void loadImportsOf(Egg::FileImageSegment* segment);

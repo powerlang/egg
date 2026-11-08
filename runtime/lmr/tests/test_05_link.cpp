@@ -52,3 +52,16 @@ TEST_CASE("relocating binds the imports of the runtime core by name", "[link]")
         REQUIRE(referencesTo(sentinel, segment) == 0);
     }
 }
+
+TEST_CASE("relocating binds the imports of the modules bound by name", "[link]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    REQUIRE(launcher.loaded());
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+
+    auto segment = launcher.segmentNamed("LMR.LauncherTests");
+    REQUIRE(!segment->_importDescriptors.empty());
+    auto sentinel = reinterpret_cast<Egg::Object*>(segment->spaceStart());
+    REQUIRE(referencesTo(sentinel, segment) == 0);
+}

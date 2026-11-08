@@ -67,16 +67,20 @@ void Launcher::loadImportsOf(Egg::FileImageSegment* segment)
             throw std::runtime_error("cannot find the segment of module " + module + " in " + _directory);
 }
 
+void Launcher::bind(const std::string& module)
+{
+    _bound.insert(module);
+}
+
 void Launcher::relocate()
 {
-    static const std::set<std::string> core = {"Kernel", "Kernel.LMR", "LMR"};
     for (auto& [name, segment] : _segments)
         segment->relocate();
     this->collectSymbols();
     for (auto& [name, segment] : _segments) {
         auto sentinel = reinterpret_cast<Egg::Object*>(segment->spaceStart());
         std::vector<Egg::Object*> imports(segment->_importDescriptors.size(), sentinel);
-        if (core.count(name))
+        if (_bound.contains(name))
             imports = this->importsOf(name);
         segment->bindImports(imports);
     }
