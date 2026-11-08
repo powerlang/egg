@@ -77,3 +77,9 @@ LauncherTestsModule >> firstEven [
 	#(1 2 3) do: [:each | each even ifTrue: [^each]].
 	^0
 ]
+
+{ #category : #entries }
+LauncherTestsModule >> platformNameSize [
+	<callback: slong ()>
+	^Kernel host platformName size
+]

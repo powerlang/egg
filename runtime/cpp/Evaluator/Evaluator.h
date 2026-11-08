@@ -6,6 +6,8 @@
 #include <map>
 #include <functional>
 
+#include <ffi.h>
+
 #include "FFIGlue.h"
 
 #include "../HeapObject.h"
@@ -22,6 +24,13 @@
 extern "C" void closureCallbackWrapper(ffi_cif* cif, void* ret, void** args, void* userData);
 
 namespace Egg {
+
+struct FFIDescriptorImpl {
+    ffi_cif *cif;
+    ffi_type **argTypes;
+    void(*fnAddr)();
+};
+
 
 class Runtime;
 class SExpressionLinearizer;

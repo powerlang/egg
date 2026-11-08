@@ -3,6 +3,7 @@
 #include "Egg.h"
 #include "Allocator/Memory.h"
 #include "KnownConstants.h"
+#include "FFIGlue.h"
 
 #include <cstring>
 #include <filesystem>
@@ -85,6 +86,7 @@ void Launcher::relocate()
         segment->bindImports(imports);
     }
     this->initializeKernelSpace();
+    this->initializeHostLinkage();
     this->makeExecutable();
 }
 
@@ -107,6 +109,15 @@ uint32_t Launcher::instVarIndex(Egg::HeapObject* species, const std::string& nam
         }
     }
     throw std::runtime_error("instances have no variable named " + name);
+}
+
+void Launcher::initializeHostLinkage()
+{
+    auto linkage = this->segmentNamed("Kernel.LMR")->_exports.at("HostLinkage");
+    linkage->slot(0) = reinterpret_cast<Egg::Object*>(Egg::SymbolFinder() << 1 | 1);
+    linkage->slot(1) = reinterpret_cast<Egg::Object*>(Egg::LoaderHandle() << 1 | 1);
+    auto platform = linkage->slot(2)->asHeapObject();
+    std::strncpy(reinterpret_cast<char*>(&platform->byte(0)), Egg::PlatformName(), platform->size() - 1);
 }
 
 void Launcher::initializeKernelSpace()

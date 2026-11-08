@@ -58,3 +58,16 @@ LMRHostSystem >> write: aString to: anInteger [
 	aString isEmpty ifTrue: [^self].
 	self libc write: anInteger address: aString size: aString size
 ]
+
+{ #category : #services }
+LMRHostSystem >> initializeFFI: anExternalLibrary symbolFinder: anFFIMethod [
+	anExternalLibrary address: (HostLinkage at: 2).
+	anFFIMethod address: (HostLinkage at: 1)
+]
+
+{ #category : #services }
+LMRHostSystem >> platformName [
+	| rawName |
+	rawName := HostLinkage at: 3.
+	^rawName upTo: Character null
+]

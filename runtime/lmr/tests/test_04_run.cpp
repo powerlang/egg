@@ -11,6 +11,9 @@
 
 #include "Launcher.h"
 #include "SegmentPath.h"
+#include "FFIGlue.h"
+
+#include <cstring>
 
 TEST_CASE("running the nativized __start__ returns 42", "[run]")
 {
@@ -109,4 +112,15 @@ TEST_CASE("a non-local return returns from the closure's home method", "[run]")
 
     auto result = launcher.run("nonLocalReturn");
     REQUIRE((result >> 1) == 12);
+}
+
+TEST_CASE("the native host knows the platform it runs on", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    REQUIRE(launcher.loaded());
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+
+    auto result = launcher.run("platformNameSize");
+    REQUIRE((result >> 1) == (int64_t)std::strlen(Egg::PlatformName()));
 }

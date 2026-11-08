@@ -25,7 +25,9 @@ add_library(lmr_egg STATIC
     ${CPP}/Object.cpp
     ${CPP}/KnownObjects.cpp
     ${CPP}/SmallInteger.cpp
-    ${CPP}/${PLATFORM}/Memory.cpp)
+    ${CPP}/${PLATFORM}/Memory.cpp
+    ${CPP}/${PLATFORM}/FFIGlue.cpp)
+target_link_libraries(lmr_egg PUBLIC ${CMAKE_DL_LIBS})
 target_include_directories(lmr_egg PUBLIC ${CPP} ${CPP}/${PLATFORM} ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(lmr_launcher STATIC Launcher.cpp CodeInstaller.cpp)

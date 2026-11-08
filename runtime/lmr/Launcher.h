@@ -65,6 +65,7 @@ class Launcher
     Egg::Object* methodIn(Egg::HeapObject* behavior, Egg::Object* selector);
     uint32_t instVarIndex(Egg::HeapObject* species, const std::string& name);
     void initializeKernelSpace();
+    void initializeHostLinkage();
     void makeExecutable();
 };
 
