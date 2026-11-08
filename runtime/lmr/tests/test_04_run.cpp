@@ -143,3 +143,17 @@ TEST_CASE("SmallInteger arithmetic and nil tests run natively", "[run]")
         REQUIRE((launcher.run(entry) >> 1) == value);
     }
 }
+
+TEST_CASE("native code allocates arrays and byte arrays", "[run]")
+{
+    const std::pair<const char*, int64_t> expected[] = {
+        {"newArray", 3},
+        {"newBytes", 5}};
+    for (auto& [entry, value] : expected) {
+        INFO("entry: " << entry);
+        lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+        launcher.bind("LMR.LauncherTests");
+        launcher.relocate();
+        REQUIRE((launcher.run(entry) >> 1) == value);
+    }
+}

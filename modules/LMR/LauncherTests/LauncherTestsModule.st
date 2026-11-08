@@ -143,3 +143,15 @@ LauncherTestsModule >> nothing [
 LauncherTestsModule >> six [
 	^6
 ]
+
+{ #category : #entries }
+LauncherTestsModule >> newArray [
+	<callback: slong ()>
+	^(Array new: 3) size
+]
+
+{ #category : #entries }
+LauncherTestsModule >> newBytes [
+	<callback: slong ()>
+	^(ByteArray new: 5) size
+]
