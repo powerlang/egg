@@ -50,6 +50,11 @@ LibC >> memcpy: address from: aString size: anInteger [
 ]
 
 { #category : #accessing }
+LibC >> strlen: address [
+	<cdecl: sint64 strlen(pointer)>
+]
+
+{ #category : #accessing }
 LibC >> timespecGet: aByteArray base: anInteger [
 	<cdecl: sint32 timespec_get(pointer, sint32)>
 ]

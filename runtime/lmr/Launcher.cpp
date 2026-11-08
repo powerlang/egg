@@ -75,6 +75,12 @@ void Launcher::bind(const std::string& module)
         _bound.push_back(module);
 }
 
+void Launcher::arguments(int argc, const char* const* argv)
+{
+    _argc = argc;
+    _argv = argv;
+}
+
 bool Launcher::isBound(const std::string& module) const
 {
     return std::find(_bound.begin(), _bound.end(), module) != _bound.end();
@@ -127,6 +133,8 @@ void Launcher::initializeHostLinkage()
     linkage->slot(1) = reinterpret_cast<Egg::Object*>(Egg::LoaderHandle() << 1 | 1);
     linkage->slot(3) = reinterpret_cast<Egg::Object*>(Egg::HeapNextFree() << 1 | 1);
     linkage->slot(4) = reinterpret_cast<Egg::Object*>(Egg::HeapLimit() << 1 | 1);
+    linkage->slot(6) = reinterpret_cast<Egg::Object*>(uintptr_t(_argc) << 1 | 1);
+    linkage->slot(7) = reinterpret_cast<Egg::Object*>(reinterpret_cast<uintptr_t>(_argv) << 1 | 1);
     auto modules = linkage->slot(5)->asHeapObject();
     uint32_t count = 0;
     for (auto& name : _bound)

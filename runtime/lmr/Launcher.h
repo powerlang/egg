@@ -45,6 +45,7 @@ class Launcher
      */
     void relocate();
     void bind(const std::string& module);
+    void arguments(int argc, const char* const* argv);
     std::vector<Egg::Object*> importsOf(const std::string& module);
     Egg::HeapObject* exported(const std::string& name);
     void* entry(const std::string& name);
@@ -56,6 +57,8 @@ class Launcher
     Egg::FileImageSegment* _segment = nullptr;
     std::map<std::string, Egg::Object*> _symbols;
     std::vector<std::string> _bound = {"Kernel", "Kernel.LMR", "LMR"};
+    int _argc = 0;
+    const char* const* _argv = nullptr;
 
     Egg::FileImageSegment* load(const std::string& module, const std::string& file);
     void loadImportsOf(Egg::FileImageSegment* segment);

@@ -229,6 +229,17 @@ TEST_CASE("FFI initializes natively and calls C functions", "[run]")
     REQUIRE((launcher.run("callsC") >> 1) == 1);
 }
 
+TEST_CASE("the native host reads the program arguments", "[run]")
+{
+    const char* argv[] = {"lmr", "egg"};
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    bindFFI(launcher);
+    launcher.bind("LMR.LauncherTests");
+    launcher.arguments(2, argv);
+    launcher.relocate();
+    REQUIRE((launcher.run("readsArguments") >> 1) == 42);
+}
+
 TEST_CASE("the native host reads a whole file", "[run]")
 {
     const std::string contents = "egg reads files";

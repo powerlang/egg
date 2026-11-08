@@ -284,6 +284,15 @@ LauncherTestsModule >> callsC [
 ]
 
 { #category : #entries }
+LauncherTestsModule >> readsArguments [
+	| arguments |
+	<callback: slong ()>
+	self startFFI.
+	arguments := Kernel host arguments.
+	^(arguments size = 2 and: [(arguments at: 2) = 'egg']) ifTrue: [42] ifFalse: [0]
+]
+
+{ #category : #entries }
 LauncherTestsModule >> readsFile [
 	| contents |
 	<callback: slong ()>
@@ -381,9 +390,6 @@ LauncherTestsModule >> startsMemory [
 
 { #category : #services }
 LauncherTestsModule >> startFFI [
-	| ffi |
-	Kernel host registerBoundModules.
-	ffi := ExternalLibrary module.
-	ffi initializeForCurrentPlatform.
-	^ffi
+	Kernel host startUp.
+	^ExternalLibrary module
 ]

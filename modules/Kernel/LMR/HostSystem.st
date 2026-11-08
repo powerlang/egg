@@ -66,6 +66,35 @@ LMRHostSystem >> initializeFFI: anExternalLibrary symbolFinder: anFFIMethod [
 ]
 
 { #category : #services }
+LMRHostSystem >> arguments [
+	| argv |
+	argv := HostLinkage at: 8.
+	^(0 to: (HostLinkage at: 7) - 1) collect: [:i | self stringAt: (self pointerAt: argv + (i * WordSize))]
+]
+
+{ #category : #private }
+LMRHostSystem >> pointerAt: address [
+	| buffer |
+	buffer := ByteArray new: WordSize.
+	self libc memcpy: buffer from: address size: WordSize.
+	^buffer pointerAtOffset: 0
+]
+
+{ #category : #private }
+LMRHostSystem >> stringAt: address [
+	| string |
+	string := String new: (self libc strlen: address).
+	self libc memcpy: string from: address size: string size.
+	^string
+]
+
+{ #category : #services }
+LMRHostSystem >> startUp [
+	self registerBoundModules.
+	LibC module initializeForCurrentPlatform
+]
+
+{ #category : #services }
 LMRHostSystem >> registerBoundModules [
 	(HostLinkage at: 6) do: [:module |
 		module ifNotNil: [Kernel loadedModules at: module name asSymbol put: module]]
