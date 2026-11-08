@@ -88,3 +88,14 @@ TEST_CASE("perform: runs the method it finds", "[run]")
     auto result = launcher.run("performAnswer");
     REQUIRE((result >> 1) == 42);
 }
+
+TEST_CASE("inlined andNot: and orNot: negate their last condition", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    REQUIRE(launcher.loaded());
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+
+    auto result = launcher.run("negations");
+    REQUIRE((result >> 1) == 3);
+}

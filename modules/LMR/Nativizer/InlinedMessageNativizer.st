@@ -528,19 +528,25 @@ InlinedMessageNativizer >> nativizer: aTreecodeNativizer [
 
 { #category : #nativizing }
 InlinedMessageNativizer >> negateBoolean [
-		| retry failed done |
+	| retry failed negated done |
 	retry := assembler newLabel.
 	failed := assembler newLabel.
-		done := assembler newLabel.
+	negated := assembler newLabel.
+	done := assembler newLabel.
 	assembler
 		@ retry;
 		loadAwithR;
 		loadRwithFalse;
 		compareRwithA;
-		jumpIfEqualTo: done;
+		jumpIfEqualTo: negated;
 		loadRwithTrue;
 		compareRwithA;
-		jumpIfNotEqualTo: failed; @done.
+		jumpIfNotEqualTo: failed;
+		loadRwithFalse;
+		jumpTo: done;
+		@ negated;
+		loadRwithTrue;
+		@ done.
 	nativizer
 		addFallback: [ assembler @ failed.
 			nativizer sendMustBeBoolean.

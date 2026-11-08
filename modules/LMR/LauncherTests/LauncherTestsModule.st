@@ -56,3 +56,12 @@ LauncherTestsModule >> performAnswer [
 	<callback: slong ()>
 	^self perform: #answer
 ]
+
+{ #category : #entries }
+LauncherTestsModule >> negations [
+	| first second |
+	<callback: slong ()>
+	first := (true andNot: [false]) ifTrue: [1] ifFalse: [0].
+	second := (false orNot: [true]) ifTrue: [0] ifFalse: [2].
+	^first + second
+]
