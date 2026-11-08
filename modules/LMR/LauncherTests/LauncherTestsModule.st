@@ -14,6 +14,7 @@ LauncherTestsModule >> imports [
 	^{
 		#Kernel -> #(ActiveProcess ImageSegment MessageNotUnderstood).
 		#FFI -> #(ExternalLibrary ExternalMemory).
+		#'Kernel.LMR' -> #(HostLinkage).
 		#LMR -> #(Memory).
 		#'FFI.Posix' -> #(DLLibrary).
 		#'FFI.Windows' -> #(KernelDLL).
@@ -404,6 +405,47 @@ LauncherTestsModule >> startsMemory [
 	Memory current startUp.
 	bytes := ByteArray new: 200000.
 	^bytes size = 200000 ifTrue: [42] ifFalse: [0]
+]
+
+{ #category : #entries }
+LauncherTestsModule >> callsOutWithIntegers [
+	<callback: slong ()>
+	^self testLibrary labs: -42
+]
+
+{ #category : #entries }
+LauncherTestsModule >> callsOutWithDoubles [
+	<callback: slong ()>
+	^((self testLibrary sqrt: 2.25) * 4.0) truncated
+]
+
+{ #category : #entries }
+LauncherTestsModule >> callsOutWithFloats [
+	<callback: slong ()>
+	^((self testLibrary sqrtf: 6.25) * 4) truncated
+]
+
+{ #category : #entries }
+LauncherTestsModule >> passesStackArguments [
+	<callback: slong ()>
+	^self testLibrary
+		stackArguments: 1 a2: 2 a3: 3 a4: 4 a5: 5 a6: 6 a7: 7 a8: 8 a9: 9 a10: -10 a11: 11 a12: 12
+]
+
+{ #category : #entries }
+LauncherTestsModule >> passesFloatArguments [
+	<callback: slong ()>
+	^(self testLibrary
+		floatArguments: 1.5 d2: 2.5 d3: 3.5 d4: 4.5 d5: 5.5 d6: 6.5 d7: 7.5 d8: 8.5 f9: 9.5 d10: 10.5 f11: 11.5) truncated
+]
+
+{ #category : #services }
+LauncherTestsModule >> testLibrary [
+	| library |
+	self startFFI.
+	library := LauncherTestsLibrary new initialize.
+	library address: (HostLinkage at: 2).
+	^library
 ]
 
 { #category : #services }

@@ -331,3 +331,37 @@ TEST_CASE("native code handles a message not understood", "[run]")
     launcher.relocate();
     REQUIRE((launcher.run("handlesDnu") >> 1) == 4);
 }
+
+extern "C" __attribute__((visibility("default"), used)) int64_t lmrTestStackArguments(
+    int64_t a1, int64_t a2, int64_t a3, int64_t a4, int64_t a5, int64_t a6,
+    int64_t a7, int64_t a8, int32_t a9, int8_t a10, int16_t a11, int64_t a12)
+{
+    return a1 + 2 * a2 + 3 * a3 + 4 * a4 + 5 * a5 + 6 * a6 + 7 * a7 + 8 * a8
+        + 9 * a9 + 10 * a10 + 11 * a11 + 12 * a12;
+}
+
+extern "C" __attribute__((visibility("default"), used)) double lmrTestFloatArguments(
+    double d1, double d2, double d3, double d4, double d5, double d6, double d7,
+    double d8, float f9, double d10, float f11)
+{
+    return d1 + 2 * d2 + 3 * d3 + 4 * d4 + 5 * d5 + 6 * d6 + 7 * d7 + 8 * d8
+        + 9 * f9 + 10 * d10 + 11 * f11;
+}
+
+TEST_CASE("native callouts pass integers, floats and stack arguments", "[run]")
+{
+    const std::pair<const char*, int64_t> expected[] = {
+        {"callsOutWithIntegers", 42},
+        {"callsOutWithDoubles", 6},
+        {"callsOutWithFloats", 10},
+        {"passesStackArguments", 450},
+        {"passesFloatArguments", 539}};
+    for (auto& [entry, value] : expected) {
+        INFO("entry: " << entry);
+        lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+        launcher.bindFFI();
+        launcher.bind("LMR.LauncherTests");
+        launcher.relocate();
+        REQUIRE((launcher.run(entry) >> 1) == value);
+    }
+}
