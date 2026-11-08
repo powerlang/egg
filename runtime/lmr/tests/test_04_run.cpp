@@ -195,8 +195,9 @@ TEST_CASE("an inlined to:by:do: counts up and down by its step", "[run]")
 TEST_CASE("FFI initializes natively and calls C functions", "[run]")
 {
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    auto windows = std::string(Egg::PlatformName()).ends_with("win32");
     launcher.bind("FFI");
-    launcher.bind("FFI.Posix");
+    launcher.bind(windows ? "FFI.Windows" : "FFI.Posix");
     launcher.bind("LMR.LauncherTests");
     launcher.relocate();
     REQUIRE((launcher.run("callsC") >> 1) == 1);

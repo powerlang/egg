@@ -20,20 +20,20 @@ Class {
 WindowsLibraryLoader >> bootstrapOpen: anExternalLibrary [
 	| path parameter handle |
 	path := anExternalLibrary class libpath, anExternalLibrary class windowsFilename.
-	parameter := path nullTerminated.
+	parameter := Kernel utf16 parameterFrom: path.
 	handle := kernel32 LoadLibraryW: parameter.
-	anExternalLibrary handle: handle.
+	anExternalLibrary address: handle
 ]
 
 { #category : #accessing }
 WindowsLibraryLoader >> findSymbol: aSymbol in: anExternalLibrary [
-	^kernel32 GetProcAddressW: anExternalLibrary lpProcName: aSymbol nullTerminated
+	^kernel32 GetProcAddress: anExternalLibrary lpProcName: aSymbol nullTerminated
 ]
 
 { #category : #accessing }
 WindowsLibraryLoader >> initialize [
 	kernel32 := KernelDLL new.
-	Kernel host initializeFFI: kernel32 symbolFinder: KernelDLL >> #GetProcAddressW
+	Kernel host initializeFFI: kernel32 symbolFinder: KernelDLL >> #GetProcAddress:lpProcName:
 ]
 
 { #category : #accessing }
@@ -43,9 +43,10 @@ WindowsLibraryLoader >> libraryFilename: externalLibrary [
 
 { #category : #services }
 WindowsLibraryLoader >> open: anExternalLibrary [
-	| path handle |
+	| path parameter handle |
 	path := anExternalLibrary class libpath, anExternalLibrary class windowsFilename.
-	handle := kernel32 LoadLibraryW: path externalCopy asParameter.
+	parameter := path externalUTF16Copy.
+	handle := kernel32 LoadLibraryW: parameter.
 	anExternalLibrary address: handle.
 ]
 

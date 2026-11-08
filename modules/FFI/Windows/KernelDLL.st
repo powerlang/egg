@@ -11,13 +11,13 @@ Class {
 	#category : #FFI
 }
 { #category : #accessing }
-KernelDLL class >> name [
+KernelDLL class >> libname [
 	^'kernel32'
 ]
 
 { #category : #accessing }
 KernelDLL >> LoadLibraryW: lpLibFileName [
-	<cdecl: pointer LoadLibrary (pointer)>
+	<cdecl: pointer LoadLibraryW (pointer)>
 ]
 
 { #category : #accessing }

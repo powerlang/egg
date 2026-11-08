@@ -14,7 +14,8 @@ LauncherTestsModule >> imports [
 	^{
 		#Kernel -> #(ActiveProcess).
 		#FFI -> #(ExternalLibrary).
-		#'FFI.Posix' -> #(DLLibrary)
+		#'FFI.Posix' -> #(DLLibrary).
+		#'FFI.Windows' -> #(KernelDLL)
 	}
 ]
 
@@ -247,16 +248,17 @@ LauncherTestsModule >> toByDo [
 
 { #category : #entries }
 LauncherTestsModule >> callsC [
-	| ffi libc memory dl found |
+	| os ffi libc memory found |
 	<callback: slong ()>
-	Kernel loadedModules at: #'FFI.Posix' put: DLLibrary module.
+	os := (Kernel host platformName endsWith: 'win32')
+		ifTrue: [#'FFI.Windows' -> KernelDLL module]
+		ifFalse: [#'FFI.Posix' -> DLLibrary module].
+	Kernel loadedModules at: os key put: os value.
 	ffi := ExternalLibrary module.
 	ffi initializeForCurrentPlatform.
 	libc := ffi libc.
 	memory := libc malloc: 16.
 	libc free: memory.
-	dl := DLLibrary new.
-	Kernel host initializeFFI: dl symbolFinder: DLLibrary >> #dlsym:symbol:.
-	found := dl dlsym: dl handle asInteger symbol: 'malloc' nullTerminated.
+	found := ffi loader findSymbol: #malloc in: libc address.
 	^(memory = 0 or: [found = 0]) ifTrue: [0] ifFalse: [1]
 ]
