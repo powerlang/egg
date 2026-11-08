@@ -227,7 +227,7 @@ Module >> importDescriptor: descriptor [
 
 { #category : #services }
 Module >> importRequiredModules [
-	requires do: [:name | self import: name].
+	self requires do: [:name | self import: name].
 	self imports do: [:descriptor | self importDescriptor: descriptor]
 ]
 

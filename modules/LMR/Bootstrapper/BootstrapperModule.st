@@ -33,12 +33,17 @@ BootstrapperModule >> main: args [
 	| lmrModule nativizer platform names |
 	names := args allButFirst: 2.
 	roots := names collect: [:name | Kernel load: name asSymbol].
-	lmrModule := Memory module.
+	lmrModule := LMR.
 	nativizer := NativizerModule module.
 	platform := NativizationPlatform host.
 	self
 		bootstrapLMR: lmrModule nativizer: nativizer platform: platform;
 		writeSegments.
+]
+
+{ #category : #spec }
+BootstrapperModule >> requires [
+	^#(LMR)
 ]
 
 { #category : #running }
@@ -305,7 +310,7 @@ BootstrapperModule >> nativizePolymorphicCacheWith: env [
 BootstrapperModule >> writeSegments [
 	| all closure |
 	all := {
-		Memory module.                 "LMR"
+		LMR.
 		NativizerModule module.        "LMR.Nativizer"
 		self class module.             "LMR.Bootstrapper"
 	} , roots.
@@ -365,14 +370,14 @@ BootstrapperModule >> segmentBuilderFor: aModule [
 	(self requiresNativization: aModule) ifTrue: [builder nativizer: environment].
 	aModule == Kernel ifTrue: [self addKernelOverridesTo: builder].
 	self mapPlaceholdersIn: builder.
-	builder map: Memory module memory to: memory.
+	builder map: LMR memory to: memory.
 	^builder
 ]
 
 { #category : #writing }
 BootstrapperModule >> mapPlaceholdersIn: aBuilder [
 	| globals |
-	globals := Memory module globals.
+	globals := LMR globals.
 	placeholders withIndexDo: [:placeholder :i | | global |
 		global := globals at: i.
 		global isNativeCode ifTrue: [aBuilder map: placeholder code to: global code]]
@@ -380,7 +385,7 @@ BootstrapperModule >> mapPlaceholdersIn: aBuilder [
 
 { #category : #writing }
 BootstrapperModule >> requiresNativization: aModule [
-	^({Kernel. LMRProtoObject module. Memory module} includes: aModule) or: [roots includes: aModule]
+	^({Kernel. LMRProtoObject module. LMR} includes: aModule) or: [roots includes: aModule]
 ]
 
 { #category : #writing }
@@ -401,7 +406,7 @@ BootstrapperModule >> kernelOverrides [
 			ifTrue: [
 				self addOverridesFrom: replacement to: target into: overrides.
 				self addOverridesFrom: replacement class to: target class into: overrides]].
-	self addExtensionsOf: Memory module into: overrides.
+	self addExtensionsOf: LMR into: overrides.
 	^overrides
 ]
 
