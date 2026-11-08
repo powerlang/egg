@@ -13,7 +13,7 @@ Class {
 LauncherTestsModule >> imports [
 	^{
 		#Kernel -> #(ActiveProcess).
-		#FFI -> #(ExternalLibrary).
+		#FFI -> #(ExternalLibrary ExternalMemory).
 		#'FFI.Posix' -> #(DLLibrary).
 		#'FFI.Windows' -> #(KernelDLL)
 	}
@@ -265,6 +265,23 @@ LauncherTestsModule >> readsFile [
 	self startFFI.
 	contents := Kernel host readFile: 'launcher-tests-file.txt'.
 	^contents = 'egg reads files' ifTrue: [contents size] ifFalse: [0]
+]
+
+{ #category : #entries }
+LauncherTestsModule >> reservesMemory [
+	| host address committed memory written released |
+	<callback: slong ()>
+	self startFFI.
+	host := Kernel host.
+	address := host reserve: 16r100000.
+	address = 0 ifTrue: [^0].
+	committed := host commit: 16r1000 at: address.
+	committed = address ifFalse: [^0].
+	memory := ExternalMemory at: address.
+	memory at: 1 put: 42.
+	written := memory at: 1.
+	released := host release: address size: 16r100000.
+	^released ifTrue: [written] ifFalse: [0]
 ]
 
 { #category : #services }

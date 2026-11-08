@@ -54,3 +54,8 @@ WindowsLibraryLoader >> open: anExternalLibrary [
 WindowsLibraryLoader >> libcClass [
 	^WindowsLibC
 ]
+
+{ #category : #accessing }
+WindowsLibraryLoader >> kernel32 [
+	^kernel32
+]

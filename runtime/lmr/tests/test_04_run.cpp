@@ -222,3 +222,12 @@ TEST_CASE("the native host reads a whole file", "[run]")
     std::remove("launcher-tests-file.txt");
     REQUIRE((result >> 1) == (int64_t)contents.size());
 }
+
+TEST_CASE("the native host reserves commits and releases memory", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    bindFFI(launcher);
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+    REQUIRE((launcher.run("reservesMemory") >> 1) == 42);
+}

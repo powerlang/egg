@@ -86,3 +86,18 @@ LMRHostSystem >> readFile: filename [
 	read = size ifFalse: [^self error: 'cannot read ' , filename].
 	^contents
 ]
+
+{ #category : #memory }
+LMRHostSystem >> commit: size at: address [
+	^LibC module os commit: size at: address
+]
+
+{ #category : #memory }
+LMRHostSystem >> release: address size: size [
+	^LibC module os release: address size: size
+]
+
+{ #category : #memory }
+LMRHostSystem >> reserve: size [
+	^LibC module os reserve: size
+]

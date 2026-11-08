@@ -387,3 +387,7 @@ SmallInteger >> wideDigitAt: index [
 		bitAnd: LargeInteger base - 1
 ]
 
+{ #category : #marshalling }
+SmallInteger >> marshalOn: aStream [
+	aStream nextNativeIntegerPut: self
+]

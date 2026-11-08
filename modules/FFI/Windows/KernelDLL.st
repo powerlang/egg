@@ -24,3 +24,13 @@ KernelDLL >> LoadLibraryW: lpLibFileName [
 KernelDLL >> GetProcAddress: hModule lpProcName: lpProcName [
 	<cdecl: pointer GetProcAddress (pointer, pointer)>
 ]
+
+{ #category : #memory }
+KernelDLL >> VirtualAlloc: lpAddress dwSize: dwSize flAllocationType: flAllocationType flProtect: flProtect [
+	<cdecl: pointer VirtualAlloc (pointer, uint64, uint32, uint32)>
+]
+
+{ #category : #memory }
+KernelDLL >> VirtualFree: lpAddress dwSize: dwSize dwFreeType: dwFreeType [
+	<cdecl: sint32 VirtualFree (pointer, uint64, uint32)>
+]

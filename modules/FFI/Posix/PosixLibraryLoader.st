@@ -78,3 +78,8 @@ PosixLibraryLoader >> open: anExternalLibrary [
 	handle = 0 ifTrue: [Error signal: dl lastError].
 	anExternalLibrary address: handle
 ]
+
+{ #category : #accessing }
+PosixLibraryLoader >> libcClass [
+	^PosixLibC
+]
