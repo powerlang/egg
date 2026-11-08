@@ -66,6 +66,12 @@ LMRHostSystem >> initializeFFI: anExternalLibrary symbolFinder: anFFIMethod [
 ]
 
 { #category : #services }
+LMRHostSystem >> registerBoundModules [
+	(HostLinkage at: 6) do: [:module |
+		module ifNotNil: [Kernel loadedModules at: module name asSymbol put: module]]
+]
+
+{ #category : #services }
 LMRHostSystem >> platformName [
 	| rawName |
 	rawName := HostLinkage at: 3.

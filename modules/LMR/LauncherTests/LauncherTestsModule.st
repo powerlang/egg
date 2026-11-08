@@ -300,6 +300,15 @@ LauncherTestsModule >> writesLongs [
 ]
 
 { #category : #entries }
+LauncherTestsModule >> findsBoundModules [
+	<callback: slong ()>
+	Kernel host registerBoundModules.
+	(Kernel load: #'LMR.LauncherTests') == self ifFalse: [^0].
+	(Kernel load: #LMR) name asSymbol == #LMR ifFalse: [^0].
+	^42
+]
+
+{ #category : #entries }
 LauncherTestsModule >> allocatesHeap [
 	| address memory |
 	<callback: slong ()>
@@ -346,11 +355,8 @@ LauncherTestsModule >> makesExecutable [
 
 { #category : #services }
 LauncherTestsModule >> startFFI [
-	| os ffi |
-	os := (Kernel host platformName endsWith: 'win32')
-		ifTrue: [#'FFI.Windows' -> KernelDLL module]
-		ifFalse: [#'FFI.Posix' -> DLLibrary module].
-	Kernel loadedModules at: os key put: os value.
+	| ffi |
+	Kernel host registerBoundModules.
 	ffi := ExternalLibrary module.
 	ffi initializeForCurrentPlatform.
 	^ffi
