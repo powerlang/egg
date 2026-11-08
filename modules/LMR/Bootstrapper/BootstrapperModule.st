@@ -31,6 +31,7 @@ BootstrapperModule >> imports [
 { #category : #running }
 BootstrapperModule >> main: args [
 	| lmrModule nativizer platform names |
+	Kernel require: #LMR.
 	names := args allButFirst: 2.
 	roots := names collect: [:name | Kernel load: name asSymbol].
 	lmrModule := LMR.
@@ -385,7 +386,7 @@ BootstrapperModule >> mapPlaceholdersIn: aBuilder [
 
 { #category : #writing }
 BootstrapperModule >> requiresNativization: aModule [
-	^({Kernel. LMRProtoObject module. LMR} includes: aModule) or: [roots includes: aModule]
+	^({Kernel. Kernel.LMR. LMR} includes: aModule) or: [roots includes: aModule]
 ]
 
 { #category : #writing }
@@ -399,7 +400,7 @@ BootstrapperModule >> kernelOverrides [
 	| overrides lmr |
 	overrides := OrderedCollection new.
 	replacements := IdentityDictionary new.
-	lmr := LMRProtoObject module.
+	lmr := Kernel.LMR.
 	lmr classes do: [:replacement | | target |
 		target := replacement superclass.
 		(replacement !== lmr class and: [target module == Kernel])
