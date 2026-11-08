@@ -204,6 +204,15 @@ Module >> import: moduleName [
 ]
 
 { #category : #services }
+Module >> require: aSymbol [
+	| name module |
+	name := (self name , '.' , aSymbol) asSymbol.
+	module := Kernel load: name.
+	self bind: module as: aSymbol.
+	^module
+]
+
+{ #category : #services }
 Module >> import: name from: moduleName [
 	^self import: name from: moduleName as: name
 ]

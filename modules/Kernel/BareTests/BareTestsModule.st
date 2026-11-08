@@ -397,6 +397,12 @@ BareTestsModule >> test240HashTablePrimeForReturnsNextGoodPrime [
 	^(HashTable primeFor: 300) == 359
 ]
 
+{ #category : #tests }
+BareTestsModule >> test250RequireBindsSubmodule [
+	Kernel require: #BareTests.
+	^Kernel.BareTests == self
+]
+
 { #category : #main }
 BareTestsModule >> runTest: selector [
 	| result |
@@ -447,7 +453,8 @@ BareTestsModule >> main: anArray [
 		test222BitXorLargeIntWithSmallInt
 		test230BitShiftLeftOverflow test231BitShiftRightNegativeArg
 		test232BitShiftRightSelector
-		test240HashTablePrimeForReturnsNextGoodPrime).
+		test240HashTablePrimeForReturnsNextGoodPrime
+		test250RequireBindsSubmodule).
 	tests do: [:sel |
 		(self runTest: sel)
 			ifTrue: [passed := passed + 1]
