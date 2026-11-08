@@ -372,6 +372,15 @@ extern "C" __attribute__((visibility("default"), used)) double lmrTestFloatArgum
         + 9 * f9 + 10 * d10 + 11 * f11;
 }
 
+TEST_CASE("memory collects old space, keeping survivors and clearing weak references", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    launcher.bindFFI();
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+    REQUIRE(launcher.run("collectsOldSpace") == 5050);
+}
+
 TEST_CASE("native callouts pass integers, floats and stack arguments", "[run]")
 {
     const std::pair<const char*, int64_t> expected[] = {

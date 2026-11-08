@@ -490,9 +490,9 @@ Collection >> sum: aBlock ifNone: exceptionBlock [
 	| sum |
 	self do: [:each | | value |
 		value := aBlock evaluateWith: each.
-		value isUndefinedValue
+		value isNil
 			ifFalse: [sum := sum == nil ifTrue: [value] ifFalse: [sum + value]]].
-	^sum isUndefinedValue ifTrue: [exceptionBlock value] ifFalse: [sum]
+	^sum isNil ifTrue: [exceptionBlock value] ifFalse: [sum]
 ]
 
 { #category : #enumerating }

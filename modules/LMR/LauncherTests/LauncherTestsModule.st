@@ -12,7 +12,7 @@ Class {
 { #category : #spec }
 LauncherTestsModule >> imports [
 	^{
-		#Kernel -> #(ActiveProcess ImageSegment MessageNotUnderstood).
+		#Kernel -> #(ActiveProcess ImageSegment MessageNotUnderstood WeakArray).
 		#FFI -> #(ExternalLibrary ExternalMemory).
 		#LMR -> #(Memory).
 		#'FFI.Posix' -> #(DLLibrary).
@@ -436,6 +436,23 @@ LauncherTestsModule >> collectsGarbage [
 	kept at: 1 put: 42.
 	1 to: 200 do: [:i | (Array new: 8190) atAllPut: true].
 	^kept at: 1
+]
+
+{ #category : #entries }
+LauncherTestsModule >> collectsOldSpace [
+	| kept held weak |
+	<callback: slong ()>
+	self startFFI.
+	Memory current startUp.
+	kept := (1 to: 100) collect: [:i | Array new: i].
+	held := Array new: 3.
+	weak := WeakArray new: 2.
+	weak at: 1 put: held; at: 2 put: (Array new: 4).
+	1 to: 300 do: [:i | (Array new: 8190) atAllPut: true].
+	Memory current collect.
+	(weak at: 1) == held ifFalse: [^1].
+	(weak at: 2) isNil ifFalse: [^2].
+	^kept inject: 0 into: [:sum :each | sum + each size]
 ]
 
 { #category : #entries }
