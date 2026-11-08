@@ -420,6 +420,21 @@ BareTestsModule >> test280ImageSegmentRelocatesItsReferences [
 ]
 
 { #category : #tests }
+BareTestsModule >> test290ImageSegmentBindsItsImports [
+	| contents original segment imports changed |
+	contents := Kernel host readFile: 'image-segments/lmr/LMR.LauncherTests.ems'.
+	original := contents copy.
+	segment := ImageSegment on: contents.
+	imports := (1 to: segment importDescriptors size) asArray.
+	segment bindImports: imports.
+	changed := (48 to: segment segmentSize - 4 by: 4) select: [:offset |
+		(original uLongAtOffset: offset) != (contents uLongAtOffset: offset)].
+	^changed notEmpty and: [changed conform: [:offset | | old |
+		old := original uLongAtOffset: offset.
+		(contents uLongAtOffset: offset) = ((old bitShift: -2) + 1 * 2 + 1)]]
+]
+
+{ #category : #tests }
 BareTestsModule >> test270ImageSegmentLinksItsImports [
 	| contents segment strings symbols classes |
 	contents := Kernel host readFile: 'image-segments/lmr/LMR.LauncherTests.ems'.
@@ -500,7 +515,8 @@ BareTestsModule >> main: anArray [
 		test250RequireBindsSubmodule
 		test260ImageSegmentParsesAnEmsFile
 		test270ImageSegmentLinksItsImports
-		test280ImageSegmentRelocatesItsReferences).
+		test280ImageSegmentRelocatesItsReferences
+		test290ImageSegmentBindsItsImports).
 	tests do: [:sel |
 		(self runTest: sel)
 			ifTrue: [passed := passed + 1]

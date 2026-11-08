@@ -342,3 +342,39 @@ ImageSegment >> exportFieldSize [
 ImageSegment >> exportHeaderSize [
 	^16
 ]
+
+{ #category : #linking }
+ImageSegment >> bindImports: anArray [
+	self objectsDo: [:object | self bind: object to: anArray]
+]
+
+{ #category : #linking }
+ImageSegment >> bind: anInteger to: anArray [
+	| behavior reference |
+	behavior := self behaviorOf: anInteger.
+	(self isImport: behavior) ifTrue: [
+		reference := self referenceAt: behavior in: anArray.
+		self behaviorOf: anInteger put: (reference bitAnd: self behaviorMask)].
+	self slotsOf: anInteger do: [:slot | | external |
+		external := bytes pointerAtOffset: slot.
+		(self isImport: external) ifTrue: [
+			reference := self referenceAt: external in: anArray.
+			bytes pointerAtOffset: slot put: reference]]
+]
+
+{ #category : #linking }
+ImageSegment >> referenceAt: anInteger in: anArray [
+	| import |
+	import := anArray at: (self importIndexOf: anInteger).
+	^import _isSmallInteger ifTrue: [import * 2 + 1] ifFalse: [import _oop]
+]
+
+{ #category : #layout }
+ImageSegment >> isImport: anInteger [
+	^(anInteger bitAnd: 3) = 2
+]
+
+{ #category : #layout }
+ImageSegment >> importIndexOf: anInteger [
+	^(anInteger bitShift: -2) + 1
+]
