@@ -44,6 +44,11 @@ PosixLibraryLoader >> close: anExternalLibrary [
 ]
 
 { #category : #accessing }
+PosixLibraryLoader >> dl [
+	^dl
+]
+
+{ #category : #accessing }
 PosixLibraryLoader >> findSymbol: aSymbol in: anExternalLibrary [
 	^dl dlsym: anExternalLibrary symbol: aSymbol nullTerminated
 ]

@@ -23,8 +23,3 @@ PosixLibC >> munmap: address size: size [
 PosixLibC >> mprotect: address size: size protection: protection [
 	<cdecl: sint32 mprotect(pointer, uint64, sint32)>
 ]
-
-{ #category : #memory }
-PosixLibC >> sysIcacheInvalidate: address size: size [
-	<cdecl: void sys_icache_invalidate(pointer, uint64)>
-]

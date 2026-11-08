@@ -19,13 +19,12 @@ uintptr_t Egg::FindSymbol(uintptr_t libHandle, char *symbol)
 }
 
 uintptr_t Egg::LoaderHandle() {
-#ifdef __APPLE__
     return (uintptr_t)dlopen(nullptr, RTLD_LAZY);
-#elif _WIN32
-    return LoadLibrary("Kernel32.dll");
-#else
-    return (uintptr_t)dlopen("libdl.so.2", RTLD_LAZY);
-#endif
+}
+
+extern "C" __attribute__((visibility("default"), used)) void egg_flush_icache(void* start, size_t size)
+{
+    __builtin___clear_cache((char*)start, (char*)start + size);
 }
 
 const char* Egg::PlatformName() {

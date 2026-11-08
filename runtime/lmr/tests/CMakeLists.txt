@@ -24,6 +24,7 @@ target_link_libraries(lmr_tests
     lmr_egg
 )
 target_include_directories(lmr_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
+set_property(TARGET lmr_tests PROPERTY ENABLE_EXPORTS ON)
 
 if(APPLE)
     target_link_options(lmr_tests PRIVATE -Wl,-dead_strip)

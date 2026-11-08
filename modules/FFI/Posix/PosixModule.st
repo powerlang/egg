@@ -74,10 +74,10 @@ PosixModule >> reserve: size [
 
 { #category : #memory }
 PosixModule >> makeExecutable: address size: size [
-	| libc result |
-	libc := ExternalLibrary module libc.
-	self runsOnMac ifTrue: [libc sysIcacheInvalidate: address size: size].
-	result := libc mprotect: address size: size protection: PROT_READ + PROT_EXEC.
+	| module result |
+	module := ExternalLibrary module.
+	module loader dl flushInstructionCache: address size: size.
+	result := module libc mprotect: address size: size protection: PROT_READ + PROT_EXEC.
 	^result = 0
 ]
 
