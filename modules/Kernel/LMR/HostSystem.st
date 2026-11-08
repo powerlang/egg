@@ -94,23 +94,13 @@ LMRHostSystem >> readFile: filename [
 ]
 
 { #category : #memory }
-LMRHostSystem >> allocateHeap: size [
-	| address next |
-	address := (HostLinkage at: 4) alignedTo: self heapAlignment.
-	next := address + size alignedTo: self heapAlignment.
-	next > (HostLinkage at: 5) ifTrue: [^self error: 'the heap is full'].
-	HostLinkage at: 4 put: next.
-	^self commit: size at: address
-]
-
-{ #category : #memory }
-LMRHostSystem >> heapAlignment [
-	^16r10000
-]
-
-{ #category : #memory }
 LMRHostSystem >> commit: size at: address [
 	^LibC module os commit: size at: address
+]
+
+{ #category : #memory }
+LMRHostSystem >> decommit: address size: size [
+	^LibC module os decommit: address size: size
 ]
 
 { #category : #memory }

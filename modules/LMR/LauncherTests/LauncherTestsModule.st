@@ -310,14 +310,18 @@ LauncherTestsModule >> findsBoundModules [
 
 { #category : #entries }
 LauncherTestsModule >> allocatesHeap [
-	| address memory |
+	| os address memory written |
 	<callback: slong ()>
 	self startFFI.
-	address := Kernel host allocateHeap: 16r1000.
+	os := Kernel os.
+	address := os reserveAndCommit: 16r1000.
 	(address bitShift: -32) = (self _oop bitShift: -32) ifFalse: [^0].
 	memory := ExternalMemory at: address.
 	memory at: 1 put: 42.
-	^memory at: 1
+	written := memory at: 1.
+	(os release: address) ifFalse: [^0].
+	(os reserve: 16r1000) = address ifFalse: [^0].
+	^written
 ]
 
 { #category : #entries }

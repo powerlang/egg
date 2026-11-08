@@ -47,6 +47,11 @@ PosixModule >> commit: size at: address [
 ]
 
 { #category : #memory }
+PosixModule >> decommit: address size: size [
+	^(self map: size at: address protection: PROT_NONE flags: MAP_PRIVATE + MAP_FIXED) = address
+]
+
+{ #category : #memory }
 PosixModule >> map: size at: address protection: protection flags: flags [
 	| mapping result |
 	mapping := flags bitOr: self anonymousMapping.

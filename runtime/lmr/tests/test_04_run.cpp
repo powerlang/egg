@@ -266,7 +266,7 @@ TEST_CASE("bound modules are loaded modules natively", "[run]")
     REQUIRE((launcher.run("findsBoundModules") >> 1) == 42);
 }
 
-TEST_CASE("the native host allocates in the heap block", "[run]")
+TEST_CASE("Kernel os hands out and reuses memory in the heap block", "[run]")
 {
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
     bindFFI(launcher);

@@ -31,6 +31,7 @@ WindowsModule >> justLoaded [
 	constants
 		at: #MEM_COMMIT put: 16r1000;
 		at: #MEM_RESERVE put: 16r2000;
+		at: #MEM_DECOMMIT put: 16r4000;
 		at: #MEM_RELEASE put: 16r8000;
 		at: #PAGE_NOACCESS put: 16r1;
 		at: #PAGE_READWRITE put: 16r4;
@@ -40,6 +41,11 @@ WindowsModule >> justLoaded [
 { #category : #memory }
 WindowsModule >> commit: size at: address [
 	^self kernel32 VirtualAlloc: address dwSize: size flAllocationType: MEM_COMMIT flProtect: PAGE_READWRITE
+]
+
+{ #category : #memory }
+WindowsModule >> decommit: address size: size [
+	^(self kernel32 VirtualFree: address dwSize: size dwFreeType: MEM_DECOMMIT) != 0
 ]
 
 { #category : #memory }

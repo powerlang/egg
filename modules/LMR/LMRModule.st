@@ -59,8 +59,8 @@ LMRModule >> globals [
 { #category : #spec }
 LMRModule >> imports [
 	^{
-		#Kernel -> #(ByteArray Ephemeron IdentityDictionary IdentitySet LinkedCollection ProcessLMRStack ProcessStack ProtoObject SequenceableCollection WeakArray WeakIdentitySet WordSize WordSizeShift Processor).
-		#'Kernel.LMR' -> #(LMRProtoObject)
+		#Kernel -> #(ByteArray Ephemeron IdentityDictionary IdentitySet KernelModule LinkedCollection ProcessLMRStack ProcessStack ProtoObject SequenceableCollection WeakArray WeakIdentitySet WordSize WordSizeShift Processor).
+		#'Kernel.LMR' -> #(HostLinkage LMRProtoObject)
 	}
 ] 
 
@@ -123,6 +123,7 @@ LMRModule >> invokeStub [
 LMRModule >> justLoaded [
 	super justLoaded.
 	namespace at: #CRITICAL put: false.
+	OSMemory initializeCurrent.
 	SendSite initialize.
 	GlobalDispatchCache initialize.
 	self initializeMemory.
