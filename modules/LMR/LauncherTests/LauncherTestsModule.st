@@ -487,6 +487,15 @@ LauncherTestsModule >> sendsBoundExtension [
 	^#[7 8 9] externalCopy at: 2
 ]
 
+{ #category : #entries }
+LauncherTestsModule >> copiesStringOut [
+	| copy |
+	<callback: slong ()>
+	self startFFI.
+	copy := 'egg' externalCopy.
+	^(copy at: 2) + (copy at: 4)
+]
+
 { #category : #services }
 LauncherTestsModule >> testLibrary [
 	| library |

@@ -398,6 +398,15 @@ TEST_CASE("bound modules' extension methods run natively", "[run]")
     REQUIRE(launcher.run("sendsBoundExtension") == 8);
 }
 
+TEST_CASE("native code copies a string out to C memory", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    launcher.bindFFI();
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+    REQUIRE(launcher.run("copiesStringOut") == 'g');
+}
+
 TEST_CASE("a nativized callback receives its C arguments", "[run]")
 {
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));

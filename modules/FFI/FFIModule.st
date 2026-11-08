@@ -99,5 +99,5 @@ FFIModule >> loader [
 
 { #category : #accessing }
 FFIModule >> os [
-	^namespace at: #OS
+	^OS
 ]
