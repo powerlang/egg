@@ -20,7 +20,7 @@ SDynamicBinding >> assign: value within: anEvaluationContext [
 	^self
 		assign: value
 		within: anEvaluationContext
-		ifUnbound: [self error: 'Unbound dynamic variable: ', name printString]
+		ifUnbound: [anEvaluationContext storeBindSite: name]
 ]
 
 { #category : #accessing }
@@ -60,7 +60,7 @@ SDynamicBinding >> printOn: aStream [
 
 { #category : #accessing }
 SDynamicBinding >> valueWithin: anEvaluationContext [
-	^self valueWithin: anEvaluationContext ifUnbound: [anEvaluationContext nilLiteral]
+	^self valueWithin: anEvaluationContext ifUnbound: [anEvaluationContext loadBindSite: name]
 ]
 
 { #category : #accessing }

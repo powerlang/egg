@@ -273,6 +273,36 @@ LauncherTestsModule >> findFirst [
 ]
 
 { #category : #entries }
+LauncherTestsModule >> readsLateGlobal [
+	| before |
+	<callback: slong ()>
+	before := self late.
+	namespace at: #Late put: 42.
+	before isNil ifFalse: [^0].
+	self late.
+	^self late
+]
+
+{ #category : #entries }
+LauncherTestsModule >> writesLateGlobal [
+	<callback: slong ()>
+	namespace at: #Late put: 0.
+	self late: 5.
+	self late: 7.
+	^namespace at: #Late
+]
+
+{ #category : #sending }
+LauncherTestsModule >> late [
+	^Late
+]
+
+{ #category : #sending }
+LauncherTestsModule >> late: anInteger [
+	Late := anInteger
+]
+
+{ #category : #entries }
 LauncherTestsModule >> handlesDnu [
 	<callback: slong ()>
 	^[self zork. 0] on: MessageNotUnderstood do: [:e | e message selector size]

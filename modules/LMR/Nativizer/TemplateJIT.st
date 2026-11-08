@@ -104,30 +104,74 @@ TemplateJIT >> loadAssociationValue: anAssociation [
 
 { #category : #services }
 TemplateJIT >> storeAssociation: anAssociation value: dummy [
-	assembler
-		loadAwithLiteral: anAssociation;
-		storeRinAindex: 2;
-		pushA.
+	assembler loadAwithLiteral: anAssociation.
+	self storeRinAssociationA
+]
+
+{ #category : #services }
+TemplateJIT >> storeRinAssociationA [
+	assembler storeRinAindex: 2; pushA.
 	self emitWriteBarrier
 ]
 
 { #category : #services }
+TemplateJIT >> bindSiteFor: aSymbol [
+	| name |
+	name := aSymbol asSymbol.
+	method hasFrame: true.
+	^BindSite name: name method: method
+]
+
+{ #category : #services }
+TemplateJIT >> loadBindSite: aSymbol [
+	| site index unbound done |
+	site := self bindSiteFor: aSymbol.
+	index := BindSite indexOfSlot: 'association'.
+	unbound := assembler newLabel.
+	done := assembler newLabel.
+	assembler
+		loadRwithLiteral: site;
+		loadRwithRindex: index;
+		compareRwithNil;
+		jumpIfEqualTo: unbound;
+		loadRwithRindex: 2;
+		jumpTo: done;
+		@ unbound;
+		loadRwithLiteral: site.
+	self emitSend: #value.
+	assembler @ done
+]
+
+{ #category : #services }
+TemplateJIT >> storeBindSite: aSymbol [
+	| site index unbound done |
+	site := self bindSiteFor: aSymbol.
+	index := BindSite indexOfSlot: 'association'.
+	unbound := assembler newLabel.
+	done := assembler newLabel.
+	assembler
+		loadAwithLiteral: site;
+		loadAwithAindex: index;
+		compareWithNil: assembler regA;
+		jumpIfEqualTo: unbound.
+	self storeRinAssociationA.
+	assembler jumpTo: done; @ unbound.
+	self pushR.
+	assembler loadRwithLiteral: site.
+	self emitSend: #value:.
+	stackCount := stackCount - 1.
+	assembler @ done
+]
+
+{ #category : #services }
 TemplateJIT >> staticBindingFor: aSymbol [
-	| name instVarIndex current assoc module |
+	| name instVarIndex assoc |
 	name := aSymbol asSymbol.
 	instVarIndex := method classBinding allInstVarNames indexOf: name.
 	instVarIndex > 0 ifTrue: [
 		^SInstVarBinding new index: instVarIndex].
-	current := method classBinding.
-	[current notNil] whileTrue: [
-		current namespaces do: [:ns |
-			assoc := ns associationAt: name ifAbsent: [nil].
-			assoc ifNotNil: [^SAssociationBinding new association: assoc]].
-		current := current superclass].
-	module := method module.
-	module ifNotNil: [
-		assoc := module namespace associationAt: name ifAbsent: [nil].
-		assoc ifNotNil: [^SAssociationBinding new association: assoc]].
+	assoc := method associationFor: name.
+	assoc ifNotNil: [^SAssociationBinding new association: assoc].
 	assoc := LMRProtoObject module namespace associationAt: name ifAbsent: [nil].
 	assoc ifNotNil: [^SAssociationBinding new association: assoc].
 	Kernel host logWarning: 'undeclared ' , name , ' in ' , method classBinding name , '>>' , method selector.
@@ -614,9 +658,10 @@ TemplateJIT >> nativize [
 
 { #category : #services }
 TemplateJIT >> nativize: aCompiledMethod [
-	self
-		resetFor: aCompiledMethod;
-		nativize.
+	| framed |
+	framed := aCompiledMethod hasFrame.
+	self resetFor: aCompiledMethod; nativize.
+	framed = aCompiledMethod hasFrame ifFalse: [self resetFor: aCompiledMethod; nativize].
 	^ aCompiledMethod optimizedCode: mainCode
 ]
 

@@ -180,6 +180,20 @@ TEST_CASE("native code allocates arrays and byte arrays", "[run]")
     }
 }
 
+TEST_CASE("globals defined at run time are bound at first use", "[run]")
+{
+    const std::pair<const char*, int64_t> expected[] = {
+        {"readsLateGlobal", 42},
+        {"writesLateGlobal", 7}};
+    for (auto& [entry, value] : expected) {
+        INFO("entry: " << entry);
+        lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+        launcher.bind("LMR.LauncherTests");
+        launcher.relocate();
+        REQUIRE(launcher.run(entry) == value);
+    }
+}
+
 TEST_CASE("native code looks up method dictionaries and symbol hashes", "[run]")
 {
     const std::pair<const char*, int64_t> expected[] = {

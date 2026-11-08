@@ -192,6 +192,16 @@ CompiledMethod >> category: category [
 ]
 
 { #category : #accessing }
+CompiledMethod >> associationFor: aSymbol [
+	| found module |
+	found := class associationFor: aSymbol.
+	found ifNotNil: [^found].
+	module := self module.
+	module ifNil: [^nil].
+	^module namespace associationAt: aSymbol ifAbsent: nil
+]
+
+{ #category : #accessing }
 CompiledMethod >> classBinding [
 	^class
 ]

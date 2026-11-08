@@ -206,6 +206,25 @@ Species >> classImplementing: aSymbol [
 ]
 
 { #category : #accessing }
+Species >> associationFor: aSymbol [
+	| species found |
+	species := self.
+	[species notNil] whileTrue: [
+		found := species localAssociationFor: aSymbol.
+		found ifNotNil: [^found].
+		species := species superclass].
+	^nil
+]
+
+{ #category : #accessing }
+Species >> localAssociationFor: aSymbol [
+	self namespaces do: [:namespace | | found |
+		found := namespace associationAt: aSymbol ifAbsent: nil.
+		found ifNotNil: [^found]].
+	^nil
+]
+
+{ #category : #accessing }
 Species >> classVariableAssociationAt: aString [
 	| c assoc |
 	c := self.
