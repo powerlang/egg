@@ -444,6 +444,19 @@ TEST_CASE("bound modules' extension methods run natively", "[run]")
     REQUIRE(launcher.run("sendsBoundExtension") == 8);
 }
 
+TEST_CASE("symbols stay identical across bound and loaded segments", "[run]")
+{
+    std::filesystem::copy_file(lmr_test::segPath("Examples.HelloWorld.ems"), "launcher-tests-segment.ems",
+                               std::filesystem::copy_options::overwrite_existing);
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    launcher.bindFFI();
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+    auto result = launcher.run("keepsSymbolIdentity");
+    std::remove("launcher-tests-segment.ems");
+    REQUIRE(result == 42);
+}
+
 TEST_CASE("native code reifies its own stack into contexts", "[run]")
 {
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));

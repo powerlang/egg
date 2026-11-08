@@ -556,9 +556,23 @@ LauncherTestsModule >> reifiesStack [
 	| top |
 	<callback: slong ()>
 	top := self reifiedFrom: 7.
-	(top receiver == self and: [top code selector asString = 'reifiedFrom:']) ifFalse: [^1].
+	(top receiver == self and: [top code selector == #reifiedFrom:]) ifFalse: [^1].
 	top arguments = #(7) ifFalse: [^2].
-	^top caller code selector asString = 'reifiesStack' ifTrue: [42] ifFalse: [3]
+	^top caller code selector == #reifiesStack ifTrue: [42] ifFalse: [3]
+]
+
+{ #category : #entries }
+LauncherTestsModule >> keepsSymbolIdentity [
+	| module |
+	<callback: slong ()>
+	self startFFI.
+	'size' asSymbol == #size ifFalse: [^1].
+	(self class >> #keepsSymbolIdentity) selector == #keepsSymbolIdentity ifFalse: [^2].
+	Memory current startUp.
+	module := ImageSegment load: 'launcher-tests-segment.ems'.
+	^(module class methodDictionary keys anySatisfy: [:selector | selector == #main:])
+		ifTrue: [42]
+		ifFalse: [3]
 ]
 
 { #category : #private }
