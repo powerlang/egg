@@ -13,7 +13,9 @@
 #include "SegmentPath.h"
 #include "FFIGlue.h"
 
+#include <cstdio>
 #include <cstring>
+#include <fstream>
 
 TEST_CASE("running the nativized __start__ returns 42", "[run]")
 {
@@ -192,13 +194,31 @@ TEST_CASE("an inlined to:by:do: counts up and down by its step", "[run]")
     REQUIRE((result >> 1) == 1040710 + 100602);
 }
 
-TEST_CASE("FFI initializes natively and calls C functions", "[run]")
+static void bindFFI(lmr::Launcher& launcher)
 {
-    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
     auto windows = std::string(Egg::PlatformName()).ends_with("win32");
     launcher.bind("FFI");
     launcher.bind(windows ? "FFI.Windows" : "FFI.Posix");
+}
+
+TEST_CASE("FFI initializes natively and calls C functions", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    bindFFI(launcher);
     launcher.bind("LMR.LauncherTests");
     launcher.relocate();
     REQUIRE((launcher.run("callsC") >> 1) == 1);
+}
+
+TEST_CASE("the native host reads a whole file", "[run]")
+{
+    const std::string contents = "egg reads files";
+    std::ofstream("launcher-tests-file.txt", std::ios::binary) << contents;
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    bindFFI(launcher);
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+    auto result = launcher.run("readsFile");
+    std::remove("launcher-tests-file.txt");
+    REQUIRE((result >> 1) == (int64_t)contents.size());
 }

@@ -248,17 +248,33 @@ LauncherTestsModule >> toByDo [
 
 { #category : #entries }
 LauncherTestsModule >> callsC [
-	| os ffi libc memory found |
+	| ffi libc memory found |
 	<callback: slong ()>
+	ffi := self startFFI.
+	libc := ffi libc.
+	memory := libc malloc: 16.
+	libc free: memory.
+	found := ffi loader findSymbol: #malloc in: libc address.
+	^(memory = 0 or: [found = 0]) ifTrue: [0] ifFalse: [1]
+]
+
+{ #category : #entries }
+LauncherTestsModule >> readsFile [
+	| contents |
+	<callback: slong ()>
+	self startFFI.
+	contents := Kernel host readFile: 'launcher-tests-file.txt'.
+	^contents = 'egg reads files' ifTrue: [contents size] ifFalse: [0]
+]
+
+{ #category : #services }
+LauncherTestsModule >> startFFI [
+	| os ffi |
 	os := (Kernel host platformName endsWith: 'win32')
 		ifTrue: [#'FFI.Windows' -> KernelDLL module]
 		ifFalse: [#'FFI.Posix' -> DLLibrary module].
 	Kernel loadedModules at: os key put: os value.
 	ffi := ExternalLibrary module.
 	ffi initializeForCurrentPlatform.
-	libc := ffi libc.
-	memory := libc malloc: 16.
-	libc free: memory.
-	found := ffi loader findSymbol: #malloc in: libc address.
-	^(memory = 0 or: [found = 0]) ifTrue: [0] ifFalse: [1]
+	^ffi
 ]

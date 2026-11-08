@@ -71,3 +71,18 @@ LMRHostSystem >> platformName [
 	rawName := HostLinkage at: 3.
 	^rawName upTo: Character null
 ]
+
+{ #category : #services }
+LMRHostSystem >> readFile: filename [
+	| libc fd size contents read |
+	libc := self libc.
+	fd := libc openForReading: filename.
+	fd < 0 ifTrue: [^self error: 'cannot open ' , filename].
+	size := libc lseek: fd offset: 0 whence: 2.
+	libc lseek: fd offset: 0 whence: 0.
+	contents := String new: size.
+	read := libc read: fd address: contents size: size.
+	libc close: fd.
+	read = size ifFalse: [^self error: 'cannot read ' , filename].
+	^contents
+]
