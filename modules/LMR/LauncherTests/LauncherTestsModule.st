@@ -9,6 +9,11 @@ Class {
 	#category : #'LMR-LauncherTests'
 }
 
+{ #category : #spec }
+LauncherTestsModule >> imports [
+	^{#Kernel -> #(ActiveProcess)}
+]
+
 { #category : #entries }
 LauncherTestsModule >> start [
 	<callback: slong ()>
@@ -154,4 +159,73 @@ LauncherTestsModule >> newArray [
 LauncherTestsModule >> newBytes [
 	<callback: slong ()>
 	^(ByteArray new: 5) size
+]
+
+{ #category : #entries }
+LauncherTestsModule >> symbolHash [
+	<callback: slong ()>
+	^#launch: basicHash
+]
+
+{ #category : #entries }
+LauncherTestsModule >> methodAt [
+	<callback: slong ()>
+	^(ActiveProcess compiledMethodAt: #launch:) isNil ifTrue: [0] ifFalse: [1]
+]
+
+{ #category : #entries }
+LauncherTestsModule >> methodScan [
+	| table |
+	<callback: slong ()>
+	table := ActiveProcess methodDictionary contents.
+	1 to: table size do: [:i | (table at: i) == #launch: ifTrue: [^i]].
+	^0
+]
+
+{ #category : #entries }
+LauncherTestsModule >> tableSize [
+	<callback: slong ()>
+	^ActiveProcess methodDictionary contents size
+]
+
+{ #category : #entries }
+LauncherTestsModule >> tableIndex [
+	<callback: slong ()>
+	^ActiveProcess methodDictionary contents indexOfHash: 503096068
+]
+
+{ #category : #entries }
+LauncherTestsModule >> equates [
+	<callback: slong ()>
+	^(ActiveProcess methodDictionary contents equates: #launch: with: #launch:) ifTrue: [1] ifFalse: [0]
+]
+
+{ #category : #entries }
+LauncherTestsModule >> emptySlot [
+	<callback: slong ()>
+	^ActiveProcess methodDictionary contents emptySlot isNil ifTrue: [1] ifFalse: [0]
+]
+
+{ #category : #entries }
+LauncherTestsModule >> valueAt [
+	<callback: slong ()>
+	^(ActiveProcess methodDictionary contents valueAt: 9 ifAbsent: [nil]) isNil ifTrue: [0] ifFalse: [1]
+]
+
+{ #category : #entries }
+LauncherTestsModule >> lookupKey [
+	<callback: slong ()>
+	^(ActiveProcess methodDictionary contents lookupKey: #launch: ifAbsent: [nil]) isNil ifTrue: [0] ifFalse: [1]
+]
+
+{ #category : #entries }
+LauncherTestsModule >> hashFor [
+	<callback: slong ()>
+	^ActiveProcess methodDictionary contents hashFor: #launch:
+]
+
+{ #category : #entries }
+LauncherTestsModule >> atIfAbsent [
+	<callback: slong ()>
+	^(ActiveProcess methodDictionary at: #launch: ifAbsent: [nil]) isNil ifTrue: [0] ifFalse: [1]
 ]

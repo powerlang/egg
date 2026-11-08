@@ -157,3 +157,26 @@ TEST_CASE("native code allocates arrays and byte arrays", "[run]")
         REQUIRE((launcher.run(entry) >> 1) == value);
     }
 }
+
+TEST_CASE("native code looks up method dictionaries and symbol hashes", "[run]")
+{
+    const std::pair<const char*, int64_t> expected[] = {
+        {"symbolHash", 30916},
+        {"methodAt", 1},
+        {"methodScan", 9},
+        {"tableSize", 64},
+        {"tableIndex", 9},
+        {"equates", 1},
+        {"emptySlot", 1},
+        {"valueAt", 1},
+        {"lookupKey", 1},
+        {"hashFor", 30916},
+        {"atIfAbsent", 1}};
+    for (auto& [entry, value] : expected) {
+        INFO("entry: " << entry);
+        lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+        launcher.bind("LMR.LauncherTests");
+        launcher.relocate();
+        REQUIRE((launcher.run(entry) >> 1) == value);
+    }
+}
