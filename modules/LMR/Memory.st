@@ -897,8 +897,7 @@ Memory >> spaces [
 Memory >> startUp [
 	fromSpace == self kernelSpace
 		ifTrue: [self createRememberedSet; createSpaces; createPinnedSpace].
-	self initializeCollectors.
-	Processor activeProcess initializeStack
+	self initializeCollectors
 ]
 
 { #category : #accessing }

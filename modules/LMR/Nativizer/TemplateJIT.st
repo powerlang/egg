@@ -248,25 +248,26 @@ TemplateJIT >> emitCallbackDecoding [
 	| offsets index |
 	offsets := environment abi callbackOffsetsOf: method descriptor.
 	index := NativeCode indexOfSlot: 'compiledCode'.
-	assembler callPushesReturnAddress ifTrue: [assembler pushImm: 0].
-	assembler
-		saveCallerFrame;
-		pushNil.
-	self pushNativeCode.
-	assembler
-		loadRwithFPindex: 3;
-		pushR;
-		loadRwithLiteral: offsets;
-		pushR;
-		loadRwithMindex: index.
-	self emitSend: #argumentsAt:offsets:.
-	assembler restoreCallerFrame.
-	assembler callPushesReturnAddress ifTrue: [assembler popA]
+	self emitFramedSend: #argumentsAt:offsets: loading: [
+		assembler
+			loadRwithFPindex: 3;
+			pushR;
+			loadRwithLiteral: offsets;
+			pushR;
+			loadRwithMindex: index]
+]
+
+{ #category : #services }
+TemplateJIT >> emitCallbackEnter [
+	self emitFramedSend: #enterCallback loading: [self loadObject: ProcessLMRStack]
 ]
 
 { #category : #services }
 TemplateJIT >> emitCallbackEpilogue [
-	self emitCallbackResult.
+	self
+		emitCallbackResult;
+		loadObject: ProcessLMRStack;
+		emitSend: #exitCallback.
 	assembler restoreCallerFrame.
 	environment abi
 		restoreContext: method descriptor with: assembler
@@ -283,7 +284,7 @@ TemplateJIT >> emitCallbackPrologue [
 		loadTrueWithLiteral: true;
 		loadFalseWithLiteral: false;
 		loadEwithNil.
-	self emitCallbackArguments.
+	self emitCallbackEnter; emitCallbackArguments.
 	assembler callPushesReturnAddress ifTrue: [assembler pushImm: 0].
 	assembler
 		loadRwithMindex: (NativeCode indexOfSlot: 'compiledCode');
@@ -300,6 +301,19 @@ TemplateJIT >> emitCallbackResult [
 	self
 		loadObject: method;
 		emitSend: #store:at:
+]
+
+{ #category : #services }
+TemplateJIT >> emitFramedSend: aSymbol loading: aBlock [
+	assembler callPushesReturnAddress ifTrue: [assembler pushImm: 0].
+	assembler
+		saveCallerFrame;
+		pushNil.
+	self pushNativeCode.
+	aBlock value.
+	self emitSend: aSymbol.
+	assembler restoreCallerFrame.
+	assembler callPushesReturnAddress ifTrue: [assembler popA]
 ]
 
 { #category : #services }
@@ -322,7 +336,7 @@ TemplateJIT >> emitCallout [
 		self loadObject: method; emitSend: #lookupFor:.
 		assembler jumpTo: resolved].
 	buffer := self emitMarshalling: types size.
-	self loadObject: method.
+	self emitChunkTop; loadObject: method.
 	assembler
 		loadRwithRindex: index;
 		convertRtoNativeInteger.
@@ -333,6 +347,18 @@ TemplateJIT >> emitCallout [
 			self loadRwithStack: buffer.
 			assembler loadRwithRindex: i].
 	self emitCalloutResult: return in: buffer
+]
+
+{ #category : #services }
+TemplateJIT >> emitChunkTop [
+	assembler codegen move: assembler regSP to: assembler regR.
+	assembler
+		setRintegerBit;
+		pushR;
+		loadRwithFP;
+		setRintegerBit;
+		pushR.
+	self loadObject: ProcessLMRStack; emitSend: #calloutTop:frame:
 ]
 
 { #category : #services }

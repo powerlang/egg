@@ -33,3 +33,8 @@ LauncherTestsLibrary >> stackArguments: a1 a2: a2 a3: a3 a4: a4 a5: a5 a6: a6 a7
 LauncherTestsLibrary >> floatArguments: d1 d2: d2 d3: d3 d4: d4 d5: d5 d6: d6 d7: d7 d8: d8 f9: f9 d10: d10 f11: f11 [
 	<cdecl: double lmrTestFloatArguments(double, double, double, double, double, double, double, double, float, double, float)>
 ]
+
+{ #category : #callouts }
+LauncherTestsLibrary >> callBack: anAddress times: anInteger [
+	<cdecl: sint64 lmrTestCallBack(pointer, sint64)>
+]

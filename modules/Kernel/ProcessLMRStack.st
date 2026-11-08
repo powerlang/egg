@@ -7,7 +7,9 @@ Class {
 	#name : #ProcessLMRStack,
 	#superclass : #ProcessStack,
 	#instVars : [
-		'locked'
+		'locked',
+		'chunk',
+		'spare'
 	],
 	#classVars : [
 		'Instances',
@@ -30,6 +32,21 @@ ProcessLMRStack class >> on: aProcess [
 	^stack
 ]
 
+{ #category : #callouts }
+ProcessLMRStack class >> calloutTop: top frame: frame [
+	Processor activeProcess nativeStack calloutTop: top frame: frame
+]
+
+{ #category : #callbacks }
+ProcessLMRStack class >> enterCallback [
+	Processor activeProcess nativeStack enterCallback
+]
+
+{ #category : #callbacks }
+ProcessLMRStack class >> exitCallback [
+	Processor activeProcess nativeStack exitCallback
+]
+
 { #category : #accessing }
 ProcessLMRStack class >> registeredInstances [
 	^Instances
@@ -45,6 +62,28 @@ ProcessLMRStack >> bp: aPointer [
 	bp := aPointer
 ]
 
+{ #category : #callouts }
+ProcessLMRStack >> calloutTop: top frame: frame [
+	spare ifNil: [spare := ProcessStackChunk new].
+	chunk sp: top; bp: frame
+]
+
+{ #category : #callbacks }
+ProcessLMRStack >> enterCallback [
+	spare prev: chunk.
+	chunk := spare.
+	spare := nil
+]
+
+{ #category : #callbacks }
+ProcessLMRStack >> exitCallback [
+	| exited |
+	exited := chunk.
+	chunk := exited prev.
+	exited invalidate; prev: nil.
+	spare := exited
+]
+
 { #category : #private }
 ProcessLMRStack >> callerOf: frame [
 	^(frame _asObject _basicAt: 1) _asPointer
@@ -52,7 +91,12 @@ ProcessLMRStack >> callerOf: frame [
 
 { #category : #enumerating }
 ProcessLMRStack >> framesDo: aBlock [
-	self framesFrom: sp do: aBlock
+	| suspended |
+	self framesFrom: sp do: aBlock.
+	suspended := chunk prev.
+	[suspended isForCallback] whileTrue: [
+		self framesOf: suspended do: aBlock.
+		suspended := suspended prev]
 ]
 
 { #category : #enumerating }
@@ -62,6 +106,14 @@ ProcessLMRStack >> framesFrom: top do: aBlock [
 	[(caller := self callerOf: frame) = 0] whileFalse: [
 		self slotsFrom: frame + (SlotSize * 2) _asPointer to: caller do: aBlock.
 		frame := caller]
+]
+
+{ #category : #enumerating }
+ProcessLMRStack >> framesOf: aProcessStackChunk do: aBlock [
+	| frame |
+	frame := aProcessStackChunk bp.
+	self slotsFrom: aProcessStackChunk sp to: frame do: aBlock.
+	self framesFrom: frame do: aBlock
 ]
 
 { #category : #testing }
@@ -98,7 +150,9 @@ ProcessLMRStack >> objectsDo: aBlock [
 { #category : #accessing }
 ProcessLMRStack >> process: aProcess [
 	super process: aProcess.
-	locked := false
+	locked := false.
+	chunk := ProcessStackChunk new.
+	spare := ProcessStackChunk new
 ]
 
 { #category : #enumerating }

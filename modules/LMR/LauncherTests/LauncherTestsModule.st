@@ -470,6 +470,27 @@ LauncherTestsModule >> dropsUnreferencedStacks [
 ]
 
 { #category : #entries }
+LauncherTestsModule >> allocatesInCallback [
+	<callback: slong ()>
+	1 to: 200 do: [:i | (Array new: 8190) atAllPut: true].
+	^1
+]
+
+{ #category : #entries }
+LauncherTestsModule >> nestsCallbacks [
+	| library ring method entry called total |
+	<callback: slong ()>
+	library := self testLibrary.
+	Memory current startUp.
+	ring := (1 to: 100) collect: [:i | Array new: i].
+	method := self namespace at: #allocatesInCallback.
+	entry := method nativeCodeAddress.
+	called := library callBack: entry times: 2.
+	total := ring inject: 0 into: [:sum :each | sum + each size].
+	^called + total
+]
+
+{ #category : #entries }
 LauncherTestsModule >> startsMemory [
 	| bytes |
 	<callback: slong ()>

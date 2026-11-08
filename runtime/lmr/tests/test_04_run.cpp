@@ -372,6 +372,15 @@ extern "C" __attribute__((visibility("default"), used)) double lmrTestFloatArgum
         + 9 * f9 + 10 * d10 + 11 * f11;
 }
 
+extern "C" __attribute__((visibility("default"), used)) int64_t lmrTestCallBack(
+    int64_t (*entry)(), int64_t times)
+{
+    int64_t sum = 0;
+    for (int64_t i = 0; i < times; i++)
+        sum += entry();
+    return sum;
+}
+
 TEST_CASE("memory collects old space, keeping survivors and clearing weak references", "[run]")
 {
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
@@ -388,6 +397,15 @@ TEST_CASE("memory drops process stacks nothing references", "[run]")
     launcher.bind("LMR.LauncherTests");
     launcher.relocate();
     REQUIRE(launcher.run("dropsUnreferencedStacks") == 1);
+}
+
+TEST_CASE("callbacks nest inside callouts and collect garbage there", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    launcher.bindFFI();
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+    REQUIRE(launcher.run("nestsCallbacks") == 5052);
 }
 
 TEST_CASE("native callouts pass integers, floats and stack arguments", "[run]")
