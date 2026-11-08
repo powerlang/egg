@@ -213,17 +213,10 @@ TEST_CASE("an inlined to:by:do: counts up and down by its step", "[run]")
     REQUIRE((result >> 1) == 1040710 + 100602);
 }
 
-static void bindFFI(lmr::Launcher& launcher)
-{
-    auto windows = std::string(Egg::PlatformName()).ends_with("win32");
-    launcher.bind("FFI");
-    launcher.bind(windows ? "FFI.Windows" : "FFI.Posix");
-}
-
 TEST_CASE("FFI initializes natively and calls C functions", "[run]")
 {
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
-    bindFFI(launcher);
+    launcher.bindFFI();
     launcher.bind("LMR.LauncherTests");
     launcher.relocate();
     REQUIRE((launcher.run("callsC") >> 1) == 1);
@@ -233,11 +226,22 @@ TEST_CASE("the native host reads the program arguments", "[run]")
 {
     const char* argv[] = {"lmr", "egg"};
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
-    bindFFI(launcher);
+    launcher.bindFFI();
     launcher.bind("LMR.LauncherTests");
     launcher.arguments(2, argv);
     launcher.relocate();
     REQUIRE((launcher.run("readsArguments") >> 1) == 42);
+}
+
+TEST_CASE("the start entry loads a module natively and runs its main", "[run]")
+{
+    const char* argv[] = {"lmr", LMR_SEG_DIR, "Examples.HelloWorld"};
+    lmr::Launcher launcher(lmr_test::segPath("LMR.Start.ems"));
+    launcher.bindFFI();
+    launcher.bind("LMR.Start");
+    launcher.arguments(3, argv);
+    launcher.relocate();
+    REQUIRE((launcher.run("start") >> 1) == 0);
 }
 
 TEST_CASE("the native host reads a whole file", "[run]")
@@ -245,7 +249,7 @@ TEST_CASE("the native host reads a whole file", "[run]")
     const std::string contents = "egg reads files";
     std::ofstream("launcher-tests-file.txt", std::ios::binary) << contents;
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
-    bindFFI(launcher);
+    launcher.bindFFI();
     launcher.bind("LMR.LauncherTests");
     launcher.relocate();
     auto result = launcher.run("readsFile");
@@ -258,7 +262,7 @@ TEST_CASE("an image segment loads natively", "[run]")
     std::filesystem::copy_file(lmr_test::segPath("Examples.HelloWorld.ems"), "launcher-tests-segment.ems",
                                std::filesystem::copy_options::overwrite_existing);
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
-    bindFFI(launcher);
+    launcher.bindFFI();
     launcher.bind("LMR.LauncherTests");
     launcher.relocate();
     auto result = launcher.run("loadsSegment");
@@ -269,7 +273,7 @@ TEST_CASE("an image segment loads natively", "[run]")
 TEST_CASE("the native host reserves commits and releases memory", "[run]")
 {
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
-    bindFFI(launcher);
+    launcher.bindFFI();
     launcher.bind("LMR.LauncherTests");
     launcher.relocate();
     REQUIRE((launcher.run("reservesMemory") >> 1) == 42);
@@ -294,7 +298,7 @@ TEST_CASE("bound modules are loaded modules natively", "[run]")
 TEST_CASE("Kernel os hands out and reuses memory in the heap block", "[run]")
 {
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
-    bindFFI(launcher);
+    launcher.bindFFI();
     launcher.bind("LMR.LauncherTests");
     launcher.relocate();
     REQUIRE((launcher.run("allocatesHeap") >> 1) == 42);
@@ -303,7 +307,7 @@ TEST_CASE("Kernel os hands out and reuses memory in the heap block", "[run]")
 TEST_CASE("native memory starts up and allocates beyond the kernel space", "[run]")
 {
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
-    bindFFI(launcher);
+    launcher.bindFFI();
     launcher.bind("LMR.LauncherTests");
     launcher.relocate();
     REQUIRE((launcher.run("startsMemory") >> 1) == 42);
@@ -312,7 +316,7 @@ TEST_CASE("native memory starts up and allocates beyond the kernel space", "[run
 TEST_CASE("the native host makes memory executable", "[run]")
 {
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
-    bindFFI(launcher);
+    launcher.bindFFI();
     launcher.bind("LMR.LauncherTests");
     launcher.relocate();
     REQUIRE((launcher.run("makesExecutable") >> 1) == 42);

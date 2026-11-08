@@ -45,6 +45,7 @@ class Launcher
      */
     void relocate();
     void bind(const std::string& module);
+    void bindFFI();
     void arguments(int argc, const char* const* argv);
     std::vector<Egg::Object*> importsOf(const std::string& module);
     Egg::HeapObject* exported(const std::string& name);
