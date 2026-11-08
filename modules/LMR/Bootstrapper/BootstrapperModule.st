@@ -57,6 +57,7 @@ BootstrapperModule >> __start__ [
 BootstrapperModule >> bootstrapLMR: anLMRModule nativizer: aNativizerModule platform: aPlatform [
 	| env |
 
+	Kernel log: 'nativizing the LMR runtime' , String cr.
 	env := aNativizerModule newNativizationEnvironmentFor: aPlatform.
 	env lmrModule: anLMRModule.
 	ProcessLMRStack
@@ -324,10 +325,12 @@ BootstrapperModule >> writeSegments [
 BootstrapperModule >> writeSegmentOf: aModule [
 	| filename builder code |
 	filename := 'image-segments/lmr/' , aModule name , '.ems'.
+	Kernel log: 'building ' , aModule name , '... '.
 	builder := self segmentBuilderFor: aModule.
 	code := codeSegments at: aModule ifAbsent: [#()].
 	code do: [:bytes | builder addCode: bytes].
-	aModule writeCachedSegmentAt: filename with: builder
+	aModule writeCachedSegmentAt: filename with: builder.
+	Kernel log: 'done at ' , filename , String cr
 ]
 
 { #category : #snapshotting }
