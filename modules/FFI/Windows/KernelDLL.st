@@ -34,3 +34,13 @@ KernelDLL >> VirtualAlloc: lpAddress dwSize: dwSize flAllocationType: flAllocati
 KernelDLL >> VirtualFree: lpAddress dwSize: dwSize dwFreeType: dwFreeType [
 	<cdecl: sint32 VirtualFree (pointer, uint64, uint32)>
 ]
+
+{ #category : #memory }
+KernelDLL >> FlushInstructionCache: hProcess lpBaseAddress: lpBaseAddress dwSize: dwSize [
+	<cdecl: sint32 FlushInstructionCache (pointer, pointer, uint64)>
+]
+
+{ #category : #memory }
+KernelDLL >> VirtualProtect: lpAddress dwSize: dwSize flNewProtect: flNewProtect lpflOldProtect: lpflOldProtect [
+	<cdecl: sint32 VirtualProtect (pointer, uint64, uint32, pointer)>
+]

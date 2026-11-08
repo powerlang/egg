@@ -38,7 +38,7 @@ PosixModule >> justLoaded [
 
 { #category : #memory }
 PosixModule >> anonymousMapping [
-	^(Kernel host platformName endsWith: 'darwin') ifTrue: [16r1000] ifFalse: [16r20]
+	^self runsOnMac ifTrue: [16r1000] ifFalse: [16r20]
 ]
 
 { #category : #memory }
@@ -70,4 +70,18 @@ PosixModule >> release: address size: size [
 { #category : #memory }
 PosixModule >> reserve: size [
 	^self map: size at: 0 protection: PROT_NONE flags: MAP_PRIVATE
+]
+
+{ #category : #memory }
+PosixModule >> makeExecutable: address size: size [
+	| libc result |
+	libc := ExternalLibrary module libc.
+	self runsOnMac ifTrue: [libc sysIcacheInvalidate: address size: size].
+	result := libc mprotect: address size: size protection: PROT_READ + PROT_EXEC.
+	^result = 0
+]
+
+{ #category : #testing }
+PosixModule >> runsOnMac [
+	^Kernel host platformName endsWith: 'darwin'
 ]

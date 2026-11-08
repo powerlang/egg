@@ -101,3 +101,8 @@ LMRHostSystem >> release: address size: size [
 LMRHostSystem >> reserve: size [
 	^LibC module os reserve: size
 ]
+
+{ #category : #memory }
+LMRHostSystem >> makeExecutable: address size: size [
+	^LibC module os makeExecutable: address size: size
+]

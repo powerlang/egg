@@ -17,7 +17,10 @@ WindowsModule >> externalCopyOfString: aString [
 
 { #category : #services }
 WindowsModule >> imports [
-	^{ #FFI -> #(ExternalLibrary LibC LibraryLoader) }
+	^{
+		#Kernel -> #(ByteArray).
+		#FFI -> #(ExternalLibrary LibC LibraryLoader)
+	}
 ]
 
 { #category : #initialization }
@@ -30,7 +33,8 @@ WindowsModule >> justLoaded [
 		at: #MEM_RESERVE put: 16r2000;
 		at: #MEM_RELEASE put: 16r8000;
 		at: #PAGE_NOACCESS put: 16r1;
-		at: #PAGE_READWRITE put: 16r4
+		at: #PAGE_READWRITE put: 16r4;
+		at: #PAGE_EXECUTE_READ put: 16r20
 ]
 
 { #category : #memory }
@@ -53,4 +57,13 @@ WindowsModule >> release: address size: size [
 { #category : #memory }
 WindowsModule >> reserve: size [
 	^self kernel32 VirtualAlloc: 0 dwSize: size flAllocationType: MEM_RESERVE flProtect: PAGE_NOACCESS
+]
+
+{ #category : #memory }
+WindowsModule >> makeExecutable: address size: size [
+	| previous protected |
+	previous := ByteArray new: 4.
+	protected := self kernel32 VirtualProtect: address dwSize: size flNewProtect: PAGE_EXECUTE_READ lpflOldProtect: previous.
+	self kernel32 FlushInstructionCache: -1 lpBaseAddress: address dwSize: size.
+	^protected != 0
 ]

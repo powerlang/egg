@@ -284,6 +284,22 @@ LauncherTestsModule >> reservesMemory [
 	^released ifTrue: [written] ifFalse: [0]
 ]
 
+{ #category : #entries }
+LauncherTestsModule >> makesExecutable [
+	| host address memory executable read |
+	<callback: slong ()>
+	self startFFI.
+	host := Kernel host.
+	address := host reserve: 16r100000.
+	host commit: 16r1000 at: address.
+	memory := ExternalMemory at: address.
+	memory at: 1 put: 42.
+	executable := host makeExecutable: address size: 16r1000.
+	read := memory at: 1.
+	host release: address size: 16r100000.
+	^executable ifTrue: [read] ifFalse: [0]
+]
+
 { #category : #services }
 LauncherTestsModule >> startFFI [
 	| os ffi |
