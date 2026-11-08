@@ -12,11 +12,12 @@ Class {
 { #category : #spec }
 LauncherTestsModule >> imports [
 	^{
-		#Kernel -> #(ActiveProcess).
+		#Kernel -> #(ActiveProcess ImageSegment).
 		#FFI -> #(ExternalLibrary ExternalMemory).
 		#LMR -> #(Memory).
 		#'FFI.Posix' -> #(DLLibrary).
-		#'FFI.Windows' -> #(KernelDLL)
+		#'FFI.Windows' -> #(KernelDLL).
+		#'Examples.HelloWorld' -> #(HelloWorldModule)
 	}
 ]
 
@@ -323,6 +324,16 @@ LauncherTestsModule >> allocatesHeap [
 	(os release: address) ifFalse: [^0].
 	(os reserve: 16r1000) = address ifFalse: [^0].
 	^written
+]
+
+{ #category : #entries }
+LauncherTestsModule >> loadsSegment [
+	| module |
+	<callback: slong ()>
+	self startFFI.
+	Memory current startUp.
+	module := ImageSegment load: 'launcher-tests-segment.ems'.
+	^module name = 'Examples.HelloWorld' ifTrue: [42] ifFalse: [0]
 ]
 
 { #category : #entries }

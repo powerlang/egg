@@ -15,6 +15,7 @@
 
 #include <cstdio>
 #include <cstring>
+#include <filesystem>
 #include <fstream>
 
 TEST_CASE("running the nativized __start__ returns 42", "[run]")
@@ -239,6 +240,19 @@ TEST_CASE("the native host reads a whole file", "[run]")
     auto result = launcher.run("readsFile");
     std::remove("launcher-tests-file.txt");
     REQUIRE((result >> 1) == (int64_t)contents.size());
+}
+
+TEST_CASE("an image segment loads natively", "[run]")
+{
+    std::filesystem::copy_file(lmr_test::segPath("Examples.HelloWorld.ems"), "launcher-tests-segment.ems",
+                               std::filesystem::copy_options::overwrite_existing);
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    bindFFI(launcher);
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+    auto result = launcher.run("loadsSegment");
+    std::remove("launcher-tests-segment.ems");
+    REQUIRE((result >> 1) == 42);
 }
 
 TEST_CASE("the native host reserves commits and releases memory", "[run]")

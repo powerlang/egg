@@ -45,6 +45,11 @@ LibC >> malloc: anInteger [
 ]
 
 { #category : #accessing }
+LibC >> memcpy: address from: aString size: anInteger [
+	<cdecl: pointer memcpy(pointer, pointer, uint64)>
+]
+
+{ #category : #accessing }
 LibC >> timespecGet: aByteArray base: anInteger [
 	<cdecl: sint32 timespec_get(pointer, sint32)>
 ]

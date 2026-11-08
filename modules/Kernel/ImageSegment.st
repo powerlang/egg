@@ -21,8 +21,9 @@ Class {
 
 { #category : #accessing }
 ImageSegment class >> load: filename [
-	"TO BE IMPLEMENTED!"
-	^nil
+	| contents |
+	contents := Kernel host readFile: filename.
+	^(self on: contents) install
 ]
 
 { #category : #'instance creation' }
@@ -111,6 +112,11 @@ ImageSegment >> readImportStringsAt: anInteger [
 		offset := offset + self countSize + length.
 		string].
 	^offset
+]
+
+{ #category : #accessing }
+ImageSegment >> reservedSize [
+	^bytes pointerAtOffset: self reservedSizeOffset
 ]
 
 { #category : #accessing }
@@ -264,6 +270,11 @@ ImageSegment >> sizeOffset [
 ]
 
 { #category : #layout }
+ImageSegment >> reservedSizeOffset [
+	^24
+]
+
+{ #category : #layout }
 ImageSegment >> moduleOffset [
 	^32
 ]
@@ -377,4 +388,18 @@ ImageSegment >> isImport: anInteger [
 { #category : #layout }
 ImageSegment >> importIndexOf: anInteger [
 	^(anInteger bitShift: -2) + 1
+]
+
+{ #category : #installing }
+ImageSegment >> install [
+	| host address |
+	host := Kernel host.
+	address := Kernel os reserveAndCommit: self reservedSize.
+	self
+		relocateTo: address;
+		linkImports;
+		bindImports: imports.
+	host libc memcpy: address from: bytes size: self storedSize.
+	codeSize = 0 ifFalse: [host makeExecutable: address + self codeStart size: codeSize].
+	^(self module // 2) _asObject
 ]
