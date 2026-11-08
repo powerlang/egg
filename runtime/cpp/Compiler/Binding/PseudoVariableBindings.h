@@ -107,6 +107,13 @@ public:
     const std::vector<Egg::string>& names() const { return _names; }
     
     void encodeUsing_(TreecodeEncoder* encoder) override;
+
+    std::optional<LiteralValue> literal() const override {
+        std::vector<LiteralValue> symbols;
+        for (const auto& name : _names)
+            symbols.push_back(LiteralValue::fromSymbol(name));
+        return LiteralValue::fromArray(symbols);
+    }
     
     Binding* copy_() override {
         return new NestedDynamicBinding(_names);

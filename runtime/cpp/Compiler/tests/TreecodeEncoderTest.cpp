@@ -9,6 +9,8 @@
 #include "../CompilerTypes.h"
 #include "../AST/SMethodNode.h"
 #include "../AST/SBlockNode.h"
+#include "../CompilationResult.h"
+#include "../Backend/SCompiledMethod.h"
 
 using namespace Egg;
 
@@ -28,4 +30,13 @@ TEST_CASE("TreecodeEncoder: a block reads an outer environment from its parent's
     TreecodeEncoder encoder;
     auto elements = encoder.encodeClosureElements_(inner);
     REQUIRE(elements == std::vector<uint8_t>{ClosureEnvironmentValue, 2});
+}
+
+TEST_CASE("TreecodeEncoder: a dotted name becomes an array of its symbols", "[encoder]") {
+    SSmalltalkCompiler compiler;
+    auto result = compiler.compileMethod_("foo ^Kernel.Object");
+    auto method = static_cast<SCompiledMethod*>(result->method());
+    REQUIRE(method != nullptr);
+    auto names = LiteralValue::fromArray({LiteralValue::fromSymbol("Kernel"), LiteralValue::fromSymbol("Object")});
+    REQUIRE(method->indexOf(names) != 0);
 }

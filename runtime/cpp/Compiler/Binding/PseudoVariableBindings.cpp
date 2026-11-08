@@ -45,7 +45,7 @@ void DynamicBinding::beReferencedFrom_(SScriptNode* aScriptNode) {
 }
 
 void NestedDynamicBinding::encodeUsing_(TreecodeEncoder* encoder) {
-    encoder->encodeNestedDynamicVar_(name());
+    encoder->encodeNestedDynamicVar_(*literal());
 }
 
 DynamicBinding* DynamicBinding::named_(const Egg::string& name) {
