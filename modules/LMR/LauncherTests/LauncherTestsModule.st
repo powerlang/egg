@@ -62,6 +62,29 @@ LauncherTestsModule >> capture: anInteger and: anotherInteger [
 ]
 
 { #category : #entries }
+LauncherTestsModule >> sumInBlock [
+	| sum |
+	<callback: slong ()>
+	sum := 0.
+	#(1 2 3) do: [:each | sum := sum + each].
+	^sum
+]
+
+{ #category : #entries }
+LauncherTestsModule >> captureThroughBlocks [
+	<callback: slong ()>
+	^self captureThroughBlocks: 5
+]
+
+{ #category : #testing }
+LauncherTestsModule >> captureThroughBlocks: anInteger [
+	| offset sums |
+	offset := anInteger.
+	sums := #(1 2) collect: [:i | namespace size. #(1 2) collect: [:j | offset + j]].
+	^(sums at: 2) at: 2
+]
+
+{ #category : #entries }
 LauncherTestsModule >> performAnswer [
 	<callback: slong ()>
 	^self perform: #answer

@@ -96,7 +96,7 @@ BootstrapperModule >> nativizeEntry: aCompiledMethod of: aModule with: env [
 	env nativize: code.
 	self installSelfReferenceOn: code optimizedCode.
 	aModule export: code optimizedCode as: aCompiledMethod selector.
-	(self codeSegmentOf: aModule) add: code optimizedCode code
+	self addCodeOf: code to: aModule
 ]
 
 { #category : #bootstrapping }

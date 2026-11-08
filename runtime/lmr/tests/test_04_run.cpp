@@ -116,6 +116,24 @@ TEST_CASE("a non-local return returns from the closure's home method", "[run]")
     REQUIRE((result >> 1) == 12);
 }
 
+TEST_CASE("a block in a launcher entry runs and returns to it", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    REQUIRE(launcher.loaded());
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+    REQUIRE((launcher.run("sumInBlock") >> 1) == 6);
+}
+
+TEST_CASE("a nested block captures a method temporary through its outer block", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    REQUIRE(launcher.loaded());
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+    REQUIRE((launcher.run("captureThroughBlocks") >> 1) == 7);
+}
+
 TEST_CASE("the native host knows the platform it runs on", "[run]")
 {
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));

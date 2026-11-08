@@ -160,7 +160,7 @@ TemplateJIT >> captureVariable: stream index: anInteger [
 			loadTwithFPindex: 3 + self argumentCount - pos;
 			storeTinRindex: anInteger].
 	type = EnvironmentValue
-		ifTrue: [assembler loadTwithEindex: pos; storeTinRindex: anInteger]
+		ifTrue: [assembler loadTwithEindex: pos + activeScript offsetOfCurrentEnvironment; storeTinRindex: anInteger]
 ]
 
 { #category : #services }
@@ -276,7 +276,7 @@ TemplateJIT >> emitMarshalling: count [
 TemplateJIT >> emitEpilogue [
 	method hasBlocks
 		ifTrue: [ assembler restoreCallerEnvironment ].
-	method isCallback
+	(method isCallback and: [ activeScript isMethod ])
 		ifTrue: [ ^ self emitCallbackEpilogue ].
 	method isFrameless
 		ifFalse: [ assembler restoreCallerFrame ].
