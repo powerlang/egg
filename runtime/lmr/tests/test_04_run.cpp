@@ -55,3 +55,14 @@ TEST_CASE("a static send runs a Kernel.LMR replacement", "[run]")
     auto result = launcher.run("sendsToReplacement");
     REQUIRE((result >> 1) == 1);
 }
+
+TEST_CASE("native code allocates in the Kernel space before startUp", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    REQUIRE(launcher.loaded());
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+
+    auto result = launcher.run("allocation");
+    REQUIRE((result >> 1) == 3);
+}

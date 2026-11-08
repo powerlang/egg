@@ -110,7 +110,8 @@ LMRModule >> initializeMemory [
 	memory := Memory new
 		addKernelSpace: kernel;
 		fromSpace: kernel;
-		eden: kernel
+		eden: kernel.
+	self export: kernel as: #KernelSpace
 ]
 
 { #category : #accessing }

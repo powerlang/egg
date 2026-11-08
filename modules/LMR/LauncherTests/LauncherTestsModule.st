@@ -31,3 +31,9 @@ LauncherTestsModule >> send [
 LauncherTestsModule >> answer [
 	^42
 ]
+
+{ #category : #entries }
+LauncherTestsModule >> allocation [
+	<callback: slong ()>
+	^(ByteArray new: 3) size
+]

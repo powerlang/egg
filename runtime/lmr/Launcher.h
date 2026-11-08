@@ -63,6 +63,8 @@ class Launcher
     Egg::Object* kernelExport(const std::string& name);
     Egg::Object* bindImport(const std::vector<std::string>& tokens);
     Egg::Object* methodIn(Egg::HeapObject* behavior, Egg::Object* selector);
+    uint32_t instVarIndex(Egg::HeapObject* species, const std::string& name);
+    void initializeKernelSpace();
     void makeExecutable();
 };
 

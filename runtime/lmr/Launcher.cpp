@@ -84,7 +84,43 @@ void Launcher::relocate()
             imports = this->importsOf(name);
         segment->bindImports(imports);
     }
+    this->initializeKernelSpace();
     this->makeExecutable();
+}
+
+uint32_t Launcher::instVarIndex(Egg::HeapObject* species, const std::string& name)
+{
+    auto nil = this->kernelExport("nil");
+    std::vector<Egg::HeapObject*> chain;
+    for (auto current = (Egg::Object*)species; current != nil; current = current->asHeapObject()->slot(Egg::Offsets::SpeciesSuperclass))
+        chain.insert(chain.begin(), current->asHeapObject());
+    uint32_t index = 0;
+    for (auto each : chain) {
+        auto names = each->slot(Egg::Offsets::SpeciesInstanceVariables);
+        if (names == nil)
+            continue;
+        auto array = names->asHeapObject();
+        for (uint32_t i = 0; i < array->size(); i++, index++) {
+            auto string = array->slot(i)->asHeapObject();
+            if (std::string((const char*)&string->byte(0), strnlen((const char*)&string->byte(0), string->size())) == name)
+                return index;
+        }
+    }
+    throw std::runtime_error("instances have no variable named " + name);
+}
+
+void Launcher::initializeKernelSpace()
+{
+    auto& exports = this->segmentNamed("LMR")->_exports;
+    auto space = exports.at("KernelSpace");
+    auto species = exports.at("GCSpace");
+    auto kernel = this->segmentNamed("Kernel");
+    auto free = kernel->header.codeSize == 0 ? kernel->spaceEnd() : Egg::pagealign(kernel->codeEnd());
+    auto limit = kernel->reservedEnd();
+    for (auto& [name, address] : std::map<std::string, uintptr_t>{
+             {"base", kernel->spaceStart()}, {"nextFree", free}, {"softLimit", limit},
+             {"commitedLimit", limit}, {"reservedLimit", limit}})
+        space->slot(this->instVarIndex(species, name)) = reinterpret_cast<Egg::Object*>(address | 1);
 }
 
 void Launcher::collectSymbols()
