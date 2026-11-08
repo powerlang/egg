@@ -268,6 +268,18 @@ LauncherTestsModule >> readsFile [
 ]
 
 { #category : #entries }
+LauncherTestsModule >> allocatesHeap [
+	| address memory |
+	<callback: slong ()>
+	self startFFI.
+	address := Kernel host allocateHeap: 16r1000.
+	(address bitShift: -32) = (self _oop bitShift: -32) ifFalse: [^0].
+	memory := ExternalMemory at: address.
+	memory at: 1 put: 42.
+	^memory at: 1
+]
+
+{ #category : #entries }
 LauncherTestsModule >> reservesMemory [
 	| host address committed memory written released |
 	<callback: slong ()>

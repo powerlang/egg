@@ -29,6 +29,8 @@ constexpr uintptr_t MarkBitmapSize = MarkChunkSize / 64;
 
 void     InitializeMemory();
 uintptr_t ReserveMemory(uintptr_t baseHint, uintptr_t size);
+uintptr_t HeapNextFree();
+uintptr_t HeapLimit();
 void     CommitMemory(uintptr_t base, uintptr_t size);
 void     DecommitMemory(uintptr_t base, uintptr_t size);
 void     MakeWritable(uintptr_t base, uintptr_t size);

@@ -93,6 +93,16 @@ uintptr_t Egg::ReserveMemory(uintptr_t baseHint, uintptr_t size)
     return base;
 }
 
+uintptr_t Egg::HeapNextFree()
+{
+    return Egg::nextFree;
+}
+
+uintptr_t Egg::HeapLimit()
+{
+    return Egg::limit;
+}
+
 void Egg::CommitMemory(uintptr_t base, uintptr_t size)
 {
     if (mprotect((void*)base, pagealign(size), PROT_READ | PROT_WRITE) != 0) {

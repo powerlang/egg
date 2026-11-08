@@ -15,7 +15,8 @@ LMRModule >> justLoaded [
 	| linkage |
 	super justLoaded.
 	namespace at: #LastHash put: 1.
-	linkage := Array with: nil with: nil with: (String new: 32).
+	linkage := Array new: 5.
+	linkage at: 3 put: (String new: 32).
 	self exportByReference: linkage as: #HostLinkage
 ]
 

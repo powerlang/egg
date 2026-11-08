@@ -125,6 +125,8 @@ void Launcher::initializeHostLinkage()
     auto linkage = this->segmentNamed("Kernel.LMR")->_exports.at("HostLinkage");
     linkage->slot(0) = reinterpret_cast<Egg::Object*>(Egg::SymbolFinder() << 1 | 1);
     linkage->slot(1) = reinterpret_cast<Egg::Object*>(Egg::LoaderHandle() << 1 | 1);
+    linkage->slot(3) = reinterpret_cast<Egg::Object*>(Egg::HeapNextFree() << 1 | 1);
+    linkage->slot(4) = reinterpret_cast<Egg::Object*>(Egg::HeapLimit() << 1 | 1);
     auto platform = linkage->slot(2)->asHeapObject();
     std::strncpy(reinterpret_cast<char*>(&platform->byte(0)), Egg::PlatformName(), platform->size() - 1);
 }
