@@ -57,7 +57,7 @@ class Launcher
     std::map<std::string, std::unique_ptr<Egg::FileImageSegment>> _segments;
     Egg::FileImageSegment* _segment = nullptr;
     std::map<std::string, Egg::Object*> _symbols;
-    std::vector<std::string> _bound = {"Kernel", "Kernel.LMR", "LMR"};
+    std::vector<std::string> _bound = {"Kernel", "Kernel.LMR", "LMR", "FFI"};
     int _argc = 0;
     const char* const* _argv = nullptr;
 

@@ -188,7 +188,41 @@ TemplateJIT >> emitBlockPrologue: anSBlock [
 ]
 
 { #category : #services }
+TemplateJIT >> emitCallbackArguments [
+	method argumentCount = 0 ifTrue: [^self].
+	self emitCallbackDecoding.
+	assembler loadAwithR.
+	1 to: method argumentCount do: [:i |
+		assembler
+			loadRwithA;
+			loadRwithRindex: i;
+			pushR]
+]
+
+{ #category : #services }
+TemplateJIT >> emitCallbackDecoding [
+	| offsets index |
+	offsets := environment abi callbackOffsetsOf: method descriptor.
+	index := NativeCode indexOfSlot: 'compiledCode'.
+	assembler callPushesReturnAddress ifTrue: [assembler pushImm: 0].
+	assembler
+		saveCallerFrame;
+		pushNil.
+	self pushNativeCode.
+	assembler
+		loadRwithFPindex: 3;
+		pushR;
+		loadRwithLiteral: offsets;
+		pushR;
+		loadRwithMindex: index.
+	self emitSend: #argumentsAt:offsets:.
+	assembler restoreCallerFrame.
+	assembler callPushesReturnAddress ifTrue: [assembler popA]
+]
+
+{ #category : #services }
 TemplateJIT >> emitCallbackEpilogue [
+	self emitCallbackResult.
 	assembler restoreCallerFrame.
 	environment abi
 		restoreContext: method descriptor with: assembler
@@ -196,20 +230,32 @@ TemplateJIT >> emitCallbackEpilogue [
 
 { #category : #services }
 TemplateJIT >> emitCallbackPrologue [
-	| retaddr |
 	environment abi emitEntrypoint: method descriptor with: assembler.
-	retaddr := 0.
 	assembler
-		pushImm: retaddr;
 		xorFPwithFP;
 		loadMwithOwnNativeCode: environment platform behaviorOffset;
 		loadGwithLiteral: environment lmrModule globals;
 		loadNilWithLiteral: nil;
 		loadTrueWithLiteral: true;
 		loadFalseWithLiteral: false;
-		loadEwithNil;
+		loadEwithNil.
+	self emitCallbackArguments.
+	assembler callPushesReturnAddress ifTrue: [assembler pushImm: 0].
+	assembler
 		loadRwithMindex: (NativeCode indexOfSlot: 'compiledCode');
 		loadRwithRindex: (CallbackMethod indexOfSlot: 'receiver')
+]
+
+{ #category : #services }
+TemplateJIT >> emitCallbackResult [
+	method descriptor returnTypeName == #void ifTrue: [^self].
+	assembler
+		pushR;
+		loadRwithFPindex: 3 + method argumentCount;
+		pushR.
+	self
+		loadObject: method;
+		emitSend: #store:at:
 ]
 
 { #category : #services }

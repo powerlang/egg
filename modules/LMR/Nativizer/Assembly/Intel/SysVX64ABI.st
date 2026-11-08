@@ -19,8 +19,7 @@ SysVX64ABI >> emitEntrypoint: anFFIDescriptor with: anAssembler [
 		pushTrue;
 		pushFalse;
 		pushM.
-	self storeArgumentsInStack: anFFIDescriptor with: anAssembler.
-	
+	self spillCallbackArguments: anFFIDescriptor with: anAssembler
 ]
 
 { #category : #callouts }
@@ -45,16 +44,8 @@ SysVX64ABI >> placesOf: types [
 ]
 
 { #category : #'as yet unclassified' }
-SysVX64ABI >> popRetaddrAndArgs: anFFIDescriptor with: anAssembler [
-	anAssembler
-		popA;
-		popA;
-		popA
-]
-
-{ #category : #'as yet unclassified' }
 SysVX64ABI >> restoreContext: anFFIDescriptor with: anAssembler [
-	self popRetaddrAndArgs: anFFIDescriptor with: anAssembler.
+	self loadCallbackResult: anFFIDescriptor with: anAssembler.
 	anAssembler
 		popM;
 		popFalse;
@@ -65,10 +56,12 @@ SysVX64ABI >> restoreContext: anFFIDescriptor with: anAssembler [
 		return
 ]
 
-{ #category : #'as yet unclassified' }
-SysVX64ABI >> storeArgumentsInStack: anFFIDescriptor with: anAssembler [
-	anAssembler pushS;
-		loadRwithArgPointer;
-		convertRtoSmallInteger;
-		pushR
+{ #category : #callbacks }
+SysVX64ABI >> callbackFloatRegisters [
+	^{xmm0. xmm1. xmm2. xmm3. xmm4. xmm5. xmm6. xmm7}
+]
+
+{ #category : #callbacks }
+SysVX64ABI >> callbackIntegerRegisters [
+	^{rdi. rsi. rdx. rcx. r8. r9}
 ]

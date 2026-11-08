@@ -82,14 +82,22 @@ FFIDescriptor >> marshalArguments: anArray [
 
 { #category : #marshalling }
 FFIDescriptor >> resultFrom: aByteArray [
-	| type float |
+	| type |
 	type := self returnTypeName.
 	type == #void ifTrue: [^0].
+	^self valueOf: type at: 0 in: aByteArray
+]
+
+{ #category : #marshalling }
+FFIDescriptor >> valueOf: type at: offset in: aByteArray [
+	| float |
 	(type == #float or: [type == #double]) ifTrue: [
 		float := Float new.
-		float replaceBytesFrom: 1 to: 8 with: aByteArray startingAt: 1.
+		float replaceBytesFrom: 1 to: 8 with: aByteArray startingAt: offset + 1.
 		^float].
+	(#(sint32 sint) includes: type) ifTrue: [^aByteArray longAtOffset: offset].
+	(#(uint32 uint) includes: type) ifTrue: [^aByteArray uLongAtOffset: offset].
 	^type first = $s
-		ifTrue: [aByteArray largeAtOffset: 0]
-		ifFalse: [aByteArray pointerAtOffset: 0]
+		ifTrue: [aByteArray largeAtOffset: offset]
+		ifFalse: [aByteArray pointerAtOffset: offset]
 ]

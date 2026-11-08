@@ -448,6 +448,30 @@ LauncherTestsModule >> testLibrary [
 	^library
 ]
 
+{ #category : #entries }
+LauncherTestsModule >> second: first with: second [
+	<callback: slong (slong, slong)>
+	^second
+]
+
+{ #category : #entries }
+LauncherTestsModule >> negated: anInteger [
+	<callback: sint (sint)>
+	^anInteger negated
+]
+
+{ #category : #entries }
+LauncherTestsModule >> identity: aFloat [
+	<callback: double (double)>
+	^aFloat
+]
+
+{ #category : #entries }
+LauncherTestsModule >> large [
+	<callback: slong ()>
+	^16r4000000000000000
+]
+
 { #category : #services }
 LauncherTestsModule >> startFFI [
 	Kernel host startUp.

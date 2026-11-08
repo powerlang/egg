@@ -20,5 +20,5 @@ int main(int argc, char** argv)
     launcher.bind("LMR.Start");
     launcher.arguments(argc, argv);
     launcher.relocate();
-    return static_cast<int>(static_cast<int64_t>(launcher.run("start")) >> 1);
+    return static_cast<int>(launcher.run("start"));
 }

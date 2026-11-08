@@ -1,9 +1,9 @@
 /*
     Step 4: run the nativized __start__ entry. Locate its NativeCode via the
     #__start__ export, mark the machine code executable, set up a frame and
-    jump in. __start__ is `^42`, so the result is the tagged SmallInteger 42
-    (42 * 2 + 1 = 85). This is the first nativized code executed by the
-    launcher, with no C++ evaluator involved.
+    jump in. __start__ is `^42`, answered to C as the slong 42. This is the
+    first nativized code executed by the launcher, with no C++ evaluator
+    involved.
 */
 #include <catch2/catch.hpp>
 
@@ -22,22 +22,22 @@ TEST_CASE("running the nativized __start__ returns 42", "[run]")
 {
     lmr::Launcher launcher(lmr_test::segPath("LMR.Bootstrapper.ems"));
     REQUIRE(launcher.loaded());
-
+    launcher.bind("LMR.Bootstrapper");
     launcher.relocate();
 
     auto result = launcher.run("__start__");
-    REQUIRE(result == 85);
-    REQUIRE((result >> 1) == 42);
+    REQUIRE(result == 42);
 }
 
 TEST_CASE("the launcher tests module exports its entries", "[run]")
 {
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
     REQUIRE(launcher.loaded());
+    launcher.bind("LMR.LauncherTests");
     launcher.relocate();
 
     auto result = launcher.run("start");
-    REQUIRE((result >> 1) == 42);
+    REQUIRE(result == 42);
 }
 
 TEST_CASE("a native send runs once its segment is bound", "[run]")
@@ -48,7 +48,7 @@ TEST_CASE("a native send runs once its segment is bound", "[run]")
     launcher.relocate();
 
     auto result = launcher.run("send");
-    REQUIRE((result >> 1) == 42);
+    REQUIRE(result == 42);
 }
 
 TEST_CASE("a static send runs a Kernel.LMR replacement", "[run]")
@@ -59,7 +59,7 @@ TEST_CASE("a static send runs a Kernel.LMR replacement", "[run]")
     launcher.relocate();
 
     auto result = launcher.run("sendsToReplacement");
-    REQUIRE((result >> 1) == 1);
+    REQUIRE(result == 1);
 }
 
 TEST_CASE("native code allocates in the Kernel space before startUp", "[run]")
@@ -70,7 +70,7 @@ TEST_CASE("native code allocates in the Kernel space before startUp", "[run]")
     launcher.relocate();
 
     auto result = launcher.run("allocation");
-    REQUIRE((result >> 1) == 3);
+    REQUIRE(result == 3);
 }
 
 TEST_CASE("a closure captures the method argument it names", "[run]")
@@ -81,7 +81,7 @@ TEST_CASE("a closure captures the method argument it names", "[run]")
     launcher.relocate();
 
     auto result = launcher.run("capture");
-    REQUIRE((result >> 1) == 3);
+    REQUIRE(result == 3);
 }
 
 TEST_CASE("perform: runs the method it finds", "[run]")
@@ -92,7 +92,7 @@ TEST_CASE("perform: runs the method it finds", "[run]")
     launcher.relocate();
 
     auto result = launcher.run("performAnswer");
-    REQUIRE((result >> 1) == 42);
+    REQUIRE(result == 42);
 }
 
 TEST_CASE("inlined andNot: and orNot: negate their last condition", "[run]")
@@ -103,7 +103,7 @@ TEST_CASE("inlined andNot: and orNot: negate their last condition", "[run]")
     launcher.relocate();
 
     auto result = launcher.run("negations");
-    REQUIRE((result >> 1) == 3);
+    REQUIRE(result == 3);
 }
 
 TEST_CASE("a non-local return returns from the closure's home method", "[run]")
@@ -114,7 +114,7 @@ TEST_CASE("a non-local return returns from the closure's home method", "[run]")
     launcher.relocate();
 
     auto result = launcher.run("nonLocalReturn");
-    REQUIRE((result >> 1) == 12);
+    REQUIRE(result == 12);
 }
 
 TEST_CASE("a block in a launcher entry runs and returns to it", "[run]")
@@ -123,7 +123,7 @@ TEST_CASE("a block in a launcher entry runs and returns to it", "[run]")
     REQUIRE(launcher.loaded());
     launcher.bind("LMR.LauncherTests");
     launcher.relocate();
-    REQUIRE((launcher.run("sumInBlock") >> 1) == 6);
+    REQUIRE(launcher.run("sumInBlock") == 6);
 }
 
 TEST_CASE("a nested block captures a method temporary through its outer block", "[run]")
@@ -132,7 +132,7 @@ TEST_CASE("a nested block captures a method temporary through its outer block", 
     REQUIRE(launcher.loaded());
     launcher.bind("LMR.LauncherTests");
     launcher.relocate();
-    REQUIRE((launcher.run("captureThroughBlocks") >> 1) == 7);
+    REQUIRE(launcher.run("captureThroughBlocks") == 7);
 }
 
 TEST_CASE("the native host knows the platform it runs on", "[run]")
@@ -143,7 +143,7 @@ TEST_CASE("the native host knows the platform it runs on", "[run]")
     launcher.relocate();
 
     auto result = launcher.run("platformNameSize");
-    REQUIRE((result >> 1) == (int64_t)std::strlen(Egg::PlatformName()));
+    REQUIRE(result == (int64_t)std::strlen(Egg::PlatformName()));
 }
 
 TEST_CASE("SmallInteger arithmetic and nil tests run natively", "[run]")
@@ -162,7 +162,7 @@ TEST_CASE("SmallInteger arithmetic and nil tests run natively", "[run]")
         lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
         launcher.bind("LMR.LauncherTests");
         launcher.relocate();
-        REQUIRE((launcher.run(entry) >> 1) == value);
+        REQUIRE(launcher.run(entry) == value);
     }
 }
 
@@ -176,7 +176,7 @@ TEST_CASE("native code allocates arrays and byte arrays", "[run]")
         lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
         launcher.bind("LMR.LauncherTests");
         launcher.relocate();
-        REQUIRE((launcher.run(entry) >> 1) == value);
+        REQUIRE(launcher.run(entry) == value);
     }
 }
 
@@ -200,7 +200,7 @@ TEST_CASE("native code looks up method dictionaries and symbol hashes", "[run]")
         lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
         launcher.bind("LMR.LauncherTests");
         launcher.relocate();
-        REQUIRE((launcher.run(entry) >> 1) == value);
+        REQUIRE(launcher.run(entry) == value);
     }
 }
 
@@ -212,7 +212,7 @@ TEST_CASE("an inlined to:by:do: counts up and down by its step", "[run]")
     launcher.relocate();
 
     auto result = launcher.run("toByDo");
-    REQUIRE((result >> 1) == 1040710 + 100602);
+    REQUIRE(result == 1040710 + 100602);
 }
 
 TEST_CASE("FFI initializes natively and calls C functions", "[run]")
@@ -221,7 +221,7 @@ TEST_CASE("FFI initializes natively and calls C functions", "[run]")
     launcher.bindFFI();
     launcher.bind("LMR.LauncherTests");
     launcher.relocate();
-    REQUIRE((launcher.run("callsC") >> 1) == 1);
+    REQUIRE(launcher.run("callsC") == 1);
 }
 
 TEST_CASE("the native host reads the program arguments", "[run]")
@@ -232,7 +232,7 @@ TEST_CASE("the native host reads the program arguments", "[run]")
     launcher.bind("LMR.LauncherTests");
     launcher.arguments(2, argv);
     launcher.relocate();
-    REQUIRE((launcher.run("readsArguments") >> 1) == 42);
+    REQUIRE(launcher.run("readsArguments") == 42);
 }
 
 TEST_CASE("the start entry loads a module natively and runs its main", "[run]")
@@ -243,7 +243,7 @@ TEST_CASE("the start entry loads a module natively and runs its main", "[run]")
     launcher.bind("LMR.Start");
     launcher.arguments(3, argv);
     launcher.relocate();
-    REQUIRE((launcher.run("start") >> 1) == 0);
+    REQUIRE(launcher.run("start") == 0);
 }
 
 TEST_CASE("the native host reads a whole file", "[run]")
@@ -256,7 +256,7 @@ TEST_CASE("the native host reads a whole file", "[run]")
     launcher.relocate();
     auto result = launcher.run("readsFile");
     std::remove("launcher-tests-file.txt");
-    REQUIRE((result >> 1) == (int64_t)contents.size());
+    REQUIRE(result == (int64_t)contents.size());
 }
 
 TEST_CASE("an image segment loads natively", "[run]")
@@ -269,7 +269,7 @@ TEST_CASE("an image segment loads natively", "[run]")
     launcher.relocate();
     auto result = launcher.run("loadsSegment");
     std::remove("launcher-tests-segment.ems");
-    REQUIRE((result >> 1) == 42);
+    REQUIRE(result == 42);
 }
 
 TEST_CASE("the native host reserves commits and releases memory", "[run]")
@@ -278,7 +278,7 @@ TEST_CASE("the native host reserves commits and releases memory", "[run]")
     launcher.bindFFI();
     launcher.bind("LMR.LauncherTests");
     launcher.relocate();
-    REQUIRE((launcher.run("reservesMemory") >> 1) == 42);
+    REQUIRE(launcher.run("reservesMemory") == 42);
 }
 
 TEST_CASE("native code writes 32-bit integers into bytes", "[run]")
@@ -286,7 +286,7 @@ TEST_CASE("native code writes 32-bit integers into bytes", "[run]")
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
     launcher.bind("LMR.LauncherTests");
     launcher.relocate();
-    REQUIRE((launcher.run("writesLongs") >> 1) == 42);
+    REQUIRE(launcher.run("writesLongs") == 42);
 }
 
 TEST_CASE("bound modules are loaded modules natively", "[run]")
@@ -294,7 +294,7 @@ TEST_CASE("bound modules are loaded modules natively", "[run]")
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
     launcher.bind("LMR.LauncherTests");
     launcher.relocate();
-    REQUIRE((launcher.run("findsBoundModules") >> 1) == 42);
+    REQUIRE(launcher.run("findsBoundModules") == 42);
 }
 
 TEST_CASE("Kernel os hands out and reuses memory in the heap block", "[run]")
@@ -303,7 +303,7 @@ TEST_CASE("Kernel os hands out and reuses memory in the heap block", "[run]")
     launcher.bindFFI();
     launcher.bind("LMR.LauncherTests");
     launcher.relocate();
-    REQUIRE((launcher.run("allocatesHeap") >> 1) == 42);
+    REQUIRE(launcher.run("allocatesHeap") == 42);
 }
 
 TEST_CASE("native memory starts up and allocates beyond the kernel space", "[run]")
@@ -312,7 +312,7 @@ TEST_CASE("native memory starts up and allocates beyond the kernel space", "[run
     launcher.bindFFI();
     launcher.bind("LMR.LauncherTests");
     launcher.relocate();
-    REQUIRE((launcher.run("startsMemory") >> 1) == 42);
+    REQUIRE(launcher.run("startsMemory") == 42);
 }
 
 TEST_CASE("the native host makes memory executable", "[run]")
@@ -321,7 +321,7 @@ TEST_CASE("the native host makes memory executable", "[run]")
     launcher.bindFFI();
     launcher.bind("LMR.LauncherTests");
     launcher.relocate();
-    REQUIRE((launcher.run("makesExecutable") >> 1) == 42);
+    REQUIRE(launcher.run("makesExecutable") == 42);
 }
 
 TEST_CASE("native code handles a message not understood", "[run]")
@@ -329,7 +329,7 @@ TEST_CASE("native code handles a message not understood", "[run]")
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
     launcher.bind("LMR.LauncherTests");
     launcher.relocate();
-    REQUIRE((launcher.run("handlesDnu") >> 1) == 4);
+    REQUIRE(launcher.run("handlesDnu") == 4);
 }
 
 extern "C" __attribute__((visibility("default"), used)) int64_t lmrTestStackArguments(
@@ -362,6 +362,43 @@ TEST_CASE("native callouts pass integers, floats and stack arguments", "[run]")
         launcher.bindFFI();
         launcher.bind("LMR.LauncherTests");
         launcher.relocate();
-        REQUIRE((launcher.run(entry) >> 1) == value);
+        REQUIRE(launcher.run(entry) == value);
     }
+}
+
+TEST_CASE("a nativized callback receives its C arguments", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+    auto second = reinterpret_cast<int64_t (*)(int64_t, int64_t)>(launcher.entry("second:with:"));
+    REQUIRE(second(3, 4) == 4);
+    REQUIRE(second(4, -5) == -5);
+}
+
+TEST_CASE("a nativized callback takes and answers 32-bit ints", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+    auto negated = reinterpret_cast<int (*)(int)>(launcher.entry("negated:"));
+    REQUIRE(negated(5) == -5);
+    REQUIRE(negated(-7) == 7);
+}
+
+TEST_CASE("a nativized callback takes and answers doubles", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+    auto identity = reinterpret_cast<double (*)(double)>(launcher.entry("identity:"));
+    REQUIRE(identity(2.5) == 2.5);
+}
+
+TEST_CASE("a nativized callback answers integers beyond SmallInteger", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+    REQUIRE(launcher.run("large") == 0x4000000000000000);
 }

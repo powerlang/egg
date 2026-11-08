@@ -84,7 +84,6 @@ void Launcher::arguments(int argc, const char* const* argv)
 void Launcher::bindFFI()
 {
     auto windows = std::string(Egg::PlatformName()).ends_with("win32");
-    this->bind("FFI");
     this->bind(windows ? "FFI.Windows" : "FFI.Posix");
 }
 
