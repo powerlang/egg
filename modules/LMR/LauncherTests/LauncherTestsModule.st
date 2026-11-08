@@ -439,6 +439,25 @@ LauncherTestsModule >> collectsGarbage [
 ]
 
 { #category : #entries }
+LauncherTestsModule >> keepsEnvironmentAcrossCallbacks [
+	| library ring method entry called total |
+	<callback: slong ()>
+	library := self testLibrary.
+	Memory current startUp.
+	ring := (1 to: 100) collect: [:i | Array new: i].
+	method := self namespace at: #allocatesInCallback.
+	entry := method nativeCodeAddress.
+	called := library callBack: entry times: 2.
+	total := self valueOf: [ring inject: 0 into: [:sum :each | sum + each size]].
+	^called + total
+]
+
+{ #category : #private }
+LauncherTestsModule >> valueOf: aBlock [
+	^aBlock value
+]
+
+{ #category : #entries }
 LauncherTestsModule >> collectsOldSpace [
 	| kept held weak |
 	<callback: slong ()>

@@ -408,6 +408,15 @@ TEST_CASE("callbacks nest inside callouts and collect garbage there", "[run]")
     REQUIRE(launcher.run("nestsCallbacks") == 5052);
 }
 
+TEST_CASE("a young environment survives a collection inside a nested callback", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    launcher.bindFFI();
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+    REQUIRE(launcher.run("keepsEnvironmentAcrossCallbacks") == 5052);
+}
+
 TEST_CASE("native callouts pass integers, floats and stack arguments", "[run]")
 {
     const std::pair<const char*, int64_t> expected[] = {
