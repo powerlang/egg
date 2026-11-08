@@ -180,3 +180,14 @@ TEST_CASE("native code looks up method dictionaries and symbol hashes", "[run]")
         REQUIRE((launcher.run(entry) >> 1) == value);
     }
 }
+
+TEST_CASE("an inlined to:by:do: counts up and down by its step", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    REQUIRE(launcher.loaded());
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+
+    auto result = launcher.run("toByDo");
+    REQUIRE((result >> 1) == 1040710 + 100602);
+}

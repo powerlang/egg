@@ -229,3 +229,14 @@ LauncherTestsModule >> atIfAbsent [
 	<callback: slong ()>
 	^(ActiveProcess methodDictionary at: #launch: ifAbsent: [nil]) isNil ifTrue: [0] ifFalse: [1]
 ]
+
+{ #category : #entries }
+LauncherTestsModule >> toByDo [
+	| up down |
+	<callback: slong ()>
+	up := 0.
+	1 to: 10 by: 3 do: [:i | up := up * 100 + i].
+	down := 0.
+	10 to: 1 by: -4 do: [:i | down := down * 100 + i].
+	^up + down
+]
