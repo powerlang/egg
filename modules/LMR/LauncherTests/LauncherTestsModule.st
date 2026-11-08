@@ -154,6 +154,12 @@ LauncherTestsModule >> modulo [
 ]
 
 { #category : #entries }
+LauncherTestsModule >> floatTimesInteger [
+	<callback: slong ()>
+	^(2.5 * 4) truncated
+]
+
+{ #category : #entries }
 LauncherTestsModule >> answerIfNotNil [
 	<callback: slong ()>
 	self six ifNotNil: [:six | ^six].

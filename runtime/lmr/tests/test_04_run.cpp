@@ -154,6 +154,7 @@ TEST_CASE("SmallInteger arithmetic and nil tests run natively", "[run]")
         {"smiTimes", 42},
         {"largeProduct", 503096068},
         {"modulo", 4},
+        {"floatTimesInteger", 10},
         {"answerIfNotNil", 6},
         {"answerIfNilIfNotNil", 7}};
     for (auto& [entry, value] : expected) {

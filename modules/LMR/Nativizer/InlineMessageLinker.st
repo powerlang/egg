@@ -39,8 +39,10 @@ InlineMessageLinker class >> supported [
 InlineMessageLinker >> assembleAsFloatInto [
 	#_asFloatInto:.
 	assembler
+		convertRtoNativeInteger;
 		loadX0withRasDouble;
-		storeLargeX0inA
+		storeLargeX0inA;
+		convertRtoSmallInteger
 ]
 
 { #category : #'private - assemble' }
