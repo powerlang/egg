@@ -13,7 +13,7 @@ Class {
 { #category : #spec }
 BareTestsModule >> imports [
 	^{
-		#Kernel -> #(HashTable ImageSegment)
+		#Kernel -> #(HashTable ImageSegment Processor)
 	}
 ]
 
@@ -420,6 +420,14 @@ BareTestsModule >> test280ImageSegmentRelocatesItsReferences [
 ]
 
 { #category : #tests }
+BareTestsModule >> test300BlockContextAnswersItsArguments [
+	| context |
+	context := [:x | Processor activeProcess reifiedCopy topContext] value: 7.
+	[context code isBlock] whileFalse: [context := context caller].
+	^context arguments = #(7)
+]
+
+{ #category : #tests }
 BareTestsModule >> test290ImageSegmentBindsItsImports [
 	| contents original segment imports changed |
 	contents := Kernel host readFile: 'image-segments/lmr/LMR.LauncherTests.ems'.
@@ -516,7 +524,8 @@ BareTestsModule >> main: anArray [
 		test260ImageSegmentParsesAnEmsFile
 		test270ImageSegmentLinksItsImports
 		test280ImageSegmentRelocatesItsReferences
-		test290ImageSegmentBindsItsImports).
+		test290ImageSegmentBindsItsImports
+		test300BlockContextAnswersItsArguments).
 	tests do: [:sel |
 		(self runTest: sel)
 			ifTrue: [passed := passed + 1]

@@ -575,6 +575,15 @@ LauncherTestsModule >> keepsSymbolIdentity [
 		ifFalse: [3]
 ]
 
+{ #category : #entries }
+LauncherTestsModule >> reifiesBlockArguments [
+	| context |
+	<callback: slong ()>
+	context := [:x | Processor activeProcess reifiedCopy topContext] value: 7.
+	[context code isBlock] whileFalse: [context := context caller].
+	^context arguments = #(7) ifTrue: [42] ifFalse: [0]
+]
+
 { #category : #private }
 LauncherTestsModule >> reifiedFrom: anInteger [
 	^Processor activeProcess reifiedCopy topContext

@@ -186,6 +186,11 @@ CompiledBlock >> invalidateOptimizedCode [
 ]
 
 { #category : #testing }
+CompiledBlock >> hasSpecialABI [
+	^false
+]
+
+{ #category : #testing }
 CompiledBlock >> isBlock [
 	^true
 ]

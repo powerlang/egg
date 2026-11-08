@@ -457,6 +457,14 @@ TEST_CASE("symbols stay identical across bound and loaded segments", "[run]")
     REQUIRE(result == 42);
 }
 
+TEST_CASE("a reified block context answers its arguments", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+    REQUIRE(launcher.run("reifiesBlockArguments") == 42);
+}
+
 TEST_CASE("native code reifies its own stack into contexts", "[run]")
 {
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
