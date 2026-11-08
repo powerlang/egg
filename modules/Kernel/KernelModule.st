@@ -19,7 +19,8 @@ Class {
 		'properties',
 		'utf8',
 		'utf16',
-		'utf32'
+		'utf32',
+		'registeredImports'
 	],
 	#category : #Kernel
 }
@@ -34,7 +35,8 @@ KernelModule >> prepareForSnapshot: aBuilder [
 	aBuilder
 		addNilToken;
 		map: loadedModules to: dict;
-		map: moduleLoaders to: loaders
+		map: moduleLoaders to: loaders;
+		map: registeredImports to: IdentityDictionary new
 ]
 
 { #category : #bootstrapping }
@@ -147,6 +149,7 @@ KernelModule >> initialize [
 			obj isClass ifTrue: [classes add: obj].
 			exports add: symbol].
 	session := SmalltalkSession new.
+	registeredImports := IdentityDictionary new.
 	properties := WeakIdentityDictionary new.
 
 ]
@@ -310,4 +313,14 @@ KernelModule >> utf16 [
 { #category : #accessing }
 KernelModule >> utf32 [
 	^utf32
+]
+
+{ #category : #services }
+KernelModule >> register: anObject exportedBy: aModule as: aSymbolicReference [
+	registeredImports at: anObject put: aModule -> aSymbolicReference
+]
+
+{ #category : #services }
+KernelModule >> registeredImportOf: anObject [
+	^registeredImports at: anObject ifAbsent: [nil]
 ]

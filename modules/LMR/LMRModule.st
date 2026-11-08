@@ -38,7 +38,17 @@ LMRModule >> globalNamed: aSymbol [
 LMRModule >> globalNamed: aSymbol put: anObject [
 	| index |
 	index := self class indexOfGlobal: aSymbol.
-	globals at: index put: anObject
+	globals at: index put: anObject.
+	anObject isNativeCode ifTrue: [self exportGlobal: anObject as: aSymbol]
+]
+
+{ #category : #accessing }
+LMRModule >> exportGlobal: aNativeCode as: aSymbol [
+	| name |
+	name := ('__' , aSymbol , 'Code__') asSymbol.
+	self
+		exportByReference: aNativeCode as: aSymbol;
+		exportByReference: aNativeCode code as: name
 ]
 
 { #category : #accessing }
@@ -56,7 +66,8 @@ LMRModule >> imports [
 
 { #category : #accessing }
 LMRModule >> globals: anArray [
-	globals := anArray
+	globals := anArray.
+	self exportByReference: anArray as: #'__globals__'
 ]
 
 { #category : #accessing }
@@ -76,7 +87,8 @@ LMRModule >> micStub [
 
 { #category : #accessing }
 LMRModule >> micStub: aByteArray [
-	micStub := aByteArray
+	micStub := aByteArray.
+	self exportByReference: aByteArray as: #'__micStub__'
 ]
 
 { #category : #accessing }
@@ -86,7 +98,8 @@ LMRModule >> picStub [
 
 { #category : #accessing }
 LMRModule >> picStub: aByteArray [
-	picStub := aByteArray
+	picStub := aByteArray.
+	self exportByReference: aByteArray as: #'__picStub__'
 ]
 
 { #category : #bootstrapping }

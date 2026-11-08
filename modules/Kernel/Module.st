@@ -164,6 +164,14 @@ Module >> export: anObject as: aSymbol [
 ]
 
 { #category : #services }
+Module >> exportByReference: anObject as: aSymbol [
+	| reference |
+	self export: anObject as: aSymbol.
+	reference := SymbolicReference forMvarNamed: aSymbol in: self name.
+	Kernel register: anObject exportedBy: self as: reference
+]
+
+{ #category : #services }
 Module >> exportClass: aClass [
 	self export: aClass as: aClass name asSymbol
 ]

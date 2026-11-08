@@ -64,11 +64,14 @@ ObjectClosure >> addSlotsOf: anObject [
 
 { #category : #closure }
 ObjectClosure >> analyze: anObject from: source [
-	| surrogate |
+	| surrogate import |
 	surrogate := self surrogateFor: anObject.
 	(boundary includesKey: surrogate) ifTrue: [^self].
 	(added includes: surrogate) ifTrue: [^self].
 	(surrogate shouldBeStoredIn: self) ifFalse: [^self addBoundary: surrogate].
+	import := Kernel registeredImportOf: surrogate.
+	(import notNil and: [import key !== self module])
+		ifTrue: [^self addBoundary: surrogate as: import value].
 	self isDebugging ifTrue: [reversePaths at: anObject put: source].
 	added add: surrogate.
 	objects add: surrogate.
