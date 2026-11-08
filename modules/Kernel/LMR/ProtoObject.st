@@ -383,7 +383,7 @@ LMRProtoObject >> lookupAndInvoke: aSymbol [
 	cm := self _cachedLookup: aSymbol.
 	cm == nil ifTrue: [^self doesNotUnderstandSelector: aSymbol].
 	cm prepareForExecution.
-	self _transferControlDiscardingLastArgTo: cm validNativeCodeAddress _asNative
+	self _transferControlDiscardingLastArgTo: cm optimizedCode
 ]
 
 { #category : #system }

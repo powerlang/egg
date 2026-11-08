@@ -77,3 +77,14 @@ TEST_CASE("a closure captures the method argument it names", "[run]")
     auto result = launcher.run("capture");
     REQUIRE((result >> 1) == 3);
 }
+
+TEST_CASE("perform: runs the method it finds", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    REQUIRE(launcher.loaded());
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+
+    auto result = launcher.run("performAnswer");
+    REQUIRE((result >> 1) == 42);
+}

@@ -50,3 +50,9 @@ LauncherTestsModule >> capture: anInteger and: anotherInteger [
 	block := [anInteger].
 	^block value
 ]
+
+{ #category : #entries }
+LauncherTestsModule >> performAnswer [
+	<callback: slong ()>
+	^self perform: #answer
+]
