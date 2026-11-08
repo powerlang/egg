@@ -13,7 +13,8 @@ Class {
 		'codeSize',
 		'importStrings',
 		'importDescriptors',
-		'exports'
+		'exports',
+		'imports'
 	],
 	#category : #Kernel
 }
@@ -121,4 +122,25 @@ ImageSegment >> segmentSize [
 ImageSegment >> storedSize [
 	codeSize = 0 ifTrue: [^segmentSize].
 	^(segmentSize alignedTo: 16r10000) + codeSize
+]
+
+{ #category : #accessing }
+ImageSegment >> imports [
+	^imports
+]
+
+{ #category : #linking }
+ImageSegment >> link: anArray [
+	| descriptor token reference |
+	descriptor := anArray collect: [:index | (importStrings at: index + 1) asSymbol].
+	descriptor size = 2 ifTrue: [token := descriptor second].
+	descriptor size > 2 ifTrue: [token := descriptor allButFirst].
+	reference := SymbolicReference linker: descriptor first token: token.
+	^reference link
+]
+
+{ #category : #linking }
+ImageSegment >> linkImports [
+	imports := importDescriptors collect: [:descriptor | self link: descriptor].
+	^imports
 ]

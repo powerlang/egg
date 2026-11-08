@@ -404,6 +404,20 @@ BareTestsModule >> test250RequireBindsSubmodule [
 ]
 
 { #category : #tests }
+BareTestsModule >> test270ImageSegmentLinksItsImports [
+	| contents segment strings symbols classes |
+	contents := Kernel host readFile: 'image-segments/lmr/LMR.LauncherTests.ems'.
+	segment := ImageSegment on: contents.
+	strings := segment importStrings.
+	symbols := segment importDescriptors select: [:descriptor | (strings at: descriptor first + 1) = 'asSymbol'].
+	classes := segment importDescriptors select: [:descriptor | (strings at: descriptor first + 1) = 'asClass'].
+	^symbols notEmpty
+		and: [classes notEmpty
+		and: [(symbols conform: [:descriptor | (segment link: descriptor) == (strings at: descriptor last + 1) asSymbol])
+		and: [classes conform: [:descriptor | (segment link: descriptor) isClass]]]]
+]
+
+{ #category : #tests }
 BareTestsModule >> test260ImageSegmentParsesAnEmsFile [
 	| contents segment strings first |
 	contents := Kernel host readFile: 'image-segments/lmr/LMR.LauncherTests.ems'.
@@ -468,7 +482,8 @@ BareTestsModule >> main: anArray [
 		test232BitShiftRightSelector
 		test240HashTablePrimeForReturnsNextGoodPrime
 		test250RequireBindsSubmodule
-		test260ImageSegmentParsesAnEmsFile).
+		test260ImageSegmentParsesAnEmsFile
+		test270ImageSegmentLinksItsImports).
 	tests do: [:sel |
 		(self runTest: sel)
 			ifTrue: [passed := passed + 1]
