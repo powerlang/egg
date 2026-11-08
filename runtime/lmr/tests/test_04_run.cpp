@@ -191,3 +191,13 @@ TEST_CASE("an inlined to:by:do: counts up and down by its step", "[run]")
     auto result = launcher.run("toByDo");
     REQUIRE((result >> 1) == 1040710 + 100602);
 }
+
+TEST_CASE("FFI initializes natively and calls C functions", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    launcher.bind("FFI");
+    launcher.bind("FFI.Posix");
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+    REQUIRE((launcher.run("callsC") >> 1) == 1);
+}

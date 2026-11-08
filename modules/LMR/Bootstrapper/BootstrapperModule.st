@@ -386,7 +386,8 @@ BootstrapperModule >> mapPlaceholdersIn: aBuilder [
 
 { #category : #writing }
 BootstrapperModule >> requiresNativization: aModule [
-	^({Kernel. Kernel.LMR. LMR} includes: aModule) or: [roots includes: aModule]
+	^({Kernel. Kernel.LMR. LMR} includes: aModule)
+		or: [(self importsClosureFor: roots) includes: aModule]
 ]
 
 { #category : #writing }

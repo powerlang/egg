@@ -11,7 +11,11 @@ Class {
 
 { #category : #spec }
 LauncherTestsModule >> imports [
-	^{#Kernel -> #(ActiveProcess)}
+	^{
+		#Kernel -> #(ActiveProcess).
+		#FFI -> #(ExternalLibrary).
+		#'FFI.Posix' -> #(DLLibrary)
+	}
 ]
 
 { #category : #entries }
@@ -239,4 +243,20 @@ LauncherTestsModule >> toByDo [
 	down := 0.
 	10 to: 1 by: -4 do: [:i | down := down * 100 + i].
 	^up + down
+]
+
+{ #category : #entries }
+LauncherTestsModule >> callsC [
+	| ffi libc memory dl found |
+	<callback: slong ()>
+	Kernel loadedModules at: #'FFI.Posix' put: DLLibrary module.
+	ffi := ExternalLibrary module.
+	ffi initializeForCurrentPlatform.
+	libc := ffi libc.
+	memory := libc malloc: 16.
+	libc free: memory.
+	dl := DLLibrary new.
+	Kernel host initializeFFI: dl symbolFinder: DLLibrary >> #dlsym:symbol:.
+	found := dl dlsym: dl handle asInteger symbol: 'malloc' nullTerminated.
+	^(memory = 0 or: [found = 0]) ifTrue: [0] ifFalse: [1]
 ]

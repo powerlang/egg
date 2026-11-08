@@ -5,6 +5,7 @@
 #include "KnownConstants.h"
 #include "FFIGlue.h"
 
+#include <algorithm>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
@@ -70,7 +71,13 @@ void Launcher::loadImportsOf(Egg::FileImageSegment* segment)
 
 void Launcher::bind(const std::string& module)
 {
-    _bound.insert(module);
+    if (!this->isBound(module))
+        _bound.push_back(module);
+}
+
+bool Launcher::isBound(const std::string& module) const
+{
+    return std::find(_bound.begin(), _bound.end(), module) != _bound.end();
 }
 
 void Launcher::relocate()
@@ -78,12 +85,14 @@ void Launcher::relocate()
     for (auto& [name, segment] : _segments)
         segment->relocate();
     this->collectSymbols();
+    for (auto& name : _bound)
+        if (auto segment = this->segmentNamed(name))
+            segment->bindImports(this->importsOf(name));
     for (auto& [name, segment] : _segments) {
+        if (this->isBound(name))
+            continue;
         auto sentinel = reinterpret_cast<Egg::Object*>(segment->spaceStart());
-        std::vector<Egg::Object*> imports(segment->_importDescriptors.size(), sentinel);
-        if (_bound.contains(name))
-            imports = this->importsOf(name);
-        segment->bindImports(imports);
+        segment->bindImports(std::vector<Egg::Object*>(segment->_importDescriptors.size(), sentinel));
     }
     this->initializeKernelSpace();
     this->initializeHostLinkage();

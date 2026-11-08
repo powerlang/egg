@@ -55,7 +55,7 @@ class Launcher
     std::map<std::string, std::unique_ptr<Egg::FileImageSegment>> _segments;
     Egg::FileImageSegment* _segment = nullptr;
     std::map<std::string, Egg::Object*> _symbols;
-    std::set<std::string> _bound = {"Kernel", "Kernel.LMR", "LMR"};
+    std::vector<std::string> _bound = {"Kernel", "Kernel.LMR", "LMR"};
 
     Egg::FileImageSegment* load(const std::string& module, const std::string& file);
     void loadImportsOf(Egg::FileImageSegment* segment);
@@ -66,6 +66,7 @@ class Launcher
     uint32_t instVarIndex(Egg::HeapObject* species, const std::string& name);
     void initializeKernelSpace();
     void initializeHostLinkage();
+    bool isBound(const std::string& module) const;
     void makeExecutable();
 };
 
