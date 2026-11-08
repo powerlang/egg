@@ -12,7 +12,7 @@ Class {
 { #category : #spec }
 StartModule >> imports [
 	^{
-		#Kernel -> #(ImageSegment).
+		#Kernel -> #(ImageSegment Processor).
 		#LMR -> #(Memory).
 		#'FFI.Posix' -> #(DLLibrary).
 		#'FFI.Windows' -> #(KernelDLL)
@@ -31,6 +31,7 @@ StartModule >> start [
 	Kernel host startUp.
 	Kernel unhandledExceptionHandler: [:exception | self exitBecause: exception].
 	Memory current startUp.
+	Processor enableInterrupts: true.
 	arguments := Kernel host arguments.
 	name := arguments at: 3.
 	program := ImageSegment load: (arguments at: 2) , '/' , name , '.ems'.

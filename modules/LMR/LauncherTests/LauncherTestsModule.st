@@ -12,7 +12,7 @@ Class {
 { #category : #spec }
 LauncherTestsModule >> imports [
 	^{
-		#Kernel -> #(ActiveProcess ImageSegment MessageNotUnderstood WeakArray).
+		#Kernel -> #(ActiveProcess ImageSegment MessageNotUnderstood ProcessLMRStack Processor WeakArray).
 		#FFI -> #(ExternalLibrary ExternalMemory).
 		#LMR -> #(Memory).
 		#'FFI.Posix' -> #(DLLibrary).
@@ -453,6 +453,20 @@ LauncherTestsModule >> collectsOldSpace [
 	(weak at: 1) == held ifFalse: [^1].
 	(weak at: 2) isNil ifFalse: [^2].
 	^kept inject: 0 into: [:sum :each | sum + each size]
+]
+
+{ #category : #entries }
+LauncherTestsModule >> dropsUnreferencedStacks [
+	| before |
+	<callback: slong ()>
+	self startFFI.
+	Memory current startUp.
+	Processor enableInterrupts: true.
+	ProcessLMRStack on: nil.
+	before := ProcessLMRStack registeredInstances size.
+	1 to: 300 do: [:i | (Array new: 8190) atAllPut: true].
+	Memory current collect.
+	^before - ProcessLMRStack registeredInstances size
 ]
 
 { #category : #entries }

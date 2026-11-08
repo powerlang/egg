@@ -381,6 +381,15 @@ TEST_CASE("memory collects old space, keeping survivors and clearing weak refere
     REQUIRE(launcher.run("collectsOldSpace") == 5050);
 }
 
+TEST_CASE("memory drops process stacks nothing references", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    launcher.bindFFI();
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+    REQUIRE(launcher.run("dropsUnreferencedStacks") == 1);
+}
+
 TEST_CASE("native callouts pass integers, floats and stack arguments", "[run]")
 {
     const std::pair<const char*, int64_t> expected[] = {
