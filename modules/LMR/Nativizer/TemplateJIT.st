@@ -214,56 +214,62 @@ TemplateJIT >> emitCallbackPrologue [
 
 { #category : #services }
 TemplateJIT >> emitCallout [
-	| descriptor types return index lookup resolved |
+	| descriptor types return index lookup resolved buffer |
 	descriptor := method descriptor.
 	types := descriptor argumentTypeNames.
 	return := descriptor returnTypeName.
 	index := method class indexOfSlot: 'address'.
 	lookup := assembler newLabel.
 	resolved := assembler newLabel.
-	(self isFloat: return) ifTrue: [
-		self loadObject: Float; emitSend: #new.
-		assembler pushR].
 	assembler @ resolved.
 	self loadObject: method.
 	assembler
 		loadRwithRindex: index;
 		compareRwithNil;
-		jumpIfEqualTo: lookup;
-		convertRtoNativeInteger.
+		jumpIfEqualTo: lookup.
 	self addFallback: [
 		assembler @ lookup; pushS.
 		self loadObject: method; emitSend: #lookupFor:.
 		assembler jumpTo: resolved].
+	buffer := self emitMarshalling: types size.
+	self loadObject: method.
+	assembler
+		loadRwithRindex: index;
+		convertRtoNativeInteger.
 	environment abi
 		emitCallout: types
 		with: assembler
-		loading: [:i | | type |
-			type := types at: i.
-			self emitCalloutArgument: i type: type].
-	self emitCalloutResult: return
+		loading: [:i |
+			self loadRwithStack: buffer.
+			assembler loadRwithRindex: i].
+	self emitCalloutResult: return in: buffer
 ]
 
 { #category : #services }
-TemplateJIT >> emitCalloutArgument: index type: aSymbol [
-	| nonInteger done |
-	self argumentInStackAt: index.
-	nonInteger := assembler labeledIntegerBitTestOfR.
-	done := assembler newLabel.
-	assembler
-		convertRtoNativeInteger;
-		jumpTo: done;
-		@ nonInteger.
-	(self isFloat: aSymbol) ifTrue: [assembler loadRwithRindex: 1].
-	assembler @ done
-]
-
-{ #category : #services }
-TemplateJIT >> emitCalloutResult: type [
+TemplateJIT >> emitCalloutResult: type in: buffer [
 	type == #void ifTrue: [^assembler loadRwithImmediate: 1].
 	environment abi extendResult: type with: assembler.
-	(self isFloat: type) ifTrue: [^assembler popA; moveX0toR; storeRinAindex: 1; loadRwithA].
-	assembler convertRtoSmallInteger
+	(self isFloat: type) ifTrue: [assembler moveX0toR].
+	self loadAwithStack: buffer.
+	assembler storeRinAindex: 1.
+	self loadObject: method descriptor; emitSend: #resultFrom:.
+	stackCount := stackCount - 1
+]
+
+{ #category : #services }
+TemplateJIT >> emitMarshalling: count [
+	| arguments |
+	assembler loadRwithSmallInteger: count.
+	self pushR; loadObject: Array; emitSend: #new:.
+	stackCount := stackCount - 1.
+	arguments := self pushR.
+	1 to: count do: [:i |
+		self argumentInStackAt: i; loadAwithStack: arguments.
+		assembler storeRinAindex: i; pushA.
+		self emitWriteBarrier].
+	self loadObject: method descriptor; emitSend: #marshalArguments:.
+	stackCount := stackCount - 1.
+	^self pushR
 ]
 
 { #category : #services }

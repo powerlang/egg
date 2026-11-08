@@ -21,7 +21,7 @@ NativizerModule >> environment [
 { #category : #spec }
 NativizerModule >> imports [
 	^{
-		#Kernel -> #(Behavior CallbackBehavior CallbackMethod CharacterArray Closure CompiledBlock CompiledMethod Error Float Object OrderedCollection Process ProtoObject Species String).
+		#Kernel -> #(Array Behavior CallbackBehavior CallbackMethod CharacterArray Closure CompiledBlock CompiledMethod Error Float Object OrderedCollection Process ProtoObject Species String).
 		#'Kernel.LMR' -> #(LMRCompiledMethod LMRProtoObject LMRFloat LMRSpecies).
 		#LMR -> #(CriticalArray GCSpace GlobalDispatchCache LMRModule Memory NativeCode SendSite Thread).
 		#'LMR.SExpressions' -> #(SExpression SMethod SBlock SBinding SInstVarBinding SLocalBinding SArgumentBinding STemporaryBinding SDynamicBinding SAssociationBinding SLiteral SIdentifier SReturn SAssignment SCascade SMessage SPragma TreecodeDecoder).
