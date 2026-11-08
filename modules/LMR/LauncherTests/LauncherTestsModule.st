@@ -533,6 +533,21 @@ LauncherTestsModule >> passesFloatArguments [
 ]
 
 { #category : #entries }
+LauncherTestsModule >> reifiesStack [
+	| top |
+	<callback: slong ()>
+	top := self reifiedFrom: 7.
+	(top receiver == self and: [top code selector asString = 'reifiedFrom:']) ifFalse: [^1].
+	top arguments = #(7) ifFalse: [^2].
+	^top caller code selector asString = 'reifiesStack' ifTrue: [42] ifFalse: [3]
+]
+
+{ #category : #private }
+LauncherTestsModule >> reifiedFrom: anInteger [
+	^Processor activeProcess reifiedCopy topContext
+]
+
+{ #category : #entries }
 LauncherTestsModule >> sendsBoundExtension [
 	<callback: slong ()>
 	self startFFI.

@@ -61,6 +61,7 @@ BootstrapperModule >> bootstrapLMR: anLMRModule nativizer: aNativizerModule plat
 	env := aNativizerModule newNativizationEnvironmentFor: aPlatform.
 	env lmrModule: anLMRModule.
 	ProcessLMRStack
+		initializeConstants;
 		initializeInstances;
 		slotSize: env newAssembler codegen stackSlotSize.
 

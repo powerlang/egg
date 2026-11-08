@@ -19,6 +19,17 @@ Class {
 }
 
 { #category : #initialization }
+ProcessLMRStack class >> initializeConstants [
+	self addNamespaceAs: #FrameSlots.
+	FrameSlots
+		at: #ReceiverSlot put: 1;
+		at: #CodeSlot put: 2;
+		at: #EnvironmentSlot put: 4;
+		at: #CallerSlots put: 2;
+		at: #SnapshotFrames put: 3
+]
+
+{ #category : #initialization }
 ProcessLMRStack class >> initializeInstances [
 	Instances := WeakIdentitySet new
 ]
@@ -164,6 +175,79 @@ ProcessLMRStack >> slotsFrom: start to: end do: aBlock [
 		ifFalse: [0 to: count - 1 do: [:i | aBlock value: start + (i * SlotSize) _asPointer value: 1]]
 ]
 
+{ #category : #reifying }
+ProcessLMRStack >> reify [
+	^Context fromStack: self
+]
+
+{ #category : #reifying }
+ProcessLMRStack >> receiverAt: frame [
+	^self slot: ReceiverSlot below: frame
+]
+
+{ #category : #reifying }
+ProcessLMRStack >> codeAt: frame [
+	| code |
+	code := self slot: CodeSlot below: frame.
+	^code compiledCode
+]
+
+{ #category : #reifying }
+ProcessLMRStack >> environmentAt: frame [
+	| code |
+	code := self codeAt: frame.
+	(self hasEnvironment: code) ifFalse: [^nil].
+	^self slot: EnvironmentSlot below: frame
+]
+
+{ #category : #reifying }
+ProcessLMRStack >> stackAt: frame top: callee [
+	| temps |
+	temps := self tempsAt: frame.
+	callee = frame ifTrue: [^temps].
+	^temps , (self argumentsAbove: callee)
+]
+
+{ #category : #reifying }
+ProcessLMRStack >> returnPcAt: frame [
+	^nil
+]
+
+{ #category : #reifying }
+ProcessLMRStack >> callerTopOf: frame [
+	^frame
+]
+
+{ #category : #private }
+ProcessLMRStack >> hasEnvironment: aCompiledCode [
+	^aCompiledCode isBlock or: [aCompiledCode hasBlocks]
+]
+
+{ #category : #private }
+ProcessLMRStack >> tempsAt: frame [
+	| code first |
+	code := self codeAt: frame.
+	first := (self hasEnvironment: code) ifTrue: [EnvironmentSlot + 1] ifFalse: [CodeSlot + 1].
+	^(0 to: code tempCount - 1) collect: [:i | self slot: first + i below: frame]
+]
+
+{ #category : #private }
+ProcessLMRStack >> argumentsAbove: frame [
+	| count |
+	count := (self codeAt: frame) argumentCount.
+	^(1 to: count) collect: [:i | self slot: i - count - CallerSlots below: frame]
+]
+
+{ #category : #private }
+ProcessLMRStack >> slot: anInteger below: frame [
+	^(frame - (SlotSize * anInteger) _asPointer) _asObject _basicAt: 1
+]
+
+{ #category : #services }
+ProcessLMRStack >> snapshot [
+	self updateBack: SnapshotFrames
+]
+
 { #category : #accessing }
 ProcessLMRStack >> sp: aPointer [
 	sp := aPointer
@@ -180,5 +264,5 @@ ProcessLMRStack >> updateBack: anInteger [
 	frame := self _framePointer _asPointer.
 	anInteger - 1 timesRepeat: [frame := self callerOf: frame].
 	sp := frame.
-	bp := self callerOf: frame
+	bp := frame
 ]

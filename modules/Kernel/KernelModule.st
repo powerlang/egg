@@ -54,6 +54,7 @@ KernelModule >> bootstrap [
 	LargeInteger initializeBase.
 	LargeNegativeInteger initializeConstants.
 	SmallInteger initializeConstants.
+	ProcessVMStack initializeConstants.
 	cachedLookups := Dictionary new.
 	shift := WordSize = 8 ifTrue: [3] ifFalse: [2].
 	namespace 

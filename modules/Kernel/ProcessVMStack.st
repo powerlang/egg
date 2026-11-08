@@ -90,3 +90,50 @@ ProcessVMStack >> sp: anInteger [
 ProcessVMStack >> reify [
 	^Context fromStack: self
 ]
+
+{ #category : #initialization }
+ProcessVMStack class >> initializeConstants [
+	self addNamespaceAs: #FrameOffsets.
+	FrameOffsets
+		at: #ReceiverOffset put: 1;
+		at: #CodeOffset put: 2;
+		at: #EnvironmentOffset put: 4;
+		at: #FirstTempOffset put: 5;
+		at: #ReturnPcOffset put: 1;
+		at: #CallerTopOffset put: 2
+]
+
+{ #category : #reifying }
+ProcessVMStack >> receiverAt: frame [
+	^self at: frame - ReceiverOffset
+]
+
+{ #category : #reifying }
+ProcessVMStack >> codeAt: frame [
+	^self at: frame - CodeOffset
+]
+
+{ #category : #reifying }
+ProcessVMStack >> environmentAt: frame [
+	^self at: frame - EnvironmentOffset
+]
+
+{ #category : #reifying }
+ProcessVMStack >> stackAt: frame top: top [
+	^self copyFrom: frame - FirstTempOffset to: top
+]
+
+{ #category : #reifying }
+ProcessVMStack >> callerOf: frame [
+	^self bpAt: frame
+]
+
+{ #category : #reifying }
+ProcessVMStack >> returnPcAt: frame [
+	^self pcAt: frame + ReturnPcOffset
+]
+
+{ #category : #reifying }
+ProcessVMStack >> callerTopOf: frame [
+	^frame + CallerTopOffset
+]

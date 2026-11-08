@@ -435,6 +435,14 @@ TEST_CASE("bound modules' extension methods run natively", "[run]")
     REQUIRE(launcher.run("sendsBoundExtension") == 8);
 }
 
+TEST_CASE("native code reifies its own stack into contexts", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+    REQUIRE(launcher.run("reifiesStack") == 42);
+}
+
 TEST_CASE("native code copies a string out to C memory", "[run]")
 {
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));

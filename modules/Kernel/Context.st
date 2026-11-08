@@ -25,12 +25,11 @@ Context class >> fromStack: aStack [
 
 { #category : #reifying }
 Context class >> fromStack: aStack frameAt: bp pc: pc top: top callee: callee [
-	| receiver code env first temps context next nextpc caller |
-	receiver := aStack at: bp - 1.
-	code := aStack at: bp - 2.
-	env := aStack at: bp - 4.
-	first := bp - 5.
-	temps := aStack copyFrom: first to: top.
+	| receiver code env temps context next nextpc nexttop caller |
+	receiver := aStack receiverAt: bp.
+	code := aStack codeAt: bp.
+	env := aStack environmentAt: bp.
+	temps := aStack stackAt: bp top: top.
 	context := self new
 		receiver: receiver;
 		code: code;
@@ -39,10 +38,11 @@ Context class >> fromStack: aStack frameAt: bp pc: pc top: top callee: callee [
 		stack: temps;
 		callee: callee;
 		yourself.
-	next := aStack bpAt: bp.
+	next := aStack callerOf: bp.
 	next > 0 ifTrue: [
-		nextpc := aStack pcAt: bp + 1.
-		caller := self fromStack: aStack frameAt: next pc: nextpc top: bp + 2 callee: context.
+		nextpc := aStack returnPcAt: bp.
+		nexttop := aStack callerTopOf: bp.
+		caller := self fromStack: aStack frameAt: next pc: nextpc top: nexttop callee: context.
 		context caller: caller].
 	^context
 ]
