@@ -19,17 +19,12 @@ StartModule >> imports [
 	}
 ]
 
-{ #category : #services }
-StartModule >> exitBecause: anException [
-	Kernel host logError: anException description; exit: -1
-]
-
 { #category : #entries }
 StartModule >> start [
 	| arguments name program |
 	<callback: slong ()>
 	Kernel host startUp.
-	Kernel unhandledExceptionHandler: [:exception | self exitBecause: exception].
+	Kernel terminateOnUnhandledExceptions.
 	Memory current startUp.
 	Processor enableInterrupts: true.
 	arguments := Kernel host arguments.

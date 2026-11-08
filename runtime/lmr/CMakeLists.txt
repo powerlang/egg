@@ -54,5 +54,7 @@ add_test(NAME LmrHelloWorld COMMAND lmr ${CMAKE_CURRENT_SOURCE_DIR}/../../image-
 set_tests_properties(LmrHelloWorld PROPERTIES PASS_REGULAR_EXPRESSION "Hello, World!")
 add_test(NAME LmrUnhandledError COMMAND lmr ${CMAKE_CURRENT_SOURCE_DIR}/../../image-segments/lmr NoSuchModule)
 set_tests_properties(LmrUnhandledError PROPERTIES PASS_REGULAR_EXPRESSION "cannot open .*NoSuchModule.ems")
+add_test(NAME LmrUnhandledErrorBacktrace COMMAND lmr ${CMAKE_CURRENT_SOURCE_DIR}/../../image-segments/lmr NoSuchModule)
+set_tests_properties(LmrUnhandledErrorBacktrace PROPERTIES PASS_REGULAR_EXPRESSION "ImageSegment class>>load:")
 
 add_subdirectory(tests)
