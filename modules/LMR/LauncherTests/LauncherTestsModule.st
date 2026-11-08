@@ -83,3 +83,63 @@ LauncherTestsModule >> platformNameSize [
 	<callback: slong ()>
 	^Kernel host platformName size
 ]
+
+{ #category : #entries }
+LauncherTestsModule >> add [
+	<callback: slong ()>
+	^3 + 4
+]
+
+{ #category : #entries }
+LauncherTestsModule >> times [
+	<callback: slong ()>
+	^self six * 7
+]
+
+{ #category : #entries }
+LauncherTestsModule >> smiTimes [
+	<callback: slong ()>
+	^self six _smiTimes: 7
+]
+
+{ #category : #entries }
+LauncherTestsModule >> largeProduct [
+	| a |
+	<callback: slong ()>
+	a := 30916.
+	^a * 16273
+]
+
+{ #category : #entries }
+LauncherTestsModule >> modulo [
+	| a |
+	<callback: slong ()>
+	a := 503096068.
+	^a \\ 16
+]
+
+{ #category : #entries }
+LauncherTestsModule >> answerIfNotNil [
+	<callback: slong ()>
+	self six ifNotNil: [:six | ^six].
+	^0
+]
+
+{ #category : #entries }
+LauncherTestsModule >> answerIfNilIfNotNil [
+	| some none |
+	<callback: slong ()>
+	some := self six ifNil: [0] ifNotNil: [:six | six].
+	none := self nothing ifNil: [1] ifNotNil: [:object | 100].
+	^some + none
+]
+
+{ #category : #sending }
+LauncherTestsModule >> nothing [
+	^nil
+]
+
+{ #category : #sending }
+LauncherTestsModule >> six [
+	^6
+]

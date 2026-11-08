@@ -124,3 +124,22 @@ TEST_CASE("the native host knows the platform it runs on", "[run]")
     auto result = launcher.run("platformNameSize");
     REQUIRE((result >> 1) == (int64_t)std::strlen(Egg::PlatformName()));
 }
+
+TEST_CASE("SmallInteger arithmetic and nil tests run natively", "[run]")
+{
+    const std::pair<const char*, int64_t> expected[] = {
+        {"add", 7},
+        {"times", 42},
+        {"smiTimes", 42},
+        {"largeProduct", 503096068},
+        {"modulo", 4},
+        {"answerIfNotNil", 6},
+        {"answerIfNilIfNotNil", 7}};
+    for (auto& [entry, value] : expected) {
+        INFO("entry: " << entry);
+        lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+        launcher.bind("LMR.LauncherTests");
+        launcher.relocate();
+        REQUIRE((launcher.run(entry) >> 1) == value);
+    }
+}
