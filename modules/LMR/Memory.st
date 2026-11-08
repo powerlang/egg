@@ -32,6 +32,11 @@ Class {
 	#category : #Kernel
 }
 
+{ #category : #initialization }
+Memory class >> initializeConstants [
+	LargeThreshold := 100000
+]
+
 { #category : #errors }
 Memory class >> allocateMemory: size near: address [
 	| limit |

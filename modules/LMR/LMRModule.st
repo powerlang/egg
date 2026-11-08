@@ -124,6 +124,7 @@ LMRModule >> justLoaded [
 	super justLoaded.
 	namespace at: #CRITICAL put: false.
 	OSMemory initializeCurrent.
+	Memory initializeConstants.
 	SendSite initialize.
 	GlobalDispatchCache initialize.
 	self initializeMemory.
