@@ -766,11 +766,6 @@ Assembler >> loadRwithA [
 	self subclassResponsibility
 ]
 
-{ #category : #'push/pop' }
-Assembler >> loadRwithArgPointer [
-	self subclassResponsibility
-]
-
 { #category : #loading }
 Assembler >> loadRwithE [
 	self subclassResponsibility

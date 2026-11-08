@@ -785,13 +785,6 @@ GenericAssembler >> loadRwithA [
 	codegen move: codegen regA to: codegen regR
 ]
 
-{ #category : #'push/pop' }
-GenericAssembler >> loadRwithArgPointer [
-	| memref |
-	memref := codegen memRef: codegen regFP stackIndexImm: 3.
-	codegen lea: codegen regR withMem: memref
-]
-
 { #category : #loading }
 GenericAssembler >> loadRwithE [
 	codegen move: codegen regE to: codegen regR

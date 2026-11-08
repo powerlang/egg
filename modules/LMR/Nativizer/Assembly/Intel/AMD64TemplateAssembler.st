@@ -470,12 +470,6 @@ AMD64TemplateAssembler >> loadRwithA [
 ]
 
 { #category : #loading }
-AMD64TemplateAssembler >> loadRwithArgPointer [
-	self assembleBytes: #[16r48 16r8D 16r45 16r10].
-	
-]
-
-{ #category : #loading }
 AMD64TemplateAssembler >> loadRwithE [
 	self assembleBytes: #[16r48 16r89 16rF8].
 	
