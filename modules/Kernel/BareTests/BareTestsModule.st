@@ -13,7 +13,7 @@ Class {
 { #category : #spec }
 BareTestsModule >> imports [
 	^{
-		#Kernel -> #(HashTable)
+		#Kernel -> #(HashTable ImageSegment)
 	}
 ]
 
@@ -403,6 +403,19 @@ BareTestsModule >> test250RequireBindsSubmodule [
 	^Kernel.BareTests == self
 ]
 
+{ #category : #tests }
+BareTestsModule >> test260ImageSegmentParsesAnEmsFile [
+	| contents segment strings first |
+	contents := Kernel host readFile: 'image-segments/lmr/LMR.LauncherTests.ems'.
+	segment := ImageSegment on: contents.
+	strings := segment importStrings.
+	first := segment importDescriptors first.
+	^segment segmentSize > 48
+		and: [(segment exports includesKey: '__module__')
+		and: [(strings includes: 'Kernel')
+		and: [first conform: [:index | index < strings size]]]]
+]
+
 { #category : #main }
 BareTestsModule >> runTest: selector [
 	| result |
@@ -454,7 +467,8 @@ BareTestsModule >> main: anArray [
 		test230BitShiftLeftOverflow test231BitShiftRightNegativeArg
 		test232BitShiftRightSelector
 		test240HashTablePrimeForReturnsNextGoodPrime
-		test250RequireBindsSubmodule).
+		test250RequireBindsSubmodule
+		test260ImageSegmentParsesAnEmsFile).
 	tests do: [:sel |
 		(self runTest: sel)
 			ifTrue: [passed := passed + 1]
