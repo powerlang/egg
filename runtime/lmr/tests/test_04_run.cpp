@@ -315,6 +315,15 @@ TEST_CASE("native memory starts up and allocates beyond the kernel space", "[run
     REQUIRE(launcher.run("startsMemory") == 42);
 }
 
+TEST_CASE("native memory collects garbage and keeps what survives", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    launcher.bindFFI();
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+    REQUIRE(launcher.run("collectsGarbage") == 42);
+}
+
 TEST_CASE("the native host makes memory executable", "[run]")
 {
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));

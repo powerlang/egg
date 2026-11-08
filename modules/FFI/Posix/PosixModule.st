@@ -43,7 +43,9 @@ PosixModule >> anonymousMapping [
 
 { #category : #memory }
 PosixModule >> commit: size at: address [
-	^self map: size at: address protection: PROT_READ + PROT_WRITE flags: MAP_PRIVATE + MAP_FIXED
+	| result |
+	result := ExternalLibrary module libc mprotect: address size: size protection: PROT_READ + PROT_WRITE.
+	^result = 0 ifTrue: [address] ifFalse: [0]
 ]
 
 { #category : #memory }

@@ -398,6 +398,18 @@ LauncherTestsModule >> makesExecutable [
 ]
 
 { #category : #entries }
+LauncherTestsModule >> collectsGarbage [
+	| kept |
+	<callback: slong ()>
+	self startFFI.
+	Memory current startUp.
+	kept := Array new: 8190.
+	kept at: 1 put: 42.
+	1 to: 200 do: [:i | (Array new: 8190) atAllPut: true].
+	^kept at: 1
+]
+
+{ #category : #entries }
 LauncherTestsModule >> startsMemory [
 	| bytes |
 	<callback: slong ()>
