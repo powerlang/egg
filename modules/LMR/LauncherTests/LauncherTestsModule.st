@@ -14,6 +14,7 @@ LauncherTestsModule >> imports [
 	^{
 		#Kernel -> #(ActiveProcess).
 		#FFI -> #(ExternalLibrary ExternalMemory).
+		#LMR -> #(Memory).
 		#'FFI.Posix' -> #(DLLibrary).
 		#'FFI.Windows' -> #(KernelDLL)
 	}
@@ -355,6 +356,16 @@ LauncherTestsModule >> makesExecutable [
 	read := memory at: 1.
 	host release: address size: 16r100000.
 	^executable ifTrue: [read] ifFalse: [0]
+]
+
+{ #category : #entries }
+LauncherTestsModule >> startsMemory [
+	| bytes |
+	<callback: slong ()>
+	self startFFI.
+	Memory current startUp.
+	bytes := ByteArray new: 200000.
+	^bytes size = 200000 ifTrue: [42] ifFalse: [0]
 ]
 
 { #category : #services }

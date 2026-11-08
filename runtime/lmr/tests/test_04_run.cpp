@@ -275,6 +275,15 @@ TEST_CASE("Kernel os hands out and reuses memory in the heap block", "[run]")
     REQUIRE((launcher.run("allocatesHeap") >> 1) == 42);
 }
 
+TEST_CASE("native memory starts up and allocates beyond the kernel space", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    bindFFI(launcher);
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+    REQUIRE((launcher.run("startsMemory") >> 1) == 42);
+}
+
 TEST_CASE("the native host makes memory executable", "[run]")
 {
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
