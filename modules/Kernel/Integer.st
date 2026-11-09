@@ -381,6 +381,11 @@ Integer >> lowWord [
 	^self bitAnd: 16rFFFF
 ]
 
+{ #category : #marshalling }
+Integer >> marshalOn: aStream [
+	aStream nextLargePut: self
+]
+
 { #category : #converting }
 Integer >> mbytes [
 	^self kbytes * 1024

@@ -92,7 +92,7 @@ TemplateJIT >> associationValueAt: anInteger put: dummy [
 
 { #category : #services }
 TemplateJIT >> isFloat: type [
-	^#(float double) includes: type
+	^environment abi isFloat: type
 ]
 
 { #category : #services }
@@ -104,30 +104,74 @@ TemplateJIT >> loadAssociationValue: anAssociation [
 
 { #category : #services }
 TemplateJIT >> storeAssociation: anAssociation value: dummy [
-	assembler
-		loadAwithLiteral: anAssociation;
-		storeRinAindex: 2;
-		pushA.
+	assembler loadAwithLiteral: anAssociation.
+	self storeRinAssociationA
+]
+
+{ #category : #services }
+TemplateJIT >> storeRinAssociationA [
+	assembler storeRinAindex: 2; pushA.
 	self emitWriteBarrier
 ]
 
 { #category : #services }
+TemplateJIT >> bindSiteFor: aSymbol [
+	| name |
+	name := aSymbol asSymbol.
+	method hasFrame: true.
+	^BindSite name: name method: method
+]
+
+{ #category : #services }
+TemplateJIT >> loadBindSite: aSymbol [
+	| site index unbound done |
+	site := self bindSiteFor: aSymbol.
+	index := BindSite indexOfSlot: 'association'.
+	unbound := assembler newLabel.
+	done := assembler newLabel.
+	assembler
+		loadRwithLiteral: site;
+		loadRwithRindex: index;
+		compareRwithNil;
+		jumpIfEqualTo: unbound;
+		loadRwithRindex: 2;
+		jumpTo: done;
+		@ unbound;
+		loadRwithLiteral: site.
+	self emitSend: #value.
+	assembler @ done
+]
+
+{ #category : #services }
+TemplateJIT >> storeBindSite: aSymbol [
+	| site index unbound done |
+	site := self bindSiteFor: aSymbol.
+	index := BindSite indexOfSlot: 'association'.
+	unbound := assembler newLabel.
+	done := assembler newLabel.
+	assembler
+		loadAwithLiteral: site;
+		loadAwithAindex: index;
+		compareWithNil: assembler regA;
+		jumpIfEqualTo: unbound.
+	self storeRinAssociationA.
+	assembler jumpTo: done; @ unbound.
+	self pushR.
+	assembler loadRwithLiteral: site.
+	self emitSend: #value:.
+	stackCount := stackCount - 1.
+	assembler @ done
+]
+
+{ #category : #services }
 TemplateJIT >> staticBindingFor: aSymbol [
-	| name instVarIndex current assoc module |
+	| name instVarIndex assoc |
 	name := aSymbol asSymbol.
 	instVarIndex := method classBinding allInstVarNames indexOf: name.
 	instVarIndex > 0 ifTrue: [
 		^SInstVarBinding new index: instVarIndex].
-	current := method classBinding.
-	[current notNil] whileTrue: [
-		current namespaces do: [:ns |
-			assoc := ns associationAt: name ifAbsent: [nil].
-			assoc ifNotNil: [^SAssociationBinding new association: assoc]].
-		current := current superclass].
-	module := method module.
-	module ifNotNil: [
-		assoc := module namespace associationAt: name ifAbsent: [nil].
-		assoc ifNotNil: [^SAssociationBinding new association: assoc]].
+	assoc := method associationFor: name.
+	assoc ifNotNil: [^SAssociationBinding new association: assoc].
 	assoc := LMRProtoObject module namespace associationAt: name ifAbsent: [nil].
 	assoc ifNotNil: [^SAssociationBinding new association: assoc].
 	Kernel host logWarning: 'undeclared ' , name , ' in ' , method classBinding name , '>>' , method selector.
@@ -157,10 +201,10 @@ TemplateJIT >> captureVariable: stream index: anInteger [
 	pos := stream next.
 	type = LocalArgument ifTrue: [
 		assembler
-			loadTwithFPindex: pos + 2;
+			loadTwithFPindex: 3 + self argumentCount - pos;
 			storeTinRindex: anInteger].
 	type = EnvironmentValue
-		ifTrue: [assembler loadTwithEindex: pos; storeTinRindex: anInteger]
+		ifTrue: [assembler loadTwithEindex: pos + activeScript offsetOfCurrentEnvironment; storeTinRindex: anInteger]
 ]
 
 { #category : #services }
@@ -188,7 +232,42 @@ TemplateJIT >> emitBlockPrologue: anSBlock [
 ]
 
 { #category : #services }
+TemplateJIT >> emitCallbackArguments [
+	method argumentCount = 0 ifTrue: [^self].
+	self emitCallbackDecoding.
+	assembler loadAwithR.
+	1 to: method argumentCount do: [:i |
+		assembler
+			loadRwithA;
+			loadRwithRindex: i;
+			pushR]
+]
+
+{ #category : #services }
+TemplateJIT >> emitCallbackDecoding [
+	| offsets index |
+	offsets := environment abi callbackOffsetsOf: method descriptor.
+	index := NativeCode indexOfSlot: 'compiledCode'.
+	self emitFramedSend: #argumentsAt:offsets: loading: [
+		assembler
+			loadRwithFPindex: 3;
+			pushR;
+			loadRwithLiteral: offsets;
+			pushR;
+			loadRwithMindex: index]
+]
+
+{ #category : #services }
+TemplateJIT >> emitCallbackEnter [
+	self emitFramedSend: #enterCallback loading: [self loadObject: ProcessLMRStack]
+]
+
+{ #category : #services }
 TemplateJIT >> emitCallbackEpilogue [
+	self
+		emitCallbackResult;
+		loadObject: ProcessLMRStack;
+		emitSend: #exitCallback.
 	assembler restoreCallerFrame.
 	environment abi
 		restoreContext: method descriptor with: assembler
@@ -196,81 +275,124 @@ TemplateJIT >> emitCallbackEpilogue [
 
 { #category : #services }
 TemplateJIT >> emitCallbackPrologue [
-	| retaddr |
 	environment abi emitEntrypoint: method descriptor with: assembler.
-	retaddr := 0.
 	assembler
-		pushImm: retaddr;
 		xorFPwithFP;
 		loadMwithOwnNativeCode: environment platform behaviorOffset;
 		loadGwithLiteral: environment lmrModule globals;
 		loadNilWithLiteral: nil;
 		loadTrueWithLiteral: true;
 		loadFalseWithLiteral: false;
-		loadEwithNil;
+		loadEwithNil.
+	self emitCallbackEnter; emitCallbackArguments.
+	assembler callPushesReturnAddress ifTrue: [assembler pushImm: 0].
+	assembler
 		loadRwithMindex: (NativeCode indexOfSlot: 'compiledCode');
 		loadRwithRindex: (CallbackMethod indexOfSlot: 'receiver')
 ]
 
 { #category : #services }
+TemplateJIT >> emitCallbackResult [
+	method descriptor returnTypeName == #void ifTrue: [^self].
+	assembler
+		pushR;
+		loadRwithFPindex: 3 + method argumentCount;
+		pushR.
+	self
+		loadObject: method;
+		emitSend: #store:at:
+]
+
+{ #category : #services }
+TemplateJIT >> emitFramedSend: aSymbol loading: aBlock [
+	assembler callPushesReturnAddress ifTrue: [assembler pushImm: 0].
+	assembler
+		saveCallerFrame;
+		pushNil.
+	self pushNativeCode.
+	aBlock value.
+	self emitSend: aSymbol.
+	assembler restoreCallerFrame.
+	assembler callPushesReturnAddress ifTrue: [assembler popA]
+]
+
+{ #category : #services }
 TemplateJIT >> emitCallout [
-	| descriptor types return index lookup resolved |
+	| descriptor types return index lookup resolved buffer |
 	descriptor := method descriptor.
 	types := descriptor argumentTypeNames.
 	return := descriptor returnTypeName.
 	index := method class indexOfSlot: 'address'.
 	lookup := assembler newLabel.
 	resolved := assembler newLabel.
-	(self isFloat: return) ifTrue: [
-		self loadObject: Float; emitSend: #new.
-		assembler pushR].
 	assembler @ resolved.
 	self loadObject: method.
 	assembler
 		loadRwithRindex: index;
 		compareRwithNil;
-		jumpIfEqualTo: lookup;
-		convertRtoNativeInteger.
+		jumpIfEqualTo: lookup.
 	self addFallback: [
 		assembler @ lookup; pushS.
 		self loadObject: method; emitSend: #lookupFor:.
 		assembler jumpTo: resolved].
+	buffer := self emitMarshalling: types size.
+	self emitChunkTop; loadObject: method.
+	assembler
+		loadRwithRindex: index;
+		convertRtoNativeInteger.
 	environment abi
 		emitCallout: types
 		with: assembler
-		loading: [:i | | type |
-			type := types at: i.
-			self emitCalloutArgument: i type: type].
-	self emitCalloutResult: return
+		loading: [:i |
+			self loadRwithStack: buffer.
+			assembler loadRwithRindex: i].
+	self emitCalloutResult: return in: buffer
 ]
 
 { #category : #services }
-TemplateJIT >> emitCalloutArgument: index type: aSymbol [
-	| nonInteger done |
-	self argumentInStackAt: index.
-	nonInteger := assembler labeledIntegerBitTestOfR.
-	done := assembler newLabel.
+TemplateJIT >> emitChunkTop [
+	assembler codegen move: assembler regSP to: assembler regR.
 	assembler
-		convertRtoNativeInteger;
-		jumpTo: done;
-		@ nonInteger.
-	(self isFloat: aSymbol) ifTrue: [assembler loadRwithRindex: 1].
-	assembler @ done
+		setRintegerBit;
+		pushR;
+		loadRwithFP;
+		setRintegerBit;
+		pushR.
+	self loadObject: ProcessLMRStack; emitSend: #calloutTop:frame:
 ]
 
 { #category : #services }
-TemplateJIT >> emitCalloutResult: type [
+TemplateJIT >> emitCalloutResult: type in: buffer [
 	type == #void ifTrue: [^assembler loadRwithImmediate: 1].
 	environment abi extendResult: type with: assembler.
-	(self isFloat: type) ifTrue: [^assembler popA; moveX0toR; storeRinAindex: 1; loadRwithA].
-	assembler convertRtoSmallInteger
+	(self isFloat: type) ifTrue: [assembler moveX0toR].
+	self loadAwithStack: buffer.
+	assembler storeRinAindex: 1.
+	self loadObject: method descriptor; emitSend: #resultFrom:.
+	stackCount := stackCount - 1
+]
+
+{ #category : #services }
+TemplateJIT >> emitMarshalling: count [
+	| arguments |
+	assembler loadRwithSmallInteger: count.
+	self pushR; loadObject: Array; emitSend: #new:.
+	stackCount := stackCount - 1.
+	arguments := self pushR.
+	1 to: count do: [:i |
+		self argumentInStackAt: i; loadAwithStack: arguments.
+		assembler storeRinAindex: i; pushA.
+		self emitWriteBarrier].
+	self loadObject: method descriptor; emitSend: #marshalArguments:.
+	stackCount := stackCount - 1.
+	^self pushR
 ]
 
 { #category : #services }
 TemplateJIT >> emitEpilogue [
 	method hasBlocks
 		ifTrue: [ assembler restoreCallerEnvironment ].
-	method isCallback
+	(method isCallback and: [ activeScript isMethod ])
 		ifTrue: [ ^ self emitCallbackEpilogue ].
 	method isFrameless
 		ifFalse: [ assembler restoreCallerFrame ].
@@ -337,6 +459,16 @@ TemplateJIT >> emitSend: selector super: aBoolean [
 	method isDebuggable
 		ifTrue: [ aBoolean ifTrue: [linker emitSendSuperDebuggable: selector from: method classBinding using: assembler] ifFalse: [linker emitSendDebuggable: selector using: assembler ]]
 		ifFalse: [ aBoolean ifTrue: [linker emitSendSuper: selector from: method classBinding using: assembler ] ifFalse: [linker emitSend: selector using: assembler ]]
+]
+
+{ #category : #services }
+TemplateJIT >> inlinesBinary: anSMessage [
+	| selector |
+	anSMessage receiver isSuper ifTrue: [ ^ false ].
+	anSMessage arguments size = 1 ifFalse: [ ^ false ].
+	selector := anSMessage selector.
+	selector isSymbol ifFalse: [ selector := method at: selector ].
+	^ BinaryMessageNativizer inlinedSelectors includes: selector
 ]
 
 { #category : #services }
@@ -552,9 +684,10 @@ TemplateJIT >> nativize [
 
 { #category : #services }
 TemplateJIT >> nativize: aCompiledMethod [
-	self
-		resetFor: aCompiledMethod;
-		nativize.
+	| framed |
+	framed := aCompiledMethod hasFrame.
+	self resetFor: aCompiledMethod; nativize.
+	framed = aCompiledMethod hasFrame ifFalse: [self resetFor: aCompiledMethod; nativize].
 	^ aCompiledMethod optimizedCode: mainCode
 ]
 
@@ -794,7 +927,7 @@ TemplateJIT >> visitMessage: anSMessage [
 	| arguments index |
 	anSMessage isInlined
 		ifTrue: [ ^ self visitInlinedMessage: anSMessage ].
-	anSMessage isOptimized
+	(anSMessage isOptimized or: [ self inlinesBinary: anSMessage ])
 		ifTrue: [ ^ self visitOptimizedMessage: anSMessage ].
 	anSMessage receiver acceptVisitor: self.
 	arguments := anSMessage arguments.

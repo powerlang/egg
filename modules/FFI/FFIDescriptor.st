@@ -57,7 +57,7 @@ FFIDescriptor >> callingConvention: ccCode [
 ]
 
 { #category : #accessing }
-FFIDescriptor >>returnType [
+FFIDescriptor >> returnType [
 	^self at: self size - 1
 ]
 
@@ -69,4 +69,35 @@ FFIDescriptor >> returnTypeName [
 { #category : #accessing }
 FFIDescriptor >> returnType: anInteger [
 	self at: self size - 1 put: anInteger
+]
+
+{ #category : #marshalling }
+FFIDescriptor >> marshalArguments: anArray [
+	| buffer stream |
+	buffer := ByteArray new: (anArray size max: 1) * WordSize.
+	stream := buffer writeStream.
+	anArray do: [:argument | argument marshalOn: stream].
+	^buffer
+]
+
+{ #category : #marshalling }
+FFIDescriptor >> resultFrom: aByteArray [
+	| type |
+	type := self returnTypeName.
+	type == #void ifTrue: [^0].
+	^self valueOf: type at: 0 in: aByteArray
+]
+
+{ #category : #marshalling }
+FFIDescriptor >> valueOf: type at: offset in: aByteArray [
+	| float |
+	(type == #float or: [type == #double]) ifTrue: [
+		float := Float new.
+		float replaceBytesFrom: 1 to: 8 with: aByteArray startingAt: offset + 1.
+		^float].
+	(#(sint32 sint) includes: type) ifTrue: [^aByteArray longAtOffset: offset].
+	(#(uint32 uint) includes: type) ifTrue: [^aByteArray uLongAtOffset: offset].
+	^type first = $s
+		ifTrue: [aByteArray largeAtOffset: offset]
+		ifFalse: [aByteArray pointerAtOffset: offset]
 ]

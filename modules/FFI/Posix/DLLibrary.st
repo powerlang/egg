@@ -26,6 +26,11 @@ DLLibrary >> dlsym: handle symbol: functionName [
 	<cdecl: pointer dlsym (pointer, pointer)>
 ]
 
+{ #category : #memory }
+DLLibrary >> flushInstructionCache: address size: size [
+	<cdecl: void egg_flush_icache (pointer, uint64)>
+]
+
 { #category : #accessing }
 DLLibrary >> lastError [
 	| address cstring |

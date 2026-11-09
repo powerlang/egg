@@ -70,40 +70,18 @@ AAPCS64ABI >> emitEntrypoint: anFFIDescriptor with: anAssembler [
 		pushTrue;
 		pushFalse;
 		pushM.
-	self storeArgumentsInStack: anFFIDescriptor with: anAssembler
-]
-
-{ #category : #callouts }
-AAPCS64ABI >> stackAreaOf: places types: types [
-	| end |
-	end := 0.
-	places with: types do: [:place :type |
-		place isInteger ifTrue: [end := end max: place + (self stackBytesOf: type)]].
-	^end alignedTo: 16
+	self spillCallbackArguments: anFFIDescriptor with: anAssembler
 ]
 
 { #category : #callouts }
 AAPCS64ABI >> stackBytesOf: type [
-	^packsStackArguments ifTrue: [(self bitsOf: type) // 8] ifFalse: [8]
-]
-
-{ #category : #callbacks }
-AAPCS64ABI >> storeArgumentsInStack: anFFIDescriptor with: anAssembler [
-	anAssembler
-		pushS;
-		loadRwithArgPointer;
-		convertRtoSmallInteger;
-		pushR
-]
-
-{ #category : #callbacks }
-AAPCS64ABI >> popRetaddrAndArgs: anFFIDescriptor with: anAssembler [
-	anAssembler popA; popA; popA
+	packsStackArguments ifTrue: [^(self bitsOf: type) // 8].
+	^super stackBytesOf: type
 ]
 
 { #category : #callbacks }
 AAPCS64ABI >> restoreContext: anFFIDescriptor with: anAssembler [
-	self popRetaddrAndArgs: anFFIDescriptor with: anAssembler.
+	self loadCallbackResult: anFFIDescriptor with: anAssembler.
 	anAssembler
 		popM;
 		popFalse;
@@ -119,14 +97,6 @@ AAPCS64ABI >> restoreContext: anFFIDescriptor with: anAssembler [
 
 { #category : #accessing }
 AAPCS64ABI >> bits [
-	^64
-]
-
-{ #category : #callouts }
-AAPCS64ABI >> bitsOf: type [
-	(#(uint8 sint8 uchar schar) includes: type) ifTrue: [^8].
-	(#(uint16 sint16 ushort sshort) includes: type) ifTrue: [^16].
-	(#(uint32 sint32 uint sint float) includes: type) ifTrue: [^32].
 	^64
 ]
 
@@ -185,11 +155,6 @@ AAPCS64ABI >> extendResult: type with: anAssembler [
 ]
 
 { #category : #callouts }
-AAPCS64ABI >> isFloat: type [
-	^#(float double) includes: type
-]
-
-{ #category : #callouts }
 AAPCS64ABI >> moveArgumentTo: aRegister with: codegen [
 	aRegister == x0 ifTrue: [^self].
 	aRegister isFloat ifFalse: [^codegen move: x0 to: aRegister].
@@ -220,8 +185,7 @@ AAPCS64ABI >> placesOf: types [
 	floats := 0.
 	offset := 0.
 	^types collect: [:type | | place bytes |
-		(#(longdouble complexFloat complexDouble complexLongdouble) includes: type)
-			ifTrue: [^self error: 'FFI type ' , type , ' not supported natively yet'].
+		self ensureSupported: type.
 		(self isFloat: type)
 			ifTrue: [
 				floats := floats + 1.
@@ -332,3 +296,12 @@ AAPCS64ABI >> wordSizeShift [
 	^3
 ]
 
+{ #category : #callbacks }
+AAPCS64ABI >> callbackFloatRegisters [
+	^{d0. d1. d2. d3. d4. d5. d6. d7}
+]
+
+{ #category : #callbacks }
+AAPCS64ABI >> callbackIntegerRegisters [
+	^{x0. x1. x2. x3. x4. x5. x6. x7}
+]

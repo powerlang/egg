@@ -10,6 +10,8 @@ Class {
 		'codeSegments',
 		'environment',
 		'kernelOverrides',
+		'memory',
+		'placeholders',
 		'replacements',
 		'roots'
 	],
@@ -21,7 +23,7 @@ BootstrapperModule >> imports [
 	^{
 		#Kernel -> #(OrderedCollection IdentityDictionary Object Magnitude ProcessLMRStack ProtoObject SmallInteger CallbackBehavior MethodDictionary).
 		#'Kernel.LMR' -> #(LMRProtoObject).
-		#LMR -> #(Memory NativeCode SendSite GCSpace CriticalArray).
+		#LMR -> #(Memory NativeCode SendSite GCSpace CriticalArray GlobalDispatchCache).
 		#'LMR.Nativizer' -> #(NativizerModule NativizationPlatform NativizationEnvironment LookupNativizer LookupLinker)
 	}
 ]
@@ -29,14 +31,20 @@ BootstrapperModule >> imports [
 { #category : #running }
 BootstrapperModule >> main: args [
 	| lmrModule nativizer platform names |
+	Kernel require: #LMR.
 	names := args allButFirst: 2.
 	roots := names collect: [:name | Kernel load: name asSymbol].
-	lmrModule := Memory module.
+	lmrModule := LMR.
 	nativizer := NativizerModule module.
 	platform := NativizationPlatform host.
 	self
 		bootstrapLMR: lmrModule nativizer: nativizer platform: platform;
 		writeSegments.
+]
+
+{ #category : #spec }
+BootstrapperModule >> requires [
+	^#(LMR)
 ]
 
 { #category : #running }
@@ -49,9 +57,11 @@ BootstrapperModule >> __start__ [
 BootstrapperModule >> bootstrapLMR: anLMRModule nativizer: aNativizerModule platform: aPlatform [
 	| env |
 
+	Kernel log: 'nativizing the LMR runtime' , String cr.
 	env := aNativizerModule newNativizationEnvironmentFor: aPlatform.
 	env lmrModule: anLMRModule.
 	ProcessLMRStack
+		initializeConstants;
 		initializeInstances;
 		slotSize: env newAssembler codegen stackSlotSize.
 
@@ -61,10 +71,14 @@ BootstrapperModule >> bootstrapLMR: anLMRModule nativizer: aNativizerModule plat
 		nativizeInvokeFor: anLMRModule env: env nativizer: aNativizerModule;
 		nativizeWriteBarrierFor: anLMRModule env: env nativizer: aNativizerModule;
 		nativizeLookupFor: anLMRModule env: env nativizer: aNativizerModule;
+		useBootstrapMemoryFor: anLMRModule;
+		reserveSendSiteCachesFor: anLMRModule;
+		initializeDispatchCache;
 		nativizeSendSiteStubs: env.
 
 	env initializeLinkersFor: anLMRModule; completeInitialization.
 	environment := env.
+	Memory current: memory.
 	kernelOverrides := self kernelOverrides.
 	self nativizeEntriesOf: self with: env.
 	roots do: [:module | self nativizeEntriesOf: module with: env]
@@ -84,7 +98,7 @@ BootstrapperModule >> nativizeEntry: aCompiledMethod of: aModule with: env [
 	env nativize: code.
 	self installSelfReferenceOn: code optimizedCode.
 	aModule export: code optimizedCode as: aCompiledMethod selector.
-	(self codeSegmentOf: aModule) add: code optimizedCode code
+	self addCodeOf: code to: aModule
 ]
 
 { #category : #bootstrapping }
@@ -103,12 +117,27 @@ BootstrapperModule >> installSelfReferenceOn: aNativeCode [
 
 { #category : #bootstrapping }
 BootstrapperModule >> initializeGlobalsFor: anLMRModule [
-	| placeholders |
 	placeholders := anLMRModule class globalNames
 		collect: [:name | NativeCode new code: name , ' placeholder'].
 	anLMRModule
-		globals: placeholders;
+		globals: placeholders copy;
 		globalNamed: #SmallIntegerBehavior put: SmallInteger instanceBehavior
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> useBootstrapMemoryFor: anLMRModule [
+	memory := anLMRModule memory.
+	anLMRModule memory: BootstrapMemory new
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> reserveSendSiteCachesFor: anLMRModule [
+	SendSite reserveCachesWith: anLMRModule lookup
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> initializeDispatchCache [
+	GlobalDispatchCache current: GlobalDispatchCache new
 ]
 
 { #category : #bootstrapping }
@@ -284,7 +313,7 @@ BootstrapperModule >> nativizePolymorphicCacheWith: env [
 BootstrapperModule >> writeSegments [
 	| all closure |
 	all := {
-		Memory module.                 "LMR"
+		LMR.
 		NativizerModule module.        "LMR.Nativizer"
 		self class module.             "LMR.Bootstrapper"
 	} , roots.
@@ -297,10 +326,12 @@ BootstrapperModule >> writeSegments [
 BootstrapperModule >> writeSegmentOf: aModule [
 	| filename builder code |
 	filename := 'image-segments/lmr/' , aModule name , '.ems'.
+	Kernel log: 'building ' , aModule name , '... '.
 	builder := self segmentBuilderFor: aModule.
 	code := codeSegments at: aModule ifAbsent: [#()].
 	code do: [:bytes | builder addCode: bytes].
-	aModule writeCachedSegmentAt: filename with: builder
+	aModule writeCachedSegmentAt: filename with: builder.
+	Kernel log: 'done at ' , filename , String cr
 ]
 
 { #category : #snapshotting }
@@ -343,12 +374,24 @@ BootstrapperModule >> segmentBuilderFor: aModule [
 	builder := aModule newSegmentBuilder.
 	(self requiresNativization: aModule) ifTrue: [builder nativizer: environment].
 	aModule == Kernel ifTrue: [self addKernelOverridesTo: builder].
+	self mapPlaceholdersIn: builder.
+	builder map: LMR memory to: memory.
 	^builder
 ]
 
 { #category : #writing }
+BootstrapperModule >> mapPlaceholdersIn: aBuilder [
+	| globals |
+	globals := LMR globals.
+	placeholders withIndexDo: [:placeholder :i | | global |
+		global := globals at: i.
+		global isNativeCode ifTrue: [aBuilder map: placeholder code to: global code]]
+]
+
+{ #category : #writing }
 BootstrapperModule >> requiresNativization: aModule [
-	^({Kernel. LMRProtoObject module. Memory module} includes: aModule) or: [roots includes: aModule]
+	^({Kernel. Kernel.LMR. LMR} includes: aModule)
+		or: [(self importsClosureFor: roots) includes: aModule]
 ]
 
 { #category : #writing }
@@ -362,32 +405,22 @@ BootstrapperModule >> kernelOverrides [
 	| overrides lmr |
 	overrides := OrderedCollection new.
 	replacements := IdentityDictionary new.
-	lmr := LMRProtoObject module.
+	lmr := Kernel.LMR.
 	lmr classes do: [:replacement | | target |
 		target := replacement superclass.
 		(replacement !== lmr class and: [target module == Kernel])
 			ifTrue: [
 				self addOverridesFrom: replacement to: target into: overrides.
 				self addOverridesFrom: replacement class to: target class into: overrides]].
-	self addExtensionsOf: Memory module into: overrides.
+	self addExtensionsOf: LMR into: overrides.
 	^overrides
 ]
 
 { #category : #bootstrapping }
 BootstrapperModule >> addExtensionsOf: aModule into: aCollection [
-	aModule extensions keysAndValuesDo: [:key :methods | | meta name class target |
-		meta := key endsWith: ' class'.
-		name := meta ifTrue: [(key trimTail: ' class') asSymbol] ifFalse: [key].
-		class := aModule namespace at: name.
-		target := meta ifTrue: [class class] ifFalse: [class].
-		self addExtensions: methods of: target into: aCollection]
-]
-
-{ #category : #bootstrapping }
-BootstrapperModule >> addExtensions: aCollection of: aClass into: anOrderedCollection [
-	aCollection do: [:method | | copy |
-		copy := (aClass compiledMethodAt: method selector) copy.
-		self add: copy replacing: method into: anOrderedCollection]
+	aModule extensionsDo: [:target :method | | copy |
+		copy := method copy.
+		self add: copy replacing: method into: aCollection]
 ]
 
 { #category : #bootstrapping }

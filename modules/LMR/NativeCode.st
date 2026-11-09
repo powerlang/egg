@@ -23,7 +23,7 @@ NativeCode class >> aspects [
 NativeCode class >> withAll: aCollection [
 	| nc |
 	nc := self new: aCollection size.
-	aCollection withIndexDo: [:elem :i | nc _basicAt: i put: elem].
+	aCollection withIndexDo: [:elem :i | nc basicAt: i put: elem].
 	^nc
 ]
 

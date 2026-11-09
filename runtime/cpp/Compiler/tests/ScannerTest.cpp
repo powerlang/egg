@@ -350,19 +350,6 @@ TEST_CASE_METHOD(SSmalltalkScannerTestFixture, "Scanner: Parentheses and bracket
     REQUIRE(token->is_('}'));
 }
 
-TEST_CASE_METHOD(SSmalltalkScannerTestFixture, "Scanner: Period separator", "[scanner]") {
-    setUp();
-    scan("a.b");
-    
-    auto token = next();
-    REQUIRE(token->value() == "a");
-    
-    token = next();
-    REQUIRE(token->is_('.'));
-    
-    token = next();
-    REQUIRE(token->value() == "b");
-}
 
 TEST_CASE_METHOD(SSmalltalkScannerTestFixture, "Scanner: Semicolon cascade", "[scanner]") {
     setUp();
@@ -426,4 +413,40 @@ TEST_CASE_METHOD(SSmalltalkScannerTestFixture, "Scanner: Complex expression", "[
     
     token = next();
     REQUIRE(token->value() == "1");
+}
+
+TEST_CASE_METHOD(SSmalltalkScannerTestFixture, "Scanner: Dotted identifier", "[scanner]") {
+    setUp();
+    scan("Kernel.Object size");
+    auto token = next();
+    REQUIRE(token->isName());
+    REQUIRE(token->value() == "Kernel.Object");
+    token = next();
+    REQUIRE(token->value() == "size");
+}
+
+TEST_CASE_METHOD(SSmalltalkScannerTestFixture, "Scanner: Periods that end statements", "[scanner]") {
+    setUp();
+    scan("a. b");
+    REQUIRE(next()->value() == "a");
+    REQUIRE(next()->is('.'));
+    REQUIRE(next()->value() == "b");
+
+    setUp();
+    scan("a1.b");
+    REQUIRE(next()->value() == "a1");
+    REQUIRE(next()->is('.'));
+    REQUIRE(next()->value() == "b");
+
+    setUp();
+    scan("a.1");
+    REQUIRE(next()->value() == "a");
+    REQUIRE(next()->is('.'));
+    REQUIRE(next()->value() == "1");
+
+    setUp();
+    scan("a.");
+    REQUIRE(next()->value() == "a");
+    REQUIRE(next()->is('.'));
+    REQUIRE(next()->isEnd());
 }

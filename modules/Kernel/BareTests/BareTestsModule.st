@@ -13,7 +13,7 @@ Class {
 { #category : #spec }
 BareTestsModule >> imports [
 	^{
-		#Kernel -> #(HashTable)
+		#Kernel -> #(HashTable ImageSegment Processor)
 	}
 ]
 
@@ -397,6 +397,78 @@ BareTestsModule >> test240HashTablePrimeForReturnsNextGoodPrime [
 	^(HashTable primeFor: 300) == 359
 ]
 
+{ #category : #tests }
+BareTestsModule >> test250RequireBindsSubmodule [
+	Kernel require: #BareTests.
+	^Kernel.BareTests == self
+]
+
+{ #category : #tests }
+BareTestsModule >> test280ImageSegmentRelocatesItsReferences [
+	| contents original segment base module offset first |
+	contents := Kernel host readFile: 'image-segments/lmr/LMR.LauncherTests.ems'.
+	original := contents copy.
+	segment := ImageSegment on: contents.
+	base := segment baseAddress.
+	module := segment module.
+	offset := module - base.
+	first := original pointerAtOffset: offset.
+	segment relocateTo: base + 16r100000.
+	^segment module = (module + 16r100000)
+		and: [segment baseAddress = (base + 16r100000)
+		and: [(first bitAnd: 3) != 0 or: [(contents pointerAtOffset: offset) = (first + 16r100000)]]]
+]
+
+{ #category : #tests }
+BareTestsModule >> test300BlockContextAnswersItsArguments [
+	| context |
+	context := [:x | Processor activeProcess reifiedCopy topContext] value: 7.
+	[context code isBlock] whileFalse: [context := context caller].
+	^context arguments = #(7)
+]
+
+{ #category : #tests }
+BareTestsModule >> test290ImageSegmentBindsItsImports [
+	| contents original segment imports changed |
+	contents := Kernel host readFile: 'image-segments/lmr/LMR.LauncherTests.ems'.
+	original := contents copy.
+	segment := ImageSegment on: contents.
+	imports := (1 to: segment importDescriptors size) asArray.
+	segment bindImports: imports.
+	changed := (48 to: segment segmentSize - 4 by: 4) select: [:offset |
+		(original uLongAtOffset: offset) != (contents uLongAtOffset: offset)].
+	^changed notEmpty and: [changed conform: [:offset | | old |
+		old := original uLongAtOffset: offset.
+		(contents uLongAtOffset: offset) = ((old bitShift: -2) + 1 * 2 + 1)]]
+]
+
+{ #category : #tests }
+BareTestsModule >> test270ImageSegmentLinksItsImports [
+	| contents segment strings symbols classes |
+	contents := Kernel host readFile: 'image-segments/lmr/LMR.LauncherTests.ems'.
+	segment := ImageSegment on: contents.
+	strings := segment importStrings.
+	symbols := segment importDescriptors select: [:descriptor | (strings at: descriptor first + 1) = 'asSymbol'].
+	classes := segment importDescriptors select: [:descriptor | (strings at: descriptor first + 1) = 'asClass'].
+	^symbols notEmpty
+		and: [classes notEmpty
+		and: [(symbols conform: [:descriptor | (segment link: descriptor) == (strings at: descriptor last + 1) asSymbol])
+		and: [classes conform: [:descriptor | (segment link: descriptor) isClass]]]]
+]
+
+{ #category : #tests }
+BareTestsModule >> test260ImageSegmentParsesAnEmsFile [
+	| contents segment strings first |
+	contents := Kernel host readFile: 'image-segments/lmr/LMR.LauncherTests.ems'.
+	segment := ImageSegment on: contents.
+	strings := segment importStrings.
+	first := segment importDescriptors first.
+	^segment segmentSize > 48
+		and: [(segment exports includesKey: '__module__')
+		and: [(strings includes: 'Kernel')
+		and: [first conform: [:index | index < strings size]]]]
+]
+
 { #category : #main }
 BareTestsModule >> runTest: selector [
 	| result |
@@ -447,7 +519,13 @@ BareTestsModule >> main: anArray [
 		test222BitXorLargeIntWithSmallInt
 		test230BitShiftLeftOverflow test231BitShiftRightNegativeArg
 		test232BitShiftRightSelector
-		test240HashTablePrimeForReturnsNextGoodPrime).
+		test240HashTablePrimeForReturnsNextGoodPrime
+		test250RequireBindsSubmodule
+		test260ImageSegmentParsesAnEmsFile
+		test270ImageSegmentLinksItsImports
+		test280ImageSegmentRelocatesItsReferences
+		test290ImageSegmentBindsItsImports
+		test300BlockContextAnswersItsArguments).
 	tests do: [:sel |
 		(self runTest: sel)
 			ifTrue: [passed := passed + 1]

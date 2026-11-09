@@ -32,6 +32,11 @@ Class {
 	#category : #Kernel
 }
 
+{ #category : #initialization }
+Memory class >> initializeConstants [
+	LargeThreshold := 100000
+]
+
 { #category : #errors }
 Memory class >> allocateMemory: size near: address [
 	| limit |
@@ -324,13 +329,9 @@ Memory >> createLargeSpace: size [
 
 { #category : #private }
 Memory >> createPinnedSpace [
-	"
-	We limit the pinned space to 32 bits so that
-	we can use for safely storing behaviors
-	"
 	| size address |
 	size := 4096 + 64 * 1024.
-	address := Kernel os reserveAndCommit: size near: 0 limit: 0x100000000.
+	address := Kernel os reserveAndCommit: size.
 	pinnedSpace := self newSpace address: address size: size.
 	pinnedSpace
 		name: 'Pinned Object';
@@ -359,7 +360,7 @@ Memory >> createSpaces [
 	youngBase := fromSpace base.
 	youngLimit := eden reservedLimit.
 	self addSpace: fromSpace; addSpace: eden.
-	oldZone := self reserveZoneSized: 12 * 1024 * 1024 * 1024 near: 0x100000000.
+	oldZone := self reserveZoneSized: 1024 * 1024 * 1024.
 	allocator := edenSpace := eden.
 	largeSpaces := CriticalArray new usePinnedAllocation; growTo: 1000.
 	unreachableEphemerons := CriticalArray new growTo: 1000
@@ -852,9 +853,9 @@ Memory >> reserveSpaceSized: reserved commiting: commited [
 ]
 
 { #category : #private }
-Memory >> reserveZoneSized: size near: start [
+Memory >> reserveZoneSized: size [
 	| address |
-	address := Kernel os reserve: size near: start.
+	address := Kernel os reserve: size.
 	^AllocationZone new
 		memory: self;
 		base: address // 2;

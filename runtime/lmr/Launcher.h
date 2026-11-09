@@ -12,8 +12,10 @@
 
 #include <cstdint>
 #include <map>
+#include <set>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "FileImageSegment.h"
 
@@ -36,19 +38,39 @@ class Launcher
     Egg::FileImageSegment* segmentNamed(const std::string& module) const;
 
     /**
-     * Rebases every loaded segment. Imports are left unresolved (a sentinel).
+     * Rebases every loaded segment and binds the imports of the runtime
+     * core (Kernel, Kernel.LMR and LMR), and of the modules given to
+     * bind(), by name, without running code. The imports of the other
+     * segments are left unresolved (a sentinel).
      */
     void relocate();
+    void bind(const std::string& module);
+    void bindFFI();
+    void arguments(int argc, const char* const* argv);
+    std::vector<Egg::Object*> importsOf(const std::string& module);
     Egg::HeapObject* exported(const std::string& name);
+    void* entry(const std::string& name);
     uint64_t run(const std::string& name);
 
   private:
     std::string _directory;
     std::map<std::string, std::unique_ptr<Egg::FileImageSegment>> _segments;
     Egg::FileImageSegment* _segment = nullptr;
+    std::map<std::string, Egg::Object*> _symbols;
+    std::vector<std::string> _bound = {"Kernel", "Kernel.LMR", "LMR", "FFI"};
+    int _argc = 0;
+    const char* const* _argv = nullptr;
 
     Egg::FileImageSegment* load(const std::string& module, const std::string& file);
     void loadImportsOf(Egg::FileImageSegment* segment);
+    void collectSymbols();
+    Egg::Object* kernelExport(const std::string& name);
+    Egg::Object* bindImport(const std::vector<std::string>& tokens);
+    Egg::Object* methodIn(Egg::HeapObject* behavior, Egg::Object* selector);
+    uint32_t instVarIndex(Egg::HeapObject* species, const std::string& name);
+    void initializeKernelSpace();
+    void initializeHostLinkage();
+    bool isBound(const std::string& module) const;
     void makeExecutable();
 };
 

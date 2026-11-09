@@ -10,7 +10,8 @@ Class {
 		'loader',
 		'mallocHeap',
 		'defaultHeap',
-		'libc'
+		'libc',
+		'libm'
 	],
 	#category : #FFI
 }
@@ -27,20 +28,25 @@ FFIModule >> imports [
 	}
 ]
 
+{ #category : #initialization }
+FFIModule >> justLoaded [
+	super justLoaded.
+	namespace at: #FFI put: self
+]
+
 { #category : #private }
 FFIModule >> initializeFor: moduleName loader: loaderName [
 	| module loaderType |
 	module := Kernel load: moduleName.
-	self namespace
-		at: #FFI put: self;
-		at: #OS put: module.
+	self namespace at: #OS put: module.
 	loaderType := module namespace at: loaderName.
-	loader := loaderType new
+	loader := loaderType basicNew.
+	loader initialize
 ]
 
 { #category : #private }
 FFIModule >> initializeLibC [
-	libc := LibC new.
+	libc := loader libcClass new.
 	loader bootstrapOpen: libc.
 	defaultHeap := mallocHeap := MallocHeap new
 ]
@@ -88,7 +94,17 @@ FFIModule >> libc [
 ]
 
 { #category : #accessing }
+FFIModule >> libm [
+	libm ifNil: [libm := LibM new initialize; open; yourself].
+	^libm
+]
+
+{ #category : #accessing }
 FFIModule >> loader [
 	^loader
 ]
 
+{ #category : #accessing }
+FFIModule >> os [
+	^OS
+]

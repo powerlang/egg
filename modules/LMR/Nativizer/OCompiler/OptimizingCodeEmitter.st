@@ -692,7 +692,7 @@ OptimizingCodeEmitter >> assembleTransferControlTo: instruction [
 	self assembleCopyIfNeeded: receiver to: assembler regR.
 	self activationRecord savesPreviousSelf
 		ifTrue: [assembler pop: assembler regS].
-	assembler restoreCallerFrame; jumpToReg: assembler regA
+	assembler restoreCallerFrame; loadMwithA; jumpToMindex: 1
 ]
 
 { #category : #unclassified }
@@ -879,9 +879,8 @@ OptimizingCodeEmitter >> visitLoadImplicit: instruction [
 		^frame hasFrame ifTrue: [
 			assembler
 				reserveStackSlots: frame temporaries + 2;
-				store: assembler regR in: assembler regFP index: 0;
-				loadVwithPointer: method;
-				store: assembler regV in: assembler regFP index: -1.
+				storeRinFPindex: 0;
+				storeMinFPindex: -1.
 			self savesPreviousSelf ifTrue: [assembler push: assembler regS]]]
 ]
 
@@ -910,11 +909,8 @@ OptimizingCodeEmitter >> visitReturn: aReturnInstruction [
 	self assembleCopyIfNeeded: source to: assembler regR.
 	self savesPreviousSelf
 		ifTrue: [assembler pop: assembler regS; restoreCallerFrame]
-		ifFalse: [
-			assembler
-				restoreCallerFrame;
-				load: assembler regS from: assembler regFP atIndex: 0].
-	assembler return
+		ifFalse: [assembler restoreCallerFrame; restoreCallerSelf].
+	assembler restoreCallerM; return
 ]
 
 { #category : #unclassified }

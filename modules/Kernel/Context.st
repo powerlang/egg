@@ -25,12 +25,11 @@ Context class >> fromStack: aStack [
 
 { #category : #reifying }
 Context class >> fromStack: aStack frameAt: bp pc: pc top: top callee: callee [
-	| receiver code env first temps context next nextpc caller |
-	receiver := aStack at: bp - 1.
-	code := aStack at: bp - 2.
-	env := aStack at: bp - 4.
-	first := bp - 5.
-	temps := aStack copyFrom: first to: top.
+	| receiver code env temps context next nextpc nexttop caller |
+	receiver := aStack receiverAt: bp.
+	code := aStack codeAt: bp.
+	env := aStack environmentAt: bp.
+	temps := aStack stackAt: bp top: top.
 	context := self new
 		receiver: receiver;
 		code: code;
@@ -39,10 +38,11 @@ Context class >> fromStack: aStack frameAt: bp pc: pc top: top callee: callee [
 		stack: temps;
 		callee: callee;
 		yourself.
-	next := aStack bpAt: bp.
+	next := aStack callerOf: bp.
 	next > 0 ifTrue: [
-		nextpc := aStack pcAt: bp + 1.
-		caller := self fromStack: aStack frameAt: next pc: nextpc top: bp + 2 callee: context.
+		nextpc := aStack returnPcAt: bp.
+		nexttop := aStack callerTopOf: bp.
+		caller := self fromStack: aStack frameAt: next pc: nextpc top: nexttop callee: context.
 		context caller: caller].
 	^context
 ]
@@ -59,16 +59,32 @@ Context >> arguments [
 
 { #category : #printing }
 Context >> backtrace [
-	| result context depth |
-	result := ''.
+	^String streamContents: [:s |
+		(self frameDescriptions: 64) do: [:description | s nextPutAll: description; nextPutAll: String cr]]
+]
+
+{ #category : #accessing }
+Context >> below: anObject [
+	| top context |
+	top := self.
 	context := self.
-	depth := 0.
-	[context notNil and: [depth < 64]] whileTrue: [
-		result := result, context frameDescription, String cr.
-		context := context caller.
-		depth := depth + 1].
-	context notNil ifTrue: [result := result, '... (truncated)', String cr].
-	^result
+	[context notNil] whileTrue: [
+		context receiver == anObject ifTrue: [top := context caller].
+		context := context caller].
+	^top
+]
+
+{ #category : #printing }
+Context >> frameDescriptions: maxFrames [
+	| limit descriptions context |
+	limit := maxFrames ifNil: [SmallInteger maximum].
+	descriptions := OrderedCollection new.
+	context := self.
+	[context notNil and: [descriptions size < limit]] whileTrue: [
+		descriptions add: context frameDescription.
+		context := context caller].
+	context notNil ifTrue: [descriptions add: '... (truncated)', String cr].
+	^descriptions
 ]
 
 { #category : #accessing }
@@ -181,10 +197,14 @@ Context >> frameDescription [
 	^String streamContents: [:s |
 		s nextPutAll: ([self frameHeader] on: Error do: ['<bad frame>']).
 		code isBlock ifTrue: [
-			s crtab; nextPutAll: 'args: '; nextPutAll: ([self arguments printString] on: Error do: ['<?>'])].
-		s crtab; nextPutAll: 'receiver: '; nextPutAll: ([receiver printString] on: Error do: ['<?>']).
-		s crtab; nextPutAll: 'temps: '; nextPutAll: ([self temps printString] on: Error do: ['<?>']).
-		s crtab; nextPutAll: 'env: '; nextPutAll: ([environment printString] on: Error do: ['<?>']).
+			s crtab; nextPutAll: 'args: '.
+			self print: [self arguments] limitedOn: s].
+		s crtab; nextPutAll: 'receiver: '.
+		self print: [receiver] limitedOn: s.
+		s crtab; nextPutAll: 'temps: '.
+		self print: [self temps] limitedOn: s.
+		s crtab; nextPutAll: 'env: '.
+		self print: [environment] limitedOn: s.
 		s cr]
 ]
 
@@ -205,6 +225,14 @@ Context >> lastEnvironment [
 { #category : #private }
 Context >> previousEnvironment [
 	^caller lastEnvironment
+]
+
+{ #category : #printing }
+Context >> print: aBlock limitedOn: aStream [
+	| string |
+	string := [aBlock value printString] on: Error do: ['<?>'].
+	string size > 200 ifTrue: [string := (string copyFrom: 1 to: 200) , '...'].
+	aStream nextPutAll: string
 ]
 
 { #category : #accessing }

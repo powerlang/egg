@@ -581,11 +581,6 @@ ARM64CodeGenerator >> emitEffectiveAddrToVOf: memRef [
 ]
 
 { #category : #'memory - load / store' }
-ARM64CodeGenerator >> store: valueReg in: baseReg indexAt: indexReg [
-	self assemble: 'str' with: valueReg with: baseReg with: indexReg
-]
-
-{ #category : #'memory - load / store' }
 ARM64CodeGenerator >> storeByte: byteValueOrReg in: baseReg offset: offset [
 	byteValueOrReg isInteger ifTrue: [
 		self moveImm: byteValueOrReg to: self regV.

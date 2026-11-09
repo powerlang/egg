@@ -76,7 +76,7 @@ public:
     void encodePushR();
     void encodePopR();
     void encodeDynamicVar_(const Egg::string& name);
-    void encodeNestedDynamicVar_(const Egg::string& name);
+    void encodeNestedDynamicVar_(const LiteralValue& names);
     void encodeArgument_env_(int index, LocalEnvironment* environment);
     void encodeTemporary_env_(int index, LocalEnvironment* environment);
     std::vector<uint8_t> encodeClosureElements_(SBlockNode* node);
@@ -92,7 +92,6 @@ private:
     void nextBigIntegerPut(int64_t value);
     void nextBooleanPut(bool value);
     void nextSymbolPut(const Egg::string& symbol);
-    void nextLiteralPut(const Egg::string& literal);
     void nextTypePut(uint8_t typeId);
     
     int encodedEnvironment_(LocalEnvironment* environment);

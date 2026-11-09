@@ -9,3 +9,8 @@ Extension { #name : #CharacterArray }
 CharacterArray >> externalCopy [
 	^OS externalCopyOfString: self
 ]
+
+{ #category : #'ffi' }
+CharacterArray >> externalUTF16Copy [
+	^Kernel utf16 externalCopyOf: self
+]

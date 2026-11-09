@@ -6,6 +6,8 @@
 #include <map>
 #include <functional>
 
+#include <ffi.h>
+
 #include "FFIGlue.h"
 
 #include "../HeapObject.h"
@@ -22,6 +24,13 @@
 extern "C" void closureCallbackWrapper(ffi_cif* cif, void* ret, void** args, void* userData);
 
 namespace Egg {
+
+struct FFIDescriptorImpl {
+    ffi_cif *cif;
+    ffi_type **argTypes;
+    void(*fnAddr)();
+};
+
 
 class Runtime;
 class SExpressionLinearizer;
@@ -278,7 +287,6 @@ private:
 	Object* primitiveUnderSize();
 
 	void initializeCIF(HeapObject *method, int argCount);
-	Object* demarshalFFIResult(void *, uint8_t type);
 	Object* primitiveFFICall();
 
 	Object* underprimitiveBasicAt(Object *receiver, std::vector<Object*> &args);
@@ -315,7 +323,9 @@ private:
 	Object* underprimitiveSmallIntegerByteAt(Object *receiver, std::vector<Object*> &args);
 	Object* underprimitiveSmallSize(Object *receiver, std::vector<Object*> &args);
 	Object* underprimitiveULargeAtOffset(Object *receiver, std::vector<Object*> &args);
+	Object* underprimitiveULargeAtOffsetInto(Object *receiver, std::vector<Object*> &args);
 	Object* underprimitiveULargeAtOffsetPut(Object *receiver, std::vector<Object*> &args);
+	Object* underprimitiveObjectAtOffsetPut(Object *receiver, std::vector<Object*> &args);
 	Object* underprimitiveULongAtOffset(Object *receiver, std::vector<Object*> &args);
 	Object* underprimitiveULongAtOffsetPut(Object *receiver, std::vector<Object*> &args);
 	Object* underprimitiveUShortAtOffset(Object *receiver, std::vector<Object*> &args);

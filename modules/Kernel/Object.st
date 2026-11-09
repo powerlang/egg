@@ -667,11 +667,7 @@ Object >> literalString [
 
 { #category : #errors }
 Object >> marshalOn: aStream [
-	| s |
-	s := self sizeInBytes.
-	aStream putBytesFrom: self from: 1 to: s.
-	s < WordSize
-		ifTrue: [aStream putBytesFrom: #[0 0 0 0 0 0 0 0] from: 1 to: WordSize - s]
+	aStream _nextNativePut: self
 ]
 
 { #category : #'instance behavior' }

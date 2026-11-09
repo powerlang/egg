@@ -7,16 +7,9 @@
 #define _FFIGLUE_H_
 
 #include <cstdint>
-#include <ffi.h>
 
 namespace Egg
 {
-struct FFIDescriptorImpl {
-    ffi_cif *cif;
-    ffi_type **argTypes;
-    void(*fnAddr)();
-};
-
 uintptr_t FindSymbol(uintptr_t libHandle, char *symbol);
 uintptr_t LoaderHandle();
 uintptr_t SymbolFinder();

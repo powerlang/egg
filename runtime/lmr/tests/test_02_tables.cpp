@@ -1,6 +1,6 @@
 /*
     Step 2: loading a segment parses its import and export tables, and each
-    export address is relocated to point inside the reserved segment region.
+    export address is relocated to point inside the segment's objects or code.
     Later steps use the exports to find entry points (a module, a method) by
     name, and the imports to bind references into other segments.
 */
@@ -27,7 +27,8 @@ TEST_CASE("loading a segment parses its import and export tables", "[tables]")
     {
         INFO("export: " << name);
         auto address = reinterpret_cast<uintptr_t>(object);
-        REQUIRE(address >= seg->spaceStart());
-        REQUIRE(address < seg->spaceEnd());
+        auto inObjects = address >= seg->spaceStart() && address < seg->spaceEnd();
+        auto inCode = seg->header.codeSize != 0 && address >= seg->codeStart() && address < seg->codeEnd();
+        REQUIRE((inObjects || inCode));
     }
 }

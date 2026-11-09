@@ -74,6 +74,7 @@ class ImageSegment
     uintptr_t spaceEnd() { return _currentBase + header.size; }
     uintptr_t codeStart() { return _currentBase + align(header.size, SegmentCodeAlignment); }
     uintptr_t codeEnd() { return this->codeStart() + header.codeSize; }
+    uintptr_t reservedEnd() { return _currentBase + header.reservedSize; }
 
     void dumpObjects();
 };

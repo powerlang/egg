@@ -35,6 +35,7 @@ Builder >> build [
 	| metaclasses |
     classes := module classes.
 	classes do: [:c | self mapClass: c].
+	module extensionsDo: [:target :method | self mapMethod: method].
 	module prepareForSnapshot: self.
 	metaclasses := classes collect: [:c | c class].
 	closure scope: classes , metaclasses; traverse: module.
@@ -102,12 +103,13 @@ Builder >> mapMethod: method [
 	nativizer ifNotNil: [nativizer nativize: copy].
 	closure map: method to: copy.
 	self addNativeCodeOf: copy.
-	method hasBlocks ifFalse: [^self].
+	method hasBlocks ifFalse: [^copy].
 	method withIndexDo: [:b :i | | bcopy |
 		b isBlock ifTrue: [
 			bcopy := copy at: i.
 			closure map: b to: bcopy.
-			self addNativeCodeOf: bcopy]]
+			self addNativeCodeOf: bcopy]].
+	^copy
 ]
 
 { #category : #accessing }

@@ -144,8 +144,8 @@ ByteArray >> largeAtOffset: offset [
 			by: -1
 			do: [:i | integer := (integer bitShift: 8) + ((self at: i) bitXor: 16rFF)].
 		^(integer + 1) negated].
-	lo := self uLongAtOffset: 0.
-	hi := self uLongAtOffset: 4.
+	lo := self uLongAtOffset: offset.
+	hi := self uLongAtOffset: offset + 4.
 	^(hi bitShift: 32) + lo
 ]
 

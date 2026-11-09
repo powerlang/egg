@@ -320,11 +320,6 @@ SmallInteger >> low32 [
 	^WordSize > 4 ifTrue: [self bitAnd: 0xFFFFFFFF] ifFalse: [self]
 ]
 
-{ #category : #private }
-SmallInteger >> marshalOn: aStream [
-	aStream _nextNativePut: self
-]
-
 { #category : #unclassified }
 SmallInteger >> negated [
 	self = Minimum ifTrue: [^Maximum + 1].
@@ -392,3 +387,7 @@ SmallInteger >> wideDigitAt: index [
 		bitAnd: LargeInteger base - 1
 ]
 
+{ #category : #marshalling }
+SmallInteger >> marshalOn: aStream [
+	aStream nextNativeIntegerPut: self
+]

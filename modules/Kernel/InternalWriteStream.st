@@ -31,6 +31,12 @@ InternalWriteStream >> _nextNativePut: anObject [
 	position := position + WordSize
 ]
 
+{ #category : #services }
+InternalWriteStream >> nextNativeIntegerPut: anInteger [
+	contents _uLargeAtOffset: position put: anInteger.
+	position := position + WordSize
+]
+
 { #category : #writing }
 InternalWriteStream >> alignTo: boundary [
 	| null |

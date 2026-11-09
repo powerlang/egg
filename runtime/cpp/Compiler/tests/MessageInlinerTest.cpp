@@ -73,3 +73,28 @@ TEST_CASE_METHOD(SMessageInlinerTestFixture,
     });
     REQUIRE(sawInlined);
 }
+
+static bool inlinesMessage(SMethodNode* method) {
+    bool inlined = false;
+    method->nodesDo_([&](SParseNode* n) {
+        if (n->isMessage() && static_cast<SMessageNode*>(n)->isInlined())
+            inlined = true;
+    });
+    return inlined;
+}
+
+TEST_CASE_METHOD(SMessageInlinerTestFixture,
+                 "Inliner: to:by:do: with a literal step is inlined", "[inliner]") {
+    SMethodNode* method = parse("foo 1 to: 10 by: 2 do: [:i | i]");
+    REQUIRE(method != nullptr);
+    runInlinerOver(method);
+    REQUIRE(inlinesMessage(method));
+}
+
+TEST_CASE_METHOD(SMessageInlinerTestFixture,
+                 "Inliner: to:by:do: with a non-literal step is not inlined", "[inliner]") {
+    SMethodNode* method = parse("foo: n 1 to: 10 by: n do: [:i | i]");
+    REQUIRE(method != nullptr);
+    runInlinerOver(method);
+    REQUIRE_FALSE(inlinesMessage(method));
+}

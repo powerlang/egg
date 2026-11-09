@@ -500,13 +500,6 @@ ARM64TemplateAssembler >> loadRwithA [
 ]
 
 { #category : #templates }
-ARM64TemplateAssembler >> loadRwithArgPointer [
-	codegen
-		emit: 16rAA1D03E0;
-		emit: 16r91008000
-]
-
-{ #category : #templates }
 ARM64TemplateAssembler >> loadRwithE [
 	codegen emit: 16rAA1403E0
 ]

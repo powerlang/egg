@@ -19,7 +19,8 @@ Class {
 		'properties',
 		'utf8',
 		'utf16',
-		'utf32'
+		'utf32',
+		'registeredImports'
 	],
 	#category : #Kernel
 }
@@ -34,7 +35,8 @@ KernelModule >> prepareForSnapshot: aBuilder [
 	aBuilder
 		addNilToken;
 		map: loadedModules to: dict;
-		map: moduleLoaders to: loaders
+		map: moduleLoaders to: loaders;
+		map: registeredImports to: IdentityDictionary new
 ]
 
 { #category : #bootstrapping }
@@ -52,6 +54,7 @@ KernelModule >> bootstrap [
 	LargeInteger initializeBase.
 	LargeNegativeInteger initializeConstants.
 	SmallInteger initializeConstants.
+	ProcessVMStack initializeConstants.
 	cachedLookups := Dictionary new.
 	shift := WordSize = 8 ifTrue: [3] ifFalse: [2].
 	namespace 
@@ -68,7 +71,10 @@ KernelModule >> bootstrap [
 	utf16 := UTF16 new.
 	utf32 := UTF32 new.
 	Symbol initializeSymbolTable.
-	namespace at: #SymbolTable put: Symbol symbolTable.
+	namespace
+		at: #SymbolTable put: Symbol symbolTable;
+		at: #NilToken put: HashTable nilToken;
+		at: #ByteCharacters put: Character byteCharacters.
 	Stream initializePools.
 	CharacterArray initializePools.
 	ProtoObject initializeConstants; initializeBitMasks.
@@ -144,6 +150,7 @@ KernelModule >> initialize [
 			obj isClass ifTrue: [classes add: obj].
 			exports add: symbol].
 	session := SmalltalkSession new.
+	registeredImports := IdentityDictionary new.
 	properties := WeakIdentityDictionary new.
 
 ]
@@ -264,12 +271,16 @@ KernelModule >> suspendBecause: anException [
 
 { #category : #services }
 KernelModule >> terminateOnUnhandledExceptions [
-	unhandledErrorHandler := [:exception | self terminateSessionBecause: exception description]
+	unhandledErrorHandler := [:exception | self terminateSessionFor: exception]
 ]
 
 { #category : #services }
-KernelModule >> terminateSessionBecause: aString [
-	host logError: aString; logError: Processor activeProcess backtrace; exit: -1
+KernelModule >> terminateSessionFor: anException [
+	| top descriptions |
+	top := Processor activeProcess reifiedCopy topContext below: anException.
+	descriptions := top frameDescriptions: 64.
+	descriptions reverseDo: [:description | host logError: description].
+	host logError: anException description; exit: -1
 ]
 
 { #category : #services }
@@ -303,4 +314,14 @@ KernelModule >> utf16 [
 { #category : #accessing }
 KernelModule >> utf32 [
 	^utf32
+]
+
+{ #category : #services }
+KernelModule >> register: anObject exportedBy: aModule as: aSymbolicReference [
+	registeredImports at: anObject put: aModule -> aSymbolicReference
+]
+
+{ #category : #services }
+KernelModule >> registeredImportOf: anObject [
+	^registeredImports at: anObject ifAbsent: [nil]
 ]

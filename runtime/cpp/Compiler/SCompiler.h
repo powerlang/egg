@@ -11,6 +11,7 @@
 namespace Egg {
 
 class HeapObject;
+class Stream;
 
 /**
  * Corresponds to SCompiler in Smalltalk.
@@ -28,6 +29,7 @@ public:
 
     bool canStartIdentifier_(uint32_t ch) const;
     bool canBeInIdentifier_(uint32_t ch) const;
+    bool peekForIdentifier_(Stream& stream) const;
 };
 
 } // namespace Egg

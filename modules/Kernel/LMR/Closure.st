@@ -78,7 +78,7 @@ LMRClosure >> whileTrue: aBlock [
 
 { #category : '*handling' }
 LMRClosure >> saveHomeFrame [
-	homeFrame := (self _framePointer _basicAt: 1) _asPointer
+	homeFrame := self _framePointer _asPointer
 ]
 
 { #category : '*handling' }

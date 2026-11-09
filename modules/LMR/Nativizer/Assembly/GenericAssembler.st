@@ -785,13 +785,6 @@ GenericAssembler >> loadRwithA [
 	codegen move: codegen regA to: codegen regR
 ]
 
-{ #category : #'push/pop' }
-GenericAssembler >> loadRwithArgPointer [
-	| memref |
-	memref := codegen memRef: codegen regFP stackIndexImm: 3.
-	codegen lea: codegen regR withMem: memref
-]
-
 { #category : #loading }
 GenericAssembler >> loadRwithE [
 	codegen move: codegen regE to: codegen regR
@@ -1598,7 +1591,7 @@ GenericAssembler >> store: valueReg in: baseReg indexAt: indexReg [
 { #category : #'memory - load / store' }
 GenericAssembler >> load: dstReg from: baseReg atIndexAt: indexReg [
 	| memref |
-	memref := codegen memRef: baseReg index: indexReg.
+	memref := codegen memRef: baseReg index: indexReg sizedAs: dstReg.
 	codegen load: dstReg fromMem: memref
 ]
 
@@ -1719,14 +1712,14 @@ GenericAssembler >> store: srcReg intoMem: dstMemRef [
 { #category : #'memory - load / store' }
 GenericAssembler >> store: srcReg in: baseReg index: index [
 	| memref |
-	memref := codegen memRef: baseReg indexImm: index.
+	memref := codegen memRef: baseReg indexImm: index sizedAs: srcReg.
 	codegen store: srcReg intoMem: memref
 ]
 
 { #category : #'memory - load / store' }
 GenericAssembler >> load: dstReg from: baseReg atIndex: index [
 	| memref |
-	memref := codegen memRef: baseReg indexImm: index.
+	memref := codegen memRef: baseReg indexImm: index sizedAs: dstReg.
 	codegen load: dstReg fromMem: memref
 ]
 
@@ -1834,6 +1827,13 @@ GenericAssembler >> storeRinEindex: index [
 	codegen
 		store: codegen regR
 		intoMem: memref
+]
+
+{ #category : #storing }
+GenericAssembler >> storeMinFPindex: index [
+	| memref |
+	memref := codegen memRef: codegen regFP stackIndexImm: index.
+	codegen store: codegen regM intoMem: memref
 ]
 
 { #category : #storing }

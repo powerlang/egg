@@ -262,7 +262,7 @@ LMRProtoObject >> _pointersSize [
 { #category : #'raw access' }
 LMRProtoObject >> _uLongAtValidOffset: offset put: anInteger [
 	anInteger size > 4 ifTrue: [self error: 'does not fit in 32 bits'].
-	self _primitiveULongAtOffset: offset put: anInteger.
+	self _uLongAtOffset: offset put: anInteger.
 	^anInteger
 ]
 
@@ -383,7 +383,7 @@ LMRProtoObject >> lookupAndInvoke: aSymbol [
 	cm := self _cachedLookup: aSymbol.
 	cm == nil ifTrue: [^self doesNotUnderstandSelector: aSymbol].
 	cm prepareForExecution.
-	self _transferControlDiscardingLastArgTo: cm validNativeCodeAddress _asNative
+	self _transferControlDiscardingLastArgTo: cm optimizedCode
 ]
 
 { #category : #system }

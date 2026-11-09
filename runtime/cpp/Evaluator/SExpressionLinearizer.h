@@ -13,7 +13,7 @@ namespace Egg {
 class Evaluator;
 
 class SExpressionLinearizer : public SExpressionVisitor {
-	Object *_greaterThan, *_plus, *_not, *_equalsEquals, *_ifTrue, *_ifFalse, *_ifTrueIfFalse, *_ifFalseIfTrue, *_ifNil, *_ifNotNil, *_ifNilIfNotNil, *_ifNotNilIfNil, *_whileTrue, *_whileFalse, *_whileTrue_, *_whileFalse_, *_toDo, *_toByDo, *_repeat, *_timesRepeat, *_andNot, *_orNot;
+	Object *_greaterThan, *_lessThan, *_plus, *_not, *_equalsEquals, *_ifTrue, *_ifFalse, *_ifTrueIfFalse, *_ifFalseIfTrue, *_ifNil, *_ifNotNil, *_ifNilIfNotNil, *_ifNotNilIfNil, *_whileTrue, *_whileFalse, *_whileTrue_, *_whileFalse_, *_toDo, *_toByDo, *_repeat, *_timesRepeat, *_andNot, *_orNot;
 	SLiteral *_one;
 	bool _inBlock;
 	bool _dropsArguments;
@@ -36,6 +36,7 @@ public:
 		this->_one = nullptr;
 
 		this->_greaterThan = nullptr;
+		this->_lessThan = nullptr;
 		this->_plus = nullptr;
 		this->_not = nullptr;
 		this->_equalsEquals = nullptr;

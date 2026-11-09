@@ -240,7 +240,33 @@ void SExpressionLinearizer::inlineToDo_(SMessage *anSMessage)
 
 void SExpressionLinearizer::inlineToByDo_(SMessage *anSMessage)
 {
-    error("not yet implemented");
+    anSMessage->receiver()->acceptVisitor_(this);
+
+    auto block = (SBlock*)anSMessage->arguments()[2];
+    auto step = (SLiteral*)anSMessage->arguments()[1];
+    auto index = block->inlinedArgs()[0];
+    auto current = new SOpLoadRfromFrame(index);
+    this->storeRintoFrameAt_(index);
+    anSMessage->arguments()[0]->acceptVisitor_(this);
+    this->pushR();
+
+    auto limit = new SOpLoadRfromFrame(_stackTop);
+    auto start = this->currentPC();
+
+    auto past = step->value()->asSmallInteger()->asNative() > 0 ? _greaterThan : _lessThan;
+    auto compare = new SMessage(current, past, {limit}, false);
+    this->visitMessage(compare);
+
+    auto end = this->branchIf_(true);
+    this->visitStatements(block->statements());
+
+    auto increment = new SMessage(current, _plus, {step}, false);
+
+    this->visitMessage(increment);
+    this->storeRintoFrameAt_(index);
+    this->jumpTo_(start);
+    this->branchTargetOf_(end);
+    this->dropToS();
 }
 
 void SExpressionLinearizer::inlineTimesRepeat_(SMessage *anSMessage)
@@ -396,6 +422,7 @@ void SExpressionLinearizer::runtime_(Runtime *aRuntime) {
 
     this->_plus = _runtime->existingSymbolFrom_("+");
     this->_greaterThan = _runtime->existingSymbolFrom_(">");
+    this->_lessThan = _runtime->existingSymbolFrom_("<");
     this->_equalsEquals = _runtime->existingSymbolFrom_("==");
     this->_not = _runtime->existingSymbolFrom_("not");
     this->_ifTrue = _runtime->existingSymbolFrom_("ifTrue:");

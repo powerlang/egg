@@ -35,11 +35,6 @@ FFIMethod >> descriptor: anFFIDescriptor [
 	descriptor := anFFIDescriptor
 ]
 
-{ #category : #accessing }
-FFIMethod >> descriptorBytes: aByteArray [
-	descriptor := FFIDescriptor withAll: aByteArray
-]
-
 { #category : #testing }
 FFIMethod >> hasFrame [
 	^true

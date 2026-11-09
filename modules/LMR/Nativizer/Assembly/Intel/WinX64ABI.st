@@ -14,21 +14,24 @@ WinX64ABI >> emitEntrypoint: anFFIDescriptor with: anAssembler [
 		pushM;
 		pushE;
 		pushS.
-	self storeArgumentsInStack: anFFIDescriptor with: anAssembler.
-	
+	self spillCallbackArguments: anFFIDescriptor with: anAssembler
 ]
 
-{ #category : #services }
-WinX64ABI >> popRetaddrAndArgs: anFFIDescriptor with: anAssembler [
-	anAssembler
-		popA;
-		popA;
-		popA
+{ #category : #callouts }
+WinX64ABI >> placesOf: types [
+	^types withIndexCollect: [:type :i |
+		self ensureSupported: type.
+		i > 4
+			ifTrue: [i - 1 * 8]
+			ifFalse: [
+				(self isFloat: type)
+					ifTrue: [{xmm0. xmm1. xmm2. xmm3} at: i]
+					ifFalse: [{rcx. rdx. r8. r9} at: i]]]
 ]
 
 { #category : #services }
 WinX64ABI >> restoreContext: anFFIDescriptor with: anAssembler [
-	self popRetaddrAndArgs: anFFIDescriptor with: anAssembler.
+	self loadCallbackResult: anFFIDescriptor with: anAssembler.
 	anAssembler
 		popS;
 		popE;
@@ -41,10 +44,17 @@ WinX64ABI >> restoreContext: anFFIDescriptor with: anAssembler [
 		return
 ]
 
-{ #category : #services }
-WinX64ABI >> storeArgumentsInStack: anFFIDescriptor with: anAssembler [
-	anAssembler pushS;
-		loadRwithArgPointer;
-		convertRtoSmallInteger;
-		pushR
+{ #category : #callouts }
+WinX64ABI >> stackEndOf: places types: types [
+	^(super stackEndOf: places types: types) max: 32
+]
+
+{ #category : #callbacks }
+WinX64ABI >> callbackFloatRegisters [
+	^{xmm0. xmm1. xmm2. xmm3}
+]
+
+{ #category : #callbacks }
+WinX64ABI >> callbackIntegerRegisters [
+	^{rcx. rdx. r8. r9}
 ]

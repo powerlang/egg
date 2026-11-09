@@ -338,6 +338,30 @@ CodeGenerator >> memRef8: baseReg indexImm: indexImm [
 ]
 
 { #category : #memory }
+CodeGenerator >> memRef: baseReg index: indexReg sizedAs: aRegister [
+	| bytes |
+	bytes := aRegister length // 8.
+	^self memRef
+		length: aRegister length;
+		base: baseReg;
+		index: indexReg;
+		scale: bytes;
+		displacement: bytes negated;
+		yourself
+]
+
+{ #category : #memory }
+CodeGenerator >> memRef: baseReg indexImm: anInteger sizedAs: aRegister [
+	| bytes |
+	bytes := aRegister length // 8.
+	^self memRef
+		length: aRegister length;
+		base: baseReg;
+		displacement: (anInteger - 1) * bytes;
+		yourself
+]
+
+{ #category : #memory }
 CodeGenerator >> memRef: baseReg index: indexRef [
 	^ self memRef 
 		base: baseReg; 
@@ -598,6 +622,13 @@ CodeGenerator >> shiftRightArithmetic: srcAndDst byImm: count [
 { #category : #basic }
 CodeGenerator >> sqrtDouble: srcReg into: dstReg [
 	self subclassResponsibility
+]
+
+{ #category : #memory }
+CodeGenerator >> store: valueReg in: baseReg indexAt: indexReg [
+	| memref |
+	memref := self memRef: baseReg index: indexReg sizedAs: valueReg.
+	self store: valueReg intoMem: memref
 ]
 
 { #category : #memory }

@@ -16,7 +16,8 @@ Class {
 		'grows',
 		'shrinks',
 		'rescued',
-		'lastPass'
+		'lastPass',
+		'timespec'
 	],
 	#category : #Kernel
 }
@@ -38,7 +39,8 @@ MemoryMeter >> initialize [
 	grows := 0.
 	shrinks := 0.
 	rescued := 0.
-	lastPass := GenGCPass new
+	lastPass := GenGCPass new.
+	timespec := ByteArray new: 16
 ]
 
 { #category : #accessing }
@@ -48,11 +50,13 @@ MemoryMeter >> lastPass [
 
 { #category : #accessing }
 MemoryMeter >> measure: aBlock [
-	| eden from old milliseconds |
+	| eden from old start milliseconds |
 	eden := memory eden usedBytes.
 	from := memory from usedBytes.
 	old := memory old usedBytes.
-	milliseconds := (Smalltalk os microsecondsToRun: aBlock) / 1000.0.
+	start := Kernel host currentMicrosecondsIn: timespec.
+	aBlock value.
+	milliseconds := ((Kernel host currentMicrosecondsIn: timespec) - start) / 1000.0.
 	oldGrown := memory old usedBytes - old.
 	youngFreed := memory from usedBytes - from - eden.
 	runs := runs + 1.

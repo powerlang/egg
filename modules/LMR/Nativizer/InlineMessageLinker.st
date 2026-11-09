@@ -39,8 +39,10 @@ InlineMessageLinker class >> supported [
 InlineMessageLinker >> assembleAsFloatInto [
 	#_asFloatInto:.
 	assembler
+		convertRtoNativeInteger;
 		loadX0withRasDouble;
-		storeLargeX0inA
+		storeLargeX0inA;
+		convertRtoSmallInteger
 ]
 
 { #category : #'private - assemble' }
@@ -785,19 +787,19 @@ InlineMessageLinker >> loadTrueComparingRwithA [
 { #category : #'private - assemble' }
 InlineMessageLinker >> assembleBeSeen [
 	#_beSeen.
-	self loadMarkOfR.
+	self loadTAVwithMarkByteAddressAndMaskOfR.
 	assembler
-		or: assembler regT with: assembler regS;
+		or: assembler regT with: assembler regV;
 		storeByte: assembler regT byte in: assembler regA offset: 0
 ]
 
 { #category : #'private - assemble' }
 InlineMessageLinker >> assembleBeUnseen [
 	#_beUnseen.
-	self loadMarkOfR.
+	self loadTAVwithMarkByteAddressAndMaskOfR.
 	assembler
-		or: assembler regT with: assembler regS;
-		xor: assembler regT with: assembler regS;
+		or: assembler regT with: assembler regV;
+		xor: assembler regT with: assembler regV;
 		storeByte: assembler regT byte in: assembler regA offset: 0
 ]
 
@@ -805,10 +807,10 @@ InlineMessageLinker >> assembleBeUnseen [
 InlineMessageLinker >> assembleHasBeenSeen [
 	| done |
 	#_hasBeenSeen.
-	self loadMarkOfR.
+	self loadTAVwithMarkByteAddressAndMaskOfR.
 	done := assembler newLabel.
 	assembler
-		test: assembler regT with: assembler regS;
+		test: assembler regT with: assembler regV;
 		loadRwithTrue;
 		shortJumpIfNotZeroTo: done;
 		loadRwithFalse;
@@ -881,13 +883,19 @@ InlineMessageLinker >> storeRinFloatStatus [
 ]
 
 { #category : #'private - helpers' }
-InlineMessageLinker >> loadMarkOfR [
+InlineMessageLinker >> loadTAVwithMarkByteAddressAndMaskOfR [
+	"
+	Locate R's mark bit in the bitmap at the start of its 4 GB block (one bit per 8-byte word):
+	A := address of R's mark byte
+	T := that byte
+	V := mask of R's bit within that byte
+	"
 	assembler
 		loadTwithR;
 		shiftRight: assembler regT byImm: 3;
 		and: assembler regT withImm: 7;
-		moveImm: 1 to: assembler regS;
-		shiftLeft: assembler regS by: assembler regT;
+		moveImm: 1 to: assembler regV;
+		shiftLeft: assembler regV by: assembler regT;
 		loadAwithR;
 		shiftLeft: assembler regA byImm: 32;
 		shiftRight: assembler regA byImm: 38;

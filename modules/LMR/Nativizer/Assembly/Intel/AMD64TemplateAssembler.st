@@ -470,12 +470,6 @@ AMD64TemplateAssembler >> loadRwithA [
 ]
 
 { #category : #loading }
-AMD64TemplateAssembler >> loadRwithArgPointer [
-	self assembleBytes: #[16r48 16r8D 16r45 16r10].
-	
-]
-
-{ #category : #loading }
 AMD64TemplateAssembler >> loadRwithE [
 	self assembleBytes: #[16r48 16r89 16rF8].
 	
@@ -1278,8 +1272,7 @@ AMD64TemplateAssembler >> subTslotsToSP [
 AMD64TemplateAssembler >> platform: aNativizationPlatform [
 	super platform: aNativizationPlatform.
 	wordSize := aNativizationPlatform wordSize.
-	buffer := RelocatableBuffer new.
-
+	buffer := codegen memory
 ]
 
 { #category : #integers }

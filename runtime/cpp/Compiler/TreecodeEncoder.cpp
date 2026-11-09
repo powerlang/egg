@@ -249,13 +249,6 @@ void TreecodeEncoder::nextSymbolPut(const Egg::string& symbol) {
     nextIntegerPut(index);
 }
 
-void TreecodeEncoder::nextLiteralPut(const Egg::string& literal) {
-    auto litLv = LiteralValue::fromString(literal);
-    int index = _method->indexOf(litLv);
-    ASSERT(index != 0);
-    nextIntegerPut(index);
-}
-
 void TreecodeEncoder::nextTypePut(uint8_t typeId) {
     nextPut(typeId);
 }
@@ -338,9 +331,11 @@ void TreecodeEncoder::encodeDynamicVar_(const Egg::string& name) {
     nextSymbolPut(name);
 }
 
-void TreecodeEncoder::encodeNestedDynamicVar_(const Egg::string& name) {
+void TreecodeEncoder::encodeNestedDynamicVar_(const LiteralValue& names) {
     stream_.push_back(NestedDynamicVarId);
-    nextLiteralPut(name);
+    int index = _method->indexOf(names);
+    ASSERT(index != 0);
+    nextIntegerPut(index);
 }
 
 void TreecodeEncoder::encodeArgument_env_(int index, LocalEnvironment* environment) {

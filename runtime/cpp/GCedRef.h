@@ -41,29 +41,29 @@ public:
         uintptr_t selectorHash(const Object *obj) const;
 
         bool operator()(const GCedRef* lhs, const GCedRef* rhs) const {
-            return selectorHash(lhs) <= selectorHash(rhs);
+            return selectorHash(lhs) < selectorHash(rhs);
         }
 
         bool operator()(const GCedRef* lhs, const Object* rhs) const {
-            return selectorHash(lhs) <= selectorHash(rhs);
+            return selectorHash(lhs) < selectorHash(rhs);
         }
 
         bool operator()(const Object* lhs, const GCedRef* rhs) const {
-            return selectorHash(lhs) <= selectorHash(rhs);
+            return selectorHash(lhs) < selectorHash(rhs);
         }
 
         // comparisons for pairs of GCedRef*
         bool operator()(const std::pair<GCedRef*, GCedRef*>& lhs, const std::pair<GCedRef*, GCedRef*>& rhs) const {
             auto lhs1 = selectorHash(lhs.first), lhs2 = hash(lhs.second);
             auto rhs1 = selectorHash(rhs.first), rhs2 = hash(rhs.second);
-            return std::tie(lhs1, lhs2) <= std::tie(rhs1, rhs2);
+            return std::tie(lhs1, lhs2) < std::tie(rhs1, rhs2);
         }
 
         // Compare two std::pair<HeapObject*, HeapObject*>
         bool operator()(const std::pair<Object*, Object*>& lhs, const std::pair<Object*, Object*>& rhs) const {
             auto lhs1 = selectorHash(lhs.first), lhs2 = hash(lhs.second);
             auto rhs1 = selectorHash(rhs.first), rhs2 = hash(rhs.second);
-            return std::tie(lhs1, lhs2) <= std::tie(rhs1, rhs2);
+            return std::tie(lhs1, lhs2) < std::tie(rhs1, rhs2);
         }
 
         // Compare pairs of HeapObject with pairs of GCedRef
@@ -71,14 +71,14 @@ public:
                         const std::pair<Object*, Object*>& rhs) const {
             auto lhs1 = selectorHash(lhs.first), lhs2 = hash(lhs.second);
             auto rhs1 = selectorHash(rhs.first), rhs2 = hash(rhs.second);
-            return std::tie(lhs1, lhs2) <= std::tie(rhs1, rhs2);
+            return std::tie(lhs1, lhs2) < std::tie(rhs1, rhs2);
         }
 
         bool operator()(const std::pair<Object*, Object*>& lhs,
                         const std::pair<GCedRef*, GCedRef*>& rhs) const {
             auto lhs1 = selectorHash(lhs.first), lhs2 = hash(lhs.second);
             auto rhs1 = selectorHash(rhs.first), rhs2 = hash(rhs.second);
-            return std::tie(lhs1, lhs2) <= std::tie(rhs1, rhs2);
+            return std::tie(lhs1, lhs2) < std::tie(rhs1, rhs2);
         }
     };
 

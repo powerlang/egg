@@ -72,6 +72,11 @@ void MessageInliner::inline_(SMessageNode* aMessageNode) {
         inlineToDo();
         return;
     }
+
+    if (s == "to:by:do:") {
+        inlineToByDo();
+        return;
+    }
     
     std::vector<Egg::string> keywords;
     size_t pos = 0;
@@ -230,6 +235,9 @@ void MessageInliner::inlineToByDo() {
     if (block->arguments().size() != 1) return;
     
     SParseNode* step = arguments[1];
+    if (!step->isLiteral()) return;
+    auto& value = static_cast<SLiteralNode*>(step)->literalValue();
+    if (!value.isInteger() || value.intVal == 0) return;
     
     _message->beInlined_();
     block->beInlined_();

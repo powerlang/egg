@@ -152,7 +152,7 @@ SendSite class >> reserveMoreMICs [
 	but will raise errors because memory hasn't been initialized yet
 	"
 	| memory amount array mic |
-	memory := Memory current.
+	memory := LMR memory.
 	amount := 2000.
 	array := memory newLargeArray: amount.
 	mic := Array new: 2.
@@ -163,7 +163,7 @@ SendSite class >> reserveMoreMICs [
 { #category : #private }
 SendSite class >> reserveMorePICsWith: aNativeCode [
 	| memory amount array lookup pic |
-	memory := Memory current.
+	memory := LMR memory.
 	amount := 1000.
 	array := memory newLargeArray: amount.
 	lookup := aNativeCode ifNil: [LMR lookup].

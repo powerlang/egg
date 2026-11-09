@@ -24,9 +24,9 @@ target_link_libraries(lmr_tests
     lmr_egg
 )
 target_include_directories(lmr_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
-
-if(APPLE)
-    target_link_options(lmr_tests PRIVATE -Wl,-dead_strip)
+lmr_executable(lmr_tests)
+if(UNIX AND NOT APPLE)
+    target_link_options(lmr_tests PRIVATE -Wl,--export-dynamic-symbol=lmrTest*)
 endif()
 
 add_test(NAME LmrTests COMMAND lmr_tests)

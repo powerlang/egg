@@ -793,8 +793,6 @@ bool SSmalltalkParser::attachPragmaTo_(SMethodNode* method) {
         if (keyword == "primitive:") {
             node = pragma();
         } else if (keyword == "callback:") {
-            if (!method->arguments().empty())
-                error_("<callback> methods with arguments are not supported yet");
             node = ffiCall_method_(false, method);
         } else if (keyword == "cdecl:" || keyword == "callout:") {
             node = ffiCall_method_(true, method);

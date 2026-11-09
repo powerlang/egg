@@ -40,3 +40,8 @@ ExternalObject >> initialize [
 { #category : #'testing' }
 ExternalObject >> release [
 ]
+
+{ #category : #marshalling }
+ExternalObject >> marshalOn: aStream [
+	handle marshalOn: aStream
+]

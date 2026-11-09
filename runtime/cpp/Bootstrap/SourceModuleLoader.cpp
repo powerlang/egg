@@ -367,13 +367,15 @@ Object* SourceModuleLoader::newMethodFrom_(SCompiledMethod* smethod, const Egg::
     const auto& literals = smethod->literals();
     uint32_t literalCount = literals.size();
 
-    auto cmClass = smethod->isCallout() ? ffiMethodClass_() : lookupClass_(smethod->methodClassname());
+    auto cmClass = smethod->isCallout() ? ffiClassNamed_("FFIMethod") : lookupClass_(smethod->methodClassname());
     uint32_t instBase = _runtime->speciesInstanceSize_(cmClass->asHeapObject());
     auto size = (Object*)_runtime->newInteger_(literalCount);
     auto method = _runtime->sendLocal_to_with_("new:", cmClass, size);
     GCedRef methodRef(method);
     if (smethod->isCallout())
         initializeFFIMethod_(methodRef.get(), smethod);
+    else if (!smethod->ffiDescriptor().empty())
+        initializeDescriptor_(methodRef.get(), smethod);
 
     // Set method fields
     auto format = (Object*)_runtime->newInteger_(smethod->format());
@@ -401,23 +403,31 @@ Object* SourceModuleLoader::newMethodFrom_(SCompiledMethod* smethod, const Egg::
     return methodRef.get();
 }
 
-Object* SourceModuleLoader::ffiMethodClass_() {
-    auto symbol = (Object*)_runtime->addSymbol_("FFIMethod");
-    auto namespace_ = _runtime->sendLocal_to_("namespace", _module->get());
-    if (_runtime->sendLocal_to_with_("includesKey:", namespace_, symbol) != (Object*)_runtime->_trueObj) {
-        auto kernel = (Object*)_runtime->_kernel->_exports["__module__"];
-        auto ffi = _runtime->sendLocal_to_with_("loadedModuleNamed:", kernel, (Object*)_runtime->addSymbol_("FFI"));
-        namespace_ = _runtime->sendLocal_to_("namespace", ffi);
+Object* SourceModuleLoader::ffiClassNamed_(const std::string& name) {
+    auto symbol = (Object*)_runtime->addSymbol_(name);
+    if (_module) {
+        auto namespace_ = _runtime->sendLocal_to_("namespace", _module->get());
+        if (_runtime->sendLocal_to_with_("includesKey:", namespace_, symbol) == (Object*)_runtime->_trueObj)
+            return _runtime->sendLocal_to_with_("at:", namespace_, symbol);
     }
+    auto kernel = (Object*)_runtime->_kernel->_exports["__module__"];
+    auto ffi = _runtime->sendLocal_to_with_("load:", kernel, (Object*)_runtime->addSymbol_("FFI"));
+    auto namespace_ = _runtime->sendLocal_to_("namespace", ffi);
     return _runtime->sendLocal_to_with_("at:", namespace_, symbol);
+}
+
+void SourceModuleLoader::initializeDescriptor_(Object* method, SCompiledMethod* smethod) {
+    GCedRef methodRef(method);
+    const auto& bytes = smethod->ffiDescriptor();
+    auto descriptorClass = ffiClassNamed_("FFIDescriptor");
+    auto descriptor = _runtime->newBytes_size_(descriptorClass->asHeapObject(), bytes.size());
+    std::memcpy((void*)descriptor, bytes.data(), bytes.size());
+    _runtime->sendLocal_to_with_("descriptor:", methodRef.get(), (Object*)descriptor);
 }
 
 void SourceModuleLoader::initializeFFIMethod_(Object* method, SCompiledMethod* smethod) {
     GCedRef methodRef(method);
-    const auto& bytes = smethod->ffiDescriptor();
-    auto descriptor = _runtime->newBytes_size_(_runtime->_kernel->_exports["ByteArray"], bytes.size());
-    std::memcpy((void*)descriptor, bytes.data(), bytes.size());
-    _runtime->sendLocal_to_with_("descriptorBytes:", methodRef.get(), (Object*)descriptor);
+    initializeDescriptor_(methodRef.get(), smethod);
     auto symbol = (Object*)_runtime->newString_(smethod->ffiName().toUtf8());
     methodRef.get()->asHeapObject()->slot(Offsets::FFIMethodSymbol) = symbol;
 }

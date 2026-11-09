@@ -387,10 +387,9 @@ void SSmalltalkScanner::skipBinary() {
 
 void SSmalltalkScanner::skipIdentifier() {
     while (!stream.atEnd()) {
-        if (!canBeInIdentifier_(stream.peek())) {
+        if (!_compiler->frontend()->peekForIdentifier_(stream)) {
             return;
         }
-        stream.next();
     }
 }
 
