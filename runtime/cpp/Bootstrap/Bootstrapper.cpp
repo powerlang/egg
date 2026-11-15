@@ -916,7 +916,7 @@ HeapObject* Bootstrapper::allocateBytesRaw_(uint32_t byteCount) {
         return nullptr;
     }
 
-    return initializeHeader_((void*)allocation, byteCount, HeapObject::SmallHeader::IsBytes);
+    return initializeHeader_((void*)allocation, byteCount, HeapObject::SmallHeader::IsBytes | HeapObject::SmallHeader::IsArrayed);
 }
 
 } // namespace Egg
