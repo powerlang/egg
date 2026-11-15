@@ -196,7 +196,7 @@ OptimizingBraunAssigner >> getRegisterForSend: send [
 OptimizingBraunAssigner >> indexOf: register [
 	| regs |
 	regs := self wordSize = 4
-		ifTrue: #(ebp eax edx ecx esi)
+		ifTrue: [#(ebp eax edx ecx esi)]
 		ifFalse: [#(rbp rax rdx rcx rsi r8 r9 r10 r11 rbx r12 r13 r14 r15)].
 	^regs indexOf: register name
 ]
