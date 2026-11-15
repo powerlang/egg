@@ -227,6 +227,7 @@ ProcessLMRStack >> hasEnvironment: aCompiledCode [
 ProcessLMRStack >> tempsAt: frame [
 	| code first |
 	code := self codeAt: frame.
+	code hasSpecialABI ifTrue: [^#()].
 	first := (self hasEnvironment: code) ifTrue: [EnvironmentSlot + 1] ifFalse: [CodeSlot + 1].
 	^(0 to: code tempCount - 1) collect: [:i | self slot: first + i below: frame]
 ]
