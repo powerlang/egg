@@ -268,15 +268,15 @@ void Bootstrapper::initializeMetaobjectsOf_(const Egg::string& className) {
 
     uint32_t classInstVarCount = spec->metaclass()->instVarNames().size();
     uint32_t metaclassInstSize = instSizeOf_("Class") + classInstVarCount;
-    uint32_t metaFormat = (metaclassInstSize & 0x7F) | 0x4000;
+    uint32_t metaFormat = (metaclassInstSize & 0x7F) | SpeciesPointers;
     metaclass->slot(Offsets::SpeciesFormat) = newSmallInteger_(metaFormat);
 
     // --- Class slots ---
     uint32_t format = spec->instSize() & 0x7F;
     if (spec->isVariable())
-        format |= 0x2000;
+        format |= SpeciesVariable;
     if (spec->isPointers())
-        format |= 0x4000;
+        format |= SpeciesPointers;
     cls->slot(Offsets::SpeciesFormat) = newSmallInteger_(format);
     cls->slot(Offsets::SpeciesInstanceBehavior) = (Object*)behavior;
     cls->slot(Offsets::ClassName) = internSymbol_(spec->name());
@@ -750,7 +750,7 @@ HeapObject* Bootstrapper::newSlots_sized_(const Egg::string& className, uint32_t
             auto format = it->second->slot(Offsets::SpeciesFormat)->asSmallInteger()->asNative();
             if ((format & 0x7F) > 0)
                 obj->beNamed();
-            if (format & 0x2000)
+            if (format & SpeciesVariable)
                 obj->beArrayed();
         }
     }

@@ -23,6 +23,11 @@ enum BlockCapturedVariables {
     InlinedArgument = 4
 };
 
+enum SpeciesFlags {
+    SpeciesVariable = 0x2000,
+    SpeciesPointers = 0x4000
+};
+
 enum MethodFlags {
     MethodArgCount = 0x3F,
     MethodTempCount = 0x1FE000,

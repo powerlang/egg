@@ -276,6 +276,11 @@ Object* SourceModuleLoader::createNewClassFrom_(ClassSpec* spec, Object* module)
         classRef.get()->asHeapObject()->slot(Offsets::SpeciesFormat) = (Object*)SmallInteger::from(newFormat);
     }
 
+    if (spec->isVariable() && spec->isPointers()) {
+        auto& formatSlot = classRef.get()->asHeapObject()->slot(Offsets::SpeciesFormat);
+        formatSlot = (Object*)SmallInteger::from(formatSlot->asSmallInteger()->asNative() | SpeciesVariable);
+    }
+
     // Set bytes flag if needed
     if (!spec->isPointers()) {
         _runtime->sendLocal_to_("beBytes", classRef.get());

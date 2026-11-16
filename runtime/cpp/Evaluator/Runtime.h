@@ -424,7 +424,7 @@ public:
     }
 
 	bool speciesIsBytes_(HeapObject *species) {
-		return !(this->speciesFormat_(species)->asNative() & 0x4000);
+		return !(this->speciesFormat_(species)->asNative() & SpeciesPointers);
 	}
 
 	bool speciesIsMetaclass_(HeapObject *species) {
