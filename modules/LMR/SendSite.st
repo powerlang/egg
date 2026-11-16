@@ -548,7 +548,11 @@ SendSite >> takeNextFreeMIC [
 	| result |
 	result := MICs _basicAt: NextMIC.
 	NextMIC = MICs _size
-		ifTrue: [self class useNextMICs]
+		ifTrue: [
+			"useNextMICs inlined: any send here would need a MIC from the exhausted pool"
+			MICs := NextMICs.
+			NextMIC := 1.
+			self class reserveMoreMICs]
 		ifFalse: [NextMIC := NextMIC + 1].
 	^result
 ]
