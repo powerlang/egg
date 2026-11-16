@@ -63,7 +63,7 @@ LMRSpecies >> primitiveNew [
 
 { #category : 'Primitives' }
 LMRSpecies >> primitiveNew: size [
-	size _isSmallInteger ifFalse: [self error: 'invalid size'].
+	(size _isSmallInteger and: [size >= 0]) ifFalse: [self error: 'invalid size'].
 	self _instancesAreArrayed ifFalse: [self errorNotIndexable].
 	^self _instancesHavePointers
 		ifTrue: [self primitiveNewPointers: size + self instSize]
