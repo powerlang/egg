@@ -72,11 +72,12 @@ LMRSpecies >> primitiveNew: size [
 
 { #category : 'Primitives' }
 LMRSpecies >> primitiveNewBytes: size [
+	"flags first: a collection while zeroing must not scan the body as pointers"
 	| byteSize object |
 	byteSize := size + WordSize - 1 bitAnd: 0 - WordSize.
 	object := self allocate: byteSize size: size.
-	self zero: byteSize bytesOf: object.
 	object _beBytes; _beArrayed.
+	self zero: byteSize bytesOf: object.
 	^object
 ]
 
@@ -88,9 +89,10 @@ LMRSpecies >> primitiveNewPointers: size [
 
 { #category : 'Primitives' }
 LMRSpecies >> primitiveNewPointers: size arrayed: aBoolean [
+	"no send while unfilled: it could collect and scan the slots"
 	| object |
 	object := self allocate: size * WordSize size: size.
-	self nil: size slotsOf: object.
+	object _nilSlots: size.
 	aBoolean ifTrue: [object _beArrayed].
 	self instSize > 0 ifTrue: [object _beNamed].
 	^object
