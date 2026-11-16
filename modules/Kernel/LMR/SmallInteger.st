@@ -64,9 +64,13 @@ LMRSmallInteger >> // aNumber [
 
 { #category : #arithmetic }
 LMRSmallInteger >> \\ aNumber [
+	| remainder |
 	aNumber == 0 ifTrue: [^self zeroDivisorOn: #'\\'].
 	aNumber _isSmallInteger
-		ifTrue: [^self _remainderTowardZero: aNumber]
+		ifTrue: [
+			remainder := self _remainderTowardZero: aNumber.
+			(remainder = 0 or: [remainder positive = aNumber positive]) ifTrue: [^remainder].
+			^remainder + aNumber]
 		ifFalse: [
 			aNumber isLargeInteger
 				ifTrue: [aNumber positive == self positive ifTrue: [^self]].
