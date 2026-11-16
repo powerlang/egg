@@ -339,7 +339,7 @@ NativeWriter >> codeHashOf: obj [
 
 { #category : #accessing }
 NativeWriter >> writeObjectHeader: obj [
-	| smallsize behavior |
+	| smallsize behavior flags |
 	obj _isLarge
 		ifTrue: [
 			stream
@@ -349,10 +349,11 @@ NativeWriter >> writeObjectHeader: obj [
 		ifFalse: [
 			smallsize := obj _smallSize].
 	behavior := self encodedReferenceTo: obj behavior.
+	flags := obj _basicFlags bitAnd: 16rF7.
 	stream
 		nextUShortPut: (self hashOf: obj);
 		nextPut: smallsize;
-		nextPut: obj _basicFlags;
+		nextPut: flags;
 		nextULongPut: behavior.
 	self ASSERT: stream position == (self offsetOf: obj)
 ]
