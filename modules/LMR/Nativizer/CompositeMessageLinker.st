@@ -38,3 +38,11 @@ CompositeMessageLinker >> emitSendSuper: selector from: aClass using: anAssemble
 CompositeMessageLinker >> initialize [
 	candidates := OrderedCollection new
 ]
+
+{ #category : #services }
+CompositeMessageLinker >> withoutInvokers [
+	| result |
+	result := self class new.
+	candidates do: [:linker | (linker isKindOf: InvokeLinker) ifFalse: [result add: linker]].
+	^result
+]
