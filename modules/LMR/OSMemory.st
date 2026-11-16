@@ -28,7 +28,12 @@ OSMemory class >> initializeCurrent [
 
 { #category : #services }
 OSMemory >> commit: size at: address [
-	^Kernel host commit: size at: address
+	| critical result |
+	critical := CRITICAL.
+	CRITICAL := true.
+	result := Kernel host commit: size at: address.
+	CRITICAL := critical.
+	^result
 ]
 
 { #category : #services }
@@ -38,7 +43,12 @@ OSMemory >> decommit: address [
 
 { #category : #services }
 OSMemory >> decommit: address size: size [
-	^Kernel host decommit: address size: size
+	| critical result |
+	critical := CRITICAL.
+	CRITICAL := true.
+	result := Kernel host decommit: address size: size.
+	CRITICAL := critical.
+	^result
 ]
 
 { #category : #initialization }
