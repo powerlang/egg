@@ -11,5 +11,5 @@ Class {
 
 { #category : #accessing }
 LMRActiveProcess >> bp [
-	^(self _framePointer _basicAt: 1) _asPointer
+	^self _framePointer _asPointer
 ]
