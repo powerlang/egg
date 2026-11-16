@@ -24,13 +24,6 @@ LargePositiveInteger >> at: index [
 ]
 
 { #category : #bits }
-LargePositiveInteger >> bitAnd: anInteger [
-	(anInteger isSmallInteger and: [anInteger > 0])
-		ifTrue: [^anInteger bitAnd: self].
-	^super bitAnd: anInteger
-]
-
-{ #category : #bits }
 LargePositiveInteger >> bitInvert [
 	| n integer mask |
 	n := self highWideDigit highBit = Bits
