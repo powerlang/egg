@@ -66,7 +66,8 @@ class Launcher
     void collectSymbols();
     Egg::Object* kernelExport(const std::string& name);
     Egg::Object* bindImport(const std::vector<std::string>& tokens);
-    Egg::Object* methodIn(Egg::HeapObject* behavior, Egg::Object* selector);
+    Egg::Object* methodIn(Egg::FileImageSegment* segment, Egg::HeapObject* behavior, const std::string& name, Egg::Object* selector);
+    bool isUnboundSymbol(Egg::FileImageSegment* segment, Egg::Object* key, const std::string& name);
     uint32_t instVarIndex(Egg::HeapObject* species, const std::string& name);
     void initializeKernelSpace();
     void initializeHostLinkage();

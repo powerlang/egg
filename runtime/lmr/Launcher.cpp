@@ -251,7 +251,7 @@ Egg::Object* Launcher::bindImport(const std::vector<std::string>& tokens)
             auto behavior = linker == "asMethod"
                 ? species->slot(Egg::Offsets::SpeciesInstanceBehavior)->asHeapObject()
                 : species->behavior();
-            auto method = this->methodIn(behavior, selector->second);
+            auto method = this->methodIn(segment, behavior, tokens[3], selector->second);
             if (method)
                 return method;
         }
@@ -262,14 +262,27 @@ Egg::Object* Launcher::bindImport(const std::vector<std::string>& tokens)
     throw std::runtime_error("the launcher cannot bind the import" + import);
 }
 
-Egg::Object* Launcher::methodIn(Egg::HeapObject* behavior, Egg::Object* selector)
+Egg::Object* Launcher::methodIn(Egg::FileImageSegment* segment, Egg::HeapObject* behavior, const std::string& name, Egg::Object* selector)
 {
     auto dictionary = behavior->slot(Egg::Offsets::BehaviorMethodDictionary)->asHeapObject();
     auto table = dictionary->slot(Egg::Offsets::DictionaryTable)->asHeapObject();
-    for (uintptr_t i = 1; i + 1 < table->size(); i += 2)
-        if (table->slot(i) == selector)
+    for (uintptr_t i = 1; i + 1 < table->size(); i += 2) {
+        auto key = table->slot(i);
+        if (key == selector || this->isUnboundSymbol(segment, key, name))
             return table->slot(i + 1);
+    }
     return nullptr;
+}
+
+bool Launcher::isUnboundSymbol(Egg::FileImageSegment* segment, Egg::Object* key, const std::string& name)
+{
+    auto reference = reinterpret_cast<uintptr_t>(key);
+    if (!Egg::FileImageSegment::isExternalReference(reference))
+        return false;
+    auto& descriptor = segment->_importDescriptors[Egg::FileImageSegment::externalIndexOf(reference)];
+    return descriptor.size() == 2
+        && segment->importStringAt_(descriptor[0]) == "asSymbol"
+        && segment->importStringAt_(descriptor[1]) == name;
 }
 
 void Launcher::makeExecutable()
