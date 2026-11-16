@@ -99,7 +99,9 @@ EdenCollector >> forwardingIndexOf: anObject [
 
 { #category : #cleaning }
 EdenCollector >> hasToPurge: object [
+	"work-space objects are unreachable after the collection, which may wipe the space"
 	| class |
+	(workSpace includes: object) ifTrue: [^true].
 	class := object class.
 	(class == ProcessLMRStack and: [self newspaceIsRefererredByStack: object])
 		ifTrue: [^false].
