@@ -120,7 +120,11 @@ ProcessVMStack >> environmentAt: frame [
 
 { #category : #reifying }
 ProcessVMStack >> stackAt: frame top: top [
-	^self copyFrom: frame - FirstTempOffset to: top
+	"the stack grows toward lower indices: a frame with neither temps nor operands has top above its first temp"
+	| first |
+	first := frame - FirstTempOffset.
+	first < top ifTrue: [^Array new].
+	^self copyFrom: first to: top
 ]
 
 { #category : #reifying }
