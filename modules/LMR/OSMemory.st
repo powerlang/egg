@@ -141,3 +141,14 @@ OSMemory >> takeReleased: bytes [
 			^address]].
 	^0
 ]
+
+{ #category : #services }
+OSMemory >> critical: aBlock [
+	"evaluates aBlock with no collection nor recompilation meanwhile: what it allocates goes old"
+	| critical result |
+	critical := CRITICAL.
+	CRITICAL := true.
+	result := aBlock value.
+	CRITICAL := critical.
+	^result
+]

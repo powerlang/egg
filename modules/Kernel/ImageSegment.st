@@ -408,12 +408,11 @@ ImageSegment >> install [
 	| host address |
 	host := Kernel host.
 	address := Kernel os reserveAndCommit: self reservedSize.
-	self
-		relocateTo: address;
-		linkImports;
-		bindImports: imports.
-	host libc memcpy: address from: bytes size: self storedSize.
-	self holdReferencesAt: address.
+	self relocateTo: address; linkImports.
+	Kernel os critical: [
+		self bindImports: imports.
+		host libc memcpy: address from: bytes size: self storedSize.
+		self holdReferencesAt: address].
 	codeSize = 0 ifFalse: [host makeExecutable: address + self codeStart size: codeSize].
 	^(self module // 2) _asObject
 ]
