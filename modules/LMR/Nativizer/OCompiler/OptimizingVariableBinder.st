@@ -9,8 +9,6 @@ Class {
 	#instVars : [
 		'definitions',
 		'currentBlock',
-		'dominatorTree',
-		'immediateDominators',
 		'dominanceFrontiers',
 		'pendingReads',
 		'pendingPhis',
@@ -96,14 +94,13 @@ OptimizingVariableBinder >> definitionOf: name before: block [
 		instruction := instruction next].
 	current := block.
 	[
-		current := immediateDominators
-			at: current
-			ifAbsent: [self error: 'undefined variable <' , name , '>'].
+		current := current immediateDominator.
 		current notNil]
 		whileTrue: [
 			definitions
 				at: current
-				ifPresent: [:here | here at: name ifPresent: [:value | ^value]]]
+				ifPresent: [:here | here at: name ifPresent: [:value | ^value]]].
+	self error: 'undefined variable <' , name , '>'
 ]
 
 { #category : #unclassified }
@@ -114,12 +111,8 @@ OptimizingVariableBinder >> definitionOf: name from: block [
 		definitions
 			at: current
 			ifPresent: [:here | here at: name ifPresent: [:value | ^value]].
-		current := immediateDominators
-			at: current
-			ifAbsent: [^block lastValue
-			"BMNullaryOperation
-				name: 'nop'
-				self error: 'undefined variable <' , name , '>'"]]
+		current := current immediateDominator].
+	^block lastValue
 ]
 
 { #category : #unclassified }
@@ -132,10 +125,8 @@ OptimizingVariableBinder >> definitionOf: name in: block [
 
 { #category : #unclassified }
 OptimizingVariableBinder >> doBindingFrom: firstBlock [
-	dominatorTree := firstBlock dominatorTree.
-	immediateDominators := dominatorTree allImmediateDominators.
-	dominanceFrontiers := firstBlock
-		dominanceFrontiersUsing: immediateDominators.
+	firstBlock computeDominance.
+	dominanceFrontiers := firstBlock dominanceFrontiers.
 	firstBlock reversePostOrderDo: [:block | 
 		currentBlock := block.
 		block firstInstruction acceptVisitor: self].

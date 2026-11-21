@@ -8,7 +8,8 @@ Class {
 	#superclass : #OBeginInstruction,
 	#instVars : [
 		'end',
-		'predecessors'
+		'predecessors',
+		'immediateDominator'
 	],
 	#category : #IR
 }
@@ -114,6 +115,45 @@ OBasicBlock >> cleanPredecessors [
 ]
 
 { #category : #unclassified }
+OBasicBlock >> computeDominance [
+	| all idoms indices intersect changed |
+	all := self updatePredecessors withSuccessorsPostOrder reversed.
+	idoms := Array new: all size.
+	idoms at: 1 put: 1.
+	indices := Dictionary new.
+	all withIndexDo: [:block :index | indices at: block put: index].
+	intersect := [:index1 :index2 | | finger1 finger2 |
+		finger1 := index1.
+		finger2 := index2.
+		[finger1 != finger2] whileTrue: [
+			finger1 > finger2
+				ifTrue: [finger1 := idoms at: finger1]
+				ifFalse: [finger2 := idoms at: finger2]].
+		finger1].
+	changed := true.
+	[changed] whileTrue: [
+		changed := false.
+		(all copyFrom: 2)
+			withIndexDo: [:block :index | | processed initial intersection |
+				processed := block predecessors select: [:predecessor | | i |
+					i := indices at: predecessor.
+					(idoms at: i) notNil].
+				initial := indices at: processed first.
+				intersection := processed
+					inject: initial
+					into: [:actual :predecessor | | candidate |
+						candidate := indices at: predecessor.
+						intersect value: actual value: candidate].
+				intersection != (idoms at: index + 1) ifTrue: [
+					idoms at: index + 1 put: intersection.
+					changed := true]]].
+	2 to: all size do: [:i | | index dominator |
+		index := idoms at: i.
+		dominator := all at: index.
+		(all at: i) immediateDominator: dominator]
+]
+
+{ #category : #unclassified }
 OBasicBlock >> computeLiveOutInto: liveOut andLiveInInto: liveIn [
 	| blocks changed |
 	blocks := self withSuccessorsPostOrder.
@@ -147,13 +187,6 @@ OBasicBlock >> dissolveIfUnreachable [
 
 { #category : #unclassified }
 OBasicBlock >> dominanceFrontiers [
-	| idoms |
-	idoms := self dominatorTree allImmediateDominators.
-	^self dominanceFrontiersUsing: idoms
-]
-
-{ #category : #unclassified }
-OBasicBlock >> dominanceFrontiersUsing: idoms [
 	| blocks result |
 	blocks := self withSuccessorsPostOrder.
 	result := Dictionary new.
@@ -162,49 +195,12 @@ OBasicBlock >> dominanceFrontiersUsing: idoms [
 		block hasMultiplePredecessors ifTrue: [
 			block predecessors do: [:predecessor | | runner end |
 				runner := predecessor.
-				end := idoms at: block.
+				end := block immediateDominator.
 				[runner != end] whileTrue: [| frontiers |
 					frontiers := result at: runner.
 					(frontiers includes: block) ifFalse: [frontiers add: block].
-					runner := idoms at: runner]]]].
+					runner := runner immediateDominator]]]].
 	^result
-]
-
-{ #category : #unclassified }
-OBasicBlock >> dominatorTree [
-	| all root idoms indices intersect changed |
-	all := self updatePredecessors withSuccessorsPostOrder reversed.
-	idoms := Array new: all size.
-	idoms at: 1 put: 1.
-	root := all first.
-	indices := Dictionary new.
-	all withIndexDo: [:block :index | indices at: block put: index].
-	intersect := [:index1 :index2 | | finger1 finger2 |
-		finger1 := index1.
-		finger2 := index2.
-		[finger1 != finger2] whileTrue: [
-			finger1 > finger2
-				ifTrue: [finger1 := idoms at: finger1]
-				ifFalse: [finger2 := idoms at: finger2]].
-		finger1].
-	changed := true.
-	[changed] whileTrue: [
-		changed := false.
-		(all copyFrom: 2)
-			withIndexDo: [:block :index | | processed initial intersection |
-				processed := block predecessors select: [:predecessor | | i |
-					i := indices at: predecessor.
-					(idoms at: i) notNil].
-				initial := indices at: processed first.
-				intersection := processed
-					inject: initial
-					into: [:actual :predecessor | | candidate |
-						candidate := indices at: predecessor.
-						intersect value: actual value: candidate].
-				intersection != (idoms at: index + 1) ifTrue: [
-					idoms at: index + 1 put: intersection.
-					changed := true]]].
-	^ODominatorTree from: root with: all dominators: idoms
 ]
 
 { #category : #unclassified }
@@ -267,6 +263,16 @@ OBasicBlock >> hasMultipleSuccessors [
 { #category : #unclassified }
 OBasicBlock >> hasSuccessors [
 	^self lastInstruction isJump
+]
+
+{ #category : #accessing }
+OBasicBlock >> immediateDominator [
+	^immediateDominator
+]
+
+{ #category : #accessing }
+OBasicBlock >> immediateDominator: aBasicBlock [
+	immediateDominator := aBasicBlock
 ]
 
 { #category : #unclassified }

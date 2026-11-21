@@ -10,7 +10,6 @@ Class {
 		'firstBlock',
 		'variable',
 		'reloads',
-		'idoms',
 		'iteratedFrontiers',
 		'insertedPhis',
 		'blocks'
@@ -30,7 +29,7 @@ OptimizingSSAReconstructor >> definitionInBlockFrom: instruction [
 { #category : #initialization }
 OptimizingSSAReconstructor >> firstBlock: block [
 	firstBlock := block.
-	idoms := firstBlock dominatorTree allImmediateDominators
+	block computeDominance
 ]
 
 { #category : #initialization }
@@ -55,14 +54,14 @@ OptimizingSSAReconstructor >> reachingDefinitionFrom: instruction at: block [
 		def := self definitionInBlockFrom: search.
 		def ifNotNil: [^def].
 		(iteratedFrontiers includes: current) ifTrue: [^self insertPhiAt: current].
-		current := idoms at: current.
+		current := current immediateDominator.
 		search := current lastInstruction] repeat
 ]
 
 { #category : #initialization }
 OptimizingSSAReconstructor >> reconstructSSA [
 	| frontiers reloadBlocks uses |
-	frontiers := firstBlock dominanceFrontiersUsing: idoms.
+	frontiers := firstBlock dominanceFrontiers.
 	reloadBlocks := reloads collect: [:reload | blocks at: reload].
 	iteratedFrontiers := firstBlock
 		iteratedDominanceFrontiersOf: reloadBlocks
