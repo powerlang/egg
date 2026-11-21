@@ -5,10 +5,9 @@
 
 Class {
 	#name : #OJumpConditional,
-	#superclass : #OInstruction,
+	#superclass : #OJump,
 	#instVars : [
 		'variable',
-		'target',
 		'implicitTarget'
 	],
 	#category : #IR
@@ -48,11 +47,6 @@ OJumpConditional >> isConditionalJump [
 ]
 
 { #category : #unclassified }
-OJumpConditional >> isJump [
-	^true
-]
-
-{ #category : #unclassified }
 OJumpConditional >> operandsDo: aBlock [
 	aBlock value: variable
 ]
@@ -76,16 +70,6 @@ OJumpConditional >> replaceWithUnconditional: condition in: basicBlock [
 OJumpConditional >> retargetFrom: aBasicBlock to: otherBasicBlock [
 	target == aBasicBlock ifTrue: [target := otherBasicBlock].
 	implicitTarget == aBasicBlock ifTrue: [implicitTarget := otherBasicBlock]
-]
-
-{ #category : #unclassified }
-OJumpConditional >> target [
-	^target
-]
-
-{ #category : #unclassified }
-OJumpConditional >> target: aBasicBlock [
-	target := aBasicBlock
 ]
 
 { #category : #unclassified }
