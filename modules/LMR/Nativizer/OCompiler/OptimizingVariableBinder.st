@@ -106,11 +106,9 @@ OptimizingVariableBinder >> definitionOf: name [
 
 { #category : #unclassified }
 OptimizingVariableBinder >> definitionOf: name before: block [
-	| instruction current |
-	instruction := block firstInstruction.
-	[instruction isBlockParameter] whileTrue: [
-		(parameterNames at: instruction ifAbsent: nil) = name ifTrue: [^instruction].
-		instruction := instruction next].
+	| current |
+	block parametersDo: [:parameter |
+		(parameterNames at: parameter ifAbsent: nil) = name ifTrue: [^parameter]].
 	current := block.
 	[
 		current := current immediateDominator.

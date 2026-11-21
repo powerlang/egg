@@ -34,12 +34,7 @@ OptimizingParameterSimplification >> mark: instruction [
 
 { #category : #unclassified }
 OptimizingParameterSimplification >> process: aBasicBlock [
-	| instruction |
-	instruction := aBasicBlock firstInstruction.
-	[instruction isBlockParameter] whileTrue: [| next |
-		next := instruction next.
-		self simplify: instruction.
-		instruction := next]
+	aBasicBlock parameters do: [:parameter | self simplify: parameter]
 ]
 
 { #category : #unclassified }
