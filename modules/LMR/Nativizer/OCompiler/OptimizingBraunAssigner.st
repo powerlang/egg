@@ -210,13 +210,13 @@ OptimizingBraunAssigner >> initialize [
 ]
 
 { #category : #private }
-OptimizingBraunAssigner >> insertCopyTo: dest for: phi at: pred [
+OptimizingBraunAssigner >> insertCopyTo: dest for: parameter at: pred [
 	| value copy |
-	value := phi atOperand: pred.
+	value := parameter atOperand: pred.
 	copy := value insertCopyBefore: pred lastInstruction.
 	assignments at: copy put: dest.
-	value removeUse: phi at: pred.
-	phi atOperand: pred put: copy
+	value removeUse: parameter at: pred.
+	parameter atOperand: pred put: copy
 ]
 
 { #category : #private }

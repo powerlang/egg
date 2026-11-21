@@ -135,8 +135,8 @@ OptimizingRegisterAllocator >> breakCycleIn: aCollection before: aJump [
 ]
 
 { #category : #unclassified }
-OptimizingRegisterAllocator >> canOverwrite: phi in: aCollection [
-	^aCollection conform: [:assoc | assoc key == phi or: [assoc value !== phi]]
+OptimizingRegisterAllocator >> canOverwrite: parameter in: aCollection [
+	^aCollection conform: [:assoc | assoc key == parameter or: [assoc value !== parameter]]
 ]
 
 { #category : #unclassified }
@@ -189,7 +189,7 @@ OptimizingRegisterAllocator >> copyArguments [
 OptimizingRegisterAllocator >> copyArgumentsOf: aCollection from: aBasicBlock [
 	| jump pending |
 	jump := aBasicBlock lastInstruction.
-	pending := aCollection collect: [:phi | phi -> (phi atOperand: aBasicBlock)].
+	pending := aCollection collect: [:parameter | parameter -> (parameter atOperand: aBasicBlock)].
 	[pending notEmpty] whileTrue: [| ready |
 		ready := self anyReadyArgumentIn: pending.
 		ready isNil
@@ -250,10 +250,10 @@ OptimizingRegisterAllocator >> initialize [
 ]
 
 { #category : #unclassified }
-OptimizingRegisterAllocator >> insertCopyOf: value to: phi before: aJump from: aBasicBlock [
+OptimizingRegisterAllocator >> insertCopyOf: value to: parameter before: aJump from: aBasicBlock [
 	| copy |
 	copy := value insertCopyBefore: aJump.
-	phi replaceOperand: aBasicBlock with: copy
+	parameter replaceOperand: aBasicBlock with: copy
 ]
 
 { #category : #unclassified }

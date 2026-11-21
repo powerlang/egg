@@ -898,7 +898,7 @@ OptimizingCodeEmitter >> visitNullary: instruction [
 ]
 
 { #category : #unclassified }
-OptimizingCodeEmitter >> visitPhi: phiInstruction [
+OptimizingCodeEmitter >> visitPhi: aParameter [
 	
 ]
 

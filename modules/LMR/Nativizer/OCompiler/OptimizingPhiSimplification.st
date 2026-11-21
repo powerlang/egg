@@ -49,11 +49,11 @@ OptimizingPhiSimplification >> processFrom: firstBlock [
 ]
 
 { #category : #unclassified }
-OptimizingPhiSimplification >> simplify: aPhi [
+OptimizingPhiSimplification >> simplify: aParameter [
 	| vars |
-	vars := aPhi variables.
+	vars := aParameter variables.
 	vars size to: 1 by: -1 do: [:i | | var |
 		var := vars at: i.
-		((self isMarked: var) or: [aPhi isUntied]) ifFalse: [aPhi removeVariable: var at: i]]
+		((self isMarked: var) or: [aParameter isUntied]) ifFalse: [aParameter removeVariable: var at: i]]
 ]
 

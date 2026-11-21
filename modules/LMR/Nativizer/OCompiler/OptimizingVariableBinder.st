@@ -11,8 +11,8 @@ Class {
 		'currentBlock',
 		'dominanceFrontiers',
 		'pendingReads',
-		'pendingPhis',
-		'phiNames',
+		'pendingParameters',
+		'parameterNames',
 		'abi',
 		'method'
 	],
@@ -30,10 +30,10 @@ OptimizingVariableBinder >> abi: anAbi [
 ]
 
 { #category : #private }
-OptimizingVariableBinder >> define: aPhi named: aString in: aBasicBlock [
+OptimizingVariableBinder >> define: aParameter named: aString in: aBasicBlock [
 	aBasicBlock predecessors do: [:predecessor | | definition |
 		definition := self definitionOf: aString from: predecessor.
-		aPhi addVariable: definition from: predecessor]
+		aParameter addVariable: definition from: predecessor]
 ]
 
 { #category : #accessing }
@@ -98,7 +98,7 @@ OptimizingVariableBinder >> definitionOf: name before: block [
 	| instruction current |
 	instruction := block firstInstruction.
 	[instruction isPhi] whileTrue: [
-		(phiNames at: instruction ifAbsent: nil) = name ifTrue: [^instruction].
+		(parameterNames at: instruction ifAbsent: nil) = name ifTrue: [^instruction].
 		instruction := instruction next].
 	current := block.
 	[
@@ -145,8 +145,8 @@ OptimizingVariableBinder >> doBindingFrom: firstBlock [
 OptimizingVariableBinder >> initialize [
 	definitions := Dictionary new.
 	pendingReads := OrderedCollection new.
-	pendingPhis := OrderedCollection new.
-	phiNames := IdentityDictionary new
+	pendingParameters := OrderedCollection new.
+	parameterNames := IdentityDictionary new
 ]
 
 { #category : #unclassified }
@@ -155,8 +155,8 @@ OptimizingVariableBinder >> insertPhiOf: name at: block [
 	(self definitionOf: name in: block) ifNotNil: [^self].
 	parameter := OBlockParameter new.
 	block insertParameter: parameter.
-	phiNames at: parameter put: name.
-	pendingPhis add: parameter -> block.
+	parameterNames at: parameter put: name.
+	pendingParameters add: parameter -> block.
 	self define: parameter as: name in: block
 ]
 
@@ -328,13 +328,13 @@ OptimizingVariableBinder >> resolveSelf: aReadVariable [
 
 { #category : #unclassified }
 OptimizingVariableBinder >> rewritePhis [
-	pendingPhis do: [:association | | phi block name |
-		phi := association key.
+	pendingParameters do: [:association | | parameter block name |
+		parameter := association key.
 		block := association value.
-		name := phiNames at: phi.
-		(phi livesAfter: phi orOutOf: block)
-			ifTrue: [self define: phi named: name in: block]
-			ifFalse: [phi dissolve]]
+		name := parameterNames at: parameter.
+		(parameter livesAfter: parameter orOutOf: block)
+			ifTrue: [self define: parameter named: name in: block]
+			ifFalse: [parameter dissolve]]
 ]
 
 { #category : #unclassified }
@@ -378,7 +378,7 @@ OptimizingVariableBinder >> visitMessageSend: aMessageSend [
 ]
 
 { #category : #unclassified }
-OptimizingVariableBinder >> visitPhi: aPhi [
+OptimizingVariableBinder >> visitPhi: aParameter [
 	
 ]
 

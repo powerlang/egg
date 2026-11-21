@@ -11,7 +11,7 @@ Class {
 		'variable',
 		'reloads',
 		'iteratedFrontiers',
-		'insertedPhis',
+		'insertedParameters',
 		'blocks'
 	],
 	#category : #OCompiler
@@ -34,7 +34,7 @@ OptimizingSSAReconstructor >> firstBlock: block [
 
 { #category : #initialization }
 OptimizingSSAReconstructor >> insertPhiAt: block [
-	^insertedPhis at: block ifAbsentPut: [| arguments parameter predecessors |
+	^insertedParameters at: block ifAbsentPut: [| arguments parameter predecessors |
 		predecessors := block predecessors.
 		arguments := predecessors collect: [:pred | | search |
 			search := pred lastInstruction.
@@ -83,7 +83,7 @@ OptimizingSSAReconstructor >> reconstructSSA [
 { #category : #initialization }
 OptimizingSSAReconstructor >> setupFor: anInstruction with: redefinitions [
 	| users |
-	insertedPhis := Dictionary new.
+	insertedParameters := Dictionary new.
 	variable := anInstruction.
 	reloads := redefinitions.
 	blocks := Dictionary new.
