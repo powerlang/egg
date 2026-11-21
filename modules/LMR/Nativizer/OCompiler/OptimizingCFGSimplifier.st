@@ -25,9 +25,9 @@ OptimizingCFGSimplifier >> cleanFrom: aBlock [
 
 { #category : #private }
 OptimizingCFGSimplifier >> dissolvePhisOf: aBasicBlock from: predecessor [
-	aBasicBlock phis do: [:phi | | value |
-		value := phi atOperand: predecessor.
-		phi replaceAllUsesWith: value; dissolve]
+	aBasicBlock parameters do: [:parameter | | value |
+		value := parameter atOperand: predecessor.
+		parameter replaceAllUsesWith: value; dissolve]
 ]
 
 { #category : #private }
@@ -37,9 +37,9 @@ OptimizingCFGSimplifier >> hoistBranchIn: succ to: pred [
 	branch := succ lastInstruction.
 	condition := branch variable.
 	succ
-		phisDo: [:phi | 
-			condition := phi atOperand: pred.
-			phi removeBlock: pred];
+		parametersDo: [:parameter |
+			condition := parameter atOperand: pred.
+			parameter removeBlock: pred];
 		removePredecessor: pred.
 	new := branch class
 		variable: condition
@@ -53,7 +53,7 @@ OptimizingCFGSimplifier >> hoistBranchIn: succ to: pred [
 
 { #category : #private }
 OptimizingCFGSimplifier >> link: aBasicBlock to: anotherBasicBlock [
-	anotherBasicBlock phisDo: [:phi | phi addEdgeFrom: aBasicBlock]; addPredecessor: aBasicBlock
+	anotherBasicBlock parametersDo: [:parameter | parameter addEdgeFrom: aBasicBlock]; addPredecessor: aBasicBlock
 ]
 
 { #category : #private }
@@ -117,7 +117,7 @@ OptimizingCFGSimplifier >> tryRemovingEmptyBlock: block [
 		(self wouldDuplicateEdgesOf: block into: following) ifTrue: [^false].
 		arguments := block lastInstruction argumentsTo: following.
 		following
-			phisDo: [:phi | phi forgetEdgeFrom: block];
+			parametersDo: [:parameter | parameter forgetEdgeFrom: block];
 			removePredecessor: block.
 		block predecessors do: [:predecessor | | jump |
 			jump := predecessor lastInstruction.
@@ -131,7 +131,7 @@ OptimizingCFGSimplifier >> tryRemovingEmptyBlock: block [
 { #category : #private }
 OptimizingCFGSimplifier >> wouldDuplicateEdgesOf: block into: following [
 	| predecessors |
-	following phis isEmpty ifTrue: [^false].
+	following parameters isEmpty ifTrue: [^false].
 	predecessors := following predecessors.
 	^block predecessors anySatisfy: [:predecessor | predecessors includes: predecessor]
 ]

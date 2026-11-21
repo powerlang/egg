@@ -92,7 +92,7 @@ OBlockParameter >> forgetEdgeFrom: predecessor [
 
 { #category : #unclassified }
 OBlockParameter >> index [
-	^self basicBlock indexOfPhi: self
+	^self basicBlock indexOfParameter: self
 ]
 
 { #category : #unclassified }

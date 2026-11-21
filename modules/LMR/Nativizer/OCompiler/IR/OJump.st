@@ -19,17 +19,17 @@ OJump class >> to: aDestination [
 ]
 
 { #category : #'jump arguments' }
-OJump >> argumentFor: aPhi [
+OJump >> argumentFor: aParameter [
 	| passed |
-	passed := self argumentsTo: aPhi basicBlock.
-	^passed at: aPhi index
+	passed := self argumentsTo: aParameter basicBlock.
+	^passed at: aParameter index
 ]
 
 { #category : #'jump arguments' }
-OJump >> argumentFor: aPhi put: value [
+OJump >> argumentFor: aParameter put: value [
 	| passed |
-	passed := self argumentsTo: aPhi basicBlock.
-	passed at: aPhi index put: value
+	passed := self argumentsTo: aParameter basicBlock.
+	passed at: aParameter index put: value
 ]
 
 { #category : #'jump arguments' }

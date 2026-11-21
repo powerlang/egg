@@ -240,7 +240,7 @@ OBasicBlock >> firstInstruction [
 OBasicBlock >> fullyRemovePredecessor: predecessor [
 	self
 		removePredecessor: predecessor;
-		phisDo: [:phi | phi removeBlock: predecessor].
+		parametersDo: [:parameter | parameter removeBlock: predecessor].
 	predecessors isEmpty
 		ifTrue: [self successorsDo: [:succ | succ fullyRemovePredecessor: self]]
 ]
@@ -288,8 +288,8 @@ OBasicBlock >> indexOf: anInstruction [
 ]
 
 { #category : #'block parameters' }
-OBasicBlock >> indexOfPhi: aPhi [
-	^self phis indexOf: aPhi
+OBasicBlock >> indexOfParameter: aParameter [
+	^self parameters indexOf: aParameter
 ]
 
 { #category : #unclassified }
@@ -317,9 +317,9 @@ OBasicBlock >> inline: inlined replacing: aMessageSend [
 ]
 
 { #category : #'block parameters' }
-OBasicBlock >> insertPhi: aPhi [
+OBasicBlock >> insertParameter: aParameter [
 	self incomingJumps do: [:jump | (jump argumentsTo: self) addFirst: nil].
-	self addFront: aPhi
+	self addFront: aParameter
 ]
 
 { #category : #unclassified }
@@ -342,11 +342,11 @@ at: block1
 and: value2
 at: block2
 replacing: operation [
-	| phi |
-	phi := OBlockParameter new.
-	self insertPhi: phi.
-	phi addVariable: value1 from: block1; addVariable: value2 from: block2.
-	operation replaceAllUsesWith: phi; dissolve
+	| parameter |
+	parameter := OBlockParameter new.
+	self insertParameter: parameter.
+	parameter addVariable: value1 from: block1; addVariable: value2 from: block2.
+	operation replaceAllUsesWith: parameter; dissolve
 ]
 
 { #category : #unclassified }
@@ -485,11 +485,11 @@ OBasicBlock >> name [
 
 { #category : #'block parameters' }
 OBasicBlock >> newArguments [
-	^OrderedCollection new: self phis size withAll: nil
+	^OrderedCollection new: self parameters size withAll: nil
 ]
 
 { #category : #unclassified }
-OBasicBlock >> phis [
+OBasicBlock >> parameters [
 	| result |
 	result := OrderedCollection new.
 	self
@@ -499,7 +499,7 @@ OBasicBlock >> phis [
 ]
 
 { #category : #unclassified }
-OBasicBlock >> phisDo: aBlock [
+OBasicBlock >> parametersDo: aBlock [
 	self
 		instructionsDo: [:instr | instr isPhi
 			ifTrue: [aBlock value: instr]
@@ -582,9 +582,9 @@ OBasicBlock >> printOn: aStream using: names [
 ]
 
 { #category : #'block parameters' }
-OBasicBlock >> removeParameter: aPhi [
+OBasicBlock >> removeParameter: aParameter [
 	| index |
-	index := self indexOfPhi: aPhi.
+	index := self indexOfParameter: aParameter.
 	self incomingJumps do: [:jump | (jump argumentsTo: self) removeIndex: index]
 ]
 
@@ -595,7 +595,7 @@ OBasicBlock >> removePredecessor: aBasicBlock [
 
 { #category : #unclassified }
 OBasicBlock >> replacePredecessor: old with: new [
-	self phisDo: [:phi | phi replaceBlock: old with: new].
+	self parametersDo: [:parameter | parameter replaceBlock: old with: new].
 	predecessors replace: old with: new
 ]
 
@@ -606,7 +606,7 @@ OBasicBlock >> reversePostOrderDo: aBlock [
 
 { #category : #unclassified }
 OBasicBlock >> sortPhiVariables [
-	self phisDo: [:phi | phi sortAfter: predecessors]
+	self parametersDo: [:parameter | parameter sortAfter: predecessors]
 ]
 
 { #category : #unclassified }
@@ -691,7 +691,7 @@ OBasicBlock >> successorsPostOrder [
 
 { #category : #unclassified }
 OBasicBlock >> unifyReturns [
-	| all last extra ret prev end jump phi |
+	| all last extra ret prev end jump parameter |
 	all := self withSuccessorsPostOrder.
 	last := all removeFirst.
 	extra := OrderedCollection new.
@@ -704,28 +704,28 @@ OBasicBlock >> unifyReturns [
 	(prev isPhi and: prev = last firstInstruction)
 		ifTrue: [
 			end := last.
-			phi := prev]
+			parameter := prev]
 		ifFalse: [
 			end := last splitAfter: prev.
 			end addPredecessor: last.
 			jump := OJump to: end.
 			prev afterInsert: jump.
-			phi := OBlockParameter new.
-			end insertPhi: phi.
-			phi
+			parameter := OBlockParameter new.
+			end insertParameter: parameter.
+			parameter
 				addVariable: ret source from: last;
 				addUse: ret at: #source.
 			ret source removeUse: ret at: #source.
-			ret source: phi].
+			ret source: parameter].
 	extra do: [:assoc | | tail block old |
 		tail := assoc key.
 		block := assoc value.
 		end addPredecessor: block.
 		jump := tail next.
 		old := jump target.
-		old removePredecessor: block; phisDo: [:each | each removeBlock: block].
+		old removePredecessor: block; parametersDo: [:each | each removeBlock: block].
 		jump target: end.
-		phi addVariable: tail source from: block.
+		parameter addVariable: tail source from: block.
 		tail dissolve]
 ]
 

@@ -53,7 +53,7 @@ OptimizingLivenessAnalysis >> analyzeLivenessOf: block [
 			alive addIfAbsent: value].
 		alive removeIfPresent: instr.
 		pressure := presure max: alive size].
-	block phis reverseDo: [:phi | alive removeIfPresent: phi].
+	block parameters reverseDo: [:parameter | alive removeIfPresent: parameter].
 	pressures at: block put: pressure.
 	changed := true.
 	liveIn

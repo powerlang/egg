@@ -33,12 +33,12 @@ OptimizingCSSATransformer >> firstBlock: block [
 
 { #category : #accessing }
 OptimizingCSSATransformer >> liftPhisIn: block [
-	block phisDo: [:phi | 
-		phi variablesWithBlocksDo: [:var :pred | | copy |
+	block parametersDo: [:parameter |
+		parameter variablesWithBlocksDo: [:var :pred | | copy |
 			copy := var insertCopyBefore: pred lastInstruction.
-			phi atOperand: pred put: copy.
-			var removeUse: phi at: pred; dissolveIfUnused.
-			copy addUse: phi at: pred]]
+			parameter atOperand: pred put: copy.
+			var removeUse: parameter at: pred; dissolveIfUnused.
+			copy addUse: parameter at: pred]]
 ]
 
 { #category : #accessing }

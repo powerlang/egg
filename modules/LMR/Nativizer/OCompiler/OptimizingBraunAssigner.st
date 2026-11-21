@@ -97,7 +97,7 @@ OptimizingBraunAssigner >> colorBlock: block [
 	incoming := liveness liveInOf: block.
 	initial := incoming collect: [:value | (assignments at: value) -> value].
 	occupied := Dictionary withAll: initial.
-	block phisDo: [:phi | self getRegisterFor: phi].
+	block parametersDo: [:parameter | self getRegisterFor: parameter].
 	block predecessors do: [:pred | 
 		(processed includes: pred)
 			ifTrue: [self insertParallelCopiesFrom: pred to: block]].
@@ -112,9 +112,9 @@ OptimizingBraunAssigner >> colorBlock: block [
 { #category : #private }
 OptimizingBraunAssigner >> computeClusters [
 	firstBlock withSuccessorsPostOrder do: [:block | 
-		block phisDo: [:phi | | cluster |
-			cluster := clusters at: phi ifAbsentPut: [OrderedCollection with: phi].
-			phi operandsDo: [:value | 
+		block parametersDo: [:parameter | | cluster |
+			cluster := clusters at: parameter ifAbsentPut: [OrderedCollection with: parameter].
+			parameter operandsDo: [:value |
 				cluster addIfAbsent: value.
 				clusters at: value put: cluster]]]
 ]
@@ -221,28 +221,28 @@ OptimizingBraunAssigner >> insertCopyTo: dest for: phi at: pred [
 
 { #category : #private }
 OptimizingBraunAssigner >> insertParallelCopiesFrom: pred to: block [
-	| phis sources destinations saved |
-	phis := block phis.
-	sources := phis collect: [:phi | | value |
-		value := phi atOperand: pred.
+	| parameters sources destinations saved |
+	parameters := block parameters.
+	sources := parameters collect: [:parameter | | value |
+		value := parameter atOperand: pred.
 		assignments at: value].
-	destinations := phis collect: [:phi | assignments at: phi].
+	destinations := parameters collect: [:parameter | assignments at: parameter].
 	"remove nops"
-	phis size to: 1 by: -1 do: [:i | 
+	parameters size to: 1 by: -1 do: [:i |
 		(sources at: i) = (destinations at: i) ifTrue: [
 			sources removeIndex: i.
 			destinations removeIndex: i.
-			phis removeIndex: i]].
+			parameters removeIndex: i]].
 	"schedule copies"
 	saved := OrderedCollection new.
 	[
-		self scheduleCopyingOf: phis from: pred.
-		phis size > 0]
+		self scheduleCopyingOf: parameters from: pred.
+		parameters size > 0]
 		whileTrue: [| free |
-			free := phis first.
+			free := parameters first.
 			self insertPushOf: (free atOperand: pred) at: pred.
 			saved add: free.
-			phis removeIndex: 1.
+			parameters removeIndex: 1.
 			sources removeIndex: 1.
 			destinations removeIndex: 1].
 	[saved isEmpty] whileFalse: [| var |
@@ -306,7 +306,7 @@ OptimizingBraunAssigner >> purgeAllocationEntry [
 		alive := self liveInOf: block.
 		available := allocationEntry at: block.
 		available
-			removeAllSuchThat: [:var | (block phis includes: var)
+			removeAllSuchThat: [:var | (block parameters includes: var)
 				or: [(alive includes: var) not]]]
 ]
 
@@ -320,24 +320,24 @@ OptimizingBraunAssigner >> registersByPreference: prefs [
 ]
 
 { #category : #private }
-OptimizingBraunAssigner >> scheduleCopyingOf: phis from: pred [
+OptimizingBraunAssigner >> scheduleCopyingOf: parameters from: pred [
 	| destinations changed sources |
-	sources := phis collect: [:phi | | value |
-		value := phi atOperand: pred.
+	sources := parameters collect: [:parameter | | value |
+		value := parameter atOperand: pred.
 		assignments at: value].
-	destinations := phis collect: [:phi | assignments at: phi].
+	destinations := parameters collect: [:parameter | assignments at: parameter].
 	"schedule copies"
 	changed := true.
-	[phis size > 0 and: changed] whileTrue: [
+	[parameters size > 0 and: changed] whileTrue: [
 		changed := false.
-		phis size to: 1 by: -1 do: [:i | | dest phi |
+		parameters size to: 1 by: -1 do: [:i | | dest parameter |
 			dest := destinations at: i.
 			(sources includes: dest) ifFalse: [
-				phi := phis at: i.
-				self insertCopyTo: dest for: phi at: pred.
+				parameter := parameters at: i.
+				self insertCopyTo: dest for: parameter at: pred.
 				sources removeIndex: i.
 				destinations removeIndex: i.
-				phis removeIndex: i.
+				parameters removeIndex: i.
 				changed := true]]]
 ]
 

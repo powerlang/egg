@@ -201,10 +201,10 @@ OptimizingRegisterAllocator >> copyArgumentsOf: aCollection from: aBasicBlock [
 
 { #category : #unclassified }
 OptimizingRegisterAllocator >> copyArgumentsTo: aBasicBlock [
-	| phis |
-	phis := aBasicBlock phis.
-	phis isEmpty ifTrue: [^self].
-	phis first blocks copy do: [:predecessor | self copyArgumentsOf: phis from: predecessor]
+	| parameters |
+	parameters := aBasicBlock parameters.
+	parameters isEmpty ifTrue: [^self].
+	parameters first blocks copy do: [:predecessor | self copyArgumentsOf: parameters from: predecessor]
 ]
 
 { #category : #unclassified }

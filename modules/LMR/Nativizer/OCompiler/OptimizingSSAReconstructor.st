@@ -34,15 +34,15 @@ OptimizingSSAReconstructor >> firstBlock: block [
 
 { #category : #initialization }
 OptimizingSSAReconstructor >> insertPhiAt: block [
-	^insertedPhis at: block ifAbsentPut: [| arguments phi predecessors |
+	^insertedPhis at: block ifAbsentPut: [| arguments parameter predecessors |
 		predecessors := block predecessors.
 		arguments := predecessors collect: [:pred | | search |
 			search := pred lastInstruction.
 			self reachingDefinitionFrom: search at: pred].
-		phi := OBlockParameter new.
-		block insertPhi: phi.
-		arguments with: predecessors do: [:var :pred | phi addVariable: var from: pred].
-		phi]
+		parameter := OBlockParameter new.
+		block insertParameter: parameter.
+		arguments with: predecessors do: [:var :pred | parameter addVariable: var from: pred].
+		parameter]
 ]
 
 { #category : #initialization }

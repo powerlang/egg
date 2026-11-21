@@ -127,8 +127,8 @@ OptimizingBraunAllocator >> computeUseDistancesOf: block using: distancesEntry [
 		incoming keysAndValuesDo: [:operand :distance | | previous |
 			previous := distances at: operand ifAbsent: Number infinity.
 			distances at: operand put: (previous min: distance + length)].
-		succ phisDo: [:phi | | operand previous |
-			operand := phi atOperand: block.
+		succ parametersDo: [:parameter | | operand previous |
+			operand := parameter atOperand: block.
 			previous := distances at: operand ifAbsent: Number infinity.
 			distances at: operand put: (previous min: length)]].
 	distancesExit
@@ -155,7 +155,7 @@ OptimizingBraunAllocator >> couple: block withPredecessor: predecessor [
 	predSexit := spillExit at: predecessor.
 	newSentry := (oldSentry , predSexit) withoutDuplicates intersection: wentry.
 	(wentry rejectAll: predWexit) do: [:value | 
-		(block phis includes: value)
+		(block parameters includes: value)
 			ifFalse: [self scheduleReload: value before: predecessor lastInstruction]].
 	(newSentry rejectAll: predSexit) do: [:value | self scheduleSpillFor: value].
 	difference := newSentry rejectAll: oldSentry.
@@ -173,7 +173,7 @@ OptimizingBraunAllocator >> coupleWithPredecessors: block [
 	predecessors do: [:pred | | wexit sexit |
 		wexit := allocationExit at: pred.
 		(currentlyAvailable rejectAll: wexit) do: [:value | 
-			(block phis includes: value)
+			(block parameters includes: value)
 				ifFalse: [self scheduleReload: value before: pred lastInstruction]].
 		sexit := spillExit at: pred.
 		(currentlySpilled rejectAll: sexit)
@@ -233,7 +233,7 @@ OptimizingBraunAllocator >> initialize [
 OptimizingBraunAllocator >> initLoopHeader: block [
 	| loop available candidates liveThrough pressure freeLoop extra |
 	loop := loops at: block.
-	available := (block phis , (self liveInOf: block)) withoutDuplicates.
+	available := (block parameters , (self liveInOf: block)) withoutDuplicates.
 	candidates := self subsetOf: available usedIn: loop.
 	liveThrough := available rejectAll: candidates.
 	candidates size < self amountOfRegisters
