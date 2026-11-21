@@ -82,6 +82,11 @@ OptimizingRegisterAllocator >> allocation [
 ]
 
 { #category : #unclassified }
+OptimizingRegisterAllocator >> anyReadyArgumentIn: aCollection [
+	^aCollection detect: [:assoc | self canOverwrite: assoc key in: aCollection] ifNone: nil
+]
+
+{ #category : #unclassified }
 OptimizingRegisterAllocator >> assign: register to: aRange [
 	((free includes: register) not and: [(used at: register) != aRange])
 		ifTrue: [self error: 'register ' , register , ' is not free'].
@@ -119,6 +124,19 @@ OptimizingRegisterAllocator >> assureLiveRangeStartingAt: anInstruction in: bloc
 	range := OSimpleLiveRange new definedAt: anInstruction in: block.
 	liveRanges at: anInstruction put: range.
 	^range
+]
+
+{ #category : #unclassified }
+OptimizingRegisterAllocator >> breakCycleIn: aCollection before: aJump [
+	| read temporary |
+	read := aCollection anyone key.
+	temporary := read insertCopyBefore: aJump.
+	aCollection do: [:assoc | assoc value == read ifTrue: [assoc value: temporary]]
+]
+
+{ #category : #unclassified }
+OptimizingRegisterAllocator >> canOverwrite: phi in: aCollection [
+	^aCollection conform: [:assoc | assoc key == phi or: [assoc value !== phi]]
 ]
 
 { #category : #unclassified }
@@ -163,6 +181,33 @@ OptimizingRegisterAllocator >> computeLiveRangesOf: block [
 ]
 
 { #category : #unclassified }
+OptimizingRegisterAllocator >> copyArguments [
+	firstBlock withSuccessorsPostOrder do: [:block | self copyArgumentsTo: block]
+]
+
+{ #category : #unclassified }
+OptimizingRegisterAllocator >> copyArgumentsOf: aCollection from: aBasicBlock [
+	| jump pending |
+	jump := aBasicBlock lastInstruction.
+	pending := aCollection collect: [:phi | phi -> (phi atOperand: aBasicBlock)].
+	[pending notEmpty] whileTrue: [| ready |
+		ready := self anyReadyArgumentIn: pending.
+		ready isNil
+			ifTrue: [self breakCycleIn: pending before: jump]
+			ifFalse: [
+				self insertCopyOf: ready value to: ready key before: jump from: aBasicBlock.
+				pending remove: ready]]
+]
+
+{ #category : #unclassified }
+OptimizingRegisterAllocator >> copyArgumentsTo: aBasicBlock [
+	| phis |
+	phis := aBasicBlock phis.
+	phis isEmpty ifTrue: [^self].
+	phis first blocks copy do: [:predecessor | self copyArgumentsOf: phis from: predecessor]
+]
+
+{ #category : #unclassified }
 OptimizingRegisterAllocator >> currentBlock: aBasicBlock [
 	currentBlock := aBasicBlock
 ]
@@ -172,7 +217,7 @@ OptimizingRegisterAllocator >> doAllocation [
 	| record |
 	"	record := self activationRecord.
 	record isLoadImplicit ifFalse: [free remove: ebp]."
-	self computeLiveRanges; allocateLiveRanges; reserveSpaceForLocals.
+	self copyArguments; computeLiveRanges; allocateLiveRanges; reserveSpaceForLocals.
 	^allocation
 ]
 
@@ -202,6 +247,13 @@ OptimizingRegisterAllocator >> initialize [
 	locals := 2.
 	used := Dictionary new.
 	usedOut := Dictionary new
+]
+
+{ #category : #unclassified }
+OptimizingRegisterAllocator >> insertCopyOf: value to: phi before: aJump from: aBasicBlock [
+	| copy |
+	copy := value insertCopyBefore: aJump.
+	phi replaceOperand: aBasicBlock with: copy
 ]
 
 { #category : #unclassified }

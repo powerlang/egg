@@ -708,7 +708,7 @@ OBasicBlock >> splitEdgeTo: block [
 
 { #category : #unclassified }
 OBasicBlock >> splitIncomingCriticalEdges [
-	self hasMultiplePredecessors ifTrue: [
+	(self hasMultiplePredecessors or: [self firstInstruction isPhi]) ifTrue: [
 		predecessors
 			do: [:pred | pred hasMultipleSuccessors ifTrue: [pred splitEdgeTo: self]]]
 ]

@@ -212,8 +212,7 @@ OptimizingNativizer >> nativize [
 		removeRedundantCode;
 		simplifyCFG;
 		eliminateDeadPhis;
-		splitCriticalEdges;
-		transformToCSSA.
+		splitCriticalEdges.
 	allocation := self allocate.
 	self
 		enforceTwoAddressCodeUsing: allocation;
@@ -241,13 +240,6 @@ OptimizingNativizer >> simplifyCFG [
 { #category : #unclassified }
 OptimizingNativizer >> splitCriticalEdges [
 	firstBlock splitAllCriticalEdges
-]
-
-{ #category : #allocation }
-OptimizingNativizer >> transformToCSSA [
-	| transformer |
-	transformer := OptimizingCSSATransformer new firstBlock: firstBlock.
-	transformer applyTransformation
 ]
 
 { #category : #unclassified }
