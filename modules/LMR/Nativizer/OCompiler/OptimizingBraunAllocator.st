@@ -122,7 +122,7 @@ OptimizingBraunAllocator >> computeUseDistancesOf: block using: distancesEntry [
 	| distances index length |
 	distances := IdentityDictionary new.
 	length := block length.
-	block successors do: [:succ | | incoming |
+	block successorsDo: [:succ | | incoming |
 		incoming := distancesEntry at: succ ifAbsent: [Dictionary new].
 		incoming keysAndValuesDo: [:operand :distance | | previous |
 			previous := distances at: operand ifAbsent: Number infinity.
@@ -196,8 +196,8 @@ OptimizingBraunAllocator >> doAllocation [
 			coupleWithPredecessors: block;
 			spillAsBeladyIn: block.
 		blocksDone add: block.
-		block successors
-			do: [:succ | (blocksDone includes: succ)
+		block
+			successorsDo: [:succ | (blocksDone includes: succ)
 				ifTrue: [self couple: succ withPredecessor: block]]].
 	redefinitions := self computeTemporaryIndexes; insertSpillsAndReloads.
 	self reconstructSSA: redefinitions

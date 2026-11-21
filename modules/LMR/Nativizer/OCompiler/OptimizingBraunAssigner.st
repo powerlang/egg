@@ -104,7 +104,7 @@ OptimizingBraunAssigner >> colorBlock: block [
 	"Assign registers"
 	block firstNonPhi do: [:instruction | self assignRegisterTo: instruction].
 	processed add: block.
-	block successors do: [:succ | 
+	block successorsDo: [:succ |
 		(processed includes: succ)
 			ifTrue: [self insertParallelCopiesFrom: block to: block successors first]]
 ]

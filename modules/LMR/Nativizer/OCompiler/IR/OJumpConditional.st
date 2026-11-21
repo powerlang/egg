@@ -72,6 +72,12 @@ OJumpConditional >> retargetFrom: aBasicBlock to: otherBasicBlock [
 	implicitTarget == aBasicBlock ifTrue: [implicitTarget := otherBasicBlock]
 ]
 
+{ #category : #private }
+OJumpConditional >> successorsDo: aBlock [
+	aBlock value: target.
+	aBlock value: implicitTarget
+]
+
 { #category : #unclassified }
 OJumpConditional >> targets [
 	^OrderedCollection with: implicitTarget with: target

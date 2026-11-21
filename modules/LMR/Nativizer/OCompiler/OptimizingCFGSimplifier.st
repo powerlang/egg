@@ -69,18 +69,12 @@ OptimizingCFGSimplifier >> simplify [
 OptimizingCFGSimplifier >> tryCombining: block [
 	| last following |
 	last := block lastInstruction.
-	(last isUnconditionalJump and: [
-		following := last target.
-		following predecessors size = 1])
-		ifTrue: [
-			following successors do: [:successor | 
-				successor
-					addPredecessor: block;
-					removePredecessor: following;
-					phisDo: [:phi | phi replaceBlock: following with: block]].
-			last afterInsertAll: following firstInstruction; dissolve.
-			^true].
-	^false
+	last isUnconditionalJump ifFalse: [^false].
+	following := last target.
+	following hasMultiplePredecessors ifTrue: [^false].
+	following moveAllTo: block after: last.
+	last dissolve.
+	^true
 ]
 
 { #category : #private }

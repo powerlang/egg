@@ -198,13 +198,13 @@ OptimizingInstructionFragmenter >> fragmentSpecialABIArgumentsIn: aBasicBlock [
 	literals size = 0 ifTrue: [^self].
 	(literals at: 1) == #loadsOwnNativeCode ifTrue: [
 		aBasicBlock activationRecord doLoadOwnNativeCode.
-		load := aBasicBlock firstInstruction detect: [:inst | inst isConstant].
+		load := aBasicBlock detect: [:inst | inst isConstant].
 		load dissolve.
 		literals := literals copyFrom: 2].
 	literals size = 0 ifTrue: [^self].
 	(literals at: 1) == #savePreviousSelf ifTrue: [
 		aBasicBlock activationRecord doSavePreviousSelf.
-		load := aBasicBlock firstInstruction detect: [:inst | inst isConstant].
+		load := aBasicBlock detect: [:inst | inst isConstant].
 		load dissolve.
 		literals := literals copyFrom: 2].
 	literals size = 0 ifTrue: [^self].
@@ -218,18 +218,18 @@ OptimizingInstructionFragmenter >> fragmentSpecialABIArgumentsIn: aBasicBlock [
 			register := self registerNamed: regname.
 			name = #self
 				ifTrue: [
-					receiver := aBasicBlock firstInstruction
+					receiver := aBasicBlock
 						detect: [:instruction | instruction isLoadImplicit
 							and: [instruction name = #self]].
 					receiver source: register]
 				ifFalse: [
 					implicit := (OLoadImplicit named: name) source: register.
-					argument := aBasicBlock firstInstruction
+					argument := aBasicBlock
 						detect: [:instruction | instruction isDefineArgument
 							and: [instruction name = name]].
 					argument dissolveReplacingWith: implicit].
 			i := i + 1].
-	actual := aBasicBlock firstInstruction detect: [:inst | inst isConstant].
+	actual := aBasicBlock detect: [:inst | inst isConstant].
 	[
 		next := actual next.
 		actual dissolve.

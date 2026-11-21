@@ -68,7 +68,7 @@ OptimizingLivenessAnalysis >> computeExpirationsAt: block [
 	alive := self gatherAliveAfter: block.
 	last := block lastInstruction.
 	last isConditionalJump ifTrue: [
-		block successors do: [:succ | | real leftover |
+		block successorsDo: [:succ | | real leftover |
 			real := liveIn at: succ.
 			leftover := alive rejectAll: real.
 			leftover do: [:val | self kill: val at: succ firstInstruction]]].

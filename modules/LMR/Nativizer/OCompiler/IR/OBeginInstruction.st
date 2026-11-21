@@ -15,6 +15,11 @@ OBeginInstruction >> basicAcceptVisitor: aVisitor [
 ]
 
 { #category : #unclassified }
+OBeginInstruction >> detect: aBlock ifNone: absentBlock [
+	^next detect: aBlock ifNone: absentBlock
+]
+
+{ #category : #unclassified }
 OBeginInstruction >> do: aBlock [
 	next do: aBlock
 ]

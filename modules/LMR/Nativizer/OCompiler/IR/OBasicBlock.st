@@ -19,11 +19,6 @@ OBasicBlock class >> new [
 ]
 
 { #category : #unclassified }
-OBasicBlock class >> newStartingWith: anInstruction [
-	^self basicNew initializeWith: anInstruction
-]
-
-{ #category : #unclassified }
 OBasicBlock >> activationRecord [
 	^self firstInstruction
 ]
@@ -71,8 +66,8 @@ OBasicBlock >> allLoopHeads [
 	loops := Dictionary new.
 	doms := self allDominators.
 	self withSuccessorsPostOrder do: [:block | 
-		block successors
-			do: [:succ | ((doms at: block) includes: succ)
+		block
+			successorsDo: [:succ | ((doms at: block) includes: succ)
 				ifTrue: [loops add: succ -> block]]].
 	^loops
 ]
@@ -106,6 +101,11 @@ OBasicBlock >> asReversePostOrderInstructionsCollection [
 { #category : #accessing }
 OBasicBlock >> basicBlock [
 	^self
+]
+
+{ #category : #unclassified }
+OBasicBlock >> beforeInsert: anInstruction [
+	self error: 'cannot insert instructions before the start of a basic block'
 ]
 
 { #category : #unclassified }
@@ -159,7 +159,7 @@ OBasicBlock >> dominanceFrontiersUsing: idoms [
 	result := Dictionary new.
 	blocks do: [:block | result at: block put: OrderedCollection new].
 	blocks do: [:block | 
-		block predecessors size > 1 ifTrue: [
+		block hasMultiplePredecessors ifTrue: [
 			block predecessors do: [:predecessor | | runner end |
 				runner := predecessor.
 				end := idoms at: block.
@@ -251,16 +251,22 @@ OBasicBlock >> fullyRemovePredecessor: predecessor [
 		removePredecessor: predecessor;
 		phisDo: [:phi | phi removeBlock: predecessor].
 	predecessors isEmpty
-		ifTrue: [self successors do: [:succ | succ fullyRemovePredecessor: self]]
+		ifTrue: [self successorsDo: [:succ | succ fullyRemovePredecessor: self]]
 ]
 
 { #category : #unclassified }
-OBasicBlock >> ifHasExplicitSuccesor: explicitBlock ifHasImplicitSuccesor: implicitBlock [
-	| last |
-	last := self lastInstruction.
-	last isJump ifFalse: [^self].
-	explicitBlock value: last target.
-	last isConditionalJump ifTrue: [implicitBlock value: last implicitTarget]
+OBasicBlock >> hasMultiplePredecessors [
+	^predecessors size > 1
+]
+
+{ #category : #unclassified }
+OBasicBlock >> hasMultipleSuccessors [
+	^self lastInstruction isConditionalJump
+]
+
+{ #category : #unclassified }
+OBasicBlock >> hasSuccessors [
+	^self lastInstruction isJump
 ]
 
 { #category : #unclassified }
@@ -298,14 +304,6 @@ OBasicBlock >> initialize [
 ]
 
 { #category : #unclassified }
-OBasicBlock >> initializeWith: anInstruction [
-	next := anInstruction.
-	anInstruction prev: self.
-	end := self last next.
-	predecessors := OrderedCollection new
-]
-
-{ #category : #unclassified }
 OBasicBlock >> inline: inlined replacing: aMessageSend [
 	| returned return join last |
 	last := inlined lastBlock.
@@ -313,12 +311,12 @@ OBasicBlock >> inline: inlined replacing: aMessageSend [
 	returned := return source.
 	aMessageSend replaceAllUsesWith: returned.
 	return dissolve.
-	inlined successors isEmpty ifFalse: [
+	inlined hasSuccessors ifTrue: [
 		join := self splitAfter: aMessageSend.
 		join addPredecessor: last.
 		last endWithJumpTo: join].
-	inlined firstInstruction spliceReplacing: aMessageSend.
-	self replaceAsPredecessor: inlined.
+	inlined moveAllTo: self after: aMessageSend.
+	aMessageSend dissolve.
 	^join ifNil: [self]
 ]
 
@@ -488,6 +486,15 @@ OBasicBlock >> length [
 ]
 
 { #category : #unclassified }
+OBasicBlock >> moveAllTo: block after: instruction [
+	self successorsDo: [:succ | succ replacePredecessor: self with: block].
+	next == end ifTrue: [^self].
+	end prev afterConnect: instruction next.
+	instruction afterConnect: next.
+	self afterConnect: end
+]
+
+{ #category : #unclassified }
 OBasicBlock >> movePhisTo: otherBlock [
 	| inst dest |
 	inst := self firstInstruction.
@@ -537,10 +544,8 @@ OBasicBlock >> phiWithArgument: instruction [
 OBasicBlock >> postOrder: result seen: seen [
 	seen add: self.
 	self
-		ifHasExplicitSuccesor: [:next | (seen includes: next)
-			ifFalse: [next postOrder: result seen: seen]]
-		ifHasImplicitSuccesor: [:next | (seen includes: next)
-			ifFalse: [next postOrder: result seen: seen]].
+		successorsDo: [:succ | (seen includes: succ)
+			ifFalse: [succ postOrder: result seen: seen]].
 	result add: self
 ]
 
@@ -552,6 +557,11 @@ OBasicBlock >> postOrderDo: aBlock [
 { #category : #unclassified }
 OBasicBlock >> predecessors [
 	^predecessors
+]
+
+{ #category : #unclassified }
+OBasicBlock >> prev: anInstruction [
+	self error: 'cannot insert instructions before the start of a basic block'
 ]
 
 { #category : #unclassified }
@@ -619,11 +629,6 @@ OBasicBlock >> removePredecessor: aBasicBlock [
 ]
 
 { #category : #unclassified }
-OBasicBlock >> replaceAsPredecessor: old [
-	self successors do: [:succ | succ replacePredecessor: old with: self]
-]
-
-{ #category : #unclassified }
 OBasicBlock >> replacePredecessor: old with: new [
 	self phisDo: [:phi | phi replaceBlock: old with: new].
 	predecessors replace: old with: new
@@ -646,11 +651,15 @@ OBasicBlock >> split [
 
 { #category : #unclassified }
 OBasicBlock >> splitAfter: anInstruction [
-	| next |
-	next := self class newStartingWith: anInstruction next.
-	end := anInstruction cutFollowing.
-	next replaceAsPredecessor: self.
-	^next
+	| block start last |
+	block := self class new.
+	start := anInstruction next.
+	start isEnd ifTrue: [^block].
+	last := end prev.
+	self successorsDo: [:succ | succ replacePredecessor: self with: block].
+	block afterInsert: start to: last.
+	anInstruction afterConnect: end.
+	^block
 ]
 
 { #category : #unclassified }
@@ -666,7 +675,7 @@ OBasicBlock >> splitBefore: anInstruction [
 
 { #category : #unclassified }
 OBasicBlock >> splitEdgeIfCriticalTo: succ [
-	^(self successors size > 1 and: [succ predecessors size > 1])
+	^(self hasMultipleSuccessors and: [succ hasMultiplePredecessors])
 		ifTrue: [self splitEdgeTo: succ]
 		ifFalse: [succ]
 ]
@@ -688,9 +697,9 @@ OBasicBlock >> splitEdgeTo: block [
 
 { #category : #unclassified }
 OBasicBlock >> splitIncomingCriticalEdges [
-	predecessors size > 1 ifTrue: [
+	self hasMultiplePredecessors ifTrue: [
 		predecessors
-			do: [:pred | pred successors size > 1 ifTrue: [pred splitEdgeTo: self]]]
+			do: [:pred | pred hasMultipleSuccessors ifTrue: [pred splitEdgeTo: self]]]
 ]
 
 { #category : #unclassified }
@@ -699,15 +708,18 @@ OBasicBlock >> successors [
 ]
 
 { #category : #unclassified }
+OBasicBlock >> successorsDo: aBlock [
+	next == end ifFalse: [self lastInstruction successorsDo: aBlock]
+]
+
+{ #category : #unclassified }
 OBasicBlock >> successorsPostOrder [
 	| seen result |
 	seen := Set new.
 	result := OrderedCollection new: 10.
 	self
-		ifHasExplicitSuccesor: [:next | (seen includes: next)
-			ifFalse: [next postOrder: result seen: seen]]
-		ifHasImplicitSuccesor: [:next | (seen includes: next)
-			ifFalse: [next postOrder: result seen: seen]].
+		successorsDo: [:succ | (seen includes: succ)
+			ifFalse: [succ postOrder: result seen: seen]].
 	^result
 ]
 
@@ -753,8 +765,8 @@ OBasicBlock >> unifyReturns [
 OBasicBlock >> updatePredecessors [
 	self
 		postOrderDo: [:block | block cleanPredecessors];
-		postOrderDo: [:block | block successors
-			do: [:successor | successor addPredecessor: block]];
+		postOrderDo: [:block | block
+			successorsDo: [:successor | successor addPredecessor: block]];
 		postOrderDo: [:block | block sortPhiVariables]
 ]
 
@@ -785,8 +797,8 @@ OBasicBlock >> verifyAllInstructionsSanity [
 { #category : #unclassified }
 OBasicBlock >> verifyAllPredecessorsSanity [
 	self withSuccessorsDo: [:block | 
-		block successors
-			do: [:successor | self ASSERT: (successor predecessors includes: block)].
+		block
+			successorsDo: [:successor | self ASSERT: (successor predecessors includes: block)].
 		block predecessors
 			do: [:predecessor | self ASSERT: (predecessor successors includes: block)]]
 ]
@@ -824,14 +836,13 @@ OBasicBlock >> withSuccessorsDo: aBlock [
 	done := Set new.
 	remaining := OrderedCollection new: 10.
 	remaining add: self.
-	[remaining notEmpty] whileTrue: [| block more |
+	[remaining notEmpty] whileTrue: [| block |
 		block := remaining removeFirst.
 		aBlock value: block.
 		done add: block.
-		more := block successors
-			reject: [:succesor | (done includes: succesor)
-				or: [remaining includes: succesor]].
-		remaining addAll: more]
+		block successorsDo: [:succ |
+			((done includes: succ) or: [remaining includes: succ])
+				ifFalse: [remaining add: succ]]]
 ]
 
 { #category : #unclassified }

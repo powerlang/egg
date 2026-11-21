@@ -52,6 +52,11 @@ OJump >> retargetFrom: aBasicBlock to: otherBasicBlock [
 	target := otherBasicBlock
 ]
 
+{ #category : #private }
+OJump >> successorsDo: aBlock [
+	aBlock value: target
+]
+
 { #category : #unclassified }
 OJump >> target [
 	^target

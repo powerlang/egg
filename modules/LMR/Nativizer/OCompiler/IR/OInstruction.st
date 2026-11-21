@@ -49,21 +49,21 @@ OInstruction >> addUse: user at: name [
 ]
 
 { #category : #unclassified }
-OInstruction >> afterInsert: anInstruction [
-	anInstruction next: next.
+OInstruction >> afterConnect: anInstruction [
 	anInstruction prev: self.
-	next prev: anInstruction.
 	next := anInstruction
 ]
 
 { #category : #unclassified }
-OInstruction >> afterInsertAll: anInstruction [
-	| last |
-	last := anInstruction last.
-	last next: next.
-	anInstruction prev: self.
-	next prev: last.
-	next := anInstruction
+OInstruction >> afterInsert: anInstruction [
+	anInstruction afterConnect: next.
+	self afterConnect: anInstruction
+]
+
+{ #category : #unclassified }
+OInstruction >> afterInsert: start to: last [
+	last afterConnect: next.
+	self afterConnect: start
 ]
 
 { #category : #unclassified }
@@ -104,10 +104,8 @@ OInstruction >> basicBlock [
 
 { #category : #unclassified }
 OInstruction >> beforeInsert: anInstruction [
-	anInstruction next: self.
-	anInstruction prev: prev.
-	prev next: anInstruction.
-	prev := anInstruction
+	prev afterConnect: anInstruction.
+	anInstruction afterConnect: self
 ]
 
 { #category : #unclassified }
@@ -119,15 +117,6 @@ OInstruction >> beforeInsertAll: anInstruction [
 	prev next: anInstruction.
 	prev := last.
 	self shouldBeImplemented
-]
-
-{ #category : #unclassified }
-OInstruction >> cutFollowing [
-	| end |
-	end := OEndInstruction new.
-	end prev: self.
-	next := end.
-	^end
 ]
 
 { #category : #unclassified }
@@ -144,7 +133,7 @@ OInstruction >> detect: aBlock ifNone: absentBlock [
 
 { #category : #unclassified }
 OInstruction >> dissolve [
-	self untie; operandsDo: [:instruction | instruction removeUse: self]
+	self remove; operandsDo: [:instruction | instruction removeUse: self]
 ]
 
 { #category : #unclassified }
@@ -154,25 +143,11 @@ OInstruction >> dissolveIfUnused [
 
 { #category : #unclassified }
 OInstruction >> dissolveReplacingWith: anInstruction [
-	prev next: anInstruction.
-	next prev: anInstruction.
-	anInstruction prev: prev.
-	anInstruction next: next.
+	anInstruction afterConnect: next.
+	prev afterConnect: anInstruction.
 	prev := next := nil.
 	self operandsDo: [:instruction | instruction removeUse: self].
 	self replaceAllUsesWith: anInstruction
-]
-
-{ #category : #unclassified }
-OInstruction >> dissolveSplicing: instructions [
-	| last |
-	last := instructions last.
-	prev next: instructions.
-	instructions prev: prev.
-	last next: next.
-	next prev: last.
-	prev := next := nil.
-	self operandsDo: [:instruction | instruction removeUse: self]
 ]
 
 { #category : #unclassified }
@@ -467,6 +442,12 @@ OInstruction >> realReverseDo: aBlock [
 ]
 
 { #category : #unclassified }
+OInstruction >> remove [
+	prev afterConnect: next.
+	prev := next := nil
+]
+
+{ #category : #unclassified }
 OInstruction >> removeUse: instruction [
 	firstUse instruction == instruction
 		ifTrue: [firstUse := firstUse nextUse]
@@ -511,7 +492,7 @@ OInstruction >> replaceUsesOf: value with: instruction [
 OInstruction >> replaceWithCopyOf: value [
 	| instruction |
 	instruction := ((value isUsedOnlyBy: self) andNot: [value isPhi])
-		ifTrue: [value untie]
+		ifTrue: [value remove]
 		ifFalse: [value newCopy].
 	self dissolveReplacingWith: instruction.
 	^instruction
@@ -528,20 +509,13 @@ OInstruction >> reverseDo: aBlock [
 ]
 
 { #category : #unclassified }
-OInstruction >> spliceReplacing: anInstruction [
-	anInstruction dissolveSplicing: self
+OInstruction >> successorsDo: aBlock [
+	
 ]
 
 { #category : #unclassified }
 OInstruction >> targets [
 	^OrderedCollection new
-]
-
-{ #category : #unclassified }
-OInstruction >> untie [
-	prev next: next.
-	next prev: prev.
-	prev := next := nil
 ]
 
 { #category : #unclassified }
