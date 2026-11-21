@@ -154,6 +154,7 @@ TEST_CASE("SmallInteger arithmetic and nil tests run natively", "[run]")
         {"times", 42},
         {"smiTimes", 42},
         {"largeProduct", 503096068},
+        {"printsLargeProducts", 58},
         {"modulo", 4},
         {"floatTimesInteger", 10},
         {"answerIfNotNil", 6},
