@@ -5,10 +5,9 @@
 
 Class {
 	#name : #OBasicBlock,
-	#superclass : #Object,
+	#superclass : #OBeginInstruction,
 	#instVars : [
-		'firstInstruction',
-		'lastInstruction',
+		'end',
 		'predecessors'
 	],
 	#category : #IR
@@ -31,12 +30,12 @@ OBasicBlock >> activationRecord [
 
 { #category : #unclassified }
 OBasicBlock >> add: instruction [
-	^lastInstruction beforeInsert: instruction
+	^end beforeInsert: instruction
 ]
 
 { #category : #unclassified }
 OBasicBlock >> addFront: instruction [
-	^firstInstruction afterInsert: instruction
+	^self afterInsert: instruction
 ]
 
 { #category : #unclassified }
@@ -102,6 +101,11 @@ OBasicBlock >> asReversePostOrderInstructionsCollection [
 		instructionsWithReversePostOrderSuccessorsDo: [:inst | collection
 			add: inst].
 	^collection
+]
+
+{ #category : #accessing }
+OBasicBlock >> basicBlock [
+	^self
 ]
 
 { #category : #unclassified }
@@ -233,7 +237,7 @@ OBasicBlock >> endWithJumpTrueTo: target skipping: skipped if: condition [
 
 { #category : #unclassified }
 OBasicBlock >> firstInstruction [
-	^firstInstruction next
+	^next
 ]
 
 { #category : #unclassified }
@@ -288,15 +292,16 @@ OBasicBlock >> indexOf: anInstruction [
 
 { #category : #unclassified }
 OBasicBlock >> initialize [
-	firstInstruction := OInstruction empty.
-	lastInstruction := firstInstruction next.
+	next := OEndInstruction new prev: self.
+	end := next.
 	predecessors := OrderedCollection new
 ]
 
 { #category : #unclassified }
 OBasicBlock >> initializeWith: anInstruction [
-	firstInstruction := anInstruction cutPrevious.
-	lastInstruction := firstInstruction last next.
+	next := anInstruction.
+	anInstruction prev: self.
+	end := self last next.
 	predecessors := OrderedCollection new
 ]
 
@@ -377,13 +382,13 @@ OBasicBlock >> instructionsAsCollection [
 
 { #category : #unclassified }
 OBasicBlock >> instructionsDo: aBlock [
-	^firstInstruction do: aBlock
+	^next do: aBlock
 ]
 
 { #category : #unclassified }
 OBasicBlock >> instructionsSelect: condition thenDo: aBlock [
-	^firstInstruction
-		do: [:next | (condition value: next) ifTrue: [aBlock value: next]]
+	^next
+		do: [:instruction | (condition value: instruction) ifTrue: [aBlock value: instruction]]
 ]
 
 { #category : #unclassified }
@@ -457,7 +462,7 @@ OBasicBlock >> lastBlock [
 
 { #category : #unclassified }
 OBasicBlock >> lastInstruction [
-	^lastInstruction prev
+	^end prev
 ]
 
 { #category : #unclassified }
@@ -468,8 +473,8 @@ OBasicBlock >> lastPhi [
 { #category : #unclassified }
 OBasicBlock >> lastValue [
 	| last |
-	last := lastInstruction lastValue.
-	^last = firstInstruction
+	last := end lastValue.
+	^last = self
 		ifTrue: [predecessors size = 1 ifTrue: [predecessors first lastValue]]
 		ifFalse: [last]
 ]
@@ -580,9 +585,9 @@ OBasicBlock >> printAllNamed [
 
 { #category : #unclassified }
 OBasicBlock >> printOn: aStream [
-	aStream
-		nextPutAll: '<=== ' , self name , String cr , firstInstruction asString
-			, '===>'
+	aStream nextPutAll: '<=== ' , self name , String cr.
+	super printOn: aStream.
+	aStream nextPutAll: '===>'
 ]
 
 { #category : #unclassified }
@@ -596,7 +601,7 @@ OBasicBlock >> printOn: aStream using: names [
 				nextPutAll: (names at: pred ifAbsent: 'missing') , ' | '].
 		aStream nextPutAll: (names at: predecessors last ifAbsent: 'missing')].
 	aStream
-		nextPutAll: '/' , String cr , (firstInstruction printStringUsing: names)
+		nextPutAll: '/' , String cr , (self printStringUsing: names)
 			, '===>'
 ]
 
@@ -643,7 +648,7 @@ OBasicBlock >> split [
 OBasicBlock >> splitAfter: anInstruction [
 	| next |
 	next := self class newStartingWith: anInstruction next.
-	lastInstruction := anInstruction cutFollowing.
+	end := anInstruction cutFollowing.
 	next replaceAsPredecessor: self.
 	^next
 ]
@@ -690,7 +695,7 @@ OBasicBlock >> splitIncomingCriticalEdges [
 
 { #category : #unclassified }
 OBasicBlock >> successors [
-	^lastInstruction prev targets
+	^end prev targets
 ]
 
 { #category : #unclassified }
@@ -755,7 +760,7 @@ OBasicBlock >> updatePredecessors [
 
 { #category : #unclassified }
 OBasicBlock >> usesResultOf: anInstruction [
-	firstInstruction
+	next
 		detect: [:instruction | instruction usesResultOf: anInstruction]
 		ifNone: [^false].
 	^true
@@ -765,7 +770,7 @@ OBasicBlock >> usesResultOf: anInstruction [
 OBasicBlock >> verifyAllInstructionsSanity [
 	self withSuccessorsDo: [:block | | forward current backwards |
 		forward := OrderedCollection new.
-		current := block instVarNamed: #firstInstruction.
+		current := block.
 		[current == nil] whileFalse: [
 			forward add: current.
 			current := current next].

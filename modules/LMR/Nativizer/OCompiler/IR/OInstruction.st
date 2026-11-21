@@ -15,16 +15,6 @@ Class {
 }
 
 { #category : #unclassified }
-OInstruction class >> empty [
-	| begin last |
-	begin := OBeginInstruction new.
-	last := OEndInstruction new.
-	begin next: last.
-	last prev: begin.
-	^begin
-]
-
-{ #category : #unclassified }
 OInstruction >> acceptVisitor: aVisitor [
 	| following current |
 	current := self.
@@ -107,6 +97,11 @@ OInstruction >> basicPrintString [
 	^self primitivePrintString
 ]
 
+{ #category : #accessing }
+OInstruction >> basicBlock [
+	^prev basicBlock
+]
+
 { #category : #unclassified }
 OInstruction >> beforeInsert: anInstruction [
 	anInstruction next: self.
@@ -133,15 +128,6 @@ OInstruction >> cutFollowing [
 	end prev: self.
 	next := end.
 	^end
-]
-
-{ #category : #unclassified }
-OInstruction >> cutPrevious [
-	| begin |
-	begin := OBeginInstruction new.
-	begin next: self.
-	prev := begin.
-	^begin
 ]
 
 { #category : #unclassified }
