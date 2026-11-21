@@ -4,7 +4,7 @@
 "
 
 Class {
-	#name : #OptimizingPhiSimplification,
+	#name : #OptimizingParameterSimplification,
 	#superclass : #Object,
 	#instVars : [
 		'marks'
@@ -13,27 +13,27 @@ Class {
 }
 
 { #category : #unclassified }
-OptimizingPhiSimplification class >> new [
+OptimizingParameterSimplification class >> new [
 	^self basicNew initialize
 ]
 
 { #category : #unclassified }
-OptimizingPhiSimplification >> initialize [
+OptimizingParameterSimplification >> initialize [
 	marks := Set new
 ]
 
 { #category : #unclassified }
-OptimizingPhiSimplification >> isMarked: instruction [
+OptimizingParameterSimplification >> isMarked: instruction [
 	^marks includes: instruction
 ]
 
 { #category : #unclassified }
-OptimizingPhiSimplification >> mark: instruction [
+OptimizingParameterSimplification >> mark: instruction [
 	^marks add: instruction
 ]
 
 { #category : #unclassified }
-OptimizingPhiSimplification >> process: aBasicBlock [
+OptimizingParameterSimplification >> process: aBasicBlock [
 	| instruction |
 	instruction := aBasicBlock firstInstruction.
 	[instruction isBlockParameter] whileTrue: [| next |
@@ -43,13 +43,13 @@ OptimizingPhiSimplification >> process: aBasicBlock [
 ]
 
 { #category : #unclassified }
-OptimizingPhiSimplification >> processFrom: firstBlock [
+OptimizingParameterSimplification >> processFrom: firstBlock [
 	firstBlock instructionsWithSuccessorsDo: [:inst | self mark: inst].
 	firstBlock reversePostOrderDo: [:block | self process: block]
 ]
 
 { #category : #unclassified }
-OptimizingPhiSimplification >> simplify: aParameter [
+OptimizingParameterSimplification >> simplify: aParameter [
 	| vars |
 	vars := aParameter variables.
 	vars size to: 1 by: -1 do: [:i | | var |

@@ -32,6 +32,11 @@ OptimizingNativizer >> abi: anAbi [
 	abi := anAbi
 ]
 
+{ #category : #unclassified }
+OptimizingNativizer >> eliminateDeadParameters [
+	OptimizingParameterSimplification new processFrom: firstBlock
+]
+
 { #category : #accessing }
 OptimizingNativizer >> environment: aNativizationEnvironment [
 	environment := aNativizationEnvironment.
@@ -121,11 +126,6 @@ OptimizingNativizer >> defaultInlinedMethods [
 ]
 
 { #category : #unclassified }
-OptimizingNativizer >> eliminateDeadPhis [
-	OptimizingPhiSimplification new processFrom: firstBlock
-]
-
-{ #category : #unclassified }
 OptimizingNativizer >> enforceTwoAddressCodeUsing: allocation [
 	| enforcer |
 	enforcer := OptimizingTwoAddressEnforcer new
@@ -211,7 +211,7 @@ OptimizingNativizer >> nativize [
 		simplifyCFG;
 		removeRedundantCode;
 		simplifyCFG;
-		eliminateDeadPhis;
+		eliminateDeadParameters;
 		splitCriticalEdges.
 	allocation := self allocate.
 	self

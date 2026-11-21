@@ -149,7 +149,7 @@ OptimizingVariableBinder >> doBindingFrom: firstBlock [
 	firstBlock reversePostOrderDo: [:block | 
 		currentBlock := block.
 		block firstInstruction acceptVisitor: self].
-	self resolvePendingReads; rewritePhis
+	self resolvePendingReads; rewriteParameters
 ]
 
 { #category : #unclassified }
@@ -327,7 +327,7 @@ OptimizingVariableBinder >> resolveSelf: aReadVariable [
 ]
 
 { #category : #unclassified }
-OptimizingVariableBinder >> rewritePhis [
+OptimizingVariableBinder >> rewriteParameters [
 	pendingParameters do: [:association | | parameter block name |
 		parameter := association key.
 		block := association value.
