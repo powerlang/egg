@@ -946,3 +946,8 @@ Memory >> youngBase [
 Memory >> youngLimit [
 	^youngLimit
 ]
+
+{ #category : #accessing }
+Memory class >> largeThreshold [
+	^LargeThreshold
+]
