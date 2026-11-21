@@ -97,7 +97,7 @@ OptimizingVariableBinder >> definitionOf: name [
 OptimizingVariableBinder >> definitionOf: name before: block [
 	| instruction current |
 	instruction := block firstInstruction.
-	[instruction isPhi] whileTrue: [
+	[instruction isBlockParameter] whileTrue: [
 		(parameterNames at: instruction ifAbsent: nil) = name ifTrue: [^instruction].
 		instruction := instruction next].
 	current := block.

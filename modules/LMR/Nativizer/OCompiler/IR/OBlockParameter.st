@@ -101,7 +101,7 @@ OBlockParameter >> initialize [
 ]
 
 { #category : #unclassified }
-OBlockParameter >> isPhi [
+OBlockParameter >> isBlockParameter [
 	^true
 ]
 

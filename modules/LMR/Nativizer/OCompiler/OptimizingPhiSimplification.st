@@ -36,7 +36,7 @@ OptimizingPhiSimplification >> mark: instruction [
 OptimizingPhiSimplification >> process: aBasicBlock [
 	| instruction |
 	instruction := aBasicBlock firstInstruction.
-	[instruction isPhi] whileTrue: [| next |
+	[instruction isBlockParameter] whileTrue: [| next |
 		next := instruction next.
 		self simplify: instruction.
 		instruction := next]

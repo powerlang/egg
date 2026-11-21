@@ -191,6 +191,11 @@ OInstruction >> insertPushBefore: anInstruction [
 ]
 
 { #category : #unclassified }
+OInstruction >> isBlockParameter [
+	^false
+]
+
+{ #category : #unclassified }
 OInstruction >> isBlockStart [
 	^false
 ]
@@ -248,11 +253,6 @@ OInstruction >> isLoadImplicit [
 
 { #category : #unclassified }
 OInstruction >> isMessageSend [
-	^false
-]
-
-{ #category : #unclassified }
-OInstruction >> isPhi [
 	^false
 ]
 
@@ -485,7 +485,7 @@ OInstruction >> replaceUsesBy: user with: instruction [
 { #category : #unclassified }
 OInstruction >> replaceWithCopyOf: value [
 	| instruction |
-	instruction := ((value isUsedOnlyBy: self) andNot: [value isPhi])
+	instruction := ((value isUsedOnlyBy: self) andNot: [value isBlockParameter])
 		ifTrue: [value remove]
 		ifFalse: [value newCopy].
 	self dissolveReplacingWith: instruction.

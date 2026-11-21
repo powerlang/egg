@@ -420,7 +420,7 @@ OBasicBlock >> isEmptyJump [
 { #category : #unclassified }
 OBasicBlock >> isEmptyPhiBranch [
 	self instructionsDo: [:instruction | | empty |
-		empty := instruction isPhi and: [| next |
+		empty := instruction isBlockParameter and: [| next |
 			next := instruction next.
 			next isConditionalJump
 				and: [next variable == instruction and: [instruction isUsedJustOnce]]].
@@ -493,7 +493,7 @@ OBasicBlock >> parameters [
 	| result |
 	result := OrderedCollection new.
 	self
-		instructionsDo: [:instr | instr isPhi
+		instructionsDo: [:instr | instr isBlockParameter
 			ifTrue: [result add: instr]
 			ifFalse: [^result]]
 ]
@@ -501,7 +501,7 @@ OBasicBlock >> parameters [
 { #category : #unclassified }
 OBasicBlock >> parametersDo: aBlock [
 	self
-		instructionsDo: [:instr | instr isPhi
+		instructionsDo: [:instr | instr isBlockParameter
 			ifTrue: [aBlock value: instr]
 			ifFalse: [^self]]
 ]
@@ -663,7 +663,7 @@ OBasicBlock >> splitEdgeTo: block [
 
 { #category : #unclassified }
 OBasicBlock >> splitIncomingCriticalEdges [
-	(self hasMultiplePredecessors or: [self firstInstruction isPhi]) ifTrue: [
+	(self hasMultiplePredecessors or: [self firstInstruction isBlockParameter]) ifTrue: [
 		predecessors
 			do: [:pred | pred hasMultipleSuccessors ifTrue: [pred splitEdgeTo: self]]]
 ]
@@ -701,7 +701,7 @@ OBasicBlock >> unifyReturns [
 	extra size = 0 ifTrue: [^self].
 	ret := last lastInstruction.
 	prev := ret prev.
-	(prev isPhi and: prev = last firstInstruction)
+	(prev isBlockParameter and: prev = last firstInstruction)
 		ifTrue: [
 			end := last.
 			parameter := prev]

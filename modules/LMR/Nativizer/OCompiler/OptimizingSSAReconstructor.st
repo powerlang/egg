@@ -69,7 +69,7 @@ OptimizingSSAReconstructor >> reconstructSSA [
 	uses := variable allUses.
 	uses do: [:use | | search block def user |
 		user := use user.
-		user isPhi
+		user isBlockParameter
 			ifTrue: [
 				block := use name.
 				search := use name lastInstruction]

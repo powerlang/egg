@@ -286,7 +286,7 @@ OptimizingRegisterAllocator >> insertCopyToR: anInstruction before: inst [
 { #category : #unclassified }
 OptimizingRegisterAllocator >> insertLoadBefore: use at: block changing: operand [
 	| stack load range definition |
-	use isPhi ifTrue: [
+	use isBlockParameter ifTrue: [
 		range := self liveRangeOf: use.
 		range beSpilled.
 		^self].
@@ -329,7 +329,7 @@ OptimizingRegisterAllocator >> insertPush: anInstruction before: inst [
 OptimizingRegisterAllocator >> insertStoreAfter: definition at: block [
 	| stack store range |
 	unifiedLiveRanges removeKey: definition ifAbsent: [].
-	definition isPhi ifTrue: [^self].
+	definition isBlockParameter ifTrue: [^self].
 	stack := used at: abi regFP.
 	store := OTernaryOperation
 		receiver: stack anyDefinition
@@ -497,7 +497,7 @@ OptimizingRegisterAllocator >> usedRangeLessAccessed [
 	| ranges |
 	ranges := (used copy removeKey: abi regFP) values asOrderedCollection.
 	^ranges
-		min: [:range | (range allDefinitions , range allUses reject: #isPhi) size]
+		min: [:range | (range allDefinitions , range allUses reject: #isBlockParameter) size]
 ]
 
 { #category : #unclassified }
