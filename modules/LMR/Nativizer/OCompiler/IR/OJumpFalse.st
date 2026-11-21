@@ -40,8 +40,8 @@ OJumpFalse >> primitivePrintString [
 { #category : #unclassified }
 OJumpFalse >> printStringUsing: names [
 	^'jump false ' , (names at: variable ifAbsent: ['missing']) , ' to '
-		, (names at: target ifAbsent: 'missing')
+		, (names at: target ifAbsent: 'missing') , (self printArgumentsTo: target using: names)
 		, ' or fall to '
-		, (names at: implicitTarget ifAbsent: 'missing')
+		, (names at: implicitTarget ifAbsent: 'missing') , (self printArgumentsTo: implicitTarget using: names)
 ]
 

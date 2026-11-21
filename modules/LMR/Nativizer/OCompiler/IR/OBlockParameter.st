@@ -139,6 +139,11 @@ OBlockParameter >> printEdge: aBasicBlock using: names [
 	^(names at: aBasicBlock ifAbsent: ['missing']) , '->' , (names at: operand ifAbsent: ['missing'])
 ]
 
+{ #category : #printing }
+OBlockParameter >> printForwardOn: aStream using: names [
+	next printForwardOn: aStream using: names
+]
+
 { #category : #unclassified }
 OBlockParameter >> printStringUsing: names [
 	| sources |

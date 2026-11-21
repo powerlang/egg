@@ -101,9 +101,24 @@ OJump >> primitivePrintString [
 	^'{jump}'
 ]
 
+{ #category : #printing }
+OJump >> printArgumentsTo: aBasicBlock using: names [
+	| passed stream |
+	passed := self argumentsTo: aBasicBlock.
+	passed isEmpty ifTrue: [^''].
+	stream := '' writeStream.
+	stream nextPut: $(.
+	passed
+		do: [:value | | name |
+			name := names at: value ifAbsent: ['missing'].
+			stream nextPutAll: name]
+		separatedBy: [stream nextPutAll: ', '].
+	^stream nextPut: $); contents
+]
+
 { #category : #unclassified }
 OJump >> printStringUsing: names [
-	^'jump to ' , (names at: target)
+	^'jump to ' , (names at: target) , (self printArgumentsTo: target using: names)
 ]
 
 { #category : #unclassified }

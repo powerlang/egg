@@ -576,8 +576,10 @@ OBasicBlock >> printOn: aStream using: names [
 			do: [:pred | aStream
 				nextPutAll: (names at: pred ifAbsent: 'missing') , ' | '].
 		aStream nextPutAll: (names at: predecessors last ifAbsent: 'missing')].
+	aStream nextPutAll: '/'.
+	self parameters do: [:parameter | aStream nextPutAll: ' ' , (names at: parameter ifAbsent: ['missing'])].
 	aStream
-		nextPutAll: '/' , String cr , (self printStringUsing: names)
+		nextPutAll: String cr , (self printStringUsing: names)
 			, '===>'
 ]
 
