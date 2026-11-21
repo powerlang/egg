@@ -159,14 +159,6 @@ OInstruction >> do: aBlock [
 ]
 
 { #category : #unclassified }
-OInstruction >> firstNonPhi [
-	| current |
-	current := self.
-	[current isPhi] whileTrue: [current := current next].
-	^current
-]
-
-{ #category : #unclassified }
 OInstruction >> firstUse [
 	^firstUse
 ]
@@ -307,14 +299,6 @@ OInstruction >> isUsedOnlyBy: instruction [
 { #category : #unclassified }
 OInstruction >> last [
 	^next last
-]
-
-{ #category : #unclassified }
-OInstruction >> lastPhi [
-	| current |
-	current := self.
-	[current next isPhi] whileTrue: [current := current next].
-	^current
 ]
 
 { #category : #unclassified }

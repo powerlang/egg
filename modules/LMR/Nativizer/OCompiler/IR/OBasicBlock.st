@@ -237,11 +237,6 @@ OBasicBlock >> firstInstruction [
 ]
 
 { #category : #unclassified }
-OBasicBlock >> firstNonPhi [
-	^self firstInstruction firstNonPhi
-]
-
-{ #category : #unclassified }
 OBasicBlock >> fullyRemovePredecessor: predecessor [
 	self
 		removePredecessor: predecessor;
@@ -433,22 +428,6 @@ OBasicBlock >> isEmptyPhiBranch [
 ]
 
 { #category : #unclassified }
-OBasicBlock >> isOnlyPhiBranch [
-	| last |
-	last := self lastInstruction.
-	last isConditionalJump ifFalse: [^false].
-	self instructionsDo: [:instruction | 
-		instruction = last ifTrue: [^true].
-		instruction isPhi ifFalse: [^false]]
-]
-
-{ #category : #unclassified }
-OBasicBlock >> isPhiArgument: instruction [
-	self phisDo: [:phi | (phi variables includes: instruction) ifTrue: [^true]].
-	^false
-]
-
-{ #category : #unclassified }
 OBasicBlock >> iteratedDominanceFrontiersOf: blocks using: frontiers [
 	| result changed |
 	result := (blocks gather: [:block | frontiers at: block]) asSet.
@@ -469,11 +448,6 @@ OBasicBlock >> lastBlock [
 { #category : #unclassified }
 OBasicBlock >> lastInstruction [
 	^end prev
-]
-
-{ #category : #unclassified }
-OBasicBlock >> lastPhi [
-	^self firstInstruction lastPhi
 ]
 
 { #category : #unclassified }
@@ -530,17 +504,6 @@ OBasicBlock >> phisDo: aBlock [
 		instructionsDo: [:instr | instr isPhi
 			ifTrue: [aBlock value: instr]
 			ifFalse: [^self]]
-]
-
-{ #category : #unclassified }
-OBasicBlock >> phiValuesComingFrom: block [
-	^self phis collect: [:phi | phi atOperand: block]
-]
-
-{ #category : #unclassified }
-OBasicBlock >> phiWithArgument: instruction [
-	self phisDo: [:phi | (phi variables includes: instruction) ifTrue: [^phi]].
-	self error: 'not found'
 ]
 
 { #category : #unclassified }
@@ -616,14 +579,6 @@ OBasicBlock >> printOn: aStream using: names [
 	aStream
 		nextPutAll: '/' , String cr , (self printStringUsing: names)
 			, '===>'
-]
-
-{ #category : #unclassified }
-OBasicBlock >> realInstructionsDo: aBlock [
-	| current |
-	current := self firstInstruction.
-	[current isPhi] whileTrue: [current := current next].
-	current do: aBlock
 ]
 
 { #category : #'block parameters' }
