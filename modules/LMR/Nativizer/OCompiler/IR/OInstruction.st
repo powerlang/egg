@@ -133,7 +133,7 @@ OInstruction >> detect: aBlock ifNone: absentBlock [
 
 { #category : #unclassified }
 OInstruction >> dissolve [
-	self remove; operandsDo: [:instruction | instruction removeUse: self]
+	self remove; operandsDo: [:instruction | instruction removeUseBy: self]
 ]
 
 { #category : #unclassified }
@@ -146,7 +146,7 @@ OInstruction >> dissolveReplacingWith: anInstruction [
 	anInstruction afterConnect: next.
 	prev afterConnect: anInstruction.
 	prev := next := nil.
-	self operandsDo: [:instruction | instruction removeUse: self].
+	self operandsDo: [:instruction | instruction removeUseBy: self].
 	self replaceAllUsesWith: anInstruction
 ]
 
@@ -448,10 +448,12 @@ OInstruction >> remove [
 ]
 
 { #category : #unclassified }
-OInstruction >> removeUse: instruction [
-	firstUse instruction == instruction
-		ifTrue: [firstUse := firstUse nextUse]
-		ifFalse: [firstUse removeUse: instruction]
+OInstruction >> removeUse: anOperand [
+	firstUse == anOperand
+		ifTrue: [
+			firstUse := anOperand nextUse.
+			anOperand nextUse: nil]
+		ifFalse: [firstUse removeUse: anOperand]
 ]
 
 { #category : #unclassified }
@@ -459,6 +461,13 @@ OInstruction >> removeUse: instruction at: name [
 	(firstUse instruction == instruction and: [firstUse name = name])
 		ifTrue: [firstUse := firstUse nextUse]
 		ifFalse: [firstUse removeUse: instruction at: name]
+]
+
+{ #category : #unclassified }
+OInstruction >> removeUseBy: instruction [
+	firstUse instruction == instruction
+		ifTrue: [firstUse := firstUse nextUse]
+		ifFalse: [firstUse removeUseBy: instruction]
 ]
 
 { #category : #unclassified }
@@ -474,18 +483,14 @@ OInstruction >> replaceAllUsesWith: anInstruction [
 OInstruction >> replaceOperand: name with: instruction [
 	| previous |
 	previous := self atOperand: name.
-	previous removeUse: self.
+	previous removeUse: self at: name.
 	self atOperand: name put: instruction.
 	instruction addUse: self at: name
 ]
 
 { #category : #unclassified }
-OInstruction >> replaceUsesOf: value with: instruction [
-	self operandsDo: [:operand | 
-		operand = value ifTrue: [
-			operand
-				usesDo: [:use | use user = self
-					ifTrue: [use disolveReplacingWith: instruction]]]]
+OInstruction >> replaceUsesBy: user with: instruction [
+	firstUse ifNotNil: [firstUse replaceUsesBy: user with: instruction]
 ]
 
 { #category : #unclassified }

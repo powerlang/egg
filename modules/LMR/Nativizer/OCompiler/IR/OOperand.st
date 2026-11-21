@@ -46,13 +46,6 @@ OOperand >> definition [
 ]
 
 { #category : #unclassified }
-OOperand >> disolveReplacingWith: otherInstruction [
-	self definition removeUse: instruction.
-	instruction atOperand: name put: otherInstruction.
-	otherInstruction addUse: instruction at: name
-]
-
-{ #category : #unclassified }
 OOperand >> instruction [
 	^instruction
 ]
@@ -78,6 +71,11 @@ OOperand >> nextUse [
 ]
 
 { #category : #unclassified }
+OOperand >> nextUse: anOperand [
+	nextUse := anOperand
+]
+
+{ #category : #unclassified }
 OOperand >> printOn: aStream [
 	aStream
 		nextPutAll: '[op #' , name printString , '@' , instruction printString
@@ -85,10 +83,12 @@ OOperand >> printOn: aStream [
 ]
 
 { #category : #unclassified }
-OOperand >> removeUse: anInstruction [
-	nextUse instruction == anInstruction
-		ifTrue: [nextUse := nextUse nextUse]
-		ifFalse: [nextUse removeUse: anInstruction]
+OOperand >> removeUse: anOperand [
+	nextUse == anOperand
+		ifTrue: [
+			nextUse := anOperand nextUse.
+			anOperand nextUse: nil]
+		ifFalse: [nextUse removeUse: anOperand]
 ]
 
 { #category : #unclassified }
@@ -96,6 +96,13 @@ OOperand >> removeUse: anInstruction at: aName [
 	(nextUse instruction == anInstruction and: [nextUse name = aName])
 		ifTrue: [nextUse := nextUse nextUse]
 		ifFalse: [nextUse removeUse: anInstruction at: aName]
+]
+
+{ #category : #unclassified }
+OOperand >> removeUseBy: anInstruction [
+	nextUse instruction == anInstruction
+		ifTrue: [nextUse := nextUse nextUse]
+		ifFalse: [nextUse removeUseBy: anInstruction]
 ]
 
 { #category : #unclassified }
@@ -108,6 +115,21 @@ OOperand >> replaceAllUsesWith: otherInstruction [
 OOperand >> replaceUseWith: otherInstruction [
 	self DENY: otherInstruction class == OOperand.
 	instruction atOperand: name put: otherInstruction
+]
+
+{ #category : #unclassified }
+OOperand >> replaceUsesBy: user with: otherInstruction [
+	| following |
+	following := nextUse.
+	instruction == user ifTrue: [self transferUseTo: otherInstruction].
+	following ifNotNil: [following replaceUsesBy: user with: otherInstruction]
+]
+
+{ #category : #unclassified }
+OOperand >> transferUseTo: otherInstruction [
+	self definition removeUse: self.
+	instruction atOperand: name put: otherInstruction.
+	otherInstruction addUse: self
 ]
 
 { #category : #unclassified }

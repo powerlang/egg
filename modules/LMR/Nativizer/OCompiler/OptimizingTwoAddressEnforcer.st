@@ -21,20 +21,16 @@ OptimizingTwoAddressEnforcer >> allocation: aDictionary [
 { #category : #unclassified }
 OptimizingTwoAddressEnforcer >> convert: instruction copyingLeftInto: dest [
 	| load |
-	load := OUnaryOperation receiver: instruction left name: #copy.
-	instruction left addUse: load at: #receiver.
-	instruction beforeInsert: load; left: load.
+	load := instruction left newCopy.
+	instruction beforeInsert: load; replaceOperand: #left with: load.
 	allocation at: load put: dest
 ]
 
 { #category : #unclassified }
 OptimizingTwoAddressEnforcer >> convert: instruction copyingReceiverInto: dest [
 	| load |
-	load := OUnaryOperation receiver: instruction receiver name: #copy.
-	instruction receiver
-		addUse: load at: #receiver;
-		removeUse: instruction.
-	instruction beforeInsert: load; receiver: load.
+	load := instruction receiver newCopy.
+	instruction beforeInsert: load; replaceOperand: #receiver with: load.
 	allocation at: load put: dest
 ]
 
@@ -65,7 +61,7 @@ OptimizingTwoAddressEnforcer >> invertMinus: minus with: left with: right [
 	minus beforeInsert: negate.
 	allocation at: negate put: right.
 	minus right
-		removeUse: minus;
+		removeUseBy: minus;
 		addUse: negate at: #receiver.
 	negate addUse: minus at: #right.
 	minus right: negate; name: #'+'; swapOperands
@@ -83,7 +79,7 @@ OptimizingTwoAddressEnforcer >> visitBinaryWithConstant: instruction [
 
 { #category : #unclassified }
 OptimizingTwoAddressEnforcer >> visitBinaryWithVariable: instruction [
-	| left right dest temp |
+	| left right dest |
 	left := allocation at: instruction left.
 	right := allocation at: instruction right.
 	dest := allocation at: instruction ifAbsent: [^self].
@@ -95,10 +91,7 @@ OptimizingTwoAddressEnforcer >> visitBinaryWithVariable: instruction [
 		instruction name == #'-'
 			ifTrue: [^self invertMinus: instruction with: left with: right].
 		(#(+ bitAnd: bitOr: &  ) includes: instruction name)
-			ifTrue: [
-				temp := instruction left.
-				instruction left: instruction right.
-				^instruction right: temp]
+			ifTrue: [^instruction swapOperands]
 			ifFalse: [self halt]].
 	self convert: instruction copyingLeftInto: dest
 ]

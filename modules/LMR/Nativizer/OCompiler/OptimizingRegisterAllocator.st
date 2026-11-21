@@ -246,8 +246,7 @@ OptimizingRegisterAllocator >> insertLoadBefore: use at: block changing: operand
 	stack anyDefinition addUse: load at: #left.
 	use beforeInsert: load.
 	definition := operand definition.
-	operand replaceUseWith: load.
-	load addUse: use at: operand name.
+	operand transferUseTo: load.
 	range := self assureLiveRangeStartingAt: load.
 	range addUseFrom: use at: block.
 	self kill: range at: use.

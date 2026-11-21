@@ -222,7 +222,7 @@ OptimizingInstructionSelector >> sendGenericMessage: instruction [
 	new := arguments
 		collect: [:argument | self insertPush: argument before: instruction].
 	instruction arguments: new.
-	arguments do: [:argument | argument removeUse: instruction].
+	arguments do: [:argument | argument removeUseBy: instruction].
 	values do: [:value | (self tileOf: value) beUsed].
 	tile := self newTile: instruction.
 	self

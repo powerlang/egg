@@ -78,7 +78,7 @@ OptimizingSSAReconstructor >> reconstructSSA [
 				block := blocks at: user.
 				search := user prev].
 		def := self reachingDefinitionFrom: search at: block.
-		use disolveReplacingWith: def]
+		use transferUseTo: def]
 ]
 
 { #category : #initialization }

@@ -108,7 +108,7 @@ OptimizingInstructionFragmenter >> fragmentGenericMessage: instruction [
 		collect: [:argument | self insertPush: argument before: instruction].
 	instruction arguments: new.
 	arguments
-		do: [:argument | argument removeUse: instruction; dissolveIfUnused].
+		do: [:argument | argument removeUseBy: instruction; dissolveIfUnused].
 	firstBlock activationRecord haveFrame
 ]
 

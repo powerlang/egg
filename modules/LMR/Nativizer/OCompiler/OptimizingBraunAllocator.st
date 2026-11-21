@@ -296,9 +296,8 @@ OptimizingBraunAllocator >> insertReloadOf: value before: user [
 		right: index
 		name: #_basicAt:.
 	stack addUse: reload at: #left.
-	user
-		beforeInsert: reload;
-		replaceUsesOf: value with: reload.
+	user beforeInsert: reload.
+	value replaceUsesBy: user with: reload.
 	^reload
 ]
 
