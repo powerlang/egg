@@ -25,7 +25,7 @@ OptimizingCFGSimplifier >> cleanFrom: aBlock [
 
 { #category : #private }
 OptimizingCFGSimplifier >> dissolveParametersOf: aBasicBlock from: predecessor [
-	aBasicBlock parameters do: [:parameter | | value |
+	aBasicBlock parametersDo: [:parameter | | value |
 		value := parameter atOperand: predecessor.
 		parameter replaceAllUsesWith: value; dissolve]
 ]
@@ -37,10 +37,10 @@ OptimizingCFGSimplifier >> hoistBranchIn: succ to: pred [
 	branch := succ lastInstruction.
 	condition := branch variable.
 	succ
+		removePredecessor: pred;
 		parametersDo: [:parameter |
 			condition := parameter atOperand: pred.
-			parameter removeBlock: pred];
-		removePredecessor: pred.
+			parameter removeBlock: pred].
 	new := branch class
 		variable: condition
 		target: branch target
@@ -53,7 +53,7 @@ OptimizingCFGSimplifier >> hoistBranchIn: succ to: pred [
 
 { #category : #private }
 OptimizingCFGSimplifier >> link: aBasicBlock to: anotherBasicBlock [
-	anotherBasicBlock parametersDo: [:parameter | parameter addEdgeFrom: aBasicBlock]; addPredecessor: aBasicBlock
+	anotherBasicBlock parametersDo: [:parameter | parameter trackArgumentFrom: aBasicBlock]; addPredecessor: aBasicBlock
 ]
 
 { #category : #private }
@@ -117,7 +117,7 @@ OptimizingCFGSimplifier >> tryRemovingEmptyBlock: block [
 		(self wouldDuplicateEdgesOf: block into: following) ifTrue: [^false].
 		arguments := block lastInstruction argumentsTo: following.
 		following
-			parametersDo: [:parameter | parameter forgetEdgeFrom: block];
+			parametersDo: [:parameter | parameter untrackArgumentFrom: block];
 			removePredecessor: block.
 		block predecessors do: [:predecessor | | jump |
 			jump := predecessor lastInstruction.

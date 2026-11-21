@@ -47,6 +47,9 @@ OptimizingRegisterAllocator >> activationRecord [
 { #category : #unclassified }
 OptimizingRegisterAllocator >> addLiveRangesOf: block [
 	block
+		parametersDo: [:parameter | self
+			assureLiveRangeStartingAt: parameter
+			in: block];
 		instructionsDo: [:instruction | self
 			assureLiveRangeStartingAt: instruction
 			in: block]
@@ -72,7 +75,9 @@ OptimizingRegisterAllocator >> allocateLiveRanges [
 	firstBlock reversePostOrderDo: [:block | 
 		currentBlock := block.
 		self recalculateRegisterUsage.
-		block instructionsDo: [:inst | self allocateFor: inst].
+		block
+			parametersDo: [:inst | self allocateFor: inst];
+			instructionsDo: [:inst | self allocateFor: inst].
 		usedOut at: block put: used copy]
 ]
 
@@ -177,6 +182,7 @@ OptimizingRegisterAllocator >> computeLiveRanges [
 
 { #category : #unclassified }
 OptimizingRegisterAllocator >> computeLiveRangesOf: block [
+	block parametersDo: [:parameter | self visitBlockParameter: parameter].
 	block firstInstruction acceptVisitor: self
 ]
 
@@ -204,7 +210,7 @@ OptimizingRegisterAllocator >> copyArgumentsTo: aBasicBlock [
 	| parameters |
 	parameters := aBasicBlock parameters.
 	parameters isEmpty ifTrue: [^self].
-	parameters first blocks copy do: [:predecessor | self copyArgumentsOf: parameters from: predecessor]
+	aBasicBlock predecessors copy do: [:predecessor | self copyArgumentsOf: parameters from: predecessor]
 ]
 
 { #category : #unclassified }

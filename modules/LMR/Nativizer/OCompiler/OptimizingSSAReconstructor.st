@@ -34,15 +34,11 @@ OptimizingSSAReconstructor >> firstBlock: block [
 
 { #category : #initialization }
 OptimizingSSAReconstructor >> insertParameterAt: block [
-	^insertedParameters at: block ifAbsentPut: [| arguments parameter predecessors |
-		predecessors := block predecessors.
-		arguments := predecessors collect: [:pred | | search |
+	^insertedParameters at: block ifAbsentPut: [| arguments |
+		arguments := block predecessors collect: [:pred | | search |
 			search := pred lastInstruction.
 			self reachingDefinitionFrom: search at: pred].
-		parameter := OBlockParameter new.
-		block insertParameter: parameter.
-		arguments with: predecessors do: [:var :pred | parameter addVariable: var from: pred].
-		parameter]
+		block newParameterWith: arguments]
 ]
 
 { #category : #initialization }

@@ -9,7 +9,8 @@ Class {
 	#instVars : [
 		'end',
 		'predecessors',
-		'immediateDominator'
+		'immediateDominator',
+		'parameters'
 	],
 	#category : #IR
 }
@@ -27,11 +28,6 @@ OBasicBlock >> activationRecord [
 { #category : #unclassified }
 OBasicBlock >> add: instruction [
 	^end beforeInsert: instruction
-]
-
-{ #category : #unclassified }
-OBasicBlock >> addFront: instruction [
-	^self afterInsert: instruction
 ]
 
 { #category : #unclassified }
@@ -180,9 +176,9 @@ OBasicBlock >> computeLiveOutInto: liveOut andLiveInInto: liveIn [
 
 { #category : #unclassified }
 OBasicBlock >> dissolveIfUnreachable [
-	predecessors isEmpty ifTrue: [
-		self lastValue
-			ifNotNil: [:last | last reverseDo: [:instruction | instruction dissolve]]]
+	predecessors isEmpty ifFalse: [^self].
+	end lastValue reverseDo: [:instruction | instruction dissolve].
+	self parametersDo: [:parameter | parameter dissolve]
 ]
 
 { #category : #unclassified }
@@ -289,14 +285,15 @@ OBasicBlock >> indexOf: anInstruction [
 
 { #category : #'block parameters' }
 OBasicBlock >> indexOfParameter: aParameter [
-	^self parameters indexOf: aParameter
+	^parameters indexOf: aParameter
 ]
 
 { #category : #unclassified }
 OBasicBlock >> initialize [
 	next := OEndInstruction new prev: self.
 	end := next.
-	predecessors := OrderedCollection new
+	predecessors := OrderedCollection new.
+	parameters := OrderedCollection new
 ]
 
 { #category : #unclassified }
@@ -314,12 +311,6 @@ OBasicBlock >> inline: inlined replacing: aMessageSend [
 	inlined moveAllTo: self after: aMessageSend.
 	aMessageSend dissolve.
 	^join ifNil: [self]
-]
-
-{ #category : #'block parameters' }
-OBasicBlock >> insertParameter: aParameter [
-	self incomingJumps do: [:jump | (jump argumentsTo: self) addFirst: nil].
-	self addFront: aParameter
 ]
 
 { #category : #unclassified }
@@ -343,8 +334,7 @@ and: value2
 at: block2
 replacing: operation [
 	| parameter |
-	parameter := OBlockParameter new.
-	self insertParameter: parameter.
+	parameter := self newParameter.
 	parameter addVariable: value1 from: block1; addVariable: value2 from: block2.
 	operation replaceAllUsesWith: parameter; dissolve
 ]
@@ -370,7 +360,7 @@ OBasicBlock >> instructionsAfter: first withReversePostOrderSuccessorsDo: aBlock
 	first do: aBlock.
 	self withSuccessorsPostOrder
 		removeLast;
-		reverseDo: [:block | block instructionsDo: aBlock]
+		reverseDo: [:block | block parametersDo: aBlock; instructionsDo: aBlock]
 ]
 
 { #category : #unclassified }
@@ -404,27 +394,26 @@ OBasicBlock >> instructionsWithReversePostOrderSuccessorsDo: aBlock [
 
 { #category : #unclassified }
 OBasicBlock >> instructionsWithSuccessorsDo: aBlock [
-	self withSuccessorsDo: [:block | block instructionsDo: aBlock]
+	self withSuccessorsDo: [:block | block parametersDo: aBlock; instructionsDo: aBlock]
 ]
 
 { #category : #unclassified }
 OBasicBlock >> isEmptyBranch [
-	self instructionsDo: [:instruction | ^instruction isConditionalJump]
+	^parameters isEmpty and: [next isConditionalJump]
 ]
 
 { #category : #unclassified }
 OBasicBlock >> isEmptyJump [
-	self instructionsDo: [:instruction | ^instruction isUnconditionalJump]
+	^parameters isEmpty and: [next isUnconditionalJump]
 ]
 
 { #category : #unclassified }
 OBasicBlock >> isEmptyParameterBranch [
-	self instructionsDo: [:instruction | | empty |
-		empty := instruction isBlockParameter and: [| next |
-			next := instruction next.
-			next isConditionalJump
-				and: [next variable == instruction and: [instruction isUsedJustOnce]]].
-		^empty]
+	| parameter |
+	parameters size = 1 ifFalse: [^false].
+	parameter := parameters first.
+	^next isConditionalJump
+		and: [next variable == parameter and: [parameter isUsedJustOnce]]
 ]
 
 { #category : #unclassified }
@@ -454,9 +443,9 @@ OBasicBlock >> lastInstruction [
 OBasicBlock >> lastValue [
 	| last |
 	last := end lastValue.
-	^last = self
-		ifTrue: [predecessors size = 1 ifTrue: [predecessors first lastValue]]
-		ifFalse: [last]
+	last = self ifFalse: [^last].
+	parameters isEmpty ifFalse: [^parameters last].
+	^predecessors size = 1 ifTrue: [predecessors first lastValue]
 ]
 
 { #category : #unclassified }
@@ -485,25 +474,40 @@ OBasicBlock >> name [
 
 { #category : #'block parameters' }
 OBasicBlock >> newArguments [
-	^OrderedCollection new: self parameters size withAll: nil
+	^OrderedCollection new: parameters size withAll: nil
+]
+
+{ #category : #'block parameters' }
+OBasicBlock >> newParameter [
+	| parameter |
+	parameter := OBlockParameter new.
+	self incomingJumps do: [:jump | (jump argumentsTo: self) addFirst: nil].
+	parameters addFirst: parameter.
+	parameter basicBlock: self.
+	^parameter
+]
+
+{ #category : #'block parameters' }
+OBasicBlock >> newParameterWith: aCollection [
+	| parameter |
+	parameter := self newParameter.
+	aCollection with: predecessors do: [:value :block | parameter addVariable: value from: block].
+	^parameter
+]
+
+{ #category : #unclassified }
+OBasicBlock >> nextDetect: aBlock ifNone: absentBlock [
+	^parameters detect: aBlock ifNone: [next detect: aBlock ifNone: absentBlock]
 ]
 
 { #category : #unclassified }
 OBasicBlock >> parameters [
-	| result |
-	result := OrderedCollection new.
-	self
-		instructionsDo: [:instr | instr isBlockParameter
-			ifTrue: [result add: instr]
-			ifFalse: [^result]]
+	^parameters
 ]
 
 { #category : #unclassified }
 OBasicBlock >> parametersDo: aBlock [
-	self
-		instructionsDo: [:instr | instr isBlockParameter
-			ifTrue: [aBlock value: instr]
-			ifFalse: [^self]]
+	parameters copy do: aBlock
 ]
 
 { #category : #unclassified }
@@ -548,6 +552,9 @@ OBasicBlock >> printAllNamed [
 	vars := 0.
 	blocks := 0.
 	self reversePostOrderDo: [:block | 
+		block parametersDo: [:inst |
+			names at: inst put: 'v' , vars printString.
+			vars := vars + 1].
 		block instructionsDo: [:inst | 
 			names at: inst put: 'v' , vars printString.
 			vars := vars + 1].
@@ -577,7 +584,7 @@ OBasicBlock >> printOn: aStream using: names [
 				nextPutAll: (names at: pred ifAbsent: 'missing') , ' | '].
 		aStream nextPutAll: (names at: predecessors last ifAbsent: 'missing')].
 	aStream nextPutAll: '/'.
-	self parameters do: [:parameter | aStream nextPutAll: ' ' , (names at: parameter ifAbsent: ['missing'])].
+	parameters do: [:parameter | aStream nextPutAll: ' ' , (names at: parameter ifAbsent: ['missing'])].
 	aStream
 		nextPutAll: String cr , (self printStringUsing: names)
 			, '===>'
@@ -587,7 +594,8 @@ OBasicBlock >> printOn: aStream using: names [
 OBasicBlock >> removeParameter: aParameter [
 	| index |
 	index := self indexOfParameter: aParameter.
-	self incomingJumps do: [:jump | (jump argumentsTo: self) removeIndex: index]
+	self incomingJumps do: [:jump | (jump argumentsTo: self) removeIndex: index].
+	parameters removeIndex: index
 ]
 
 { #category : #unclassified }
@@ -604,11 +612,6 @@ OBasicBlock >> replacePredecessor: old with: new [
 { #category : #unclassified }
 OBasicBlock >> reversePostOrderDo: aBlock [
 	self withSuccessorsPostOrder reverseDo: [:block | aBlock value: block]
-]
-
-{ #category : #unclassified }
-OBasicBlock >> sortParameterEdges [
-	self parametersDo: [:parameter | parameter sortAfter: predecessors]
 ]
 
 { #category : #unclassified }
@@ -665,7 +668,7 @@ OBasicBlock >> splitEdgeTo: block [
 
 { #category : #unclassified }
 OBasicBlock >> splitIncomingCriticalEdges [
-	(self hasMultiplePredecessors or: [self parameters notEmpty]) ifTrue: [
+	(self hasMultiplePredecessors or: [parameters notEmpty]) ifTrue: [
 		predecessors
 			do: [:pred | pred hasMultipleSuccessors ifTrue: [pred splitEdgeTo: self]]]
 ]
@@ -703,20 +706,17 @@ OBasicBlock >> unifyReturns [
 	extra size = 0 ifTrue: [^self].
 	ret := last lastInstruction.
 	prev := ret prev.
-	(prev isBlockParameter and: prev = last firstInstruction)
+	(prev == last and: [last parameters size = 1])
 		ifTrue: [
 			end := last.
-			parameter := prev]
+			parameter := last parameters first]
 		ifFalse: [
 			end := last splitAfter: prev.
 			end addPredecessor: last.
 			jump := OJump to: end.
 			prev afterInsert: jump.
-			parameter := OBlockParameter new.
-			end insertParameter: parameter.
-			parameter
-				addVariable: ret source from: last;
-				addUse: ret at: #source.
+			parameter := end newParameterWith: {ret source}.
+			parameter addUse: ret at: #source.
 			ret source removeUse: ret at: #source.
 			ret source: parameter].
 	extra do: [:assoc | | tail block old |
@@ -736,14 +736,13 @@ OBasicBlock >> updatePredecessors [
 	self
 		postOrderDo: [:block | block cleanPredecessors];
 		postOrderDo: [:block | block
-			successorsDo: [:successor | successor addPredecessor: block]];
-		postOrderDo: [:block | block sortParameterEdges]
+			successorsDo: [:successor | successor addPredecessor: block]]
 ]
 
 { #category : #unclassified }
 OBasicBlock >> usesResultOf: anInstruction [
-	next
-		detect: [:instruction | instruction usesResultOf: anInstruction]
+	self
+		nextDetect: [:instruction | instruction usesResultOf: anInstruction]
 		ifNone: [^false].
 	^true
 ]

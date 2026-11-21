@@ -20,7 +20,7 @@ OptimizingUsesVerifier >> verify: definition usedBy: user [
 OptimizingUsesVerifier >> verifyFrom: firstBlock [
 	firstBlock
 		instructionsWithSuccessorsDo: [:instruction | instruction
-			acceptVisitor: self]
+			basicAcceptVisitor: self]
 ]
 
 { #category : #unclassified }

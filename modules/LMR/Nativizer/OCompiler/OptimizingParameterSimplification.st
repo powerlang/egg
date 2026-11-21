@@ -34,7 +34,7 @@ OptimizingParameterSimplification >> mark: instruction [
 
 { #category : #unclassified }
 OptimizingParameterSimplification >> process: aBasicBlock [
-	aBasicBlock parameters do: [:parameter | self simplify: parameter]
+	aBasicBlock parametersDo: [:parameter | self simplify: parameter]
 ]
 
 { #category : #unclassified }
@@ -45,10 +45,8 @@ OptimizingParameterSimplification >> processFrom: firstBlock [
 
 { #category : #unclassified }
 OptimizingParameterSimplification >> simplify: aParameter [
-	| vars |
-	vars := aParameter variables.
-	vars size to: 1 by: -1 do: [:i | | var |
-		var := vars at: i.
-		((self isMarked: var) or: [aParameter isUntied]) ifFalse: [aParameter removeVariable: var at: i]]
+	(aParameter variables conform: [:var | self isMarked: var]) ifTrue: [^self].
+	self DENY: aParameter isUsed.
+	aParameter dissolve
 ]
 

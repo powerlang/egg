@@ -40,8 +40,7 @@ OptimizingVariableBinder >> define: aParameter named: aString in: aBasicBlock [
 OptimizingVariableBinder >> insertParameterOf: name at: block [
 	| parameter |
 	(self definitionOf: name in: block) ifNotNil: [^self].
-	parameter := OBlockParameter new.
-	block insertParameter: parameter.
+	parameter := block newParameter.
 	parameterNames at: parameter put: name.
 	pendingParameters add: parameter -> block.
 	self define: parameter as: name in: block
@@ -332,7 +331,7 @@ OptimizingVariableBinder >> rewriteParameters [
 		name := parameterNames at: parameter.
 		(parameter livesAfter: parameter orOutOf: block)
 			ifTrue: [self define: parameter named: name in: block]
-			ifFalse: [parameter dissolve]]
+			ifFalse: [parameter remove]]
 ]
 
 { #category : #unclassified }
