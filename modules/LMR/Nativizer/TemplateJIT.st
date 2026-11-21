@@ -477,14 +477,24 @@ TemplateJIT >> inlinesBinary: anSMessage [
 
 { #category : #services }
 TemplateJIT >> emitWriteBarrier [
-	| saving |
-	saving := method isFrameless and: [assembler callPushesReturnAddress not].
-	saving ifTrue: [assembler popT; saveReturnAddress; pushT].
+	method isFrameless ifTrue: [^self emitWriteBarrierInFramelessMethod].
+	self emitWriteBarrierInFramedMethod
+]
+
+{ #category : #services }
+TemplateJIT >> emitWriteBarrierInFramelessMethod [
+	"no frame to reload M from on return, nor a stacked return address on arm64"
+	assembler popT; pushM; saveReturnAddress; pushT.
+	self emitWriteBarrierInFramedMethod.
+	assembler restoreReturnAddress; popM
+]
+
+{ #category : #services }
+TemplateJIT >> emitWriteBarrierInFramedMethod [
 	assembler
 		loadAwithGlobal: #WriteBarrier;
 		callIndirectA;
-		discardArguments: 1.
-	saving ifTrue: [assembler restoreReturnAddress]
+		discardArguments: 1
 ]
 
 { #category : #accessing }
