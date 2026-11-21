@@ -1073,7 +1073,7 @@ InlineMessageLinker >> assembleTransferControlDiscardingLastArgTo [
 	#_transferControlDiscardingLastArgTo:.
 	assembler
 		restoreCallerFrame;
-		popSPindirect;
+		dropArgumentUnderReturnAddress;
 		loadMwithA;
 		jumpToMindex: 1
 ]

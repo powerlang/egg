@@ -2034,3 +2034,8 @@ GenericAssembler >> saveReturnAddress [
 GenericAssembler >> restoreReturnAddress [
 	codegen restoreReturnAddress
 ]
+
+{ #category : #'push/pop' }
+GenericAssembler >> dropArgumentUnderReturnAddress [
+	self popSPindirect
+]

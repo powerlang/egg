@@ -1205,3 +1205,8 @@ ARM64TemplateAssembler >> xorFPwithFP [
 ARM64TemplateAssembler >> xorRwithA [
 	codegen emit: 16rCA010000
 ]
+
+{ #category : #'push/pop' }
+ARM64TemplateAssembler >> dropArgumentUnderReturnAddress [
+	self dropTos: 1
+]
