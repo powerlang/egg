@@ -44,7 +44,7 @@ OBlockParameter >> atOperand: name put: instruction [
 
 { #category : #unclassified }
 OBlockParameter >> basicAcceptVisitor: aVisitor [
-	^aVisitor visitPhi: self
+	^aVisitor visitBlockParameter: self
 ]
 
 { #category : #unclassified }

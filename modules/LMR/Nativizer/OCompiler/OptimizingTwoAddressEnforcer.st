@@ -97,6 +97,10 @@ OptimizingTwoAddressEnforcer >> visitBinaryWithVariable: instruction [
 ]
 
 { #category : #unclassified }
+OptimizingTwoAddressEnforcer >> visitBlockParameter: instruction [
+]
+
+{ #category : #unclassified }
 OptimizingTwoAddressEnforcer >> visitJump: instruction [
 	
 ]
@@ -128,11 +132,6 @@ OptimizingTwoAddressEnforcer >> visitMessageSend: instruction [
 
 { #category : #unclassified }
 OptimizingTwoAddressEnforcer >> visitNullary: instruction [
-	
-]
-
-{ #category : #unclassified }
-OptimizingTwoAddressEnforcer >> visitPhi: instruction [
 	
 ]
 

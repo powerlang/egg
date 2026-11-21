@@ -392,6 +392,10 @@ OptimizingInstructionFragmenter >> visitBinaryWithVariable: instruction [
 ]
 
 { #category : #unclassified }
+OptimizingInstructionFragmenter >> visitBlockParameter: instruction [
+]
+
+{ #category : #unclassified }
 OptimizingInstructionFragmenter >> visitDefineArgument: instruction [
 	
 ]
@@ -426,11 +430,6 @@ OptimizingInstructionFragmenter >> visitMessageSend: instruction [
 	| selector |
 	selector := self selectorFor: instruction selector.
 	self perform: selector with: instruction
-]
-
-{ #category : #unclassified }
-OptimizingInstructionFragmenter >> visitPhi: instruction [
-	
 ]
 
 { #category : #unclassified }

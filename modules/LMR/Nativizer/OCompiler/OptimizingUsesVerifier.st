@@ -36,6 +36,12 @@ OptimizingUsesVerifier >> visitBinaryWithVariable: instruction [
 ]
 
 { #category : #unclassified }
+OptimizingUsesVerifier >> visitBlockParameter: instruction [
+	instruction variables
+		do: [:operation | self verify: operation usedBy: instruction]
+]
+
+{ #category : #unclassified }
 OptimizingUsesVerifier >> visitJump: instruction [
 	
 ]
@@ -68,12 +74,6 @@ OptimizingUsesVerifier >> visitMessageSend: instruction [
 { #category : #unclassified }
 OptimizingUsesVerifier >> visitNullary: instruction [
 	
-]
-
-{ #category : #unclassified }
-OptimizingUsesVerifier >> visitPhi: instruction [
-	instruction variables
-		do: [:operation | self verify: operation usedBy: instruction]
 ]
 
 { #category : #unclassified }

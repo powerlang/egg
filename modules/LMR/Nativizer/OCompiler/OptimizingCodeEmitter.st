@@ -831,6 +831,10 @@ OptimizingCodeEmitter >> visitBinaryWithVariable: instruction [
 ]
 
 { #category : #unclassified }
+OptimizingCodeEmitter >> visitBlockParameter: aParameter [
+]
+
+{ #category : #unclassified }
 OptimizingCodeEmitter >> visitBranch: branch comparing: aBoolean [
 	| reg |
 	(self jumpWasAssembledInComparison: branch) ifTrue: [^self].
@@ -895,11 +899,6 @@ OptimizingCodeEmitter >> visitNullary: instruction [
 	| selector |
 	selector := #assemble , (self selectorFor: instruction) , #':'.
 	self perform: selector asSymbol with: instruction
-]
-
-{ #category : #unclassified }
-OptimizingCodeEmitter >> visitPhi: aParameter [
-	
 ]
 
 { #category : #visiting }

@@ -348,6 +348,10 @@ OptimizingVariableBinder >> visitBinaryWithVariable: instruction [
 ]
 
 { #category : #unclassified }
+OptimizingVariableBinder >> visitBlockParameter: aParameter [
+]
+
+{ #category : #unclassified }
 OptimizingVariableBinder >> visitDefineArgument: instruction [
 	self define: instruction as: instruction name
 ]
@@ -374,11 +378,6 @@ OptimizingVariableBinder >> visitLoadConstant: aLoadImplicit [
 
 { #category : #unclassified }
 OptimizingVariableBinder >> visitMessageSend: aMessageSend [
-	
-]
-
-{ #category : #unclassified }
-OptimizingVariableBinder >> visitPhi: aParameter [
 	
 ]
 

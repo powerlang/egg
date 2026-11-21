@@ -348,6 +348,16 @@ OptimizingInstructionSelector >> tileOf: instruction [
 ]
 
 { #category : #unclassified }
+OptimizingInstructionSelector >> visitBlockParameter: instruction [
+	| tile |
+	instruction variables
+		collect: [:source | self tileOf: source]
+		thenDo: #beUsed.
+	tile := self newTile: instruction.
+	self tile: instruction as: tile
+]
+
+{ #category : #unclassified }
 OptimizingInstructionSelector >> visitJump: instruction [
 	| new |
 	new := self newTile: instruction.
@@ -404,16 +414,6 @@ OptimizingInstructionSelector >> visitMessageSend: instruction [
 	| selector |
 	selector := self selectorFor: instruction selector.
 	self perform: selector with: instruction
-]
-
-{ #category : #unclassified }
-OptimizingInstructionSelector >> visitPhi: instruction [
-	| tile |
-	instruction variables
-		collect: [:source | self tileOf: source]
-		thenDo: #beUsed.
-	tile := self newTile: instruction.
-	self tile: instruction as: tile
 ]
 
 { #category : #unclassified }

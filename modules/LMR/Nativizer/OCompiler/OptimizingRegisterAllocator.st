@@ -542,6 +542,17 @@ OptimizingRegisterAllocator >> visitBinaryWithVariable: instruction [
 ]
 
 { #category : #unclassified }
+OptimizingRegisterAllocator >> visitBlockParameter: instruction [
+	| unified |
+	unified := OComposedLiveRange new.
+	instruction variables do: [:source |
+		self
+			use: source from: instruction;
+			unify: source liveRangeTo: unified].
+	self unify: instruction liveRangeTo: unified
+]
+
+{ #category : #unclassified }
 OptimizingRegisterAllocator >> visitJump: instruction [
 	
 ]
@@ -578,17 +589,6 @@ OptimizingRegisterAllocator >> visitMessageSend: instruction [
 { #category : #unclassified }
 OptimizingRegisterAllocator >> visitNullary: instruction [
 	
-]
-
-{ #category : #unclassified }
-OptimizingRegisterAllocator >> visitPhi: instruction [
-	| unified |
-	unified := OComposedLiveRange new.
-	instruction variables do: [:source | 
-		self
-			use: source from: instruction;
-			unify: source liveRangeTo: unified].
-	self unify: instruction liveRangeTo: unified
 ]
 
 { #category : #unclassified }
