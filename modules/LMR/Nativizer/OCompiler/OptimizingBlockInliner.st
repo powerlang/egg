@@ -30,15 +30,15 @@ OptimizingBlockInliner >> inlineAnd: message in: block [
 	self inlineInnerBlocksOf: firstSkipped.
 	lastSkipped := firstSkipped lastBlock.
 	join := block splitAfter: message.
+	block endWithJumpFalseTo: join skipping: firstSkipped if: message receiver.
+	lastSkipped endWithJumpTo: join.
+	firstSkipped addPredecessor: block.
+	join addPredecessor: block; addPredecessor: lastSkipped.
 	join
 		insertPhiOf: message receiver
 		at: block
 		and: lastSkipped
 		replacing: message.
-	block endWithJumpFalseTo: join skipping: firstSkipped if: message receiver.
-	lastSkipped endWithJumpTo: join.
-	firstSkipped addPredecessor: block.
-	join addPredecessor: block; addPredecessor: lastSkipped.
 	^join
 ]
 
@@ -85,7 +85,6 @@ OptimizingBlockInliner >> inlineIfTrueifFalse: message in: block [
 	lastTrue := firstTrue lastBlock.
 	lastFalse := firstFalse lastBlock.
 	join := block splitAfter: message.
-	join insertPhiOf: lastTrue and: lastFalse replacing: message.
 	block
 		endWithJumpFalseTo: firstFalse
 		skipping: firstTrue
@@ -95,6 +94,7 @@ OptimizingBlockInliner >> inlineIfTrueifFalse: message in: block [
 	firstTrue addPredecessor: block.
 	firstFalse addPredecessor: block.
 	join addPredecessor: lastTrue; addPredecessor: lastFalse.
+	join insertPhiOf: lastTrue and: lastFalse replacing: message.
 	^join
 ]
 
@@ -128,15 +128,15 @@ OptimizingBlockInliner >> inlineOr: message in: block [
 	self inlineInnerBlocksOf: firstSkipped.
 	lastSkipped := firstSkipped lastBlock.
 	join := block splitAfter: message.
+	block endWithJumpTrueTo: join skipping: firstSkipped if: message receiver.
+	lastSkipped endWithJumpTo: join.
+	firstSkipped addPredecessor: block.
+	join addPredecessor: block; addPredecessor: lastSkipped.
 	join
 		insertPhiOf: message receiver
 		at: block
 		and: lastSkipped
 		replacing: message.
-	block endWithJumpTrueTo: join skipping: firstSkipped if: message receiver.
-	lastSkipped endWithJumpTo: join.
-	firstSkipped addPredecessor: block.
-	join addPredecessor: block; addPredecessor: lastSkipped.
 	^join
 ]
 

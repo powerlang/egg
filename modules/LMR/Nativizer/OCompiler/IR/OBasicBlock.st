@@ -275,21 +275,11 @@ OBasicBlock >> immediateDominator: aBasicBlock [
 	immediateDominator := aBasicBlock
 ]
 
-{ #category : #unclassified }
-OBasicBlock >> incorporatePhisFrom: predecessor [
-	| index |
-	predecessors size = 1 ifTrue: [^predecessor movePhisTo: self].
-	self phisDo: [:phi | | source parents vars |
-		index := phi blocks indexOf: predecessor.
-		source := phi variables at: index.
-		parents := predecessor predecessors.
-		vars := (predecessor phis includes: source)
-			ifTrue: [source variables copy]
-			ifFalse: [OrderedCollection new: parents size withAll: source].
-		vars withIndexDo: [:var :i | | pred |
-			pred := parents at: i.
-			phi addVariable: var from: pred].
-		phi removeVariable: source at: index]
+{ #category : #'block parameters' }
+OBasicBlock >> incomingJumps [
+	| jumps |
+	jumps := predecessors collect: [:block | block lastInstruction].
+	^jumps withoutDuplicates
 ]
 
 { #category : #unclassified }
@@ -300,6 +290,11 @@ OBasicBlock >> indexOf: anInstruction [
 		instruction == anInstruction ifTrue: [^current].
 		current := current + 1].
 	self error: 'instruction not found'
+]
+
+{ #category : #'block parameters' }
+OBasicBlock >> indexOfPhi: aPhi [
+	^self phis indexOf: aPhi
 ]
 
 { #category : #unclassified }
@@ -326,6 +321,12 @@ OBasicBlock >> inline: inlined replacing: aMessageSend [
 	^join ifNil: [self]
 ]
 
+{ #category : #'block parameters' }
+OBasicBlock >> insertPhi: aPhi [
+	self incomingJumps do: [:jump | (jump argumentsTo: self) addFirst: nil].
+	self addFront: aPhi
+]
+
 { #category : #unclassified }
 OBasicBlock >> insertPhiOf: block1 and: block2 replacing: operation [
 	| value1 value2 |
@@ -347,8 +348,9 @@ and: value2
 at: block2
 replacing: operation [
 	| phi |
-	phi := OPhi with: value1 from: block1 with: value2 from: block2.
-	self firstInstruction beforeInsert: phi.
+	phi := OPhi new.
+	self insertPhi: phi.
+	phi addVariable: value1 from: block1; addVariable: value2 from: block2.
 	operation replaceAllUsesWith: phi; dissolve
 ]
 
@@ -493,28 +495,23 @@ OBasicBlock >> length [
 
 { #category : #unclassified }
 OBasicBlock >> moveAllTo: block after: instruction [
-	self successorsDo: [:succ | succ replacePredecessor: self with: block].
+	| last |
 	next == end ifTrue: [^self].
-	end prev afterConnect: instruction next.
+	last := end prev.
+	last afterConnect: instruction next.
 	instruction afterConnect: next.
-	self afterConnect: end
-]
-
-{ #category : #unclassified }
-OBasicBlock >> movePhisTo: otherBlock [
-	| inst dest |
-	inst := self firstInstruction.
-	dest := otherBlock firstInstruction prev.
-	[inst isPhi] whileTrue: [| next |
-		next := inst next.
-		dest afterInsert: inst.
-		dest := inst.
-		inst := next]
+	self afterConnect: end.
+	last successorsDo: [:succ | succ replacePredecessor: self with: block]
 ]
 
 { #category : #unclassified }
 OBasicBlock >> name [
 	^'#' , self hash printString
+]
+
+{ #category : #'block parameters' }
+OBasicBlock >> newArguments [
+	^OrderedCollection new: self phis size withAll: nil
 ]
 
 { #category : #unclassified }
@@ -629,6 +626,13 @@ OBasicBlock >> realInstructionsDo: aBlock [
 	current do: aBlock
 ]
 
+{ #category : #'block parameters' }
+OBasicBlock >> removeParameter: aPhi [
+	| index |
+	index := self indexOfPhi: aPhi.
+	self incomingJumps do: [:jump | (jump argumentsTo: self) removeIndex: index]
+]
+
 { #category : #unclassified }
 OBasicBlock >> removePredecessor: aBasicBlock [
 	predecessors remove: aBasicBlock
@@ -662,9 +666,9 @@ OBasicBlock >> splitAfter: anInstruction [
 	start := anInstruction next.
 	start isEnd ifTrue: [^block].
 	last := end prev.
-	self successorsDo: [:succ | succ replacePredecessor: self with: block].
 	block afterInsert: start to: last.
 	anInstruction afterConnect: end.
+	last successorsDo: [:succ | succ replacePredecessor: self with: block].
 	^block
 ]
 
@@ -693,6 +697,7 @@ OBasicBlock >> splitEdgeTo: block [
 	jump := OJump to: block.
 	middle add: jump.
 	branch := self lastInstruction.
+	branch moveArgumentsTo: jump for: block.
 	branch target = block
 		ifTrue: [branch target: middle]
 		ifFalse: [branch implicitTarget: middle].
@@ -751,19 +756,21 @@ OBasicBlock >> unifyReturns [
 			jump := OJump to: end.
 			prev afterInsert: jump.
 			phi := OPhi new.
+			end insertPhi: phi.
 			phi
 				addVariable: ret source from: last;
 				addUse: ret at: #source.
 			ret source removeUse: ret at: #source.
-			ret source: phi; beforeInsert: phi].
-	extra do: [:assoc | | tail block |
+			ret source: phi].
+	extra do: [:assoc | | tail block old |
 		tail := assoc key.
 		block := assoc value.
-		phi addVariable: tail source from: block.
 		end addPredecessor: block.
 		jump := tail next.
-		jump target removePredecessor: block.
+		old := jump target.
+		old removePredecessor: block; phisDo: [:each | each removeBlock: block].
 		jump target: end.
+		phi addVariable: tail source from: block.
 		tail dissolve]
 ]
 

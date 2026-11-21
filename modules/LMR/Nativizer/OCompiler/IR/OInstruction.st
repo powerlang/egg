@@ -284,6 +284,11 @@ OInstruction >> isUnconditionalJump [
 	^self isJump andNot: [self isConditionalJump]
 ]
 
+{ #category : #testing }
+OInstruction >> isUntied [
+	^prev isNil
+]
+
 { #category : #unclassified }
 OInstruction >> isUsed [
 	^firstUse notNil

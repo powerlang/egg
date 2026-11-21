@@ -36,13 +36,9 @@ OptimizingPhiSimplification >> mark: instruction [
 OptimizingPhiSimplification >> process: aBasicBlock [
 	| instruction |
 	instruction := aBasicBlock firstInstruction.
-	[instruction isPhi] whileTrue: [| vars next |
+	[instruction isPhi] whileTrue: [| next |
 		next := instruction next.
-		vars := instruction variables.
-		vars size to: 1 by: -1 do: [:i | | var |
-			var := vars at: i.
-			(self isMarked: var) ifFalse: [
-				instruction removeVariable: var at: i]].
+		self simplify: instruction.
 		instruction := next]
 ]
 
@@ -50,5 +46,14 @@ OptimizingPhiSimplification >> process: aBasicBlock [
 OptimizingPhiSimplification >> processFrom: firstBlock [
 	firstBlock instructionsWithSuccessorsDo: [:inst | self mark: inst].
 	firstBlock reversePostOrderDo: [:block | self process: block]
+]
+
+{ #category : #unclassified }
+OptimizingPhiSimplification >> simplify: aPhi [
+	| vars |
+	vars := aPhi variables.
+	vars size to: 1 by: -1 do: [:i | | var |
+		var := vars at: i.
+		((self isMarked: var) or: [aPhi isUntied]) ifFalse: [aPhi removeVariable: var at: i]]
 ]
 

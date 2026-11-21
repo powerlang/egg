@@ -13,15 +13,6 @@ Class {
 }
 
 { #category : #private }
-OptimizingCFGSimplifier >> addPredecessor: predecessor like: middle to: final [
-	final phisDo: [:phi | | source |
-		source := phi atOperand: middle.
-		phi addVariable: source from: predecessor].
-	final addPredecessor: predecessor.
-	^final
-]
-
-{ #category : #private }
 OptimizingCFGSimplifier >> cleanFrom: aBlock [
 	| all |
 	firstBlock := aBlock.
@@ -33,8 +24,15 @@ OptimizingCFGSimplifier >> cleanFrom: aBlock [
 ]
 
 { #category : #private }
+OptimizingCFGSimplifier >> dissolvePhisOf: aBasicBlock from: predecessor [
+	aBasicBlock phis do: [:phi | | value |
+		value := phi atOperand: predecessor.
+		phi replaceAllUsesWith: value; dissolve]
+]
+
+{ #category : #private }
 OptimizingCFGSimplifier >> hoistBranchIn: succ to: pred [
-	| jump branch condition new target1 target2 |
+	| jump branch condition new |
 	jump := pred lastInstruction.
 	branch := succ lastInstruction.
 	condition := branch variable.
@@ -43,14 +41,19 @@ OptimizingCFGSimplifier >> hoistBranchIn: succ to: pred [
 			condition := phi atOperand: pred.
 			phi removeBlock: pred];
 		removePredecessor: pred.
-	target1 := self addPredecessor: pred like: succ to: branch target.
-	target2 := self addPredecessor: pred like: succ to: branch implicitTarget.
 	new := branch class
 		variable: condition
-		target: target1
-		implicitTarget: target2.
+		target: branch target
+		implicitTarget: branch implicitTarget.
 	condition addUse: new at: #variable.
-	jump dissolveReplacingWith: new
+	jump dissolveReplacingWith: new.
+	branch passArgumentsTo: new.
+	new successorsDo: [:target | self link: pred to: target]
+]
+
+{ #category : #private }
+OptimizingCFGSimplifier >> link: aBasicBlock to: anotherBasicBlock [
+	anotherBasicBlock phisDo: [:phi | phi addEdgeFrom: aBasicBlock]; addPredecessor: aBasicBlock
 ]
 
 { #category : #private }
@@ -72,6 +75,7 @@ OptimizingCFGSimplifier >> tryCombining: block [
 	last isUnconditionalJump ifFalse: [^false].
 	following := last target.
 	following hasMultiplePredecessors ifTrue: [^false].
+	self dissolvePhisOf: following from: block.
 	following moveAllTo: block after: last.
 	last dissolve.
 	^true
@@ -107,14 +111,28 @@ OptimizingCFGSimplifier >> tryHoistingBranch: block [
 
 { #category : #private }
 OptimizingCFGSimplifier >> tryRemovingEmptyBlock: block [
-	| following |
+	| following arguments |
 	block isEmptyJump ifTrue: [
 		following := block lastInstruction target.
-		following incorporatePhisFrom: block; removePredecessor: block.
-		block predecessors do: [:predecessor | 
-			predecessor lastInstruction retargetFrom: block to: following.
-			following addPredecessor: predecessor].
+		(self wouldDuplicateEdgesOf: block into: following) ifTrue: [^false].
+		arguments := block lastInstruction argumentsTo: following.
+		following
+			phisDo: [:phi | phi forgetEdgeFrom: block];
+			removePredecessor: block.
+		block predecessors do: [:predecessor | | jump |
+			jump := predecessor lastInstruction.
+			jump retargetFrom: block to: following.
+			jump argumentsTo: following put: arguments copy.
+			self link: predecessor to: following].
 		^true].
 	^false
+]
+
+{ #category : #private }
+OptimizingCFGSimplifier >> wouldDuplicateEdgesOf: block into: following [
+	| predecessors |
+	following phis isEmpty ifTrue: [^false].
+	predecessors := following predecessors.
+	^block predecessors anySatisfy: [:predecessor | predecessors includes: predecessor]
 ]
 

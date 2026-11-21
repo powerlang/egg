@@ -12,6 +12,7 @@ Class {
 		'dominanceFrontiers',
 		'pendingReads',
 		'pendingPhis',
+		'phiNames',
 		'abi',
 		'method'
 	],
@@ -26,6 +27,13 @@ OptimizingVariableBinder class >> new [
 { #category : #accessing }
 OptimizingVariableBinder >> abi: anAbi [
 	abi := anAbi
+]
+
+{ #category : #private }
+OptimizingVariableBinder >> define: aPhi named: aString in: aBasicBlock [
+	aBasicBlock predecessors do: [:predecessor | | definition |
+		definition := self definitionOf: aString from: predecessor.
+		aPhi addVariable: definition from: predecessor]
 ]
 
 { #category : #accessing }
@@ -90,7 +98,7 @@ OptimizingVariableBinder >> definitionOf: name before: block [
 	| instruction current |
 	instruction := block firstInstruction.
 	[instruction isPhi] whileTrue: [
-		instruction variables first = name ifTrue: [^instruction].
+		(phiNames at: instruction ifAbsent: nil) = name ifTrue: [^instruction].
 		instruction := instruction next].
 	current := block.
 	[
@@ -137,19 +145,17 @@ OptimizingVariableBinder >> doBindingFrom: firstBlock [
 OptimizingVariableBinder >> initialize [
 	definitions := Dictionary new.
 	pendingReads := OrderedCollection new.
-	pendingPhis := OrderedCollection new
+	pendingPhis := OrderedCollection new.
+	phiNames := IdentityDictionary new
 ]
 
 { #category : #unclassified }
 OptimizingVariableBinder >> insertPhiOf: name at: block [
-	| size variables phi |
+	| phi |
 	(self definitionOf: name in: block) ifNotNil: [^self].
-	size := block predecessors size.
-	variables := (Array new: size)
-		atAllPut: name;
-		asOrderedCollection.
-	phi := OPhi withAll: variables in: block predecessors.
-	block firstInstruction beforeInsert: phi.
+	phi := OPhi new.
+	block insertPhi: phi.
+	phiNames at: phi put: name.
 	pendingPhis add: phi -> block.
 	self define: phi as: name in: block
 ]
@@ -322,17 +328,13 @@ OptimizingVariableBinder >> resolveSelf: aReadVariable [
 
 { #category : #unclassified }
 OptimizingVariableBinder >> rewritePhis [
-	pendingPhis do: [:association | | phi block |
+	pendingPhis do: [:association | | phi block name |
 		phi := association key.
 		block := association value.
+		name := phiNames at: phi.
 		(phi livesAfter: phi orOutOf: block)
-			ifTrue: [
-				block predecessors withIndexDo: [:predecessor :i | | name source |
-					name := phi variables at: i.
-					source := self definitionOf: name from: predecessor.
-					phi variables at: i put: source.
-					source addUse: phi at: predecessor]]
-			ifFalse: [phi clearVariables; dissolve]]
+			ifTrue: [self define: phi named: name in: block]
+			ifFalse: [phi dissolve]]
 ]
 
 { #category : #unclassified }

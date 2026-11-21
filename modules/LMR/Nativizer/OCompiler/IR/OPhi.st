@@ -7,7 +7,6 @@ Class {
 	#name : #OPhi,
 	#superclass : #OInstruction,
 	#instVars : [
-		'variables',
 		'blocks'
 	],
 	#category : #IR
@@ -19,40 +18,28 @@ OPhi class >> new [
 ]
 
 { #category : #unclassified }
-OPhi class >> with: operation1
-from: block1
-with: operation2
-from: block2 [
-	^self new
-		addVariable: operation1 from: block1;
-		addVariable: operation2 from: block2
-]
-
-{ #category : #unclassified }
-OPhi class >> withAll: operations in: blocks [
-	^self new variables: operations; blocks: blocks copy
+OPhi >> addEdgeFrom: predecessor [
+	(blocks includes: predecessor) ifTrue: [^self].
+	blocks add: predecessor.
+	(self atOperand: predecessor) addUse: self at: predecessor
 ]
 
 { #category : #unclassified }
 OPhi >> addVariable: value from: block [
 	self DENY: (blocks includes: block).
-	variables add: value.
 	blocks add: block.
+	self atOperand: block put: value.
 	value addUse: self at: block
 ]
 
 { #category : #unclassified }
 OPhi >> atOperand: name [
-	| index |
-	index := blocks indexOf: name.
-	^variables at: index
+	^(self jumpFrom: name) argumentFor: self
 ]
 
 { #category : #unclassified }
 OPhi >> atOperand: name put: instruction [
-	| index |
-	index := blocks indexOf: name.
-	variables at: index put: instruction
+	(self jumpFrom: name) argumentFor: self put: instruction
 ]
 
 { #category : #unclassified }
@@ -63,11 +50,9 @@ OPhi >> basicAcceptVisitor: aVisitor [
 { #category : #unclassified }
 OPhi >> basicPrintString [
 	| sources |
-	sources := variables size > 0
+	sources := blocks size > 0
 		ifTrue: [
-			(variables
-				with: blocks
-				collect: [:var :block | block name , '->' , var primitivePrintString])
+			(blocks collect: [:block | block name , '->' , (self atOperand: block) primitivePrintString])
 				gather: [:x | x , ', ']]
 		ifFalse: ['  '].
 	^'[phi(' , (sources allButLast: 2) , ')]'
@@ -84,14 +69,34 @@ OPhi >> blocks: aCollection [
 ]
 
 { #category : #unclassified }
-OPhi >> clearVariables [
-	variables := OrderedCollection new.
-	blocks := OrderedCollection new
+OPhi >> dissolve [
+	| values |
+	values := self leaveBlock.
+	super dissolve.
+	values do: [:value | value removeUseBy: self]
+]
+
+{ #category : #unclassified }
+OPhi >> dissolveReplacingWith: anInstruction [
+	| values |
+	values := self leaveBlock.
+	super dissolveReplacingWith: anInstruction.
+	values do: [:value | value removeUseBy: self]
+]
+
+{ #category : #unclassified }
+OPhi >> forgetEdgeFrom: predecessor [
+	(self atOperand: predecessor) removeUse: self at: predecessor.
+	blocks remove: predecessor
+]
+
+{ #category : #unclassified }
+OPhi >> index [
+	^self basicBlock indexOfPhi: self
 ]
 
 { #category : #unclassified }
 OPhi >> initialize [
-	variables := OrderedCollection new.
 	blocks := OrderedCollection new
 ]
 
@@ -101,8 +106,25 @@ OPhi >> isPhi [
 ]
 
 { #category : #unclassified }
+OPhi >> jumpFrom: block [
+	^block lastInstruction
+]
+
+{ #category : #unclassified }
+OPhi >> leaveBlock [
+	| values |
+	values := OrderedCollection new.
+	self operandsDo: [:value | values add: value].
+	self basicBlock removeParameter: self.
+	blocks := OrderedCollection new.
+	^values
+]
+
+{ #category : #unclassified }
 OPhi >> operandsDo: aBlock [
-	variables do: aBlock
+	blocks do: [:block | | value |
+		value := self atOperand: block.
+		aBlock value: value]
 ]
 
 { #category : #unclassified }
@@ -110,15 +132,19 @@ OPhi >> primitivePrintString [
 	^'{#phi}'
 ]
 
+{ #category : #printing }
+OPhi >> printEdge: aBasicBlock using: names [
+	| operand |
+	operand := self atOperand: aBasicBlock.
+	^(names at: aBasicBlock ifAbsent: ['missing']) , '->' , (names at: operand ifAbsent: ['missing'])
+]
+
 { #category : #unclassified }
 OPhi >> printStringUsing: names [
 	| sources |
-	sources := variables size > 0
+	sources := blocks size > 0
 		ifTrue: [
-			(variables
-				with: blocks
-				collect: [:var :block | (names at: block ifAbsent: ['missing']) , '->'
-					, (names at: var ifAbsent: ['missing'])])
+			(blocks collect: [:block | self printEdge: block using: names])
 				gather: [:x | x , ', ']]
 		ifFalse: ['  '].
 	^'phi(' , (sources allButLast: 2) , ')'
@@ -131,72 +157,65 @@ OPhi >> realReverseDo: aBlock [
 
 { #category : #unclassified }
 OPhi >> removeBlock: removed [
-	| index variable |
+	| index variable last |
 	index := blocks indexOf: removed.
-	variable := variables at: index.
+	variable := self atOperand: removed.
 	variable removeUse: self at: removed.
-	variables removeIndex: index.
+	(self jumpFrom: removed) argumentFor: self put: nil.
 	blocks removeIndex: index.
-	variables size = 1 ifTrue: [
-		self replaceAllUsesWith: variables first; dissolve.
-		^variables first].
+	blocks size = 1 ifTrue: [
+		last := self atOperand: blocks first.
+		self replaceAllUsesWith: last; dissolve.
+		^last].
 	^self
 ]
 
 { #category : #unclassified }
 OPhi >> removeVariable: removed at: index [
-	| block |
+	| block last |
 	block := blocks at: index.
 	removed removeUse: self at: block.
-	variables removeIndex: index.
+	(self jumpFrom: block) argumentFor: self put: nil.
 	blocks removeIndex: index.
-	variables size = 1
-		ifTrue: [self replaceAllUsesWith: variables first; dissolve]
+	blocks size = 1 ifFalse: [^self].
+	last := self atOperand: blocks first.
+	self replaceAllUsesWith: last; dissolve
 ]
 
 { #category : #enumerating }
 OPhi >> replaceBlock: original with: new [
-	blocks withIndexDo: [:block :i | | source |
+	blocks withIndexDo: [:block :i |
 		block == original ifTrue: [
-			source := variables at: i.
-			source updateUser: self named: original with: new.
+			(self atOperand: new) updateUser: self named: original with: new.
 			blocks at: i put: new]]
 ]
 
 { #category : #printing }
 OPhi >> shortPrintString [
 	| sources |
-	sources := variables size > 0
-		ifTrue: [(variables collect: #primitivePrintString) gather: [:x | x , ', ']]
+	sources := blocks size > 0
+		ifTrue: [(blocks collect: [:block | (self atOperand: block) primitivePrintString]) gather: [:x | x , ', ']]
 		ifFalse: ['  '].
 	^'[phi(' , (sources allButLast: 2) , ')]'
 ]
 
 { #category : #unclassified }
 OPhi >> sortAfter: predecessors [
-	| indices |
-	indices := predecessors collect: [:pred | blocks indexOf: pred].
-	variables := indices collect: [:index | variables at: index].
 	blocks := predecessors copy
 ]
 
 { #category : #unclassified }
 OPhi >> usesResultOf: anInstruction [
-	^variables includes: anInstruction
+	^self variables includes: anInstruction
 ]
 
 { #category : #unclassified }
 OPhi >> variables [
-	^variables
-]
-
-{ #category : #unclassified }
-OPhi >> variables: aCollection [
-	variables := aCollection
+	^blocks collect: [:block | self atOperand: block]
 ]
 
 { #category : #unclassified }
 OPhi >> variablesWithBlocksDo: aBlock [
-	variables with: blocks do: aBlock
+	self variables with: blocks copy do: aBlock
 ]
 
