@@ -24,7 +24,7 @@ OptimizingCFGSimplifier >> cleanFrom: aBlock [
 ]
 
 { #category : #private }
-OptimizingCFGSimplifier >> dissolvePhisOf: aBasicBlock from: predecessor [
+OptimizingCFGSimplifier >> dissolveParametersOf: aBasicBlock from: predecessor [
 	aBasicBlock parameters do: [:parameter | | value |
 		value := parameter atOperand: predecessor.
 		parameter replaceAllUsesWith: value; dissolve]
@@ -75,7 +75,7 @@ OptimizingCFGSimplifier >> tryCombining: block [
 	last isUnconditionalJump ifFalse: [^false].
 	following := last target.
 	following hasMultiplePredecessors ifTrue: [^false].
-	self dissolvePhisOf: following from: block.
+	self dissolveParametersOf: following from: block.
 	following moveAllTo: block after: last.
 	last dissolve.
 	^true
@@ -102,7 +102,7 @@ OptimizingCFGSimplifier >> tryHoistingBranch: block [
 	last := block lastInstruction.
 	(last isUnconditionalJump and: [
 		following := last target.
-		following isEmptyBranch or: [following isEmptyPhiBranch]])
+		following isEmptyBranch or: [following isEmptyParameterBranch]])
 		ifTrue: [
 			self hoistBranchIn: following to: block.
 			^true].

@@ -35,7 +35,7 @@ OptimizingBlockInliner >> inlineAnd: message in: block [
 	firstSkipped addPredecessor: block.
 	join addPredecessor: block; addPredecessor: lastSkipped.
 	join
-		insertPhiOf: message receiver
+		insertParameterOf: message receiver
 		at: block
 		and: lastSkipped
 		replacing: message.
@@ -94,7 +94,7 @@ OptimizingBlockInliner >> inlineIfTrueifFalse: message in: block [
 	firstTrue addPredecessor: block.
 	firstFalse addPredecessor: block.
 	join addPredecessor: lastTrue; addPredecessor: lastFalse.
-	join insertPhiOf: lastTrue and: lastFalse replacing: message.
+	join insertParameterOf: lastTrue and: lastFalse replacing: message.
 	^join
 ]
 
@@ -133,7 +133,7 @@ OptimizingBlockInliner >> inlineOr: message in: block [
 	firstSkipped addPredecessor: block.
 	join addPredecessor: block; addPredecessor: lastSkipped.
 	join
-		insertPhiOf: message receiver
+		insertParameterOf: message receiver
 		at: block
 		and: lastSkipped
 		replacing: message.

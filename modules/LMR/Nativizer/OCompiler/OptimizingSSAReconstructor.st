@@ -33,7 +33,7 @@ OptimizingSSAReconstructor >> firstBlock: block [
 ]
 
 { #category : #initialization }
-OptimizingSSAReconstructor >> insertPhiAt: block [
+OptimizingSSAReconstructor >> insertParameterAt: block [
 	^insertedParameters at: block ifAbsentPut: [| arguments parameter predecessors |
 		predecessors := block predecessors.
 		arguments := predecessors collect: [:pred | | search |
@@ -53,7 +53,7 @@ OptimizingSSAReconstructor >> reachingDefinitionFrom: instruction at: block [
 	[| def |
 		def := self definitionInBlockFrom: search.
 		def ifNotNil: [^def].
-		(iteratedFrontiers includes: current) ifTrue: [^self insertPhiAt: current].
+		(iteratedFrontiers includes: current) ifTrue: [^self insertParameterAt: current].
 		current := current immediateDominator.
 		search := current lastInstruction] repeat
 ]

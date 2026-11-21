@@ -36,6 +36,17 @@ OptimizingVariableBinder >> define: aParameter named: aString in: aBasicBlock [
 		aParameter addVariable: definition from: predecessor]
 ]
 
+{ #category : #unclassified }
+OptimizingVariableBinder >> insertParameterOf: name at: block [
+	| parameter |
+	(self definitionOf: name in: block) ifNotNil: [^self].
+	parameter := OBlockParameter new.
+	block insertParameter: parameter.
+	parameterNames at: parameter put: name.
+	pendingParameters add: parameter -> block.
+	self define: parameter as: name in: block
+]
+
 { #category : #accessing }
 OptimizingVariableBinder >> method: aCompiledMethod [
 	method := aCompiledMethod
@@ -150,17 +161,6 @@ OptimizingVariableBinder >> initialize [
 ]
 
 { #category : #unclassified }
-OptimizingVariableBinder >> insertPhiOf: name at: block [
-	| parameter |
-	(self definitionOf: name in: block) ifNotNil: [^self].
-	parameter := OBlockParameter new.
-	block insertParameter: parameter.
-	parameterNames at: parameter put: name.
-	pendingParameters add: parameter -> block.
-	self define: parameter as: name in: block
-]
-
-{ #category : #unclassified }
 OptimizingVariableBinder >> instructionsForWriting: aWriteVariable [
 	| binding |
 	binding := aWriteVariable binding.
@@ -239,7 +239,7 @@ OptimizingVariableBinder >> instructionsForWriting: aWriteVariable toTemporary: 
 	self define: aWriteVariable source as: binding name asSymbol.
 	aWriteVariable dissolve.
 	(dominanceFrontiers at: currentBlock)
-		do: [:block | self insertPhiOf: binding name asSymbol at: block]
+		do: [:block | self insertParameterOf: binding name asSymbol at: block]
 ]
 
 { #category : #unclassified }

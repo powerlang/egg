@@ -323,13 +323,13 @@ OBasicBlock >> insertParameter: aParameter [
 ]
 
 { #category : #unclassified }
-OBasicBlock >> insertPhiOf: block1 and: block2 replacing: operation [
+OBasicBlock >> insertParameterOf: block1 and: block2 replacing: operation [
 	| value1 value2 |
 	value1 := block1 lastValue.
 	value2 := block2 lastValue.
 	(value1 == nil or: [value2 == nil]) ifTrue: [^operation dissolve].
 	self
-		insertPhiOf: value1
+		insertParameterOf: value1
 		at: block1
 		and: value2
 		at: block2
@@ -337,7 +337,7 @@ OBasicBlock >> insertPhiOf: block1 and: block2 replacing: operation [
 ]
 
 { #category : #unclassified }
-OBasicBlock >> insertPhiOf: value1
+OBasicBlock >> insertParameterOf: value1
 at: block1
 and: value2
 at: block2
@@ -350,7 +350,7 @@ replacing: operation [
 ]
 
 { #category : #unclassified }
-OBasicBlock >> insertPhiOf: value1
+OBasicBlock >> insertParameterOf: value1
 at: block1
 and: block2
 replacing: operation [
@@ -358,7 +358,7 @@ replacing: operation [
 	value2 := block2 lastValue.
 	value2 == nil ifTrue: [^operation dissolve].
 	self
-		insertPhiOf: value1
+		insertParameterOf: value1
 		at: block1
 		and: value2
 		at: block2
@@ -418,7 +418,7 @@ OBasicBlock >> isEmptyJump [
 ]
 
 { #category : #unclassified }
-OBasicBlock >> isEmptyPhiBranch [
+OBasicBlock >> isEmptyParameterBranch [
 	self instructionsDo: [:instruction | | empty |
 		empty := instruction isBlockParameter and: [| next |
 			next := instruction next.
@@ -605,7 +605,7 @@ OBasicBlock >> reversePostOrderDo: aBlock [
 ]
 
 { #category : #unclassified }
-OBasicBlock >> sortPhiVariables [
+OBasicBlock >> sortParameterEdges [
 	self parametersDo: [:parameter | parameter sortAfter: predecessors]
 ]
 
@@ -735,7 +735,7 @@ OBasicBlock >> updatePredecessors [
 		postOrderDo: [:block | block cleanPredecessors];
 		postOrderDo: [:block | block
 			successorsDo: [:successor | successor addPredecessor: block]];
-		postOrderDo: [:block | block sortPhiVariables]
+		postOrderDo: [:block | block sortParameterEdges]
 ]
 
 { #category : #unclassified }
