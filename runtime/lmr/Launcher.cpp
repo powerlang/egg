@@ -135,13 +135,13 @@ uint32_t Launcher::instVarIndex(Egg::HeapObject* species, const std::string& nam
 void Launcher::initializeHostLinkage()
 {
     auto linkage = this->segmentNamed("Kernel.LMR")->_exports.at("HostLinkage");
-    linkage->slot(0) = reinterpret_cast<Egg::Object*>(Egg::SymbolFinder() << 1 | 1);
-    linkage->slot(1) = reinterpret_cast<Egg::Object*>(Egg::LoaderHandle() << 1 | 1);
-    linkage->slot(3) = reinterpret_cast<Egg::Object*>(Egg::HeapNextFree() << 1 | 1);
-    linkage->slot(4) = reinterpret_cast<Egg::Object*>(Egg::HeapLimit() << 1 | 1);
-    linkage->slot(6) = reinterpret_cast<Egg::Object*>(uintptr_t(_argc) << 1 | 1);
-    linkage->slot(7) = reinterpret_cast<Egg::Object*>(reinterpret_cast<uintptr_t>(_argv) << 1 | 1);
-    auto modules = linkage->slot(5)->asHeapObject();
+    linkage->slot(LinkageSymbolFinder) = reinterpret_cast<Egg::Object*>(Egg::SymbolFinder() << 1 | 1);
+    linkage->slot(LinkageLoaderHandle) = reinterpret_cast<Egg::Object*>(Egg::LoaderHandle() << 1 | 1);
+    linkage->slot(LinkageHeapNext) = reinterpret_cast<Egg::Object*>(Egg::HeapNextFree() << 1 | 1);
+    linkage->slot(LinkageHeapLimit) = reinterpret_cast<Egg::Object*>(Egg::HeapLimit() << 1 | 1);
+    linkage->slot(LinkageArgumentCount) = reinterpret_cast<Egg::Object*>(uintptr_t(_argc) << 1 | 1);
+    linkage->slot(LinkageArgumentVector) = reinterpret_cast<Egg::Object*>(reinterpret_cast<uintptr_t>(_argv) << 1 | 1);
+    auto modules = linkage->slot(LinkageBoundModules)->asHeapObject();
     uint32_t count = 0;
     for (auto& name : _bound)
         if (auto segment = this->segmentNamed(name)) {
@@ -149,7 +149,7 @@ void Launcher::initializeHostLinkage()
                 throw std::runtime_error("too many bound modules for HostLinkage");
             modules->slot(count++) = reinterpret_cast<Egg::Object*>(segment->header.module);
         }
-    auto platform = linkage->slot(2)->asHeapObject();
+    auto platform = linkage->slot(LinkagePlatformName)->asHeapObject();
     std::strncpy(reinterpret_cast<char*>(&platform->byte(0)), Egg::PlatformName(), platform->size() - 1);
 }
 

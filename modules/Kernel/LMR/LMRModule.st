@@ -15,9 +15,8 @@ LMRModule >> justLoaded [
 	| linkage |
 	super justLoaded.
 	namespace at: #LastHash put: 1.
-	linkage := Array new: 8.
-	linkage at: 3 put: (String new: 32).
-	linkage at: 6 put: (Array new: 16).
+	LMRHostSystem initializeLinkageSlots.
+	linkage := LMRHostSystem newLinkage.
 	self exportByReference: linkage as: #HostLinkage
 ]
 

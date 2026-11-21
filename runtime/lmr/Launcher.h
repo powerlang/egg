@@ -22,6 +22,17 @@
 namespace lmr
 {
 
+enum HostLinkageSlots {
+    LinkageSymbolFinder = 0,
+    LinkageLoaderHandle = 1,
+    LinkagePlatformName = 2,
+    LinkageHeapNext = 3,
+    LinkageHeapLimit = 4,
+    LinkageBoundModules = 5,
+    LinkageArgumentCount = 6,
+    LinkageArgumentVector = 7
+};
+
 class Launcher
 {
   public:

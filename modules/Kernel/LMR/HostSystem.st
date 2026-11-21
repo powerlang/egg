@@ -6,8 +6,34 @@
 Class {
 	#name : #LMRHostSystem,
 	#superclass : #HostSystem,
+	#classVars : [
+		'LinkageSlots'
+	],
 	#category : #Kernel
 }
+
+{ #category : #initialization }
+LMRHostSystem class >> initializeLinkageSlots [
+	LinkageSlots := self addNamespace
+		at: #LinkageSymbolFinder put: 1;
+		at: #LinkageLoaderHandle put: 2;
+		at: #LinkagePlatformName put: 3;
+		at: #LinkageHeapNext put: 4;
+		at: #LinkageHeapLimit put: 5;
+		at: #LinkageBoundModules put: 6;
+		at: #LinkageArgumentCount put: 7;
+		at: #LinkageArgumentVector put: 8;
+		yourself
+]
+
+{ #category : #linkage }
+LMRHostSystem class >> newLinkage [
+	| linkage |
+	linkage := Array new: LinkageSlots size.
+	linkage at: LinkagePlatformName put: (String new: 32).
+	linkage at: LinkageBoundModules put: (Array new: 16).
+	^linkage
+]
 
 { #category : #services }
 LMRHostSystem >> currentMilliseconds [
@@ -167,45 +193,45 @@ LMRHostSystem >> makeExecutable: address size: size [
 
 { #category : #linkage }
 LMRHostSystem >> symbolFinder [
-	^HostLinkage at: 1
+	^HostLinkage at: LinkageSymbolFinder
 ]
 
 { #category : #linkage }
 LMRHostSystem >> loaderHandle [
-	^HostLinkage at: 2
+	^HostLinkage at: LinkageLoaderHandle
 ]
 
 { #category : #linkage }
 LMRHostSystem >> rawPlatformName [
-	^HostLinkage at: 3
+	^HostLinkage at: LinkagePlatformName
 ]
 
 { #category : #linkage }
 LMRHostSystem >> heapNext [
-	^HostLinkage at: 4
+	^HostLinkage at: LinkageHeapNext
 ]
 
 { #category : #linkage }
 LMRHostSystem >> heapNext: anInteger [
-	HostLinkage at: 4 put: anInteger
+	HostLinkage at: LinkageHeapNext put: anInteger
 ]
 
 { #category : #linkage }
 LMRHostSystem >> heapLimit [
-	^HostLinkage at: 5
+	^HostLinkage at: LinkageHeapLimit
 ]
 
 { #category : #linkage }
 LMRHostSystem >> boundModules [
-	^HostLinkage at: 6
+	^HostLinkage at: LinkageBoundModules
 ]
 
 { #category : #linkage }
 LMRHostSystem >> argumentCount [
-	^HostLinkage at: 7
+	^HostLinkage at: LinkageArgumentCount
 ]
 
 { #category : #linkage }
 LMRHostSystem >> argumentVector [
-	^HostLinkage at: 8
+	^HostLinkage at: LinkageArgumentVector
 ]
