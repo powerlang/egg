@@ -152,6 +152,14 @@ LauncherTestsModule >> printsLargeProducts [
 ]
 
 { #category : #entries }
+LauncherTestsModule >> printsRecursiveBlock [
+	| block |
+	<callback: slong ()>
+	block := [:x | block value: x].
+	^(block printString beginsWith: 'Closure(') ifTrue: [1] ifFalse: [0]
+]
+
+{ #category : #entries }
 LauncherTestsModule >> modulo [
 	| a |
 	<callback: slong ()>

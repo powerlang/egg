@@ -271,9 +271,7 @@ Closure >> printOn: aStream [
 	aStream nextPut: $(.
 	block printOn: aStream.
 	(1 to: self size)
-		do: [:i | | field |
-			field := self at: i.
-			field printOn: aStream]
+		do: [:i | aStream nextPutAll: (self at: i) class name withArticle]
 		separatedBy: [aStream space].
 	aStream nextPut: $)
 ]

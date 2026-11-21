@@ -168,6 +168,15 @@ TEST_CASE("SmallInteger arithmetic and nil tests run natively", "[run]")
     }
 }
 
+TEST_CASE("a block that captures itself prints", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    REQUIRE(launcher.loaded());
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+    REQUIRE(launcher.run("printsRecursiveBlock") == 1);
+}
+
 TEST_CASE("native code allocates arrays and byte arrays", "[run]")
 {
     const std::pair<const char*, int64_t> expected[] = {
