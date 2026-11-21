@@ -187,8 +187,12 @@ TemplateJIT >> captureClosure: anSBlock [
 	[ variables atEnd ]
 		whileFalse: [ self captureVariable: variables index: slot.
 			slot := slot + 1 ].
-	anSBlock capturesHome
-		ifTrue: [ self emitSend: #saveHomeFrame ]
+	anSBlock capturesHome ifFalse: [ ^self ].
+	activeScript isBlock
+		ifTrue: [
+			assembler pushE.
+			self emitSend: #saveHomeFrameOf: ]
+		ifFalse: [ self emitSend: #saveHomeFrame ]
 ]
 
 { #category : #services }
