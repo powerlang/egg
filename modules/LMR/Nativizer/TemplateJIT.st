@@ -924,24 +924,46 @@ TemplateJIT >> visitLiteral: anSLiteral [
 
 { #category : #services }
 TemplateJIT >> visitMessage: anSMessage [
-	| arguments index |
+	| receiver |
 	anSMessage isInlined
 		ifTrue: [ ^ self visitInlinedMessage: anSMessage ].
 	(anSMessage isOptimized or: [ self inlinesBinary: anSMessage ])
 		ifTrue: [ ^ self visitOptimizedMessage: anSMessage ].
+	receiver := anSMessage receiver.
+	(receiver isIdentifier and: [ receiver isSelfOrSuper ])
+		ifTrue: [ self visitSelfMessage: anSMessage ]
+		ifFalse: [ self visitPushedMessage: anSMessage ]
+]
+
+{ #category : #services }
+TemplateJIT >> visitPushedMessage: anSMessage [
+	"the receiver is reloaded relative to sp: _expandInStackSized: shifts fixed indices"
+	| arguments |
 	anSMessage receiver acceptVisitor: self.
 	arguments := anSMessage arguments.
-	arguments isEmpty
-		ifFalse: [ index := self pushR.
-			arguments
-				do: [ :node | 
-					node acceptVisitor: self.
-					self pushR ].
-			self loadRwithStack: index ].
-	self emitSend: anSMessage selector super: anSMessage receiver isSuper.
+	arguments isEmpty ifTrue: [ ^self emitSend: anSMessage selector super: false ].
+	self pushR; pushArguments: arguments.
+	assembler loadRwithSPindex: arguments size + 1.
+	self emitSend: anSMessage selector super: false.
 	stackCount := stackCount - arguments size.
-	arguments isEmpty
-		ifFalse: [ self dropTos ]
+	self dropTos
+]
+
+{ #category : #services }
+TemplateJIT >> visitSelfMessage: anSMessage [
+	| arguments |
+	arguments := anSMessage arguments.
+	self pushArguments: arguments.
+	assembler loadRwithS.
+	self emitSend: anSMessage selector super: anSMessage receiver isSuper.
+	stackCount := stackCount - arguments size
+]
+
+{ #category : #services }
+TemplateJIT >> pushArguments: aCollection [
+	aCollection do: [ :node |
+		node acceptVisitor: self.
+		self pushR ]
 ]
 
 { #category : #services }
