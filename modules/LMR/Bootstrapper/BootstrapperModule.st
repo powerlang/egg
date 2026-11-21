@@ -414,10 +414,16 @@ BootstrapperModule >> kernelOverrides [
 		target := replacement superclass.
 		(replacement !== lmr class and: [target module == Kernel])
 			ifTrue: [
+				self addNamespacesOf: replacement to: target.
 				self addOverridesFrom: replacement to: target into: overrides.
 				self addOverridesFrom: replacement class to: target class into: overrides]].
 	self addExtensionsOf: LMR into: overrides.
 	^overrides
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> addNamespacesOf: aClass to: anotherClass [
+	aClass namespaces do: [:namespace | anotherClass addNamespace: namespace]
 ]
 
 { #category : #bootstrapping }
