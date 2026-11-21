@@ -39,7 +39,7 @@ OptimizingSSAReconstructor >> insertPhiAt: block [
 		arguments := predecessors collect: [:pred | | search |
 			search := pred lastInstruction.
 			self reachingDefinitionFrom: search at: pred].
-		phi := OPhi new.
+		phi := OBlockParameter new.
 		block insertPhi: phi.
 		arguments with: predecessors do: [:var :pred | phi addVariable: var from: pred].
 		phi]

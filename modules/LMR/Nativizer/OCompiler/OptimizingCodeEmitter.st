@@ -769,7 +769,7 @@ OptimizingCodeEmitter >> jumpWasAssembledInComparison: aConditionalJump [
 	prev == aConditionalJump variable ifFalse: [^false].
 	prev allUses size != 1 ifTrue: [^false].
 	prev class == OMessageSend ifTrue: [^false].
-	prev class == OPhi ifTrue: [^false].
+	prev class == OBlockParameter ifTrue: [^false].
 	(prev isKindOf: OBinaryOperation) ifTrue: [
 		(#(< <= = == != >= >) includes: prev name) ifTrue: [^true].
 		(#(_basicAt:) includes: prev name) ifTrue: [^false]].

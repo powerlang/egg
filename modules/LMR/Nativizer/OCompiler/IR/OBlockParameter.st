@@ -4,7 +4,7 @@
 "
 
 Class {
-	#name : #OPhi,
+	#name : #OBlockParameter,
 	#superclass : #OInstruction,
 	#instVars : [
 		'blocks'
@@ -13,19 +13,19 @@ Class {
 }
 
 { #category : #unclassified }
-OPhi class >> new [
+OBlockParameter class >> new [
 	^self basicNew initialize
 ]
 
 { #category : #unclassified }
-OPhi >> addEdgeFrom: predecessor [
+OBlockParameter >> addEdgeFrom: predecessor [
 	(blocks includes: predecessor) ifTrue: [^self].
 	blocks add: predecessor.
 	(self atOperand: predecessor) addUse: self at: predecessor
 ]
 
 { #category : #unclassified }
-OPhi >> addVariable: value from: block [
+OBlockParameter >> addVariable: value from: block [
 	self DENY: (blocks includes: block).
 	blocks add: block.
 	self atOperand: block put: value.
@@ -33,22 +33,22 @@ OPhi >> addVariable: value from: block [
 ]
 
 { #category : #unclassified }
-OPhi >> atOperand: name [
+OBlockParameter >> atOperand: name [
 	^(self jumpFrom: name) argumentFor: self
 ]
 
 { #category : #unclassified }
-OPhi >> atOperand: name put: instruction [
+OBlockParameter >> atOperand: name put: instruction [
 	(self jumpFrom: name) argumentFor: self put: instruction
 ]
 
 { #category : #unclassified }
-OPhi >> basicAcceptVisitor: aVisitor [
+OBlockParameter >> basicAcceptVisitor: aVisitor [
 	^aVisitor visitPhi: self
 ]
 
 { #category : #unclassified }
-OPhi >> basicPrintString [
+OBlockParameter >> basicPrintString [
 	| sources |
 	sources := blocks size > 0
 		ifTrue: [
@@ -59,17 +59,17 @@ OPhi >> basicPrintString [
 ]
 
 { #category : #enumerating }
-OPhi >> blocks [
+OBlockParameter >> blocks [
 	^blocks
 ]
 
 { #category : #unclassified }
-OPhi >> blocks: aCollection [
+OBlockParameter >> blocks: aCollection [
 	blocks := aCollection
 ]
 
 { #category : #unclassified }
-OPhi >> dissolve [
+OBlockParameter >> dissolve [
 	| values |
 	values := self leaveBlock.
 	super dissolve.
@@ -77,7 +77,7 @@ OPhi >> dissolve [
 ]
 
 { #category : #unclassified }
-OPhi >> dissolveReplacingWith: anInstruction [
+OBlockParameter >> dissolveReplacingWith: anInstruction [
 	| values |
 	values := self leaveBlock.
 	super dissolveReplacingWith: anInstruction.
@@ -85,33 +85,33 @@ OPhi >> dissolveReplacingWith: anInstruction [
 ]
 
 { #category : #unclassified }
-OPhi >> forgetEdgeFrom: predecessor [
+OBlockParameter >> forgetEdgeFrom: predecessor [
 	(self atOperand: predecessor) removeUse: self at: predecessor.
 	blocks remove: predecessor
 ]
 
 { #category : #unclassified }
-OPhi >> index [
+OBlockParameter >> index [
 	^self basicBlock indexOfPhi: self
 ]
 
 { #category : #unclassified }
-OPhi >> initialize [
+OBlockParameter >> initialize [
 	blocks := OrderedCollection new
 ]
 
 { #category : #unclassified }
-OPhi >> isPhi [
+OBlockParameter >> isPhi [
 	^true
 ]
 
 { #category : #unclassified }
-OPhi >> jumpFrom: block [
+OBlockParameter >> jumpFrom: block [
 	^block lastInstruction
 ]
 
 { #category : #unclassified }
-OPhi >> leaveBlock [
+OBlockParameter >> leaveBlock [
 	| values |
 	values := OrderedCollection new.
 	self operandsDo: [:value | values add: value].
@@ -121,26 +121,26 @@ OPhi >> leaveBlock [
 ]
 
 { #category : #unclassified }
-OPhi >> operandsDo: aBlock [
+OBlockParameter >> operandsDo: aBlock [
 	blocks do: [:block | | value |
 		value := self atOperand: block.
 		aBlock value: value]
 ]
 
 { #category : #unclassified }
-OPhi >> primitivePrintString [
+OBlockParameter >> primitivePrintString [
 	^'{#phi}'
 ]
 
 { #category : #printing }
-OPhi >> printEdge: aBasicBlock using: names [
+OBlockParameter >> printEdge: aBasicBlock using: names [
 	| operand |
 	operand := self atOperand: aBasicBlock.
 	^(names at: aBasicBlock ifAbsent: ['missing']) , '->' , (names at: operand ifAbsent: ['missing'])
 ]
 
 { #category : #unclassified }
-OPhi >> printStringUsing: names [
+OBlockParameter >> printStringUsing: names [
 	| sources |
 	sources := blocks size > 0
 		ifTrue: [
@@ -151,12 +151,12 @@ OPhi >> printStringUsing: names [
 ]
 
 { #category : #enumerating }
-OPhi >> realReverseDo: aBlock [
+OBlockParameter >> realReverseDo: aBlock [
 	
 ]
 
 { #category : #unclassified }
-OPhi >> removeBlock: removed [
+OBlockParameter >> removeBlock: removed [
 	| index variable last |
 	index := blocks indexOf: removed.
 	variable := self atOperand: removed.
@@ -171,7 +171,7 @@ OPhi >> removeBlock: removed [
 ]
 
 { #category : #unclassified }
-OPhi >> removeVariable: removed at: index [
+OBlockParameter >> removeVariable: removed at: index [
 	| block last |
 	block := blocks at: index.
 	removed removeUse: self at: block.
@@ -183,7 +183,7 @@ OPhi >> removeVariable: removed at: index [
 ]
 
 { #category : #enumerating }
-OPhi >> replaceBlock: original with: new [
+OBlockParameter >> replaceBlock: original with: new [
 	blocks withIndexDo: [:block :i |
 		block == original ifTrue: [
 			(self atOperand: new) updateUser: self named: original with: new.
@@ -191,7 +191,7 @@ OPhi >> replaceBlock: original with: new [
 ]
 
 { #category : #printing }
-OPhi >> shortPrintString [
+OBlockParameter >> shortPrintString [
 	| sources |
 	sources := blocks size > 0
 		ifTrue: [(blocks collect: [:block | (self atOperand: block) primitivePrintString]) gather: [:x | x , ', ']]
@@ -200,22 +200,22 @@ OPhi >> shortPrintString [
 ]
 
 { #category : #unclassified }
-OPhi >> sortAfter: predecessors [
+OBlockParameter >> sortAfter: predecessors [
 	blocks := predecessors copy
 ]
 
 { #category : #unclassified }
-OPhi >> usesResultOf: anInstruction [
+OBlockParameter >> usesResultOf: anInstruction [
 	^self variables includes: anInstruction
 ]
 
 { #category : #unclassified }
-OPhi >> variables [
+OBlockParameter >> variables [
 	^blocks collect: [:block | self atOperand: block]
 ]
 
 { #category : #unclassified }
-OPhi >> variablesWithBlocksDo: aBlock [
+OBlockParameter >> variablesWithBlocksDo: aBlock [
 	self variables with: blocks copy do: aBlock
 ]
 

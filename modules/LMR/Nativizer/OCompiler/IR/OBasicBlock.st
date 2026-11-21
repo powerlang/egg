@@ -348,7 +348,7 @@ and: value2
 at: block2
 replacing: operation [
 	| phi |
-	phi := OPhi new.
+	phi := OBlockParameter new.
 	self insertPhi: phi.
 	phi addVariable: value1 from: block1; addVariable: value2 from: block2.
 	operation replaceAllUsesWith: phi; dissolve
@@ -755,7 +755,7 @@ OBasicBlock >> unifyReturns [
 			end addPredecessor: last.
 			jump := OJump to: end.
 			prev afterInsert: jump.
-			phi := OPhi new.
+			phi := OBlockParameter new.
 			end insertPhi: phi.
 			phi
 				addVariable: ret source from: last;

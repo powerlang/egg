@@ -153,7 +153,7 @@ OptimizingVariableBinder >> initialize [
 OptimizingVariableBinder >> insertPhiOf: name at: block [
 	| phi |
 	(self definitionOf: name in: block) ifNotNil: [^self].
-	phi := OPhi new.
+	phi := OBlockParameter new.
 	block insertPhi: phi.
 	phiNames at: phi put: name.
 	pendingPhis add: phi -> block.
