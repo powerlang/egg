@@ -769,7 +769,6 @@ OptimizingCodeEmitter >> jumpWasAssembledInComparison: aConditionalJump [
 	prev == aConditionalJump variable ifFalse: [^false].
 	prev allUses size != 1 ifTrue: [^false].
 	prev class == OMessageSend ifTrue: [^false].
-	prev isBlockParameter ifTrue: [^false].
 	(prev isKindOf: OBinaryOperation) ifTrue: [
 		(#(< <= = == != >= >) includes: prev name) ifTrue: [^true].
 		(#(_basicAt:) includes: prev name) ifTrue: [^false]].
@@ -828,10 +827,6 @@ OptimizingCodeEmitter >> visitBinaryWithVariable: instruction [
 	| selector |
 	selector := #assemble , (self selectorFor: instruction) , #':'.
 	self perform: selector asSymbol with: instruction
-]
-
-{ #category : #unclassified }
-OptimizingCodeEmitter >> visitBlockParameter: aParameter [
 ]
 
 { #category : #unclassified }

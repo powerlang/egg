@@ -345,10 +345,6 @@ OptimizingVariableBinder >> visitBinaryWithVariable: instruction [
 ]
 
 { #category : #unclassified }
-OptimizingVariableBinder >> visitBlockParameter: aParameter [
-]
-
-{ #category : #unclassified }
 OptimizingVariableBinder >> visitDefineArgument: instruction [
 	self define: instruction as: instruction name
 ]

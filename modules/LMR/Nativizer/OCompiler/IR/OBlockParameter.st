@@ -118,11 +118,6 @@ OBlockParameter >> printEdge: aBasicBlock using: names [
 	^(names at: aBasicBlock ifAbsent: ['missing']) , '->' , (names at: operand ifAbsent: ['missing'])
 ]
 
-{ #category : #printing }
-OBlockParameter >> printForwardOn: aStream using: names [
-	next printForwardOn: aStream using: names
-]
-
 { #category : #unclassified }
 OBlockParameter >> printStringUsing: names [
 	| sources |
@@ -132,11 +127,6 @@ OBlockParameter >> printStringUsing: names [
 				gather: [:x | x , ', ']]
 		ifFalse: ['  '].
 	^'phi(' , (sources allButLast: 2) , ')'
-]
-
-{ #category : #enumerating }
-OBlockParameter >> realReverseDo: aBlock [
-	
 ]
 
 { #category : #unclassified }

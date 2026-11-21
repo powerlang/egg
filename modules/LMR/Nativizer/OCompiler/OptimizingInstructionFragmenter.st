@@ -392,10 +392,6 @@ OptimizingInstructionFragmenter >> visitBinaryWithVariable: instruction [
 ]
 
 { #category : #unclassified }
-OptimizingInstructionFragmenter >> visitBlockParameter: instruction [
-]
-
-{ #category : #unclassified }
 OptimizingInstructionFragmenter >> visitDefineArgument: instruction [
 	
 ]

@@ -215,10 +215,6 @@ OptimizingValueNumbering >> resultOfBinaryWithBothConstants: aBinaryInstruction 
 ]
 
 { #category : #unclassified }
-OptimizingValueNumbering >> visitBlockParameter: instruction [
-]
-
-{ #category : #unclassified }
 OptimizingValueNumbering >> visitBranch: branch [
 	| hash receiver |
 	receiver := self nameOf: branch variable.
