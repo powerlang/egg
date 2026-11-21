@@ -197,7 +197,7 @@ TemplateJIT >> captureClosure: anSBlock [
 
 { #category : #services }
 TemplateJIT >> captureVariable: stream index: anInteger [
-	| type pos |
+	| type pos slot |
 	type := stream next.
 	type = nil ifTrue: [^self].
 	type = Self ifTrue: [^assembler storeSinRindex: anInteger].
@@ -208,7 +208,12 @@ TemplateJIT >> captureVariable: stream index: anInteger [
 			loadTwithFPindex: 3 + self argumentCount - pos;
 			storeTinRindex: anInteger].
 	type = EnvironmentValue
-		ifTrue: [assembler loadTwithEindex: pos + activeScript offsetOfCurrentEnvironment; storeTinRindex: anInteger]
+		ifTrue: [assembler loadTwithEindex: pos + activeScript offsetOfCurrentEnvironment; storeTinRindex: anInteger].
+	type = InlinedArgument ifTrue: [
+		slot := self stackIndexOfTemporary: pos.
+		assembler
+			loadTwithFPindex: slot;
+			storeTinRindex: anInteger]
 ]
 
 { #category : #services }
@@ -849,12 +854,16 @@ TemplateJIT >> temporaryInEnvironment: envIndex atPut: index [
 
 { #category : #services }
 TemplateJIT >> temporaryInStackAt: index [
-		| start |
-	start := self pushesEnvironments
-					 ifTrue: [ -3 ]
-					 ifFalse: [ -1 ].
-		^ assembler loadRwithFPindex: start - index .
+	| slot |
+	slot := self stackIndexOfTemporary: index.
+	^assembler loadRwithFPindex: slot
+]
 
+{ #category : #services }
+TemplateJIT >> stackIndexOfTemporary: index [
+	| start |
+	start := self pushesEnvironments ifTrue: [-3] ifFalse: [-1].
+	^start - index
 ]
 
 { #category : #services }
