@@ -648,6 +648,23 @@ OptimizingCodeEmitter >> assemblePush: instruction [
 ]
 
 { #category : #unclassified }
+OptimizingCodeEmitter >> assembleQuotientConstant: instruction [
+	| left shift |
+	left := allocation at: instruction left.
+	shift := self equivalentShiftsToLowerMultiplyBy: instruction right.
+	assembler
+		shiftRightArithmetic: left byImm: shift;
+		setIntegerBit: left
+]
+
+{ #category : #unclassified }
+OptimizingCodeEmitter >> assembleRemainderConstant: instruction [
+	| left |
+	left := allocation at: instruction left.
+	assembler and: left withImm: instruction right * 2 - 1
+]
+
+{ #category : #unclassified }
 OptimizingCodeEmitter >> assembleRestorePreviousContext: instruction [
 	assembler restoreCallerFrame
 ]
@@ -737,6 +754,8 @@ OptimizingCodeEmitter >> initializeAssemblers [
 		at: #'+' put: #Plus;
 		at: #'-' put: #Minus;
 		at: #'*' put: #Times;
+		at: #'//' put: #Quotient;
+		at: #'\\' put: #Remainder;
 		at: #'=' put: #Equals;
 		at: #'==' put: #Equals;
 		at: #'~=' put: #NotEqual;

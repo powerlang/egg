@@ -101,6 +101,15 @@ OptimizingInstructionFragmenter >> fragmentCallSite: instruction [
 ]
 
 { #category : #unclassified }
+OptimizingInstructionFragmenter >> fragmentDivision: instruction [
+	| divisor |
+	divisor := instruction arguments first.
+	(divisor isConstant and: [self isPowerOfTwo: divisor value])
+		ifTrue: [^self replace: instruction withBinary: instruction receiver withConstant: divisor].
+	self fragmentGenericMessage: instruction
+]
+
+{ #category : #unclassified }
 OptimizingInstructionFragmenter >> fragmentGenericMessage: instruction [
 	| arguments new |
 	arguments := instruction arguments.
@@ -286,8 +295,8 @@ OptimizingInstructionFragmenter >> initializeMessages [
 		at: #'+' put: #BinaryCommutative:;
 		at: #'-' put: #BinaryNonCommutative:;
 		at: #'*' put: #BinaryCommutative:;
-		at: #'//' put: #BinaryNonCommutative:;
-		at: #'\\' put: #BinaryNonCommutative:;
+		at: #'//' put: #Division:;
+		at: #'\\' put: #Division:;
 		at: #'<' put: #BinaryCompare:;
 		at: #'<=' put: #BinaryCompare:;
 		at: #'=' put: #BinaryCompare:;
@@ -342,6 +351,11 @@ OptimizingInstructionFragmenter >> insertPush: anInstruction before: instruction
 	anInstruction addUse: push at: #receiver.
 	instruction beforeInsert: push.
 	^push
+]
+
+{ #category : #private }
+OptimizingInstructionFragmenter >> isPowerOfTwo: anObject [
+	^anObject isSmallInteger and: [anObject > 0 and: [(anObject bitAnd: anObject - 1) = 0]]
 ]
 
 { #category : #private }
