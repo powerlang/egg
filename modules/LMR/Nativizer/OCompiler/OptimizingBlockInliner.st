@@ -54,7 +54,7 @@ OptimizingBlockInliner >> inlineIfFalse: message in: block [
 	lastSkipped endWithJumpTo: join.
 	firstSkipped addPredecessor: block.
 	join addPredecessor: lastSkipped; addPredecessor: block.
-	message dissolve.
+	self insertParameterAt: join of: lastSkipped orNilFrom: block replacing: message.
 	^join
 ]
 
@@ -70,7 +70,7 @@ OptimizingBlockInliner >> inlineIfTrue: message in: block [
 	lastSkipped endWithJumpTo: join.
 	firstSkipped addPredecessor: block.
 	join addPredecessor: lastSkipped; addPredecessor: block.
-	message dissolve.
+	self insertParameterAt: join of: lastSkipped orNilFrom: block replacing: message.
 	^join
 ]
 
@@ -167,6 +167,15 @@ OptimizingBlockInliner >> inlineWhileTrue: message in: block [
 	firstConsequent addPredecessor: lastAntecedent.
 	join addPredecessor: lastAntecedent.
 	^join
+]
+
+{ #category : #unclassified }
+OptimizingBlockInliner >> insertParameterAt: join of: lastSkipped orNilFrom: block replacing: message [
+	| constant |
+	message isUsed ifFalse: [^message dissolve].
+	constant := OLoadConstant valued: nil.
+	block lastInstruction beforeInsert: constant.
+	join insertParameterOf: constant at: block and: lastSkipped replacing: message
 ]
 
 { #category : #unclassified }
