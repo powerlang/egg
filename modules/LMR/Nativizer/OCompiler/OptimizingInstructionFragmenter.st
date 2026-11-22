@@ -275,6 +275,12 @@ OptimizingInstructionFragmenter >> fragmentUnary: instruction [
 	instruction dissolveReplacingWith: new
 ]
 
+{ #category : #private }
+OptimizingInstructionFragmenter >> hasBoxedNumber: instruction [
+	^instruction operands anySatisfy: [:operand |
+		operand isConstant and: [operand value isNumber and: [operand value isSmallInteger not]]]
+]
+
 { #category : #unclassified }
 OptimizingInstructionFragmenter >> initialize [
 	self initializeMessages
@@ -428,7 +434,8 @@ OptimizingInstructionFragmenter >> visitLoadImplicit: instruction [
 { #category : #unclassified }
 OptimizingInstructionFragmenter >> visitMessageSend: instruction [
 	| selector |
-	instruction isSuper ifTrue: [^self fragmentGenericMessage: instruction].
+	(instruction isSuper or: [self hasBoxedNumber: instruction])
+		ifTrue: [^self fragmentGenericMessage: instruction].
 	selector := self selectorFor: instruction selector.
 	self perform: selector with: instruction
 ]
