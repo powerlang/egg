@@ -265,7 +265,20 @@ OptimizingBlockInliner >> inlineOr: message in: block [
 
 { #category : #unclassified }
 OptimizingBlockInliner >> inliners [
-	^#(ifTrue: ifFalse: ifTrue:ifFalse: ifFalse:ifTrue: and: or: to:do: to:by:do: whileTrue: whileFalse: ifNil: ifNotNil: ifNil:ifNotNil: ifNotNil:ifNil:)
+	^#(ifTrue: ifFalse: ifTrue:ifFalse: ifFalse:ifTrue: and: or: to:do: to:by:do: timesRepeat: whileTrue: whileFalse: ifNil: ifNotNil: ifNil:ifNotNil: ifNotNil:ifNil:)
+]
+
+{ #category : #unclassified }
+OptimizingBlockInliner >> inlineTimesRepeat: message in: block [
+	| one |
+	one := OLoadConstant valued: 1.
+	message beforeInsert: one.
+	^self
+		inlineLoop: message
+		in: block
+		from: one
+		to: message receiver
+		by: 1
 ]
 
 { #category : #unclassified }
