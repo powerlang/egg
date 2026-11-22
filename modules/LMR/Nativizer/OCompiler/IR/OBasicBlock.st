@@ -685,8 +685,12 @@ OBasicBlock >> successorsDo: aBlock [
 
 { #category : #unclassified }
 OBasicBlock >> successorsPostOrder [
-	| seen result |
-	seen := Set new.
+	^self successorsPostOrderSkipping: Set new
+]
+
+{ #category : #unclassified }
+OBasicBlock >> successorsPostOrderSkipping: seen [
+	| result |
 	result := OrderedCollection new: 10.
 	self
 		successorsDo: [:succ | (seen includes: succ)

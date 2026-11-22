@@ -318,7 +318,9 @@ OInstruction >> livesAfter: anInstruction orOutOf: aBasicBlock [
 
 { #category : #unclassified }
 OInstruction >> livesOutOfBlock: aBasicBlock [
-	aBasicBlock successorsPostOrder
+	| definer |
+	definer := Set with: self basicBlock.
+	(aBasicBlock successorsPostOrderSkipping: definer)
 		reverseDo: [:block | (block usesResultOf: self) ifTrue: [^true]].
 	^false
 ]
