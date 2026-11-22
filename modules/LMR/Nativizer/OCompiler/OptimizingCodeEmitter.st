@@ -641,8 +641,11 @@ OptimizingCodeEmitter >> assembleObjectAtOffsetPut: instruction [
 	| base value offset |
 	base := allocation at: instruction receiver.
 	value := allocation at: instruction right.
-	offset := instruction left value.
-	assembler storePointer: value in: base offset: offset
+	offset := allocation at: instruction left.
+	assembler
+		convertToNativeInteger: offset;
+		storePointer: value in: base offset: offset;
+		convertToSmallInteger: offset
 ]
 
 { #category : #unclassified }

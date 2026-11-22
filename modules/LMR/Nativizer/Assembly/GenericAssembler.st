@@ -1822,6 +1822,13 @@ GenericAssembler >> storeLongTinRatOffsetA [
 ]
 
 { #category : #storing }
+GenericAssembler >> storePointer: srcReg in: baseReg offset: offsetReg [
+	| memref |
+	memref := codegen memRef: baseReg offset: offsetReg.
+	codegen store: srcReg intoMem: memref
+]
+
+{ #category : #storing }
 GenericAssembler >> storeRinAindex: index [
 	| memref |
 	memref := codegen memRef: codegen regA indexImm: index.
