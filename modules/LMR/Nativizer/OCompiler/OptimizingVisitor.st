@@ -57,6 +57,25 @@ OptimizingVisitor >> isReceiver [
 ]
 
 { #category : #unclassified }
+OptimizingVisitor >> send: aMessageNode to: anInstruction [
+	| arguments send block |
+	block := currentBlock.
+	arguments := aMessageNode arguments
+		collect: [:node | node acceptVisitor: self].
+	send := OMessageSend
+		receiver: anInstruction
+		selector: aMessageNode selector value asSymbol
+		arguments: arguments.
+	aMessageNode receiver isSuper ifTrue: [send beSuperFrom: classBinding].
+	anInstruction addUse: send at: #receiver.
+	arguments
+		withIndexDo: [:argument :i | argument isInstruction
+			ifTrue: [argument addUse: send at: i]].
+	block add: send.
+	^send
+]
+
+{ #category : #unclassified }
 OptimizingVisitor >> store: operation into: anIdentifierNode [
 	| instruction |
 	instruction := OWriteVariable
@@ -94,15 +113,10 @@ OptimizingVisitor >> visitBlock: aBlockNode [
 
 { #category : #unclassified }
 OptimizingVisitor >> visitCascade: aCascadeNode [
-	| result |
-	aCascadeNode receiver acceptVisitor: self.
-	aCascadeNode messages do: [:node | result := node acceptVisitor: self].
+	| receiver result |
+	receiver := aCascadeNode receiver acceptVisitor: self.
+	aCascadeNode messages do: [:node | result := self send: node to: receiver].
 	^result
-]
-
-{ #category : #unclassified }
-OptimizingVisitor >> visitCascadeMessage: aCascadeMessageNode [
-	^self visitMessage: aCascadeMessageNode
 ]
 
 { #category : #unclassified }
@@ -128,22 +142,9 @@ OptimizingVisitor >> visitLiteral: aLiteralNode [
 
 { #category : #unclassified }
 OptimizingVisitor >> visitMessage: aMessageNode [
-	| receiver arguments send block |
-	block := currentBlock.
+	| receiver |
 	receiver := aMessageNode receiver acceptVisitor: self.
-	arguments := aMessageNode arguments
-		collect: [:node | node acceptVisitor: self].
-	send := OMessageSend
-		receiver: receiver
-		selector: aMessageNode selector value asSymbol
-		arguments: arguments.
-	aMessageNode receiver isSuper ifTrue: [send beSuperFrom: classBinding].
-	receiver addUse: send at: #receiver.
-	arguments
-		withIndexDo: [:argument :i | argument isInstruction
-			ifTrue: [argument addUse: send at: i]].
-	block add: send.
-	^send
+	^self send: aMessageNode to: receiver
 ]
 
 { #category : #unclassified }
