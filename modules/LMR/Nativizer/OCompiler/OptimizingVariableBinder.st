@@ -77,15 +77,11 @@ OptimizingVariableBinder >> resolve: aReadVariable asDynamic: binding [
 
 { #category : #private }
 OptimizingVariableBinder >> associationFor: name [
-	| current symbol assoc |
+	| symbol assoc |
 	symbol := name asSymbol.
-	current := method classBinding.
-	[current notNil] whileTrue: [
-		current namespaces do: [:ns |
-			assoc := ns associationAt: symbol ifAbsent: [nil].
-			assoc ifNotNil: [^assoc]].
-		current := current superclass].
-	^method module namespace associationAt: symbol ifAbsent: [nil]
+	assoc := method associationFor: symbol.
+	assoc ifNotNil: [^assoc].
+	^LMRProtoObject module namespace associationAt: symbol ifAbsent: nil
 ]
 
 { #category : #private }
