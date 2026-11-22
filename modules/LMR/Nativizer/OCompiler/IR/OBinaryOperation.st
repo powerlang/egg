@@ -38,9 +38,7 @@ OBinaryOperation >> invertOperation [
 	name == #'<' ifTrue: [^name := #'>'].
 	name == #'<=' ifTrue: [^name := #'>='].
 	name == #'>' ifTrue: [^name := #'<'].
-	name == #'>=' ifTrue: [^name := #'<='].
-	name == #'==' ifTrue: [^name].
-	self halt
+	name == #'>=' ifTrue: [^name := #'<=']
 ]
 
 { #category : #unclassified }
