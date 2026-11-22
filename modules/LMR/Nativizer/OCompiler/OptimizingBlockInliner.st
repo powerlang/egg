@@ -35,6 +35,15 @@ OptimizingBlockInliner >> doInline [
 	self inlineInnerBlocksOf: firstBlock
 ]
 
+{ #category : #private }
+OptimizingBlockInliner >> familyOf: selector [
+	| keywords |
+	keywords := selector keywords asSet.
+	(keywords size = 1 and: [#('and:' 'or:') includes: keywords anyone])
+		ifTrue: [^keywords anyone asSymbol].
+	^selector
+]
+
 { #category : #unclassified }
 OptimizingBlockInliner >> inline: aMessageSend in: block [
 	^self performInlinerFor: aMessageSend in: block
@@ -61,28 +70,41 @@ OptimizingBlockInliner >> inline: message in: block if: condition then: positive
 
 { #category : #unclassified }
 OptimizingBlockInliner >> inlineAnd: message in: block [
-	| closure firstSkipped lastSkipped join |
-	closure := message arguments first.
-	firstSkipped := closure firstBlock.
-	self inlineInnerBlocksOf: firstSkipped.
-	lastSkipped := firstSkipped lastBlock.
-	join := block splitAfter: message.
-	block endWithJumpFalseTo: join skipping: firstSkipped if: message receiver.
-	lastSkipped endWithJumpTo: join.
-	firstSkipped addPredecessor: block.
-	join addPredecessor: block; addPredecessor: lastSkipped.
-	join
-		insertParameterOf: message receiver
-		at: block
-		and: lastSkipped
-		replacing: message.
-	^join
+	^self inlineChain: message in: block exitingWith: OJumpFalse
 ]
 
 { #category : #unclassified }
 OptimizingBlockInliner >> inlineAndNot: message in: block [
 	self negate: message arguments first.
 	^self inlineAnd: message in: block
+]
+
+{ #category : #unclassified }
+OptimizingBlockInliner >> inlineChain: message in: block exitingWith: jumpType [
+	| join current condition values parameter |
+	join := block splitAfter: message.
+	current := block.
+	condition := message receiver.
+	values := OrderedCollection new.
+	message arguments do: [:closure | | first |
+		first := closure firstBlock.
+		self inlineInnerBlocksOf: first.
+		current
+			endWith: jumpType
+			to: join
+			skipping: first
+			if: condition.
+		first addPredecessor: current.
+		join addPredecessor: current.
+		values add: condition.
+		current := first lastBlock.
+		condition := current lastValue].
+	current endWithJumpTo: join.
+	join addPredecessor: current.
+	values add: condition.
+	parameter := join newParameterWith: values.
+	message replaceAllUsesWith: parameter; dissolve.
+	^join
 ]
 
 { #category : #unclassified }
@@ -254,22 +276,7 @@ OptimizingBlockInliner >> inlineNilCheck: message in: block skippingWith: jumpTy
 
 { #category : #unclassified }
 OptimizingBlockInliner >> inlineOr: message in: block [
-	| closure firstSkipped lastSkipped join |
-	closure := message arguments first.
-	firstSkipped := closure firstBlock.
-	self inlineInnerBlocksOf: firstSkipped.
-	lastSkipped := firstSkipped lastBlock.
-	join := block splitAfter: message.
-	block endWithJumpTrueTo: join skipping: firstSkipped if: message receiver.
-	lastSkipped endWithJumpTo: join.
-	firstSkipped addPredecessor: block.
-	join addPredecessor: block; addPredecessor: lastSkipped.
-	join
-		insertParameterOf: message receiver
-		at: block
-		and: lastSkipped
-		replacing: message.
-	^join
+	^self inlineChain: message in: block exitingWith: OJumpTrue
 ]
 
 { #category : #unclassified }
@@ -400,8 +407,9 @@ OptimizingBlockInliner >> on: block [
 
 { #category : #private }
 OptimizingBlockInliner >> performInlinerFor: messageSend in: block [
-	| selector inliner |
-	selector := messageSend selector asString copyWithout: $:.
+	| family selector inliner |
+	family := self familyOf: messageSend selector.
+	selector := family asString copyWithout: $:.
 	inliner := #inline , selector capitalized , ':in:'.
 	^self perform: inliner asSymbol with: messageSend with: block
 ]
@@ -417,9 +425,11 @@ OptimizingBlockInliner >> send: selector to: receiver with: argument [
 
 { #category : #unclassified }
 OptimizingBlockInliner >> shouldInline: anInstruction [
-	^anInstruction isMessageSend
-		and: [anInstruction isSuper not
-			and: [(self inliners includes: anInstruction selector)
-				and: [(self closuresOf: anInstruction) conform: [:closure | closure isBlockClosure]]]]
+	| family |
+	anInstruction isMessageSend ifFalse: [^false].
+	family := self familyOf: anInstruction selector.
+	^anInstruction isSuper not
+		and: [(self inliners includes: family)
+			and: [(self closuresOf: anInstruction) conform: [:closure | closure isBlockClosure]]]
 ]
 
