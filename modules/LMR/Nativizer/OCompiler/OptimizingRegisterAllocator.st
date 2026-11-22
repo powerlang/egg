@@ -94,7 +94,7 @@ OptimizingRegisterAllocator >> anyReadyArgumentIn: aCollection [
 { #category : #unclassified }
 OptimizingRegisterAllocator >> assign: register to: aRange [
 	((free includes: register) not and: [(used at: register) != aRange])
-		ifTrue: [self error: 'register ' , register , ' is not free'].
+		ifTrue: [self error: 'register ' , register printString , ' is not free'].
 	allocation at: aRange put: register.
 	free remove: register ifAbsent: [].
 	used at: register put: aRange
