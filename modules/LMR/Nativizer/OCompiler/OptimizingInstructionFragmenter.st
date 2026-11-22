@@ -162,17 +162,6 @@ OptimizingInstructionFragmenter >> fragmentNormalArgumentsIn: aBasicBlock [
 ]
 
 { #category : #unclassified }
-OptimizingInstructionFragmenter >> fragmentNot: instruction [
-	| negated |
-	negated := instruction receiver halt shallowCopy.
-	negated negateOperation.
-	negated left addUse: negated at: #left.
-	negated right addUse: negated at: #right.
-	instruction dissolveReplacingWith: negated.
-	instruction receiver dissolveIfUnused
-]
-
-{ #category : #unclassified }
 OptimizingInstructionFragmenter >> fragmentPatchIndirectCallSiteTo: instruction [
 	| nativeCode callsite patch |
 	nativeCode := instruction arguments first.
@@ -330,7 +319,6 @@ OptimizingInstructionFragmenter >> initializeMessages [
 		at: #_transferControlTo: put: #TransferControlTo:;
 		at: #_callSite put: #CallSite:;
 		at: #_patchIndirectCallSiteTo: put: #PatchIndirectCallSiteTo:;
-		at: #not put: #Not:;
 		yourself
 ]
 
