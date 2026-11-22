@@ -499,29 +499,6 @@ OptimizingRegisterAllocator >> use: operand from: anInstruction in: block [
 ]
 
 { #category : #unclassified }
-OptimizingRegisterAllocator >> usedRangeLessAccessed [
-	| ranges |
-	ranges := (used copy removeKey: abi regFP) values asOrderedCollection.
-	^ranges
-		min: [:range | (range allDefinitions , range allUses reject: #isBlockParameter) size]
-]
-
-{ #category : #unclassified }
-OptimizingRegisterAllocator >> usedRangeReadLast [
-	| ranges |
-	ranges := (used copy removeKey: abi regFP) values asOrderedCollection.
-	currentBlock
-		instructionsWithReversePostOrderSuccessorsDo: [:instruction | | candidate |
-			candidate := ranges first.
-			ranges removeAllSuchThat: [:range | 
-				range allDefinitions
-					anySatisfy: [:definition | instruction usesResultOf: definition]].
-			ranges size = 1 ifTrue: [^ranges first].
-			ranges size = 0 ifTrue: [^candidate]].
-	self ASSERT: false
-]
-
-{ #category : #unclassified }
 OptimizingRegisterAllocator >> usedRangeReadLastAfter: first [
 	| ranges |
 	ranges := (used copy removeKey: abi regFP) values asOrderedCollection.
