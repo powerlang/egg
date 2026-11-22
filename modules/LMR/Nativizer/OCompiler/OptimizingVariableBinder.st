@@ -142,7 +142,7 @@ OptimizingVariableBinder >> definitionOf: name before: block [
 			definitions
 				at: current
 				ifPresent: [:here | here at: name ifPresent: [:value | ^value]]].
-	self error: 'undefined variable <' , name , '>'
+	^nil
 ]
 
 { #category : #unclassified }
@@ -376,7 +376,9 @@ OptimizingVariableBinder >> resolvePendingReads [
 		read := association key.
 		block := association value.
 		source := self definitionOf: read binding name asSymbol before: block.
-		resolved := read replaceWithCopyOf: source.
+		resolved := source
+			ifNil: [self resolveUndefined: read]
+			ifNotNil: [read replaceWithCopyOf: source].
 		self redefine: read as: resolved]
 ]
 
@@ -385,6 +387,14 @@ OptimizingVariableBinder >> resolveSelf: aReadVariable [
 	| receiver |
 	receiver := self definitionOf: #self.
 	^aReadVariable replaceAllUsesWith: receiver; dissolve
+]
+
+{ #category : #unclassified }
+OptimizingVariableBinder >> resolveUndefined: aReadVariable [
+	| constant |
+	constant := OLoadConstant valued: nil.
+	aReadVariable dissolveReplacingWith: constant.
+	^constant
 ]
 
 { #category : #unclassified }
