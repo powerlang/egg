@@ -22,8 +22,11 @@ OptimizingBlockInliner >> bind: value to: closure [
 
 { #category : #private }
 OptimizingBlockInliner >> closuresOf: message [
-	(#(to:do: to:by:do:) includes: message selector)
-		ifTrue: [^{message arguments last}].
+	| selector |
+	selector := message selector.
+	(#(to:do: to:by:do:) includes: selector) ifTrue: [^{message arguments last}].
+	(#(whileTrue: whileFalse: whileTrue whileFalse repeat) includes: selector)
+		ifTrue: [^message arguments copyWith: message receiver].
 	^message arguments
 ]
 
@@ -276,8 +279,16 @@ OptimizingBlockInliner >> inlineOrNot: message in: block [
 ]
 
 { #category : #unclassified }
+OptimizingBlockInliner >> inlineRepeat: message in: block [
+	| constant |
+	constant := OLoadConstant valued: true.
+	message receiver lastBlock add: constant.
+	^self inlineWhile: message in: block exitingWith: OJumpFalse
+]
+
+{ #category : #unclassified }
 OptimizingBlockInliner >> inliners [
-	^#(ifTrue: ifFalse: ifTrue:ifFalse: ifFalse:ifTrue: and: or: andNot: orNot: to:do: to:by:do: timesRepeat: whileTrue: whileFalse: ifNil: ifNotNil: ifNil:ifNotNil: ifNotNil:ifNil:)
+	^#(ifTrue: ifFalse: ifTrue:ifFalse: ifFalse:ifTrue: and: or: andNot: orNot: to:do: to:by:do: timesRepeat: whileTrue: whileFalse: whileTrue whileFalse repeat ifNil: ifNotNil: ifNil:ifNotNil: ifNotNil:ifNil:)
 ]
 
 { #category : #unclassified }
@@ -319,7 +330,9 @@ OptimizingBlockInliner >> inlineTodo: message in: block [
 OptimizingBlockInliner >> inlineWhile: message in: block exitingWith: jumpType [
 	| antecedent consequent firstAntecedent firstConsequent lastAntecedent lastConsequent join constant |
 	antecedent := message receiver.
-	consequent := message arguments first.
+	consequent := message arguments
+		at: 1
+		ifAbsent: [OBlockClosure containing: OBasicBlock new].
 	firstAntecedent := antecedent firstBlock.
 	firstConsequent := consequent firstBlock.
 	self inlineInnerBlocksOf: firstAntecedent and: firstConsequent.
