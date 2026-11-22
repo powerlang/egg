@@ -77,6 +77,12 @@ OptimizingBlockInliner >> inlineAnd: message in: block [
 ]
 
 { #category : #unclassified }
+OptimizingBlockInliner >> inlineAndNot: message in: block [
+	self negate: message arguments first.
+	^self inlineAnd: message in: block
+]
+
+{ #category : #unclassified }
 OptimizingBlockInliner >> inlineIfFalse: message in: block [
 	| closure firstSkipped lastSkipped join |
 	closure := message arguments first.
@@ -264,8 +270,14 @@ OptimizingBlockInliner >> inlineOr: message in: block [
 ]
 
 { #category : #unclassified }
+OptimizingBlockInliner >> inlineOrNot: message in: block [
+	self negate: message arguments first.
+	^self inlineOr: message in: block
+]
+
+{ #category : #unclassified }
 OptimizingBlockInliner >> inliners [
-	^#(ifTrue: ifFalse: ifTrue:ifFalse: ifFalse:ifTrue: and: or: to:do: to:by:do: timesRepeat: whileTrue: whileFalse: ifNil: ifNotNil: ifNil:ifNotNil: ifNotNil:ifNil:)
+	^#(ifTrue: ifFalse: ifTrue:ifFalse: ifFalse:ifTrue: and: or: andNot: orNot: to:do: to:by:do: timesRepeat: whileTrue: whileFalse: ifNil: ifNotNil: ifNil:ifNotNil: ifNotNil:ifNil:)
 ]
 
 { #category : #unclassified }
@@ -348,6 +360,15 @@ OptimizingBlockInliner >> insertParameterAt: join of: lastSkipped orNilFrom: blo
 	constant := OLoadConstant valued: nil.
 	block lastInstruction beforeInsert: constant.
 	join insertParameterOf: constant at: block and: lastSkipped replacing: message
+]
+
+{ #category : #private }
+OptimizingBlockInliner >> negate: closure [
+	| value not |
+	value := closure lastValue.
+	not := OMessageSend receiver: value selector: #not arguments: #().
+	value addUse: not at: #receiver.
+	closure lastBlock add: not
 ]
 
 { #category : #private }
