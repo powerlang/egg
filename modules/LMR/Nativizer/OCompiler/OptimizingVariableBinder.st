@@ -239,6 +239,17 @@ OptimizingVariableBinder >> instructionsForWriting: aWriteVariable toTemporary: 
 		do: [:block | self insertParameterOf: binding name asSymbol at: block]
 ]
 
+{ #category : #private }
+OptimizingVariableBinder >> redefine: aReadVariable as: anInstruction [
+	definitions do: [:here | self redefine: aReadVariable as: anInstruction in: here]
+]
+
+{ #category : #private }
+OptimizingVariableBinder >> redefine: aReadVariable as: anInstruction in: aDictionary [
+	aDictionary keysAndValuesDo: [:name :value |
+		value == aReadVariable ifTrue: [aDictionary at: name put: anInstruction]]
+]
+
 { #category : #unclassified }
 OptimizingVariableBinder >> resolve: aReadVariable asArgument: binding [
 	| source |
@@ -309,11 +320,12 @@ OptimizingVariableBinder >> resolve: aReadVariable asTemporary: binding [
 
 { #category : #unclassified }
 OptimizingVariableBinder >> resolvePendingReads [
-	pendingReads do: [:association | | read block source |
+	pendingReads do: [:association | | read block source resolved |
 		read := association key.
 		block := association value.
 		source := self definitionOf: read binding name asSymbol before: block.
-		read replaceWithCopyOf: source]
+		resolved := read replaceWithCopyOf: source.
+		self redefine: read as: resolved]
 ]
 
 { #category : #unclassified }
