@@ -109,7 +109,12 @@ NativizationEnvironment >> nativize: aCompiledMethod [
 
 { #category : #services }
 NativizationEnvironment >> nativizeOptimizing: aCompiledMethod [
+	"Temporary, until the OCompiler nativizes blocks: the template JIT first
+	nativizes the method and its blocks, setting the optimizedCode of each
+	CompiledBlock. The OCompiler then replaces only the method's code; the
+	closures it creates run the template code of their blocks"
 	| code on |
+	aCompiledMethod hasBlocks ifTrue: [self nativizeWithoutOptimizing: aCompiledMethod].
 	on := self optimizingNativizer.
 	on method: aCompiledMethod.
 	on messageLinker: messageLinker.

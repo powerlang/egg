@@ -27,7 +27,7 @@ NativizerModule >> imports [
 		#'LMR.SExpressions' -> #(SExpression SMethod SBlock SBinding SInstVarBinding SLocalBinding SArgumentBinding STemporaryBinding SDynamicBinding SAssociationBinding SLiteral SIdentifier SReturn SAssignment SCascade SMessage SPragma TreecodeDecoder).
 		#'LMR.Nativizer.Assembly.Intel' -> #(AMD64CodeGenerator AMD64TemplateAssembler SysVX64ABI WinX64ABI Register).
 		#'LMR.Nativizer.Assembly.Aarch64' -> #(ARM64CodeGenerator ARM64Register ARM64MemoryOperand ARM64BranchFixup AAPCS64ABI).
-		#'LMR.Nativizer.OCompiler' -> #(OptimizingNativizer)
+		#'LMR.Nativizer.OCompiler' -> #(OptimizingNativizer OptimizingVisitor)
 	}
 ]
 
@@ -63,7 +63,8 @@ NativizerModule >> invokedMethods [
 { #category : #accessing }
 NativizerModule >> justLoaded [
 	InlineMessageLinker initializeInlineMessageLinkerFlags.
-	TemplateJIT initializeClosureElementTypes
+	TemplateJIT initializeClosureElementTypes.
+	OptimizingVisitor addNamespace: (TemplateJIT classVarNamed: #ClosureElementTypes)
 ]
 
 { #category : #accessing }

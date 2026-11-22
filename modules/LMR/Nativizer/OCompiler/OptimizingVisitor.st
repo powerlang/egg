@@ -14,6 +14,9 @@ Class {
 		'classBinding',
 		'environment'
 	],
+	#pools : [
+		'ClosureElementTypes'
+	],
 	#category : #OCompiler
 }
 
@@ -24,7 +27,6 @@ OptimizingVisitor class >> new [
 
 { #category : #private }
 OptimizingVisitor >> argumentsOf: aBlockNode [
-	aBlockNode isInlined ifFalse: [^#()].
 	^aBlockNode inlinedArgs asArray collect: [:index | self inlinedArgument: index]
 ]
 
@@ -37,11 +39,47 @@ OptimizingVisitor >> bindingOf: anIdentifierNode [
 ]
 
 { #category : #private }
+OptimizingVisitor >> captureNext: aStream into: closure at: anInteger [
+	"a block that only returns from home captures an environment its method does not have"
+	| value index |
+	value := self decodeNextCapture: aStream.
+	value ifNil: [^self].
+	index := self constant: anInteger.
+	self send: #_basicAt:put: to: closure with: {index. value}
+]
+
+{ #category : #private }
+OptimizingVisitor >> closureFor: aBlockNode [
+	| block closure variables slot |
+	block := self constant: aBlockNode compiledCode.
+	closure := self send: #newClosure to: block with: #().
+	variables := aBlockNode capturedVariables readStream.
+	slot := Closure instSize.
+	[variables atEnd] whileFalse: [
+		slot := slot + 1.
+		self captureNext: variables into: closure at: slot].
+	aBlockNode capturesHome ifTrue: [self send: #saveHomeFrame to: closure with: #()].
+	^closure
+]
+
+{ #category : #private }
 OptimizingVisitor >> constant: anObject [
 	| load |
 	load := OLoadConstant valued: anObject.
 	currentBlock add: load.
 	^load
+]
+
+{ #category : #private }
+OptimizingVisitor >> decodeNextCapture: aStream [
+	| type |
+	type := aStream next.
+	type = Self ifTrue: [^self read: SSelfBinding new].
+	type = LocalArgument ifTrue: [^self read: (SArgumentBinding new index: aStream next)].
+	type = Environment ifTrue: [^environment].
+	type = EnvironmentValue ifTrue: [^self environmentAt: aStream next].
+	type = InlinedArgument ifTrue: [^self read: (self inlinedArgument: aStream next)].
+	self error: 'unknown capture type: ' , type printString
 ]
 
 { #category : #private }
@@ -114,6 +152,14 @@ OptimizingVisitor >> isReceiver [
 	^isReceiver
 ]
 
+{ #category : #private }
+OptimizingVisitor >> read: aBinding [
+	| read |
+	read := OReadVariable binding: aBinding.
+	currentBlock add: read.
+	^read
+]
+
 { #category : #unclassified }
 OptimizingVisitor >> send: aMessageNode to: anInstruction [
 	| arguments send block |
@@ -173,6 +219,7 @@ OptimizingVisitor >> visitAssignment: anAssignmentNode [
 { #category : #unclassified }
 OptimizingVisitor >> visitBlock: aBlockNode [
 	| previous cfg arguments |
+	aBlockNode isInlined ifFalse: [^self closureFor: aBlockNode].
 	previous := currentBlock.
 	cfg := OBasicBlock new.
 	currentBlock := cfg.
@@ -197,12 +244,10 @@ OptimizingVisitor >> visitCascadeReceiver: aCascadeReceiverNode [
 
 { #category : #unclassified }
 OptimizingVisitor >> visitIdentifier: anIdentifierNode [
-	| binding load |
+	| binding |
 	binding := self bindingOf: anIdentifierNode.
 	(self isInEnvironment: binding) ifTrue: [^self environmentAt: binding index].
-	load := OReadVariable binding: binding.
-	currentBlock add: load.
-	^load
+	^self read: binding
 ]
 
 { #category : #unclassified }
