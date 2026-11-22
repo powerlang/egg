@@ -72,7 +72,7 @@ OptimizingVariableBinder >> resolve: aReadVariable asDynamic: binding [
 		read := OBinaryConstantOperation left: global right: self associationValueIndex name: #_basicAt:.
 		global addUse: read at: #left.
 		^aReadVariable beforeInsert: global; dissolveReplacingWith: read].
-	self error: 'unresolved dynamic binding read: ', name
+	^self resolve: aReadVariable asBindSite: name
 ]
 
 { #category : #private }
@@ -86,6 +86,13 @@ OptimizingVariableBinder >> associationFor: name [
 			assoc ifNotNil: [^assoc]].
 		current := current superclass].
 	^method module namespace associationAt: symbol ifAbsent: [nil]
+]
+
+{ #category : #private }
+OptimizingVariableBinder >> bindSiteFor: aString [
+	| site |
+	site := BindSite name: aString asSymbol method: method.
+	^OLoadConstant valued: site
 ]
 
 { #category : #unclassified }
@@ -219,7 +226,7 @@ OptimizingVariableBinder >> instructionsForWriting: aWriteVariable toDynamic: bi
 		global addUse: write at: #receiver.
 		aWriteVariable source addUse: write at: #right.
 		^aWriteVariable beforeInsert: global; dissolveReplacingWith: write].
-	self error: 'unresolved dynamic binding write: ', name
+	^self instructionsForWriting: aWriteVariable toBindSite: name
 ]
 
 { #category : #unclassified }
@@ -234,6 +241,16 @@ OptimizingVariableBinder >> instructionsForWriting: aWriteVariable toAssociation
 	global addUse: write at: #receiver.
 	aWriteVariable source addUse: write at: #right.
 	aWriteVariable beforeInsert: global; dissolveReplacingWith: write
+]
+
+{ #category : #unclassified }
+OptimizingVariableBinder >> instructionsForWriting: aWriteVariable toBindSite: aString [
+	| site write |
+	site := self bindSiteFor: aString.
+	write := OMessageSend receiver: site selector: #value: arguments: {aWriteVariable source}.
+	site addUse: write at: #receiver.
+	aWriteVariable source addUse: write at: 1.
+	^aWriteVariable beforeInsert: site; dissolveReplacingWith: write
 ]
 
 { #category : #unclassified }
@@ -312,6 +329,15 @@ OptimizingVariableBinder >> resolve: aReadVariable asAssociationValue: binding [
 { #category : #private }
 OptimizingVariableBinder >> foldableConstantValueFor: aName [
 	^abi foldableConstants at: aName asSymbol ifAbsent: [self]
+]
+
+{ #category : #private }
+OptimizingVariableBinder >> resolve: aReadVariable asBindSite: aString [
+	| site read |
+	site := self bindSiteFor: aString.
+	read := OMessageSend receiver: site selector: #value arguments: #().
+	site addUse: read at: #receiver.
+	^aReadVariable beforeInsert: site; dissolveReplacingWith: read
 ]
 
 { #category : #unclassified }

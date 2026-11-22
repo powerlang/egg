@@ -14,7 +14,7 @@ OCompilerModule >> imports [
 	^{
 		#Kernel -> #(Array Association ByteArray CharacterArray CompiledBlock CompiledMethod Error Object OrderedCollection Dictionary IdentityDictionary ProtoObject Species String).
 		#'Kernel.LMR' -> #(LMRProtoObject LMRSpecies).
-		#LMR -> #(GCSpace NativeCode SendSite).
+		#LMR -> #(BindSite GCSpace NativeCode SendSite).
 		#'LMR.SExpressions' -> #(STemporaryBinding).
 		#'LMR.Nativizer.Assembly.Intel' -> #(AMD64CodeGenerator AMD64TemplateAssembler Register).
 		#'LMR.Nativizer.Assembly' -> #(GenericAssembler).
