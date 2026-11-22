@@ -39,11 +39,12 @@ OptimizingVariableBinder >> define: aParameter named: aString in: aBasicBlock [
 { #category : #unclassified }
 OptimizingVariableBinder >> insertParameterOf: name at: block [
 	| parameter |
-	(self definitionOf: name in: block) ifNotNil: [^self].
+	(self parameterOf: name in: block) ifNotNil: [^self].
 	parameter := block newParameter.
 	parameterNames at: parameter put: name.
 	pendingParameters add: parameter -> block.
-	self define: parameter as: name in: block.
+	(self definitionOf: name in: block)
+		ifNil: [self define: parameter as: name in: block].
 	(dominanceFrontiers at: block)
 		do: [:frontier | self insertParameterOf: name at: frontier]
 ]
@@ -128,8 +129,7 @@ OptimizingVariableBinder >> definitionOf: name [
 { #category : #unclassified }
 OptimizingVariableBinder >> definitionOf: name before: block [
 	| current |
-	block parametersDo: [:parameter |
-		(parameterNames at: parameter ifAbsent: nil) = name ifTrue: [^parameter]].
+	(self parameterOf: name in: block) ifNotNil: [:parameter | ^parameter].
 	current := block.
 	[
 		current := current immediateDominator.
@@ -276,6 +276,13 @@ OptimizingVariableBinder >> isLive: anAssociation [
 	| block |
 	block := anAssociation value.
 	^anAssociation key livesAfter: block orOutOf: block
+]
+
+{ #category : #private }
+OptimizingVariableBinder >> parameterOf: name in: block [
+	block parametersDo: [:parameter |
+		(parameterNames at: parameter ifAbsent: nil) = name ifTrue: [^parameter]].
+	^nil
 ]
 
 { #category : #private }

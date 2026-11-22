@@ -170,6 +170,21 @@ LauncherTestsModule >> store: aCharacter in: aString [
 ]
 
 { #category : #entries }
+LauncherTestsModule >> countsDown [
+	<callback: slong ()>
+	^self countDownFrom: 42
+]
+
+{ #category : #private }
+LauncherTestsModule >> countDownFrom: anInteger [
+	| index count |
+	index := anInteger + 1.
+	count := 0.
+	[(index := index - 1) > 0 and: [count < 100]] whileTrue: [count := count + 1].
+	^count
+]
+
+{ #category : #entries }
 LauncherTestsModule >> printsLargeProducts [
 	<callback: slong ()>
 	^(4611686018427387903 printString , (4611686018427387903 * -4611686018427387904) printString) size

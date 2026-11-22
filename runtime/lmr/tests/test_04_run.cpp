@@ -96,6 +96,17 @@ TEST_CASE("perform: runs the method it finds", "[run]")
     REQUIRE(result == 42);
 }
 
+TEST_CASE("a loop condition sees the variable it assigns", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    REQUIRE(launcher.loaded());
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+
+    auto result = launcher.run("countsDown");
+    REQUIRE(result == 42);
+}
+
 TEST_CASE("a send is not inlined as a method of another class", "[run]")
 {
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
