@@ -376,7 +376,6 @@ OptimizingBlockInliner >> inlineWhileTrue: message in: block [
 { #category : #unclassified }
 OptimizingBlockInliner >> insertParameterAt: join of: lastSkipped orNilFrom: block replacing: message [
 	| constant |
-	message isUsed ifFalse: [^message dissolve].
 	constant := OLoadConstant valued: nil.
 	block lastInstruction beforeInsert: constant.
 	join insertParameterOf: constant at: block and: lastSkipped replacing: message
