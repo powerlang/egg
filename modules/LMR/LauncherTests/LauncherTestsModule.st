@@ -93,6 +93,18 @@ LauncherTestsModule >> performAnswer [
 ]
 
 { #category : #entries }
+LauncherTestsModule >> expandsArguments [
+	<callback: slong ()>
+	^self invoke: #answer expanding: #()
+]
+
+{ #category : #private }
+LauncherTestsModule >> invoke: aSymbol expanding: anArray [
+	anArray _expandInStackSized: anArray size.
+	^self lookupAndInvoke: aSymbol
+]
+
+{ #category : #entries }
 LauncherTestsModule >> negations [
 	| first second |
 	<callback: slong ()>

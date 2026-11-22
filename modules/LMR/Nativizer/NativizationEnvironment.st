@@ -215,9 +215,16 @@ NativizationEnvironment >> shouldInline: aSymbol [
 { #category : #queries }
 NativizationEnvironment >> shouldOptimize: method [
 	| selector classname |
+	(method literals anySatisfy: [:literal | self stackShapingSelectors includes: literal])
+		ifTrue: [^false].
 	selector := method selector.
 	classname := method classBinding name.
 	^optimizedMethods anySatisfy: [:m | m selector = selector and: [ m classBinding name = classname ]  ]
+]
+
+{ #category : #queries }
+NativizationEnvironment >> stackShapingSelectors [
+	^#(#_beCurrent #_expandInStackSized: #_transferControlDiscardingLastArgTo:)
 ]
 
 { #category : #accessing }

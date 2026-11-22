@@ -96,6 +96,17 @@ TEST_CASE("perform: runs the method it finds", "[run]")
     REQUIRE(result == 42);
 }
 
+TEST_CASE("arguments expanded in the stack reach the method invoked", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    REQUIRE(launcher.loaded());
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+
+    auto result = launcher.run("expandsArguments");
+    REQUIRE(result == 42);
+}
+
 TEST_CASE("inlined andNot: and orNot: negate their last condition", "[run]")
 {
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
