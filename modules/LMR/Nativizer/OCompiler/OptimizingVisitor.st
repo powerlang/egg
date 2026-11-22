@@ -11,7 +11,8 @@ Class {
 		'currentBlock',
 		'isReceiver',
 		'argumentsCount',
-		'classBinding'
+		'classBinding',
+		'environment'
 	],
 	#category : #OCompiler
 }
@@ -35,11 +36,44 @@ OptimizingVisitor >> bindingOf: anIdentifierNode [
 	^self inlinedArgument: binding index
 ]
 
+{ #category : #private }
+OptimizingVisitor >> constant: anObject [
+	| load |
+	load := OLoadConstant valued: anObject.
+	currentBlock add: load.
+	^load
+]
+
+{ #category : #private }
+OptimizingVisitor >> environmentAt: anInteger [
+	| index |
+	index := self constant: anInteger.
+	^self send: #_basicAt: to: environment with: {index}
+]
+
+{ #category : #private }
+OptimizingVisitor >> environmentAt: anInteger put: operation [
+	| index store |
+	index := self constant: anInteger.
+	store := self send: #_basicAt:put: to: environment with: {index. operation}.
+	self send: #holdRefererIfNeeded: to: operation with: {environment}.
+	^store
+]
+
 { #category : #unclassified }
 OptimizingVisitor >> initialize [
 	firstBlock := OBasicBlock new.
 	currentBlock := firstBlock.
 	isReceiver := true
+]
+
+{ #category : #private }
+OptimizingVisitor >> initializeEnvironmentFor: aCompiledMethod [
+	| array size |
+	aCompiledMethod hasEnvironment ifFalse: [^self].
+	array := self constant: Array.
+	size := self constant: aCompiledMethod environmentCount.
+	environment := self send: #new: to: array with: {size}
 ]
 
 { #category : #private }
@@ -70,6 +104,11 @@ OptimizingVisitor >> insertReturnSelf [
 	^instruction
 ]
 
+{ #category : #private }
+OptimizingVisitor >> isInEnvironment: aBinding [
+	^aBinding isTemporary and: [aBinding environment = 0]
+]
+
 { #category : #unclassified }
 OptimizingVisitor >> isReceiver [
 	^isReceiver
@@ -94,9 +133,21 @@ OptimizingVisitor >> send: aMessageNode to: anInstruction [
 	^send
 ]
 
+{ #category : #private }
+OptimizingVisitor >> send: aSymbol to: receiver with: arguments [
+	| send |
+	send := OMessageSend receiver: receiver selector: aSymbol arguments: arguments.
+	receiver addUse: send at: #receiver.
+	arguments withIndexDo: [:argument :i | argument addUse: send at: i].
+	currentBlock add: send.
+	^send
+]
+
 { #category : #unclassified }
 OptimizingVisitor >> store: operation into: anIdentifierNode [
 	| instruction |
+	(self isInEnvironment: anIdentifierNode binding)
+		ifTrue: [^self environmentAt: anIdentifierNode binding index put: operation].
 	instruction := OWriteVariable
 		binding: anIdentifierNode binding
 		valued: operation.
@@ -148,6 +199,7 @@ OptimizingVisitor >> visitCascadeReceiver: aCascadeReceiverNode [
 OptimizingVisitor >> visitIdentifier: anIdentifierNode [
 	| binding load |
 	binding := self bindingOf: anIdentifierNode.
+	(self isInEnvironment: binding) ifTrue: [^self environmentAt: binding index].
 	load := OReadVariable binding: binding.
 	currentBlock add: load.
 	^load
@@ -155,10 +207,7 @@ OptimizingVisitor >> visitIdentifier: anIdentifierNode [
 
 { #category : #unclassified }
 OptimizingVisitor >> visitLiteral: aLiteralNode [
-	| load |
-	load := OLoadConstant valued: aLiteralNode value.
-	currentBlock add: load.
-	^load
+	^self constant: aLiteralNode value
 ]
 
 { #category : #unclassified }
@@ -175,6 +224,7 @@ OptimizingVisitor >> visitMethod: aMethodNode [
 	argumentsCount := aMethodNode compiledCode argumentCount.
 	classBinding := aMethodNode compiledCode classBinding.
 	1 to: argumentsCount do: [:i | self insertDefineArgument: ('arg', i printString) asSymbol].
+	self initializeEnvironmentFor: aMethodNode compiledCode.
 	self visitScript: aMethodNode.
 	last := currentBlock lastValue.
 	last isReturn ifFalse: [self insertReturnSelf]
