@@ -255,13 +255,29 @@ OptimizingCodeEmitter >> assembleBitOrConstant: instruction [
 
 { #category : #unclassified }
 OptimizingCodeEmitter >> assembleBitShift: instruction [
-	| src offset right |
+	| src right count negative done |
 	src := allocation at: instruction left.
 	right := instruction right.
 	right isConstant
 		ifTrue: [^self assembleBitShift: src by: right value].
-	offset := allocation at: right.
-	offset halt
+	count := allocation at: right.
+	negative := assembler newLabel.
+	done := assembler newLabel.
+	assembler
+		convertToNativeInteger: count;
+		test: count with: count;
+		jumpIfSignTo: negative;
+		clearIntegerBit: src;
+		shiftLeft: src by: count;
+		setIntegerBit: src;
+		jumpTo: done;
+		@ negative;
+		negate: count;
+		shiftRightArithmetic: src by: count;
+		setIntegerBit: src;
+		negate: count;
+		@ done;
+		convertToSmallInteger: count
 ]
 
 { #category : #unclassified }
@@ -269,12 +285,12 @@ OptimizingCodeEmitter >> assembleBitShift: src by: amount [
 	amount > 0
 		ifTrue: [
 			assembler
-				convertToNativeInteger: src;
-				shiftLeft: src by: amount + 1;
-				convertToSmallInteger: src]
+				clearIntegerBit: src;
+				shiftLeft: src byImm: amount;
+				setIntegerBit: src]
 		ifFalse: [
 			assembler
-				shiftRight: src by: 0 - amount;
+				shiftRightArithmetic: src byImm: 0 - amount;
 				setIntegerBit: src]
 ]
 
