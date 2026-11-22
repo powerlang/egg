@@ -51,7 +51,7 @@ OBlockParameter >> basicPrintString [
 			(self predecessors collect: [:block | block name , '->' , (self atOperand: block) primitivePrintString])
 				gather: [:x | x , ', ']]
 		ifFalse: ['  '].
-	^'[phi(' , (sources allButLast: 2) , ')]'
+	^'[param(' , (sources allButLast: 2) , ')]'
 ]
 
 { #category : #unclassified }
@@ -108,7 +108,7 @@ OBlockParameter >> predecessors [
 
 { #category : #unclassified }
 OBlockParameter >> primitivePrintString [
-	^'{#phi}'
+	^'{#param}'
 ]
 
 { #category : #printing }
@@ -126,7 +126,7 @@ OBlockParameter >> printStringUsing: names [
 			(self predecessors collect: [:block | self printEdge: block using: names])
 				gather: [:x | x , ', ']]
 		ifFalse: ['  '].
-	^'phi(' , (sources allButLast: 2) , ')'
+	^'param(' , (sources allButLast: 2) , ')'
 ]
 
 { #category : #unclassified }
@@ -156,7 +156,7 @@ OBlockParameter >> shortPrintString [
 	sources := self predecessors size > 0
 		ifTrue: [(self predecessors collect: [:block | (self atOperand: block) primitivePrintString]) gather: [:x | x , ', ']]
 		ifFalse: ['  '].
-	^'[phi(' , (sources allButLast: 2) , ')]'
+	^'[param(' , (sources allButLast: 2) , ')]'
 ]
 
 { #category : #unclassified }
