@@ -77,7 +77,8 @@ OptimizingVisitor >> visit: aParseNode [
 OptimizingVisitor >> visitAssignment: anAssignmentNode [
 	| result |
 	result := anAssignmentNode expression acceptVisitor: self.
-	anAssignmentNode assignees do: [:node | self store: result into: node]
+	anAssignmentNode assignees do: [:node | self store: result into: node].
+	^result
 ]
 
 { #category : #unclassified }
