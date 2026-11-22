@@ -1217,6 +1217,11 @@ GenericAssembler >> moveX0toR [
 	codegen moveDouble: codegen regX0 into: codegen regR
 ]
 
+{ #category : #'operations - arithmetic' }
+GenericAssembler >> multiply: src1AndDst by: src2 [
+	codegen multiply: src1AndDst by: src2
+]
+
 { #category : #'floting point' }
 GenericAssembler >> multiplyDoubleX0byX1 [
 	codegen mulDouble: codegen regX0 by: codegen regX1

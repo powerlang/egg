@@ -670,6 +670,11 @@ ARM64CodeGenerator >> shiftRightArithmetic: srcAndDstReg by: countReg [
 ]
 
 { #category : #'operations - arithmetic' }
+ARM64CodeGenerator >> multiply: src1AndDst by: src2 [
+	self assemble: 'mul' with: src1AndDst with: src1AndDst with: src2
+]
+
+{ #category : #'operations - arithmetic' }
 ARM64CodeGenerator >> multiply: src1AndDstLoReg by: src2reg wideningTo: dstHiReg [
 	self
 		assemble: 'smulh' with: self regV with: src1AndDstLoReg with: src2reg;

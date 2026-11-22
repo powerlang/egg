@@ -90,7 +90,7 @@ OptimizingTwoAddressEnforcer >> visitBinaryWithVariable: instruction [
 			ifTrue: [^self].
 		instruction name == #'-'
 			ifTrue: [^self invertMinus: instruction with: left with: right].
-		(#(+ bitAnd: bitOr: &  ) includes: instruction name)
+		(#(+ * bitAnd: bitOr: &  ) includes: instruction name)
 			ifTrue: [^instruction swapOperands]
 			ifFalse: [self halt]].
 	self convert: instruction copyingLeftInto: dest

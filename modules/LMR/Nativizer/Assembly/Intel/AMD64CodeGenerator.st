@@ -631,6 +631,11 @@ AMD64CodeGenerator >> mulDouble: src1andDstReg by: src2reg [
 ]
 
 { #category : #basic }
+AMD64CodeGenerator >> multiply: src1AndDst by: src2 [
+	self assemble: 'imul' with: src1AndDst with: src2
+]
+
+{ #category : #basic }
 AMD64CodeGenerator >> multiply: src1AndDstLoReg by: src2reg wideningTo: dstHiReg [
 	self
 		ASSERT: src1AndDstLoReg r == rax;

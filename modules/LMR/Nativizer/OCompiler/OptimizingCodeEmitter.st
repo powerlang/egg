@@ -653,6 +653,20 @@ OptimizingCodeEmitter >> assembleRestorePreviousContext: instruction [
 ]
 
 { #category : #unclassified }
+OptimizingCodeEmitter >> assembleTimes: instruction [
+	| left right |
+	left := allocation at: instruction left.
+	right := allocation at: instruction right.
+	assembler
+		clearIntegerBit: left;
+		clearIntegerBit: right;
+		multiply: left by: right;
+		shiftRightArithmetic: left byImm: 1;
+		setIntegerBit: right;
+		setIntegerBit: left
+]
+
+{ #category : #unclassified }
 OptimizingCodeEmitter >> assembleTimesConstant: instruction [
 	| left value shift |
 	left := allocation at: instruction left.
