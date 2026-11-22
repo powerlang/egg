@@ -1783,6 +1783,13 @@ GenericAssembler >> storeDoubleResultInRindirect [
 ]
 
 { #category : #storing }
+GenericAssembler >> storeEinFPindex: index [
+	| memref |
+	memref := codegen memRef: codegen regFP stackIndexImm: index.
+	codegen store: codegen regE intoMem: memref
+]
+
+{ #category : #storing }
 GenericAssembler >> storeEinRindex: index [
 	| memref |
 	memref := codegen memRef: codegen regR indexImm: index.

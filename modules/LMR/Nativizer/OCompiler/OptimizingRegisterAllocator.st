@@ -223,6 +223,7 @@ OptimizingRegisterAllocator >> doAllocation [
 	| record |
 	"	record := self activationRecord.
 	record isLoadImplicit ifFalse: [free remove: ebp]."
+	locals := self activationRecord fixedSlots.
 	self copyArguments; computeLiveRanges; allocateLiveRanges; reserveSpaceForLocals.
 	^allocation
 ]
@@ -257,7 +258,6 @@ OptimizingRegisterAllocator >> initialize [
 	liveRanges := IdentityDictionary new.
 	unifiedLiveRanges := IdentityDictionary new.
 	expirations := IdentityDictionary new.
-	locals := 2.
 	used := Dictionary new.
 	usedOut := Dictionary new
 ]

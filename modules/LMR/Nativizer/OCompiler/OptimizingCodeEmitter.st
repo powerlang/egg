@@ -955,6 +955,7 @@ OptimizingCodeEmitter >> visitLoadImplicit: instruction [
 				reserveStackSlots: frame temporaries + 2;
 				storeRinFPindex: 0;
 				storeMinFPindex: -1.
+			frame keepsEnvironment ifTrue: [assembler storeEinFPindex: -2].
 			self savesPreviousSelf ifTrue: [assembler push: assembler regS]]]
 ]
 

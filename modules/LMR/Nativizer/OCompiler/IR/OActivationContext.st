@@ -10,7 +10,8 @@ Class {
 		'hasFrame',
 		'temporaries',
 		'storesPreviousSelf',
-		'loadsOwnNativeCode'
+		'loadsOwnNativeCode',
+		'keepsEnvironment'
 	],
 	#category : #IR
 }
@@ -26,6 +27,11 @@ OActivationContext >> doSavePreviousSelf [
 ]
 
 { #category : #accessing }
+OActivationContext >> doKeepEnvironment [
+	keepsEnvironment := true
+]
+
+{ #category : #accessing }
 OActivationContext >> doLoadOwnNativeCode [
 	loadsOwnNativeCode := true
 ]
@@ -33,6 +39,11 @@ OActivationContext >> doLoadOwnNativeCode [
 { #category : #accessing }
 OActivationContext >> loadsOwnNativeCode [
 	^loadsOwnNativeCode
+]
+
+{ #category : #accessing }
+OActivationContext >> fixedSlots [
+	^keepsEnvironment ifTrue: [3] ifFalse: [2]
 ]
 
 { #category : #accessing }
@@ -49,7 +60,13 @@ OActivationContext >> haveFrame [
 OActivationContext >> initialize [
 	hasFrame := false.
 	storesPreviousSelf := false.
-	loadsOwnNativeCode := false
+	loadsOwnNativeCode := false.
+	keepsEnvironment := false
+]
+
+{ #category : #testing }
+OActivationContext >> keepsEnvironment [
+	^keepsEnvironment
 ]
 
 { #category : #accessing }

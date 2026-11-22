@@ -41,6 +41,7 @@ OptimizingInstructionFragmenter >> fragmentActivationRecordDeclarationIn: aBasic
 	declaration := aBasicBlock firstInstruction.
 	implicit := OActivationContext named: #activationRecord.
 	implicit source: abi regFP.
+	method hasBlocks ifTrue: [implicit doKeepEnvironment].
 	declaration dissolveReplacingWith: implicit
 ]
 
