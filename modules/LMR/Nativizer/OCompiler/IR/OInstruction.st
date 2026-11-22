@@ -423,6 +423,11 @@ OInstruction >> printOn: aStream [
 ]
 
 { #category : #unclassified }
+OInstruction >> producesSmallInteger [
+	^false
+]
+
+{ #category : #unclassified }
 OInstruction >> realReverseDo: aBlock [
 	| following |
 	following := prev.

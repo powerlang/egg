@@ -60,6 +60,11 @@ OBinaryOperation >> negateOperation [
 ]
 
 { #category : #unclassified }
+OBinaryOperation >> producesSmallInteger [
+	^#(+ - * // \\ & bitAnd: bitOr: bitShift:) includes: name
+]
+
+{ #category : #unclassified }
 OBinaryOperation >> right [
 	^right
 ]

@@ -46,6 +46,13 @@ OptimizingInstructionFragmenter >> fragmentActivationRecordDeclarationIn: aBasic
 ]
 
 { #category : #unclassified }
+OptimizingInstructionFragmenter >> fragmentAnd: instruction [
+	(instruction operands conform: [:operand | operand producesSmallInteger])
+		ifFalse: [^self fragmentGenericMessage: instruction].
+	self fragmentBinaryCommutative: instruction
+]
+
+{ #category : #unclassified }
 OptimizingInstructionFragmenter >> fragmentArgumentsIn: aBasicBlock with: aCompiledMethod [
 	method := aCompiledMethod.
 	self
@@ -302,7 +309,7 @@ OptimizingInstructionFragmenter >> initializeMessages [
 		at: #'!=' put: #BinaryCompare:;
 		at: #'>=' put: #BinaryCompare:;
 		at: #'>' put: #BinaryCompare:;
-		at: #'&' put: #BinaryCommutative:;
+		at: #'&' put: #And:;
 		at: #_asNative put: #Unary:;
 		at: #_asObject put: #Unary:;
 		at: #_asPointer put: #Unary:;
