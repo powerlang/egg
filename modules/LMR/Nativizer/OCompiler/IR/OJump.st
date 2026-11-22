@@ -149,6 +149,6 @@ OJump >> targets [
 
 { #category : #unclassified }
 OJump >> usesResultOf: anInstruction [
-	^false
+	^arguments anySatisfy: [:argument | argument == anInstruction]
 ]
 

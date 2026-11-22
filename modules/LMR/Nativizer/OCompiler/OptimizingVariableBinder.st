@@ -260,9 +260,9 @@ OptimizingVariableBinder >> instructionsForWriting: aWriteVariable toTemporary: 
 
 { #category : #private }
 OptimizingVariableBinder >> isLive: anAssociation [
-	| parameter |
-	parameter := anAssociation key.
-	^parameter livesAfter: parameter orOutOf: anAssociation value
+	| block |
+	block := anAssociation value.
+	^anAssociation key livesAfter: block orOutOf: block
 ]
 
 { #category : #private }

@@ -90,11 +90,6 @@ OBlockParameter >> jumpFrom: block [
 ]
 
 { #category : #unclassified }
-OBlockParameter >> nextDetect: aBlock ifNone: absentBlock [
-	^basicBlock nextDetect: aBlock ifNone: absentBlock
-]
-
-{ #category : #unclassified }
 OBlockParameter >> operandsDo: aBlock [
 	self predecessors do: [:block | | value |
 		value := self atOperand: block.
@@ -171,7 +166,7 @@ OBlockParameter >> untrackArgumentFrom: predecessor [
 
 { #category : #unclassified }
 OBlockParameter >> usesResultOf: anInstruction [
-	^self variables includes: anInstruction
+	^false
 ]
 
 { #category : #unclassified }

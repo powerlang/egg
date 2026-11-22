@@ -107,7 +107,9 @@ OJumpConditional >> targets [
 
 { #category : #unclassified }
 OJumpConditional >> usesResultOf: anInstruction [
-	^variable == anInstruction
+	^variable == anInstruction or: [
+		(super usesResultOf: anInstruction)
+			or: [implicitArguments anySatisfy: [:argument | argument == anInstruction]]]
 ]
 
 { #category : #unclassified }

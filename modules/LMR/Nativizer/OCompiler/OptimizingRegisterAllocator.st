@@ -551,9 +551,9 @@ OptimizingRegisterAllocator >> visitBinaryWithVariable: instruction [
 OptimizingRegisterAllocator >> visitBlockParameter: instruction [
 	| unified |
 	unified := OComposedLiveRange new.
-	instruction variables do: [:source |
+	instruction variablesWithBlocksDo: [:source :block |
 		self
-			use: source from: instruction;
+			use: source from: block lastInstruction in: block;
 			unify: source liveRangeTo: unified].
 	self unify: instruction liveRangeTo: unified
 ]
