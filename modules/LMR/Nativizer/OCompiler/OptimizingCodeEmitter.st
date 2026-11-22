@@ -653,6 +653,20 @@ OptimizingCodeEmitter >> assembleRestorePreviousContext: instruction [
 ]
 
 { #category : #unclassified }
+OptimizingCodeEmitter >> assembleTimes: instruction [
+	| left right |
+	left := allocation at: instruction left.
+	right := allocation at: instruction right.
+	assembler
+		clearIntegerBit: left;
+		clearIntegerBit: right;
+		multiply: left by: right;
+		shiftRightArithmetic: left byImm: 1;
+		setIntegerBit: right;
+		setIntegerBit: left
+]
+
+{ #category : #unclassified }
 OptimizingCodeEmitter >> assembleTimesConstant: instruction [
 	| left value shift |
 	left := allocation at: instruction left.
@@ -769,7 +783,6 @@ OptimizingCodeEmitter >> jumpWasAssembledInComparison: aConditionalJump [
 	prev == aConditionalJump variable ifFalse: [^false].
 	prev allUses size != 1 ifTrue: [^false].
 	prev class == OMessageSend ifTrue: [^false].
-	prev class == OPhi ifTrue: [^false].
 	(prev isKindOf: OBinaryOperation) ifTrue: [
 		(#(< <= = == != >= >) includes: prev name) ifTrue: [^true].
 		(#(_basicAt:) includes: prev name) ifTrue: [^false]].
@@ -895,11 +908,6 @@ OptimizingCodeEmitter >> visitNullary: instruction [
 	| selector |
 	selector := #assemble , (self selectorFor: instruction) , #':'.
 	self perform: selector asSymbol with: instruction
-]
-
-{ #category : #unclassified }
-OptimizingCodeEmitter >> visitPhi: phiInstruction [
-	
 ]
 
 { #category : #visiting }

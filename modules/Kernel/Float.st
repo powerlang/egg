@@ -686,7 +686,7 @@ Float >> printDecimals: decimals separatedBy: aString [
 
 { #category : #printing }
 Float >> printOn: aStream [
-	self printOn: aStream separatedBy: ActiveLocale decimalSeparator
+	self printOn: aStream separatedBy: '.'
 ]
 
 { #category : #printing }

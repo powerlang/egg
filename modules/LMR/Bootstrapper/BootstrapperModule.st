@@ -13,7 +13,8 @@ Class {
 		'memory',
 		'placeholders',
 		'replacements',
-		'roots'
+		'roots',
+		'userEnvironment'
 	],
 	#category : #'LMR-Bootstrapper'
 }
@@ -341,6 +342,7 @@ BootstrapperModule >> prepareForSnapshot: aBuilder [
 	aBuilder
 		map: codeSegments to: nil;
 		map: environment to: nil;
+		map: userEnvironment to: nil;
 		map: kernelOverrides to: nil;
 		map: replacements to: nil;
 		map: roots to: nil
@@ -370,9 +372,11 @@ BootstrapperModule >> importsClosureFor: roots [
 
 { #category : #writing }
 BootstrapperModule >> segmentBuilderFor: aModule [
-	| builder |
+	| builder nativizer |
 	builder := aModule newSegmentBuilder.
-	(self requiresNativization: aModule) ifTrue: [builder nativizer: environment].
+	(self requiresNativization: aModule) ifTrue: [
+		nativizer := self environmentFor: aModule.
+		builder nativizer: nativizer].
 	aModule == Kernel ifTrue: [self addKernelOverridesTo: builder].
 	self mapPlaceholdersIn: builder.
 	builder map: LMR memory to: memory.
@@ -410,10 +414,16 @@ BootstrapperModule >> kernelOverrides [
 		target := replacement superclass.
 		(replacement !== lmr class and: [target module == Kernel])
 			ifTrue: [
+				self addNamespacesOf: replacement to: target.
 				self addOverridesFrom: replacement to: target into: overrides.
 				self addOverridesFrom: replacement class to: target class into: overrides]].
 	self addExtensionsOf: LMR into: overrides.
 	^overrides
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> addNamespacesOf: aClass to: anotherClass [
+	aClass namespaces do: [:namespace | anotherClass addNamespace: namespace]
 ]
 
 { #category : #bootstrapping }
@@ -436,4 +446,15 @@ BootstrapperModule >> add: aCompiledMethod replacing: anotherMethod into: aColle
 	environment nativize: aCompiledMethod.
 	replacements at: anotherMethod put: aCompiledMethod.
 	aCollection add: aCompiledMethod classBinding -> aCompiledMethod
+]
+
+{ #category : #writing }
+BootstrapperModule >> environmentFor: aModule [
+	({Kernel. Kernel.LMR. LMR} includes: aModule) ifTrue: [^environment].
+	userEnvironment isNil ifTrue: [
+		userEnvironment := environment copy.
+		userEnvironment
+			messageLinker: environment messageLinker withoutInvokers;
+			completeInitialization].
+	^userEnvironment
 ]

@@ -29,15 +29,11 @@ LMRSmallInteger >> ~= aNumber [
 
 { #category : #arithmetic }
 SmallInteger >> * aNumber [
-	| size result |
+	| result |
 	aNumber _isSmallInteger ifFalse: [^aNumber * self].
 	(self _smiTimes: aNumber) ifNotNil: [:res | ^res].
-	
-	size := self sizeInBytes + aNumber sizeInBytes.
-	result := self positive = aNumber positive
-		ifTrue: [LargePositiveInteger new: size]
-		ifFalse: [LargeNegativeInteger new: size].
-	^(self _smiTimes: aNumber into: result) reduced
+	result := self abs asLargeInteger mult: aNumber abs.
+	^self positive = aNumber positive ifTrue: [result] ifFalse: [result negated]
 ]
 
 { #category : '*Primitives' }
@@ -64,9 +60,13 @@ LMRSmallInteger >> // aNumber [
 
 { #category : #arithmetic }
 LMRSmallInteger >> \\ aNumber [
+	| remainder |
 	aNumber == 0 ifTrue: [^self zeroDivisorOn: #'\\'].
 	aNumber _isSmallInteger
-		ifTrue: [^self _remainderTowardZero: aNumber]
+		ifTrue: [
+			remainder := self _remainderTowardZero: aNumber.
+			(remainder = 0 or: [remainder positive = aNumber positive]) ifTrue: [^remainder].
+			^remainder + aNumber]
 		ifFalse: [
 			aNumber isLargeInteger
 				ifTrue: [aNumber positive == self positive ifTrue: [^self]].

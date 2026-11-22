@@ -336,12 +336,16 @@ BinaryMessageNativizer >> inlinePlus [
 
 { #category : #private }
 BinaryMessageNativizer >> inlineQuotient [
+	"bail out on zero, and on negatives because the arch rounds toward zero, unlike Smalltalk"
 	| |
 	done := assembler newLabel.
 	failed := assembler newLabel.
 	self loadOperands.
 	assembler
 		compareRwithSmallInteger: 0;
+		jumpIfLessOrEqualSignedTo: failed;
+		loadTwithA;
+		compareTwithImmediate: 1;
 		jumpIfLessOrEqualSignedTo: failed.
 	nativizer saveContextSwitchPoint.
 	assembler
@@ -361,11 +365,15 @@ BinaryMessageNativizer >> inlineQuotient [
 
 { #category : #private }
 BinaryMessageNativizer >> inlineRemainder [
+	"bail out on zero, and on negatives because the arch rounds toward zero, unlike Smalltalk"
 	done := assembler newLabel.
 	failed := assembler newLabel.
 	self loadOperands.
 	assembler
 		compareRwithSmallInteger: 0;
+		jumpIfLessOrEqualSignedTo: failed;
+		loadTwithA;
+		compareTwithImmediate: 1;
 		jumpIfLessOrEqualSignedTo: failed.
 	nativizer saveContextSwitchPoint.
 	assembler

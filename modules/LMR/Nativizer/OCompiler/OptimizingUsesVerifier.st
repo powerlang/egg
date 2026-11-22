@@ -20,7 +20,7 @@ OptimizingUsesVerifier >> verify: definition usedBy: user [
 OptimizingUsesVerifier >> verifyFrom: firstBlock [
 	firstBlock
 		instructionsWithSuccessorsDo: [:instruction | instruction
-			acceptVisitor: self]
+			basicAcceptVisitor: self]
 ]
 
 { #category : #unclassified }
@@ -33,6 +33,12 @@ OptimizingUsesVerifier >> visitBinaryWithVariable: instruction [
 	self
 		verify: instruction left usedBy: instruction;
 		verify: instruction right usedBy: instruction
+]
+
+{ #category : #unclassified }
+OptimizingUsesVerifier >> visitBlockParameter: instruction [
+	instruction variables
+		do: [:operation | self verify: operation usedBy: instruction]
 ]
 
 { #category : #unclassified }
@@ -68,12 +74,6 @@ OptimizingUsesVerifier >> visitMessageSend: instruction [
 { #category : #unclassified }
 OptimizingUsesVerifier >> visitNullary: instruction [
 	
-]
-
-{ #category : #unclassified }
-OptimizingUsesVerifier >> visitPhi: instruction [
-	instruction variables
-		do: [:operation | self verify: operation usedBy: instruction]
 ]
 
 { #category : #unclassified }

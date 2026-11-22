@@ -267,11 +267,6 @@ OptimizingValueNumbering >> visitNullary: instruction [
 ]
 
 { #category : #unclassified }
-OptimizingValueNumbering >> visitPhi: instruction [
-	
-]
-
-{ #category : #unclassified }
 OptimizingValueNumbering >> visitReturn: instruction [
 	
 ]

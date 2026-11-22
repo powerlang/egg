@@ -53,7 +53,7 @@ OptimizingLivenessAnalysis >> analyzeLivenessOf: block [
 			alive addIfAbsent: value].
 		alive removeIfPresent: instr.
 		pressure := presure max: alive size].
-	block phis reverseDo: [:phi | alive removeIfPresent: phi].
+	block parameters reverseDo: [:parameter | alive removeIfPresent: parameter].
 	pressures at: block put: pressure.
 	changed := true.
 	liveIn
@@ -68,7 +68,7 @@ OptimizingLivenessAnalysis >> computeExpirationsAt: block [
 	alive := self gatherAliveAfter: block.
 	last := block lastInstruction.
 	last isConditionalJump ifTrue: [
-		block successors do: [:succ | | real leftover |
+		block successorsDo: [:succ | | real leftover |
 			real := liveIn at: succ.
 			leftover := alive rejectAll: real.
 			leftover do: [:val | self kill: val at: succ firstInstruction]]].

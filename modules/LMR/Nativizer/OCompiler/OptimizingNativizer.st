@@ -121,11 +121,6 @@ OptimizingNativizer >> defaultInlinedMethods [
 ]
 
 { #category : #unclassified }
-OptimizingNativizer >> eliminateDeadPhis [
-	OptimizingPhiSimplification new processFrom: firstBlock
-]
-
-{ #category : #unclassified }
 OptimizingNativizer >> enforceTwoAddressCodeUsing: allocation [
 	| enforcer |
 	enforcer := OptimizingTwoAddressEnforcer new
@@ -211,14 +206,18 @@ OptimizingNativizer >> nativize [
 		simplifyCFG;
 		removeRedundantCode;
 		simplifyCFG;
-		eliminateDeadPhis;
-		splitCriticalEdges;
-		transformToCSSA.
+		pruneParameters;
+		splitCriticalEdges.
 	allocation := self allocate.
 	self
 		enforceTwoAddressCodeUsing: allocation;
 		simplifyCFG.
 	^self assembleUsing: allocation
+]
+
+{ #category : #unclassified }
+OptimizingNativizer >> pruneParameters [
+	OptimizingParameterPruning new processFrom: firstBlock
 ]
 
 { #category : #unclassified }
@@ -241,13 +240,6 @@ OptimizingNativizer >> simplifyCFG [
 { #category : #unclassified }
 OptimizingNativizer >> splitCriticalEdges [
 	firstBlock splitAllCriticalEdges
-]
-
-{ #category : #allocation }
-OptimizingNativizer >> transformToCSSA [
-	| transformer |
-	transformer := OptimizingCSSATransformer new firstBlock: firstBlock.
-	transformer applyTransformation
 ]
 
 { #category : #unclassified }

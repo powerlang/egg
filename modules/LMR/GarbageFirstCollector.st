@@ -71,7 +71,7 @@ GarbageFirstCollector >> initializeLocals [
 				(space !== current and: [headroom > used]) ifTrue: [
 					headroom := headroom - used.
 					size := space reservedSize.
-					Kernel os commit: size * 2 at: space base + size * 2.
+					Kernel os commit: size * 2 at: (space base + size) * 2.
 					evacuated at: i put: 1]]]].
 	super initializeLocals
 ]

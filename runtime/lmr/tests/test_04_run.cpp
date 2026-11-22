@@ -154,6 +154,7 @@ TEST_CASE("SmallInteger arithmetic and nil tests run natively", "[run]")
         {"times", 42},
         {"smiTimes", 42},
         {"largeProduct", 503096068},
+        {"printsLargeProducts", 58},
         {"modulo", 4},
         {"floatTimesInteger", 10},
         {"answerIfNotNil", 6},
@@ -165,6 +166,15 @@ TEST_CASE("SmallInteger arithmetic and nil tests run natively", "[run]")
         launcher.relocate();
         REQUIRE(launcher.run(entry) == value);
     }
+}
+
+TEST_CASE("a block that captures itself prints", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    REQUIRE(launcher.loaded());
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+    REQUIRE(launcher.run("printsRecursiveBlock") == 1);
 }
 
 TEST_CASE("native code allocates arrays and byte arrays", "[run]")

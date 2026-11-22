@@ -82,6 +82,16 @@ LMRClosure >> saveHomeFrame [
 ]
 
 { #category : '*handling' }
+LMRClosure >> saveHomeFrameOf: aClosure [
+	homeFrame := aClosure homeFrame
+]
+
+{ #category : #accessing }
+LMRClosure >> homeFrame [
+	^homeFrame
+]
+
+{ #category : '*handling' }
 LMRClosure >> _return: result [
 	^self return: result
 ]

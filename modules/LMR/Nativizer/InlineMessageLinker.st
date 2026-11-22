@@ -322,7 +322,8 @@ InlineMessageLinker >> assembleExpandInStackSized [
 		loadTwithA;
 		loopTtimes: [ assembler
 				pushIndirectR;
-				addRwithImmediate: assembler wordSize ]
+				addRwithImmediate: assembler wordSize ];
+		pushS
 ]
 
 { #category : #'private - assemble' }
@@ -1072,7 +1073,7 @@ InlineMessageLinker >> assembleTransferControlDiscardingLastArgTo [
 	#_transferControlDiscardingLastArgTo:.
 	assembler
 		restoreCallerFrame;
-		popSPindirect;
+		dropArgumentUnderReturnAddress;
 		loadMwithA;
 		jumpToMindex: 1
 ]

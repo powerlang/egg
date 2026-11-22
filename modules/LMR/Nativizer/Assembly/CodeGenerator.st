@@ -457,6 +457,11 @@ CodeGenerator >> mulDouble: src1andDstReg by: src2reg [
 ]
 
 { #category : #basic }
+CodeGenerator >> multiply: src1AndDst by: src2 [
+	self subclassResponsibility
+]
+
+{ #category : #basic }
 CodeGenerator >> multiply: src1AndDstLoReg by: src2reg wideningTo: dstHiReg [
 	self subclassResponsibility
 ]

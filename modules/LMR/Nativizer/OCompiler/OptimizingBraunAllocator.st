@@ -122,13 +122,13 @@ OptimizingBraunAllocator >> computeUseDistancesOf: block using: distancesEntry [
 	| distances index length |
 	distances := IdentityDictionary new.
 	length := block length.
-	block successors do: [:succ | | incoming |
+	block successorsDo: [:succ | | incoming |
 		incoming := distancesEntry at: succ ifAbsent: [Dictionary new].
 		incoming keysAndValuesDo: [:operand :distance | | previous |
 			previous := distances at: operand ifAbsent: Number infinity.
 			distances at: operand put: (previous min: distance + length)].
-		succ phisDo: [:phi | | operand previous |
-			operand := phi atOperand: block.
+		succ parametersDo: [:parameter | | operand previous |
+			operand := parameter atOperand: block.
 			previous := distances at: operand ifAbsent: Number infinity.
 			distances at: operand put: (previous min: length)]].
 	distancesExit
@@ -155,7 +155,7 @@ OptimizingBraunAllocator >> couple: block withPredecessor: predecessor [
 	predSexit := spillExit at: predecessor.
 	newSentry := (oldSentry , predSexit) withoutDuplicates intersection: wentry.
 	(wentry rejectAll: predWexit) do: [:value | 
-		(block phis includes: value)
+		(block parameters includes: value)
 			ifFalse: [self scheduleReload: value before: predecessor lastInstruction]].
 	(newSentry rejectAll: predSexit) do: [:value | self scheduleSpillFor: value].
 	difference := newSentry rejectAll: oldSentry.
@@ -173,7 +173,7 @@ OptimizingBraunAllocator >> coupleWithPredecessors: block [
 	predecessors do: [:pred | | wexit sexit |
 		wexit := allocationExit at: pred.
 		(currentlyAvailable rejectAll: wexit) do: [:value | 
-			(block phis includes: value)
+			(block parameters includes: value)
 				ifFalse: [self scheduleReload: value before: pred lastInstruction]].
 		sexit := spillExit at: pred.
 		(currentlySpilled rejectAll: sexit)
@@ -196,8 +196,8 @@ OptimizingBraunAllocator >> doAllocation [
 			coupleWithPredecessors: block;
 			spillAsBeladyIn: block.
 		blocksDone add: block.
-		block successors
-			do: [:succ | (blocksDone includes: succ)
+		block
+			successorsDo: [:succ | (blocksDone includes: succ)
 				ifTrue: [self couple: succ withPredecessor: block]]].
 	redefinitions := self computeTemporaryIndexes; insertSpillsAndReloads.
 	self reconstructSSA: redefinitions
@@ -233,7 +233,7 @@ OptimizingBraunAllocator >> initialize [
 OptimizingBraunAllocator >> initLoopHeader: block [
 	| loop available candidates liveThrough pressure freeLoop extra |
 	loop := loops at: block.
-	available := (block phis , (self liveInOf: block)) withoutDuplicates.
+	available := (block parameters , (self liveInOf: block)) withoutDuplicates.
 	candidates := self subsetOf: available usedIn: loop.
 	liveThrough := available rejectAll: candidates.
 	candidates size < self amountOfRegisters
@@ -296,9 +296,8 @@ OptimizingBraunAllocator >> insertReloadOf: value before: user [
 		right: index
 		name: #_basicAt:.
 	stack addUse: reload at: #left.
-	user
-		beforeInsert: reload;
-		replaceUsesOf: value with: reload.
+	user beforeInsert: reload.
+	value replaceUsesBy: user with: reload.
 	^reload
 ]
 

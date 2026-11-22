@@ -245,7 +245,7 @@ AllocationZone >> shallowCopyCommiting: object [
 	copy == nil ifFalse: [^copy].
 	size := object _sizeInBytes.
 	size > Memory largeThreshold ifTrue: [
-		space := memory createLargeSpace: size.
+		space := memory createLargeSpace: object _headerSizeInBytes + size.
 		^space shallowCopyCommiting: object].
 	self bumpSpace.
 	^current shallowCopyCommiting: object

@@ -9,11 +9,10 @@ Class {
 	#instVars : [
 		'definitions',
 		'currentBlock',
-		'dominatorTree',
-		'immediateDominators',
 		'dominanceFrontiers',
 		'pendingReads',
-		'pendingPhis',
+		'pendingParameters',
+		'parameterNames',
 		'abi',
 		'method'
 	],
@@ -28,6 +27,25 @@ OptimizingVariableBinder class >> new [
 { #category : #accessing }
 OptimizingVariableBinder >> abi: anAbi [
 	abi := anAbi
+]
+
+{ #category : #private }
+OptimizingVariableBinder >> define: aParameter named: aString in: aBasicBlock [
+	aBasicBlock predecessors do: [:predecessor | | definition |
+		definition := self definitionOf: aString from: predecessor.
+		aParameter addVariable: definition from: predecessor]
+]
+
+{ #category : #unclassified }
+OptimizingVariableBinder >> insertParameterOf: name at: block [
+	| parameter |
+	(self definitionOf: name in: block) ifNotNil: [^self].
+	parameter := block newParameter.
+	parameterNames at: parameter put: name.
+	pendingParameters add: parameter -> block.
+	self define: parameter as: name in: block.
+	(dominanceFrontiers at: block)
+		do: [:frontier | self insertParameterOf: name at: frontier]
 ]
 
 { #category : #accessing }
@@ -82,6 +100,23 @@ OptimizingVariableBinder >> define: value as: name in: block [
 	here at: name put: value
 ]
 
+{ #category : #private }
+OptimizingVariableBinder >> defineLiveParameters [
+	| live |
+	live := pendingParameters select: [:association | self isLive: association].
+	pendingParameters removeAll: live.
+	live do: [:association | self defineParameter: association].
+	^live notEmpty
+]
+
+{ #category : #private }
+OptimizingVariableBinder >> defineParameter: anAssociation [
+	| parameter name |
+	parameter := anAssociation key.
+	name := parameterNames at: parameter.
+	self define: parameter named: name in: anAssociation value
+]
+
 { #category : #unclassified }
 OptimizingVariableBinder >> definitionOf: name [
 	^self definitionOf: name from: currentBlock
@@ -89,21 +124,18 @@ OptimizingVariableBinder >> definitionOf: name [
 
 { #category : #unclassified }
 OptimizingVariableBinder >> definitionOf: name before: block [
-	| instruction current |
-	instruction := block firstInstruction.
-	[instruction isPhi] whileTrue: [
-		instruction variables first = name ifTrue: [^instruction].
-		instruction := instruction next].
+	| current |
+	block parametersDo: [:parameter |
+		(parameterNames at: parameter ifAbsent: nil) = name ifTrue: [^parameter]].
 	current := block.
 	[
-		current := immediateDominators
-			at: current
-			ifAbsent: [self error: 'undefined variable <' , name , '>'].
+		current := current immediateDominator.
 		current notNil]
 		whileTrue: [
 			definitions
 				at: current
-				ifPresent: [:here | here at: name ifPresent: [:value | ^value]]]
+				ifPresent: [:here | here at: name ifPresent: [:value | ^value]]].
+	self error: 'undefined variable <' , name , '>'
 ]
 
 { #category : #unclassified }
@@ -114,12 +146,8 @@ OptimizingVariableBinder >> definitionOf: name from: block [
 		definitions
 			at: current
 			ifPresent: [:here | here at: name ifPresent: [:value | ^value]].
-		current := immediateDominators
-			at: current
-			ifAbsent: [^block lastValue
-			"BMNullaryOperation
-				name: 'nop'
-				self error: 'undefined variable <' , name , '>'"]]
+		current := current immediateDominator].
+	^block lastValue
 ]
 
 { #category : #unclassified }
@@ -132,35 +160,20 @@ OptimizingVariableBinder >> definitionOf: name in: block [
 
 { #category : #unclassified }
 OptimizingVariableBinder >> doBindingFrom: firstBlock [
-	dominatorTree := firstBlock dominatorTree.
-	immediateDominators := dominatorTree allImmediateDominators.
-	dominanceFrontiers := firstBlock
-		dominanceFrontiersUsing: immediateDominators.
+	firstBlock computeDominance.
+	dominanceFrontiers := firstBlock dominanceFrontiers.
 	firstBlock reversePostOrderDo: [:block | 
 		currentBlock := block.
 		block firstInstruction acceptVisitor: self].
-	self resolvePendingReads; rewritePhis
+	self resolvePendingReads; rewriteParameters
 ]
 
 { #category : #unclassified }
 OptimizingVariableBinder >> initialize [
 	definitions := Dictionary new.
 	pendingReads := OrderedCollection new.
-	pendingPhis := OrderedCollection new
-]
-
-{ #category : #unclassified }
-OptimizingVariableBinder >> insertPhiOf: name at: block [
-	| size variables phi |
-	(self definitionOf: name in: block) ifNotNil: [^self].
-	size := block predecessors size.
-	variables := (Array new: size)
-		atAllPut: name;
-		asOrderedCollection.
-	phi := OPhi withAll: variables in: block predecessors.
-	block firstInstruction beforeInsert: phi.
-	pendingPhis add: phi -> block.
-	self define: phi as: name in: block
+	pendingParameters := OrderedCollection new.
+	parameterNames := IdentityDictionary new
 ]
 
 { #category : #unclassified }
@@ -240,9 +253,27 @@ OptimizingVariableBinder >> instructionsForWriting: aWriteVariable toInstanceVar
 { #category : #unclassified }
 OptimizingVariableBinder >> instructionsForWriting: aWriteVariable toTemporary: binding [
 	self define: aWriteVariable source as: binding name asSymbol.
-	aWriteVariable dissolve.
+	aWriteVariable replaceAllUsesWith: aWriteVariable source; dissolve.
 	(dominanceFrontiers at: currentBlock)
-		do: [:block | self insertPhiOf: binding name asSymbol at: block]
+		do: [:block | self insertParameterOf: binding name asSymbol at: block]
+]
+
+{ #category : #private }
+OptimizingVariableBinder >> isLive: anAssociation [
+	| block |
+	block := anAssociation value.
+	^anAssociation key livesAfter: block orOutOf: block
+]
+
+{ #category : #private }
+OptimizingVariableBinder >> redefine: aReadVariable as: anInstruction [
+	definitions do: [:here | self redefine: aReadVariable as: anInstruction in: here]
+]
+
+{ #category : #private }
+OptimizingVariableBinder >> redefine: aReadVariable as: anInstruction in: aDictionary [
+	aDictionary keysAndValuesDo: [:name :value |
+		value == aReadVariable ifTrue: [aDictionary at: name put: anInstruction]]
 ]
 
 { #category : #unclassified }
@@ -315,11 +346,12 @@ OptimizingVariableBinder >> resolve: aReadVariable asTemporary: binding [
 
 { #category : #unclassified }
 OptimizingVariableBinder >> resolvePendingReads [
-	pendingReads do: [:association | | read block source |
+	pendingReads do: [:association | | read block source resolved |
 		read := association key.
 		block := association value.
 		source := self definitionOf: read binding name asSymbol before: block.
-		read replaceWithCopyOf: source]
+		resolved := read replaceWithCopyOf: source.
+		self redefine: read as: resolved]
 ]
 
 { #category : #unclassified }
@@ -330,18 +362,9 @@ OptimizingVariableBinder >> resolveSelf: aReadVariable [
 ]
 
 { #category : #unclassified }
-OptimizingVariableBinder >> rewritePhis [
-	pendingPhis do: [:association | | phi block |
-		phi := association key.
-		block := association value.
-		(phi livesAfter: phi orOutOf: block)
-			ifTrue: [
-				block predecessors withIndexDo: [:predecessor :i | | name source |
-					name := phi variables at: i.
-					source := self definitionOf: name from: predecessor.
-					phi variables at: i put: source.
-					source addUse: phi at: predecessor]]
-			ifFalse: [phi clearVariables; dissolve]]
+OptimizingVariableBinder >> rewriteParameters [
+	[self defineLiveParameters] whileTrue.
+	pendingParameters do: [:association | association key remove]
 ]
 
 { #category : #unclassified }
@@ -381,11 +404,6 @@ OptimizingVariableBinder >> visitLoadConstant: aLoadImplicit [
 
 { #category : #unclassified }
 OptimizingVariableBinder >> visitMessageSend: aMessageSend [
-	
-]
-
-{ #category : #unclassified }
-OptimizingVariableBinder >> visitPhi: aPhi [
 	
 ]
 

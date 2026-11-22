@@ -30,15 +30,15 @@ OptimizingBlockInliner >> inlineAnd: message in: block [
 	self inlineInnerBlocksOf: firstSkipped.
 	lastSkipped := firstSkipped lastBlock.
 	join := block splitAfter: message.
-	join
-		insertPhiOf: message receiver
-		at: block
-		and: lastSkipped
-		replacing: message.
 	block endWithJumpFalseTo: join skipping: firstSkipped if: message receiver.
 	lastSkipped endWithJumpTo: join.
 	firstSkipped addPredecessor: block.
 	join addPredecessor: block; addPredecessor: lastSkipped.
+	join
+		insertParameterOf: message receiver
+		at: block
+		and: lastSkipped
+		replacing: message.
 	^join
 ]
 
@@ -54,7 +54,7 @@ OptimizingBlockInliner >> inlineIfFalse: message in: block [
 	lastSkipped endWithJumpTo: join.
 	firstSkipped addPredecessor: block.
 	join addPredecessor: lastSkipped; addPredecessor: block.
-	message dissolve.
+	self insertParameterAt: join of: lastSkipped orNilFrom: block replacing: message.
 	^join
 ]
 
@@ -70,7 +70,7 @@ OptimizingBlockInliner >> inlineIfTrue: message in: block [
 	lastSkipped endWithJumpTo: join.
 	firstSkipped addPredecessor: block.
 	join addPredecessor: lastSkipped; addPredecessor: block.
-	message dissolve.
+	self insertParameterAt: join of: lastSkipped orNilFrom: block replacing: message.
 	^join
 ]
 
@@ -85,7 +85,6 @@ OptimizingBlockInliner >> inlineIfTrueifFalse: message in: block [
 	lastTrue := firstTrue lastBlock.
 	lastFalse := firstFalse lastBlock.
 	join := block splitAfter: message.
-	join insertPhiOf: lastTrue and: lastFalse replacing: message.
 	block
 		endWithJumpFalseTo: firstFalse
 		skipping: firstTrue
@@ -95,6 +94,7 @@ OptimizingBlockInliner >> inlineIfTrueifFalse: message in: block [
 	firstTrue addPredecessor: block.
 	firstFalse addPredecessor: block.
 	join addPredecessor: lastTrue; addPredecessor: lastFalse.
+	join insertParameterOf: lastTrue and: lastFalse replacing: message.
 	^join
 ]
 
@@ -128,15 +128,15 @@ OptimizingBlockInliner >> inlineOr: message in: block [
 	self inlineInnerBlocksOf: firstSkipped.
 	lastSkipped := firstSkipped lastBlock.
 	join := block splitAfter: message.
-	join
-		insertPhiOf: message receiver
-		at: block
-		and: lastSkipped
-		replacing: message.
 	block endWithJumpTrueTo: join skipping: firstSkipped if: message receiver.
 	lastSkipped endWithJumpTo: join.
 	firstSkipped addPredecessor: block.
 	join addPredecessor: block; addPredecessor: lastSkipped.
+	join
+		insertParameterOf: message receiver
+		at: block
+		and: lastSkipped
+		replacing: message.
 	^join
 ]
 
@@ -167,6 +167,15 @@ OptimizingBlockInliner >> inlineWhileTrue: message in: block [
 	firstConsequent addPredecessor: lastAntecedent.
 	join addPredecessor: lastAntecedent.
 	^join
+]
+
+{ #category : #unclassified }
+OptimizingBlockInliner >> insertParameterAt: join of: lastSkipped orNilFrom: block replacing: message [
+	| constant |
+	message isUsed ifFalse: [^message dissolve].
+	constant := OLoadConstant valued: nil.
+	block lastInstruction beforeInsert: constant.
+	join insertParameterOf: constant at: block and: lastSkipped replacing: message
 ]
 
 { #category : #unclassified }

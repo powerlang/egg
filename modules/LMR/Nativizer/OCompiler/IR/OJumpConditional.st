@@ -5,11 +5,11 @@
 
 Class {
 	#name : #OJumpConditional,
-	#superclass : #OInstruction,
+	#superclass : #OJump,
 	#instVars : [
 		'variable',
-		'target',
-		'implicitTarget'
+		'implicitTarget',
+		'implicitArguments'
 	],
 	#category : #IR
 }
@@ -20,6 +20,20 @@ OJumpConditional class >> variable: operation target: explicitTarget implicitTar
 		variable: operation;
 		target: explicitTarget;
 		implicitTarget: implicitTarget
+]
+
+{ #category : #'jump arguments' }
+OJumpConditional >> argumentsTo: aBasicBlock [
+	aBasicBlock == target ifTrue: [^arguments].
+	aBasicBlock == implicitTarget ifTrue: [^implicitArguments].
+	^self error: 'not a target of the jump'
+]
+
+{ #category : #'jump arguments' }
+OJumpConditional >> argumentsTo: aBasicBlock put: aCollection [
+	aBasicBlock == target ifTrue: [^arguments := aCollection].
+	aBasicBlock == implicitTarget ifTrue: [^implicitArguments := aCollection].
+	^self error: 'not a target of the jump'
 ]
 
 { #category : #unclassified }
@@ -39,16 +53,18 @@ OJumpConditional >> implicitTarget [
 
 { #category : #unclassified }
 OJumpConditional >> implicitTarget: aBasicBlock [
+	implicitTarget == aBasicBlock ifFalse: [implicitArguments := aBasicBlock newArguments].
 	implicitTarget := aBasicBlock
+]
+
+{ #category : #initialization }
+OJumpConditional >> initialize [
+	super initialize.
+	implicitArguments := OrderedCollection new
 ]
 
 { #category : #unclassified }
 OJumpConditional >> isConditionalJump [
-	^true
-]
-
-{ #category : #unclassified }
-OJumpConditional >> isJump [
 	^true
 ]
 
@@ -67,25 +83,21 @@ OJumpConditional >> replaceWithUnconditional: condition in: basicBlock [
 		ifFalse: [
 			fixed := implicitTarget.
 			removed := target].
+	removed fullyRemovePredecessor: basicBlock.
 	jump := OJump to: fixed.
-	self dissolveReplacingWith: jump.
-	removed fullyRemovePredecessor: basicBlock
+	self dissolveReplacingWith: jump
 ]
 
 { #category : #unclassified }
 OJumpConditional >> retargetFrom: aBasicBlock to: otherBasicBlock [
-	target == aBasicBlock ifTrue: [target := otherBasicBlock].
-	implicitTarget == aBasicBlock ifTrue: [implicitTarget := otherBasicBlock]
+	target == aBasicBlock ifTrue: [self target: otherBasicBlock].
+	implicitTarget == aBasicBlock ifTrue: [self implicitTarget: otherBasicBlock]
 ]
 
-{ #category : #unclassified }
-OJumpConditional >> target [
-	^target
-]
-
-{ #category : #unclassified }
-OJumpConditional >> target: aBasicBlock [
-	target := aBasicBlock
+{ #category : #private }
+OJumpConditional >> successorsDo: aBlock [
+	aBlock value: target.
+	aBlock value: implicitTarget
 ]
 
 { #category : #unclassified }
@@ -95,7 +107,9 @@ OJumpConditional >> targets [
 
 { #category : #unclassified }
 OJumpConditional >> usesResultOf: anInstruction [
-	^variable == anInstruction
+	^variable == anInstruction or: [
+		(super usesResultOf: anInstruction)
+			or: [implicitArguments anySatisfy: [:argument | argument == anInstruction]]]
 ]
 
 { #category : #unclassified }

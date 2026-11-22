@@ -187,13 +187,17 @@ TemplateJIT >> captureClosure: anSBlock [
 	[ variables atEnd ]
 		whileFalse: [ self captureVariable: variables index: slot.
 			slot := slot + 1 ].
-	anSBlock capturesHome
-		ifTrue: [ self emitSend: #saveHomeFrame ]
+	anSBlock capturesHome ifFalse: [ ^self ].
+	activeScript isBlock
+		ifTrue: [
+			assembler pushE.
+			self emitSend: #saveHomeFrameOf: ]
+		ifFalse: [ self emitSend: #saveHomeFrame ]
 ]
 
 { #category : #services }
 TemplateJIT >> captureVariable: stream index: anInteger [
-	| type pos |
+	| type pos slot |
 	type := stream next.
 	type = nil ifTrue: [^self].
 	type = Self ifTrue: [^assembler storeSinRindex: anInteger].
@@ -204,7 +208,12 @@ TemplateJIT >> captureVariable: stream index: anInteger [
 			loadTwithFPindex: 3 + self argumentCount - pos;
 			storeTinRindex: anInteger].
 	type = EnvironmentValue
-		ifTrue: [assembler loadTwithEindex: pos + activeScript offsetOfCurrentEnvironment; storeTinRindex: anInteger]
+		ifTrue: [assembler loadTwithEindex: pos + activeScript offsetOfCurrentEnvironment; storeTinRindex: anInteger].
+	type = InlinedArgument ifTrue: [
+		slot := self stackIndexOfTemporary: pos.
+		assembler
+			loadTwithFPindex: slot;
+			storeTinRindex: anInteger]
 ]
 
 { #category : #services }
@@ -473,14 +482,24 @@ TemplateJIT >> inlinesBinary: anSMessage [
 
 { #category : #services }
 TemplateJIT >> emitWriteBarrier [
-	| saving |
-	saving := method isFrameless and: [assembler callPushesReturnAddress not].
-	saving ifTrue: [assembler popT; saveReturnAddress; pushT].
+	method isFrameless ifTrue: [^self emitWriteBarrierInFramelessMethod].
+	self emitWriteBarrierInFramedMethod
+]
+
+{ #category : #services }
+TemplateJIT >> emitWriteBarrierInFramelessMethod [
+	"no frame to reload M from on return, nor a stacked return address on arm64"
+	assembler popT; pushM; saveReturnAddress; pushT.
+	self emitWriteBarrierInFramedMethod.
+	assembler restoreReturnAddress; popM
+]
+
+{ #category : #services }
+TemplateJIT >> emitWriteBarrierInFramedMethod [
 	assembler
 		loadAwithGlobal: #WriteBarrier;
 		callIndirectA;
-		discardArguments: 1.
-	saving ifTrue: [assembler restoreReturnAddress]
+		discardArguments: 1
 ]
 
 { #category : #accessing }
@@ -835,12 +854,16 @@ TemplateJIT >> temporaryInEnvironment: envIndex atPut: index [
 
 { #category : #services }
 TemplateJIT >> temporaryInStackAt: index [
-		| start |
-	start := self pushesEnvironments
-					 ifTrue: [ -3 ]
-					 ifFalse: [ -1 ].
-		^ assembler loadRwithFPindex: start - index .
+	| slot |
+	slot := self stackIndexOfTemporary: index.
+	^assembler loadRwithFPindex: slot
+]
 
+{ #category : #services }
+TemplateJIT >> stackIndexOfTemporary: index [
+	| start |
+	start := self pushesEnvironments ifTrue: [-3] ifFalse: [-1].
+	^start - index
 ]
 
 { #category : #services }
@@ -924,24 +947,46 @@ TemplateJIT >> visitLiteral: anSLiteral [
 
 { #category : #services }
 TemplateJIT >> visitMessage: anSMessage [
-	| arguments index |
+	| receiver |
 	anSMessage isInlined
 		ifTrue: [ ^ self visitInlinedMessage: anSMessage ].
 	(anSMessage isOptimized or: [ self inlinesBinary: anSMessage ])
 		ifTrue: [ ^ self visitOptimizedMessage: anSMessage ].
+	receiver := anSMessage receiver.
+	(receiver isIdentifier and: [ receiver isSelfOrSuper ])
+		ifTrue: [ self visitSelfMessage: anSMessage ]
+		ifFalse: [ self visitPushedMessage: anSMessage ]
+]
+
+{ #category : #services }
+TemplateJIT >> visitPushedMessage: anSMessage [
+	"the receiver is reloaded relative to sp: _expandInStackSized: shifts fixed indices"
+	| arguments |
 	anSMessage receiver acceptVisitor: self.
 	arguments := anSMessage arguments.
-	arguments isEmpty
-		ifFalse: [ index := self pushR.
-			arguments
-				do: [ :node | 
-					node acceptVisitor: self.
-					self pushR ].
-			self loadRwithStack: index ].
-	self emitSend: anSMessage selector super: anSMessage receiver isSuper.
+	arguments isEmpty ifTrue: [ ^self emitSend: anSMessage selector super: false ].
+	self pushR; pushArguments: arguments.
+	assembler loadRwithSPindex: arguments size + 1.
+	self emitSend: anSMessage selector super: false.
 	stackCount := stackCount - arguments size.
-	arguments isEmpty
-		ifFalse: [ self dropTos ]
+	self dropTos
+]
+
+{ #category : #services }
+TemplateJIT >> visitSelfMessage: anSMessage [
+	| arguments |
+	arguments := anSMessage arguments.
+	self pushArguments: arguments.
+	assembler loadRwithS.
+	self emitSend: anSMessage selector super: anSMessage receiver isSuper.
+	stackCount := stackCount - arguments size
+]
+
+{ #category : #services }
+TemplateJIT >> pushArguments: aCollection [
+	aCollection do: [ :node |
+		node acceptVisitor: self.
+		self pushR ]
 ]
 
 { #category : #services }

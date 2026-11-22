@@ -7,7 +7,8 @@ Class {
 	#name : #OJump,
 	#superclass : #OInstruction,
 	#instVars : [
-		'target'
+		'target',
+		'arguments'
 	],
 	#category : #IR
 }
@@ -15,6 +16,32 @@ Class {
 { #category : #unclassified }
 OJump class >> to: aDestination [
 	^self new target: aDestination
+]
+
+{ #category : #'jump arguments' }
+OJump >> argumentFor: aParameter [
+	| passed |
+	passed := self argumentsTo: aParameter basicBlock.
+	^passed at: aParameter index
+]
+
+{ #category : #'jump arguments' }
+OJump >> argumentFor: aParameter put: value [
+	| passed |
+	passed := self argumentsTo: aParameter basicBlock.
+	passed at: aParameter index put: value
+]
+
+{ #category : #'jump arguments' }
+OJump >> argumentsTo: aBasicBlock [
+	aBasicBlock == target ifFalse: [^self error: 'not a target of the jump'].
+	^arguments
+]
+
+{ #category : #'jump arguments' }
+OJump >> argumentsTo: aBasicBlock put: aCollection [
+	aBasicBlock == target ifFalse: [^self error: 'not a target of the jump'].
+	arguments := aCollection
 ]
 
 { #category : #unclassified }
@@ -27,9 +54,27 @@ OJump >> basicPrintString [
 	^'[jump to ' , target name , ']'
 ]
 
+{ #category : #'jump arguments' }
+OJump >> dissolveReplacingWith: aJump [
+	self passArgumentsTo: aJump.
+	super dissolveReplacingWith: aJump
+]
+
+{ #category : #initialization }
+OJump >> initialize [
+	arguments := OrderedCollection new
+]
+
 { #category : #unclassified }
 OJump >> isJump [
 	^true
+]
+
+{ #category : #'jump arguments' }
+OJump >> moveArgumentsTo: aJump for: aBasicBlock [
+	| passed |
+	passed := self argumentsTo: aBasicBlock.
+	aJump argumentsTo: aBasicBlock put: passed
 ]
 
 { #category : #private }
@@ -37,19 +82,53 @@ OJump >> operandsDo: aBlock [
 	
 ]
 
+{ #category : #'jump arguments' }
+OJump >> passArgumentsTo: aJump [
+	| targets |
+	targets := self targets.
+	aJump successorsDo: [:block | (targets includes: block) ifTrue: [self passArgumentsTo: aJump for: block]]
+]
+
+{ #category : #'jump arguments' }
+OJump >> passArgumentsTo: aJump for: aBasicBlock [
+	| passed |
+	passed := (self argumentsTo: aBasicBlock) copy.
+	aJump argumentsTo: aBasicBlock put: passed
+]
+
 { #category : #unclassified }
 OJump >> primitivePrintString [
 	^'{jump}'
 ]
 
+{ #category : #printing }
+OJump >> printArgumentsTo: aBasicBlock using: names [
+	| passed stream |
+	passed := self argumentsTo: aBasicBlock.
+	passed isEmpty ifTrue: [^''].
+	stream := '' writeStream.
+	stream nextPut: $(.
+	passed
+		do: [:value | | name |
+			name := names at: value ifAbsent: ['missing'].
+			stream nextPutAll: name]
+		separatedBy: [stream nextPutAll: ', '].
+	^stream nextPut: $); contents
+]
+
 { #category : #unclassified }
 OJump >> printStringUsing: names [
-	^'jump to ' , (names at: target)
+	^'jump to ' , (names at: target) , (self printArgumentsTo: target using: names)
 ]
 
 { #category : #unclassified }
 OJump >> retargetFrom: aBasicBlock to: otherBasicBlock [
-	target := otherBasicBlock
+	self target: otherBasicBlock
+]
+
+{ #category : #private }
+OJump >> successorsDo: aBlock [
+	aBlock value: target
 ]
 
 { #category : #unclassified }
@@ -59,6 +138,7 @@ OJump >> target [
 
 { #category : #unclassified }
 OJump >> target: aBasicBlock [
+	target == aBasicBlock ifFalse: [arguments := aBasicBlock newArguments].
 	target := aBasicBlock
 ]
 
@@ -69,6 +149,6 @@ OJump >> targets [
 
 { #category : #unclassified }
 OJump >> usesResultOf: anInstruction [
-	^false
+	^arguments anySatisfy: [:argument | argument == anInstruction]
 ]
 

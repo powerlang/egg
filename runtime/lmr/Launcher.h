@@ -22,6 +22,17 @@
 namespace lmr
 {
 
+enum HostLinkageSlots {
+    LinkageSymbolFinder = 0,
+    LinkageLoaderHandle = 1,
+    LinkagePlatformName = 2,
+    LinkageHeapNext = 3,
+    LinkageHeapLimit = 4,
+    LinkageBoundModules = 5,
+    LinkageArgumentCount = 6,
+    LinkageArgumentVector = 7
+};
+
 class Launcher
 {
   public:
@@ -66,7 +77,8 @@ class Launcher
     void collectSymbols();
     Egg::Object* kernelExport(const std::string& name);
     Egg::Object* bindImport(const std::vector<std::string>& tokens);
-    Egg::Object* methodIn(Egg::HeapObject* behavior, Egg::Object* selector);
+    Egg::Object* methodIn(Egg::FileImageSegment* segment, Egg::HeapObject* behavior, const std::string& name, Egg::Object* selector);
+    bool isUnboundSymbol(Egg::FileImageSegment* segment, Egg::Object* key, const std::string& name);
     uint32_t instVarIndex(Egg::HeapObject* species, const std::string& name);
     void initializeKernelSpace();
     void initializeHostLinkage();

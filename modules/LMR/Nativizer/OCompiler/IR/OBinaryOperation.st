@@ -74,8 +74,8 @@ OBinaryOperation >> right: anInstruction [
 { #category : #unclassified }
 OBinaryOperation >> swapOperands [
 	| temp |
-	left removeUse: self.
-	right removeUse: self.
+	left removeUseBy: self.
+	right removeUseBy: self.
 	temp := left.
 	left := right.
 	right := temp.

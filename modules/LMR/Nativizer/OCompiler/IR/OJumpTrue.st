@@ -39,8 +39,8 @@ OJumpTrue >> primitivePrintString [
 
 { #category : #printing }
 OJumpTrue >> printStringUsing: names [
-	^'jump true ' , (names at: variable) , ' to ' , (names at: target)
+	^'jump true ' , (names at: variable) , ' to ' , (names at: target) , (self printArgumentsTo: target using: names)
 		, ' or fall to '
-		, (names at: implicitTarget)
+		, (names at: implicitTarget) , (self printArgumentsTo: implicitTarget using: names)
 ]
 
