@@ -98,6 +98,23 @@ OptimizingVariableBinder >> define: value as: name in: block [
 	here at: name put: value
 ]
 
+{ #category : #private }
+OptimizingVariableBinder >> defineLiveParameters [
+	| live |
+	live := pendingParameters select: [:association | self isLive: association].
+	pendingParameters removeAll: live.
+	live do: [:association | self defineParameter: association].
+	^live notEmpty
+]
+
+{ #category : #private }
+OptimizingVariableBinder >> defineParameter: anAssociation [
+	| parameter name |
+	parameter := anAssociation key.
+	name := parameterNames at: parameter.
+	self define: parameter named: name in: anAssociation value
+]
+
 { #category : #unclassified }
 OptimizingVariableBinder >> definitionOf: name [
 	^self definitionOf: name from: currentBlock
@@ -240,6 +257,13 @@ OptimizingVariableBinder >> instructionsForWriting: aWriteVariable toTemporary: 
 ]
 
 { #category : #private }
+OptimizingVariableBinder >> isLive: anAssociation [
+	| parameter |
+	parameter := anAssociation key.
+	^parameter livesAfter: parameter orOutOf: anAssociation value
+]
+
+{ #category : #private }
 OptimizingVariableBinder >> redefine: aReadVariable as: anInstruction [
 	definitions do: [:here | self redefine: aReadVariable as: anInstruction in: here]
 ]
@@ -337,13 +361,8 @@ OptimizingVariableBinder >> resolveSelf: aReadVariable [
 
 { #category : #unclassified }
 OptimizingVariableBinder >> rewriteParameters [
-	pendingParameters do: [:association | | parameter block name |
-		parameter := association key.
-		block := association value.
-		name := parameterNames at: parameter.
-		(parameter livesAfter: parameter orOutOf: block)
-			ifTrue: [self define: parameter named: name in: block]
-			ifFalse: [parameter remove]]
+	[self defineLiveParameters] whileTrue.
+	pendingParameters do: [:association | association key remove]
 ]
 
 { #category : #unclassified }
