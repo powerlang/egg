@@ -416,6 +416,19 @@ LauncherTestsModule >> importsSizes [
 ]
 
 { #category : #entries }
+LauncherTestsModule >> rereadsSlots [
+	<callback: slong ()>
+	^self bump: 4
+]
+
+{ #category : #testing }
+LauncherTestsModule >> bump: anInteger [
+	version := anInteger.
+	version := version + 1.
+	^version
+]
+
+{ #category : #entries }
 LauncherTestsModule >> callsC [
 	| ffi libc memory found |
 	<callback: slong ()>

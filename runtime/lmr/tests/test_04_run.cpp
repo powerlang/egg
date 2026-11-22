@@ -176,7 +176,8 @@ TEST_CASE("helpers with loops, closures and super sends run natively", "[run]")
         {"answersIfNil", 35},
         {"capturesInClosures", 1208},
         {"returnsThroughFrames", 15},
-        {"sendsToSuper", 60}};
+        {"sendsToSuper", 60},
+        {"rereadsSlots", 5}};
     for (auto& [entry, value] : expected) {
         INFO("entry: " << entry);
         lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
