@@ -23,6 +23,25 @@ OptimizingBlockInliner >> inline: aMessageSend in: block [
 ]
 
 { #category : #unclassified }
+OptimizingBlockInliner >> inline: message in: block if: condition then: positive else: negative [
+	| firstTrue firstFalse lastTrue lastFalse join |
+	firstTrue := positive firstBlock.
+	firstFalse := negative firstBlock.
+	self inlineInnerBlocksOf: firstTrue and: firstFalse.
+	lastTrue := firstTrue lastBlock.
+	lastFalse := firstFalse lastBlock.
+	join := block splitAfter: message.
+	block endWithJumpFalseTo: firstFalse skipping: firstTrue if: condition.
+	lastTrue endWithJumpTo: join.
+	lastFalse endWithJumpTo: join.
+	firstTrue addPredecessor: block.
+	firstFalse addPredecessor: block.
+	join addPredecessor: lastTrue; addPredecessor: lastFalse.
+	join insertParameterOf: lastTrue and: lastFalse replacing: message.
+	^join
+]
+
+{ #category : #unclassified }
 OptimizingBlockInliner >> inlineAnd: message in: block [
 	| closure firstSkipped lastSkipped join |
 	closure := message arguments first.
@@ -56,6 +75,16 @@ OptimizingBlockInliner >> inlineIfFalse: message in: block [
 	join addPredecessor: lastSkipped; addPredecessor: block.
 	self insertParameterAt: join of: lastSkipped orNilFrom: block replacing: message.
 	^join
+]
+
+{ #category : #unclassified }
+OptimizingBlockInliner >> inlineIfFalseifTrue: message in: block [
+	^self
+		inline: message
+		in: block
+		if: message receiver
+		then: message arguments second
+		else: message arguments first
 ]
 
 { #category : #unclassified }
@@ -102,26 +131,12 @@ OptimizingBlockInliner >> inlineIfTrue: message in: block [
 
 { #category : #unclassified }
 OptimizingBlockInliner >> inlineIfTrueifFalse: message in: block [
-	| positive negative firstTrue firstFalse lastTrue lastFalse join |
-	positive := message arguments first.
-	negative := message arguments second.
-	firstTrue := positive firstBlock.
-	firstFalse := negative firstBlock.
-	self inlineInnerBlocksOf: firstTrue and: firstFalse.
-	lastTrue := firstTrue lastBlock.
-	lastFalse := firstFalse lastBlock.
-	join := block splitAfter: message.
-	block
-		endWithJumpFalseTo: firstFalse
-		skipping: firstTrue
-		if: message receiver.
-	lastTrue endWithJumpTo: join.
-	lastFalse endWithJumpTo: join.
-	firstTrue addPredecessor: block.
-	firstFalse addPredecessor: block.
-	join addPredecessor: lastTrue; addPredecessor: lastFalse.
-	join insertParameterOf: lastTrue and: lastFalse replacing: message.
-	^join
+	^self
+		inline: message
+		in: block
+		if: message receiver
+		then: message arguments first
+		else: message arguments second
 ]
 
 { #category : #unclassified }
