@@ -89,6 +89,7 @@ OptimizingMethodInliner >> selectors [
 { #category : #unclassified }
 OptimizingMethodInliner >> shouldInline: instruction [
 	^instruction isMessageSend
-		and: [self selectors includes: instruction selector]
+		and: [instruction isSuper not
+		and: [self selectors includes: instruction selector]]
 ]
 

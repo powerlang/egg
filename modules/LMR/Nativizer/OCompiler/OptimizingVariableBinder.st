@@ -416,6 +416,7 @@ OptimizingVariableBinder >> visitReadVariable: aReadVariable [
 	binding isArgument
 		ifTrue: [^self resolve: aReadVariable asArgument: binding].
 	binding isSelf ifTrue: [^self resolveSelf: aReadVariable].
+	binding isSuper ifTrue: [^self resolveSelf: aReadVariable].
 	binding isLiteral ifTrue: [^self resolve: aReadVariable asLiteral: binding].
 	binding isInstVar
 		ifTrue: [^self resolve: aReadVariable asInstanceVar: binding].

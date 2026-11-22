@@ -9,7 +9,8 @@ Class {
 	#instVars : [
 		'receiver',
 		'selector',
-		'arguments'
+		'arguments',
+		'classBinding'
 	],
 	#category : #IR
 }
@@ -69,8 +70,23 @@ OMessageSend >> basicPrintString [
 ]
 
 { #category : #unclassified }
+OMessageSend >> beSuperFrom: aClass [
+	classBinding := aClass
+]
+
+{ #category : #unclassified }
+OMessageSend >> classBinding [
+	^classBinding
+]
+
+{ #category : #unclassified }
 OMessageSend >> isMessageSend [
 	^true
+]
+
+{ #category : #unclassified }
+OMessageSend >> isSuper [
+	^classBinding notNil
 ]
 
 { #category : #unclassified }

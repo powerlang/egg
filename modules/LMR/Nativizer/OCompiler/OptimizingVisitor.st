@@ -10,7 +10,8 @@ Class {
 		'firstBlock',
 		'currentBlock',
 		'isReceiver',
-		'argumentsCount'
+		'argumentsCount',
+		'classBinding'
 	],
 	#category : #OCompiler
 }
@@ -135,6 +136,7 @@ OptimizingVisitor >> visitMessage: aMessageNode [
 		receiver: receiver
 		selector: aMessageNode selector value asSymbol
 		arguments: arguments.
+	aMessageNode receiver isSuper ifTrue: [send beSuperFrom: classBinding].
 	receiver addUse: send at: #receiver.
 	arguments
 		withIndexDo: [:argument :i | argument isInstruction
@@ -148,6 +150,7 @@ OptimizingVisitor >> visitMethod: aMethodNode [
 	| last |
 	self insertDefineArgument: #activationRecord; insertDefineArgument: #self.
 	argumentsCount := aMethodNode compiledCode argumentCount.
+	classBinding := aMethodNode compiledCode classBinding.
 	1 to: argumentsCount do: [:i | self insertDefineArgument: ('arg', i printString) asSymbol].
 	self visitScript: aMethodNode.
 	last := currentBlock lastValue.

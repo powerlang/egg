@@ -432,6 +432,11 @@ OptimizingCodeEmitter >> assembleFrom: aBasicBlock [
 
 { #category : #unclassified }
 OptimizingCodeEmitter >> assembleGenericMessageSend: instruction [
+	instruction isSuper ifTrue: [
+		^messageLinker
+			emitSendSuper: instruction selector
+			from: instruction classBinding
+			using: assembler].
 	self assembleLookup: instruction selector
 ]
 

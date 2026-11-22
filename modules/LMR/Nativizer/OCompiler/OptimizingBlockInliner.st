@@ -234,7 +234,8 @@ OptimizingBlockInliner >> performInlinerFor: messageSend in: block [
 { #category : #unclassified }
 OptimizingBlockInliner >> shouldInline: anInstruction [
 	^anInstruction isMessageSend
-		and: [(self inliners includes: anInstruction selector)
-			and: [anInstruction arguments conform: [:argument | argument isBlockClosure]]]
+		and: [anInstruction isSuper not
+			and: [(self inliners includes: anInstruction selector)
+				and: [anInstruction arguments conform: [:argument | argument isBlockClosure]]]]
 ]
 

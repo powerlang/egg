@@ -438,6 +438,7 @@ OptimizingInstructionFragmenter >> visitLoadImplicit: instruction [
 { #category : #unclassified }
 OptimizingInstructionFragmenter >> visitMessageSend: instruction [
 	| selector |
+	instruction isSuper ifTrue: [^self fragmentGenericMessage: instruction].
 	selector := self selectorFor: instruction selector.
 	self perform: selector with: instruction
 ]
