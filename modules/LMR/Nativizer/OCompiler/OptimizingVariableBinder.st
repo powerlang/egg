@@ -234,7 +234,7 @@ OptimizingVariableBinder >> instructionsForWriting: aWriteVariable toInstanceVar
 { #category : #unclassified }
 OptimizingVariableBinder >> instructionsForWriting: aWriteVariable toTemporary: binding [
 	self define: aWriteVariable source as: binding name asSymbol.
-	aWriteVariable dissolve.
+	aWriteVariable replaceAllUsesWith: aWriteVariable source; dissolve.
 	(dominanceFrontiers at: currentBlock)
 		do: [:block | self insertParameterOf: binding name asSymbol at: block]
 ]
