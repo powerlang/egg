@@ -334,6 +334,88 @@ LauncherTestsModule >> toByDo [
 ]
 
 { #category : #entries }
+LauncherTestsModule >> sumsInLoops [
+	<callback: slong ()>
+	^self sumTo: 10
+]
+
+{ #category : #testing }
+LauncherTestsModule >> sumTo: anInteger [
+	| sum i |
+	sum := 0.
+	1 to: anInteger do: [:k | sum := sum + k].
+	i := anInteger.
+	[i > 0] whileTrue: [
+		sum := sum + i.
+		i := i - 1].
+	^sum
+]
+
+{ #category : #entries }
+LauncherTestsModule >> dividesNegatives [
+	<callback: slong ()>
+	^self mix: -7
+]
+
+{ #category : #testing }
+LauncherTestsModule >> mix: anInteger [
+	^(anInteger bitShift: 3) + (anInteger // 4) + (anInteger \\ 5) + anInteger negated * -3
+]
+
+{ #category : #entries }
+LauncherTestsModule >> answersIfNil [
+	<callback: slong ()>
+	^(self orThree: nil) * 10 + (self orThree: 4)
+]
+
+{ #category : #testing }
+LauncherTestsModule >> orThree: anObject [
+	^anObject ifNil: [3] ifNotNil: [:x | x + 1]
+]
+
+{ #category : #entries }
+LauncherTestsModule >> capturesInClosures [
+	<callback: slong ()>
+	^(self countWith: 2) * 100 + ((self adder: 5) value: 3)
+]
+
+{ #category : #testing }
+LauncherTestsModule >> countWith: anInteger [
+	| count |
+	count := 0.
+	#(1 2 3) do: [:each | count := count + (each * anInteger)].
+	^count
+]
+
+{ #category : #testing }
+LauncherTestsModule >> adder: anInteger [
+	^[:x | x + anInteger]
+]
+
+{ #category : #entries }
+LauncherTestsModule >> returnsThroughFrames [
+	<callback: slong ()>
+	^(self escapeWith: 7) + 1
+]
+
+{ #category : #testing }
+LauncherTestsModule >> escapeWith: anInteger [
+	self valueOf: [^anInteger * 2].
+	^0
+]
+
+{ #category : #entries }
+LauncherTestsModule >> sendsToSuper [
+	<callback: slong ()>
+	^self importsSizes
+]
+
+{ #category : #testing }
+LauncherTestsModule >> importsSizes [
+	^self imports size * 10 + super imports size
+]
+
+{ #category : #entries }
 LauncherTestsModule >> callsC [
 	| ffi libc memory found |
 	<callback: slong ()>

@@ -168,6 +168,24 @@ TEST_CASE("SmallInteger arithmetic and nil tests run natively", "[run]")
     }
 }
 
+TEST_CASE("helpers with loops, closures and super sends run natively", "[run]")
+{
+    const std::pair<const char*, int64_t> expected[] = {
+        {"sumsInLoops", 110},
+        {"dividesNegatives", 144},
+        {"answersIfNil", 35},
+        {"capturesInClosures", 1208},
+        {"returnsThroughFrames", 15},
+        {"sendsToSuper", 60}};
+    for (auto& [entry, value] : expected) {
+        INFO("entry: " << entry);
+        lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+        launcher.bind("LMR.LauncherTests");
+        launcher.relocate();
+        REQUIRE(launcher.run(entry) == value);
+    }
+}
+
 TEST_CASE("a block that captures itself prints", "[run]")
 {
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
