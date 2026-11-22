@@ -833,11 +833,9 @@ OptimizingCodeEmitter >> jumpWasAssembledInComparison: aConditionalJump [
 	prev allUses size != 1 ifTrue: [^false].
 	prev class == OMessageSend ifTrue: [^false].
 	(prev isKindOf: OBinaryOperation) ifTrue: [
-		(#(< <= = == != >= >) includes: prev name) ifTrue: [^true].
+		(#(< <= = == ~= != >= >) includes: prev name) ifTrue: [^true].
 		(#(_basicAt:) includes: prev name) ifTrue: [^false]].
-	prev class == OUnaryOperation ifTrue: [
-		(#(_isSmallInteger) includes: prev name) ifTrue: [^true].
-		(#(copy) includes: prev name) ifTrue: [^false]].
+	prev class == OUnaryOperation ifTrue: [^prev name == #_isSmallInteger].
 	self halt
 ]
 
