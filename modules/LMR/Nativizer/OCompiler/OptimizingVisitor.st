@@ -21,11 +21,30 @@ OptimizingVisitor class >> new [
 	^self basicNew initialize
 ]
 
+{ #category : #private }
+OptimizingVisitor >> argumentsOf: aBlockNode [
+	aBlockNode isInlined ifFalse: [^#()].
+	^aBlockNode inlinedArgs asArray collect: [:index | self inlinedArgument: index]
+]
+
+{ #category : #private }
+OptimizingVisitor >> bindingOf: anIdentifierNode [
+	| binding |
+	binding := anIdentifierNode binding.
+	(binding isArgument and: [binding isInlined]) ifFalse: [^binding].
+	^self inlinedArgument: binding index
+]
+
 { #category : #unclassified }
 OptimizingVisitor >> initialize [
 	firstBlock := OBasicBlock new.
 	currentBlock := firstBlock.
 	isReceiver := true
+]
+
+{ #category : #private }
+OptimizingVisitor >> inlinedArgument: anInteger [
+	^STemporaryBinding new index: anInteger; environment: -1; yourself
 ]
 
 { #category : #unclassified }
@@ -102,13 +121,14 @@ OptimizingVisitor >> visitAssignment: anAssignmentNode [
 
 { #category : #unclassified }
 OptimizingVisitor >> visitBlock: aBlockNode [
-	| previous cfg |
+	| previous cfg arguments |
 	previous := currentBlock.
 	cfg := OBasicBlock new.
 	currentBlock := cfg.
 	self visitScript: aBlockNode.
 	currentBlock := previous.
-	^OBlockClosure containing: cfg
+	arguments := self argumentsOf: aBlockNode.
+	^(OBlockClosure containing: cfg) arguments: arguments
 ]
 
 { #category : #unclassified }
@@ -126,8 +146,9 @@ OptimizingVisitor >> visitCascadeReceiver: aCascadeReceiverNode [
 
 { #category : #unclassified }
 OptimizingVisitor >> visitIdentifier: anIdentifierNode [
-	| load |
-	load := OReadVariable binding: anIdentifierNode binding.
+	| binding load |
+	binding := self bindingOf: anIdentifierNode.
+	load := OReadVariable binding: binding.
 	currentBlock add: load.
 	^load
 ]

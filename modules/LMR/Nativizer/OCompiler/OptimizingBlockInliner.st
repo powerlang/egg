@@ -12,6 +12,21 @@ Class {
 	#category : #OCompiler
 }
 
+{ #category : #private }
+OptimizingBlockInliner >> bind: value to: closure [
+	closure arguments do: [:binding | | write |
+		write := OWriteVariable binding: binding valued: value.
+		value addUse: write at: #source.
+		closure firstBlock afterInsert: write]
+]
+
+{ #category : #private }
+OptimizingBlockInliner >> closuresOf: message [
+	(#(to:do: to:by:do:) includes: message selector)
+		ifTrue: [^{message arguments last}].
+	^message arguments
+]
+
 { #category : #unclassified }
 OptimizingBlockInliner >> doInline [
 	self inlineInnerBlocksOf: firstBlock
@@ -162,6 +177,35 @@ OptimizingBlockInliner >> inlineInnerBlocksOf: basicBlock1 and: basicBlock2 and:
 ]
 
 { #category : #unclassified }
+OptimizingBlockInliner >> inlineLoop: message in: block from: start to: limit by: step [
+	| closure body last exit header counter test increment next |
+	closure := message arguments last.
+	body := closure firstBlock.
+	self inlineInnerBlocksOf: body.
+	last := body lastBlock.
+	exit := block splitAfter: message.
+	header := OBasicBlock new.
+	block endWithJumpTo: header.
+	last endWithJumpTo: header.
+	header addPredecessor: block; addPredecessor: last.
+	counter := header newParameter.
+	test := step > 0
+		ifTrue: [self send: #<= to: counter with: limit]
+		ifFalse: [self send: #<= to: limit with: counter].
+	header add: test.
+	header endWithJumpFalseTo: exit skipping: body if: test.
+	body addPredecessor: header.
+	exit addPredecessor: header.
+	increment := OLoadConstant valued: step.
+	next := self send: #+ to: counter with: increment.
+	last lastInstruction beforeInsert: increment; beforeInsert: next.
+	counter addVariable: start from: block; addVariable: next from: last.
+	self bind: counter to: closure.
+	message replaceAllUsesWith: message receiver; dissolve.
+	^exit
+]
+
+{ #category : #unclassified }
 OptimizingBlockInliner >> inlineOr: message in: block [
 	| closure firstSkipped lastSkipped join |
 	closure := message arguments first.
@@ -183,7 +227,29 @@ OptimizingBlockInliner >> inlineOr: message in: block [
 
 { #category : #unclassified }
 OptimizingBlockInliner >> inliners [
-	^#(ifTrue: ifFalse: ifTrue:ifFalse: ifFalse:ifTrue: and: or: to:do: whileTrue: whileFalse: ifNil:)
+	^#(ifTrue: ifFalse: ifTrue:ifFalse: ifFalse:ifTrue: and: or: to:do: to:by:do: whileTrue: whileFalse: ifNil:)
+]
+
+{ #category : #unclassified }
+OptimizingBlockInliner >> inlineTobydo: message in: block [
+	| step |
+	step := message arguments second value.
+	^self
+		inlineLoop: message
+		in: block
+		from: message receiver
+		to: message arguments first
+		by: step
+]
+
+{ #category : #unclassified }
+OptimizingBlockInliner >> inlineTodo: message in: block [
+	^self
+		inlineLoop: message
+		in: block
+		from: message receiver
+		to: message arguments first
+		by: 1
 ]
 
 { #category : #unclassified }
@@ -246,11 +312,20 @@ OptimizingBlockInliner >> performInlinerFor: messageSend in: block [
 	^self perform: inliner asSymbol with: messageSend with: block
 ]
 
+{ #category : #private }
+OptimizingBlockInliner >> send: selector to: receiver with: argument [
+	| send |
+	send := OMessageSend receiver: receiver selector: selector arguments: {argument}.
+	receiver addUse: send at: #receiver.
+	argument addUse: send at: 1.
+	^send
+]
+
 { #category : #unclassified }
 OptimizingBlockInliner >> shouldInline: anInstruction [
 	^anInstruction isMessageSend
 		and: [anInstruction isSuper not
 			and: [(self inliners includes: anInstruction selector)
-				and: [anInstruction arguments conform: [:argument | argument isBlockClosure]]]]
+				and: [(self closuresOf: anInstruction) conform: [:closure | closure isBlockClosure]]]]
 ]
 
