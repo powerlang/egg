@@ -714,12 +714,23 @@ OptimizingCodeEmitter >> assembleTimes: instruction [
 ]
 
 { #category : #unclassified }
+OptimizingCodeEmitter >> assembleTimes: register constant: anInteger [
+	| scratch |
+	scratch := assembler regV.
+	assembler
+		clearIntegerBit: register;
+		moveImm: anInteger to: scratch;
+		multiply: register by: scratch;
+		setIntegerBit: register
+]
+
+{ #category : #unclassified }
 OptimizingCodeEmitter >> assembleTimesConstant: instruction [
 	| left value shift |
 	left := allocation at: instruction left.
 	value := instruction right.
 	shift := self equivalentShiftsToLowerMultiplyBy: value.
-	self ASSERT: shift notNil.
+	shift ifNil: [^self assembleTimes: left constant: value].
 	assembler
 		clearIntegerBit: left;
 		shiftLeft: left by: shift;
