@@ -700,7 +700,7 @@ OBasicBlock >> successorsPostOrderSkipping: seen [
 
 { #category : #unclassified }
 OBasicBlock >> unifyReturns [
-	| all last extra ret prev end jump parameter |
+	| all last extra ret prev end parameter |
 	all := self withSuccessorsPostOrder.
 	last := all removeFirst.
 	extra := OrderedCollection new.
@@ -710,20 +710,14 @@ OBasicBlock >> unifyReturns [
 	extra size = 0 ifTrue: [^self].
 	ret := last lastInstruction.
 	prev := ret prev.
-	(prev == last and: [last parameters size = 1])
-		ifTrue: [
-			end := last.
-			parameter := last parameters first]
-		ifFalse: [
-			end := last splitAfter: prev.
-			end addPredecessor: last.
-			jump := OJump to: end.
-			prev afterInsert: jump.
-			parameter := end newParameterWith: {ret source}.
-			parameter addUse: ret at: #source.
-			ret source removeUse: ret at: #source.
-			ret source: parameter].
-	extra do: [:assoc | | tail block old |
+	end := last splitAfter: prev.
+	end addPredecessor: last.
+	prev afterInsert: (OJump to: end).
+	parameter := end newParameterWith: {ret source}.
+	parameter addUse: ret at: #source.
+	ret source removeUse: ret at: #source.
+	ret source: parameter.
+	extra do: [:assoc | | tail block old jump |
 		tail := assoc key.
 		block := assoc value.
 		end addPredecessor: block.
@@ -732,7 +726,10 @@ OBasicBlock >> unifyReturns [
 		old removePredecessor: block; parametersDo: [:each | each removeBlock: block].
 		jump target: end.
 		parameter addVariable: tail source from: block.
-		tail dissolve]
+		tail dissolve].
+	last predecessors isEmpty ifFalse: [^self].
+	end removePredecessor: last.
+	parameter removeBlock: last
 ]
 
 { #category : #unclassified }

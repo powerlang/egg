@@ -429,6 +429,25 @@ LauncherTestsModule >> bump: anInteger [
 ]
 
 { #category : #entries }
+LauncherTestsModule >> answersFromBranches [
+	<callback: slong ()>
+	^(self remainderOf: 47560 by: 7) * 10 + (self remainderOf: -7 by: 5)
+]
+
+{ #category : #testing }
+LauncherTestsModule >> remainderOf: anInteger by: aNumber [
+	| remainder |
+	aNumber = 0 ifTrue: [^0].
+	aNumber isSmallInteger
+		ifTrue: [
+			remainder := anInteger rem: aNumber.
+			(remainder = 0 or: [remainder positive = aNumber positive])
+				ifTrue: [^remainder].
+			^remainder + aNumber]
+		ifFalse: [^nil]
+]
+
+{ #category : #entries }
 LauncherTestsModule >> callsC [
 	| ffi libc memory found |
 	<callback: slong ()>
