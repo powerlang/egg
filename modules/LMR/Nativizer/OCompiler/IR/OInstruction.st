@@ -191,6 +191,11 @@ OInstruction >> insertPushBefore: anInstruction [
 ]
 
 { #category : #unclassified }
+OInstruction >> isBlockClosure [
+	^false
+]
+
+{ #category : #unclassified }
 OInstruction >> isBlockParameter [
 	^false
 ]

@@ -28,6 +28,11 @@ OBlockClosure >> firstBlock: basicBlock [
 ]
 
 { #category : #unclassified }
+OBlockClosure >> isBlockClosure [
+	^true
+]
+
+{ #category : #unclassified }
 OBlockClosure >> lastBlock [
 	^firstBlock lastBlock
 ]
