@@ -43,7 +43,9 @@ OptimizingVariableBinder >> insertParameterOf: name at: block [
 	parameter := block newParameter.
 	parameterNames at: parameter put: name.
 	pendingParameters add: parameter -> block.
-	self define: parameter as: name in: block
+	self define: parameter as: name in: block.
+	(dominanceFrontiers at: block)
+		do: [:frontier | self insertParameterOf: name at: frontier]
 ]
 
 { #category : #accessing }
