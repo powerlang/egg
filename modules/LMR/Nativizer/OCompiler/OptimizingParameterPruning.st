@@ -4,7 +4,7 @@
 "
 
 Class {
-	#name : #OptimizingParameterSimplification,
+	#name : #OptimizingParameterPruning,
 	#superclass : #Object,
 	#instVars : [
 		'marks'
@@ -13,38 +13,38 @@ Class {
 }
 
 { #category : #unclassified }
-OptimizingParameterSimplification class >> new [
+OptimizingParameterPruning class >> new [
 	^self basicNew initialize
 ]
 
 { #category : #unclassified }
-OptimizingParameterSimplification >> initialize [
+OptimizingParameterPruning >> initialize [
 	marks := Set new
 ]
 
 { #category : #unclassified }
-OptimizingParameterSimplification >> isMarked: instruction [
+OptimizingParameterPruning >> isMarked: instruction [
 	^marks includes: instruction
 ]
 
 { #category : #unclassified }
-OptimizingParameterSimplification >> mark: instruction [
+OptimizingParameterPruning >> mark: instruction [
 	^marks add: instruction
 ]
 
 { #category : #unclassified }
-OptimizingParameterSimplification >> process: aBasicBlock [
-	aBasicBlock parametersDo: [:parameter | self simplify: parameter]
+OptimizingParameterPruning >> process: aBasicBlock [
+	aBasicBlock parametersDo: [:parameter | self prune: parameter]
 ]
 
 { #category : #unclassified }
-OptimizingParameterSimplification >> processFrom: firstBlock [
+OptimizingParameterPruning >> processFrom: firstBlock [
 	firstBlock instructionsWithSuccessorsDo: [:inst | self mark: inst].
 	firstBlock reversePostOrderDo: [:block | self process: block]
 ]
 
 { #category : #unclassified }
-OptimizingParameterSimplification >> simplify: aParameter [
+OptimizingParameterPruning >> prune: aParameter [
 	(aParameter variables conform: [:var | self isMarked: var]) ifTrue: [^self].
 	self DENY: aParameter isUsed.
 	aParameter dissolve

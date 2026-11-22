@@ -32,11 +32,6 @@ OptimizingNativizer >> abi: anAbi [
 	abi := anAbi
 ]
 
-{ #category : #unclassified }
-OptimizingNativizer >> eliminateDeadParameters [
-	OptimizingParameterSimplification new processFrom: firstBlock
-]
-
 { #category : #accessing }
 OptimizingNativizer >> environment: aNativizationEnvironment [
 	environment := aNativizationEnvironment.
@@ -211,13 +206,18 @@ OptimizingNativizer >> nativize [
 		simplifyCFG;
 		removeRedundantCode;
 		simplifyCFG;
-		eliminateDeadParameters;
+		pruneParameters;
 		splitCriticalEdges.
 	allocation := self allocate.
 	self
 		enforceTwoAddressCodeUsing: allocation;
 		simplifyCFG.
 	^self assembleUsing: allocation
+]
+
+{ #category : #unclassified }
+OptimizingNativizer >> pruneParameters [
+	OptimizingParameterPruning new processFrom: firstBlock
 ]
 
 { #category : #unclassified }
