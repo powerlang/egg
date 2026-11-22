@@ -104,28 +104,40 @@ OptimizingBlockInliner >> inlineIfFalseifTrue: message in: block [
 
 { #category : #unclassified }
 OptimizingBlockInliner >> inlineIfNil: message in: block [
-	| receiver closure firstSkipped lastSkipped constant compare join |
+	^self inlineNilCheck: message in: block skippingWith: OJumpFalse
+]
+
+{ #category : #unclassified }
+OptimizingBlockInliner >> inlineIfNilifNotNil: message in: block [
+	| receiver compare |
 	receiver := message receiver.
-	closure := message arguments first.
-	firstSkipped := closure firstBlock.
-	self inlineInnerBlocksOf: firstSkipped.
-	lastSkipped := firstSkipped lastBlock.
-	constant := OLoadConstant valued: nil.
-	compare := OMessageSend receiver: receiver selector: #== arguments: {constant}.
-	receiver addUse: compare at: #receiver.
-	constant addUse: compare at: 1.
-	message beforeInsert: constant; beforeInsert: compare.
-	join := block splitAfter: message.
-	block endWithJumpFalseTo: join skipping: firstSkipped if: compare.
-	lastSkipped endWithJumpTo: join.
-	firstSkipped addPredecessor: block.
-	join addPredecessor: block; addPredecessor: lastSkipped.
-	join
-		insertParameterOf: receiver
-		at: block
-		and: lastSkipped
-		replacing: message.
-	^join
+	compare := self nilCheckOf: receiver before: message.
+	self bind: receiver to: message arguments second.
+	^self
+		inline: message
+		in: block
+		if: compare
+		then: message arguments first
+		else: message arguments second
+]
+
+{ #category : #unclassified }
+OptimizingBlockInliner >> inlineIfNotNil: message in: block [
+	^self inlineNilCheck: message in: block skippingWith: OJumpTrue
+]
+
+{ #category : #unclassified }
+OptimizingBlockInliner >> inlineIfNotNilifNil: message in: block [
+	| receiver compare |
+	receiver := message receiver.
+	compare := self nilCheckOf: receiver before: message.
+	self bind: receiver to: message arguments first.
+	^self
+		inline: message
+		in: block
+		if: compare
+		then: message arguments second
+		else: message arguments first
 ]
 
 { #category : #unclassified }
@@ -206,6 +218,32 @@ OptimizingBlockInliner >> inlineLoop: message in: block from: start to: limit by
 ]
 
 { #category : #unclassified }
+OptimizingBlockInliner >> inlineNilCheck: message in: block skippingWith: jumpType [
+	| receiver closure firstSkipped lastSkipped compare join |
+	receiver := message receiver.
+	closure := message arguments first.
+	firstSkipped := closure firstBlock.
+	self bind: receiver to: closure; inlineInnerBlocksOf: firstSkipped.
+	lastSkipped := firstSkipped lastBlock.
+	compare := self nilCheckOf: receiver before: message.
+	join := block splitAfter: message.
+	block
+		endWith: jumpType
+		to: join
+		skipping: firstSkipped
+		if: compare.
+	lastSkipped endWithJumpTo: join.
+	firstSkipped addPredecessor: block.
+	join addPredecessor: block; addPredecessor: lastSkipped.
+	join
+		insertParameterOf: receiver
+		at: block
+		and: lastSkipped
+		replacing: message.
+	^join
+]
+
+{ #category : #unclassified }
 OptimizingBlockInliner >> inlineOr: message in: block [
 	| closure firstSkipped lastSkipped join |
 	closure := message arguments first.
@@ -227,7 +265,7 @@ OptimizingBlockInliner >> inlineOr: message in: block [
 
 { #category : #unclassified }
 OptimizingBlockInliner >> inliners [
-	^#(ifTrue: ifFalse: ifTrue:ifFalse: ifFalse:ifTrue: and: or: to:do: to:by:do: whileTrue: whileFalse: ifNil:)
+	^#(ifTrue: ifFalse: ifTrue:ifFalse: ifFalse:ifTrue: and: or: to:do: to:by:do: whileTrue: whileFalse: ifNil: ifNotNil: ifNil:ifNotNil: ifNotNil:ifNil:)
 ]
 
 { #category : #unclassified }
@@ -297,6 +335,15 @@ OptimizingBlockInliner >> insertParameterAt: join of: lastSkipped orNilFrom: blo
 	constant := OLoadConstant valued: nil.
 	block lastInstruction beforeInsert: constant.
 	join insertParameterOf: constant at: block and: lastSkipped replacing: message
+]
+
+{ #category : #private }
+OptimizingBlockInliner >> nilCheckOf: receiver before: message [
+	| constant compare |
+	constant := OLoadConstant valued: nil.
+	compare := self send: #== to: receiver with: constant.
+	message beforeInsert: constant; beforeInsert: compare.
+	^compare
 ]
 
 { #category : #unclassified }
