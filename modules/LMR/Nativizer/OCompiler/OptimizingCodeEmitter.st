@@ -250,7 +250,7 @@ OptimizingCodeEmitter >> assembleBitOrConstant: instruction [
 	| left value |
 	left := allocation at: instruction.
 	value := instruction right * 2 + 1.
-	assembler or: left with: value
+	assembler or: left withImm: value
 ]
 
 { #category : #unclassified }
