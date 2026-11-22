@@ -118,6 +118,7 @@ OptimizingInstructionFragmenter >> fragmentGenericMessage: instruction [
 	instruction arguments: new.
 	arguments withIndexDo: [:argument :index |
 		argument removeUse: instruction at: index; dissolveIfUnused].
+	new withIndexDo: [:push :index | push addUse: instruction at: index].
 	firstBlock activationRecord haveFrame
 ]
 
