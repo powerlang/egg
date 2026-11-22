@@ -207,6 +207,7 @@ OptimizingNativizer >> nativize [
 		removeRedundantCode;
 		simplifyCFG;
 		pruneParameters;
+		removeUnusedOperations;
 		splitCriticalEdges.
 	allocation := self allocate.
 	self
@@ -223,6 +224,15 @@ OptimizingNativizer >> pruneParameters [
 { #category : #unclassified }
 OptimizingNativizer >> removeRedundantCode [
 	OptimizingValueNumbering new workFrom: firstBlock
+]
+
+{ #category : #unclassified }
+OptimizingNativizer >> removeUnusedOperations [
+	firstBlock asReversePostOrderInstructionsCollection reverseDo: [:instruction |
+		(instruction isUsed not and: [
+			instruction producesSmallInteger
+				or: [instruction isUnaryOperation and: [#(#copy #copyResult) includes: instruction name]]])
+			ifTrue: [instruction dissolve]]
 ]
 
 { #category : #unclassified }
