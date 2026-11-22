@@ -57,6 +57,20 @@ OptimizingCFGSimplifier >> link: aBasicBlock to: anotherBasicBlock [
 ]
 
 { #category : #private }
+OptimizingCFGSimplifier >> retarget: predecessor from: block to: following [
+	| jump arguments unconditional |
+	jump := predecessor lastInstruction.
+	(jump targets includes: following) ifTrue: [
+		unconditional := OJump to: following.
+		^jump dissolveReplacingWith: unconditional].
+	arguments := block lastInstruction argumentsTo: following.
+	jump
+		retargetFrom: block to: following;
+		argumentsTo: following put: arguments copy.
+	self link: predecessor to: following
+]
+
+{ #category : #private }
 OptimizingCFGSimplifier >> simplify [
 	| changed |
 	changed := false.
@@ -85,11 +99,6 @@ OptimizingCFGSimplifier >> tryCombining: block [
 OptimizingCFGSimplifier >> tryFoldingRedundantBranch: block [
 	| last |
 	last := block lastInstruction.
-	(last isConditionalJump and: [last target == last implicitTarget])
-		ifTrue: [| jump |
-			jump := OJump to: last target.
-			last dissolveReplacingWith: jump.
-			^true].
 	(last isConditionalJump and: [last variable isConstant]) ifTrue: [
 		last replaceWithUnconditional: last variable value in: block.
 		^true].
@@ -111,19 +120,14 @@ OptimizingCFGSimplifier >> tryHoistingBranch: block [
 
 { #category : #private }
 OptimizingCFGSimplifier >> tryRemovingEmptyBlock: block [
-	| following arguments |
+	| following |
 	block isEmptyJump ifTrue: [
 		following := block lastInstruction target.
 		(self wouldDuplicateEdgesOf: block into: following) ifTrue: [^false].
-		arguments := block lastInstruction argumentsTo: following.
 		following
 			parametersDo: [:parameter | parameter untrackArgumentFrom: block];
 			removePredecessor: block.
-		block predecessors do: [:predecessor | | jump |
-			jump := predecessor lastInstruction.
-			jump retargetFrom: block to: following.
-			jump argumentsTo: following put: arguments copy.
-			self link: predecessor to: following].
+		block predecessors do: [:predecessor | self retarget: predecessor from: block to: following].
 		^true].
 	^false
 ]
