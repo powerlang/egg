@@ -11,7 +11,8 @@ Class {
 		'currentBlock',
 		'names',
 		'hashes',
-		'hashesOut'
+		'hashesOut',
+		'stores'
 	],
 	#category : #OCompiler
 }
@@ -50,6 +51,7 @@ OptimizingValueNumbering >> nameOf: instruction [
 
 { #category : #unclassified }
 OptimizingValueNumbering >> processMemoryStore: value as: storeHash andLoads: loadHash [
+	stores add: loadHash.
 	hashes
 		at: loadHash
 		put: value
@@ -258,7 +260,8 @@ OptimizingValueNumbering >> visitMessageSend: instruction [
 	loads := names keys select: [:instr |
 		instr isPrimitiveOperation
 			and: [#(_basicAt: _byteAt: _basicFlags) includes: instr name]].
-	loads do: [:load | hashes removeAllSuchThat: [:value | value = load]]
+	loads do: [:load | hashes removeAllSuchThat: [:value | value = load]].
+	stores do: [:hash | hashes removeKey: hash ifAbsent: nil]
 ]
 
 { #category : #unclassified }
@@ -302,6 +305,7 @@ OptimizingValueNumbering >> workFrom: aBasicBlock [
 	| count |
 	hashes := Dictionary new.
 	hashesOut := Dictionary new.
+	stores := Set new.
 	names := Dictionary new.
 	firstBlock := aBasicBlock.
 	count := 0.

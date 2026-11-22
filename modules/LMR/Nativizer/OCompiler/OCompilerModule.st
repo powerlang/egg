@@ -12,7 +12,7 @@ Class {
 { #category : #spec }
 OCompilerModule >> imports [
 	^{
-		#Kernel -> #(Array Association ByteArray CharacterArray Closure CompiledBlock CompiledMethod Error Object OrderedCollection Dictionary IdentityDictionary ProtoObject Species String).
+		#Kernel -> #(Array Association ByteArray CharacterArray Closure CompiledBlock CompiledMethod Error Object OrderedCollection Dictionary IdentityDictionary ProtoObject Set Species String).
 		#'Kernel.LMR' -> #(LMRProtoObject LMRSpecies).
 		#LMR -> #(BindSite GCSpace NativeCode SendSite).
 		#'LMR.SExpressions' -> #(SArgumentBinding SSelfBinding STemporaryBinding).
