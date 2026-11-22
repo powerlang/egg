@@ -1240,6 +1240,11 @@ GenericAssembler >> nativeCode [
 	^(NativeCode withAll: literals) code: codegen memory bytes
 ]
 
+{ #category : #'operations - arithmetic' }
+GenericAssembler >> negate: srcAndDst [
+	codegen negate: srcAndDst
+]
+
 { #category : #'operations - logical' }
 GenericAssembler >> or: src1AndDst with: src2 [
 	^ codegen or: src1AndDst with: src2

@@ -648,6 +648,11 @@ AMD64CodeGenerator >> nearJump: mnemonic to: label [
 	self jump: mnemonic to: label size: 4
 ]
 
+{ #category : #basic }
+AMD64CodeGenerator >> negate: srcAndDst [
+	self assemble: 'neg' with: srcAndDst
+]
+
 { #category : #alignment }
 AMD64CodeGenerator >> nop [
 	self assemble: 'nop'
