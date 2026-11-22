@@ -4,6 +4,7 @@ Class {
 	#instVars : [
 		'platform',
 		'optimizedMethods',
+		'moduleMethods',
 		'invokedMethods',
 		'inlinedMethods',
 		'messageLinker',
@@ -31,10 +32,19 @@ NativizationEnvironment >> completeInitialization [
 	cachedNativizer := self newTemplateJIT 
 ]
 
+{ #category : #queries }
+NativizationEnvironment >> includes: method in: aCollection [
+	| selector classname |
+	selector := method selector.
+	classname := method classBinding name.
+	^aCollection anySatisfy: [:m | m selector = selector and: [m classBinding name = classname]]
+]
+
 { #category : #initialization }
 NativizationEnvironment >> initialize [
 	busy := false.
 	optimizedMethods := OrderedCollection new.
+	moduleMethods := OrderedCollection new.
 	invokedMethods := OrderedCollection new.
 	inlinedMethods := OrderedCollection new.
 	messageLinker := CompositeMessageLinker new.
@@ -75,6 +85,12 @@ NativizationEnvironment >> invokedMethods: aCollection [
 ]
 
 
+{ #category : #queries }
+NativizationEnvironment >> isModuleMethod: method [
+	^(self includes: method in: moduleMethods)
+		and: [(self includes: method in: optimizedMethods) not]
+]
+
 { #category : #accessing }
 NativizationEnvironment >> messageLinker [
 	^messageLinker
@@ -100,6 +116,11 @@ NativizationEnvironment >> methodNativizer [
 	^cachedNativizer
 ]
 
+{ #category : #accessing }
+NativizationEnvironment >> moduleMethods [
+	^moduleMethods
+]
+
 { #category : #services }
 NativizationEnvironment >> nativize: aCompiledMethod [
 	^(self shouldOptimize: aCompiledMethod)
@@ -116,6 +137,8 @@ NativizationEnvironment >> nativizeOptimizing: aCompiledMethod [
 	| code on |
 	aCompiledMethod hasBlocks ifTrue: [self nativizeWithoutOptimizing: aCompiledMethod].
 	on := self optimizingNativizer.
+	(self isModuleMethod: aCompiledMethod)
+		ifTrue: [on inlinedMethods: self receiverIndependentMethods].
 	on method: aCompiledMethod.
 	on messageLinker: messageLinker.
 	code := on nativize.
@@ -191,6 +214,11 @@ NativizationEnvironment >> printOn: aStream [
 	aStream nextPut: $)
 ]
 
+{ #category : #queries }
+NativizationEnvironment >> receiverIndependentMethods [
+	^inlinedMethods select: [:method | {ProtoObject. LMRProtoObject} includes: method classBinding]
+]
+
 { #category : #accessing }
 NativizationEnvironment >> safepointCheck: anObject [
 	safepointCheck := anObject 
@@ -214,12 +242,10 @@ NativizationEnvironment >> shouldInline: aSymbol [
 
 { #category : #queries }
 NativizationEnvironment >> shouldOptimize: method [
-	| selector classname |
 	(method literals anySatisfy: [:literal | self stackShapingSelectors includes: literal])
 		ifTrue: [^false].
-	selector := method selector.
-	classname := method classBinding name.
-	^optimizedMethods anySatisfy: [:m | m selector = selector and: [ m classBinding name = classname ]  ]
+	^(self includes: method in: optimizedMethods)
+		or: [self includes: method in: moduleMethods]
 ]
 
 { #category : #queries }

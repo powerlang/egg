@@ -158,6 +158,18 @@ LauncherTestsModule >> largeProduct [
 ]
 
 { #category : #entries }
+LauncherTestsModule >> storesCharacters [
+	<callback: slong ()>
+	^(self store: $* in: (String new: 1)) first codePoint
+]
+
+{ #category : #private }
+LauncherTestsModule >> store: aCharacter in: aString [
+	aString at: 1 put: aCharacter.
+	^aString
+]
+
+{ #category : #entries }
 LauncherTestsModule >> printsLargeProducts [
 	<callback: slong ()>
 	^(4611686018427387903 printString , (4611686018427387903 * -4611686018427387904) printString) size

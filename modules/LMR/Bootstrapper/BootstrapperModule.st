@@ -103,7 +103,7 @@ BootstrapperModule >> optimize: aModule with: env [
 	methods := OrderedCollection new.
 	(aModule classes copyWith: aModule class)
 		do: [:class | self addMethodsOf: class to: methods].
-	env optimizedMethods: env optimizedMethods , methods
+	env moduleMethods addAll: methods
 ]
 
 { #category : #bootstrapping }
