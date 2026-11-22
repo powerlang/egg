@@ -11,6 +11,7 @@ Class {
 		'environment',
 		'kernelOverrides',
 		'memory',
+		'optimized',
 		'placeholders',
 		'replacements',
 		'roots',
@@ -34,7 +35,7 @@ BootstrapperModule >> main: args [
 	| lmrModule nativizer platform names |
 	Kernel require: #LMR.
 	names := args allButFirst: 2.
-	roots := names collect: [:name | Kernel load: name asSymbol].
+	roots := names collect: [:name | self load: name].
 	lmrModule := LMR.
 	nativizer := NativizerModule module.
 	platform := NativizationPlatform host.
@@ -80,9 +81,36 @@ BootstrapperModule >> bootstrapLMR: anLMRModule nativizer: aNativizerModule plat
 	env initializeLinkersFor: anLMRModule; completeInitialization.
 	environment := env.
 	Memory current: memory.
+	optimized do: [:module | self optimize: module with: env].
 	kernelOverrides := self kernelOverrides.
 	self nativizeEntriesOf: self with: env.
 	roots do: [:module | self nativizeEntriesOf: module with: env]
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> load: aString [
+	| name module |
+	aString first = $+ ifFalse: [^Kernel load: aString asSymbol].
+	name := aString allButFirst asSymbol.
+	module := (Kernel loadedModuleNamed: name) ifNil: [Kernel load: name].
+	optimized add: module.
+	^module
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> optimize: aModule with: env [
+	| methods |
+	methods := OrderedCollection new.
+	(aModule classes copyWith: aModule class)
+		do: [:class | self addMethodsOf: class to: methods].
+	env optimizedMethods: env optimizedMethods , methods
+]
+
+{ #category : #bootstrapping }
+BootstrapperModule >> addMethodsOf: aClass to: aCollection [
+	aClass methodDictionary
+		do: [:method | (method isCallback or: [method isCalloutMethod])
+			ifFalse: [aCollection add: method]]
 ]
 
 { #category : #bootstrapping }
@@ -206,6 +234,7 @@ BootstrapperModule >> nativizeSendSiteStubs: env [
 BootstrapperModule >> justLoaded [
 	super justLoaded.
 	codeSegments := IdentityDictionary new.
+	optimized := OrderedCollection new.
 	roots := #()
 ]
 
@@ -344,6 +373,7 @@ BootstrapperModule >> prepareForSnapshot: aBuilder [
 		map: environment to: nil;
 		map: userEnvironment to: nil;
 		map: kernelOverrides to: nil;
+		map: optimized to: nil;
 		map: replacements to: nil;
 		map: roots to: nil
 ]
