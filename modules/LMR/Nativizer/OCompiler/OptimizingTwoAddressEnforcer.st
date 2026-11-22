@@ -102,7 +102,7 @@ OptimizingTwoAddressEnforcer >> visitBinaryWithVariable: instruction [
 	dest := allocation at: instruction ifAbsent: [^self].
 	left == dest ifTrue: [^self].
 	right == dest ifTrue: [
-		(#(< <= = == > >= _transferControlTo: _basicAt: _byteAt: _basicFlags: _smallSize: _extendedFlags:)
+		(#(< <= = == ~= != > >= _transferControlTo: _basicAt: _byteAt: _basicFlags: _smallSize: _extendedFlags:)
 			includes: instruction name)
 			ifTrue: [^self].
 		instruction name == #'-'

@@ -620,6 +620,15 @@ OptimizingCodeEmitter >> assembleNegate: instruction [
 ]
 
 { #category : #unclassified }
+OptimizingCodeEmitter >> assembleNotEqual: instruction [
+	self
+		assembleCompare: instruction;
+		assembleJumpTrue: [:label | assembler jumpIfNotEqualTo: label]
+		orJumpFalse: [:label | assembler jumpIfEqualTo: label]
+		in: instruction
+]
+
+{ #category : #unclassified }
 OptimizingCodeEmitter >> assembleNotEqualConstant: instruction [
 	self
 		assembleCompareConstant: instruction
