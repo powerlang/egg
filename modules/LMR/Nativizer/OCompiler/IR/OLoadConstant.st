@@ -55,6 +55,11 @@ OLoadConstant >> printStringUsing: names [
 ]
 
 { #category : #unclassified }
+OLoadConstant >> producesSmallInteger [
+	^constant isSmallInteger
+]
+
+{ #category : #unclassified }
 OLoadConstant >> usesResultOf: anInstruction [
 	^false
 ]

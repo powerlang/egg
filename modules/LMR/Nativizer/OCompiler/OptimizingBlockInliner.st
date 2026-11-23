@@ -12,9 +12,36 @@ Class {
 	#category : #OCompiler
 }
 
+{ #category : #private }
+OptimizingBlockInliner >> bind: value to: closure [
+	closure arguments do: [:binding | | write |
+		write := OWriteVariable binding: binding valued: value.
+		value addUse: write at: #source.
+		closure firstBlock afterInsert: write]
+]
+
+{ #category : #private }
+OptimizingBlockInliner >> closuresOf: message [
+	| selector |
+	selector := message selector.
+	(#(to:do: to:by:do:) includes: selector) ifTrue: [^{message arguments last}].
+	(#(whileTrue: whileFalse: whileTrue whileFalse repeat) includes: selector)
+		ifTrue: [^message arguments copyWith: message receiver].
+	^message arguments
+]
+
 { #category : #unclassified }
 OptimizingBlockInliner >> doInline [
 	self inlineInnerBlocksOf: firstBlock
+]
+
+{ #category : #private }
+OptimizingBlockInliner >> familyOf: selector [
+	| keywords |
+	keywords := selector keywords asSet.
+	(keywords size = 1 and: [#('and:' 'or:') includes: keywords anyone])
+		ifTrue: [^keywords anyone asSymbol].
+	^selector
 ]
 
 { #category : #unclassified }
@@ -23,22 +50,60 @@ OptimizingBlockInliner >> inline: aMessageSend in: block [
 ]
 
 { #category : #unclassified }
-OptimizingBlockInliner >> inlineAnd: message in: block [
-	| closure firstSkipped lastSkipped join |
-	closure := message arguments first.
-	firstSkipped := closure firstBlock.
-	self inlineInnerBlocksOf: firstSkipped.
-	lastSkipped := firstSkipped lastBlock.
+OptimizingBlockInliner >> inline: message in: block if: condition then: positive else: negative [
+	| firstTrue firstFalse lastTrue lastFalse join |
+	firstTrue := positive firstBlock.
+	firstFalse := negative firstBlock.
+	self inlineInnerBlocksOf: firstTrue and: firstFalse.
+	lastTrue := firstTrue lastBlock.
+	lastFalse := firstFalse lastBlock.
 	join := block splitAfter: message.
-	block endWithJumpFalseTo: join skipping: firstSkipped if: message receiver.
-	lastSkipped endWithJumpTo: join.
-	firstSkipped addPredecessor: block.
-	join addPredecessor: block; addPredecessor: lastSkipped.
-	join
-		insertParameterOf: message receiver
-		at: block
-		and: lastSkipped
-		replacing: message.
+	block endWithJumpFalseTo: firstFalse skipping: firstTrue if: condition.
+	lastTrue endWithJumpTo: join.
+	lastFalse endWithJumpTo: join.
+	firstTrue addPredecessor: block.
+	firstFalse addPredecessor: block.
+	join addPredecessor: lastTrue; addPredecessor: lastFalse.
+	join insertParameterOf: lastTrue and: lastFalse replacing: message.
+	^join
+]
+
+{ #category : #unclassified }
+OptimizingBlockInliner >> inlineAnd: message in: block [
+	^self inlineChain: message in: block exitingWith: OJumpFalse
+]
+
+{ #category : #unclassified }
+OptimizingBlockInliner >> inlineAndNot: message in: block [
+	self negate: message arguments first.
+	^self inlineAnd: message in: block
+]
+
+{ #category : #unclassified }
+OptimizingBlockInliner >> inlineChain: message in: block exitingWith: jumpType [
+	| join current condition values parameter |
+	join := block splitAfter: message.
+	current := block.
+	condition := message receiver.
+	values := OrderedCollection new.
+	message arguments do: [:closure | | first |
+		first := closure firstBlock.
+		self inlineInnerBlocksOf: first.
+		current
+			endWith: jumpType
+			to: join
+			skipping: first
+			if: condition.
+		first addPredecessor: current.
+		join addPredecessor: current.
+		values add: condition.
+		current := first lastBlock.
+		condition := current lastValue].
+	current endWithJumpTo: join.
+	join addPredecessor: current.
+	values add: condition.
+	parameter := join newParameterWith: values.
+	message replaceAllUsesWith: parameter; dissolve.
 	^join
 ]
 
@@ -59,6 +124,54 @@ OptimizingBlockInliner >> inlineIfFalse: message in: block [
 ]
 
 { #category : #unclassified }
+OptimizingBlockInliner >> inlineIfFalseifTrue: message in: block [
+	^self
+		inline: message
+		in: block
+		if: message receiver
+		then: message arguments second
+		else: message arguments first
+]
+
+{ #category : #unclassified }
+OptimizingBlockInliner >> inlineIfNil: message in: block [
+	^self inlineNilCheck: message in: block skippingWith: OJumpFalse
+]
+
+{ #category : #unclassified }
+OptimizingBlockInliner >> inlineIfNilifNotNil: message in: block [
+	| receiver compare |
+	receiver := message receiver.
+	compare := self nilCheckOf: receiver before: message.
+	self bind: receiver to: message arguments second.
+	^self
+		inline: message
+		in: block
+		if: compare
+		then: message arguments first
+		else: message arguments second
+]
+
+{ #category : #unclassified }
+OptimizingBlockInliner >> inlineIfNotNil: message in: block [
+	^self inlineNilCheck: message in: block skippingWith: OJumpTrue
+]
+
+{ #category : #unclassified }
+OptimizingBlockInliner >> inlineIfNotNilifNil: message in: block [
+	| receiver compare |
+	receiver := message receiver.
+	compare := self nilCheckOf: receiver before: message.
+	self bind: receiver to: message arguments first.
+	^self
+		inline: message
+		in: block
+		if: compare
+		then: message arguments second
+		else: message arguments first
+]
+
+{ #category : #unclassified }
 OptimizingBlockInliner >> inlineIfTrue: message in: block [
 	| closure firstSkipped lastSkipped join |
 	closure := message arguments first.
@@ -76,26 +189,12 @@ OptimizingBlockInliner >> inlineIfTrue: message in: block [
 
 { #category : #unclassified }
 OptimizingBlockInliner >> inlineIfTrueifFalse: message in: block [
-	| positive negative firstTrue firstFalse lastTrue lastFalse join |
-	positive := message arguments first.
-	negative := message arguments second.
-	firstTrue := positive firstBlock.
-	firstFalse := negative firstBlock.
-	self inlineInnerBlocksOf: firstTrue and: firstFalse.
-	lastTrue := firstTrue lastBlock.
-	lastFalse := firstFalse lastBlock.
-	join := block splitAfter: message.
-	block
-		endWithJumpFalseTo: firstFalse
-		skipping: firstTrue
-		if: message receiver.
-	lastTrue endWithJumpTo: join.
-	lastFalse endWithJumpTo: join.
-	firstTrue addPredecessor: block.
-	firstFalse addPredecessor: block.
-	join addPredecessor: lastTrue; addPredecessor: lastFalse.
-	join insertParameterOf: lastTrue and: lastFalse replacing: message.
-	^join
+	^self
+		inline: message
+		in: block
+		if: message receiver
+		then: message arguments first
+		else: message arguments second
 ]
 
 { #category : #unclassified }
@@ -121,19 +220,54 @@ OptimizingBlockInliner >> inlineInnerBlocksOf: basicBlock1 and: basicBlock2 and:
 ]
 
 { #category : #unclassified }
-OptimizingBlockInliner >> inlineOr: message in: block [
-	| closure firstSkipped lastSkipped join |
+OptimizingBlockInliner >> inlineLoop: message in: block from: start to: limit by: step [
+	| closure body last exit header counter test increment next |
+	closure := message arguments last.
+	body := closure firstBlock.
+	self inlineInnerBlocksOf: body.
+	last := body lastBlock.
+	exit := block splitAfter: message.
+	header := OBasicBlock new.
+	block endWithJumpTo: header.
+	last endWithJumpTo: header.
+	header addPredecessor: block; addPredecessor: last.
+	counter := header newParameter.
+	test := step > 0
+		ifTrue: [self send: #<= to: counter with: limit]
+		ifFalse: [self send: #<= to: limit with: counter].
+	header add: test.
+	header endWithJumpFalseTo: exit skipping: body if: test.
+	body addPredecessor: header.
+	exit addPredecessor: header.
+	increment := OLoadConstant valued: step.
+	next := self send: #+ to: counter with: increment.
+	last lastInstruction beforeInsert: increment; beforeInsert: next.
+	counter addVariable: start from: block; addVariable: next from: last.
+	self bind: counter to: closure.
+	message replaceAllUsesWith: message receiver; dissolve.
+	^exit
+]
+
+{ #category : #unclassified }
+OptimizingBlockInliner >> inlineNilCheck: message in: block skippingWith: jumpType [
+	| receiver closure firstSkipped lastSkipped compare join |
+	receiver := message receiver.
 	closure := message arguments first.
 	firstSkipped := closure firstBlock.
-	self inlineInnerBlocksOf: firstSkipped.
+	self bind: receiver to: closure; inlineInnerBlocksOf: firstSkipped.
 	lastSkipped := firstSkipped lastBlock.
+	compare := self nilCheckOf: receiver before: message.
 	join := block splitAfter: message.
-	block endWithJumpTrueTo: join skipping: firstSkipped if: message receiver.
+	block
+		endWith: jumpType
+		to: join
+		skipping: firstSkipped
+		if: compare.
 	lastSkipped endWithJumpTo: join.
 	firstSkipped addPredecessor: block.
 	join addPredecessor: block; addPredecessor: lastSkipped.
 	join
-		insertParameterOf: message receiver
+		insertParameterOf: receiver
 		at: block
 		and: lastSkipped
 		replacing: message.
@@ -141,15 +275,71 @@ OptimizingBlockInliner >> inlineOr: message in: block [
 ]
 
 { #category : #unclassified }
-OptimizingBlockInliner >> inliners [
-	^#(ifTrue: ifFalse: ifTrue:ifFalse: ifFalse:ifTrue: and: or: to:do: whileTrue:)
+OptimizingBlockInliner >> inlineOr: message in: block [
+	^self inlineChain: message in: block exitingWith: OJumpTrue
 ]
 
 { #category : #unclassified }
-OptimizingBlockInliner >> inlineWhileTrue: message in: block [
-	| antecedent consequent firstAntecedent firstConsequent lastAntecedent lastConsequent join |
+OptimizingBlockInliner >> inlineOrNot: message in: block [
+	self negate: message arguments first.
+	^self inlineOr: message in: block
+]
+
+{ #category : #unclassified }
+OptimizingBlockInliner >> inlineRepeat: message in: block [
+	| constant |
+	constant := OLoadConstant valued: true.
+	message receiver lastBlock add: constant.
+	^self inlineWhile: message in: block exitingWith: OJumpFalse
+]
+
+{ #category : #unclassified }
+OptimizingBlockInliner >> inliners [
+	^#(ifTrue: ifFalse: ifTrue:ifFalse: ifFalse:ifTrue: and: or: andNot: orNot: to:do: to:by:do: timesRepeat: whileTrue: whileFalse: whileTrue whileFalse repeat ifNil: ifNotNil: ifNil:ifNotNil: ifNotNil:ifNil:)
+]
+
+{ #category : #unclassified }
+OptimizingBlockInliner >> inlineTimesRepeat: message in: block [
+	| one |
+	one := OLoadConstant valued: 1.
+	message beforeInsert: one.
+	^self
+		inlineLoop: message
+		in: block
+		from: one
+		to: message receiver
+		by: 1
+]
+
+{ #category : #unclassified }
+OptimizingBlockInliner >> inlineTobydo: message in: block [
+	| step |
+	step := message arguments second value.
+	^self
+		inlineLoop: message
+		in: block
+		from: message receiver
+		to: message arguments first
+		by: step
+]
+
+{ #category : #unclassified }
+OptimizingBlockInliner >> inlineTodo: message in: block [
+	^self
+		inlineLoop: message
+		in: block
+		from: message receiver
+		to: message arguments first
+		by: 1
+]
+
+{ #category : #unclassified }
+OptimizingBlockInliner >> inlineWhile: message in: block exitingWith: jumpType [
+	| antecedent consequent firstAntecedent firstConsequent lastAntecedent lastConsequent join constant |
 	antecedent := message receiver.
-	consequent := message arguments first.
+	consequent := message arguments
+		at: 1
+		ifAbsent: [OBlockClosure containing: OBasicBlock new].
 	firstAntecedent := antecedent firstBlock.
 	firstConsequent := consequent firstBlock.
 	self inlineInnerBlocksOf: firstAntecedent and: firstConsequent.
@@ -158,11 +348,15 @@ OptimizingBlockInliner >> inlineWhileTrue: message in: block [
 	join := block splitAfter: message.
 	block endWithJumpTo: firstAntecedent.
 	lastAntecedent
-		endWithJumpFalseTo: join
+		endWith: jumpType
+		to: join
 		skipping: firstConsequent
 		if: lastAntecedent lastValue.
 	lastConsequent endWithJumpTo: firstAntecedent.
-	message dissolve.
+	constant := OLoadConstant valued: nil.
+	message isUsed
+		ifTrue: [message dissolveReplacingWith: constant]
+		ifFalse: [message dissolve].
 	firstAntecedent addPredecessor: block; addPredecessor: lastConsequent.
 	firstConsequent addPredecessor: lastAntecedent.
 	join addPredecessor: lastAntecedent.
@@ -170,12 +364,39 @@ OptimizingBlockInliner >> inlineWhileTrue: message in: block [
 ]
 
 { #category : #unclassified }
+OptimizingBlockInliner >> inlineWhileFalse: message in: block [
+	^self inlineWhile: message in: block exitingWith: OJumpTrue
+]
+
+{ #category : #unclassified }
+OptimizingBlockInliner >> inlineWhileTrue: message in: block [
+	^self inlineWhile: message in: block exitingWith: OJumpFalse
+]
+
+{ #category : #unclassified }
 OptimizingBlockInliner >> insertParameterAt: join of: lastSkipped orNilFrom: block replacing: message [
 	| constant |
-	message isUsed ifFalse: [^message dissolve].
 	constant := OLoadConstant valued: nil.
 	block lastInstruction beforeInsert: constant.
 	join insertParameterOf: constant at: block and: lastSkipped replacing: message
+]
+
+{ #category : #private }
+OptimizingBlockInliner >> negate: closure [
+	| value not |
+	value := closure lastValue.
+	not := OMessageSend receiver: value selector: #not arguments: #().
+	value addUse: not at: #receiver.
+	closure lastBlock add: not
+]
+
+{ #category : #private }
+OptimizingBlockInliner >> nilCheckOf: receiver before: message [
+	| constant compare |
+	constant := OLoadConstant valued: nil.
+	compare := self send: #== to: receiver with: constant.
+	message beforeInsert: constant; beforeInsert: compare.
+	^compare
 ]
 
 { #category : #unclassified }
@@ -185,15 +406,29 @@ OptimizingBlockInliner >> on: block [
 
 { #category : #private }
 OptimizingBlockInliner >> performInlinerFor: messageSend in: block [
-	| selector inliner |
-	selector := messageSend selector asString copyWithout: $:.
+	| family selector inliner |
+	family := self familyOf: messageSend selector.
+	selector := family asString copyWithout: $:.
 	inliner := #inline , selector capitalized , ':in:'.
 	^self perform: inliner asSymbol with: messageSend with: block
 ]
 
+{ #category : #private }
+OptimizingBlockInliner >> send: selector to: receiver with: argument [
+	| send |
+	send := OMessageSend receiver: receiver selector: selector arguments: {argument}.
+	receiver addUse: send at: #receiver.
+	argument addUse: send at: 1.
+	^send
+]
+
 { #category : #unclassified }
 OptimizingBlockInliner >> shouldInline: anInstruction [
-	^anInstruction isMessageSend
-		and: [self inliners includes: anInstruction selector]
+	| family |
+	anInstruction isMessageSend ifFalse: [^false].
+	family := self familyOf: anInstruction selector.
+	^anInstruction isSuper not
+		and: [(self inliners includes: family)
+			and: [(self closuresOf: anInstruction) conform: [:closure | closure isBlockClosure]]]
 ]
 

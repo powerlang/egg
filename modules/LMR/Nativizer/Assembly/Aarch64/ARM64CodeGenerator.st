@@ -685,6 +685,11 @@ ARM64CodeGenerator >> multiply: src1AndDstLoReg by: src2reg wideningTo: dstHiReg
 ]
 
 { #category : #'operations - arithmetic' }
+ARM64CodeGenerator >> negate: srcAndDst [
+	self assemble: 'sub' with: srcAndDst with: xzr with: srcAndDst
+]
+
+{ #category : #'operations - arithmetic' }
 ARM64CodeGenerator >> divide: srcAndDstReg extendingTo: extReg by: divisorReg [
 	self
 		assemble: 'sdiv' with: self regV with: srcAndDstReg with: divisorReg;

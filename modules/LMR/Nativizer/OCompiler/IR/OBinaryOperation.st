@@ -38,9 +38,7 @@ OBinaryOperation >> invertOperation [
 	name == #'<' ifTrue: [^name := #'>'].
 	name == #'<=' ifTrue: [^name := #'>='].
 	name == #'>' ifTrue: [^name := #'<'].
-	name == #'>=' ifTrue: [^name := #'<='].
-	name == #'==' ifTrue: [^name].
-	self halt
+	name == #'>=' ifTrue: [^name := #'<=']
 ]
 
 { #category : #unclassified }
@@ -59,6 +57,11 @@ OBinaryOperation >> negateOperation [
 	name == #'<=' ifTrue: [^name := #'>'].
 	name == #'>' ifTrue: [^name := #'<='].
 	name == #'>=' ifTrue: [name := #'<']
+]
+
+{ #category : #unclassified }
+OBinaryOperation >> producesSmallInteger [
+	^#(+ - * // \\ & bitAnd: bitOr: bitShift:) includes: name
 ]
 
 { #category : #unclassified }

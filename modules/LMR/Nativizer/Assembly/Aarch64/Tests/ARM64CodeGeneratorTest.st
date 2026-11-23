@@ -80,6 +80,12 @@ ARM64CodeGeneratorTest >> testLeadingZeroCount [
 ]
 
 { #category : #tests }
+ARM64CodeGeneratorTest >> testNegate [
+	codegen negate: (self x: 3).
+	self assert: self words asArray equals: #(16rCB0303E3)
+]
+
+{ #category : #tests }
 ARM64CodeGeneratorTest >> testVariableShifts [
 	codegen
 		shiftLeft: (self x: 0) by: (self x: 3);

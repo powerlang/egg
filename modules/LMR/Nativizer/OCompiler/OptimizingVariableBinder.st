@@ -39,11 +39,12 @@ OptimizingVariableBinder >> define: aParameter named: aString in: aBasicBlock [
 { #category : #unclassified }
 OptimizingVariableBinder >> insertParameterOf: name at: block [
 	| parameter |
-	(self definitionOf: name in: block) ifNotNil: [^self].
+	(self parameterOf: name in: block) ifNotNil: [^self].
 	parameter := block newParameter.
 	parameterNames at: parameter put: name.
 	pendingParameters add: parameter -> block.
-	self define: parameter as: name in: block.
+	(self definitionOf: name in: block)
+		ifNil: [self define: parameter as: name in: block].
 	(dominanceFrontiers at: block)
 		do: [:frontier | self insertParameterOf: name at: frontier]
 ]
@@ -72,20 +73,23 @@ OptimizingVariableBinder >> resolve: aReadVariable asDynamic: binding [
 		read := OBinaryConstantOperation left: global right: self associationValueIndex name: #_basicAt:.
 		global addUse: read at: #left.
 		^aReadVariable beforeInsert: global; dissolveReplacingWith: read].
-	self error: 'unresolved dynamic binding read: ', name
+	^self resolve: aReadVariable asBindSite: name
 ]
 
 { #category : #private }
 OptimizingVariableBinder >> associationFor: name [
-	| current symbol assoc |
+	| symbol assoc |
 	symbol := name asSymbol.
-	current := method classBinding.
-	[current notNil] whileTrue: [
-		current namespaces do: [:ns |
-			assoc := ns associationAt: symbol ifAbsent: [nil].
-			assoc ifNotNil: [^assoc]].
-		current := current superclass].
-	^method module namespace associationAt: symbol ifAbsent: [nil]
+	assoc := method associationFor: symbol.
+	assoc ifNotNil: [^assoc].
+	^LMRProtoObject module namespace associationAt: symbol ifAbsent: nil
+]
+
+{ #category : #private }
+OptimizingVariableBinder >> bindSiteFor: aString [
+	| site |
+	site := BindSite name: aString asSymbol method: method.
+	^OLoadConstant valued: site
 ]
 
 { #category : #unclassified }
@@ -125,8 +129,7 @@ OptimizingVariableBinder >> definitionOf: name [
 { #category : #unclassified }
 OptimizingVariableBinder >> definitionOf: name before: block [
 	| current |
-	block parametersDo: [:parameter |
-		(parameterNames at: parameter ifAbsent: nil) = name ifTrue: [^parameter]].
+	(self parameterOf: name in: block) ifNotNil: [:parameter | ^parameter].
 	current := block.
 	[
 		current := current immediateDominator.
@@ -135,7 +138,7 @@ OptimizingVariableBinder >> definitionOf: name before: block [
 			definitions
 				at: current
 				ifPresent: [:here | here at: name ifPresent: [:value | ^value]]].
-	self error: 'undefined variable <' , name , '>'
+	^nil
 ]
 
 { #category : #unclassified }
@@ -219,7 +222,7 @@ OptimizingVariableBinder >> instructionsForWriting: aWriteVariable toDynamic: bi
 		global addUse: write at: #receiver.
 		aWriteVariable source addUse: write at: #right.
 		^aWriteVariable beforeInsert: global; dissolveReplacingWith: write].
-	self error: 'unresolved dynamic binding write: ', name
+	^self instructionsForWriting: aWriteVariable toBindSite: name
 ]
 
 { #category : #unclassified }
@@ -234,6 +237,16 @@ OptimizingVariableBinder >> instructionsForWriting: aWriteVariable toAssociation
 	global addUse: write at: #receiver.
 	aWriteVariable source addUse: write at: #right.
 	aWriteVariable beforeInsert: global; dissolveReplacingWith: write
+]
+
+{ #category : #unclassified }
+OptimizingVariableBinder >> instructionsForWriting: aWriteVariable toBindSite: aString [
+	| site write |
+	site := self bindSiteFor: aString.
+	write := OMessageSend receiver: site selector: #value: arguments: {aWriteVariable source}.
+	site addUse: write at: #receiver.
+	aWriteVariable source addUse: write at: 1.
+	^aWriteVariable beforeInsert: site; dissolveReplacingWith: write
 ]
 
 { #category : #unclassified }
@@ -263,6 +276,13 @@ OptimizingVariableBinder >> isLive: anAssociation [
 	| block |
 	block := anAssociation value.
 	^anAssociation key livesAfter: block orOutOf: block
+]
+
+{ #category : #private }
+OptimizingVariableBinder >> parameterOf: name in: block [
+	block parametersDo: [:parameter |
+		(parameterNames at: parameter ifAbsent: nil) = name ifTrue: [^parameter]].
+	^nil
 ]
 
 { #category : #private }
@@ -314,6 +334,15 @@ OptimizingVariableBinder >> foldableConstantValueFor: aName [
 	^abi foldableConstants at: aName asSymbol ifAbsent: [self]
 ]
 
+{ #category : #private }
+OptimizingVariableBinder >> resolve: aReadVariable asBindSite: aString [
+	| site read |
+	site := self bindSiteFor: aString.
+	read := OMessageSend receiver: site selector: #value arguments: #().
+	site addUse: read at: #receiver.
+	^aReadVariable beforeInsert: site; dissolveReplacingWith: read
+]
+
 { #category : #unclassified }
 OptimizingVariableBinder >> resolve: aReadVariable asInstanceVar: binding [
 	| receiver index load |
@@ -350,7 +379,9 @@ OptimizingVariableBinder >> resolvePendingReads [
 		read := association key.
 		block := association value.
 		source := self definitionOf: read binding name asSymbol before: block.
-		resolved := read replaceWithCopyOf: source.
+		resolved := source
+			ifNil: [self resolveUndefined: read]
+			ifNotNil: [read replaceWithCopyOf: source].
 		self redefine: read as: resolved]
 ]
 
@@ -359,6 +390,14 @@ OptimizingVariableBinder >> resolveSelf: aReadVariable [
 	| receiver |
 	receiver := self definitionOf: #self.
 	^aReadVariable replaceAllUsesWith: receiver; dissolve
+]
+
+{ #category : #unclassified }
+OptimizingVariableBinder >> resolveUndefined: aReadVariable [
+	| constant |
+	constant := OLoadConstant valued: nil.
+	aReadVariable dissolveReplacingWith: constant.
+	^constant
 ]
 
 { #category : #unclassified }
@@ -416,6 +455,7 @@ OptimizingVariableBinder >> visitReadVariable: aReadVariable [
 	binding isArgument
 		ifTrue: [^self resolve: aReadVariable asArgument: binding].
 	binding isSelf ifTrue: [^self resolveSelf: aReadVariable].
+	binding isSuper ifTrue: [^self resolveSelf: aReadVariable].
 	binding isLiteral ifTrue: [^self resolve: aReadVariable asLiteral: binding].
 	binding isInstVar
 		ifTrue: [^self resolve: aReadVariable asInstanceVar: binding].

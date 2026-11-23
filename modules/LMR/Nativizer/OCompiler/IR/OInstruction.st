@@ -191,6 +191,11 @@ OInstruction >> insertPushBefore: anInstruction [
 ]
 
 { #category : #unclassified }
+OInstruction >> isBlockClosure [
+	^false
+]
+
+{ #category : #unclassified }
 OInstruction >> isBlockParameter [
 	^false
 ]
@@ -415,6 +420,11 @@ OInstruction >> printOn: aStream [
 	aStream
 		nextPutAll: self basicPrintString
 	"	next printForwardOn: aStream cr"
+]
+
+{ #category : #unclassified }
+OInstruction >> producesSmallInteger [
+	^false
 ]
 
 { #category : #unclassified }

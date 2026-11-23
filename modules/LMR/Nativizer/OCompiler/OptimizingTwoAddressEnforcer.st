@@ -35,6 +35,23 @@ OptimizingTwoAddressEnforcer >> convert: instruction copyingReceiverInto: dest [
 ]
 
 { #category : #unclassified }
+OptimizingTwoAddressEnforcer >> convert: instruction keeping: left into: dest [
+	| copy pop |
+	copy := OUnaryOperation receiver: instruction name: #copy.
+	pop := OUnaryOperation receiver: nil name: #pop.
+	instruction left insertPushBefore: instruction.
+	instruction
+		afterInsert: copy;
+		replaceAllUsesWith: copy;
+		addUse: copy at: #receiver.
+	copy afterInsert: pop.
+	allocation
+		at: instruction put: left;
+		at: copy put: dest;
+		at: pop put: left
+]
+
+{ #category : #unclassified }
 OptimizingTwoAddressEnforcer >> doEnforce [
 	firstBlock
 		withSuccessorsDo: [:block | block firstInstruction acceptVisitor: self]
@@ -85,14 +102,14 @@ OptimizingTwoAddressEnforcer >> visitBinaryWithVariable: instruction [
 	dest := allocation at: instruction ifAbsent: [^self].
 	left == dest ifTrue: [^self].
 	right == dest ifTrue: [
-		(#(< <= = == > >= _transferControlTo: _basicAt: _byteAt: _basicFlags: _smallSize: _extendedFlags:)
+		(#(< <= = == ~= != > >= _transferControlTo: _basicAt: _byteAt: _basicFlags: _smallSize: _extendedFlags:)
 			includes: instruction name)
 			ifTrue: [^self].
 		instruction name == #'-'
 			ifTrue: [^self invertMinus: instruction with: left with: right].
 		(#(+ * bitAnd: bitOr: &  ) includes: instruction name)
 			ifTrue: [^instruction swapOperands]
-			ifFalse: [self halt]].
+			ifFalse: [^self convert: instruction keeping: left into: dest]].
 	self convert: instruction copyingLeftInto: dest
 ]
 

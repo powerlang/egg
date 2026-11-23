@@ -107,7 +107,7 @@ OptimizingRegisterAllocator >> assignRegisterTo: instruction in: aRange [
 		free isEmpty
 			ifTrue: [self spillALiveRangeInUseAfter: instruction]
 			ifFalse: [free last]].
-	"register == edx ifTrue: [self halt]."
+	self evict: register for: aRange.
 	self assign: register to: aRange
 ]
 
@@ -223,8 +223,16 @@ OptimizingRegisterAllocator >> doAllocation [
 	| record |
 	"	record := self activationRecord.
 	record isLoadImplicit ifFalse: [free remove: ebp]."
+	locals := self activationRecord fixedSlots.
 	self copyArguments; computeLiveRanges; allocateLiveRanges; reserveSpaceForLocals.
 	^allocation
+]
+
+{ #category : #unclassified }
+OptimizingRegisterAllocator >> evict: register for: aRange [
+	| holder |
+	holder := used at: register ifAbsent: [^self].
+	holder == aRange ifFalse: [self spill: holder]
 ]
 
 { #category : #unclassified }
@@ -250,7 +258,6 @@ OptimizingRegisterAllocator >> initialize [
 	liveRanges := IdentityDictionary new.
 	unifiedLiveRanges := IdentityDictionary new.
 	expirations := IdentityDictionary new.
-	locals := 2.
 	used := Dictionary new.
 	usedOut := Dictionary new
 ]
@@ -442,13 +449,17 @@ OptimizingRegisterAllocator >> reserveSpaceForLocals [
 ]
 
 { #category : #unclassified }
-OptimizingRegisterAllocator >> spillALiveRangeInUseAfter: instruction [
-	| freed register |
-	freed := self usedRangeReadLastAfter: instruction.
+OptimizingRegisterAllocator >> spill: aRange [
 	locals := locals + 1.
-	self splitRange: freed.
-	register := self free: freed.
-	^register
+	self splitRange: aRange.
+	^self free: aRange
+]
+
+{ #category : #unclassified }
+OptimizingRegisterAllocator >> spillALiveRangeInUseAfter: instruction [
+	| freed |
+	freed := self usedRangeReadLastAfter: instruction.
+	^self spill: freed
 ]
 
 { #category : #unclassified }

@@ -7,7 +7,8 @@ Class {
 	#name : #OBlockClosure,
 	#superclass : #OInstruction,
 	#instVars : [
-		'firstBlock'
+		'firstBlock',
+		'arguments'
 	],
 	#category : #IR
 }
@@ -15,6 +16,16 @@ Class {
 { #category : #unclassified }
 OBlockClosure class >> containing: initialBlock [
 	^self new firstBlock: initialBlock
+]
+
+{ #category : #accessing }
+OBlockClosure >> arguments [
+	^arguments
+]
+
+{ #category : #accessing }
+OBlockClosure >> arguments: aCollection [
+	arguments := aCollection
 ]
 
 { #category : #unclassified }
@@ -25,6 +36,11 @@ OBlockClosure >> firstBlock [
 { #category : #unclassified }
 OBlockClosure >> firstBlock: basicBlock [
 	firstBlock := basicBlock
+]
+
+{ #category : #unclassified }
+OBlockClosure >> isBlockClosure [
+	^true
 ]
 
 { #category : #unclassified }

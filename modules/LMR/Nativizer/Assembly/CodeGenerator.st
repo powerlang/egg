@@ -472,6 +472,11 @@ CodeGenerator >> nativeCode [
 ]
 
 { #category : #basic }
+CodeGenerator >> negate: srcAndDst [
+	self subclassResponsibility
+]
+
+{ #category : #basic }
 CodeGenerator >> or: src1andDest withImm: imm [
 	self subclassResponsibility
 ]

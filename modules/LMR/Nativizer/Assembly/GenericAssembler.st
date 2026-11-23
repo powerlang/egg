@@ -1240,6 +1240,11 @@ GenericAssembler >> nativeCode [
 	^(NativeCode withAll: literals) code: codegen memory bytes
 ]
 
+{ #category : #'operations - arithmetic' }
+GenericAssembler >> negate: srcAndDst [
+	codegen negate: srcAndDst
+]
+
 { #category : #'operations - logical' }
 GenericAssembler >> or: src1AndDst with: src2 [
 	^ codegen or: src1AndDst with: src2
@@ -1778,6 +1783,13 @@ GenericAssembler >> storeDoubleResultInRindirect [
 ]
 
 { #category : #storing }
+GenericAssembler >> storeEinFPindex: index [
+	| memref |
+	memref := codegen memRef: codegen regFP stackIndexImm: index.
+	codegen store: codegen regE intoMem: memref
+]
+
+{ #category : #storing }
 GenericAssembler >> storeEinRindex: index [
 	| memref |
 	memref := codegen memRef: codegen regR indexImm: index.
@@ -1814,6 +1826,13 @@ GenericAssembler >> storeLongTinRatOffsetA [
 	| memref |
 	memref := codegen memRef32: codegen regR offset: codegen regA.
 	codegen store: codegen regT long intoMem: memref
+]
+
+{ #category : #storing }
+GenericAssembler >> storePointer: srcReg in: baseReg offset: offsetReg [
+	| memref |
+	memref := codegen memRef: baseReg offset: offsetReg.
+	codegen store: srcReg intoMem: memref
 ]
 
 { #category : #storing }

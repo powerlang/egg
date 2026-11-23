@@ -250,18 +250,34 @@ OptimizingCodeEmitter >> assembleBitOrConstant: instruction [
 	| left value |
 	left := allocation at: instruction.
 	value := instruction right * 2 + 1.
-	assembler or: left with: value
+	assembler or: left withImm: value
 ]
 
 { #category : #unclassified }
 OptimizingCodeEmitter >> assembleBitShift: instruction [
-	| src offset right |
+	| src right count negative done |
 	src := allocation at: instruction left.
 	right := instruction right.
 	right isConstant
 		ifTrue: [^self assembleBitShift: src by: right value].
-	offset := allocation at: right.
-	offset halt
+	count := allocation at: right.
+	negative := assembler newLabel.
+	done := assembler newLabel.
+	assembler
+		convertToNativeInteger: count;
+		test: count with: count;
+		jumpIfSignTo: negative;
+		clearIntegerBit: src;
+		shiftLeft: src by: count;
+		setIntegerBit: src;
+		jumpTo: done;
+		@ negative;
+		negate: count;
+		shiftRightArithmetic: src by: count;
+		setIntegerBit: src;
+		negate: count;
+		@ done;
+		convertToSmallInteger: count
 ]
 
 { #category : #unclassified }
@@ -269,12 +285,12 @@ OptimizingCodeEmitter >> assembleBitShift: src by: amount [
 	amount > 0
 		ifTrue: [
 			assembler
-				convertToNativeInteger: src;
-				shiftLeft: src by: amount + 1;
-				convertToSmallInteger: src]
+				clearIntegerBit: src;
+				shiftLeft: src byImm: amount;
+				setIntegerBit: src]
 		ifFalse: [
 			assembler
-				shiftRight: src by: 0 - amount;
+				shiftRightArithmetic: src byImm: 0 - amount;
 				setIntegerBit: src]
 ]
 
@@ -432,6 +448,11 @@ OptimizingCodeEmitter >> assembleFrom: aBasicBlock [
 
 { #category : #unclassified }
 OptimizingCodeEmitter >> assembleGenericMessageSend: instruction [
+	instruction isSuper ifTrue: [
+		^messageLinker
+			emitSendSuper: instruction selector
+			from: instruction classBinding
+			using: assembler].
 	self assembleLookup: instruction selector
 ]
 
@@ -599,6 +620,15 @@ OptimizingCodeEmitter >> assembleNegate: instruction [
 ]
 
 { #category : #unclassified }
+OptimizingCodeEmitter >> assembleNotEqual: instruction [
+	self
+		assembleCompare: instruction;
+		assembleJumpTrue: [:label | assembler jumpIfNotEqualTo: label]
+		orJumpFalse: [:label | assembler jumpIfEqualTo: label]
+		in: instruction
+]
+
+{ #category : #unclassified }
 OptimizingCodeEmitter >> assembleNotEqualConstant: instruction [
 	self
 		assembleCompareConstant: instruction
@@ -611,8 +641,11 @@ OptimizingCodeEmitter >> assembleObjectAtOffsetPut: instruction [
 	| base value offset |
 	base := allocation at: instruction receiver.
 	value := allocation at: instruction right.
-	offset := instruction left value.
-	assembler storePointer: value in: base offset: offset
+	offset := allocation at: instruction left.
+	assembler
+		convertToNativeInteger: offset;
+		storePointer: value in: base offset: offset;
+		convertToSmallInteger: offset
 ]
 
 { #category : #unclassified }
@@ -648,6 +681,23 @@ OptimizingCodeEmitter >> assemblePush: instruction [
 ]
 
 { #category : #unclassified }
+OptimizingCodeEmitter >> assembleQuotientConstant: instruction [
+	| left shift |
+	left := allocation at: instruction left.
+	shift := self equivalentShiftsToLowerMultiplyBy: instruction right.
+	assembler
+		shiftRightArithmetic: left byImm: shift;
+		setIntegerBit: left
+]
+
+{ #category : #unclassified }
+OptimizingCodeEmitter >> assembleRemainderConstant: instruction [
+	| left |
+	left := allocation at: instruction left.
+	assembler and: left withImm: instruction right * 2 - 1
+]
+
+{ #category : #unclassified }
 OptimizingCodeEmitter >> assembleRestorePreviousContext: instruction [
 	assembler restoreCallerFrame
 ]
@@ -667,12 +717,23 @@ OptimizingCodeEmitter >> assembleTimes: instruction [
 ]
 
 { #category : #unclassified }
+OptimizingCodeEmitter >> assembleTimes: register constant: anInteger [
+	| scratch |
+	scratch := assembler regV.
+	assembler
+		clearIntegerBit: register;
+		moveImm: anInteger to: scratch;
+		multiply: register by: scratch;
+		setIntegerBit: register
+]
+
+{ #category : #unclassified }
 OptimizingCodeEmitter >> assembleTimesConstant: instruction [
 	| left value shift |
 	left := allocation at: instruction left.
 	value := instruction right.
 	shift := self equivalentShiftsToLowerMultiplyBy: value.
-	self ASSERT: shift notNil.
+	shift ifNil: [^self assembleTimes: left constant: value].
 	assembler
 		clearIntegerBit: left;
 		shiftLeft: left by: shift;
@@ -737,6 +798,8 @@ OptimizingCodeEmitter >> initializeAssemblers [
 		at: #'+' put: #Plus;
 		at: #'-' put: #Minus;
 		at: #'*' put: #Times;
+		at: #'//' put: #Quotient;
+		at: #'\\' put: #Remainder;
 		at: #'=' put: #Equals;
 		at: #'==' put: #Equals;
 		at: #'~=' put: #NotEqual;
@@ -784,11 +847,9 @@ OptimizingCodeEmitter >> jumpWasAssembledInComparison: aConditionalJump [
 	prev allUses size != 1 ifTrue: [^false].
 	prev class == OMessageSend ifTrue: [^false].
 	(prev isKindOf: OBinaryOperation) ifTrue: [
-		(#(< <= = == != >= >) includes: prev name) ifTrue: [^true].
+		(#(< <= = == ~= != >= >) includes: prev name) ifTrue: [^true].
 		(#(_basicAt:) includes: prev name) ifTrue: [^false]].
-	prev class == OUnaryOperation ifTrue: [
-		(#(_isSmallInteger) includes: prev name) ifTrue: [^true].
-		(#(copy) includes: prev name) ifTrue: [^false]].
+	prev class == OUnaryOperation ifTrue: [^prev name == #_isSmallInteger].
 	self halt
 ]
 
@@ -894,6 +955,7 @@ OptimizingCodeEmitter >> visitLoadImplicit: instruction [
 				reserveStackSlots: frame temporaries + 2;
 				storeRinFPindex: 0;
 				storeMinFPindex: -1.
+			frame keepsEnvironment ifTrue: [assembler storeEinFPindex: -2].
 			self savesPreviousSelf ifTrue: [assembler push: assembler regS]]]
 ]
 

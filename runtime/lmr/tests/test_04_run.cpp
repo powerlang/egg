@@ -96,6 +96,39 @@ TEST_CASE("perform: runs the method it finds", "[run]")
     REQUIRE(result == 42);
 }
 
+TEST_CASE("a loop condition sees the variable it assigns", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    REQUIRE(launcher.loaded());
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+
+    auto result = launcher.run("countsDown");
+    REQUIRE(result == 42);
+}
+
+TEST_CASE("a send is not inlined as a method of another class", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    REQUIRE(launcher.loaded());
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+
+    auto result = launcher.run("storesCharacters");
+    REQUIRE(result == 42);
+}
+
+TEST_CASE("arguments expanded in the stack reach the method invoked", "[run]")
+{
+    lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+    REQUIRE(launcher.loaded());
+    launcher.bind("LMR.LauncherTests");
+    launcher.relocate();
+
+    auto result = launcher.run("expandsArguments");
+    REQUIRE(result == 42);
+}
+
 TEST_CASE("inlined andNot: and orNot: negate their last condition", "[run]")
 {
     lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
@@ -159,6 +192,26 @@ TEST_CASE("SmallInteger arithmetic and nil tests run natively", "[run]")
         {"floatTimesInteger", 10},
         {"answerIfNotNil", 6},
         {"answerIfNilIfNotNil", 7}};
+    for (auto& [entry, value] : expected) {
+        INFO("entry: " << entry);
+        lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));
+        launcher.bind("LMR.LauncherTests");
+        launcher.relocate();
+        REQUIRE(launcher.run(entry) == value);
+    }
+}
+
+TEST_CASE("helpers with loops, closures and super sends run natively", "[run]")
+{
+    const std::pair<const char*, int64_t> expected[] = {
+        {"sumsInLoops", 110},
+        {"dividesNegatives", 144},
+        {"answersIfNil", 35},
+        {"capturesInClosures", 1208},
+        {"returnsThroughFrames", 15},
+        {"sendsToSuper", 60},
+        {"rereadsSlots", 5},
+        {"answersFromBranches", 23}};
     for (auto& [entry, value] : expected) {
         INFO("entry: " << entry);
         lmr::Launcher launcher(lmr_test::segPath("LMR.LauncherTests.ems"));

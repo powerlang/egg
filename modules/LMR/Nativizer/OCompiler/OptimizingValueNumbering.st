@@ -10,8 +10,10 @@ Class {
 		'firstBlock',
 		'currentBlock',
 		'names',
+		'constants',
 		'hashes',
-		'hashesOut'
+		'hashesOut',
+		'stores'
 	],
 	#category : #OCompiler
 }
@@ -23,7 +25,7 @@ OptimizingValueNumbering >> addNewName: instruction [
 
 { #category : #unclassified }
 OptimizingValueNumbering >> hashOfLoadConstant: instruction [
-	^[instruction value printString] on: Error do: [^nil]
+	^self nameOfConstant: instruction value
 ]
 
 { #category : #unclassified }
@@ -49,7 +51,13 @@ OptimizingValueNumbering >> nameOf: instruction [
 ]
 
 { #category : #unclassified }
+OptimizingValueNumbering >> nameOfConstant: anObject [
+	^constants at: anObject ifAbsentPut: ['{c' , constants size printString , '}']
+]
+
+{ #category : #unclassified }
 OptimizingValueNumbering >> processMemoryStore: value as: storeHash andLoads: loadHash [
+	stores add: loadHash.
 	hashes
 		at: loadHash
 		put: value
@@ -132,7 +140,7 @@ OptimizingValueNumbering >> valueOf: hash be: instruction [
 OptimizingValueNumbering >> visitBinaryWithConstant: instruction [
 	| left right hash selector load temp value replacement |
 	left := self nameOf: instruction left.
-	right := instruction right printString.
+	right := self nameOfConstant: instruction right.
 	(self isCommutative: instruction name) ifTrue: [
 		left > right ifTrue: [
 			temp := left.
@@ -243,7 +251,6 @@ OptimizingValueNumbering >> visitJumpTrue: branch [
 OptimizingValueNumbering >> visitLoadConstant: instruction [
 	| hash |
 	hash := self hashOfLoadConstant: instruction.
-	hash ifNil: [self].
 	self valueOf: hash be: instruction
 ]
 
@@ -258,7 +265,8 @@ OptimizingValueNumbering >> visitMessageSend: instruction [
 	loads := names keys select: [:instr |
 		instr isPrimitiveOperation
 			and: [#(_basicAt: _byteAt: _basicFlags) includes: instr name]].
-	loads do: [:load | hashes removeAllSuchThat: [:value | value = load]]
+	loads do: [:load | hashes removeAllSuchThat: [:value | value = load]].
+	stores do: [:hash | hashes removeKey: hash ifAbsent: nil]
 ]
 
 { #category : #unclassified }
@@ -278,7 +286,7 @@ OptimizingValueNumbering >> visitTernary: instruction [
 	operand := instruction left.
 	left := operand isInstruction
 		ifTrue: [self nameOf: operand]
-		ifFalse: [operand printString].
+		ifFalse: [self nameOfConstant: operand].
 	right := self nameOf: instruction right.
 	hash := receiver , instruction name , left , right.
 	(#(_basicAt:put: _byteAt:put:) includes: instruction name)
@@ -302,7 +310,9 @@ OptimizingValueNumbering >> workFrom: aBasicBlock [
 	| count |
 	hashes := Dictionary new.
 	hashesOut := Dictionary new.
+	stores := Set new.
 	names := Dictionary new.
+	constants := IdentityDictionary new.
 	firstBlock := aBasicBlock.
 	count := 0.
 	aBasicBlock instructionsWithSuccessorsDo: [:inst |

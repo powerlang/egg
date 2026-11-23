@@ -41,7 +41,15 @@ OptimizingInstructionFragmenter >> fragmentActivationRecordDeclarationIn: aBasic
 	declaration := aBasicBlock firstInstruction.
 	implicit := OActivationContext named: #activationRecord.
 	implicit source: abi regFP.
+	method hasBlocks ifTrue: [implicit doKeepEnvironment].
 	declaration dissolveReplacingWith: implicit
+]
+
+{ #category : #unclassified }
+OptimizingInstructionFragmenter >> fragmentAnd: instruction [
+	(instruction operands conform: [:operand | operand producesSmallInteger])
+		ifFalse: [^self fragmentGenericMessage: instruction].
+	self fragmentBinaryCommutative: instruction
 ]
 
 { #category : #unclassified }
@@ -101,6 +109,15 @@ OptimizingInstructionFragmenter >> fragmentCallSite: instruction [
 ]
 
 { #category : #unclassified }
+OptimizingInstructionFragmenter >> fragmentDivision: instruction [
+	| divisor |
+	divisor := instruction arguments first.
+	(divisor isConstant and: [self isPowerOfTwo: divisor value])
+		ifTrue: [^self replace: instruction withBinary: instruction receiver withConstant: divisor].
+	self fragmentGenericMessage: instruction
+]
+
+{ #category : #unclassified }
 OptimizingInstructionFragmenter >> fragmentGenericMessage: instruction [
 	| arguments new |
 	arguments := instruction arguments.
@@ -109,6 +126,7 @@ OptimizingInstructionFragmenter >> fragmentGenericMessage: instruction [
 	instruction arguments: new.
 	arguments withIndexDo: [:argument :index |
 		argument removeUse: instruction at: index; dissolveIfUnused].
+	new withIndexDo: [:push :index | push addUse: instruction at: index].
 	firstBlock activationRecord haveFrame
 ]
 
@@ -150,17 +168,6 @@ OptimizingInstructionFragmenter >> fragmentNormalArgumentsIn: aBasicBlock [
 				argument dissolve.
 				argument := next].
 		position := position + 1]
-]
-
-{ #category : #unclassified }
-OptimizingInstructionFragmenter >> fragmentNot: instruction [
-	| negated |
-	negated := instruction receiver halt shallowCopy.
-	negated negateOperation.
-	negated left addUse: negated at: #left.
-	negated right addUse: negated at: #right.
-	instruction dissolveReplacingWith: negated.
-	instruction receiver dissolveIfUnused
 ]
 
 { #category : #unclassified }
@@ -275,6 +282,12 @@ OptimizingInstructionFragmenter >> fragmentUnary: instruction [
 	instruction dissolveReplacingWith: new
 ]
 
+{ #category : #private }
+OptimizingInstructionFragmenter >> hasBoxedNumber: instruction [
+	^instruction operands anySatisfy: [:operand |
+		operand isConstant and: [operand value isNumber and: [operand value isSmallInteger not]]]
+]
+
 { #category : #unclassified }
 OptimizingInstructionFragmenter >> initialize [
 	self initializeMessages
@@ -286,8 +299,8 @@ OptimizingInstructionFragmenter >> initializeMessages [
 		at: #'+' put: #BinaryCommutative:;
 		at: #'-' put: #BinaryNonCommutative:;
 		at: #'*' put: #BinaryCommutative:;
-		at: #'//' put: #BinaryNonCommutative:;
-		at: #'\\' put: #BinaryNonCommutative:;
+		at: #'//' put: #Division:;
+		at: #'\\' put: #Division:;
 		at: #'<' put: #BinaryCompare:;
 		at: #'<=' put: #BinaryCompare:;
 		at: #'=' put: #BinaryCompare:;
@@ -296,7 +309,7 @@ OptimizingInstructionFragmenter >> initializeMessages [
 		at: #'!=' put: #BinaryCompare:;
 		at: #'>=' put: #BinaryCompare:;
 		at: #'>' put: #BinaryCompare:;
-		at: #'&' put: #BinaryCommutative:;
+		at: #'&' put: #And:;
 		at: #_asNative put: #Unary:;
 		at: #_asObject put: #Unary:;
 		at: #_asPointer put: #Unary:;
@@ -321,7 +334,6 @@ OptimizingInstructionFragmenter >> initializeMessages [
 		at: #_transferControlTo: put: #TransferControlTo:;
 		at: #_callSite put: #CallSite:;
 		at: #_patchIndirectCallSiteTo: put: #PatchIndirectCallSiteTo:;
-		at: #not put: #Not:;
 		yourself
 ]
 
@@ -342,6 +354,11 @@ OptimizingInstructionFragmenter >> insertPush: anInstruction before: instruction
 	anInstruction addUse: push at: #receiver.
 	instruction beforeInsert: push.
 	^push
+]
+
+{ #category : #private }
+OptimizingInstructionFragmenter >> isPowerOfTwo: anObject [
+	^anObject isSmallInteger and: [anObject > 0 and: [(anObject bitAnd: anObject - 1) = 0]]
 ]
 
 { #category : #private }
@@ -424,6 +441,8 @@ OptimizingInstructionFragmenter >> visitLoadImplicit: instruction [
 { #category : #unclassified }
 OptimizingInstructionFragmenter >> visitMessageSend: instruction [
 	| selector |
+	(instruction isSuper or: [self hasBoxedNumber: instruction])
+		ifTrue: [^self fragmentGenericMessage: instruction].
 	selector := self selectorFor: instruction selector.
 	self perform: selector with: instruction
 ]
