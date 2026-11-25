@@ -7,7 +7,7 @@ Class {
 	#name : #TonelLoader, 
 	#superclass : #Object, 
 	#instVars : [
-		'moduleDir',
+		'moduleDir'
 	], 
 	#category : #Tonel
 }

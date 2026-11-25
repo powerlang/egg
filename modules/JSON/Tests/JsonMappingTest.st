@@ -6,7 +6,7 @@
 Class {
 	#name : #JsonMappingTest,
 	#superclass : #TestCase,
-	#category : #'JSON\Tests'
+	#category : #'JSON-Tests'
 }
 
 { #category : #all }

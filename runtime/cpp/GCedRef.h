@@ -3,6 +3,9 @@
 #define _GCEDREF_H_
 
 #include "Egg.h"
+#ifdef __aarch64__
+#include <tuple>
+#endif
 
 namespace Egg {
 
